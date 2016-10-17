@@ -1,0 +1,10 @@
+textarea{
+  margin-left:6px;
+  margin-top:10px;
+  overflow:hidden;
+  width:60%;
+  max-width: 90%;
+  border-radius:5px;
+  display:inline-block;
+  vertical-align:middle;
+}

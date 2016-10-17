@@ -1,0 +1,4522 @@
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:c3131b66f6fc914dac1c694008298556@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20200101
+DTEND;VALUE=DATE:20200101
+END:VEVENT
+BEGIN:VEVENT
+UID:3a6fe8357693a6dddf33bc626adb01e6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20200106
+DTEND;VALUE=DATE:20200106
+END:VEVENT
+BEGIN:VEVENT
+UID:0e3475ba2cb0a50f27e01b9b5e3787c9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20200319
+DTEND;VALUE=DATE:20200319
+END:VEVENT
+BEGIN:VEVENT
+UID:4a4280aaaf98483fe2961575d14767c9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20200501
+DTEND;VALUE=DATE:20200501
+END:VEVENT
+BEGIN:VEVENT
+UID:a454b64632f039435f3935d50bee9427@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20200504
+DTEND;VALUE=DATE:20200504
+END:VEVENT
+BEGIN:VEVENT
+UID:32966e3bac1ae3d5a24c41fe44fbba54@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20200815
+DTEND;VALUE=DATE:20200815
+END:VEVENT
+BEGIN:VEVENT
+UID:b2aa1e02ccb0941cb304fe88f17cf727@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20200924
+DTEND;VALUE=DATE:20200924
+END:VEVENT
+BEGIN:VEVENT
+UID:9665d4a48bb0a9347ceec30d4055919a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20201010
+DTEND;VALUE=DATE:20201010
+END:VEVENT
+BEGIN:VEVENT
+UID:2ab1174b49b7d5524899d4abe8897591@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20201026
+DTEND;VALUE=DATE:20201026
+END:VEVENT
+BEGIN:VEVENT
+UID:89fe9ca34cdb3d242bbb8b7df314fb3d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20201101
+DTEND;VALUE=DATE:20201101
+END:VEVENT
+BEGIN:VEVENT
+UID:6c01e5486664d056e8f0c1dfa428df5b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20201111
+DTEND;VALUE=DATE:20201111
+END:VEVENT
+BEGIN:VEVENT
+UID:053314eee7f97eaac3394489b89889c2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20201115
+DTEND;VALUE=DATE:20201115
+END:VEVENT
+BEGIN:VEVENT
+UID:d35b9d1a5cb63798e07fd3aec47659cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20201208
+DTEND;VALUE=DATE:20201208
+END:VEVENT
+BEGIN:VEVENT
+UID:c0ea1890f898a2261afb484c8ee6b5f4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20201224
+DTEND;VALUE=DATE:20201224
+END:VEVENT
+BEGIN:VEVENT
+UID:d4877a698b456af324f9e5dacdbf792d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20201225
+DTEND;VALUE=DATE:20201225
+END:VEVENT
+BEGIN:VEVENT
+UID:11b0c220362b2b533da33b23643869e6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20201226
+DTEND;VALUE=DATE:20201226
+END:VEVENT
+BEGIN:VEVENT
+UID:f90b7d2e3aa224c6854db00a13956944@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20201231
+DTEND;VALUE=DATE:20201231
+END:VEVENT
+BEGIN:VEVENT
+UID:3ec5fdd567e9782a480187ca1374ef3f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20210101
+DTEND;VALUE=DATE:20210101
+END:VEVENT
+BEGIN:VEVENT
+UID:4618abf91a993aac42f20074cee45930@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20210106
+DTEND;VALUE=DATE:20210106
+END:VEVENT
+BEGIN:VEVENT
+UID:ba633c3f97ffc7c74813798451dc5c4b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20210319
+DTEND;VALUE=DATE:20210319
+END:VEVENT
+BEGIN:VEVENT
+UID:05057f2229325f70e206b63e11d61f6f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20210501
+DTEND;VALUE=DATE:20210501
+END:VEVENT
+BEGIN:VEVENT
+UID:fe7e5a13347fb8242fd838ec57ac528c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20210504
+DTEND;VALUE=DATE:20210504
+END:VEVENT
+BEGIN:VEVENT
+UID:ccac390b928db3be661056f31f70543d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20210815
+DTEND;VALUE=DATE:20210815
+END:VEVENT
+BEGIN:VEVENT
+UID:6917bca47686d50c109e96c426b8b24b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20210924
+DTEND;VALUE=DATE:20210924
+END:VEVENT
+BEGIN:VEVENT
+UID:69164fab88d68f0ec422dec476b2246e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20211010
+DTEND;VALUE=DATE:20211010
+END:VEVENT
+BEGIN:VEVENT
+UID:106fe51beaa1830c0d753b785a41a690@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20211026
+DTEND;VALUE=DATE:20211026
+END:VEVENT
+BEGIN:VEVENT
+UID:d506509d2866b5785f9ed8d342a30247@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20211101
+DTEND;VALUE=DATE:20211101
+END:VEVENT
+BEGIN:VEVENT
+UID:3a00f658ce5f985c59cec0bb7b28e6e5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20211111
+DTEND;VALUE=DATE:20211111
+END:VEVENT
+BEGIN:VEVENT
+UID:c39e636393a3dd8195ab6451f09efbc5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20211115
+DTEND;VALUE=DATE:20211115
+END:VEVENT
+BEGIN:VEVENT
+UID:76fa176fbd6c65d42aee4d91131b8606@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20211208
+DTEND;VALUE=DATE:20211208
+END:VEVENT
+BEGIN:VEVENT
+UID:d44787494110407dcc00778587b22a20@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20211224
+DTEND;VALUE=DATE:20211224
+END:VEVENT
+BEGIN:VEVENT
+UID:214b2551c9da88dfc06217066bf6129c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20211225
+DTEND;VALUE=DATE:20211225
+END:VEVENT
+BEGIN:VEVENT
+UID:fb9fc6529abb40f6eeaa263a1c4fddb4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20211226
+DTEND;VALUE=DATE:20211226
+END:VEVENT
+BEGIN:VEVENT
+UID:b9c7bd0dbb7c5bdb9ebe9fca31344fda@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20211231
+DTEND;VALUE=DATE:20211231
+END:VEVENT
+BEGIN:VEVENT
+UID:77265ef2d8424b4e9be7c2fc40bd8939@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20220101
+DTEND;VALUE=DATE:20220101
+END:VEVENT
+BEGIN:VEVENT
+UID:bbcbc7238312bc587f6a2e92f9337a3c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20220106
+DTEND;VALUE=DATE:20220106
+END:VEVENT
+BEGIN:VEVENT
+UID:9346b3dff381b1b657ff8517d8b114c0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20220319
+DTEND;VALUE=DATE:20220319
+END:VEVENT
+BEGIN:VEVENT
+UID:94e251e89418e291e5b00f51c9b24a9e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20220501
+DTEND;VALUE=DATE:20220501
+END:VEVENT
+BEGIN:VEVENT
+UID:a23709bb5b725c2eca13b03abb44dbfa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20220504
+DTEND;VALUE=DATE:20220504
+END:VEVENT
+BEGIN:VEVENT
+UID:b7a45ff9f8c3b47a81dbf07b19a5a66a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20220815
+DTEND;VALUE=DATE:20220815
+END:VEVENT
+BEGIN:VEVENT
+UID:6eee6e988508db96270cc0dec9b836cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20220924
+DTEND;VALUE=DATE:20220924
+END:VEVENT
+BEGIN:VEVENT
+UID:9c53f67f28bba4ad3a36219e7aa1e2e7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20221010
+DTEND;VALUE=DATE:20221010
+END:VEVENT
+BEGIN:VEVENT
+UID:5a700d91aa0424e119668f94fa81d0fa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20221026
+DTEND;VALUE=DATE:20221026
+END:VEVENT
+BEGIN:VEVENT
+UID:75d17b6a6582381ed7476345929d1675@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20221101
+DTEND;VALUE=DATE:20221101
+END:VEVENT
+BEGIN:VEVENT
+UID:756555ccce99bf5779364e3a07831120@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20221111
+DTEND;VALUE=DATE:20221111
+END:VEVENT
+BEGIN:VEVENT
+UID:88dda85c2e464db33d9b52fb59e04d8a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20221115
+DTEND;VALUE=DATE:20221115
+END:VEVENT
+BEGIN:VEVENT
+UID:a1d76e779c1d88ee27bcb59ec48e6fac@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20221208
+DTEND;VALUE=DATE:20221208
+END:VEVENT
+BEGIN:VEVENT
+UID:6770fbaa9b8db6f36040f0500a93fc96@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20221224
+DTEND;VALUE=DATE:20221224
+END:VEVENT
+BEGIN:VEVENT
+UID:d01a6c5d00f1aa5a3056f635fe70f2aa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20221225
+DTEND;VALUE=DATE:20221225
+END:VEVENT
+BEGIN:VEVENT
+UID:ed9095898f1dffe9b09a14617434f1aa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20221226
+DTEND;VALUE=DATE:20221226
+END:VEVENT
+BEGIN:VEVENT
+UID:1f590db187de4d771702a9c909a9695f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20221231
+DTEND;VALUE=DATE:20221231
+END:VEVENT
+BEGIN:VEVENT
+UID:8be0095278d37391b0046bc1255ff347@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20230101
+DTEND;VALUE=DATE:20230101
+END:VEVENT
+BEGIN:VEVENT
+UID:4f5a8f84b1c5c04784eef04fbdc9914a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20230106
+DTEND;VALUE=DATE:20230106
+END:VEVENT
+BEGIN:VEVENT
+UID:920ce9abece7afcbe7cc777cd8fd8389@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20230319
+DTEND;VALUE=DATE:20230319
+END:VEVENT
+BEGIN:VEVENT
+UID:18103d96a6d05ae29073d27bf39eede5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20230501
+DTEND;VALUE=DATE:20230501
+END:VEVENT
+BEGIN:VEVENT
+UID:51d27da28e952f640075627f4598d6d9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20230504
+DTEND;VALUE=DATE:20230504
+END:VEVENT
+BEGIN:VEVENT
+UID:129664ba198e1a6d55a30c2efef616a4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20230815
+DTEND;VALUE=DATE:20230815
+END:VEVENT
+BEGIN:VEVENT
+UID:382af1b6350871494298d4393fedf587@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20230924
+DTEND;VALUE=DATE:20230924
+END:VEVENT
+BEGIN:VEVENT
+UID:15a38127cd2d7529de8010e9098c2eb8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20231010
+DTEND;VALUE=DATE:20231010
+END:VEVENT
+BEGIN:VEVENT
+UID:938f1a2df4059e221773629d2c73c5cb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20231026
+DTEND;VALUE=DATE:20231026
+END:VEVENT
+BEGIN:VEVENT
+UID:13e70e004bdd56cf555ea07494de9b3a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20231101
+DTEND;VALUE=DATE:20231101
+END:VEVENT
+BEGIN:VEVENT
+UID:678db3aacff71c4cdd5afa3623fd6b5f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20231111
+DTEND;VALUE=DATE:20231111
+END:VEVENT
+BEGIN:VEVENT
+UID:9df76c12f64b8e9ceaa0b09f371c8f2f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20231115
+DTEND;VALUE=DATE:20231115
+END:VEVENT
+BEGIN:VEVENT
+UID:93f608e6c38494d7927c0c1d8a44afe7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20231208
+DTEND;VALUE=DATE:20231208
+END:VEVENT
+BEGIN:VEVENT
+UID:f086e0e433e91fabe5b09fe50871e6b0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20231224
+DTEND;VALUE=DATE:20231224
+END:VEVENT
+BEGIN:VEVENT
+UID:00f382407aeb1ab6ea86eccb7b0ca775@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20231225
+DTEND;VALUE=DATE:20231225
+END:VEVENT
+BEGIN:VEVENT
+UID:8630effbf06ff6af29c85f3a610d2693@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20231226
+DTEND;VALUE=DATE:20231226
+END:VEVENT
+BEGIN:VEVENT
+UID:f624d29543955fdc99b360be37ea807e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20231231
+DTEND;VALUE=DATE:20231231
+END:VEVENT
+BEGIN:VEVENT
+UID:777d0ade5b7a1000c247637696050630@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20240101
+DTEND;VALUE=DATE:20240101
+END:VEVENT
+BEGIN:VEVENT
+UID:c2cbb3e57c78648a4ea0d9505a7e31d7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20240106
+DTEND;VALUE=DATE:20240106
+END:VEVENT
+BEGIN:VEVENT
+UID:e519ad7513591d7a2d95f71cad79dc06@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20240319
+DTEND;VALUE=DATE:20240319
+END:VEVENT
+BEGIN:VEVENT
+UID:446072b1dad745ab7595adbd3a5c864f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20240501
+DTEND;VALUE=DATE:20240501
+END:VEVENT
+BEGIN:VEVENT
+UID:c3dd3e3984e4de96e6da66ad268ae4c9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20240504
+DTEND;VALUE=DATE:20240504
+END:VEVENT
+BEGIN:VEVENT
+UID:4a7b13a88590c9d0b7ce6d1e28466a87@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20240815
+DTEND;VALUE=DATE:20240815
+END:VEVENT
+BEGIN:VEVENT
+UID:f13388d4b9d042f6069555863d50c5a2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20240924
+DTEND;VALUE=DATE:20240924
+END:VEVENT
+BEGIN:VEVENT
+UID:7a813879e61aa5a03433b18ebc8071d2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20241010
+DTEND;VALUE=DATE:20241010
+END:VEVENT
+BEGIN:VEVENT
+UID:1f1cebfd4ba373b01daa0407a064d762@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20241026
+DTEND;VALUE=DATE:20241026
+END:VEVENT
+BEGIN:VEVENT
+UID:67a2ef083a37dbdca11a272e580311e5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20241101
+DTEND;VALUE=DATE:20241101
+END:VEVENT
+BEGIN:VEVENT
+UID:acbc4326145b687276b1ea5e40a2f50d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20241111
+DTEND;VALUE=DATE:20241111
+END:VEVENT
+BEGIN:VEVENT
+UID:be0ec2b96853e03faf980e8127dd21d0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20241115
+DTEND;VALUE=DATE:20241115
+END:VEVENT
+BEGIN:VEVENT
+UID:a4ca62e0780e24152ffc18a642f5cf6b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20241208
+DTEND;VALUE=DATE:20241208
+END:VEVENT
+BEGIN:VEVENT
+UID:ab21c0309300a0384d4e941bf6c6b054@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20241224
+DTEND;VALUE=DATE:20241224
+END:VEVENT
+BEGIN:VEVENT
+UID:e68849f3349fa92ab384b7b5faea5fa8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20241225
+DTEND;VALUE=DATE:20241225
+END:VEVENT
+BEGIN:VEVENT
+UID:adabddae32262b6919a1587911677c2f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20241226
+DTEND;VALUE=DATE:20241226
+END:VEVENT
+BEGIN:VEVENT
+UID:4caa7584ca289119a09af3f34bb5e1cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20241231
+DTEND;VALUE=DATE:20241231
+END:VEVENT
+BEGIN:VEVENT
+UID:90cf434114a84087fbbd1c1a0f9a7829@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20250101
+DTEND;VALUE=DATE:20250101
+END:VEVENT
+BEGIN:VEVENT
+UID:19751b973ea8a6250dbcc7b1219eef6f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20250106
+DTEND;VALUE=DATE:20250106
+END:VEVENT
+BEGIN:VEVENT
+UID:0805c46742b387e52f983c6d7a3cbe1a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20250319
+DTEND;VALUE=DATE:20250319
+END:VEVENT
+BEGIN:VEVENT
+UID:ccc611fd10b9010808ad23de30b23e6c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20250501
+DTEND;VALUE=DATE:20250501
+END:VEVENT
+BEGIN:VEVENT
+UID:27431146f1f760bcb91e228dacce05d1@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20250504
+DTEND;VALUE=DATE:20250504
+END:VEVENT
+BEGIN:VEVENT
+UID:64f73b23b3a77e9e7849e1e56180c897@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20250815
+DTEND;VALUE=DATE:20250815
+END:VEVENT
+BEGIN:VEVENT
+UID:0d0a744369d9537e275c078aab5b8e71@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20250924
+DTEND;VALUE=DATE:20250924
+END:VEVENT
+BEGIN:VEVENT
+UID:66571d8b15d12d6def3685912ef0d68e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20251010
+DTEND;VALUE=DATE:20251010
+END:VEVENT
+BEGIN:VEVENT
+UID:1b87f48df1e1929c7d5fff02a79b03e3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20251026
+DTEND;VALUE=DATE:20251026
+END:VEVENT
+BEGIN:VEVENT
+UID:1eaab6020e94d766beea7162c90f41a8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20251101
+DTEND;VALUE=DATE:20251101
+END:VEVENT
+BEGIN:VEVENT
+UID:0b063c896aced8569e1fe9d91bbd2d86@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20251111
+DTEND;VALUE=DATE:20251111
+END:VEVENT
+BEGIN:VEVENT
+UID:caf4cc9dae1a2dd9df2d23de79618d26@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20251115
+DTEND;VALUE=DATE:20251115
+END:VEVENT
+BEGIN:VEVENT
+UID:8cc94c820d746fcdfd86637341a6b51e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20251208
+DTEND;VALUE=DATE:20251208
+END:VEVENT
+BEGIN:VEVENT
+UID:1057150928360e2c1c68da30b15534c9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20251224
+DTEND;VALUE=DATE:20251224
+END:VEVENT
+BEGIN:VEVENT
+UID:2d4a52f4c2ab4c294b3ac3ef7ab1151a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20251225
+DTEND;VALUE=DATE:20251225
+END:VEVENT
+BEGIN:VEVENT
+UID:979b4557c860f91c69df0560e47365dd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20251226
+DTEND;VALUE=DATE:20251226
+END:VEVENT
+BEGIN:VEVENT
+UID:2302349fa7ff22d05494214550878024@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20251231
+DTEND;VALUE=DATE:20251231
+END:VEVENT
+BEGIN:VEVENT
+UID:11094e5bfc4e90d4e70caab8fcfbdf84@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20260101
+DTEND;VALUE=DATE:20260101
+END:VEVENT
+BEGIN:VEVENT
+UID:5dcb377a6ca08cd1e6669bfeec5adc27@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20260106
+DTEND;VALUE=DATE:20260106
+END:VEVENT
+BEGIN:VEVENT
+UID:30c38623a76fd8f6ec4644c9359b7bc8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20260319
+DTEND;VALUE=DATE:20260319
+END:VEVENT
+BEGIN:VEVENT
+UID:b453c16893865e8df48ccf3b895a359f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20260501
+DTEND;VALUE=DATE:20260501
+END:VEVENT
+BEGIN:VEVENT
+UID:7ba1e8e16fff9994b6797bdd6cdc9cda@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20260504
+DTEND;VALUE=DATE:20260504
+END:VEVENT
+BEGIN:VEVENT
+UID:bc271f73c8f28be27b4168ec0c019957@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20260815
+DTEND;VALUE=DATE:20260815
+END:VEVENT
+BEGIN:VEVENT
+UID:f077da4cb76674e04d39ac02f65aeffc@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20260924
+DTEND;VALUE=DATE:20260924
+END:VEVENT
+BEGIN:VEVENT
+UID:ba403ca01d5b056f2f4d05200977e1fd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20261010
+DTEND;VALUE=DATE:20261010
+END:VEVENT
+BEGIN:VEVENT
+UID:7dfa93a37a9b3cfdeaa98170873ee144@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20261026
+DTEND;VALUE=DATE:20261026
+END:VEVENT
+BEGIN:VEVENT
+UID:f69330b77da4d74d412a3aad17257393@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20261101
+DTEND;VALUE=DATE:20261101
+END:VEVENT
+BEGIN:VEVENT
+UID:ccfe0b492ce63241eba876fa8aa574ff@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20261111
+DTEND;VALUE=DATE:20261111
+END:VEVENT
+BEGIN:VEVENT
+UID:71a36c107c3a640b2bbd95c2cdbce8e1@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20261115
+DTEND;VALUE=DATE:20261115
+END:VEVENT
+BEGIN:VEVENT
+UID:7f2ce5984f0a165e32042ddc2759c6c2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20261208
+DTEND;VALUE=DATE:20261208
+END:VEVENT
+BEGIN:VEVENT
+UID:a65bfe51c02e853c677f8afa32174f93@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20261224
+DTEND;VALUE=DATE:20261224
+END:VEVENT
+BEGIN:VEVENT
+UID:7b60fca57c98e31dbaa417013503de20@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20261225
+DTEND;VALUE=DATE:20261225
+END:VEVENT
+BEGIN:VEVENT
+UID:8072fb13d2d8d6860f4ff70d18fb1c95@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20261226
+DTEND;VALUE=DATE:20261226
+END:VEVENT
+BEGIN:VEVENT
+UID:87bd67e53e31afc7214095f880fc2fac@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20261231
+DTEND;VALUE=DATE:20261231
+END:VEVENT
+BEGIN:VEVENT
+UID:f297f3025df5299a06788036b9fa5386@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20270101
+DTEND;VALUE=DATE:20270101
+END:VEVENT
+BEGIN:VEVENT
+UID:3091c74fc343f2f646ca123db8b61096@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20270106
+DTEND;VALUE=DATE:20270106
+END:VEVENT
+BEGIN:VEVENT
+UID:62bb3d7ff5953547c4239187f44424df@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20270319
+DTEND;VALUE=DATE:20270319
+END:VEVENT
+BEGIN:VEVENT
+UID:01a7502562f1215f97b43027af50df99@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20270501
+DTEND;VALUE=DATE:20270501
+END:VEVENT
+BEGIN:VEVENT
+UID:1b1023de1dd76e31ce133d3fb374c706@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20270504
+DTEND;VALUE=DATE:20270504
+END:VEVENT
+BEGIN:VEVENT
+UID:c7a56c6cbbf18da73fa767eec93dbbf9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20270815
+DTEND;VALUE=DATE:20270815
+END:VEVENT
+BEGIN:VEVENT
+UID:5bc5ccb066052b2a64e53716f2e51b74@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20270924
+DTEND;VALUE=DATE:20270924
+END:VEVENT
+BEGIN:VEVENT
+UID:8a067b53ae6171deb6c734000f131b10@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20271010
+DTEND;VALUE=DATE:20271010
+END:VEVENT
+BEGIN:VEVENT
+UID:7d8d57577a05517a709bf29af6dd2b54@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20271026
+DTEND;VALUE=DATE:20271026
+END:VEVENT
+BEGIN:VEVENT
+UID:a5bb6a278beb607d96a7d13d5543295d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20271101
+DTEND;VALUE=DATE:20271101
+END:VEVENT
+BEGIN:VEVENT
+UID:68965ba7c81c51d18668dcf2b3928fbf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20271111
+DTEND;VALUE=DATE:20271111
+END:VEVENT
+BEGIN:VEVENT
+UID:687f7f550c3dcff607471ce61c01a454@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20271115
+DTEND;VALUE=DATE:20271115
+END:VEVENT
+BEGIN:VEVENT
+UID:2bf928608aab84e51e33524a13776857@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20271208
+DTEND;VALUE=DATE:20271208
+END:VEVENT
+BEGIN:VEVENT
+UID:fc7e0d3aeef47f85a8a7c778e8618bb9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20271224
+DTEND;VALUE=DATE:20271224
+END:VEVENT
+BEGIN:VEVENT
+UID:66dba29018b51a27158e572a27e45bf8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20271225
+DTEND;VALUE=DATE:20271225
+END:VEVENT
+BEGIN:VEVENT
+UID:c5c079e1ef3a1489e31ade6b136a5147@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20271226
+DTEND;VALUE=DATE:20271226
+END:VEVENT
+BEGIN:VEVENT
+UID:f0ac9884ff482060c57ae76b28f0cac4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20271231
+DTEND;VALUE=DATE:20271231
+END:VEVENT
+BEGIN:VEVENT
+UID:c78e265a8b087a0dcbafb178e5950d28@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20280101
+DTEND;VALUE=DATE:20280101
+END:VEVENT
+BEGIN:VEVENT
+UID:43c6527ba4c1c0ec10d382e374156006@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20280106
+DTEND;VALUE=DATE:20280106
+END:VEVENT
+BEGIN:VEVENT
+UID:058f13d0a1bb0fdca88f6431288fafa7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20280319
+DTEND;VALUE=DATE:20280319
+END:VEVENT
+BEGIN:VEVENT
+UID:2cb98001a76b98a8b1518386c3e0e0b3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20280501
+DTEND;VALUE=DATE:20280501
+END:VEVENT
+BEGIN:VEVENT
+UID:f9521a5c9de949399d42bc2e80f22b7d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20280504
+DTEND;VALUE=DATE:20280504
+END:VEVENT
+BEGIN:VEVENT
+UID:d099c60fd67159f6a08f5c6a92d3d93f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20280815
+DTEND;VALUE=DATE:20280815
+END:VEVENT
+BEGIN:VEVENT
+UID:1a21a5bdfdcd9573f9fd3fc69e40f838@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20280924
+DTEND;VALUE=DATE:20280924
+END:VEVENT
+BEGIN:VEVENT
+UID:f760a41421a9dae0903cb3ac06b609c9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20281010
+DTEND;VALUE=DATE:20281010
+END:VEVENT
+BEGIN:VEVENT
+UID:075b0507b8eb9e2b62a4e6f78edf084f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20281026
+DTEND;VALUE=DATE:20281026
+END:VEVENT
+BEGIN:VEVENT
+UID:227da12121b66f744e96095ff18667bb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20281101
+DTEND;VALUE=DATE:20281101
+END:VEVENT
+BEGIN:VEVENT
+UID:1afbb69bb96076ebbc0c56231ccd8721@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20281111
+DTEND;VALUE=DATE:20281111
+END:VEVENT
+BEGIN:VEVENT
+UID:1d368f2de2346425143beeebad66d133@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20281115
+DTEND;VALUE=DATE:20281115
+END:VEVENT
+BEGIN:VEVENT
+UID:415102a87db5252f174d890087855269@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20281208
+DTEND;VALUE=DATE:20281208
+END:VEVENT
+BEGIN:VEVENT
+UID:a34fc4e3a3ac08833eb35d93c7833c75@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20281224
+DTEND;VALUE=DATE:20281224
+END:VEVENT
+BEGIN:VEVENT
+UID:d108122da97f453739466f37708e2825@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20281225
+DTEND;VALUE=DATE:20281225
+END:VEVENT
+BEGIN:VEVENT
+UID:05a64efb710acbf1113d4ec0636f0fa9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20281226
+DTEND;VALUE=DATE:20281226
+END:VEVENT
+BEGIN:VEVENT
+UID:f740156b622689f4ae1ea3e6c86572ae@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20281231
+DTEND;VALUE=DATE:20281231
+END:VEVENT
+BEGIN:VEVENT
+UID:b039ae2e5369ce8948aa229c2b489d67@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20290101
+DTEND;VALUE=DATE:20290101
+END:VEVENT
+BEGIN:VEVENT
+UID:d885f1f0143835bf0bd6acc0e1060a40@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20290106
+DTEND;VALUE=DATE:20290106
+END:VEVENT
+BEGIN:VEVENT
+UID:95739de94b01f5892e64a2f09ab5a14f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20290319
+DTEND;VALUE=DATE:20290319
+END:VEVENT
+BEGIN:VEVENT
+UID:b718e08d17b858b1ff3b2dea6b851e04@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20290501
+DTEND;VALUE=DATE:20290501
+END:VEVENT
+BEGIN:VEVENT
+UID:2a93e7f31e0a761786403b40ecf84d1b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20290504
+DTEND;VALUE=DATE:20290504
+END:VEVENT
+BEGIN:VEVENT
+UID:8d7848b8eb494d08d80ea72c621d8afc@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20290815
+DTEND;VALUE=DATE:20290815
+END:VEVENT
+BEGIN:VEVENT
+UID:856ec7786dad53d6ab6a892edffa3bf4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20290924
+DTEND;VALUE=DATE:20290924
+END:VEVENT
+BEGIN:VEVENT
+UID:fd7825058d2b10ebba03f44346e0bbf0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20291010
+DTEND;VALUE=DATE:20291010
+END:VEVENT
+BEGIN:VEVENT
+UID:c183c2b1bd4715d0c89e334fbe528a48@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20291026
+DTEND;VALUE=DATE:20291026
+END:VEVENT
+BEGIN:VEVENT
+UID:4d179f8212f377f8658842cd2d2eb148@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20291101
+DTEND;VALUE=DATE:20291101
+END:VEVENT
+BEGIN:VEVENT
+UID:db36e8c0081b8d082d01132c0316403b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20291111
+DTEND;VALUE=DATE:20291111
+END:VEVENT
+BEGIN:VEVENT
+UID:8c0d847bcc8a15e7eff8b68215fe65cb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20291115
+DTEND;VALUE=DATE:20291115
+END:VEVENT
+BEGIN:VEVENT
+UID:02f7434880bf750d5d43a3daabecd41a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20291208
+DTEND;VALUE=DATE:20291208
+END:VEVENT
+BEGIN:VEVENT
+UID:189c85867a5cb58669ac63cd930edf81@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20291224
+DTEND;VALUE=DATE:20291224
+END:VEVENT
+BEGIN:VEVENT
+UID:22651c6128bdf95b510469fd99b73791@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20291225
+DTEND;VALUE=DATE:20291225
+END:VEVENT
+BEGIN:VEVENT
+UID:523fb1f0869e338f74aadef95cbba77e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20291226
+DTEND;VALUE=DATE:20291226
+END:VEVENT
+BEGIN:VEVENT
+UID:144b7a7f39ce6489f4fe796ca934254f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20291231
+DTEND;VALUE=DATE:20291231
+END:VEVENT
+BEGIN:VEVENT
+UID:4ca57937c2dd6203b6661f281844faed@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20300101
+DTEND;VALUE=DATE:20300101
+END:VEVENT
+BEGIN:VEVENT
+UID:f68457bfcef19d64b9818e2ec4dc5c00@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20300106
+DTEND;VALUE=DATE:20300106
+END:VEVENT
+BEGIN:VEVENT
+UID:051ef7689bd6aaedc6e5577742692d0a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20300319
+DTEND;VALUE=DATE:20300319
+END:VEVENT
+BEGIN:VEVENT
+UID:bf1cd72b47802fd237980863b733ffb5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20300501
+DTEND;VALUE=DATE:20300501
+END:VEVENT
+BEGIN:VEVENT
+UID:b2164293de429f5b8cc6699f3f4cac9f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20300504
+DTEND;VALUE=DATE:20300504
+END:VEVENT
+BEGIN:VEVENT
+UID:f33865cdeecd2c49e7ca4e41789c457b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20300815
+DTEND;VALUE=DATE:20300815
+END:VEVENT
+BEGIN:VEVENT
+UID:6a3ccead744cfb55275e1f5e01025ade@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20300924
+DTEND;VALUE=DATE:20300924
+END:VEVENT
+BEGIN:VEVENT
+UID:5b066f008dd904d9304a102c9c1556eb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20301010
+DTEND;VALUE=DATE:20301010
+END:VEVENT
+BEGIN:VEVENT
+UID:8032092fe5cbe0e3053ed91efafb1708@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20301026
+DTEND;VALUE=DATE:20301026
+END:VEVENT
+BEGIN:VEVENT
+UID:94596729a308423224a64755f89558f8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20301101
+DTEND;VALUE=DATE:20301101
+END:VEVENT
+BEGIN:VEVENT
+UID:3e77a571ce28f7def9d0f088ce18f1fd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20301111
+DTEND;VALUE=DATE:20301111
+END:VEVENT
+BEGIN:VEVENT
+UID:2f01ac0719242576c5a51ac7729aedc4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20301115
+DTEND;VALUE=DATE:20301115
+END:VEVENT
+BEGIN:VEVENT
+UID:041fad671924c2cd5743ede2e1c00192@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20301208
+DTEND;VALUE=DATE:20301208
+END:VEVENT
+BEGIN:VEVENT
+UID:e8b48da62371fd31cfd8dfbed1473676@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20301224
+DTEND;VALUE=DATE:20301224
+END:VEVENT
+BEGIN:VEVENT
+UID:692fc0f2c6f9890b9fcd9866a66f08cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20301225
+DTEND;VALUE=DATE:20301225
+END:VEVENT
+BEGIN:VEVENT
+UID:fc435a2abc544078a84752522ee47dd3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20301226
+DTEND;VALUE=DATE:20301226
+END:VEVENT
+BEGIN:VEVENT
+UID:1c6f2b467be8b0e615ab70e4c6b8c348@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20301231
+DTEND;VALUE=DATE:20301231
+END:VEVENT
+BEGIN:VEVENT
+UID:9bd550ce7b47fc389b10dc975c956f98@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20310101
+DTEND;VALUE=DATE:20310101
+END:VEVENT
+BEGIN:VEVENT
+UID:f80cab0ee8297a55a3240179b38edc39@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20310106
+DTEND;VALUE=DATE:20310106
+END:VEVENT
+BEGIN:VEVENT
+UID:6c498a75155506369409aa5ff7c14832@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20310319
+DTEND;VALUE=DATE:20310319
+END:VEVENT
+BEGIN:VEVENT
+UID:18587f188062687c1a5cb6c396b0a3bf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20310501
+DTEND;VALUE=DATE:20310501
+END:VEVENT
+BEGIN:VEVENT
+UID:c5b2c27c0a57f6be8763a122aae9cab2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20310504
+DTEND;VALUE=DATE:20310504
+END:VEVENT
+BEGIN:VEVENT
+UID:c75bedf7c2afcfb3415a45a331602c83@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20310815
+DTEND;VALUE=DATE:20310815
+END:VEVENT
+BEGIN:VEVENT
+UID:006011980b705212dc7af64fca0f001f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20310924
+DTEND;VALUE=DATE:20310924
+END:VEVENT
+BEGIN:VEVENT
+UID:3b7d0733b396a1d6bec9945efe1fa983@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20311010
+DTEND;VALUE=DATE:20311010
+END:VEVENT
+BEGIN:VEVENT
+UID:200545ab091f37cbc05aafe2ea62975b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20311026
+DTEND;VALUE=DATE:20311026
+END:VEVENT
+BEGIN:VEVENT
+UID:279721bc6fa68f1e6c191a2346f51bd4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20311101
+DTEND;VALUE=DATE:20311101
+END:VEVENT
+BEGIN:VEVENT
+UID:cd8ed479f4f17c8485a69efa4f65cb3e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20311111
+DTEND;VALUE=DATE:20311111
+END:VEVENT
+BEGIN:VEVENT
+UID:10eb4a9234a171db943b38aa44df52fe@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20311115
+DTEND;VALUE=DATE:20311115
+END:VEVENT
+BEGIN:VEVENT
+UID:f5a6a5d91616aa6fb7afdff11e33b06b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20311208
+DTEND;VALUE=DATE:20311208
+END:VEVENT
+BEGIN:VEVENT
+UID:ddc72c5e1b7904b6a6e3468a64254153@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20311224
+DTEND;VALUE=DATE:20311224
+END:VEVENT
+BEGIN:VEVENT
+UID:8e503ea3809519b6f99340a857f1e44f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20311225
+DTEND;VALUE=DATE:20311225
+END:VEVENT
+BEGIN:VEVENT
+UID:3f76591e0498733a62b8b2e841afdeb5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20311226
+DTEND;VALUE=DATE:20311226
+END:VEVENT
+BEGIN:VEVENT
+UID:19d2ee2c2d347ffc8bc94ad70dfdaa9c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20311231
+DTEND;VALUE=DATE:20311231
+END:VEVENT
+BEGIN:VEVENT
+UID:09a144a502f19b2c3ffaa85c9590ccbd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20320101
+DTEND;VALUE=DATE:20320101
+END:VEVENT
+BEGIN:VEVENT
+UID:35cc3d8e1765dc415499fe1d06c833d8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20320106
+DTEND;VALUE=DATE:20320106
+END:VEVENT
+BEGIN:VEVENT
+UID:2b1be0d7e44dc90cebc697760dcb4f85@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20320319
+DTEND;VALUE=DATE:20320319
+END:VEVENT
+BEGIN:VEVENT
+UID:44bff2710048eab7363d8a3b3d7a51a4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20320501
+DTEND;VALUE=DATE:20320501
+END:VEVENT
+BEGIN:VEVENT
+UID:7e3a8950a8fda916b58670acf7cb598a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20320504
+DTEND;VALUE=DATE:20320504
+END:VEVENT
+BEGIN:VEVENT
+UID:980577e88e61d7d78f79eabc908648d4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20320815
+DTEND;VALUE=DATE:20320815
+END:VEVENT
+BEGIN:VEVENT
+UID:76f41748a2fbb9ed22ca289a0d81f641@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20320924
+DTEND;VALUE=DATE:20320924
+END:VEVENT
+BEGIN:VEVENT
+UID:94d761e3d8a1c8b38daf0311b538f787@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20321010
+DTEND;VALUE=DATE:20321010
+END:VEVENT
+BEGIN:VEVENT
+UID:dc8c8699eeac4579868f2c449998761f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20321026
+DTEND;VALUE=DATE:20321026
+END:VEVENT
+BEGIN:VEVENT
+UID:2f6f2765fa7b62a22c6ffb5cd2ebe10a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20321101
+DTEND;VALUE=DATE:20321101
+END:VEVENT
+BEGIN:VEVENT
+UID:45790cc80c4cd12c33d5f7fbdc602b2c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20321111
+DTEND;VALUE=DATE:20321111
+END:VEVENT
+BEGIN:VEVENT
+UID:caaee8f29ee8205eb90b43a906005a84@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20321115
+DTEND;VALUE=DATE:20321115
+END:VEVENT
+BEGIN:VEVENT
+UID:aedb91ca1f58d5fd6c15e2356e49ad25@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20321208
+DTEND;VALUE=DATE:20321208
+END:VEVENT
+BEGIN:VEVENT
+UID:986bad3126eb59cf534c179134bc86af@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20321224
+DTEND;VALUE=DATE:20321224
+END:VEVENT
+BEGIN:VEVENT
+UID:160c7432c8f8777c5c69860acefc5670@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20321225
+DTEND;VALUE=DATE:20321225
+END:VEVENT
+BEGIN:VEVENT
+UID:ff6e1db414bfffdb7d7216b8902a28e0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20321226
+DTEND;VALUE=DATE:20321226
+END:VEVENT
+BEGIN:VEVENT
+UID:92c3acf9d4cdba4745d5c9cfc3c56063@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20321231
+DTEND;VALUE=DATE:20321231
+END:VEVENT
+BEGIN:VEVENT
+UID:d3037b2f310f8c3983069651c4f80ddd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20330101
+DTEND;VALUE=DATE:20330101
+END:VEVENT
+BEGIN:VEVENT
+UID:20149cad816ff74b2ff7d883ccb13d4e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20330106
+DTEND;VALUE=DATE:20330106
+END:VEVENT
+BEGIN:VEVENT
+UID:615f7563d647d727722e9491d268258e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20330319
+DTEND;VALUE=DATE:20330319
+END:VEVENT
+BEGIN:VEVENT
+UID:f6d6d8b64730a6a7ae7f4d643e535b56@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20330501
+DTEND;VALUE=DATE:20330501
+END:VEVENT
+BEGIN:VEVENT
+UID:a3ebf1a7e2db4cbd999e7bb6d5019357@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20330504
+DTEND;VALUE=DATE:20330504
+END:VEVENT
+BEGIN:VEVENT
+UID:1f6015eff24cdb3d37dc4917575e2fa2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20330815
+DTEND;VALUE=DATE:20330815
+END:VEVENT
+BEGIN:VEVENT
+UID:1a162686cdc9879592d6d7045cb8521f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20330924
+DTEND;VALUE=DATE:20330924
+END:VEVENT
+BEGIN:VEVENT
+UID:9c13c75c19544094439f595fcddc0556@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20331010
+DTEND;VALUE=DATE:20331010
+END:VEVENT
+BEGIN:VEVENT
+UID:400388d28dd2d0f28a0a612c1eecf32b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20331026
+DTEND;VALUE=DATE:20331026
+END:VEVENT
+BEGIN:VEVENT
+UID:219cdc8f58a90e6a047c5d50bce7db00@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20331101
+DTEND;VALUE=DATE:20331101
+END:VEVENT
+BEGIN:VEVENT
+UID:fc8e3226460522ca29fe29c47375d24a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20331111
+DTEND;VALUE=DATE:20331111
+END:VEVENT
+BEGIN:VEVENT
+UID:c7220ef9be28a83def893d6a11812240@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20331115
+DTEND;VALUE=DATE:20331115
+END:VEVENT
+BEGIN:VEVENT
+UID:54166fe36f9d9559132c8ac7a9454327@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20331208
+DTEND;VALUE=DATE:20331208
+END:VEVENT
+BEGIN:VEVENT
+UID:cf8ca70e67f561602e583ee61120bc4d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20331224
+DTEND;VALUE=DATE:20331224
+END:VEVENT
+BEGIN:VEVENT
+UID:05337d5667c74d0cc2d1cf8d1411c903@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20331225
+DTEND;VALUE=DATE:20331225
+END:VEVENT
+BEGIN:VEVENT
+UID:da72332c7e17516dff5bac02155f508f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20331226
+DTEND;VALUE=DATE:20331226
+END:VEVENT
+BEGIN:VEVENT
+UID:60be8e7a3e76c6d477c0f856dfc38f1c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20331231
+DTEND;VALUE=DATE:20331231
+END:VEVENT
+BEGIN:VEVENT
+UID:a39d4d0238364ec171277d39a1a762d6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20340101
+DTEND;VALUE=DATE:20340101
+END:VEVENT
+BEGIN:VEVENT
+UID:ae41f85225310ce83ebb867bb56ca9ed@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20340106
+DTEND;VALUE=DATE:20340106
+END:VEVENT
+BEGIN:VEVENT
+UID:33959b807f24e3441ef622d73800c48a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20340319
+DTEND;VALUE=DATE:20340319
+END:VEVENT
+BEGIN:VEVENT
+UID:9f78e94a7e849d69251e95c9c203f581@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20340501
+DTEND;VALUE=DATE:20340501
+END:VEVENT
+BEGIN:VEVENT
+UID:cadd50ddaa9a75895da960fd08a77c17@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20340504
+DTEND;VALUE=DATE:20340504
+END:VEVENT
+BEGIN:VEVENT
+UID:6593607bf478a6e83a5d95cbfee61195@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20340815
+DTEND;VALUE=DATE:20340815
+END:VEVENT
+BEGIN:VEVENT
+UID:2f07003fbf688add03c06209d21aa32c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20340924
+DTEND;VALUE=DATE:20340924
+END:VEVENT
+BEGIN:VEVENT
+UID:31ab43e0450aef22079c660199acd5bd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20341010
+DTEND;VALUE=DATE:20341010
+END:VEVENT
+BEGIN:VEVENT
+UID:f063cda9dc8fdf86eee484a86918087d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20341026
+DTEND;VALUE=DATE:20341026
+END:VEVENT
+BEGIN:VEVENT
+UID:02b24edd27ee067d789c19c50f873c8d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20341101
+DTEND;VALUE=DATE:20341101
+END:VEVENT
+BEGIN:VEVENT
+UID:94232960bad69a720d641988b8543fef@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20341111
+DTEND;VALUE=DATE:20341111
+END:VEVENT
+BEGIN:VEVENT
+UID:3904faba01769d4a901cfb0cfacf5802@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20341115
+DTEND;VALUE=DATE:20341115
+END:VEVENT
+BEGIN:VEVENT
+UID:1c9f3b761e863cd4c2f3aff9cd734bb6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20341208
+DTEND;VALUE=DATE:20341208
+END:VEVENT
+BEGIN:VEVENT
+UID:df69397b8e15c34c3cd06e0259012d81@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20341224
+DTEND;VALUE=DATE:20341224
+END:VEVENT
+BEGIN:VEVENT
+UID:9191d09497bfcba0b65783cda6b9c8e3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20341225
+DTEND;VALUE=DATE:20341225
+END:VEVENT
+BEGIN:VEVENT
+UID:6aea0867c897894b2b813a20bac3e8ef@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20341226
+DTEND;VALUE=DATE:20341226
+END:VEVENT
+BEGIN:VEVENT
+UID:3524c5109886595dacb33232db6e6569@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20341231
+DTEND;VALUE=DATE:20341231
+END:VEVENT
+BEGIN:VEVENT
+UID:93e4cdfdd6e4f0dfb2ae6e37e257d2d4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/neujahr-1-jaenner/
+SUMMARY:Neujahr (§)
+DTSTART;VALUE=DATE:20350101
+DTEND;VALUE=DATE:20350101
+END:VEVENT
+BEGIN:VEVENT
+UID:bd40b05e80ff92a9390170fd8c423d35@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heilige-drei-koenige-6-jaenner/
+SUMMARY:Heilige Drei Könige (§)
+DTSTART;VALUE=DATE:20350106
+DTEND;VALUE=DATE:20350106
+END:VEVENT
+BEGIN:VEVENT
+UID:6bba98768cc5790e321be9a74679ba8d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K\,St\,T\,V
+DESCRIPTION:Der 19. März (St. Josef) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In Kärnten\, Steiermark\, Tirol und Vorarlberg wird der Heilige Josef als Landesschutzpatron gefeiert - Schulen\, Ämter und Behörden haben in diesen Bundesländern geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-josef-19-maerz/
+SUMMARY:St. Josef
+DTSTART;VALUE=DATE:20350319
+DTEND;VALUE=DATE:20350319
+END:VEVENT
+BEGIN:VEVENT
+UID:7515e46fa420b18674a82a0aeb548b34@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/staatsfeiertag-1-mai/
+SUMMARY:Staatsfeiertag (§)
+DTSTART;VALUE=DATE:20350501
+DTEND;VALUE=DATE:20350501
+END:VEVENT
+BEGIN:VEVENT
+UID:4b1c61e849cbef96688d81acfbed9e73@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:OÖ
+DESCRIPTION:Der 4. Mai (St. Florian\, Florianitag) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Oberösterreich ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-florian-4-mai/
+SUMMARY:St. Florian
+DTSTART;VALUE=DATE:20350504
+DTEND;VALUE=DATE:20350504
+END:VEVENT
+BEGIN:VEVENT
+UID:dce69b942009f6b731c57b96c6ca1626@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-himmelfahrt-15-august/
+SUMMARY:Mariä Himmelfahrt (§)
+DTSTART;VALUE=DATE:20350815
+DTEND;VALUE=DATE:20350815
+END:VEVENT
+BEGIN:VEVENT
+UID:93752d97827e9403674186968bbcca93@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:S
+DESCRIPTION:Der 24. September (St. Rupert) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. Im Bundesland Salzburg ist an diesem Tag jedoch schulfrei.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/st-rupert-24-september/
+SUMMARY:St. Rupert
+DTSTART;VALUE=DATE:20350924
+DTEND;VALUE=DATE:20350924
+END:VEVENT
+BEGIN:VEVENT
+UID:5fef49d9a5054acb8663118416789050@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:K
+DESCRIPTION:Der 10. Oktober (Tag der Volksabstimmung) ist kein gesetzlicher Feiertag im Sinne des Bundesgesetzes. In Kärnten gilt der 10. Oktober als Feiertag\, der zwar nicht absolut arbeitsfrei ist\, an dem Schulen\, Ämter und Behörden jedoch geschlossen haben.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/tag-der-volksabstimmung-10-oktober/
+SUMMARY:Tag der Volksabstimmung
+DTSTART;VALUE=DATE:20351010
+DTEND;VALUE=DATE:20351010
+END:VEVENT
+BEGIN:VEVENT
+UID:0fdded8fb3d7161b734c1896931b890d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/nationalfeiertag-26-oktober/
+SUMMARY:Nationalfeiertag (§)
+DTSTART;VALUE=DATE:20351026
+DTEND;VALUE=DATE:20351026
+END:VEVENT
+BEGIN:VEVENT
+UID:b77031175ad66ff9c75c72e118386141@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/allerheiligen-1-november/
+SUMMARY:Allerheiligen (§)
+DTSTART;VALUE=DATE:20351101
+DTEND;VALUE=DATE:20351101
+END:VEVENT
+BEGIN:VEVENT
+UID:945364d7f37eb6dc11547fdb59e26398@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:B
+DESCRIPTION:Der 11. November (Martinstag) ist kein Feiertag im Sinne des Bundesgesetzes und somit nicht generell arbeitsfrei. In Burgenland wird der Hl. Martin als Landespatron gefeiert. Schulen\, Ämter und Behörden haben in diesem Bundesland geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/martinstag-11-november/
+SUMMARY:St. Martin
+DTSTART;VALUE=DATE:20351111
+DTEND;VALUE=DATE:20351111
+END:VEVENT
+BEGIN:VEVENT
+UID:8f83d8595cef85fa8c46d3dafb7599e8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:NÖ\,W
+DESCRIPTION:Der 15. November (Hl. Leopold\, auch: Leopoldi\, St. Leopold) ist ein Feiertag im Sinne des Landesrechts und somit nicht generell arbeitsfrei. In den Bundesländern Wien und Niederösterreich haben Schulen\, Ämter und Behörden an diesem Tag jedoch geschlossen.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/hl-leopold-15-november/
+SUMMARY:St. Leopold
+DTSTART;VALUE=DATE:20351115
+DTEND;VALUE=DATE:20351115
+END:VEVENT
+BEGIN:VEVENT
+UID:ae6689cdd19227643c5798abf8638c09@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/mariae-empfaengnis-8-dezember/
+SUMMARY:Mariä Empfängnis (§)
+DTSTART;VALUE=DATE:20351208
+DTEND;VALUE=DATE:20351208
+END:VEVENT
+BEGIN:VEVENT
+UID:0f1a62509761ce730cf4e0982ebc6090@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 24. Dezember (Heiliger Abend) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 24. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/heiligabend-24-dezember/
+SUMMARY:Heiliger Abend
+DTSTART;VALUE=DATE:20351224
+DTEND;VALUE=DATE:20351224
+END:VEVENT
+BEGIN:VEVENT
+UID:1e026514bedaeef3c8cba4bb853f2643@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/weihnachten-25-dezember/
+SUMMARY:Weihnachten (§)
+DTSTART;VALUE=DATE:20351225
+DTEND;VALUE=DATE:20351225
+END:VEVENT
+BEGIN:VEVENT
+UID:b22164e9500c75ad71834878ebdb9613@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/stefanitag-26-dezember/
+SUMMARY:Stefanitag (§)
+DTSTART;VALUE=DATE:20351226
+DTEND;VALUE=DATE:20351226
+END:VEVENT
+BEGIN:VEVENT
+UID:9e3ebd74f9a7ba381f68fb77421ec966@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Der 31. Dezember (Silvester) ist kein gesetzlicher Feiertag. Die Normalarbeitszeit für den 31. Dezember ist im Kollektivvertrag geregelt.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/silvester-31-dezember/
+SUMMARY:Silvester
+DTSTART;VALUE=DATE:20351231
+DTEND;VALUE=DATE:20351231
+END:VEVENT
+BEGIN:VEVENT
+UID:4ec4c574224434c421bb69884e34579b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20000421
+DTEND;VALUE=DATE:20000421
+END:VEVENT
+BEGIN:VEVENT
+UID:097ee356afc1166429fc790a1f876c31@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20000424
+DTEND;VALUE=DATE:20000424
+END:VEVENT
+BEGIN:VEVENT
+UID:024ebf9b122810ff2e24171e0d8ae569@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20000601
+DTEND;VALUE=DATE:20000601
+END:VEVENT
+BEGIN:VEVENT
+UID:b26dfd26be93f0ad11da9296ac45cd49@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20000612
+DTEND;VALUE=DATE:20000612
+END:VEVENT
+BEGIN:VEVENT
+UID:d9ee501fb37d0a4db42271247dcb2351@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20000622
+DTEND;VALUE=DATE:20000622
+END:VEVENT
+BEGIN:VEVENT
+UID:859f497d61872b3e8ff4447bd4391217@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20010413
+DTEND;VALUE=DATE:20010413
+END:VEVENT
+BEGIN:VEVENT
+UID:059ef591fcb6ba20d93931c7f820cd39@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20010416
+DTEND;VALUE=DATE:20010416
+END:VEVENT
+BEGIN:VEVENT
+UID:c2b6bc5a621ab4d2a937a06d6480e73d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20010524
+DTEND;VALUE=DATE:20010524
+END:VEVENT
+BEGIN:VEVENT
+UID:c48e9df0d582b03e90fb13486ae83296@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20010604
+DTEND;VALUE=DATE:20010604
+END:VEVENT
+BEGIN:VEVENT
+UID:4d0fdf852174a1b5bc3d3dd7d3215ece@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20010614
+DTEND;VALUE=DATE:20010614
+END:VEVENT
+BEGIN:VEVENT
+UID:28ee2302aec0f910be41e4ea53ed7c91@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20020329
+DTEND;VALUE=DATE:20020329
+END:VEVENT
+BEGIN:VEVENT
+UID:e15f31f472b6d86ac57b0d79e829cde9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20020401
+DTEND;VALUE=DATE:20020401
+END:VEVENT
+BEGIN:VEVENT
+UID:9ea12b2d79d4f04d864523f29810ccfe@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20020509
+DTEND;VALUE=DATE:20020509
+END:VEVENT
+BEGIN:VEVENT
+UID:f94d5051eb64622c02b2646cd58e589c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20020520
+DTEND;VALUE=DATE:20020520
+END:VEVENT
+BEGIN:VEVENT
+UID:1b2967506975267654cc3282ad61ecde@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20020530
+DTEND;VALUE=DATE:20020530
+END:VEVENT
+BEGIN:VEVENT
+UID:d44ba29d5a986511ad6dd268d6dfcf24@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20030418
+DTEND;VALUE=DATE:20030418
+END:VEVENT
+BEGIN:VEVENT
+UID:17ae67d79568df8e98db902f3efe6111@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20030421
+DTEND;VALUE=DATE:20030421
+END:VEVENT
+BEGIN:VEVENT
+UID:a613700c221303c7c71a3ab6ea473b95@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20030529
+DTEND;VALUE=DATE:20030529
+END:VEVENT
+BEGIN:VEVENT
+UID:06b0450ed7598d649d235dacadf0601c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20030609
+DTEND;VALUE=DATE:20030609
+END:VEVENT
+BEGIN:VEVENT
+UID:39797042d6c34d39f4682f3a1ae09f1b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20030619
+DTEND;VALUE=DATE:20030619
+END:VEVENT
+BEGIN:VEVENT
+UID:c6e471fd9535bbf1d79596ae4801179f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20040409
+DTEND;VALUE=DATE:20040409
+END:VEVENT
+BEGIN:VEVENT
+UID:9987f7e593e8a924b2d671f658433ca3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20040412
+DTEND;VALUE=DATE:20040412
+END:VEVENT
+BEGIN:VEVENT
+UID:41851b9699bbfaa13a6f513f2feaa01d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20040520
+DTEND;VALUE=DATE:20040520
+END:VEVENT
+BEGIN:VEVENT
+UID:c00d2672a8883ef0d677118641ac2090@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20040531
+DTEND;VALUE=DATE:20040531
+END:VEVENT
+BEGIN:VEVENT
+UID:144dc5c7873e2c85cb9f4b78f0872484@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20040610
+DTEND;VALUE=DATE:20040610
+END:VEVENT
+BEGIN:VEVENT
+UID:92e10fc67672cb9317fbf47260f6a481@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20050325
+DTEND;VALUE=DATE:20050325
+END:VEVENT
+BEGIN:VEVENT
+UID:ae06e28c88dd8dde77d614164d2eae95@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20050328
+DTEND;VALUE=DATE:20050328
+END:VEVENT
+BEGIN:VEVENT
+UID:a6cbfeef3ef625f621a8083dd6f00d39@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20050505
+DTEND;VALUE=DATE:20050505
+END:VEVENT
+BEGIN:VEVENT
+UID:2fd042143f82092139c3817c9ed8db09@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20050516
+DTEND;VALUE=DATE:20050516
+END:VEVENT
+BEGIN:VEVENT
+UID:ffaafbe8baf4afa110efc2b7304ad0d8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20050526
+DTEND;VALUE=DATE:20050526
+END:VEVENT
+BEGIN:VEVENT
+UID:768719fcbd513f91686ed08e36e11832@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20060414
+DTEND;VALUE=DATE:20060414
+END:VEVENT
+BEGIN:VEVENT
+UID:099333478204db289caca8313e2604d3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20060417
+DTEND;VALUE=DATE:20060417
+END:VEVENT
+BEGIN:VEVENT
+UID:88d7a0118bbf80f3b9b229373f85794a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20060525
+DTEND;VALUE=DATE:20060525
+END:VEVENT
+BEGIN:VEVENT
+UID:488993b7f6716df504d40897e403f06c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20060605
+DTEND;VALUE=DATE:20060605
+END:VEVENT
+BEGIN:VEVENT
+UID:af1620fbaab718389b2564496418c641@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20060615
+DTEND;VALUE=DATE:20060615
+END:VEVENT
+BEGIN:VEVENT
+UID:745f376d9573211db29f1ba779f34366@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20070406
+DTEND;VALUE=DATE:20070406
+END:VEVENT
+BEGIN:VEVENT
+UID:584b98f8deae2c7bcee0e9e0932354e3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20070409
+DTEND;VALUE=DATE:20070409
+END:VEVENT
+BEGIN:VEVENT
+UID:7b90c21326be53bf212fb826e7981307@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20070517
+DTEND;VALUE=DATE:20070517
+END:VEVENT
+BEGIN:VEVENT
+UID:614e8751e24fc7f17b7cbc0605b3b08a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20070528
+DTEND;VALUE=DATE:20070528
+END:VEVENT
+BEGIN:VEVENT
+UID:39e45bb87928c5867e145b82de7fbae9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20070607
+DTEND;VALUE=DATE:20070607
+END:VEVENT
+BEGIN:VEVENT
+UID:f299d8b1aabb227fb170ac9629154afc@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20080321
+DTEND;VALUE=DATE:20080321
+END:VEVENT
+BEGIN:VEVENT
+UID:118d73d9d934d1389723cd3efed043f2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20080324
+DTEND;VALUE=DATE:20080324
+END:VEVENT
+BEGIN:VEVENT
+UID:5172477fef79eb3a71024ad6b23d8f84@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20080501
+DTEND;VALUE=DATE:20080501
+END:VEVENT
+BEGIN:VEVENT
+UID:41614f5d8a033f5a3003da6bf8c0d706@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20080512
+DTEND;VALUE=DATE:20080512
+END:VEVENT
+BEGIN:VEVENT
+UID:8ae86b4c961c2975e16380486e2170db@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20080522
+DTEND;VALUE=DATE:20080522
+END:VEVENT
+BEGIN:VEVENT
+UID:621e19680678ffbf1227faedc3797fec@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20090410
+DTEND;VALUE=DATE:20090410
+END:VEVENT
+BEGIN:VEVENT
+UID:ab2b327de7778f56a1d17588fa2101a7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20090413
+DTEND;VALUE=DATE:20090413
+END:VEVENT
+BEGIN:VEVENT
+UID:901923f355e61de35f815356855e5218@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20090521
+DTEND;VALUE=DATE:20090521
+END:VEVENT
+BEGIN:VEVENT
+UID:1d39be1993d1933422dc2b94068a1b63@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20090601
+DTEND;VALUE=DATE:20090601
+END:VEVENT
+BEGIN:VEVENT
+UID:3fbaec240d8f69960a09a7157620ec9b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20090611
+DTEND;VALUE=DATE:20090611
+END:VEVENT
+BEGIN:VEVENT
+UID:384cc6d34c6439783f072ec3b329017a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20100402
+DTEND;VALUE=DATE:20100402
+END:VEVENT
+BEGIN:VEVENT
+UID:cc1dfc2d1b3861584079c6d415efcdd3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20100405
+DTEND;VALUE=DATE:20100405
+END:VEVENT
+BEGIN:VEVENT
+UID:f7c4db9aa5778ab3d688df5931144d88@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20100513
+DTEND;VALUE=DATE:20100513
+END:VEVENT
+BEGIN:VEVENT
+UID:95dcf9e52b6c43ad8721ff518c13dbfe@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20100524
+DTEND;VALUE=DATE:20100524
+END:VEVENT
+BEGIN:VEVENT
+UID:2b180f4a06864a8efcaf7d1a07bb9c9a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20100603
+DTEND;VALUE=DATE:20100603
+END:VEVENT
+BEGIN:VEVENT
+UID:f905725264a06a205192f70ea1452554@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20110422
+DTEND;VALUE=DATE:20110422
+END:VEVENT
+BEGIN:VEVENT
+UID:61591d7d15607412abcb478775a7aba0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20110425
+DTEND;VALUE=DATE:20110425
+END:VEVENT
+BEGIN:VEVENT
+UID:e7ca27952653ef58d23f36be9821f631@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20110602
+DTEND;VALUE=DATE:20110602
+END:VEVENT
+BEGIN:VEVENT
+UID:ba063534906a522f2724ecf38e2eecb8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20110613
+DTEND;VALUE=DATE:20110613
+END:VEVENT
+BEGIN:VEVENT
+UID:3a53d3c30e3ab5b565edada90ed9c640@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20110623
+DTEND;VALUE=DATE:20110623
+END:VEVENT
+BEGIN:VEVENT
+UID:ee292e317f984b946ee72401100afbce@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20120406
+DTEND;VALUE=DATE:20120406
+END:VEVENT
+BEGIN:VEVENT
+UID:093af657da9a3d611e998e52d56471ba@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20120409
+DTEND;VALUE=DATE:20120409
+END:VEVENT
+BEGIN:VEVENT
+UID:4d7a5e40c9a77dbe947debd53f7b800a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20120517
+DTEND;VALUE=DATE:20120517
+END:VEVENT
+BEGIN:VEVENT
+UID:ac90ea64c7c7c41a07c85410fdab25b9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20120528
+DTEND;VALUE=DATE:20120528
+END:VEVENT
+BEGIN:VEVENT
+UID:204bcb0cc599d494ed89492bf7c24c31@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20120607
+DTEND;VALUE=DATE:20120607
+END:VEVENT
+BEGIN:VEVENT
+UID:4c2752d1e8bbdd90d5a3be267e25efbd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20130329
+DTEND;VALUE=DATE:20130329
+END:VEVENT
+BEGIN:VEVENT
+UID:e20d671a28e303daa687218b01a2f701@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20130401
+DTEND;VALUE=DATE:20130401
+END:VEVENT
+BEGIN:VEVENT
+UID:f1e2ed4c06d94563eebf39f660e1cfa7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20130509
+DTEND;VALUE=DATE:20130509
+END:VEVENT
+BEGIN:VEVENT
+UID:6e1cfcd32a131b5bd07e51cefef99dc5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20130520
+DTEND;VALUE=DATE:20130520
+END:VEVENT
+BEGIN:VEVENT
+UID:9f686cc00dee9f592d108ff1645f65f6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20130530
+DTEND;VALUE=DATE:20130530
+END:VEVENT
+BEGIN:VEVENT
+UID:b84209a5bf92ad958a8cdd74e36a0e98@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20140418
+DTEND;VALUE=DATE:20140418
+END:VEVENT
+BEGIN:VEVENT
+UID:348fba38980e9a49d647714487595451@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20140421
+DTEND;VALUE=DATE:20140421
+END:VEVENT
+BEGIN:VEVENT
+UID:82729aab9b8c90119dd91a823ed59d61@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20140529
+DTEND;VALUE=DATE:20140529
+END:VEVENT
+BEGIN:VEVENT
+UID:b09d0d4f60bf3d304adc51fbfe554020@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20140609
+DTEND;VALUE=DATE:20140609
+END:VEVENT
+BEGIN:VEVENT
+UID:68127e70bb736130769abea2ab539ef3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20140619
+DTEND;VALUE=DATE:20140619
+END:VEVENT
+BEGIN:VEVENT
+UID:5a8012cb71db0b35cfb79dd2bb383aa6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20150403
+DTEND;VALUE=DATE:20150403
+END:VEVENT
+BEGIN:VEVENT
+UID:d09d0942feea5d28d2c7b8fea3828394@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20150406
+DTEND;VALUE=DATE:20150406
+END:VEVENT
+BEGIN:VEVENT
+UID:ad9b9783b133f8946bf60087e6475989@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20150514
+DTEND;VALUE=DATE:20150514
+END:VEVENT
+BEGIN:VEVENT
+UID:2cf908041d3f1aa821b1c0107901ff48@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20150525
+DTEND;VALUE=DATE:20150525
+END:VEVENT
+BEGIN:VEVENT
+UID:4cac73c04e28e38af579af7c6d258fdf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20150604
+DTEND;VALUE=DATE:20150604
+END:VEVENT
+BEGIN:VEVENT
+UID:21718c72690cdd4aee8f1398f04b14be@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20160325
+DTEND;VALUE=DATE:20160325
+END:VEVENT
+BEGIN:VEVENT
+UID:304c4905893257236e14cc213a2fddfa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20160328
+DTEND;VALUE=DATE:20160328
+END:VEVENT
+BEGIN:VEVENT
+UID:96227cdbdd8873a346fd9baac1741617@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20160505
+DTEND;VALUE=DATE:20160505
+END:VEVENT
+BEGIN:VEVENT
+UID:527e89b57742fe7c1c3036596aa2608f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20160516
+DTEND;VALUE=DATE:20160516
+END:VEVENT
+BEGIN:VEVENT
+UID:d4cbff2d10e93afa405dc86976aef767@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20160526
+DTEND;VALUE=DATE:20160526
+END:VEVENT
+BEGIN:VEVENT
+UID:fa7ae7a7add4071edc86f99dc1dbf266@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20170414
+DTEND;VALUE=DATE:20170414
+END:VEVENT
+BEGIN:VEVENT
+UID:3392ec82b7c770690998b7fbddd6e36f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20170417
+DTEND;VALUE=DATE:20170417
+END:VEVENT
+BEGIN:VEVENT
+UID:2c0231d883390dc112d5045f2c823422@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20170525
+DTEND;VALUE=DATE:20170525
+END:VEVENT
+BEGIN:VEVENT
+UID:d1ca8df5a7be472ec6bb7bfd7d8fc2aa@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20170605
+DTEND;VALUE=DATE:20170605
+END:VEVENT
+BEGIN:VEVENT
+UID:50e86b4ea724192c196f9099271c0a0f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20170615
+DTEND;VALUE=DATE:20170615
+END:VEVENT
+BEGIN:VEVENT
+UID:1b9c8c2be63d27c4eda4ef9ab3c555bb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20180330
+DTEND;VALUE=DATE:20180330
+END:VEVENT
+BEGIN:VEVENT
+UID:7824fd5736ba03ded61cc779e8d284f6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20180402
+DTEND;VALUE=DATE:20180402
+END:VEVENT
+BEGIN:VEVENT
+UID:ae990fa54a1da06503a836b82a99d78f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20180510
+DTEND;VALUE=DATE:20180510
+END:VEVENT
+BEGIN:VEVENT
+UID:bf2ce333886aa3a19d1cf1e37cd6a292@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20180521
+DTEND;VALUE=DATE:20180521
+END:VEVENT
+BEGIN:VEVENT
+UID:b140ebaabc1c8e88fca5e03dbf6fe0f1@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20180531
+DTEND;VALUE=DATE:20180531
+END:VEVENT
+BEGIN:VEVENT
+UID:60b25f41f1c2f4688926ca42b732d343@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20190419
+DTEND;VALUE=DATE:20190419
+END:VEVENT
+BEGIN:VEVENT
+UID:9fe080967e04e0a353b920bb0a407ded@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20190422
+DTEND;VALUE=DATE:20190422
+END:VEVENT
+BEGIN:VEVENT
+UID:52b3b3ac98008bf4e07943b4dd170aea@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20190530
+DTEND;VALUE=DATE:20190530
+END:VEVENT
+BEGIN:VEVENT
+UID:ef8455172e0913806e9f486a7bd3081f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20190610
+DTEND;VALUE=DATE:20190610
+END:VEVENT
+BEGIN:VEVENT
+UID:b3386d521fa04a2f6fe4fcb3bcfb281f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20190620
+DTEND;VALUE=DATE:20190620
+END:VEVENT
+BEGIN:VEVENT
+UID:503d5e7055e1ed959810e6b204b5c9f0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20200410
+DTEND;VALUE=DATE:20200410
+END:VEVENT
+BEGIN:VEVENT
+UID:3e3c9a8f46206994581038ffb61b5cf3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20200413
+DTEND;VALUE=DATE:20200413
+END:VEVENT
+BEGIN:VEVENT
+UID:1ffd55fdbd98a5373f5ea36061212719@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20200521
+DTEND;VALUE=DATE:20200521
+END:VEVENT
+BEGIN:VEVENT
+UID:e88b68b2ee484e73cfa5613747c5e195@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20200601
+DTEND;VALUE=DATE:20200601
+END:VEVENT
+BEGIN:VEVENT
+UID:d72e6dd72a902e3e3b6259c1cb2b36d7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20200611
+DTEND;VALUE=DATE:20200611
+END:VEVENT
+BEGIN:VEVENT
+UID:54ee1fde38fc35a8c410eae3ebc83442@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20210402
+DTEND;VALUE=DATE:20210402
+END:VEVENT
+BEGIN:VEVENT
+UID:ec4ac9a3d89643fb238408163f4cbc0b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20210405
+DTEND;VALUE=DATE:20210405
+END:VEVENT
+BEGIN:VEVENT
+UID:c4b672167f9fe94344a5af84b7ababf8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20210513
+DTEND;VALUE=DATE:20210513
+END:VEVENT
+BEGIN:VEVENT
+UID:0a9f71e48aa1abc4899d4e82775c02f5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20210524
+DTEND;VALUE=DATE:20210524
+END:VEVENT
+BEGIN:VEVENT
+UID:344f088e41f05cd33cca2214cae3fa0a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20210603
+DTEND;VALUE=DATE:20210603
+END:VEVENT
+BEGIN:VEVENT
+UID:ae051a8295b6289eed960336c5bb5322@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20220415
+DTEND;VALUE=DATE:20220415
+END:VEVENT
+BEGIN:VEVENT
+UID:6d4f9cd76aee45c0275f8013afc8d747@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20220418
+DTEND;VALUE=DATE:20220418
+END:VEVENT
+BEGIN:VEVENT
+UID:d681d7f30b47d4a88aeaee29a067048b@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20220526
+DTEND;VALUE=DATE:20220526
+END:VEVENT
+BEGIN:VEVENT
+UID:5ff4b1cf8ed0f830200029e7af431d8a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20220606
+DTEND;VALUE=DATE:20220606
+END:VEVENT
+BEGIN:VEVENT
+UID:46de9299e7d5eb7e0ce9195458849655@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20220616
+DTEND;VALUE=DATE:20220616
+END:VEVENT
+BEGIN:VEVENT
+UID:cc3926b726b81a612f9e5604c66d4465@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20230407
+DTEND;VALUE=DATE:20230407
+END:VEVENT
+BEGIN:VEVENT
+UID:983590654f77162d819edabdfdeb35bd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20230410
+DTEND;VALUE=DATE:20230410
+END:VEVENT
+BEGIN:VEVENT
+UID:cdd76ec764a5887678b40560a171037f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20230518
+DTEND;VALUE=DATE:20230518
+END:VEVENT
+BEGIN:VEVENT
+UID:0f6d3fdba0e58fbdb9b30a99d7fc279a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20230529
+DTEND;VALUE=DATE:20230529
+END:VEVENT
+BEGIN:VEVENT
+UID:6be124937a0ade0fff2e4fd965f3152c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20230608
+DTEND;VALUE=DATE:20230608
+END:VEVENT
+BEGIN:VEVENT
+UID:8d54b2531202f8dadbdb94444337bba3@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20240329
+DTEND;VALUE=DATE:20240329
+END:VEVENT
+BEGIN:VEVENT
+UID:a58ba294f599b148e4886d4f651c335e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20240401
+DTEND;VALUE=DATE:20240401
+END:VEVENT
+BEGIN:VEVENT
+UID:67ee7a546efc620a77e2b45948a407ab@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20240509
+DTEND;VALUE=DATE:20240509
+END:VEVENT
+BEGIN:VEVENT
+UID:bd875c44f647511cfc1491701827174e@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20240520
+DTEND;VALUE=DATE:20240520
+END:VEVENT
+BEGIN:VEVENT
+UID:97f762164d8ced5fc9cd019870d7ee9d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20240530
+DTEND;VALUE=DATE:20240530
+END:VEVENT
+BEGIN:VEVENT
+UID:fe2243108b9982bcc92b46c14c26e4cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20250418
+DTEND;VALUE=DATE:20250418
+END:VEVENT
+BEGIN:VEVENT
+UID:ff94685744c714ab1e020ad81c9e447d@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20250421
+DTEND;VALUE=DATE:20250421
+END:VEVENT
+BEGIN:VEVENT
+UID:1bc62bb7b017c787e523d9688b603930@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20250529
+DTEND;VALUE=DATE:20250529
+END:VEVENT
+BEGIN:VEVENT
+UID:3fe966641733445dbb0aacb175df61b6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20250609
+DTEND;VALUE=DATE:20250609
+END:VEVENT
+BEGIN:VEVENT
+UID:9c2f740c9ef6f2d678d1d704d0430cb9@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20250619
+DTEND;VALUE=DATE:20250619
+END:VEVENT
+BEGIN:VEVENT
+UID:d2a1a6f10c424c1da64a5862b306e03f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20260403
+DTEND;VALUE=DATE:20260403
+END:VEVENT
+BEGIN:VEVENT
+UID:a44f2c4f36048391a70aed7e009b08f4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20260406
+DTEND;VALUE=DATE:20260406
+END:VEVENT
+BEGIN:VEVENT
+UID:afe20b5a20e953fc08807c37f17a4d7a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20260514
+DTEND;VALUE=DATE:20260514
+END:VEVENT
+BEGIN:VEVENT
+UID:e49151c2836ec925f5c0d9abe17a28c2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20260525
+DTEND;VALUE=DATE:20260525
+END:VEVENT
+BEGIN:VEVENT
+UID:0ef0a6092d550a24dd41bde69b395aed@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20260604
+DTEND;VALUE=DATE:20260604
+END:VEVENT
+BEGIN:VEVENT
+UID:d41dfcc7184c7d36a055bf5f0f263e52@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20270326
+DTEND;VALUE=DATE:20270326
+END:VEVENT
+BEGIN:VEVENT
+UID:07fba88ae7b03c47e4e2b276007371ac@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20270329
+DTEND;VALUE=DATE:20270329
+END:VEVENT
+BEGIN:VEVENT
+UID:9ceb53b6c7238ca369fbbc8cd3df4940@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20270506
+DTEND;VALUE=DATE:20270506
+END:VEVENT
+BEGIN:VEVENT
+UID:d0bd016047e14621276f54a2019ce73c@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20270517
+DTEND;VALUE=DATE:20270517
+END:VEVENT
+BEGIN:VEVENT
+UID:7a9c6e1256b49787c8b3c1b21af9588a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20270527
+DTEND;VALUE=DATE:20270527
+END:VEVENT
+BEGIN:VEVENT
+UID:62d9ac9b5acb6c567d9f0b1ce6dc13a0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20280414
+DTEND;VALUE=DATE:20280414
+END:VEVENT
+BEGIN:VEVENT
+UID:44f488d1349cc540db0f56cc2bbd6fdb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20280417
+DTEND;VALUE=DATE:20280417
+END:VEVENT
+BEGIN:VEVENT
+UID:249b6e777aa88c4e961f5a9f57105093@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20280525
+DTEND;VALUE=DATE:20280525
+END:VEVENT
+BEGIN:VEVENT
+UID:c91811b291c13a9bdd0b3ba5cd6cde20@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20280605
+DTEND;VALUE=DATE:20280605
+END:VEVENT
+BEGIN:VEVENT
+UID:0794a1460ab43eecbfce603f80b53af0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20280615
+DTEND;VALUE=DATE:20280615
+END:VEVENT
+BEGIN:VEVENT
+UID:af99a0795cf486eb8b7e0bcc5f3484f0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20290330
+DTEND;VALUE=DATE:20290330
+END:VEVENT
+BEGIN:VEVENT
+UID:09ad9e17af906946e939943dcc4cdb66@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20290402
+DTEND;VALUE=DATE:20290402
+END:VEVENT
+BEGIN:VEVENT
+UID:6cfab0f95c4eeee3fba683e362b465da@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20290510
+DTEND;VALUE=DATE:20290510
+END:VEVENT
+BEGIN:VEVENT
+UID:58d5cae331f655dfc0d631745ece80e5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20290521
+DTEND;VALUE=DATE:20290521
+END:VEVENT
+BEGIN:VEVENT
+UID:6129a8fe6e4ba198e87646a58565e1d6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20290531
+DTEND;VALUE=DATE:20290531
+END:VEVENT
+BEGIN:VEVENT
+UID:d7f991724a7c82fda5aec48dc4665b4f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20300419
+DTEND;VALUE=DATE:20300419
+END:VEVENT
+BEGIN:VEVENT
+UID:f67482f159396d6e7d0dec25667882cf@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20300422
+DTEND;VALUE=DATE:20300422
+END:VEVENT
+BEGIN:VEVENT
+UID:07569b2ce2fad9b0060849aa12963ec6@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20300530
+DTEND;VALUE=DATE:20300530
+END:VEVENT
+BEGIN:VEVENT
+UID:ada2adaad5bc4727fae751243ba61a56@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20300610
+DTEND;VALUE=DATE:20300610
+END:VEVENT
+BEGIN:VEVENT
+UID:be484274495d8730941623ddb2c47788@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20300620
+DTEND;VALUE=DATE:20300620
+END:VEVENT
+BEGIN:VEVENT
+UID:831120301a333e9d58cf3987f6551cde@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20310411
+DTEND;VALUE=DATE:20310411
+END:VEVENT
+BEGIN:VEVENT
+UID:2b77a1d29787bb081a6d66a8d3514700@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20310414
+DTEND;VALUE=DATE:20310414
+END:VEVENT
+BEGIN:VEVENT
+UID:5af9595c2a24344b4ec12f8a76debc41@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20310522
+DTEND;VALUE=DATE:20310522
+END:VEVENT
+BEGIN:VEVENT
+UID:e8faab9da2d954c7ffb18cf6eb77718f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20310602
+DTEND;VALUE=DATE:20310602
+END:VEVENT
+BEGIN:VEVENT
+UID:3594bb59205a85e887ef8125317c93e4@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20310612
+DTEND;VALUE=DATE:20310612
+END:VEVENT
+BEGIN:VEVENT
+UID:e41457431289bf7dbac06d1d274b47a8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20320326
+DTEND;VALUE=DATE:20320326
+END:VEVENT
+BEGIN:VEVENT
+UID:4bf66bce381894a2eaa1af5beaf8c4c7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20320329
+DTEND;VALUE=DATE:20320329
+END:VEVENT
+BEGIN:VEVENT
+UID:8a74ad667aca96e5ca0b409446fe25a8@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20320506
+DTEND;VALUE=DATE:20320506
+END:VEVENT
+BEGIN:VEVENT
+UID:295c033a2168f07ccfd3adb9770fd8eb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20320517
+DTEND;VALUE=DATE:20320517
+END:VEVENT
+BEGIN:VEVENT
+UID:f19863dade1ded79eb5cd6c605f7bf99@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20320527
+DTEND;VALUE=DATE:20320527
+END:VEVENT
+BEGIN:VEVENT
+UID:80dd79e53574ddadfe9cde7f0056175f@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20330415
+DTEND;VALUE=DATE:20330415
+END:VEVENT
+BEGIN:VEVENT
+UID:8c5d962d6f82dbc390db5efc23627436@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20330418
+DTEND;VALUE=DATE:20330418
+END:VEVENT
+BEGIN:VEVENT
+UID:a03c9aacad72ad9e80273e686d3e72f7@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20330526
+DTEND;VALUE=DATE:20330526
+END:VEVENT
+BEGIN:VEVENT
+UID:ccfdf6f2c095a3581407405e97f02dfb@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20330606
+DTEND;VALUE=DATE:20330606
+END:VEVENT
+BEGIN:VEVENT
+UID:cabb8e238e21f6d8d8c536f6836d1fa2@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20330616
+DTEND;VALUE=DATE:20330616
+END:VEVENT
+BEGIN:VEVENT
+UID:a7131b3f2a72f3a3ca4838a34b01e6c5@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20340407
+DTEND;VALUE=DATE:20340407
+END:VEVENT
+BEGIN:VEVENT
+UID:6eaac5821ee567751e0d1433536f58a0@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20340410
+DTEND;VALUE=DATE:20340410
+END:VEVENT
+BEGIN:VEVENT
+UID:b208968070f985f4fcc994f99f91a124@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20340518
+DTEND;VALUE=DATE:20340518
+END:VEVENT
+BEGIN:VEVENT
+UID:a60ee96f33edea19b65661a7773ad456@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20340529
+DTEND;VALUE=DATE:20340529
+END:VEVENT
+BEGIN:VEVENT
+UID:0dc194c90b3ca25f0360a8775abf5edd@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20340608
+DTEND;VALUE=DATE:20340608
+END:VEVENT
+BEGIN:VEVENT
+UID:2c8da987804f1b6d114f0dc67ab96f38@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Karfreitag ist ein Feiertag für Angehörige der Evangelischen Kirche H. B. und A. B.\, der Altkatholischen Kirche sowie der Methodistenkirche und für diese ein arbeitsfreier Tag.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/karfreitag/
+SUMMARY:Karfreitag
+DTSTART;VALUE=DATE:20350323
+DTEND;VALUE=DATE:20350323
+END:VEVENT
+BEGIN:VEVENT
+UID:dbd490ca88d71a23b97fd191e7e39e43@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/ostermontag/
+SUMMARY:Ostermontag (§)
+DTSTART;VALUE=DATE:20350326
+DTEND;VALUE=DATE:20350326
+END:VEVENT
+BEGIN:VEVENT
+UID:f1fcb9fa45a9f55467872600b83e2992@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/christi-himmelfahrt/
+SUMMARY:Christi Himmelfahrt (§)
+DTSTART;VALUE=DATE:20350503
+DTEND;VALUE=DATE:20350503
+END:VEVENT
+BEGIN:VEVENT
+UID:a6102d8ed0e8c837b26ee4081a6c9b27@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/pfingstmontag/
+SUMMARY:Pfingstmontag (§)
+DTSTART;VALUE=DATE:20350514
+DTEND;VALUE=DATE:20350514
+END:VEVENT
+BEGIN:VEVENT
+UID:9e75d20105ae0218c8134391f613619a@feiertage-oesterreich.at
+DTSTAMP:20160607T065125Z
+LOCATION:
+DESCRIPTION:Feiertag im Sinne des Bundesgesetzes und somit ein arbeitsfreier Tag für gesamt Österreich.
+URL;VALUE=URI:http://www.feiertage-oesterreich.at/fronleichnam/
+SUMMARY:Fronleichnam (§)
+DTSTART;VALUE=DATE:20350524
+DTEND;VALUE=DATE:20350524
+END:VEVENT
+END:VCALENDAR
