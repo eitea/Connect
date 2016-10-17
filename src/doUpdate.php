@@ -7,7 +7,7 @@ if (!isset($_SESSION['userid'])) {
 if ($_SESSION['userid'] != 1) {
   die('Access denied. <a href="logout.php"> return</a>');
 }
-//------------------------------------------------------------------------------
+
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
   $row = $result->fetch_assoc();

@@ -34,8 +34,8 @@ $invalidLogin = "";
       require "language.php";
 
       if ($row['id'] != 1){
-        header( "refresh:0;url=userHome.php?link=timeCalcTable.php");
-        die ($lang['AUTOREDIRECT'] . '<a href="userHome.php?link=timeCalcTable.php">redirect</a>');
+        header( "refresh:0;url=userHome.php?link=userSummary.php");
+        die ($lang['AUTOREDIRECT'] . '<a href="userHome.php?link=userSummary.php">redirect</a>');
       } else {
         $sql = "SELECT * FROM $adminLDAPTable;";
         $result = mysqli_query($conn, $sql);

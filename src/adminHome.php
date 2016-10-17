@@ -85,7 +85,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
     </nav>
   </header>
-
+  
   <aside class="main-sidebar">
     <section class="sidebar">
       <!-- Sidebar Menu -->

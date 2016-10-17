@@ -2,7 +2,7 @@
 <?php
 if(isset($_POST['GERMAN']) || isset($_POST['ENGLISH']))
 {
-header("location:userHome.php?link=timeCalcTable.php"); // your current page
+header("location:userHome.php?link=userSummary.php"); // your current page
 }
 ?>
 
@@ -34,7 +34,7 @@ session_start();
 if (!isset($_SESSION['userid'])) {
   die('Please <a href="login.php">login</a> first');
 }
-$URL = "timeCalcTable.php";
+$URL = "userSummary.php";
 if($_SERVER["REQUEST_METHOD"] == "GET"){
   if(isset($_GET['link'])){
     $URL = $_GET['link'];
@@ -54,7 +54,7 @@ require "language.php";
   <div class="wrapper">
     <header class="main-header">
       <!-- Logo -->
-      <a href="userHome.php?link=timeCalcTable.php" class="logo">
+      <a href="userHome.php?link=userSummary.php" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
         <span class="logo-mini"><b>H</b></span>
         <!-- logo for regular state and mobile devices -->
@@ -64,14 +64,14 @@ require "language.php";
       <!-- Header Navbar -->
       <nav class="navbar navbar-static-top" role="navigation">
         <!-- Sidebar toggle button-->
-        <a href="userHome.php?link=timeCalcTable.php" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <a href="userHome.php?link=userSummary.php" class="sidebar-toggle" data-toggle="offcanvas" role="button">
           <span class="sr-only">Toggle navigation</span>
         </a>
 
         <div class="navbar-custom-menu">
           <ul class="nav navbar-nav">
             <li>
-              <a href="userHome.php?link=timeCalcTable.php" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
+              <a href="userHome.php?link=userSummary.php" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
             </li>
             <li>
               <a href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -86,7 +86,7 @@ require "language.php";
     <section class="sidebar">
 <br><br>
         <!-- input form (Optional) -->
-      <form action="userHome.php?link=timeCalcTable.php"  method="post" class="sidebar-form">
+      <form action="userHome.php?link=userSummary.php"  method="post" class="sidebar-form">
         <div class="input-group">
         <span>
             <?php
@@ -161,11 +161,14 @@ require "language.php";
         <span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 <?php endif; ?>
 
-  <li><a href="userHome.php?link=calendar.php"><i class="fa fa-calendar"></i>
-    <span>Calendar</span></a></li>
+<li><a href="userHome.php?link=timeCalcTable.php"><i class="fa fa-clock-o"></i>
+  <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
 
-  <li><a href="userHome.php?link=makeRequest.php"><i class="fa fa-calendar-plus-o"></i>
-    <span><?php echo $lang['VACATION']?></span></a></li>
+<li><a href="userHome.php?link=calendar.php"><i class="fa fa-calendar"></i>
+  <span>Calendar</span></a></li>
+
+<li><a href="userHome.php?link=makeRequest.php"><i class="fa fa-calendar-plus-o"></i>
+  <span><?php echo $lang['VACATION']?></span></a></li>
 
     </ul>
   </section>
@@ -188,12 +191,12 @@ require "language.php";
             $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$userID';";
             $conn->query($sql);
             echo '<div class="alert alert-success fade in">';
-            echo '<a href="userHome.php?link=timeCalcTable.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
             echo '<strong>Success! </strong>Password successfully changed.';
             echo '</div>';
           } else {
             echo '<div class="alert alert-danger fade in">';
-            echo '<a href="userHome.php?link=timeCalcTable.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
             echo '<strong>Failed! </strong>Passwords did not match.';
             echo '</div>';
           }
@@ -245,7 +248,7 @@ require "language.php";
       <h3 class="control-sidebar-heading">Language</h3>
       <ul class="control-sidebar-menu">
         <li>
-          <form action="userHome.php?link=timeCalcTable.php" method="post" style="text-align:center" >
+          <form action="userHome.php?link=userSummary.php" method="post" style="text-align:center" >
             <button type="submit" name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button>
             <button type="submit" name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button>
           </form>
@@ -259,12 +262,12 @@ require "language.php";
     <!-- /.tab-pane -->
     <!-- Settings tab content -->
     <div class="tab-pane" id="control-sidebar-settings-tab">
-      <form action="userHome.php?link=timeCalcTable.php" method="post">
+      <form action="userHome.php?link=userSummary.php" method="post">
         <h3 class="control-sidebar-heading">Settings</h3>
 
         <div class="form-group">
           <label class="control-sidebar-subheading">
-            <form action="userHome.php?link=timeCalcTable.php" method="post">
+            <form action="userHome.php?link=userSummary.php" method="post">
               <?php echo $lang['NEW_PASSWORD']?>: <br>
               <input type="password" name="password" /> <br><br>
 

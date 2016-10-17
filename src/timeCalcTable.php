@@ -33,7 +33,7 @@
   $currentMonth = substr($currentTimeStamp, 5, 2);
 ?>
 
-<h1>Timetable</h1>
+<h1><?php echo $lang['VIEW_TIMESTAMPS']; ?></h1>
 
 <br><br>
 
