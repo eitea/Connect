@@ -14,7 +14,7 @@
 <body>
 <?php
 require 'connection.php';
-$sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE $userRequests.status = 2";
+$sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE $userRequests.status = '2'";
 $result = $conn->query($sql);
 $vacs = '';
 if($result && $result->num_rows > 0){
