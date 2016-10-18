@@ -31,7 +31,7 @@ require 'language.php';
 $firstname = $_GET['gn'];
 $lastname = $_GET['sn'];
 $email = $_GET['mail'];
-$begin = getCurrentTimestamp();
+$begin = substr(getCurrentTimestamp(),0,10) . ' 05:00:00';
 
 $vacDaysCredit = $overTimeLump = 0;
 $allowAccess = $gender = "";
@@ -40,9 +40,10 @@ $pass = randomPassword();
 
 if(isset($_POST['create'])){
   $accept = true;
-  if(!empty($_POST['entryDate']) && test_Date($_POST['entryDate'] ." 00:00:00")){
+  if(!empty($_POST['entryDate']) && test_Date($_POST['entryDate'] ." 05:00:00")){
     $gender = $_POST['gender'];
     $allowAccess = $_POST['enableProjecting'];
+    $begin = $_POST['entryDate'] ." 05:00:00";
 
     if(!empty($_POST['vacDaysPerYear']) && is_numeric($_POST['vacDaysPerYear'])){
       $vacDaysPerYear = $_POST['vacDaysPerYear'];
@@ -139,12 +140,35 @@ if(isset($_POST['create'])){
       }
     }
 
+    //check if entry date lies before/after today
+    //future: just reset unlogs and vacationcredit on that day, instead of creating the user on that date. (my gosh...)
+    //past: re-calculate vacationcredit until today and insert unlogs
+    $difference = timeDiff_Hours(substr(getCurrentTimestamp(),0,10) . ' 05:00:00', $begin);
+    if($difference > 0){ //future
+      $sql = "DELIMITER |
+      CREATE EVENT '$userID.$firstname' ON SCHEDULE AT $begin
+      ON COMPLETION NOT PRESERVE ENABLE
+      DO
+      BEGIN
+        DELETE * FROM $negative_logTable WHERE userID = $userID;
+        UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $userID;
+      END |
+      DELIMITER ;
+      "
+    } elseif($difference < 0) { //past
+      $credit = ($vacDaysPerYear/365) * $difference;
+      $i = $begin;
+      while(substr($i, 0, 10) != substr(getCurrentTimestamp(),0,10)){
+        $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+        VALUES('$i', $userID, $mon, $tue, $wed, $thu, $fri, $sat, $sun)";
+        $conn->query($sql);
+        $i = carryOverAdder_Hours($i, 24);
+      }
+    }
+
     header('refresh:0;url=editUsers.php');
   }
-  //check if entry date lies before/after today
-  //today: just create user.
-  //if after: create event which creates this user on that time
-  //if before: fill unlog table, fill vacation credit
+
 }
 
 ?>

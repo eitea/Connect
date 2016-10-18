@@ -96,10 +96,10 @@
     echo "<tr>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
-    echo "<td>" . substr($A,11,8) . "</td>";
+    echo "<td>" . substr($A,11,5) . "</td>";
     echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
-    echo "<td>" . substr($B,11,8)  . "</td>";
-    echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
+    echo "<td>" . substr($B,11,5) . "</td>";
+    echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";
     echo "<td>" . sprintf('%.2f', $difference) . "</td>";
     echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i]) . "</td>";
