@@ -85,7 +85,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
     </nav>
   </header>
-  
+
   <aside class="main-sidebar">
     <section class="sidebar">
       <!-- Sidebar Menu -->
@@ -200,7 +200,6 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
             $email = $row['email'];
 
           ?>
-
 
           <iframe id="myFrame" frameborder="0" scrolling="no" onload="resizeIframe(this)"  src= <?php echo $URL?>></iframe>
 

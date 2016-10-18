@@ -7,7 +7,7 @@
 
 
 <?php
-$VERSION_NUMBER=19;
+require 'version_number.php';
 
 if(!file_exists('connection_config.php')){
   header("refresh:0;url=setup_getInput.php");
@@ -41,8 +41,6 @@ $invalidLogin = "";
         $result = mysqli_query($conn, $sql);
           $row = $result->fetch_assoc();
           if($row['version'] < $VERSION_NUMBER){
-            $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER;";
-            $conn->query($sql);
             header("refresh:3;url=doUpdate.php");
             die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="doUpdate.php">update</a>');
           } else {

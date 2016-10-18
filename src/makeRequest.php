@@ -28,10 +28,11 @@ require 'language.php';
 require 'createTimestamps.php';
 
 $message = '';
-if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['requestText'])){
+if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
   if(test_Date($_POST['start']) && test_Date($_POST['end'])){
     $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start']."', '".$_POST['end']."', '".$_POST['requestText']."')";
     $conn->query($sql);
+    echo mysqli_error($conn);
   } else {
     echo 'Invalid Dates.';
   }
@@ -46,10 +47,10 @@ if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end
 <div style=float:left;padding-bottom:500px>
 <table>
   <tr>
-    <td>From: </td><td> <input id="calendar" type='text' name='start' value=''> </td>
+    <td>From: *</td><td> <input id="calendar" type='text' name='start' value=''> </td>
   </tr>
   <tr>
-    <td>Until: </td><td> <input id="calendar2" type='text' name='end' value=''> </td>
+    <td>Until: *</td><td> <input id="calendar2" type='text' name='end' value=''> </td>
   </tr>
   <tr>
     <td><input type='submit' name='makeRequest' value='Request Vacation' ></td> <td> <input type="text" name="requestText" value="" placeholder = "Info Text"> </td>

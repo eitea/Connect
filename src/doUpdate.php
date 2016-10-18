@@ -33,6 +33,11 @@ if($row['version'] < 20){
 
 }
 
+
+
 //------------------------------------------------------------------------------
+require 'version_number.php';
+$sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
+$conn->query($sql);
 header("refresh:8;url=adminHome.php");
 die ('<br>Update Finished. Click here if not redirected automatically: <a href="adminHome.php">redirect</a>');
