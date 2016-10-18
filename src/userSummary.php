@@ -12,8 +12,10 @@
 <style>
 div{
   text-align:center;
+  float:left;
+  margin-right:10px;
 }
-tr td:nth-child(1) { /* I don't think they are 0 based */
+tr td:nth-child(1) { /* not 0 based */
    text-align: left;
 }
 </style>
@@ -32,7 +34,15 @@ tr td:nth-child(1) { /* I don't think they are 0 based */
 
   $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = $ZA_Hours = 0;
 
-  $sql = "SELECT * FROM $logTable, $userTable WHERE userID = $userID AND timeEnd != '0000-00-00 00:00:00' AND $userTable.id = $userID ";
+  $sql = "SELECT * FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE $userTable.id = $userID";
+  $result = $conn->query($sql);
+  if($result && $result->num_rows > 0){
+    $userRow = $result->fetch_assoc();
+  } else {
+    die(mysqli_error($conn));
+  }
+
+  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd != '0000-00-00 00:00:00'";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
     while($row = $result->fetch_assoc()){
@@ -46,8 +56,8 @@ tr td:nth-child(1) { /* I don't think they are 0 based */
         case 0:
           $absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
           $breakCreditHours += $row['breakCredit'];
-          if($row['enableProjecting'] == 'FALSE' && timeDiff_Hours($row['time'], $timeEnd) > $row['pauseAfterHours']){
-            $breakCreditHours += $row['hoursOfRest'];
+          if($userRow['enableProjecting'] == 'FALSE' && timeDiff_Hours($row['time'], $timeEnd) > $userRow['pauseAfterHours']){
+            $breakCreditHours += $userRow['hoursOfRest'];
           }
           break;
         case 1:
@@ -80,7 +90,7 @@ tr td:nth-child(1) { /* I don't think they are 0 based */
 
   $theBigSum = $absolvedHours - $expectedHours - $breakCreditHours + $vacationHours + $specialLeaveHours;
   if($theBigSum > 0){
-    $color = 'style=color:green';
+    $color = 'style=color:#00ba29';
   } else {
     $color = 'style=color:red';
   }
@@ -104,4 +114,26 @@ echo "<tr><td style=font-weight:bold;$color>Summary: </td><td $color>". number_f
 ?>
 </table>
 </div>
+
+<div>
+<table class="table table-striped table-bordered" cellspacing="0" style='width:300px'>
+  <tr>
+    <th style=text-align:left>User Information</th>
+    <th width=30%>Hours</th>
+  </tr>
+<?php
+$biggerSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu'] + $userRow['fri'] + $userRow['sat'] + $userRow['sun'];
+echo '<tr><td>Monday: </td><td>'. $userRow['mon'] .'</td></tr>';
+echo '<tr><td>Tuesday: </td><td>'. $userRow['tue'] .'</td></tr>';
+echo '<tr><td>Wednesday: </td><td>'. $userRow['wed'] .'</td></tr>';
+echo '<tr><td>Thursday: </td><td>'. $userRow['thu'] .'</td></tr>';
+echo '<tr><td>Friday: </td><td>'. $userRow['fri'] .'</td></tr>';
+echo '<tr><td>Saturday: </td><td>'. $userRow['sat'] .'</td></tr>';
+echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
+echo "<tr><td style=font-weight:bold;>Sum: </td><td>". number_format($biggerSum, 2, '.', '').'</td></tr>';
+?>
+</table>
+</div>
+
+
 </body>
