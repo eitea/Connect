@@ -137,7 +137,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
             </ul>
           </li>
 
-          <li><a href="userHome.php?link=calendar.php"><i class="fa fa-calendar"></i>
+          <li><a href="adminHome.php?link=calendar.php"><i class="fa fa-calendar"></i>
             <span>Calendar</span></a></li>
 
           <li class="treeview">
