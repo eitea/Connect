@@ -159,16 +159,17 @@ if(isset($_POST['create'])){
 
     } elseif($difference < 0) { //past
       $credit = ($vacDaysPerYear/365) * timeDiff_Hours($begin, substr(getCurrentTimestamp(),0,10) . ' 05:00:00');
+      $sql = "INSERT INTO $vacationTable SET vacationHoursCredit = $credit WHERE userID = $userID";
+      $conn->query($sql);
       $i = $begin;
-      while(substr($i, 0, 10) != substr(getCurrentTimestamp(),0,10)){
+      while(substr($i, 0, 10) != substr(getCurrentTimestamp(), 0, 10)){
         $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
         VALUES('$i', $userID, $mon, $tue, $wed, $thu, $fri, $sat, $sun)";
         $conn->query($sql);
         $i = carryOverAdder_Hours($i, 24);
       }
     }
-
-    //header('refresh:0;url=editUsers.php');
+    header('refresh:0;url=editUsers.php');
   }
 
 }
