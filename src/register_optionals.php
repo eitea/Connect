@@ -151,7 +151,7 @@ if(isset($_POST['create'])){
       DO
       BEGIN
       DELETE FROM $negative_logTable WHERE userID = $userID;
-      UPDATE $vacationTable SET vacationHoursCredit = 0;
+      UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $userID;
       END
       ";
       $conn->query($sql);
