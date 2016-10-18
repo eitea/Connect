@@ -125,7 +125,6 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <ul class="treeview-menu">
 
               <li><a href="adminHome.php?link=editUsers.php"><?php echo $lang['VIEW_USER']; ?></a></li>
-
               <li><a href="adminHome.php?link=register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
 
               <?php require 'connectionLDAP.php';
@@ -150,7 +149,18 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <li><a href="adminHome.php?link=editCompanies.php"><?php echo $lang['COMPANIES']; ?></a></li>
               <li><a href="adminHome.php?link=configureLDAP.php"><span>LDAP</span></a></li>
               <li><a href="adminHome.php?link=editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
+            </ul>
+          </li>
+
+          <li class="treeview">
+            <a href="#"><i class="fa fa-wrench"></i> <span><?php echo $lang['FUNCTIONS']; ?></span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
               <li><a href="pullGitRepo.php" target='_blank'><span>Update</span></a></li>
+              <li><a href="fixDB.php" target='_blank'><span><?php echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
             </ul>
           </li>
 

@@ -78,6 +78,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['FIRSTNAME'] = 'First Name';
   $lang['FIELDS_REQUIRED'] = 'Fields are required';
+  $lang['FUNCTIONS'] = 'Functions';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
   $lang['GREETING_DAY'] = 'Hello';
@@ -97,6 +98,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['LASTNAME'] = 'Last Name';
   $lang['LUNCHBREAK'] = 'Lunchbreak';
+  $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
   $lang['LANGUAGE_SETTING'] = 'Language';
 
   $lang['MONTHLY_REPORT'] ='Monthly Report';
@@ -174,7 +176,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['GREETING_MORNING'] = 'Guten Morgen';
   $lang['GREETING_DAY'] = 'Guten Tag';
   $lang['GREETING_AFTERNOON'] = 'Hallo';
-  $lang['GREETING_EVENING'] = 'Guten Abend';  
+  $lang['GREETING_EVENING'] = 'Guten Abend';
   $lang['CLIENT'] = 'Kunde';
   $lang['FIRSTNAME'] = 'Vorname';
   $lang['LASTNAME'] = 'Nachname';
@@ -251,5 +253,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REPLY_TEXT'] = 'Antwort';
 
   $lang['VACATION_REQUESTS'] = 'Urlaubsanfragen';
+  $lang['LUNCHBREAK_REPAIR'] = 'Pausen Recalculieren';
+
+  $lang['FUNCTIONS'] = 'Funktionen';
 
 }
