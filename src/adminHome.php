@@ -134,10 +134,11 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <?php endif; ?>
 
               <li><a href="adminHome.php?link=allowVacations.php"><?php echo $lang['VACATION']; ?></a></li>
-
-
             </ul>
           </li>
+
+          <li><a href="userHome.php?link=calendar.php"><i class="fa fa-calendar"></i>
+            <span>Calendar</span></a></li>
 
           <li class="treeview">
             <a href="#"><i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span>

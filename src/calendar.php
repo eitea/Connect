@@ -13,13 +13,19 @@
 </head>
 <body>
 <?php
+session_start();
+if (!isset($_SESSION['userid'])) {
+  die('Please <a href="login.php">login</a> first.');
+}
 require 'connection.php';
+require'language.php';
+
 $sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE $userRequests.status = '2'";
 $result = $conn->query($sql);
 $vacs = '';
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
-    $title = 'Vacation:' . $row['firstname'] . ' ' . $row['lastname'];
+    $title = 'Vacation: ' . $row['firstname'] . ' ' . $row['lastname'];
     $start = substr($row['fromDate'], 0, 16);
     $end = substr($row['toDate'], 0, 16);
 
@@ -27,21 +33,26 @@ if($result && $result->num_rows > 0){
   }
 }
 ?>
-
-
   <div id='calendar' style='height: 850px;'></div>
   <script>
   $(document).ready(function() {
     $('#calendar').fullCalendar({
         height: 600,
+        firstDay: 1,
         header: {
           left: 'prev,next today',
 				      center: 'title',
-          right: 'month,listWeek,agendaWeek'
+          right: 'month,agendaWeek,listMonth'
         },
         defaultView: 'month',
         events: [<?php echo $vacs; ?>]
     })
   });
   </script>
+
+  <?php
+  if ($_SESSION['userid'] == 1) {
+    echo "<a href='adminHome.php?link=allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
+  }
+  ?>
 </body>

@@ -1,6 +1,7 @@
 <?php
 $lang = array();
-//german
+
+//english-----------------------------------------------------------------------
 if($_SESSION['language'] == 'ENG'){
   $activityToString = array(
     "arrival" => "Work",
@@ -20,6 +21,13 @@ if($_SESSION['language'] == 'ENG'){
   );
 
   /*
+  0 ..... open
+  1 ..... declined
+  2 ..... accepted
+  */
+  $lang_vacationRequestStatus = array("Open", "Declined", "Accepted");
+
+  /*
   -1 .... absent (should not occur!)
   0 ..... arrival
   1 ..... vacation
@@ -36,91 +44,105 @@ if($_SESSION['language'] == 'ENG'){
     "4" => "Time Balance"
   );
 
-  /*
-  0 ..... open
-  1 ..... declined
-  2 ..... accepted
-  */
-  $lang_vacationRequestStatus = array("Open", "Declined", "Accepted");
+  $lang['AUTOREDIRECT'] = 'Click here if not redirected automatically: ';
+  $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
+  $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
+  $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
+  $lang['ASSIGNED'] = 'Assigned';
+  $lang['ACTIVITY'] = 'Activity';
+
+  $lang['BLESSING'] = 'Have a nice day!';
+  $lang['BOOK_PROJECTS'] = 'Book Projects';
+  $lang['BEGIN'] = 'Begin';
+
+  $lang['CHECK_OUT'] = 'Check Out';
+  $lang['CHECK_IN'] = 'Check In';
+  $lang['CLIENT'] = 'Client';
+  $lang['COMPANIES'] = 'Companies';
+  $lang['COMPANY'] = 'Company';
+  $lang['CLIENTS'] = 'Clients';
+  $lang['CHARGED'] = 'Charged';
+
+  $lang['DISPLAY_INFORMATION'] = 'Display Infos';
+  $lang['DATE'] = 'Date';
+  $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
+  $lang['DELETE'] = 'Delete';
+  $lang['DEFAULT'] = 'Default';
+  $lang['DIFFERENCE'] = 'Difference';
+
+  $lang['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
+  $lang['EDIT'] = 'Edit';
+  $lang['ENTRANCE_DATE'] = 'Date of Entry';
+  $lang['END'] = 'End';
+  $lang['EXPECTED'] = 'Expected';
+
+  $lang['FIRSTNAME'] = 'First Name';
+  $lang['FIELDS_REQUIRED'] = 'Fields are required';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
   $lang['GREETING_DAY'] = 'Hello';
   $lang['GREETING_AFTERNOON'] = 'Good Afternoon';
   $lang['GREETING_EVENING'] = 'Good Evening';
-  $lang['CLIENT'] = 'Client';
-  $lang['FIRSTNAME'] = 'First Name';
-  $lang['LASTNAME'] = 'Last Name';
-  $lang['HOURS'] = 'Hours';
-  $lang['BLESSING'] = 'Have a nice day!';
-  $lang['AUTOREDIRECT'] = 'Click here if not redirected automatically: ';
-  $lang['UPDATE_REQUIRED'] = 'Update required. ';
-  $lang['UPTODATE'] = 'Version is up tp date. ';
-  $lang['INVALID_LOGIN'] = 'Invalid e-mail or password';
-  $lang['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
-  $lang['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
-  $lang['CHECK_OUT'] = 'Check Out';
-  $lang['CHECK_IN'] = 'Check In';
-  $lang['VACATION'] = 'Vacation';
-  $lang['SPECIAL_LEAVE'] = 'Special Leave';
-  $lang['SPECIAL_LEAVE_RET'] = 'Return from Leave';
-  $lang['REGISTER_NEW_USER'] ='Register new User';
-  $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
-  $lang['REGISTER_USERS'] = "Register LDAP Users";
-  $lang['VIEW_USER'] = 'Users';
-  $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
-  $lang['SETTINGS'] = 'Settings';
-  $lang['HOLIDAYS'] = 'Holidays';
-  $lang['COMPANIES'] = 'Companies';
-  $lang['COMPANY'] = 'Company';
-  $lang['CLIENTS'] = 'Clients';
-  $lang['VIEW_PROJECTS'] = 'View Projects';
-  $lang['NEW_PASSWORD'] = 'New Password';
-  $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
-  $lang['WEEKLY_HOURS'] = 'Weekly Hours';
-  $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
-  $lang['TIMETABLE'] = 'Timetable';
-  $lang['BOOK_PROJECTS'] = 'Book Projects';
-  $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
-  $lang['DELETE'] = 'Delete';
-  $lang['EDIT'] = 'Edit';
-  $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['GENDER'] = 'Gender';
-  $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
-  $lang['OVERTIME_ALLOWANCE'] = 'Overtime Allowance';
-  $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
-  $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
-  $lang['ENTRANCE_DATE'] = 'Date of Entry';
-  $lang['CHARGED'] = 'Charged';
-  $lang['NOT_CHARGED'] = 'Not charged';
-  $lang['PROJECT'] = 'Project';
+
+  $lang['HOURS'] = 'Hours';
+  $lang['HOLIDAYS'] = 'Holidays';
   $lang['HOURS'] = 'Hours';
   $lang['HOURS_CREDIT'] = 'Hours Credit';
   $lang['HOURS_OF_REST'] = 'Hours of Rest';
   $lang['HOURLY_RATE'] = 'Hourly Rate';
-  $lang['TIME'] = 'From - To';
-  $lang['SUM'] = 'Sum';
-  $lang['DEFAULT'] = 'Default';
-  $lang['ASSIGNED'] = 'Assigned';
-  $lang['DISPLAY_INFORMATION'] = 'Display Infos';
-  $lang['ACTIVITY'] = 'Activity';
-  $lang['LUNCHBREAK'] = 'Lunchbreak';
-  $lang['BEGIN'] = 'Begin';
-  $lang['END'] = 'End';
-  $lang['LANGUAGE_SETTING'] = 'Language';
-  $lang['EXPECTED'] = 'Expected';
-  $lang['DATE'] = 'Date';
-  $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
-  $lang['NUMBER'] = 'Number';
-  $lang['UNDO'] ='Undo';
-  $lang['MONTHLY_REPORT'] ='Monthly Report';
-  $lang['PROJECT_INFORMATION'] = 'Reports';
-  $lang['WEEKLY_DAY'] = 'Day of Week';
-  $lang['SHOULD_TIME'] = 'Should';
-  $lang['IS_TIME'] = 'Is';
-  $lang['DIFFERENCE'] = 'Difference';
-  $lang['FIELDS_REQUIRED'] = 'Fields are required';
-  $lang['REPLY_TEXT'] = 'Answer';
 
+  $lang['INVALID_LOGIN'] = 'Invalid e-mail or password';
+  $lang['IS_TIME'] = 'Is';
+
+  $lang['LASTNAME'] = 'Last Name';
+  $lang['LUNCHBREAK'] = 'Lunchbreak';
+  $lang['LANGUAGE_SETTING'] = 'Language';
+
+  $lang['MONTHLY_REPORT'] ='Monthly Report';
+
+  $lang['OVERTIME_ALLOWANCE'] = 'Overtime Allowance';
+
+  $lang['NEW_PASSWORD'] = 'New Password';
+  $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
+  $lang['NOT_CHARGED'] = 'Not charged';
+  $lang['NUMBER'] = 'Number';
+
+  $lang['PROJECT'] = 'Project';
+  $lang['PROJECT_INFORMATION'] = 'Reports';
+
+  $lang['REPLY_TEXT'] = 'Answer';
+  $lang['REGISTER_NEW_USER'] ='Register new User';
+  $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
+  $lang['REGISTER_USERS'] = "Register LDAP Users";
+
+  $lang['SUM'] = 'Sum';
+  $lang['SHOULD_TIME'] = 'Should';
+  $lang['SETTINGS'] = 'Settings';
+  $lang['SPECIAL_LEAVE'] = 'Special Leave';
+  $lang['SPECIAL_LEAVE_RET'] = 'Return from Leave';
+
+  $lang['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
+  $lang['TIMETABLE'] = 'Timetable';
+  $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
+  $lang['TIME'] = 'From - To';
+
+  $lang['UNDO'] ='Undo';
+  $lang['UPDATE_REQUIRED'] = 'Update required. ';
+  $lang['UPTODATE'] = 'Version is up tp date. ';
+
+  $lang['VACATION'] = 'Vacation';
+  $lang['VACATION_REQUESTS'] = 'Vacation Requests';
+  $lang['VIEW_USER'] = 'Users';
+  $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
+  $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
+  $lang['VIEW_PROJECTS'] = 'View Projects';
+
+  $lang['WEEKLY_HOURS'] = 'Weekly Hours';
+  $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
+  $lang['WEEKLY_DAY'] = 'Day of Week';
+
+//------------------------------------------------------------------------------
 
 } elseif($_SESSION['language'] == 'GER'){
   $activityToString = array(
@@ -152,7 +174,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['GREETING_MORNING'] = 'Guten Morgen';
   $lang['GREETING_DAY'] = 'Guten Tag';
   $lang['GREETING_AFTERNOON'] = 'Hallo';
-  $lang['GREETING_EVENING'] = 'Guten Abend';
+  $lang['GREETING_EVENING'] = 'Guten Abend';  
   $lang['CLIENT'] = 'Kunde';
   $lang['FIRSTNAME'] = 'Vorname';
   $lang['LASTNAME'] = 'Nachname';
@@ -227,5 +249,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['FIELDS_REQUIRED'] = 'Felder werden benötigt';
   $lang['REPLY_TEXT'] = 'Antwort';
+
+  $lang['VACATION_REQUESTS'] = 'Urlaubsanfragen';
 
 }
