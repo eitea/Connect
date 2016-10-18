@@ -151,7 +151,7 @@ if ($result && $result->num_rows > 0) {
   if(isset($_POST['undo'])){
     $row = $result->fetch_assoc();
 
-    if(empty($_POST['projectID'])){
+    if(empty($row['projectID'])){ //undo breaks
       $timeDiff = timeDiff_Hours($row['start'], $row['end']);
       $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
       $conn->query($sql);

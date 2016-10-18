@@ -18,6 +18,7 @@ if($row['version'] < 19){
     echo "Added reply text. <br>";
   } else {
     echo mysqli_error($conn) .'<br>';
+
   }
 
   $sql = "ALTER TABLE $userRequests ADD COLUMN answerText VARCHAR(200)";
@@ -28,6 +29,9 @@ if($row['version'] < 19){
   }
 }
 
+if($row['version'] < 20){
+
+}
 
 //------------------------------------------------------------------------------
 header("refresh:8;url=adminHome.php");
