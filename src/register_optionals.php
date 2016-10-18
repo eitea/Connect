@@ -145,18 +145,20 @@ if(isset($_POST['create'])){
     //past: re-calculate vacationcredit until today and insert unlogs
     $difference = timeDiff_Hours(substr(getCurrentTimestamp(),0,10) . ' 05:00:00', $begin);
     if($difference > 0){ //future
-      $sql = "DELIMITER |
-      CREATE EVENT '$userID.$firstname' ON SCHEDULE AT $begin
+      $sql = "CREATE EVENT create$userID ON SCHEDULE AT '$begin'
       ON COMPLETION NOT PRESERVE ENABLE
+      COMMENT 'Removing unlogs on entry date'
       DO
       BEGIN
-        DELETE * FROM $negative_logTable WHERE userID = $userID;
-        UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $userID;
-      END |
-      DELIMITER ;
-      "
+      DELETE FROM $negative_logTable WHERE userID = $userID;
+      UPDATE $vacationTable SET vacationHoursCredit = 0;
+      END
+      ";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+
     } elseif($difference < 0) { //past
-      $credit = ($vacDaysPerYear/365) * $difference;
+      $credit = ($vacDaysPerYear/365) * timeDiff_Hours($begin, substr(getCurrentTimestamp(),0,10) . ' 05:00:00');
       $i = $begin;
       while(substr($i, 0, 10) != substr(getCurrentTimestamp(),0,10)){
         $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
@@ -166,7 +168,7 @@ if(isset($_POST['create'])){
       }
     }
 
-    header('refresh:0;url=editUsers.php');
+    //header('refresh:0;url=editUsers.php');
   }
 
 }
