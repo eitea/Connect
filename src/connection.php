@@ -5,7 +5,6 @@ $userTable = "UserData";
 $logTable = "logs";
 $holidayTable = "holidays";
 $vacationTable = "vacationData";
-$adminLDAPTable = "ldapConfigTab";
 $bookingTable = "bookingData";
 $projectTable = "projectData";
 $clientTable = "clientData";
@@ -14,8 +13,11 @@ $projectBookingTable = "projectBookingData";
 $companyToUserRelationshipTable = "companyToClientRelationshipData";
 $companyDefaultProjectTable = "companyDefaultProjects";
 $negative_logTable = "unlogs";
-$configTable = "configurationData";
 $userRequests = "userRequestsData";
+
+$adminLDAPTable = "ldapConfigTab";
+$adminGitHubTable = "gitHubConfigTab";
+$configTable = "configurationData";
 
 
 $conn = new mysqli($servername, $username, $password, $dbName);

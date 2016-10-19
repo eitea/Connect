@@ -95,7 +95,7 @@ Date.prototype.dst = function() {
 </script>
 
 <div style="position: absolute; bottom: 5px;">
-    <a href=http://www.eitea.at style="color:white;text-decoration: none;">EI-TEA Partner GmbH</a>
+    <a href=http://www.eitea.at target='_blank' style="color:white;text-decoration: none;">EI-TEA Partner GmbH</a>
 </div>
 </body>
 </html>

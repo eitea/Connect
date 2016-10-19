@@ -167,6 +167,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <li><a href="adminHome.php?link=editCompanies.php"><?php echo $lang['COMPANIES']; ?></a></li>
               <li><a href="adminHome.php?link=configureLDAP.php"><span>LDAP</span></a></li>
               <li><a href="adminHome.php?link=editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
+              <li><a href="adminHome.php?link=advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
             </ul>
           </li>
 

@@ -92,7 +92,8 @@ if ($conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, 19)";
+$require 'version_number.php';
+$sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
 if ($conn->query($sql)) {
   echo "Insert into ldap table. <br>";
 } else {
@@ -333,6 +334,7 @@ if ($conn->query($sql)) {
   echo mysqli_error($conn) .'<br>';
 }
 
+
 $sql = "CREATE TABLE $userRequests(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   userID INT(6) UNSIGNED,
@@ -345,6 +347,24 @@ $sql = "CREATE TABLE $userRequests(
 )";
 if ($conn->query($sql)) {
   echo "Created request table. <br>";
+} else {
+  echo mysqli_error($conn) .'<br>';
+}
+
+
+$sql = "CREATE TABLE $adminGitHubTable(
+  sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+)";
+if ($conn->query($sql)) {
+  echo "Added gitConfigTable <br>";
+} else {
+  echo mysqli_error($conn) .'<br>';
+}
+
+$sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('TRUE')
+)";
+if ($conn->query($sql)) {
+  echo "Insert into gitConfigTable <br>";
 } else {
   echo mysqli_error($conn) .'<br>';
 }

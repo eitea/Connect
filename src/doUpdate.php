@@ -30,6 +30,22 @@ if($row['version'] < 19){
 }
 
 if($row['version'] < 20){
+  $sql = "CREATE TABLE $adminGitHubTable(
+    sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+  )";
+  if ($conn->query($sql)) {
+    echo "Added gitConfigTable <br>";
+  } else {
+    echo mysqli_error($conn) .'<br>';
+  }
+
+  $sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('TRUE')
+  )";
+  if ($conn->query($sql)) {
+    echo "Added gitConfigTable <br>";
+  } else {
+    echo mysqli_error($conn) .'<br>';
+  }
 
 }
 
