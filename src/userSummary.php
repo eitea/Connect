@@ -103,10 +103,10 @@ tr td:nth-child(1) { /* not 0 based */
     <th width=20%>Hours</th>
   </tr>
 <?php
-echo '<tr><td>Absolved Hours: </td><td>'. number_format($absolvedHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>Expected Hours: </td><td>'. number_format($expectedHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>LunchTime: </td><td>'. number_format($breakCreditHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>Hours in Vacation: </td><td>'. number_format($vacationHours, 2, '.', '').'</td></tr>';
+echo '<tr><td>Absolved Hours: </td><td>'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
+echo '<tr><td>Expected Hours: </td><td>'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
+echo '<tr><td>LunchTime: </td><td>'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
+echo '<tr><td>Hours in Vacation: </td><td>'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
 echo '<tr><td>Special Absence: </td><td>'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
 echo '<tr><td>Sick Time: </td><td>'. number_format($sickHours, 2, '.', '').'</td></tr>';
 echo '<tr><td>ZA: </td><td>'. number_format($ZA_Hours, 2, '.', '').'</td></tr>';
