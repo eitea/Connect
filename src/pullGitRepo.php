@@ -6,18 +6,22 @@ if (!isset($_SESSION['userid'])) {
 if ($_SESSION['userid'] != 1) {
   die('Access denied. <a href="logout.php"> return</a>');
 }
+
 require "connection.php";
 
-include "../vendor/gitWrapper/Git.php";
+$repositoryPath = dirname(dirname(realpath("pullGitRepo.php")));
 
-$repositoryPath = realpath(dirname(dirname(realpath("pullGitRepo.php"))));
+$command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
+exec($command, $output, $returnValue);
+echo implode('<br>', $output) .'<br><br>';
+echo $returnValue;
 
-$command = 'git GIT_SSL_NO_VERIFY=true -C ' . escapeshellarg($this->repositoryPath) . ' pull';
-if (DIRECTORY_SEPARATOR == '/') {
-    $command = 'LC_ALL=en_US.UTF-8 ' . $command;
-}
+
+$command = 'git -C ' .$repositoryPath. ' pull --force 2>&1';
 exec($command, $output, $returnValue);
 
+echo implode('<br>', $output) .'<br><br>';
+echo $returnValue;
 session_destroy();
 ?>
 

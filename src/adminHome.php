@@ -42,8 +42,6 @@ iframe {
 </script>
 </head>
 
-This is a test
-
 <?php
 session_start();
 if (!isset($_SESSION['userid'])) {
