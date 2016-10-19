@@ -15,6 +15,8 @@ if(isset($_POST['GERMAN']) || isset($_POST['ENGLISH'])) {
   <link rel="stylesheet" href="../css/homeMenu.css">
   <link rel="stylesheet" type="text/css" href="../css/submitFlags.css">
 
+  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.min.js"></script>
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -26,6 +28,10 @@ if(isset($_POST['GERMAN']) || isset($_POST['ENGLISH'])) {
 iframe {
   width:100%;
   min-height:450px;
+}
+.popover{
+    width: 400px; /* Max Width of the popover (depending on the container!) */
+    font-size:11px;
 }
 </style>
 
@@ -75,16 +81,28 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <li>
-            <a href="getProjects.php" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
+            <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH</a> <br> The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor, the Software will perform substantially in accordance with the functional specifications set forth in the documentation.">
+            <i class="fa fa-info"></i></a>
+          </li>
+
+          <li>
+            <a href="#" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
           </li>
           <li>
             <a href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
           </li>
+
         </ul>
       </div>
 
     </nav>
   </header>
+
+  <script>
+  $(document).ready(function(){
+      $('[data-toggle="popover"]').popover({html:true});
+  });
+  </script>
 
   <aside class="main-sidebar">
     <section class="sidebar">
@@ -292,8 +310,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
       <div class="control-sidebar-bg"></div>
 
     </div>
-    <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
+
     <script src="../plugins/fastclick/fastclick.js"></script>
     <script src="../js/app.min.js"></script>
     <script src="../plugins/sparkline/jquery.sparkline.min.js"></script>

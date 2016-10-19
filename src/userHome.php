@@ -18,9 +18,17 @@ header("location:userHome.php?link=userSummary.php"); // your current page
   <link rel="stylesheet" type="text/css" href="../css/submitFlags.css">
   <link rel="stylesheet" type="text/css" href="../css/stampingButt.css">
 
+  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.min.js"></script>
+
   <style>
   iframe {
     width:100%;
+    min-height:800px;
+  }
+  .popover{
+      width: 400px; /* Max Width of the popover (depending on the container!) */
+      font-size:11px;
   }
   </style>
   <script>
@@ -71,7 +79,11 @@ require "language.php";
         <div class="navbar-custom-menu">
           <ul class="nav navbar-nav">
             <li>
-              <a href="userHome.php?link=userSummary.php" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
+              <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH</a> <br> The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor, the Software will perform substantially in accordance with the functional specifications set forth in the documentation.">
+              <i class="fa fa-info"></i></a>
+            </li>
+            <li>
+              <a href="#" data-toggle="control-sidebar" title="Options"><i class="fa fa-gears"></i></a>
             </li>
             <li>
               <a href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -81,6 +93,12 @@ require "language.php";
 
       </nav>
     </header>
+
+    <script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover({html:true});
+    });
+    </script>
 
   <aside class="main-sidebar">
     <section class="sidebar">
@@ -285,8 +303,6 @@ require "language.php";
 <div class="control-sidebar-bg"></div>
 
 </div>
-<script src="../plugins/jQuery/jquery-2.2.3.min.js"></script>
-<script src="../bootstrap/js/bootstrap.min.js"></script>
 <script src="../plugins/fastclick/fastclick.js"></script>
 <script src="../js/app.min.js"></script>
 <script src="../plugins/sparkline/jquery.sparkline.min.js"></script>

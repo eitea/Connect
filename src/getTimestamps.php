@@ -324,8 +324,7 @@ if ($result && $result->num_rows > 0) {
 ?>
 
 <script>
-$("[data-toggle=popover]")
-.popover({html:true})
+$("[data-toggle=popover]").popover({html:true})
 </script>
 
 </table>
