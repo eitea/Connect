@@ -106,6 +106,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NEW_PASSWORD'] = 'New Password';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
   $lang['NOT_CHARGED'] = 'Not charged';
+  $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
 
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Allowance';
@@ -235,6 +236,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
   $lang['NOT_CHARGED'] = 'Nicht Verrechnet';
+  $lang['NOT_CHARGEABLE'] = 'Erlassen';
   $lang['NUMBER'] = 'Number';
 
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';

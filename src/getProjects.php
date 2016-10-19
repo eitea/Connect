@@ -159,6 +159,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo mysqli_error($conn);
     }
   }
+  if(isset($_POST['saveChanges']) && isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
+    foreach ($_POST["noCheckCheckingIndeces"] as $e) {
+      $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+      $conn->query($sql);
+    }
+  }
   if(isset($_POST['saveChanges']) && isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
     foreach ($_POST["checkingIndeces"] as $e) {
       $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
@@ -259,7 +265,7 @@ function toggle(source) {
 <th><?php echo $lang['SUM']; ?> (0.25h)</th>
 <th><?php echo $lang['HOURS_CREDIT']; ?></th>
 <th>Person</th>
-<th><?php echo $lang['CHARGED']; ?><input type="checkbox" onClick="toggle(this)" /></th>
+<th><?php echo $lang['CHARGED']; ?> / <?php echo $lang['NOT_CHARGEABLE']; ?><input type="checkbox" onClick="toggle(this)" /></th>
 <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
 </tr>
 </thead>
@@ -356,7 +362,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       } else {
         $selected = "checked";
       }
-      echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'></td>"; //gotta know which ones he wants checked.
+      echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+      echo " / <input type='checkbox' $selected name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
       $csv_Add[] = $row['hourlyPrice'];
       echo "<td>".$row['hourlyPrice']."</td>";
       echo "</tr>";
