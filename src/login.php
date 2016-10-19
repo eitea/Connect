@@ -66,7 +66,7 @@ function strip_input($data) {
 
 <div id="footer">
   <form method="POST" action="login.php">
-  <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value=""></input><br>
+  <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus></input><br>
 
   <label for="pw">Password: </label> <input id="pw" type="password" name="password" value=""></input><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel"><br><br>
 

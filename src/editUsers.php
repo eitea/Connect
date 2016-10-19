@@ -72,6 +72,13 @@
         if (isset($_POST['submit'.$x])) {
           $userid = $x;
 
+          //TODO: get submitDate -> date restriction (is in future)
+          //create event that changes desired values on that day, at idk.. 1am?
+          
+          if($_POST['submitDate'. $x] != substr(getCurrentTimestamp(),0,10)){
+
+          }
+
           if (!empty($_POST['firstname'.$x])) {
             $firstname = $_POST['firstname'.$x];
             $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$userid';";
@@ -343,7 +350,7 @@
         </fieldset>
 
         <br> <br>
-        <input type="submit" name="submit<?php echo $x; ?>" value="Submit"/><br><br>
+        <input type="submit" name="submit<?php echo $x; ?>" value="Submit"/> - <input type="date" min="<?php echo substr(getCurrentTimestamp(),0,10); ?>" name="submitDate<?php echo $x; ?>" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>"><br><br>
       </div>
       <?php
     }

@@ -39,8 +39,7 @@ if($row['version'] < 20){
     echo mysqli_error($conn) .'<br>';
   }
 
-  $sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('TRUE')
-  )";
+  $sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('TRUE')";
   if ($conn->query($sql)) {
     echo "Added gitConfigTable <br>";
   } else {

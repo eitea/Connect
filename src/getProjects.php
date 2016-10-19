@@ -363,7 +363,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $selected = "checked";
       }
       echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-      echo " / <input type='checkbox' $selected name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+      echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
       $csv_Add[] = $row['hourlyPrice'];
       echo "<td>".$row['hourlyPrice']."</td>";
       echo "</tr>";
