@@ -46,6 +46,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
+  $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
@@ -180,6 +181,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
   $lang['ACTIVITY'] = 'Aktivität';
+  $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
