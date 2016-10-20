@@ -202,7 +202,7 @@ function showProjects(str) {
         document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
       }
     };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?q="+str,true);
+    xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?q="+str+"&p=0",true);
     xmlhttp.send();
   }
 }
