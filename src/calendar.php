@@ -33,7 +33,7 @@ if($result && $result->num_rows > 0){
   }
 }
 ?>
-  <div id='calendar' style='height: 850px;'></div>
+  <div id='calendar' style='height: 900px;'></div>
   <script>
   $(document).ready(function() {
     $('#calendar').fullCalendar({
@@ -52,7 +52,7 @@ if($result && $result->num_rows > 0){
 
   <?php
   if ($_SESSION['userid'] == 1) {
-    echo "<a href='adminHome.php?link=allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
+    echo "<a href='allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
   }
   ?>
 </body>

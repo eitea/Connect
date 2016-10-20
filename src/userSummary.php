@@ -32,7 +32,7 @@ tr td:nth-child(1) { /* not 0 based */
   require "createTimestamps.php";
   require "language.php";
 
-  $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = $ZA_Hours = 0;
+  $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = 0;
 
   $sql = "SELECT * FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE $userTable.id = $userID";
   $result = $conn->query($sql);
@@ -68,9 +68,6 @@ tr td:nth-child(1) { /* not 0 based */
           break;
         case 3:
           $sickHours += timeDiff_Hours($row['time'], $timeEnd);
-          break;
-        case 4:
-          $ZA_Hours += timeDiff_Hours($row['time'], $timeEnd);
       }
 
       $expectedHours += $row['expectedHours'];
@@ -99,17 +96,16 @@ tr td:nth-child(1) { /* not 0 based */
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:500px'>
   <tr>
-    <th style=text-align:left>Description</th>
-    <th width=20%>Hours</th>
+    <th style=text-align:left><?php echo $lang['DESCRIPTION']; ?></th>
+    <th width=20%><?php echo $lang['HOURS']; ?></th>
   </tr>
 <?php
-echo '<tr><td>Absolved Hours: </td><td>'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>Expected Hours: </td><td>'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>LunchTime: </td><td>'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
-echo '<tr><td>Hours in Vacation: </td><td>'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>Special Absence: </td><td>'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>Sick Time: </td><td>'. number_format($sickHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>ZA: </td><td>'. number_format($ZA_Hours, 2, '.', '').'</td></tr>';
+echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
+echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
+echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
+echo '<tr><td>'.$lang['VACATION'].': </td><td>+'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
+echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
+echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'. number_format($sickHours, 2, '.', '').'</td></tr>';
 echo "<tr><td style=font-weight:bold;$color>Summary: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
 ?>
 </table>
@@ -118,11 +114,10 @@ echo "<tr><td style=font-weight:bold;$color>Summary: </td><td $color>". number_f
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:300px'>
   <tr>
-    <th style=text-align:left>User Information</th>
-    <th width=30%>Hours</th>
+    <th style=text-align:left><?php echo $lang['TIMETABLE']; ?></th>
+    <th width=30%><?php echo $lang['HOURS']; ?></th>
   </tr>
 <?php
-$biggerSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu'] + $userRow['fri'] + $userRow['sat'] + $userRow['sun'];
 echo '<tr><td>Monday: </td><td>'. $userRow['mon'] .'</td></tr>';
 echo '<tr><td>Tuesday: </td><td>'. $userRow['tue'] .'</td></tr>';
 echo '<tr><td>Wednesday: </td><td>'. $userRow['wed'] .'</td></tr>';
@@ -130,7 +125,6 @@ echo '<tr><td>Thursday: </td><td>'. $userRow['thu'] .'</td></tr>';
 echo '<tr><td>Friday: </td><td>'. $userRow['fri'] .'</td></tr>';
 echo '<tr><td>Saturday: </td><td>'. $userRow['sat'] .'</td></tr>';
 echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
-echo "<tr><td style=font-weight:bold;>Sum: </td><td>". number_format($biggerSum, 2, '.', '').'</td></tr>';
 ?>
 </table>
 </div>

@@ -74,8 +74,7 @@
 
           //TODO: get submitDate -> date restriction (is in future)
           //create event that changes desired values on that day, at idk.. 1am?
-          
-          if($_POST['submitDate'. $x] != substr(getCurrentTimestamp(),0,10)){
+          if($_POST['submitDate'. $x] != substr(getCurrentTimestamp(), 0, 10)){
 
           }
 

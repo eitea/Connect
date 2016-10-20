@@ -21,7 +21,7 @@ require "language.php";
 
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  $sql = "SELECT $userRequests.id FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
+  $sql = "SELECT $userRequests.* FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
   $result = $conn->query($sql);
   if($result->num_rows > 0){
     while($row = $result->fetch_assoc()){
@@ -29,7 +29,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $answerText = $_POST['answerText'. $row['id']];
         $sql = "UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = " .$row['id'];
         $conn->query($sql);
-        //TODO: subtract time from vacationCredit.
+        //
+        $sql = "SELECT * FROM $bookingTable WHERE userID = " . $row['userID'];
+        $result2 = $conn->query($sql);
+        $row2 = $result2->fetch_assoc();
+        //for each day he is on vacation, check if expected hours > 0, if so create vacation timestamp.
 
 
         break;

@@ -44,6 +44,7 @@ if($_SESSION['language'] == 'ENG'){
     "4" => "Time Balance"
   );
 
+  $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
@@ -68,6 +69,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DATE'] = 'Date';
   $lang['DEFAULT'] = 'Default';
   $lang['DELETE'] = 'Delete';
+  $lang['DESCRIPTION'] = 'Description';
   $lang['DIFFERENCE'] = 'Difference';
   $lang['DISPLAY_INFORMATION'] = 'Display Infos';
 
@@ -76,6 +78,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['END'] = 'End';
   $lang['ENTRANCE_DATE'] = 'Date of Entry';
   $lang['EXPECTED'] = 'Expected';
+  $lang['EXPECTED_HOURS'] = 'Expected Hours';
 
   $lang['FIELDS_REQUIRED'] = 'Fields are required';
   $lang['FIRSTNAME'] = 'First Name';
@@ -121,6 +124,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['SETTINGS'] = 'Settings';
   $lang['SHOULD_TIME'] = 'Should';
+  $lang['SICK_LEAVE'] = 'Sick Leave';
   $lang['SPECIAL_LEAVE'] = 'Special Leave';
   $lang['SPECIAL_LEAVE_RET'] = 'Return from Leave';
   $lang['SUM'] = 'Sum';
@@ -174,6 +178,7 @@ if($_SESSION['language'] == 'ENG'){
   );
   $lang_vacationRequestStatus = array("Offen", "Abgelehnt", "Bewilligt");
 
+  $lang['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
   $lang['ACTIVITY'] = 'Aktivität';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
@@ -198,6 +203,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DATE'] = 'Datum';
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
+  $lang['DESCRIPTION'] = 'Beschreibung';
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
@@ -206,6 +212,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['END'] = 'Ende';
   $lang['ENTRANCE_DATE'] = 'Eintrittsdatum';
   $lang['EXPECTED'] = 'Erwartet';
+  $lang['EXPECTED_HOURS'] = 'Erwartete Stunden';
 
   $lang['FIELDS_REQUIRED'] = 'Felder werden benötigt';
   $lang['FIRSTNAME'] = 'Vorname';
@@ -252,6 +259,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['SETTINGS'] = 'Einstellungen';
   $lang['SHOULD_TIME'] = 'Soll';
+  $lang['SICK_LEAVE'] = 'Krankenstand';
   $lang['SPECIAL_LEAVE'] = 'Sonderurlaub';
   $lang['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
   $lang['SUM'] ='Summe';
