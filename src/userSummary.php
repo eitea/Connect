@@ -13,7 +13,7 @@
 div{
   text-align:center;
   float:left;
-  margin-right:10px;
+  margin:5px;
 }
 tr td:nth-child(1) { /* not 0 based */
    text-align: left;
@@ -129,17 +129,17 @@ echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
 </table>
 </div>
 
-<table class="table table-striped table-bordered" cellspacing="0" style='width:500px'>
+<div>
+<table class="table table-striped table-bordered" cellspacing="0" style='width:810px'>
   <tr>
     <th><?php echo $lang['VACATION_DAYS_PER_YEAR']; ?></th>
-    <th><?php echo $lang['ACCUMULATED_HOURS'] .': '. $lang['VACATION']; ?></th>
+    <th><?php echo $lang['USED_HOURS'] .' / '. $lang['ACCUMULATED_HOURS'] .': '. $lang['VACATION']; ?></th>
   </tr>
 <?php
 echo '<tr>';
 echo '<td style=text-align:center;>'. $userRow['daysPerYear'] .'</td>';
-echo '<td>'. $userRow['vacationHoursCredit'] .'</td></tr>';
+echo '<td>'. number_format($vacationHours, 2, '.', '').' / '.$userRow['vacationHoursCredit'] .'</td></tr>';
 ?>
 </table>
-
-
+</div>
 </body>

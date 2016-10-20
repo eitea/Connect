@@ -138,6 +138,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UNDO'] ='Undo';
   $lang['UPDATE_REQUIRED'] = 'Update required. ';
   $lang['UPTODATE'] = 'Version is up tp date. ';
+  $lang['USED_HOURS'] ='Used Hours';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
@@ -274,6 +275,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UNDO'] = 'Rückgängig';
   $lang['UPDATE_REQUIRED'] = 'Update benötigt. ';
   $lang['UPTODATE'] = 'Version ist aktuell. ';
+  $lang['USED_HOURS'] ='Verbrauchte Stunden';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';
