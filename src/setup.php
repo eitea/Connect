@@ -32,7 +32,8 @@ $sql = "CREATE TABLE $userTable (
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   enableProjecting ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER'
+  preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
+  coreTime TIME DEFAULT '8:00'
 )";
 if ($conn->query($sql)) {
   echo "created user table. <br>";

@@ -45,7 +45,15 @@ if($row['version'] < 20){
   } else {
     echo mysqli_error($conn) .'<br>';
   }
+}
 
+if($row['version'] < 21){
+  $sql = "ALTER TABLE $userTable ADD COLUMN coreTime TIME DEFAULT '8:00'";
+  if ($conn->query($sql)) {
+    echo "Added coreTime <br>";
+  } else {
+    echo mysqli_error($conn) .'<br>';
+  }
 }
 
 

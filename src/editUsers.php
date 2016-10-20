@@ -108,6 +108,12 @@
             $conn->query($sql);
           }
 
+          if (isset($_POST['coreTime'.$x])){
+            $coreTime = $_POST['coreTime'.$x];
+            $sql = "UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$userid';";
+            $conn->query($sql);
+          }
+
           if (!empty($_POST['vacDays'.$x]) && is_numeric($_POST['vacDays'.$x])) {
             $vacDaysPerYear = $_POST['vacDays'.$x];
             $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDays' WHERE userID = '$userid';";
@@ -218,7 +224,7 @@
   <form action="#" name="myForm" method="POST" onsubmit="return confirm('Are you sure you want to proceed?');">
     <?php
     $mon=$tue=$wed=$thu=$fri=$sat=$sun=0;
-    $firstname=$lastname=$email=$gender=$vacDays=$overTimeAll = $vacDaysCredit = $pauseAfter = $rest = $begin = $passErr="";
+    $firstname=$lastname=$email=$gender=$vacDays=$overTimeAll = $vacDaysCredit = $pauseAfter = $rest = $begin = $passErr= $coreTime = "";
 
     $query = "SELECT *, $userTable.id AS userID FROM $userTable INNER JOIN $bookingTable ON $userTable.id = $bookingTable.userID INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID ORDER BY $userTable.id ASC";
     $result = mysqli_query($conn, $query);
@@ -236,6 +242,7 @@
         $lastname = $row['lastname'];
         $gender = $row['gender'];
         $email = $row['email'];
+        $coreTime = $row['coreTime'];
         $vacDaysPerYear = $row['daysPerYear'];
         $vacDaysCredit = $row['vacationHoursCredit'];
         $overTimeAll = $row['overTimeLump'];
@@ -263,6 +270,9 @@
 
             E-Mail: <br>
             <input type="text" name="email<?php echo $x; ?>" value="<?php echo $email; ?>"/><br><br>
+
+            <?php echo $lang['CORE_TIME']?>: <br>
+            <input type="time" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>"/><br><br>
 
             <?php echo $lang['ENTRANCE_DATE'] .':<br>'. substr($begin,0,10); ?>
           </div>

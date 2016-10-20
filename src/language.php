@@ -47,6 +47,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
+  $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
@@ -65,6 +66,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['CLIENTS'] = 'Clients';
   $lang['COMPANIES'] = 'Companies';
   $lang['COMPANY'] = 'Company';
+  $lang['CORE_TIME'] ='Core Time';
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
   $lang['DATE'] = 'Date';
@@ -143,6 +145,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
   $lang['VACATION_REQUESTS'] = 'Vacation Requests';
+  $lang['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
   $lang['VIEW_PROJECTS'] = 'View Projects';
   $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
   $lang['VIEW_USER'] = 'Users';
@@ -183,6 +186,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
   $lang['ACTIVITY'] = 'Aktivität';
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
+  $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
@@ -201,6 +205,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['CLIENTS'] = 'Kunden';
   $lang['COMPANY'] = 'Mandant';
   $lang['COMPANIES'] = 'Mandanten';
+  $lang['CORE_TIME'] = 'Kernzeit';
 
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';
@@ -280,6 +285,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';
   $lang['VACATION_REQUESTS'] = 'Urlaubsanfragen';
+  $lang['VACATION_WEEKS_PER_YEAR'] = 'Wochen Urlaub im Jahr';
   $lang['VIEW_PROJECTS'] = 'Projekte';
   $lang['VIEW_TIMESTAMPS'] = 'Zeitstempel';
   $lang['VIEW_USER'] = 'Benutzer';

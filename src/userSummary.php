@@ -11,7 +11,6 @@
 </head>
 <style>
 div{
-  text-align:center;
   float:left;
   margin:5px;
 }
@@ -20,7 +19,7 @@ tr td:nth-child(1) { /* not 0 based */
 }
 </style>
 <body>
-  <?php
+<?php
   session_start();
   if (!isset($_SESSION['userid'])) {
     die('Please <a href="login.php">login</a> first.');
@@ -91,57 +90,58 @@ tr td:nth-child(1) { /* not 0 based */
   } else {
     $color = 'style=color:red';
   }
-  ?>
 
+?>
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:500px'>
-  <tr>
-    <th style=text-align:left><?php echo $lang['DESCRIPTION']; ?></th>
-    <th width=20%><?php echo $lang['HOURS']; ?></th>
-  </tr>
-<?php
-echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
-echo '<tr><td>'.$lang['VACATION'].': </td><td>+'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
-echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
-echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'. number_format($sickHours, 2, '.', '').'</td></tr>';
-echo "<tr><td style=font-weight:bold;$color>Summary: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
-?>
+    <tr>
+      <th style=text-align:left><?php echo $lang['DESCRIPTION']; ?></th>
+      <th width=20%><?php echo $lang['HOURS']; ?></th>
+    </tr>
+  <?php
+  echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
+  echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
+  echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
+  echo '<tr><td>'.$lang['VACATION'].': </td><td>+'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
+  echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
+  echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'. number_format($sickHours, 2, '.', '').'</td></tr>';
+  echo "<tr><td style=font-weight:bold;>Summary: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
+  ?>
 </table>
 </div>
 
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:300px'>
-  <tr>
-    <th style=text-align:left><?php echo $lang['TIMETABLE']; ?></th>
-    <th width=30%><?php echo $lang['HOURS']; ?></th>
-  </tr>
-<?php
-echo '<tr><td>Monday: </td><td>'. $userRow['mon'] .'</td></tr>';
-echo '<tr><td>Tuesday: </td><td>'. $userRow['tue'] .'</td></tr>';
-echo '<tr><td>Wednesday: </td><td>'. $userRow['wed'] .'</td></tr>';
-echo '<tr><td>Thursday: </td><td>'. $userRow['thu'] .'</td></tr>';
-echo '<tr><td>Friday: </td><td>'. $userRow['fri'] .'</td></tr>';
-echo '<tr><td>Saturday: </td><td>'. $userRow['sat'] .'</td></tr>';
-echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
-?>
+    <tr>
+      <th style=text-align:left><?php echo $lang['TIMETABLE']; ?></th>
+      <th width=30%><?php echo $lang['HOURS']; ?></th>
+    </tr>
+  <?php
+  echo '<tr><td>Monday: </td><td>'. $userRow['mon'] .'</td></tr>';
+  echo '<tr><td>Tuesday: </td><td>'. $userRow['tue'] .'</td></tr>';
+  echo '<tr><td>Wednesday: </td><td>'. $userRow['wed'] .'</td></tr>';
+  echo '<tr><td>Thursday: </td><td>'. $userRow['thu'] .'</td></tr>';
+  echo '<tr><td>Friday: </td><td>'. $userRow['fri'] .'</td></tr>';
+  echo '<tr><td>Saturday: </td><td>'. $userRow['sat'] .'</td></tr>';
+  echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
+  ?>
 </table>
 </div>
 
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:810px'>
   <tr>
-    <th><?php echo $lang['USED_HOURS']; ?></th>
-    <th><?php echo $lang['ACCUMULATED_HOURS'] .': '. $lang['VACATION']; ?></th>
-    <th><?php echo $lang['VACATION_DAYS_PER_YEAR']. ' in ' . $lang['HOURS'] ; ?></th>
+    <th><?php echo $lang['DESCRIPTION']; ?> </th>
+    <th>Detail</th>
   </tr>
-<?php
-echo '<tr>';
-echo '<td style=text-align:center;>'. number_format($vacationHours, 2, '.', '') .'</td>';
-echo '<td>'. $userRow['vacationHoursCredit'] .'</td>';
-echo '<td>'. ($userRow['daysPerYear'] * 24) .'</td></tr>';
-?>
+  <?php
+  echo '<tr><td>'. $lang['CORE_TIME'] .' '. $lang['BEGIN'] .'</td><td>'. $userRow['coreTime'] .'</td></tr>';
+  echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
+
+  echo '<tr><td>'. $lang['ACCUMULATED_DAYS'] .': '. $lang['VACATION']. '</td><td>'. number_format($userRow['vacationHoursCredit'] / 24, 2, '.', '') .'</td></tr>';
+  echo '<tr><td>'.$lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['daysPerYear'] .'</td></tr>';
+  ?>
 </table>
 </div>
+
 </body>
