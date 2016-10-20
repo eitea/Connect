@@ -132,13 +132,15 @@ echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:810px'>
   <tr>
-    <th><?php echo $lang['VACATION_DAYS_PER_YEAR']; ?></th>
-    <th><?php echo $lang['USED_HOURS'] .' / '. $lang['ACCUMULATED_HOURS'] .': '. $lang['VACATION']; ?></th>
+    <th><?php echo $lang['USED_HOURS']; ?></th>
+    <th><?php echo $lang['ACCUMULATED_HOURS'] .': '. $lang['VACATION']; ?></th>
+    <th><?php echo $lang['VACATION_DAYS_PER_YEAR']. ' in ' . $lang['HOURS'] ; ?></th>
   </tr>
 <?php
 echo '<tr>';
-echo '<td style=text-align:center;>'. $userRow['daysPerYear'] .'</td>';
-echo '<td>'. number_format($vacationHours, 2, '.', '').' / '.$userRow['vacationHoursCredit'] .'</td></tr>';
+echo '<td style=text-align:center;>'. number_format($vacationHours, 2, '.', '') .'</td>';
+echo '<td>'. $userRow['vacationHoursCredit'] .'</td>';
+echo '<td>'. ($userRow['daysPerYear'] * 24) .'</td></tr>';
 ?>
 </table>
 </div>

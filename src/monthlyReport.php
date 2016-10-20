@@ -149,9 +149,9 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     echo "<tr $style>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
-    echo "<td>" . substr($A,11,8) . "</td>";
+    echo "<td>" . substr($A,11,5) . "</td>";
     echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
-    echo "<td>" . substr($B,11,8)  . "</td>";
+    echo "<td>" . substr($B,11,5)  . "</td>";
     echo "<td style='font-size:small; text-align:left;'>" . $tinyEndTime . "</td>";
     echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";

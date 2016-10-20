@@ -36,15 +36,13 @@ if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end
   } else {
     echo 'Invalid Dates.';
   }
-} else {
-  $message = $lang['FIELDS_REQUIRED'];
 }
 ?>
 
 <h1><?php echo $lang['VACATION']?></h1>
 
 <br>
-<div style=float:left;padding-bottom:500px>
+<div style=float:left;padding-bottom:250px>
 <table>
   <tr>
     <td>From: *</td><td> <input id="calendar" type='text' name='start' value=''> </td>
@@ -56,7 +54,7 @@ if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end
     <td><input type='submit' name='makeRequest' value='Request Vacation' ></td> <td> <input type="text" name="requestText" value="" placeholder = "Info Text"> </td>
   </tr>
   <tr>
-    <td><small>*<?php echo $message; ?></small></td>
+    <td><small>*<?php echo $lang['FIELDS_REQUIRED']; ?></small></td>
   </tr>
 </table>
 </div>
