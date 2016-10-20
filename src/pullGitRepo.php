@@ -11,9 +11,9 @@ require "connection.php";
 $sql = "SELECT * FROM $adminGitHubTable WHERE sslVerify = 'TRUE'";
 $result = $conn->query($sql);
 
-if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable, else do nothing
-  $repositoryPath = dirname(dirname(realpath("pullGitRepo.php")));
+$repositoryPath = dirname(dirname(realpath("pullGitRepo.php")));
 
+if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable, else do nothing
   $command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
   exec($command, $output, $returnValue);
   echo implode('<br>', $output) .'<br><br>';
