@@ -7,10 +7,10 @@ while($row = $result->fetch_assoc()){
   $absolvedHours = timeDiff_Hours($row['time'], $row['timeEnd']);
   if($absolvedHours != $row['expectedHours']){
     $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
-    $adjustedTime = carryOverAdder_Hours($adjustedTime, ($row['expectedHours'] * 60) % 60);
-
+    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
     $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
     $conn->query($sql);
+    echo mysqli_error($conn);
   }
 }
  ?>

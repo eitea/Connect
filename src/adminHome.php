@@ -54,7 +54,7 @@ require "connection.php";
 require "createTimestamps.php";
 require "language.php";
 
-$URL = "";
+$URL = "adminTodos.php";
 if($_SERVER["REQUEST_METHOD"] == "GET"){
   if(isset($_GET['link'])){
     $URL = $_GET['link'];
@@ -64,7 +64,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 <div class="wrapper">
   <header class="main-header">
     <!-- Logo -->
-    <a href="adminHome.php" class="logo">
+    <a href="adminHome.php?link=adminTodos.php" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>A</b></span>
       <!-- logo for regular state and mobile devices -->

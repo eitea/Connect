@@ -45,8 +45,8 @@ $invalidLogin = "";
             header("refresh:3;url=doUpdate.php");
             die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="doUpdate.php">update</a>');
           } else {
-           header("refresh:0;url=adminHome.php");
-            die ($lang['AUTOREDIRECT']. '<a href="adminHome.php">redirect</a>');
+           header("refresh:0;url=adminHome.php?link=adminTodos.php");
+            die ($lang['AUTOREDIRECT']. '<a href="adminHome.php?link=adminTodos.php">redirect</a>');
           }
         }
     } else {

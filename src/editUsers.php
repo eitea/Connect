@@ -108,12 +108,13 @@
             $conn->query($sql);
           }
 
+/*
           if (isset($_POST['coreTime'.$x])){
             $coreTime = $_POST['coreTime'.$x];
             $sql = "UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$userid';";
             $conn->query($sql);
           }
-
+*/
           if (!empty($_POST['vacDays'.$x]) && is_numeric($_POST['vacDays'.$x])) {
             $vacDaysPerYear = $_POST['vacDays'.$x];
             $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDays' WHERE userID = '$userid';";
@@ -271,8 +272,8 @@
             E-Mail: <br>
             <input type="text" name="email<?php echo $x; ?>" value="<?php echo $email; ?>"/><br><br>
 
-            <?php echo $lang['CORE_TIME']?>: <br>
-            <input type="time" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>"/><br><br>
+            <?php //echo $lang['CORE_TIME']?>
+            <!--input type="time" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>"/-->
 
             <?php echo $lang['ENTRANCE_DATE'] .':<br>'. substr($begin,0,10); ?>
           </div>
@@ -280,21 +281,21 @@
 
           <div class="floating-box">
             <?php echo $lang['VACATION_DAYS_PER_YEAR']?>: <br>
-            <input type="text" name="vacDays<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/><br><br>
+            <input type="number" name="vacDays<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/><br><br>
 
             <?php echo $lang['AMOUNT_VACATION_DAYS']?>: <br>
-            <input type="text" name="vacDaysCredit<?php echo $x; ?>" value="<?php echo $vacDaysCredit; ?>"/><br><br>
+            <input type="number" step=any  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo $vacDaysCredit; ?>"/><br><br>
 
             <?php echo $lang['OVERTIME_ALLOWANCE']?>: <br>
-            <input type="text" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/><br><br>
+            <input type="number" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/><br><br>
 
             <?php echo $lang['TAKE_BREAK_AFTER']?>: <br>
-            <input type="text" name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/><br><br>
+            <input type="number" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/><br><br>
 
             <?php echo $lang['HOURS_OF_REST']?>: <br>
-            <input type="text" name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/><br><br>
-
+            <input type="number" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/><br><br>
           </div>
+          
           <div class="floating-box">
             <?php echo $lang['GENDER']?>: <br>
             <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> />Female <br>
@@ -359,7 +360,7 @@
         </fieldset>
 
         <br> <br>
-        <input type="submit" name="submit<?php echo $x; ?>" value="Submit"/> - <input type="date" min="<?php echo substr(getCurrentTimestamp(),0,10); ?>" name="submitDate<?php echo $x; ?>" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>"><br><br>
+        <input type="submit" name="submit<?php echo $x; ?>" value="Submit"/> <br><br>
       </div>
       <?php
     }
