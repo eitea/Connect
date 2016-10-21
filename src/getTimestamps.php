@@ -147,13 +147,8 @@
           $row = mysqli_query($conn, $query)->fetch_assoc();
           $toUtc = $row['timeToUTC'] * -1;
 
-          $timeStart = carryOverAdder_Hours($_POST['datesFrom'][$i]. " " .$_POST['timesFrom'][$i], $toUtc);
-
-          if($_POST['timesTo'][$i] != "00:00") {
-            $timeFin = carryOverAdder_Hours($_POST['datesFrom'][$i]. " " .$_POST['timesTo'][$i], $toUtc);
-          } else {
-            $timeFin = "0000-00-00 00:00:00";
-          }
+          $timeStart = carryOverAdder_Hours($_POST['timesFrom'][$i] .':00', $toUtc);
+          $timeFin = carryOverAdder_Hours($_POST['timesTo'][$i] .':00', $toUtc);
 
           $sql = "UPDATE $logTable SET time='$timeStart', timeEnd='$timeFin' WHERE indexIM = $imm";
           $conn->query($sql);
@@ -203,8 +198,8 @@
         <th><?php echo $lang['DELETE']?></th>
         <th>Person</th>
         <th><?php echo $lang['ACTIVITY']?></th>
-        <th><?php echo $lang['DATE']?></th>
-        <th><?php echo $lang['TIME']?></th>
+        <th><?php echo $lang['FROM']?></th>
+        <th><?php echo $lang['TO']?></th>
         <th><?php echo $lang['SUM']?></th>
         <th><?php echo $lang['LUNCHBREAK']?></th>
         <th>Detail</th>
@@ -308,10 +303,10 @@ if ($result && $result->num_rows > 0) {
   echo "<td><input type='checkbox' name='index[]' value= ".$i."></td>";
   echo "<td>". $row['firstname'] . " " . $row['lastname'] ."</td>";
   echo "<td>". $lang_activityToString[$row['status']] ."</td>";
-  echo "<td><input readonly type='text' style='width:90px' name='datesFrom[]' value='" . substr($displayTimeTo,0,10) . "'></td>";
-  echo "<td><input maxlength='19' type=time onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='"
-  . substr($displayTimeTo,11,-3) . "'> - <input maxlength='19' onkeydown='if (event.keyCode == 13) return false;' type=time name='timesTo[]' value='"
-  . substr($displayTimeEnd,11,-3) . "'></td>";
+
+  echo "<td><input maxlength='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($displayTimeTo,0,-3) . "'></td>";
+  echo "<td><input type=text maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($displayTimeEnd,0,-3) . "'></td>";
+
   echo "<td>". number_format($hoursAbsToday, 2, '.', ''). "h</td>";
   echo "<td>$lunchTime</td>";
   echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($displayTimeTo,0,10).$row['id'].'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
