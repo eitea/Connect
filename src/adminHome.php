@@ -179,7 +179,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
             </a>
             <ul class="treeview-menu">
               <li><a href="pullGitRepo.php" target='_blank'><span>Update</span></a></li>
-              <li><a href="fixDB.php" target='_blank'><span><?php echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
+              <li><a href="fixLunchbreak.php" target='_blank'><span><?php echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
+              <li><a href="fixVacations.php" target='_blank'><span><?php echo $lang['VACATION_REPAIR']; ?></span></a></li>
             </ul>
           </li>
 

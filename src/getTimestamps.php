@@ -334,10 +334,9 @@ $("[data-toggle=popover]").popover({html:true})
   <span class="blockInput">
     <select name="action">
       <option name="act" value="0">Work</option>
-      <option name="act" value="3">Sick</option>
       <option name="act" value="1">Vacation</option>
-      <option name="act" value="4">Time Balance</option>
       <option name="act" value="2">Special Leave</option>
+      <option name="act" value="3">Sick</option>
     </select>
 
     From:    <input type="text" id="calendar" size="19" name="creatFromTime">

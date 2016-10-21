@@ -146,6 +146,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
+  $lang['VACATION_REPAIR'] = 'Repair Vacations';
   $lang['VACATION_REQUESTS'] = 'Vacation Requests';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
   $lang['VIEW_PROJECTS'] = 'View Projects';
@@ -289,6 +290,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';
   $lang['VACATION_REQUESTS'] = 'Urlaubsanfragen';
+  $lang['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Wochen Urlaub im Jahr';
   $lang['VIEW_PROJECTS'] = 'Projekte';
   $lang['VIEW_TIMESTAMPS'] = 'Zeitstempel';
