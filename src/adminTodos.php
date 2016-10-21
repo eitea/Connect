@@ -18,6 +18,7 @@ if ($_SESSION['userid'] != 1) {
   die('Access denied. <a href="logout.php"> return</a>');
 }
 require 'connection.php';
+require 'createTimestamps.php';
 require 'language.php';
 
 ?>
@@ -34,7 +35,7 @@ if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     echo '<tr>';
     echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
-    echo '<td>'. $row['time'] .' - ' . $row['timeEnd'] .'</td>';
+    echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
 
     echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
     echo '</tr>';

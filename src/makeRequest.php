@@ -30,7 +30,7 @@ require 'createTimestamps.php';
 $message = '';
 if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
   if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-    $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start'].' 08:00:00'."', '" .$_POST['end'].' 08:00:00' . "', '".$_POST['requestText']."')";
+    $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start'].' 04:00:00'."', '" .$_POST['end'].' 04:00:00' . "', '".$_POST['requestText']."')";
     $conn->query($sql);
     echo mysqli_error($conn);
   } else {

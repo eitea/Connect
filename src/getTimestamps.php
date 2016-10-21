@@ -312,7 +312,6 @@ if ($result && $result->num_rows > 0) {
   echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($displayTimeTo,0,10).$row['id'].'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
   echo "</tr>";
 
-
   echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $i . '">';
   }
 }
