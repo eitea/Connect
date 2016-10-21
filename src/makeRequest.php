@@ -83,13 +83,13 @@ myCalendar.setDateFormat("%Y-%m-%d");
           $style="";
         } elseif ($row['status'] == 1) {
           $style="style=background-color:#fc8542";
-        } elseif ($row['status'] == 2){
+        } elseif ($row['status'] == 2) {
           $style="style=background-color:#abff99";
         }
         echo "<tr $style>";
         echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
-        echo '<td>' . substr($row['toDate'],0,10) .'</td>';
-        echo '<td>' . $lang_vacationRequestStatus[$row['status']] . '</td>';
+        echo '<td>' . substr($row['toDate'],0,10) . '</td>';
+        echo '<td>' . $lang_vacationRequestStatus[$row['status']] .'</td>';
         echo '<td>' . $row['answerText'] . '</td>';
         echo '</tr>';
       }
