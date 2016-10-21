@@ -86,6 +86,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIELDS_REQUIRED'] = 'Fields are required';
   $lang['FIRSTNAME'] = 'First Name';
   $lang['FUNCTIONS'] = 'Functions';
+  $lang['FROM'] ='From';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
   $lang['GREETING_DAY'] = 'Hello';
@@ -136,6 +137,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIME'] = 'From - To';
   $lang['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
   $lang['TIMETABLE'] = 'Timetable';
+  $lang['TO'] = 'To';
 
   $lang['UNDO'] ='Undo';
   $lang['UPDATE_REQUIRED'] = 'Update required. ';
@@ -225,6 +227,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIELDS_REQUIRED'] = 'Felder werden benötigt';
   $lang['FIRSTNAME'] = 'Vorname';
   $lang['FUNCTIONS'] = 'Funktionen';
+  $lang['FROM'] ='Von';
 
   $lang['GENDER'] = 'Gender';
   $lang['GREETING_MORNING'] = 'Guten Morgen';
@@ -276,6 +279,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIME'] = 'Von - Bis';
   $lang['TIME_CALCULATION_TABLE'] = 'Stundenplan';
   $lang['TIMETABLE'] = 'Stundenplan';
+  $lang['TO'] = 'Bis';
 
   $lang['UNDO'] = 'Rückgängig';
   $lang['UPDATE_REQUIRED'] = 'Update benötigt. ';

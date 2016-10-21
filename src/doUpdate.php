@@ -56,6 +56,14 @@ if($row['version'] < 21){
   }
 }
 
+if($row['version'] < 22){
+  $sql = "ALTER TABLE $vacationTable MODIFY COLUMN vacationHoursCredit DECIMAL(6,2) DEFAULT 0";
+  if ($conn->query($sql)) {
+    echo "Adjust vacation credit<br>";
+  } else {
+    echo mysqli_error($conn) .'<br>';
+  }
+}
 
 
 //------------------------------------------------------------------------------

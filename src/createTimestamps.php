@@ -67,6 +67,20 @@ function carryOverAdder_Hours($a, $b) {
   return $date->format('Y-m-d H:i:s');
 }
 
+function carryOverAdder_Minutes($a, $b) {
+  if($a == '0000-00-00 00:00:00'){
+    return $a;
+  }
+  $date = new DateTime($a);
+  if($b<0){
+    $b *= -1;
+    $date->sub(new DateInterval("PT".$b."M"));
+  } else {
+    $date->add(new DateInterval("PT".$b."M"));
+}
+  return $date->format('Y-m-d H:i:s');
+}
+
 function test_input($data) {
   $data = trim($data);
   $data = stripslashes($data);

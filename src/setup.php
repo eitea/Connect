@@ -311,7 +311,7 @@ $conn->query($sql);
 $sql = "CREATE TABLE $vacationTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   userID INT(6) UNSIGNED,
-  vacationHoursCredit DECIMAL(5,2) DEFAULT 0,
+  vacationHoursCredit DECIMAL(6,2) DEFAULT 0,
   daysPerYear INT(2) DEFAULT 25,
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
