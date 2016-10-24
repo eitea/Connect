@@ -35,6 +35,7 @@ class Yearly_Calculator{
 
       $this->actualTime[] = $t - array_sum($m->lunchTime) - $m->overTimeLump;
       */
+
     }
   }
 

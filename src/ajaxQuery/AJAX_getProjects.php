@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body>
 <?php
 
 require "../connection.php";
@@ -25,5 +20,3 @@ if($result && $result->num_rows >0){
   }
 }
 ?>
-</body>
-</html>
