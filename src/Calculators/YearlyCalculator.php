@@ -1,5 +1,4 @@
 <?php
-
 class Yearly_Calculator{
   private $id = 0;
   private $year = 0;
@@ -24,17 +23,18 @@ class Yearly_Calculator{
     for($i = 1; $i <= 12; $i++) {
       $month = substr_replace($month, sprintf("%'.02d", $i),5,2);
       $m = new Monthly_Calculator($month, $this->id);
+      $m->calculateValues();
       $this->shouldTime[] = array_sum($m->shouldTime);
       $this->lunchTime[] = array_sum($m->lunchTime);
-      /*
+
       $t = 0;
-      for($j = 0; $j <= $m->days; $j++){
+      for($j = 0; $j < $m->days; $j++){
         $t += timeDiff_Hours($m->start[$j], $m->end[$j]);
       }
       $this->isTime[] = $t;
 
       $this->actualTime[] = $t - array_sum($m->lunchTime) - $m->overTimeLump;
-      */
+
 
     }
   }

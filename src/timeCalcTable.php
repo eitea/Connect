@@ -27,6 +27,9 @@
   require "createTimestamps.php";
   require "language.php";
 
+  require 'Calculators/MonthlyCalculator.php';
+  require 'Calculators/YearlyCalculator.php';
+
   $currentTimeStamp = getCurrentTimestamp();
 
   $currentYear = substr($currentTimeStamp, 0, 4);
@@ -62,7 +65,6 @@
   </tr>
 
 <?php
-  require 'Calculators/MonthlyCalculator.php';
 
   $calculator = new Monthly_Calculator($currentTimeStamp, $userID);
   $calculator->calculateValues();
@@ -153,7 +155,6 @@
 
   <div id="menu2" class="tab-pane fade"><br>
     <?php
-    require 'Calculators/YearlyCalculator.php';
     $calculator = new Yearly_Calculator($currentTimeStamp, $userID);
     $calculator->calculateValues();
 

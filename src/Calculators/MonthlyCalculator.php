@@ -27,6 +27,8 @@ class Monthly_Calculator{
     $this->days = date('t', strtotime($month));
   }
 
+
+//call this manually, will add different calculation methods in future
   public function calculateValues(){
     $month = $this->month;
     $id = $this->id;
