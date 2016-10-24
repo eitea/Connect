@@ -27,7 +27,7 @@ $sql = "CREATE TABLE $userTable (
   sid VARCHAR(50),
   email VARCHAR(30) UNIQUE NOT NULL,
   gender ENUM('female', 'male'),
-  overTimeLump INT(3)
+  overTimeLump INT(3) DEFAULT 0,
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,

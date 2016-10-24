@@ -18,7 +18,7 @@ class Monthly_Calculator{
 
   public $lunchTime = array();
   public $shouldTime = array();
-  public $activity = array();
+  public $activity = array();  
 
 //month like yyyy-mm-dd hh-mm-ss
   public function __construct($month, $userid){

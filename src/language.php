@@ -116,7 +116,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
 
-  $lang['OVERTIME_ALLOWANCE'] = 'Overtime Allowance';
+  $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
 
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_INFORMATION'] = 'Reports';
