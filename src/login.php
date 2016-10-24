@@ -8,7 +8,7 @@
 
 
 <?php
-require 'version_number.php';
+include 'version_number.php';
 
 if(!file_exists('connection_config.php')){
   header("refresh:0;url=setup_getInput.php");

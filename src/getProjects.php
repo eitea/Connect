@@ -11,20 +11,20 @@
   <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
   <link rel="stylesheet" type="text/css" href="../css/textArea.css">
   <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/dataTables.bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="../plugins/datatables/js/dataTables.bootstrap.css">
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src='../plugins/select2/js/select2.js'></script>
 
 <style>
-  textarea{
+  textarea {
     border-style: hidden;
     border-radius:5px;
     width:200px;
   }
 
-  input[type="number"],input[type="time"]{
+  input[type="number"],input[type="time"] {
     color:darkblue;
     font-family: monospace;
     border-style: hidden;

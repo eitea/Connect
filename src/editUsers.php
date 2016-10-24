@@ -295,7 +295,7 @@
             <?php echo $lang['HOURS_OF_REST']?>: <br>
             <input type="number" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/><br><br>
           </div>
-          
+
           <div class="floating-box">
             <?php echo $lang['GENDER']?>: <br>
             <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> />Female <br>
@@ -360,13 +360,14 @@
         </fieldset>
 
         <br> <br>
-        <input type="submit" name="submit<?php echo $x; ?>" value="Submit"/> <br><br>
+        <input type="submit" name="submit<?php echo $x; ?>" value="Save Changes"/> <br><br>
       </div>
       <?php
     }
   }
   ?>
 <br><br>
-<a href='register_choice.php'>Register New User</a>
+<a href='register_choice.php'>Register New User</a><br><br>
+<a href='editUsers_onDate.php'>Make Changes on Date</a>
 </form>
 </body>
