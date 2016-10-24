@@ -31,7 +31,7 @@ tr td:nth-child(1) { /* not 0 based */
   require "createTimestamps.php";
   require "language.php";
 
-  $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = 0;
+  $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = $overTimeAdditive = 0;
   $accumulatedVacDays = 0;
 
   if(isset($_GET['userID'])){
@@ -45,6 +45,8 @@ tr td:nth-child(1) { /* not 0 based */
   } else {
     die(mysqli_error($conn));
   }
+
+  $overTimeAdditive = $userRow['overTimeLump'] * (substr($userRow['beginningDate'],5,2) -  substr(getCurrentTimestamp(),5,2));
 
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd != '0000-00-00 00:00:00'";
   $result = $conn->query($sql);
@@ -90,7 +92,7 @@ tr td:nth-child(1) { /* not 0 based */
     }
   }
 
-  $theBigSum = $absolvedHours - $expectedHours - $breakCreditHours + $vacationHours + $specialLeaveHours;
+  $theBigSum = $absolvedHours - $expectedHours - $breakCreditHours + $vacationHours + $specialLeaveHours - $overTimeAdditive;
   if($theBigSum > 0){
     $color = 'style=color:#00ba29';
   } else {
@@ -111,11 +113,14 @@ tr td:nth-child(1) { /* not 0 based */
   echo '<tr><td>'.$lang['VACATION'].': </td><td>+'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
   echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
   echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'. number_format($sickHours, 2, '.', '').'</td></tr>';
-  echo "<tr><td style=font-weight:bold;>Summary: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
+  echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'].': </td><td>-'. $overTimeAdditive . '</td></tr>';
+  echo "<tr><td style=font-weight:bold;>Sum: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
   ?>
 </table>
 </div>
-
+<?php
+$theBigSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu'] + $userRow['fri'] + $userRow['sat'] + $userRow['sun'];
+?>
 <div>
 <table class="table table-striped table-bordered" cellspacing="0" style='width:300px'>
     <tr>
@@ -130,6 +135,7 @@ tr td:nth-child(1) { /* not 0 based */
   echo '<tr><td>Friday: </td><td>'. $userRow['fri'] .'</td></tr>';
   echo '<tr><td>Saturday: </td><td>'. $userRow['sat'] .'</td></tr>';
   echo '<tr><td>Sunday: </td><td>'. $userRow['sun'] .'</td></tr>';
+  echo "<tr><td style=font-weight:bold;>Sum: </td><td>". $theBigSum .'</td></tr>';
   ?>
 </table>
 </div>
