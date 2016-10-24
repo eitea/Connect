@@ -49,6 +49,10 @@
     require "connection.php";
     require "createTimestamps.php";
     require "language.php";
+
+
+    require "Calculators/MonthlyCalculator.php";
+    require "Calculators/YearlyCalculator.php";
     ?>
 
     <h1><?php echo $lang['VIEW_TIMESTAMPS']?></h1>
@@ -178,8 +182,6 @@
           $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeBegin', '$timeEnd', $thisuserID, '$activtiy', '$creatTimeZone');";
           $conn->query($sql);
         }
-      } else {
-        echo "Missing Input";
       }
     }
     ?>
@@ -366,7 +368,6 @@ $("[data-toggle=popover]").popover({html:true})
   <canvas id="myChart" width="500" height="250px"></canvas>
 
   <?php
-  require "Calculators/MonthlyCalculator.php";
   $filterMonth = $filterYear ."-".$filterMonth."-01 05:00:00";
 
   $calculator = new Monthly_Calculator($filterMonth, $filterID);
@@ -421,7 +422,48 @@ $("[data-toggle=popover]").popover({html:true})
 
 <div id="menu2" class="tab-pane fade">
   <br><br>
-Hi.
+  <?php
+  $calculator = new Yearly_Calculator(getCurrentTimestamp(), $filterID);
+  $calculator->calculateValues();
+
+  ?>
+
+  <canvas id="yearChart" width="500" height="250px"></canvas>
+  <script>
+  var ctx = document.getElementById("yearChart");
+  var my2ndChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [<?php echo implode(", ", $calculator->monthShortName); ?>],
+      datasets: [
+        {
+          label: "Absolved",
+          data: [<?php echo implode(", ", $calculator->actualTime); ?>],
+          backgroundColor: 'rgb(255, 144, 214)'
+        },
+        {
+          label: "Expected",
+          data: [<?php echo implode(", ", $calculator->shouldTime); ?>],
+          backgroundColor: 'rgb(255, 0, 168)'
+        },
+        {
+          label: "Lunch",
+          data: [<?php echo implode(", ", $calculator->lunchTime); ?>],
+          backgroundColor: 'rgb(178, 0, 207)'
+        }
+      ]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero:true
+          }
+        }]
+      }
+    }
+  });
+  </script>
 </div>
 
 <!-- menu division HERE ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
