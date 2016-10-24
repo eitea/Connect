@@ -162,27 +162,19 @@
             echo mysqli_error($conn);
           }
         }
-      } elseif (isset($_POST['create'])) {
+      } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime'])) {
         if($filterID != 0) {
           $thisuserID = $filterID;
           $activtiy = $_POST['action'];
           $creatTimeZone = $_POST['creatTimeZone'];
-
-          if (!empty($_POST['creatFromTime'])) {
-            $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($creatTimeZone*-1));
-          } else {
-            $timeBegin = '2000-01-01 00:00:00';
-          }
-
-          if (!empty($_POST['creatToTime'])) {
-            $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($creatTimeZone*-1));
-          } else {
-            $timeEnd = '0000-00-00 00:00:00';
-          }
+          $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($creatTimeZone*-1));
+          $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($creatTimeZone*-1));
 
           $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeBegin', '$timeEnd', $thisuserID, '$activtiy', '$creatTimeZone');";
           $conn->query($sql);
         }
+      } else {
+        echo "Missing Input";
       }
     }
     ?>
