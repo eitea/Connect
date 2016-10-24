@@ -7,7 +7,12 @@
 
 require "../connection.php";
 $q = intval($_GET['q']);
-$p = intval($_GET['p']);
+
+if(isset($_GET['p'])){
+  $p = intval($_GET['p']);
+} else {
+  $p = 0;
+}
 $sql="SELECT * FROM $projectTable WHERE clientID = $q";
 $result = mysqli_query($conn,$sql);
 if($result && $result->num_rows >0){

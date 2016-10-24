@@ -179,7 +179,7 @@ function showClients(str) {
         showProjects(xmlhttp.responseText);
       }
     };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?company="+str,true);
+    xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?company="+str+"&p=0",true);
     xmlhttp.send();
   }
 }
