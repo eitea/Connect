@@ -81,7 +81,7 @@ if(isset($_POST['save']) && isset($_POST['userID']) && $_POST['userID'] != 0 && 
   }
 
   $tense = timeDiff_Hours(substr(getCurrentTimestamp(),0,10) .' 05:00:00', $_POST['saveOnDate'] .' 05:00:00');
-  $date = $_POST['saveOnDate'] .' 00:00:00';
+  $date = $_POST['saveOnDate'] .' 01:00:00';
   $userID = $_POST['userID'];
   if($tense > 0){ //future
     $eventName = 'changeTable'.$userID;
@@ -94,7 +94,7 @@ if(isset($_POST['save']) && isset($_POST['userID']) && $_POST['userID'] != 0 && 
     DO
     UPDATE $bookingTable SET mon = '$mon', tue ='$tue', wed = '$wed', thu = '$thu', fri = '$fri', sat= '$sat', sun = '$sun' WHERE userID = $userID
     ";
-    if($conn->query($sql)){      
+    if($conn->query($sql)){
       echo '<div class="alert alert-success fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
       echo "Timetable will be changed on $date for user No.$userID, with: $mon - $tue - $wed - $thu - $fri - $sat - $sun";

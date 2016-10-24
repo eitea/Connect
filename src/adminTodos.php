@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="../css/table.css">
   <link rel="stylesheet" href="../css/submitButt.css">
   <link rel="stylesheet" href="../css/homeMenu.css">
+
+  <style>
+  p{
+    font-size:24px;
+    color:#0078ab;
+  }
+  </style>
 </head>
 <body>
 <form method=post>
@@ -38,14 +45,30 @@ if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
 }
 ?>
 
-<h1>Todos: </h1>
-<p>Illegal Timestamps</p>
+<p> Unanswered Requests: </p>
+
+<?php
+
+$sql ="SELECT * FROM $userRequests WHERE status = '0'";
+$result = $conn->query($sql);
+if($result && $result->num_rows > 0){
+  echo $result->num_rows . " Vacation Request/s: ";
+  echo "<a href=allowVacations.php > Answer</a>";
+} else {
+  echo "None";
+}
+ ?>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<p>Illegal Timestamps: </p>
+
 <table id='illTS'>
-  <th>Autocorrect</th>
   <th>User</th>
+  <th>Status</th>
   <th><?php echo $lang['TIME']; ?></th>
   <th><?php echo $lang['HOURS']; ?></th>
-  <th>Status</th>
+  <th>Autocorrect</th>
 
 <?php
 $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
@@ -57,11 +80,11 @@ $result = $conn->query($sql);
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     echo '<tr>';
-    echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' </td>';
     echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
+    echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
     echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
     echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-    echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
+    echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' </td>';
     echo '</tr>';
   }
 } else {
@@ -74,5 +97,11 @@ if($result && $result->num_rows > 0){
 <input type='submit' name='autoCorrect' value='Autocorrect'><small> - For forgotten checkouts: Set end-time to match expected hours </small></input>
 <br><br>
 <br><br>
+
+
+<!-- -------------------------------------------------------------------------->
+
+
+
 </form>
 </body>
