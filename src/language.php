@@ -121,6 +121,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
+  $lang['READY_STATUS'] = 'Ready Status';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
   $lang['REGISTER_NEW_USER'] ='Register new User';
   $lang['REGISTER_USERS'] = "Register LDAP Users";
@@ -263,6 +264,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
+  $lang['READY_STATUS'] = 'Bereitschaftsstatus';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
   $lang['REGISTER_FROM_FORM'] = 'Formular Registrierung';
   $lang['REGISTER_NEW_USER'] = 'Registrieren';

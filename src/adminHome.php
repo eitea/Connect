@@ -144,13 +144,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
               <li><a href="adminHome.php?link=editUsers.php"><?php echo $lang['VIEW_USER']; ?></a></li>
               <li><a href="adminHome.php?link=register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
-
-              <?php require 'connectionLDAP.php';
-              if($ldapConnect != ""): ?>
-              <li><a href="adminHome.php?link=ldapGet.php"><?php echo $lang['REGISTER_USERS']; ?></a></li>
-              <?php endif; ?>
-
               <li><a href="adminHome.php?link=allowVacations.php"><?php echo $lang['VACATION']; ?></a></li>
+              <li><a href="adminHome.php?link=readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li>
             </ul>
           </li>
 
