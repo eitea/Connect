@@ -34,6 +34,10 @@ tr td:nth-child(1) { /* not 0 based */
   $breakCreditHours = $absolvedHours = $expectedHours = $vacationHours = $specialLeaveHours = $sickHours = 0;
   $accumulatedVacDays = 0;
 
+  if(isset($_GET['userID'])){
+    $userID = $_GET['userID'];
+  }
+
   $sql = "SELECT * FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE $userTable.id = $userID";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
@@ -140,7 +144,7 @@ tr td:nth-child(1) { /* not 0 based */
   echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
   echo '<tr><td>'. $lang['ACCUMULATED_DAYS'] .': '. $lang['VACATION']. '</td><td>'. number_format($userRow['vacationHoursCredit'] / 24, 2, '.', '') .'</td></tr>';
   echo '<tr><td>'. $lang['USED_DAYS'] .': ' .$lang['VACATION']. '</td><td>'. $accumulatedVacDays .'</td></tr>';
-  echo '<tr><td>'.$lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['daysPerYear'] .'</td></tr>';
+  echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['daysPerYear'] .'</td></tr>';
   ?>
 </table>
 </div>

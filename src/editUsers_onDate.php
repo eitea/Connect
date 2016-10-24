@@ -139,7 +139,14 @@ if(isset($_POST['save']) && isset($_POST['userID']) && $_POST['userID'] != 0 && 
     echo mysqli_error($conn);
     //change timetable
     $sql = "UPDATE $bookingTable SET mon = '$mon', tue ='$tue', wed = '$wed', thu = '$thu', fri = '$fri', sat= '$sat', sun = '$sun' WHERE userID = $userID";
-    $conn->query($sql);
+    if($conn->query($sql)){
+      echo '<div class="alert alert-success fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo "Timetable was changed on $date for user No.$userID, with: $mon - $tue - $wed - $thu - $fri - $sat - $sun";
+      echo '</div>';
+    } else {
+      echo mysqli_error($conn);
+    }
   } else { //now
     $sql = "UPDATE $bookingTable SET mon = '$mon', tue ='$tue', wed = '$wed', thu = '$thu', fri = '$fri', sat= '$sat', sun = '$sun' WHERE userID = $userID";
     $conn->query($sql);

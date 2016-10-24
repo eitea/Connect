@@ -24,6 +24,10 @@
       max-width: 60%; /* Max Width of the popover (depending on the container!) */
       font-size:11px;
   }
+  iframe {
+    width:100%;
+    border:none;
+  }
   </style>
 </head>
 <body>
@@ -133,6 +137,7 @@
   <?php if($filterID != 0): ?>
   <li><a data-toggle="tab" href="#menu1"><?php $dateObj=DateTime::createFromFormat('!m', $filterMonth); echo $dateObj->format('F');?></a></li>
   <li><a data-toggle="tab" href="#menu2"><?php echo $filterYear; ?></a></li>
+  <li><a data-toggle="tab" href="#menu3">Summary</a></li>
   <?php endif; ?>
 </ul>
 
@@ -416,8 +421,21 @@ $("[data-toggle=popover]").popover({html:true})
 
 <div id="menu2" class="tab-pane fade">
   <br><br>
-
+Hi.
 </div>
+
+<!-- menu division HERE ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<div id="menu3" class="tab-pane fade">
+  <br><br>
+<iframe onload="resizeIframe(this)" scrolling=no src=userSummary.php?userID=<?php echo $filterID; ?>></iframe>
+<script>
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+  }
+</script>
+</div>
+
 
 </div> <!-- tab content -->
 </div> <!--tab container -->
