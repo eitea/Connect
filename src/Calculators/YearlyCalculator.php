@@ -29,7 +29,9 @@ class Yearly_Calculator{
 
       $t = 0;
       for($j = 0; $j < $m->days; $j++){
-        $t += timeDiff_Hours($m->start[$j], $m->end[$j]);
+        if($m->end[$j] != '0000-00-00 00:00:00'){
+          $t += timeDiff_Hours($m->start[$j], $m->end[$j]);
+        }
       }
       $this->isTime[] = $t;
 
