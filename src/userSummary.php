@@ -46,7 +46,7 @@ tr td:nth-child(1) { /* not 0 based */
     die(mysqli_error($conn));
   }
 
-  $overTimeAdditive = $userRow['overTimeLump'] * (substr($userRow['beginningDate'],5,2) -  substr(getCurrentTimestamp(),5,2));
+  $overTimeAdditive = $userRow['overTimeLump'] * (substr(getCurrentTimestamp(),5,2) - substr($userRow['beginningDate'],5,2));
 
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd != '0000-00-00 00:00:00'";
   $result = $conn->query($sql);
