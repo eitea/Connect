@@ -46,7 +46,7 @@ tr td:nth-child(1) { /* not 0 based */
     die(mysqli_error($conn));
   }
 
-  $overTimeAdditive = $userRow['overTimeLump'] * (substr(getCurrentTimestamp(),5,2) - substr($userRow['beginningDate'],5,2));
+  $overTimeAdditive = $userRow['overTimeLump'] * ceil(timeDiff_Hours(substr($userRow['beginningDate'],0,11).'05:00:00', substr(getCurrentTimestamp(),0,11).'05:00:00')/(24*30));
 
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd != '0000-00-00 00:00:00'";
   $result = $conn->query($sql);
@@ -148,7 +148,7 @@ $theBigSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu
   </tr>
   <?php
   echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-  echo '<tr><td>'. $lang['ACCUMULATED_DAYS'] .': '. $lang['VACATION']. '</td><td>'. number_format($userRow['vacationHoursCredit'] / 24, 2, '.', '') .'</td></tr>';
+  echo '<tr><td>'. $lang['ACCUMULATED_DAYS'] .': '. $lang['VACATION']. '</td><td>'. number_format($userRow['vacationHoursCredit'], 2, '.', '') .'</td></tr>';
   echo '<tr><td>'. $lang['USED_DAYS'] .': ' .$lang['VACATION']. '</td><td>'. $accumulatedVacDays .'</td></tr>';
   echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['daysPerYear'] .'</td></tr>';
   echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
