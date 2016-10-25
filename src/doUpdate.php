@@ -65,6 +65,24 @@ if($row['version'] < 22){
   }
 }
 
+if($row['version'] < 23){
+  $sql = "UPDATE $logTable SET breakCredit = 0 WHERE status != '0'";
+  $conn->query($sql);
+
+  require 'createTimestamps.php';
+  $sql = "SELECT * FROM $logTable WHERE status = '1'";
+  $result = $conn->query($sql);
+  while($row = $result->fetch_assoc()){
+    $absolvedHours = timeDiff_Hours($row['time'], $row['timeEnd']);
+    if($absolvedHours != $row['expectedHours']){
+      $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
+      $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
+      $conn->query($sql);
+      echo mysqli_error($conn);
+    }
+  }
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

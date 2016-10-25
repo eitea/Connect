@@ -3,7 +3,7 @@ require 'connection.php';
 
 //recalculates lunchbreak based on booking
 //get all logs with the breakCredit
-$sql = "SELECT indexIM, userID, enableProjecting FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE $userTable.enableProjecting = 'TRUE'";
+$sql = "SELECT indexIM, userID, enableProjecting FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE $userTable.enableProjecting = 'TRUE' AND status = '0'";
 $result = $conn->query($sql);
 
 //fix 1 : update lunchbreak to fit booked lunchbreaks
@@ -21,7 +21,7 @@ while($row = $result->fetch_assoc()){
 }
 
 $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
-WHERE enableProjecting = 'TRUE' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest";
+WHERE enableProjecting = 'TRUE' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
