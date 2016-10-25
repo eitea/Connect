@@ -26,7 +26,7 @@
     <tr>
     <th>Name</th>
     <th>Checkin</th>
-  </tr>
+    </tr>
     <?php
     $today = substr(getCurrentTimestamp(),0,10);
     $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEND = '0000-00-00 00:00:00'";
