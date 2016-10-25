@@ -49,6 +49,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $i = carryOverAdder_Hours($i, 24);
         }
 
+        echo '<div class="alert alert-success fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>Approval: </strong> Created Vacation Timestamps.';
+        echo '</div>';
         break;
       } elseif(isset($_POST['nokay'. $row['id']])){
         $answerText = $_POST['answerText'. $row['id']];

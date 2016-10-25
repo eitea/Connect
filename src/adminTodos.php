@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="../css/submitButt.css">
   <link rel="stylesheet" href="../css/homeMenu.css">
 
+  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.min.js"></script>
+
   <style>
   p{
     font-size:24px;
@@ -45,21 +48,64 @@ if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
 }
 ?>
 
-<p> Unanswered Requests: </p>
-
 <?php
-
 $sql ="SELECT * FROM $userRequests WHERE status = '0'";
 $result = $conn->query($sql);
-if($result && $result->num_rows > 0){
-  echo $result->num_rows . " Vacation Request/s: ";
-  echo "<a href=allowVacations.php > Answer</a>";
-} else {
-  echo "None";
-}
- ?>
+if($result && $result->num_rows > 0):
+?>
+  <p> Unanswered Requests: </p>
 
-<!-- ----------------------------------------------------------------------- -->
+<?php
+echo $result->num_rows . " Vacation Request/s: ";
+echo "<a href=allowVacations.php > Answer</a>";
+endif;
+?>
+<!-- -------------------------------------------------------------------------->
+<?php
+//if ($row['timeEnd'] != '0000-00-00 00:00:00' && timeDiff_Hours($row['time'], $row['timeEnd']) > $row['pauseAfterHours'] && $row['breakCredit'] < $row['hoursOfRest']){
+$sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
+WHERE enableProjecting = 'TRUE' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest";
+
+$result = $conn->query($sql);
+if($result && $result->num_rows > 0):
+?>
+<p> Illegal Lunchbreaks: </p>
+<a href="fixLunchbreak.php" target='_blank'><span>Autorepair (Refresh afterwards)</span></a><br><br>
+
+<table>
+  <th>Name</th>
+  <th><?php echo $lang['TIME']; ?></th>
+  <th><?php echo $lang['HOURS']; ?></th>
+  <th><?php echo $lang['LUNCHBREAK']; ?></th>
+  <th></th>
+
+  <?php
+  echo $result->num_rows . ' Invalid lunchbreaks to repair for users with booking-access: <br>';
+  while($row = $result->fetch_assoc()){
+    echo '<tr>';
+    echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
+    echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
+    echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
+    echo '<td><input type=text size=2 name="lunchbreaks[]" value='.$row['breakCredit'].' ></td>';
+    echo '<td><input type=text style=display:none name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';
+    echo '</tr>';
+  }
+  ?>
+
+</table>
+
+<?php endif; echo mysqli_error($conn); ?>
+<!-- -------------------------------------------------------------------------->
+
+<?php
+$sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
+FROM $logTable
+INNER JOIN $userTable ON $userTable.id = $logTable.userID
+WHERE TIMESTAMPDIFF(HOUR, time, timeEnd) > 12 OR TIMESTAMPDIFF(HOUR, time, timeEnd) < 0";
+
+$result = $conn->query($sql);
+if($result && $result->num_rows > 0):
+?>
 
 <p>Illegal Timestamps: </p>
 
@@ -71,25 +117,16 @@ if($result && $result->num_rows > 0){
   <th>Autocorrect</th>
 
 <?php
-$sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
-FROM $logTable
-INNER JOIN $userTable ON $userTable.id = $logTable.userID
-WHERE TIMESTAMPDIFF(HOUR, time, timeEnd) > 12 OR TIMESTAMPDIFF(HOUR, time, timeEnd) < 0";
-
-$result = $conn->query($sql);
-if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     echo '<tr>';
     echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
     echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
     echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
     echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-    echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' </td>';
+    echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' ></td>';
     echo '</tr>';
   }
-} else {
-  echo mysqli_error($conn);
-}
+
 ?>
 
 </table>
@@ -98,7 +135,9 @@ if($result && $result->num_rows > 0){
 <br><br>
 <br><br>
 
-
+<?php
+endif;
+?>
 <!-- -------------------------------------------------------------------------->
 
 
