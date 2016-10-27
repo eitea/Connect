@@ -9,31 +9,25 @@
 
 <?php
 include 'version_number.php';
-
 if(!file_exists('connection_config.php')){
   header("refresh:0;url=setup_getInput.php");
 }
-
 $invalidLogin = "";
   if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
     require 'connection.php';
     require 'createTimestamps.php';
-
     $query = "SELECT * FROM  $userTable  WHERE email = '" . strip_input($_POST['loginName']) . "' ";
     $result = mysqli_query($conn, $query);
     if($result){
       $row = $result->fetch_assoc();
     }
-
     if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
       session_start();
       $_SESSION['userid'] = $row['id'];
       $_SESSION['language'] = $row['preferredLang'];
       $timeZone = $_POST['funZone'];
       $_SESSION['timeToUTC'] = $timeZone;
-
       require "language.php";
-
       if ($row['id'] != 1){
         header( "refresh:0;url=userHome.php?link=userSummary.php");
         die ($lang['AUTOREDIRECT'] . '<a href="userHome.php?link=userSummary.php">redirect</a>');
@@ -80,15 +74,12 @@ function strip_input($data) {
 var today = new Date();
 var timeZone = today.getTimezoneOffset() /(-60);
 if(today.dst){timeZone--;}
-
 document.getElementById("funZone").value = timeZone;
-
 Date.prototype.stdTimezoneOffset = function() {
   var jan = new Date(this.getFullYear(), 0, 1);
   var jul = new Date(this.getFullYear(), 6, 1);
   return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
-
 Date.prototype.dst = function() {
   return this.getTimezoneOffset() < this.stdTimezoneOffset();
 }
