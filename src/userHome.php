@@ -17,6 +17,7 @@ header("location:userHome.php?link=userSummary.php"); // your current page
   <link rel="stylesheet" href="../css/homeMenu.css">
   <link rel="stylesheet" type="text/css" href="../css/submitFlags.css">
   <link rel="stylesheet" type="text/css" href="../css/stampingButt.css">
+<link rel="stylesheet" type="text/css" href="../css/submitButt.css">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -220,6 +221,23 @@ require "language.php";
           }
         }
 
+        if (isset($_POST['submitPIN'])) {
+          if(is_numeric($_POST['pinCode']) && !empty($_POST['pinCode'])){
+
+            $sql = "UPDATE $userTable SET terminalPin = '".$_POST['pinCode']."' WHERE id = '$userID';";
+            $conn->query($sql);
+            echo '<div class="alert alert-success fade in">';
+            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Success! </strong>Your Pincode was changed.';
+            echo '</div>';
+          } else {
+            echo '<div class="alert alert-danger fade in">';
+            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Failed: </strong>Invalid PIN.';
+            echo '</div>';
+          }
+        }
+
         if(isset($_POST['stampIn']) || isset($_POST['leaveIn'])){
           echo '<div class="alert alert-info fade in">';
           echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -292,6 +310,15 @@ require "language.php";
               <?php echo $lang['NEW_PASSWORD_CONFIRM']?>: <br>
               <input type="password" name="passwordConfirm" /><br><br>
               <input type="submit" name="submitPassword" value="Change">
+            </form>
+        </div>
+
+        <div class="form-group">
+          <label class="control-sidebar-subheading">
+            <form action="userHome.php?link=userSummary.php" method="post">
+              New PIN: <br>
+              <input type="number" name="pinCode" /> <br><br>
+              <input type="submit" name="submitPIN" value="Change">
             </form>
         </div>
         <!-- /.form-group -->
