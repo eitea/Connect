@@ -94,6 +94,32 @@ if($row['version'] < 23){
     $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
     $conn->query($sql);
     echo mysqli_error($conn);
+  }
+}
+
+if($row['version']  < 24){
+  $sql = "CREATE TABLE $piConnTable(
+    header VARCHAR(50)
+  )";
+  if($conn->query($sql)){
+    echo "Created config table for  terminals. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "INSERT INTO $piConnTable (header) VALUES ('EI-TEA Zeiterfassung v13 Code3A5B')";
+  if($conn->query($sql)){
+    echo "Insert user-agent for config table. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE $userTable ADD COLUMN terminalPin INT(8) DEFAULT 4321";
+  if($conn->query($sql)){
+    echo "Add PIN for Users. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
 }
 
 //------------------------------------------------------------------------------

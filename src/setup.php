@@ -24,6 +24,7 @@ $sql = "CREATE TABLE $userTable (
   firstname VARCHAR(30) NOT NULL,
   lastname VARCHAR(30) NOT NULL,
   psw VARCHAR(60) NOT NULL,
+  terminalPin INT(8) DEFAULT 4321,
   sid VARCHAR(50),
   email VARCHAR(30) UNIQUE NOT NULL,
   gender ENUM('female', 'male'),
@@ -369,6 +370,24 @@ if ($conn->query($sql)) {
 } else {
   echo mysqli_error($conn) .'<br>';
 }
+
+
+$sql = "CREATE TABLE $piConnTable(
+  header VARCHAR(50)
+)";
+if($conn->query($sql)){
+  echo "Created config table for  terminals. <br>";
+} else {
+  echo mysqli_error($conn);
+}
+
+$sql = "INSERT INTO $piConnTable(header) VALUES (' ')";
+if($conn->query($sql)){
+  echo "Insert statement for config table. <br>";
+} else {
+  echo mysqli_error($conn);
+}
+
 
 //------------------------------------------------------------------------------
 

@@ -102,8 +102,7 @@
     }
     ldap_unbind($ldap_connection); // Clean up after ourselves.
 
-    function randomPassword()
-    {
+    function randomPassword(){
       $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
       $pass = array(); //remember to declare $pass as an array
       $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache

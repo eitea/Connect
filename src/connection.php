@@ -18,6 +18,7 @@ $userRequests = "userRequestsData";
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
 $configTable = "configurationData";
+$piConnTable = "piConnectionData";
 
 
 $conn = new mysqli($servername, $username, $password, $dbName);

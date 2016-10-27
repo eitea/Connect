@@ -30,22 +30,50 @@ if(isset($_POST['gitSubmit'])){
   $conn->query($sql);
 }
 
-$sql = "SELECT * FROM $adminGitHubTable";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
+if(isset($_POST['terminalSubmit'])){
+    if(isset($_POST['userAgent'])){
+    $status = $_POST['userAgent'];
+    $sql = "UPDATE $piConnTable SET header = '$status'";
+    $conn->query($sql);
+  }
+}
 
-$checked = $row['sslVerify']=='TRUE'?'checked':'';
 
 ?>
 
-<h1>GitHub</h1>
+<h2>GitHub</h2>
 
-  <fieldset><br>
+<fieldset><br>
 
-    <input <?php echo $checked; ?> type=checkbox name=ssl value='TRUE'> SSL Certificate Validation </input>
+<?php
+$sql = "SELECT * FROM $adminGitHubTable";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$checked = $row['sslVerify']=='TRUE'?'checked':'';
+ ?>
+<input <?php echo $checked; ?> type=checkbox name=ssl value='TRUE'> SSL Certificate Validation </input>
+<br><br>
+<input type="submit" name= "gitSubmit" value="Save"><br>
 
-    <br><br>
-    <input type="submit" name= "gitSubmit" value="Save"><br>
-  </fieldset>
+</fieldset>
+
+<br><br>
+
+<h2>Terminal</h2>
+
+<fieldset><br>
+
+  <?php
+  $sql = "SELECT * FROM $piConnTable";
+  $result = $conn->query($sql);
+  $row = $result->fetch_assoc();
+  $myAgent = $row['header'];
+   ?>
+   User-Agent = <input type=text size=50 name=userAgent value="<?php echo $myAgent; ?>" >
+  <br><br>
+  <input type="submit" name= "terminalSubmit" value="Save"><br>
+
+</fieldset>
+
 </form>
 </body>

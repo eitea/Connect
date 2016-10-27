@@ -62,7 +62,6 @@ endif;
 ?>
 <!-- -------------------------------------------------------------------------->
 <?php
-//if ($row['timeEnd'] != '0000-00-00 00:00:00' && timeDiff_Hours($row['time'], $row['timeEnd']) > $row['pauseAfterHours'] && $row['breakCredit'] < $row['hoursOfRest']){
 $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
 WHERE enableProjecting = 'TRUE' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
 
