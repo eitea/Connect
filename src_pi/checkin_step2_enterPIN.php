@@ -31,6 +31,7 @@ if(isset($_POST['enter']) && !empty($_POST['mvar'])){
     } else {
       checkIn($userID, 0);
     }
+    echo "O.K.";
     header("refresh:2;url=checkin_step1_select.php");
   } else {
     echo 'false pin';
@@ -71,13 +72,24 @@ if(isset($_POST['enter']) && !empty($_POST['mvar'])){
     color:#3a95d0;
     background-color:white;
   }
+
+  input[type="submit"]{
+    background-color: white;
+    border-style:double;
+    display:inline-block;
+    color:#4089cc;
+    padding:5px 10px;
+    font-weight: lighter;
+    font-size:25px;
+  }
+
   </style>
 </head>
 
 <body>
 <form  method="post">
 
-<input id=mvar type="text" value="" readonly name="mvar" />
+PIN: <input id=mvar type="text" value="" readonly name="mvar" />
 <br>
 <input type="button" class="fbutton" value="1" id="1" onClick=addNumber(this); ><input type="button" class="fbutton" value="2" id="2" onClick=addNumber(this); ><input type="button" class="fbutton" value="3" id="3" onClick=addNumber(this); > <br>
 
