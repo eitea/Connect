@@ -7,7 +7,7 @@ $userAgentHead =  $headers['User-Agent'];
 //EI-TEA Zeiterfassung v13 Code3A5B
 $sql = "SELECT * FROM $piConnTable WHERE header = '$userAgentHead'";
 $result = $conn->query($sql);
-if(!$result || $result->num_rows < 0){
+if(!$result || $result->num_rows <= 0){
   die('Access denied. <a href="../src/logout.php"> return</a>');
 }
 
