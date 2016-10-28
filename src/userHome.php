@@ -17,7 +17,6 @@ header("location:userHome.php?link=userSummary.php"); // your current page
   <link rel="stylesheet" href="../css/homeMenu.css">
   <link rel="stylesheet" type="text/css" href="../css/submitFlags.css">
   <link rel="stylesheet" type="text/css" href="../css/stampingButt.css">
-<link rel="stylesheet" type="text/css" href="../css/submitButt.css">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>

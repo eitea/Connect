@@ -65,12 +65,10 @@
   </tr>
 
 <?php
-
   $calculator = new Monthly_Calculator($currentTimeStamp, $userID);
   $calculator->calculateValues();
 
   $absolvedHours = array();
-
   for($i = 0; $i < $calculator->days; $i++){
     if($calculator->end[$i] == '0000-00-00 00:00:00'){
       $endTime = getCurrentTimestamp();
@@ -78,10 +76,8 @@
       $endTime = $calculator->end[$i];
     }
 
-
     $difference = timeDiff_Hours($calculator->start[$i], $endTime );
     $absolvedHours[] = $difference - $calculator->lunchTime[$i];
-
 
     if($calculator->start[$i] != '-'){
       $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
