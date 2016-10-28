@@ -42,7 +42,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
           //only insert if expectedHours != 0
           if($expected != 0.0){
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, expectedHours) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', '$expected')";
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, expectedHours, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', '$expected', 0)";
             $conn->query($sql);
             echo mysqli_error($conn);
           }

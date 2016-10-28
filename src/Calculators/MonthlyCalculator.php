@@ -18,7 +18,7 @@ class Monthly_Calculator{
 
   public $lunchTime = array();
   public $shouldTime = array();
-  public $activity = array();  
+  public $activity = array();
 
 //month like yyyy-mm-dd hh-mm-ss
   public function __construct($month, $userid){
@@ -40,7 +40,7 @@ class Monthly_Calculator{
     $i = substr_replace($month, "01", 8, 2);
 
     $count = 1;
-    while(substr($i,0, 10) != substr(carryOverAdder_Hours($month, 24),0,10)) { //from 1st to "31th"
+    while(substr($i,0, 10) != substr(carryOverAdder_Hours($month, 24),0,10)) { //from 1st to "31th", including last day
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
 
@@ -60,7 +60,8 @@ class Monthly_Calculator{
           $sql="SELECT * FROM $userTable WHERE id = $id";
           $result = $conn->query($sql);
           $row2 = $result->fetch_assoc();
-          if(timeDiff_Hours($row['time'], $row['timeEnd']) >= $row2['pauseAfterHours']){
+          //is he supposed to have lunch?
+          if($row['status'] == 0 && timeDiff_Hours($row['time'], $row['timeEnd']) >= $row2['pauseAfterHours']){
             if($row2['enableProjecting'] == 'TRUE'){
               //he has access? leave it at the breakCredit, since thats the accumulated breaktime.
               $this->canBook = 'TRUE';
@@ -77,7 +78,7 @@ class Monthly_Calculator{
           //if there is NO log entry for the day, fill out start and end with EMPTY STRING and expected hours from the absentLog
           $sql = "SELECT * FROM $negative_logTable WHERE time LIKE '". substr($i, 0, 10) ." %' AND userID = $id";
           $result = $conn->query($sql);
-          // for today there is no entry: get the absentLog entry. there MUST be an entry for that, or the expected hours of that day will also be 0.
+          // for today there is no entry: get the absentLog entry. there MUST be an entry for that, or the dates in the future/waay past.
           if($result && $result->num_rows > 0){
             $row = $result->fetch_assoc();
             $this->start[] = '-';

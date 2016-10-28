@@ -219,7 +219,7 @@
   ?>
 
   <script> //oh noo....
-    parent.document.getElementById("myFrame").height = '2000px';
+    parent.document.getElementById("myFrame").height = '1500px';
   </script>
 
   <form action="#" name="myForm" method="POST" onsubmit="return confirm('Are you sure you want to proceed?');">

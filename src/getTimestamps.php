@@ -178,8 +178,13 @@
           $creatTimeZone = $_POST['creatTimeZone'];
           $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($creatTimeZone*-1));
           $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($creatTimeZone*-1));
+          $day = strtolower(date('D', strtotime($timeBegin)));
+          $sql = "SELECT $day FROM $bookingTable WHERE userID = $thisuserID";
+          $result2 = $conn->query($sql);
+          $row2 = $result2->fetch_assoc();
+          $day = $row2[$day];
 
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeBegin', '$timeEnd', $thisuserID, '$activtiy', '$creatTimeZone');";
+          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $thisuserID, '$activtiy', '$creatTimeZone', '$day');";
           $conn->query($sql);
         }
       }

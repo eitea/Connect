@@ -177,6 +177,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <li><a href="fixLunchbreak.php" target='_blank'><span><?php echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
               <li><a href="fixVacations.php" target='_blank'><span><?php echo $lang['VACATION_REPAIR']; ?></span></a></li>
               <li><a href="fixAccumulatedVacation.php" target='_blank'><span><?php echo $lang['RECALCULATE_VACATION']; ?></span></a></li>
+              <li><a href="fixAbsentLogTable.php" target='_blank'><span>Repair Expected Hours</span></a></li>
             </ul>
           </li>
 

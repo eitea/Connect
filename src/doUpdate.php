@@ -1,5 +1,6 @@
 <?php
 require "connection.php";
+require "createTimestamps.php";
 session_start();
 if (!isset($_SESSION['userid'])) {
   die('Please <a href="login.php">login</a> first.');
@@ -69,7 +70,6 @@ if($row['version'] < 23){
   $sql = "UPDATE $logTable SET breakCredit = 0 WHERE status != '0'";
   $conn->query($sql);
 
-  require 'createTimestamps.php';
   $sql = "SELECT * FROM $logTable WHERE status = '1'";
   $result = $conn->query($sql);
   while($row = $result->fetch_assoc()){
@@ -97,7 +97,7 @@ if($row['version'] < 23){
   }
 }
 
-if($row['version']  < 24){
+if($row['version'] < 24){
   $sql = "CREATE TABLE $piConnTable(
     header VARCHAR(50)
   )";
@@ -118,6 +118,21 @@ if($row['version']  < 24){
   if($conn->query($sql)){
     echo "Add PIN for Users. <br>";
   } else {
+    echo mysqli_error($conn);
+  }
+}
+
+if($row['version'] < 25){
+  $sql="SELECT userID, daysPerYear, beginningDate  FROM $userTable INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID";
+  $result = $conn->query($sql);
+  echo mysqli_error($conn);
+  while($row = $result->fetch_assoc()){
+    $time = $row['daysPerYear'] / 365;
+
+    $time *= timeDiff_Hours(substr($row['beginningDate'],0,11) .'05:00:00', substr(getCurrentTimestamp(),0,11) .'05:00:00');
+
+    $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
+    $conn->query($sql);
     echo mysqli_error($conn);
   }
 }
