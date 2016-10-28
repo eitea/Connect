@@ -195,103 +195,63 @@
     <table>
       <tr>
         <th><?php echo $lang['DELETE']?></th>
-        <th>Person</th>
         <th><?php echo $lang['ACTIVITY']?></th>
         <th><?php echo $lang['FROM']?></th>
-        <th><?php echo $lang['TO']?></th>
-        <th><?php echo $lang['SUM']?></th>
         <th><?php echo $lang['LUNCHBREAK']?></th>
+        <th><?php echo $lang['TO']?></th>
+
+        <th><?php echo $lang['SHOULD_TIME']?></th>
+        <th><?php echo $lang['IS_TIME']?></th>
+        <th><?php echo $lang['SUM']?></th>
+        <th><?php echo $lang['DIFFERENCE']?></th>
+
         <th>Detail</th>
       </tr>
 <?php
-/*
-$showFiltered = FALSE;
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['filter'])) {
-      echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="TRUE"/>';
-      $showFiltered = TRUE;
-    } elseif (isset($_POST['showAll'])) {
-      echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="FALSE"/>';
-    } elseif (isset($_POST['saveChanges'])) {
-      if (isset($_POST['showFiltered'])) {
-        if ($_POST['showFiltered'] == 'TRUE') {
-          echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="TRUE"/>';
-          $showFiltered = TRUE;
-        } else {
-          echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="FALSE"/>';
-          $showFiltered = FALSE;
-        }
-      } else {
-        $showFiltered = FALSE;
-        echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="FALSE"/>';
-      }
-  } else {
-    echo '<input type="text" style="visibility:hidden;" name="showFiltered" value="FALSE"/>';
-    $showFiltered = FALSE;
-  }
-}
-*/
-//set filtering options
-$filterYear2 = $filterYear;
-$filterMonth2 = $filterMonth;
 
-if($filterYear == "---"){
-$filterYear2 = "____";
-}
+
 
 if($filterMonth == 0){
-$filterMonth2 = "__";
+  $filterMonth = getCurrentTimestamp();
 }
 
-if($filterID != 0){
-  $filterIDSearchQuery = " AND $userTable.id = $filterID ";
-} else {
-  $filterIDSearchQuery = " ";}
+$filterMonth = $filterYear ."-".$filterMonth."-01 05:00:00";
 
-$filterTimestampsLike = "$filterYear2-$filterMonth2-%";
+$calculator = new Monthly_Calculator($filterMonth, $filterID);
+$calculator->calculateValues();
 
-$absolvedHours = 0;
-$expectedHours = $absolvedHoursToday = 0;
+$absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
 
-$query = "SELECT * FROM $userTable INNER JOIN $logTable ON $userTable.id = $logTable.userID WHERE $logTable.time LIKE '$filterTimestampsLike'  $filterIDSearchQuery ORDER BY $logTable.time DESC";
-$result = mysqli_query($conn, $query);
-if ($result && $result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    $i = $row['indexIM'];
-    $displayTimeTo = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
-    $displayTimeEnd = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
+for($i = 0; $i < $calculator->days; $i++){
+  if($calculator->start[$i] != '-' && $calculator->activity[$i] >= 0):
 
-    $hoursAbsToday = $lunchTime = 0;
-    if ($row['status'] != '4' && $row['timeEnd'] != '0000-00-00 00:00:00') {
-      $hoursAbsToday = timeDiff_Hours($row['time'], $row['timeEnd']);
-      if ($hoursAbsToday > (float)($row['pauseAfterHours'])) {
-        $hoursAbsToday -= (float)($row['hoursOfRest']);
-        if($row['enableProjecting'] == 'FALSE'){
-          $lunchTime = $row['hoursOfRest'];
-        }
-        $lunchTime += $row['breakCredit'];
-      }
-      $absolvedHours += $hoursAbsToday;
-    } elseif($row['status'] != '4' && $row['timeEnd'] == '0000-00-00 00:00:00') {
-      $absolvedHoursToday = timeDiff_Hours($row['time'], getCurrentTimestamp());
-    }
+  if($calculator->end[$i] == '0000-00-00 00:00:00'){
+    $endTime = getCurrentTimestamp();
+  } else {
+    $endTime = $calculator->end[$i];
+  }
 
+  $difference = timeDiff_Hours($calculator->start[$i], $endTime );
+
+  $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
+  $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
+
+$k = $calculator->indecesIM[$i];
   $sql="SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText
         FROM $projectBookingTable, $logTable, $userTable, $projectTable, $companyTable, $clientTable
         WHERE $projectBookingTable.timeStampID = $logTable.indexIM
         AND $projectBookingTable.projectID = $projectTable.id
         AND $projectTable.clientID = $clientTable.id
         AND $clientTable.companyID = $companyTable.id
-        AND $logTable.indexIM = $i
-        AND $projectBookingTable.start LIKE '".substr($row['time'], 0, 10)." %'";
+        AND $logTable.indexIM = $k";
 
   $result2 = $conn->query($sql);
   $popOverContent = "";
   if ($result2 && $result2->num_rows > 0) {
     $popOverContent = "<dl>";
     while ($roww = $result2->fetch_assoc()) {
-      $popOverContent .= "<dt>" . carryOverAdder_Hours($roww['start'], $row['timeToUTC'])
-      . " - " . carryOverAdder_Hours($roww['end'], $row['timeToUTC']) . "</dt>";
+      $popOverContent .= "<dt>" . carryOverAdder_Hours($roww['start'],  $calculator->timeToUTC[$i])
+      . " - " . carryOverAdder_Hours($roww['end'],  $calculator->timeToUTC[$i]) . "</dt>";
       $popOverContent .= "<dd>" .$roww['companyName']." > " .$roww['clientName']." > " .$roww['projectName']."</dd>";
       $popOverContent .= "<dd>" .$roww['infoText']."</dd>";
     }
@@ -300,20 +260,38 @@ if ($result && $result->num_rows > 0) {
 
   echo "<tr>";
   echo "<td><input type='checkbox' name='index[]' value= ".$i."></td>";
-  echo "<td>". $row['firstname'] . " " . $row['lastname'] ."</td>";
-  echo "<td>". $lang_activityToString[$row['status']] ."</td>";
+  echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
 
-  echo "<td><input maxlength='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($displayTimeTo,0,-3) . "'></td>";
-  echo "<td><input type=text maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($displayTimeEnd,0,-3) . "'></td>";
+  echo "<td><input maxlength='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
+  echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
+  echo "<td><input type=text maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
 
-  echo "<td>". number_format($hoursAbsToday, 2, '.', ''). "h</td>";
-  echo "<td>$lunchTime</td>";
-  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($displayTimeTo,0,10).$row['id'].'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
+  echo "<td>" . $calculator->shouldTime[$i] . "</td>";
+  echo "<td>" . sprintf('%.2f', $difference) . "</td>";
+  echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
+  echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
+
+  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10).$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
   echo "</tr>";
 
-  echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $i . '">';
-  }
+  echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '">';
+  $absolvedHoursSUM += $difference - $calculator->lunchTime[$i];
+  $expectedHoursSUM += $calculator->shouldTime[$i];
+  $lunchbreakSUM += $calculator->lunchTime[$i];
+  $saldoSUM += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+  $isTimeSUM += $difference;
+endif;
 }
+
+echo "<tr style=font-weight:bold;>
+    <td>Sum: </td>
+    <td>-</td> <td>-</td>
+    <td>".sprintf('%.2f',$lunchbreakSUM)."</td> <td>-</td>
+    <td>".sprintf('%.2f',$expectedHoursSUM)."</td>
+    <td>".sprintf('%.2f', $isTimeSUM)."</td>
+    <td>".sprintf('%.2f',$absolvedHoursSUM)."</td>
+    <td>".sprintf('%+.2f',$saldoSUM)."</td> </tr>";
+
 ?>
 
 <script>
@@ -368,10 +346,6 @@ $("[data-toggle=popover]").popover({html:true})
   <canvas id="myChart" width="500" height="250px"></canvas>
 
   <?php
-  $filterMonth = $filterYear ."-".$filterMonth."-01 05:00:00";
-
-  $calculator = new Monthly_Calculator($filterMonth, $filterID);
-  $calculator->calculateValues();
 
   $absolvedHours = array();
   for($i = 0; $i < $calculator->days; $i++){
