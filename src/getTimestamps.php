@@ -130,7 +130,6 @@
 
     <input type="submit" class="button" name="filter" value="Filter"/>
 
-
     <br><br>
 
 <!-- ####################################################################### -->
@@ -138,7 +137,8 @@
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
 
-  <?php if($filterID != 0): ?>
+  <?php if($filterID != 0): echo $filterMonth;?>
+
   <li><a data-toggle="tab" href="#menu1"><?php $dateObj=DateTime::createFromFormat('!m', $filterMonth); echo $dateObj->format('F');?></a></li>
   <li><a data-toggle="tab" href="#menu2"><?php echo $filterYear; ?></a></li>
   <li><a data-toggle="tab" href="#menu3">Summary</a></li>
@@ -276,7 +276,7 @@ $k = $calculator->indecesIM[$i];
   echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
   echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
 
-  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10).$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
+  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10) . $filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
   echo "</tr>";
 
   echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '">';

@@ -5,8 +5,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-  <script type="text/javascript" src="../js/selectize.min.js"></script>
-
   <link rel="stylesheet" type="text/css" href="../css/table.css">
   <link rel="stylesheet" type="text/css" href="../css/inputTypeTime.css">
   <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
@@ -41,7 +39,6 @@
 
 </head>
 <body>
-<form method='post'>
 <?php
 
 session_start();
@@ -57,7 +54,9 @@ require "createTimestamps.php";
 require "language.php";
 ?>
 
-<h1><?php echo $lang['DAILY_USER_PROJECT']?></h1>
+<form method='post' action='getTimestamps.php'>
+<h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['DAILY_USER_PROJECT']?></h1>
+
 <br><br>
 
 <?php
@@ -68,9 +67,21 @@ $booked = 0;
 if(isset($_GET['filterDay'])){
   $filterDay = substr($_GET['filterDay'], 0, 10);
   $userID = substr($_GET['filterDay'], 10, strlen($_GET['filterDay']));
-  $booked = 0;
 }
 
+//variables needed for getTimestamp.php to work:
+//$_POST['filteredYear']
+//$_POST['filteredMonth']
+//$_POST['filteredUserID']
+?>
+<input type=text name=filteredYear style=display:none; value="<?php echo substr($filterDay,0,4); ?>" >
+<input type=text name=filteredMonth style=display:none; value="<?php echo substr($filterDay,5,2); ?>" >
+<input type=text name=filteredUserID style=display:none; value="<?php echo $userID; ?>" >
+
+</form>
+
+<form method='post'>
+<?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterDay'])){
     $filterDay = substr($_POST['filterDay'], 0, 10);
