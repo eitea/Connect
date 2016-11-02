@@ -250,7 +250,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LASTNAME'] = 'Nachname';
   $lang['LANGUAGE_SETTING'] = 'Sprache';
   $lang['LUNCHBREAK'] = 'Mittagspause';
-  $lang['LUNCHBREAK_REPAIR'] = 'Pausen Rekalculieren';
+  $lang['LUNCHBREAK_REPAIR'] = 'Pausen Rekalkulieren';
 
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
