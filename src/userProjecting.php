@@ -56,6 +56,7 @@
   }
 
 $showUndoButton = 0;
+$insertInfoText = '';
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST["add"]) && isset($_POST['end']) && !empty($_POST['infoText'])) {
       $startDate = $_POST['date']." ".$_POST['start'];
@@ -77,6 +78,8 @@ $showUndoButton = 0;
           }
           $showUndoButton = TRUE;
         }
+      } else {
+        $insertInfoText = $_POST['infoText'];
       }
     } elseif(isset($_POST['addBreak']) && isset($_POST['startBreak']) && !empty($_POST['infoTextBreak'])){
       $startDate = $_POST['date']." ".$_POST['start'];
@@ -260,6 +263,7 @@ function showProjects(str) {
 <input type="submit" class="button" name="add" value="+"> <br>
 
 <textarea maxlength="500" placeholder="Info" name="infoText" onkeyup='textAreaAdjust(this)'>
+  <?php echo $insertInfoText; ?>
 </textarea>
 </span><br>
 
