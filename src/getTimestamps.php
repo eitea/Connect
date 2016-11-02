@@ -62,7 +62,7 @@
       <?php
       $query = "SELECT * FROM $userTable;";
       $result = mysqli_query($conn, $query);
-      $userFilterOptions = array(array("id" => "0", "firstname" => "--Show", "lastname" => "All--"));
+      $userFilterOptions = array(array("id" => "0", "firstname" => "--Select", "lastname" => "User--"));
 
       while($row=$result->fetch_assoc()){
         array_push($userFilterOptions, $row);
