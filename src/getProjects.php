@@ -11,12 +11,14 @@
   <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
   <link rel="stylesheet" type="text/css" href="../css/textArea.css">
   <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/js/dataTables.bootstrap.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-  <script src='../plugins/select2/js/select2.js'></script>
 
+<!--
+  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
+  <script src='../plugins/select2/js/select2.js'></script>
+-->
 <style>
   textarea {
     border-style: hidden;
@@ -24,7 +26,7 @@
     width:200px;
   }
 
-  input[type="number"],input[type="time"] {
+  input[type="number"],input[type="time"]{
     color:darkblue;
     font-family: monospace;
     border-style: hidden;
@@ -37,53 +39,6 @@
 </style>
 </head>
 <body>
-<script>
-function showClients(str, client) {
-  if (str != "") {
-    if (window.XMLHttpRequest) {
-      // code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp = new XMLHttpRequest();
-    } else {
-      // code for IE6, IE5
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("clientHint").innerHTML = xmlhttp.responseText;
-      }
-    };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?client="+client+"&company="+str,true);
-    xmlhttp.send();
-
-  }
-}
-
-function showProjects(str, pr) {
-  if (str != "") {
-    if (window.XMLHttpRequest) {
-      // code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp = new XMLHttpRequest();
-    } else {
-      // code for IE6, IE5
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("projectHint").innerHTML = xmlhttp.responseText;
-      }
-    };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?p="+pr+"&q="+str,true);
-    xmlhttp.send();
-  }
-}
-
-function textAreaAdjust(o) {
-    o.style.height = "1px";
-    o.style.height = (o.scrollHeight)+"px";
-}
-
-</script>
 
 <form method='post'>
 
@@ -106,21 +61,19 @@ require "language.php";
 
 <?php
 $filterMonth = substr(getCurrentTimestamp(),0,7);
-$companyID = 0;
 $booked = '0';
 
+$filterCompany = 0;
 $filterClient = 0;
 $filterProject = 0;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-
   if(isset($_POST['filterMonth'])){
     $filterMonth = $_POST['filterMonth'];
   }
 
   if(isset($_POST['filterCompany'])){
-    $companyID = $_POST['filterCompany'];
-    echo "<script type='text/javascript'> showClients($companyID); </script>";
+    $filterCompany = $_POST['filterCompany'];
   }
 
   if(isset($_POST['filterBooked'])){
@@ -143,6 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       FROM $logTable, $projectBookingTable
       WHERE $projectBookingTable.id = $imm
       AND $projectBookingTable.timestampID = $logTable.indexIM";
+
       $result = mysqli_query($conn, $query);
       if($result && $result->num_rows>0){
         $row = $result->fetch_assoc();
@@ -182,35 +136,72 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     }
   }
+} //end if post
+?>
+
+<div id='myContent'>
+</div>
+
+<script>
+function showClients(company, client){
+    $.ajax({
+        url:'ajaxQuery/AJAX_client.php',
+        data:{companyID:company, clientID:client},
+        type: 'post',
+        success : function(resp){
+            $("#filterClient").html(resp);
+        },
+        error : function(resp){}
+    });
+
+    showProjects(client, 0);
+};
+
+function showProjects(client, project){
+    $.ajax({
+        url:'ajaxQuery/AJAX_project.php',
+        data:{clientID:client, projectID:project},
+        type: 'post',
+        success : function(resp){
+            $("#filterProject").html(resp);
+        },
+        error : function(resp){}
+    });
+};
+
+
+function textAreaAdjust(o) {
+    o.style.height = "1px";
+    o.style.height = (o.scrollHeight)+"px";
 }
 
-?>
+</script>
 
 <input type="month" name="filterMonth" value="<?php echo $filterMonth; ?>">
 
-<select name="filterCompany" onchange="showClients(this.value, <?php echo $filterClient; ?>)">
 
+<select id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0)'>
+
+<option value="0">Select Company...</option>
 <?php
 $sql = "SELECT * FROM $companyTable";
 $result = mysqli_query($conn, $sql);
 if($result && $result->num_rows > 0) {
   $row = $result->fetch_assoc();
-  $first = $row['id'];
-  do{
+  do {
     $checked = '';
-    if($companyID == $row['id']) {
+    if($filterCompany == $row['id']) {
       $checked = 'selected';
-      $first = $row['id'];
     }
-    echo "<option $checked value=".$row['id'].">".$row['name']."</option>";
+    echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
 
   } while($row = $result->fetch_assoc());
 }
 
 ?>
-
-
 </select>
+
+
 <select name="filterBooked">
   <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
   <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
@@ -221,33 +212,41 @@ if($result && $result->num_rows > 0) {
 
 Optional:
 
-<script type="text/javascript">
+<!--script type="text/javascript">
 $(document).ready(function() {
   $(".js-example-basic-single").select2();
 });
-</script>
+</script-->
 
-<select class="js-example-basic-single" id="clientHint" name="filterClient" style='width:250px' onchange="showProjects(this.value, <?php echo $filterProject; ?>)">
+<select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:250px' onchange='showProjects(this.value, 0)' >
 </select>
 
 
-
-<select id="projectHint" name="filterProject">
+<select id="filterProject" name="filterProject">
 </select>
+
+<?php
+if($filterCompany != 0):
+?>
 
 <script>
-
-showClients(<?php echo "$first,  $filterClient"; ?>);
-//showProjects(<?php echo $filterClient ?>, 0);
-
+showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
+showProjects(<?php echo $filterClient; ?>, <?php echo $filterProject; ?>);
 </script>
 
+<?php endif; ?>
 
 <br><br>
 
 <script>
 function toggle(source) {
   checkboxes = document.getElementsByName('checkingIndeces[]');
+  for(var i = 0; i<checkboxes.length; i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+function toggle2(source) {
+  checkboxes = document.getElementsByName('noCheckCheckingIndeces[]');
   for(var i = 0; i<checkboxes.length; i++) {
     checkboxes[i].checked = source.checked;
   }
@@ -265,7 +264,7 @@ function toggle(source) {
 <th><?php echo $lang['SUM']; ?> (0.25h)</th>
 <th><?php echo $lang['HOURS_CREDIT']; ?></th>
 <th>Person</th>
-<th><?php echo $lang['CHARGED']; ?> / <?php echo $lang['NOT_CHARGEABLE']; ?><input type="checkbox" onClick="toggle(this)" /></th>
+<th><?php echo $lang['CHARGED']; ?><input type="checkbox" onClick="toggle(this)" /> / <?php echo $lang['NOT_CHARGEABLE']; ?><input type="checkbox" onClick="toggle2(this)" /></th>
 <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
 </tr>
 </thead>
@@ -281,7 +280,7 @@ $csv->setEncoding("UTF-8");
 $sum_min = $sum25 = 0;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  $companyID = $_POST['filterCompany'];
+  $filterCompany = $_POST['filterCompany'];
 
   if($booked == '2'){
     $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
@@ -317,7 +316,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               $projectTable.hours,
               $projectTable.hourlyPrice
         FROM $projectBookingTable, $logTable, $userTable, $clientTable, $projectTable, $companyTable
-        WHERE $companyTable.id = $companyID
+        WHERE $companyTable.id = $filterCompany
         AND $projectTable.clientID = $clientTable.id
         AND $clientTable.companyID = $companyTable.id
         AND $projectBookingTable.projectID = $projectTable.id
@@ -400,8 +399,12 @@ for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
 <input type='submit' name='saveChanges' value='Save Changes'><br><br>
 <?php endif; ?>
 
-<a href= <?php echo 'csvDownload.php?csv=' . rawurlencode($csv->compile()); ?> target='_blank'> Download as CSV </a>
+</form>
+
+<form action="csvDownload.php" method="post" target='_blank'>
+<button type='submit' name=csv value=<?php echo rawurlencode($csv->compile()); ?>> Download as CSV </a>
+</form>
+
 
 <br><br>
-</form>
 </body>
