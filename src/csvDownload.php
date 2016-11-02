@@ -1,5 +1,8 @@
 <?php
-$result = rawurldecode($_GET['csv']);
+
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  $result = rawurldecode($_POST['csv']);
+}
 
 header('Content-Type: application/csv');
 header("Content-Disposition: attachment; filename='export.csv'");
