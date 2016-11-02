@@ -137,7 +137,7 @@
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
 
-  <?php if($filterID != 0): echo $filterMonth;?>
+  <?php if($filterID != 0): ?>
 
   <li><a data-toggle="tab" href="#menu1"><?php $dateObj=DateTime::createFromFormat('!m', $filterMonth); echo $dateObj->format('F');?></a></li>
   <li><a data-toggle="tab" href="#menu2"><?php echo $filterYear; ?></a></li>

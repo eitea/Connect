@@ -54,11 +54,6 @@ require "createTimestamps.php";
 require "language.php";
 ?>
 
-<form method='post' action='getTimestamps.php'>
-<h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['DAILY_USER_PROJECT']?></h1>
-
-<br><br>
-
 <?php
 $filterDay = substr(getCurrentTimestamp(), 0, 10);
 $userID = 0;
@@ -69,19 +64,6 @@ if(isset($_GET['filterDay'])){
   $userID = substr($_GET['filterDay'], 10, strlen($_GET['filterDay']));
 }
 
-//variables needed for getTimestamp.php to work:
-//$_POST['filteredYear']
-//$_POST['filteredMonth']
-//$_POST['filteredUserID']
-?>
-<input type=text name=filteredYear style=display:none; value="<?php echo substr($filterDay,0,4); ?>" >
-<input type=text name=filteredMonth style=display:none; value="<?php echo substr($filterDay,5,2); ?>" >
-<input type=text name=filteredUserID style=display:none; value="<?php echo $userID; ?>" >
-
-</form>
-
-<form method='post'>
-<?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterDay'])){
     $filterDay = substr($_POST['filterDay'], 0, 10);
@@ -162,7 +144,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
 }
+
+//variables needed for getTimestamp.php to work:
+//$_POST['filteredYear']
+//$_POST['filteredMonth']
+//$_POST['filteredUserID']
 ?>
+
+<form method='post' action='getTimestamps.php'>
+<h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['DAILY_USER_PROJECT']?></h1>
+
+
+<input type=text name=filteredYear style=display:none; value="<?php echo substr($filterDay,0,4); ?>" >
+<input type=text name=filteredMonth style=display:none; value="<?php echo substr($filterDay,5,2); ?>" >
+<input type=text name=filteredUserID style=display:none; value="<?php echo $userID; ?>" >
+
+<br><br>
+</form>
+<form method='post'>
 
 <input id="filterDateInput" style="border-style:solid; border-color:rgb(233, 233, 233)" type="text" size="11" name="filterDay" value="<?php echo $filterDay; ?>">
 
@@ -381,12 +380,6 @@ if ($result && $result->num_rows > 1) {
 
 <input type="submit" name="addBooking" value="+"/>
 
-<script>
-$('#clientHint').selectize({
-    create: true,
-    sortField: 'text'
-});
-</script>
 </span>
 
 
