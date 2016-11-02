@@ -149,21 +149,6 @@ require "language.php";
             } else {
               echo '<input type="submit" class="button" name="stampIn" value= "'.$lang['CHECK_IN'].'"/>';
             }
-
-            echo '<br> <br> <br>';
-            $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status ='2';";
-            $result = mysqli_query($conn, $query);
-            if ($result && $result->num_rows > 0) {
-              $row = $result->fetch_assoc();
-              $now = getCurrentTimestamp();
-              if(timeDiff_Hours($row['time'], $now) > $cd/60){
-                echo '<input type="submit" class="button" name="leaveOut" value="'.$lang['SPECIAL_LEAVE_RET'].'">';
-              } else {
-                echo '<input disabled type="submit" class="button" name="leaveOut" value="'.$lang['SPECIAL_LEAVE_RET'].'">';
-              }
-            } else {
-              echo '<input type="submit" class="button" name="leaveIn" value="'.$lang['SPECIAL_LEAVE'].'"> <br><br>';
-            }
             ?>
 
           </span>
