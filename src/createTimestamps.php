@@ -11,7 +11,7 @@ function checkIn($userID, $status) {
    AND time LIKE '$timeIsLikeToday'";
 
    $result = mysqli_query($conn, $sql);
-   if($result && $result->num_rows > 0){
+   if($result && $result->num_rows > 0){ //user already stamped in today
      $row = $result->fetch_assoc();
      $diff = timeDiff_Hours($row['timeEnd'], getCurrentTimestamp());
      if($diff <= 0){
@@ -20,7 +20,7 @@ function checkIn($userID, $status) {
      $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
       $conn->query($sql);
       echo mysqli_error($conn);
-   } else {
+   } else { //create new stamp
      $sql = "SELECT * FROM $bookingTable WHERE userID = $userID";
      $result = $conn->query($sql);
      $row=$result->fetch_assoc();
