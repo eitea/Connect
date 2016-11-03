@@ -54,8 +54,16 @@ tr td:nth-child(1) { /* not 0 based */
     while($row = $result->fetch_assoc()){
       if($row['timeEnd'] == '0000-00-00 00:00:00'){
         $timeEnd = getCurrentTimestamp();
+
+        if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){
+          $expectedHours += $row['expectedHours'];
+        } else {
+          $expectedHours += timeDiff_Hours($row['time'], $timeEnd); //this may only happen for OPEN timestamps
+        }
+
       } else {
         $timeEnd = $row['timeEnd'];
+        $expectedHours += $row['expectedHours'];
       }
 
       switch($row['status']){
@@ -77,11 +85,6 @@ tr td:nth-child(1) { /* not 0 based */
           $sickHours += timeDiff_Hours($row['time'], $timeEnd);
       }
 
-      if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){
-        $expectedHours += $row['expectedHours'];
-      } else {
-        $expectedHours += timeDiff_Hours($row['time'], $timeEnd);
-      }
     }
   }
 
