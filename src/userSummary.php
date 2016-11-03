@@ -77,7 +77,11 @@ tr td:nth-child(1) { /* not 0 based */
           $sickHours += timeDiff_Hours($row['time'], $timeEnd);
       }
 
-      $expectedHours += $row['expectedHours'];
+      if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){
+        $expectedHours += $row['expectedHours'];
+      } else {
+        $expectedHours += timeDiff_Hours($row['time'], $timeEnd);
+      }
     }
   }
 
@@ -87,7 +91,7 @@ tr td:nth-child(1) { /* not 0 based */
   if($result && $result->num_rows > 0){
     while($row = $result->fetch_assoc()){
       if(!isHoliday($row['time'])){
-        $expectedHours += $row[strtolower(date('D', strtotime($row['time'])))];        
+        $expectedHours += $row[strtolower(date('D', strtotime($row['time'])))];
       }
     }
   }

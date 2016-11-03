@@ -37,6 +37,7 @@
 ?>
 
 <h1><?php echo $lang['VIEW_TIMESTAMPS']; ?></h1>
+<br><br>
 
 <form method=post>
 <select name='filteredMonth'>
