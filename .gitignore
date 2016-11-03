@@ -2,3 +2,4 @@ src/connection_config.php
 tmp.php
 test.php
 aws
+.gitignore

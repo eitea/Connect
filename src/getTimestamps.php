@@ -173,19 +173,38 @@
         }
       } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime'])) {
         if($filterID != 0) {
-          $thisuserID = $filterID;
           $activtiy = $_POST['action'];
-          $creatTimeZone = $_POST['creatTimeZone'];
-          $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($creatTimeZone*-1));
-          $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($creatTimeZone*-1));
-          $day = strtolower(date('D', strtotime($timeBegin)));
-          $sql = "SELECT $day FROM $bookingTable WHERE userID = $thisuserID";
-          $result2 = $conn->query($sql);
-          $row2 = $result2->fetch_assoc();
-          $day = $row2[$day];
 
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $thisuserID, '$activtiy', '$creatTimeZone', '$day');";
-          $conn->query($sql);
+          $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($_POST['creatTimeZone']*-1)); //UTC time
+          $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($_POST['creatTimeZone']*-1)); //UTC time
+
+          $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) ." %";
+          $timeToUTC = $_POST['creatTimeZone'];
+
+          $sql = "SELECT * FROM $logTable WHERE userID = $filterID
+           AND status = '$activtiy'
+           AND time LIKE '$timeIsLikeToday'";
+
+           $result = mysqli_query($conn, $sql);
+           if($result && $result->num_rows > 0){ //user already stamped in today
+             $row = $result->fetch_assoc();
+             $diff = timeDiff_Hours($row['timeEnd'], $timeBegin);
+             if($diff <= 0){
+               $diff = 0;
+             }
+             $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
+              $conn->query($sql);
+              echo mysqli_error($conn);
+           } else { //create new stamp
+             //get expected Hours
+             $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
+             $result = $conn->query($sql);
+             $row=$result->fetch_assoc();
+             $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
+             $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activtiy', '$creatTimeZone', '$expectedHours');";
+             $conn->query($sql);
+           }
+
         }
       }
     }
