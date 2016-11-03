@@ -35,7 +35,6 @@
     border-radius:5px;
     min-width:90px;
   }
-
 </style>
 </head>
 <body>
@@ -103,7 +102,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $toUtc = $row['timeToUTC'] * -1;
 
         $timeStart = carryOverAdder_Hours($_POST['dateFrom'][$i]." ".$_POST['timesFrom'][$i], $toUtc);
-        $timeFin = carryOverAdder_Hours($_POST['dateFrom'][$i]." ".$_POST['timesTo'][$i], $toUtc);
+        $timeFin = carryOverAdder_Hours($_POST['dateTo'][$i]." ".$_POST['timesTo'][$i], $toUtc);
 
         $infoText = test_input($_POST['infoTextArea'][$i]);
         $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText' WHERE id = $imm";
@@ -253,6 +252,11 @@ function toggle2(source) {
 }
 </script>
 
+<?php
+if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
+<fieldset disabled>
+<?php endif; ?>
+
 <table id='blank' class="table table-striped table-bordered" cellspacing="0" width="100%">
   <thead>
 <tr>
@@ -346,7 +350,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $csv_Add[] = $row['start'] . " - " . $row['end'];
       echo "<td><input type='text' style='max-width:90px; background:none;' readonly name='dateFrom[]' value='".substr($row['start'], 0, 10)."'>
       <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesFrom[]' value='". substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),11,19) ."'>
-      - <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesTo[]' value='". substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']),11,19) ."'></td>";
+      -
+      <input type='text' style='max-width:90px; background:none;' readonly name='dateTo[]' value='".substr($row['end'], 0, 10)."'>
+      <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesTo[]' value='". substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']),11,19) ."'></td>";
       $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '');
       echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '') . "</td>";
       $csv_Add[] = $t;
@@ -392,7 +398,10 @@ for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
 }
 </script>
 </table>
-
+<?php
+if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
+</fieldset>
+<?php endif; ?>
 
 <br><br>
 <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
