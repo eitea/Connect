@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="../css/homeMenu.css">
   <link rel="stylesheet" type="text/css" href="../css/table.css">
+  <link rel="stylesheet" type=text/css href = "../css/submitButt.css" >
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -31,12 +32,37 @@
   require 'Calculators/YearlyCalculator.php';
 
   $currentTimeStamp = getCurrentTimestamp();
-
   $currentYear = substr($currentTimeStamp, 0, 4);
   $currentMonth = substr($currentTimeStamp, 5, 2);
 ?>
 
 <h1><?php echo $lang['VIEW_TIMESTAMPS']; ?></h1>
+
+<form method=post>
+<select name='filteredMonth'>
+<?php
+  if (isset($_POST['applyFilter'])) {
+    $currentMonth = sprintf("%02d", $_POST['filteredMonth']);
+  }
+
+  for($i = 1; $i < 13; $i++) {
+    if ($i == $currentMonth) {
+      $selected = 'selected';
+    } else {
+      $selected= '';
+    }
+    $dateObj = DateTime::createFromFormat('!m', $i);
+    $option = $dateObj->format('F');
+    echo "<option $selected name=filterUserID value=$i>$option</option>";
+  }
+
+
+  $currentTimeStamp = $currentYear . '-' . $currentMonth . '-01 05:00:00';
+?>
+</select>
+
+<input type="submit" class="button" name="applyFilter" value="Apply" />
+</form>
 
 <br><br>
 
