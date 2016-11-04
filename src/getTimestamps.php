@@ -28,6 +28,14 @@
     width:100%;
     border:none;
   }
+  input[type="number"]{
+    color:darkblue;
+    font-family: monospace;
+    border-style: hidden;
+    width:55px;
+    padding:2px;
+    border-radius:5px;
+  }
   </style>
 </head>
 <body>
@@ -152,14 +160,26 @@
       if (isset($_POST['saveChanges'])) {
         for ($i = 0; $i < count($_POST['editingIndecesIM']); $i++) {
           $imm = $_POST['editingIndecesIM'][$i];
-          $query = "SELECT * FROM $logTable WHERE indexIM=$imm";
-          $row = mysqli_query($conn, $query)->fetch_assoc();
-          $toUtc = $row['timeToUTC'] * -1;
+          $timeStart = $_POST['timesFrom'][$i] .':00';
+          $timeFin = $_POST['timesTo'][$i] .':00';
 
-          $timeStart = carryOverAdder_Hours($_POST['timesFrom'][$i] .':00', $toUtc);
-          $timeFin = carryOverAdder_Hours($_POST['timesTo'][$i] .':00', $toUtc);
+          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $imm";
+          $conn->query($sql);
+          echo mysqli_error($conn);
 
-          $sql = "UPDATE $logTable SET time='$timeStart', timeEnd='$timeFin' WHERE indexIM = $imm";
+          $break = $_POST['lunchiTime'][$i];
+
+          $sql = "SELECT enableProjecting, pauseAfterHours, hoursOfRest FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE indexIM = $imm";
+          $result = mysqli_query($conn, $sql);
+          $row = $result->fetch_assoc();
+
+          if($row['enableProjecting'] != 'TRUE'){//'normal' users get their lunchbreak calculated dynamically, since it cannot be added/maintained to breakCredit that easily:
+             //meaning: he should have these 0.5 as dynamic lunchbreak if he actually was here for longer than 6 hours
+            if(timeDiff_Hours($timeStart, $timeFin) >= $row['pauseAfterHours']){
+              $break = $break - $row['hoursOfRest'];
+            } //else means that this timestamp has 0 dynamic lunchbreak, so we do not change the value.
+          }
+          $sql = "UPDATE $logTable SET breakCredit = $break WHERE indexIM = $imm";
           $conn->query($sql);
           echo mysqli_error($conn);
         }
@@ -286,9 +306,9 @@ $k = $calculator->indecesIM[$i];
   echo "<td><input type='checkbox' name='index[]' value= ".$i."></td>";
   echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
 
-  echo "<td><input maxlength='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
-  echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
-  echo "<td><input type=text maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
+  echo "<td><input size='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
+  echo "<td><input type=number step=any onkeydown='if (event.keyCode == 13) return false;' name='lunchiTime[]' value='" . sprintf('%.2f', $calculator->lunchTime[$i]) . "'></td>";
+  echo "<td><input type=text size='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
 
   echo "<td>" . $calculator->shouldTime[$i] . "</td>";
   echo "<td>" . sprintf('%.2f', $difference) . "</td>";
