@@ -137,6 +137,46 @@ if($row['version'] < 25){
   }
 }
 
+if($row['version'] < 26){
+  $sql = "ALTER TABLE $clientTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger Name length for Clients. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE $projectTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger Name length for Projects. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $companyTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger Name length for Companies. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $holidayTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger Name length for Holidays. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $userTable MODIFY COLUMN email VARCHAR(50) UNIQUE NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger length for E-mails. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $companyDefaultProjectTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
+  if($conn->query($sql)){
+    echo "Bigger name length for default projects. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

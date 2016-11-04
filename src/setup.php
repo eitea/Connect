@@ -26,7 +26,7 @@ $sql = "CREATE TABLE $userTable (
   psw VARCHAR(60) NOT NULL,
   terminalPin INT(8) DEFAULT 4321,
   sid VARCHAR(50),
-  email VARCHAR(30) UNIQUE NOT NULL,
+  email VARCHAR(50) UNIQUE NOT NULL,
   gender ENUM('female', 'male'),
   overTimeLump INT(3) DEFAULT 0,
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
@@ -106,7 +106,7 @@ if ($conn->query($sql)) {
 $sql = "CREATE TABLE $holidayTable(
   begin DATETIME,
   end DATETIME,
-  name VARCHAR(30)
+  name VARCHAR(60) NOT NULL
 )";
 if ($conn->query($sql)) {
   echo "Holiday Table Created. <br>";
@@ -142,7 +142,7 @@ if ($conn->query($sql)) {
 
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(32) NOT NULL
+  name VARCHAR(60) NOT NULL
 )";
 if ($conn->query($sql)) {
   echo "CompanyTable created. <br>";
@@ -161,7 +161,7 @@ if ($conn->query($sql)) {
 
 $sql = "CREATE TABLE $clientTable(
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(30) NOT NULL,
+name VARCHAR(60) NOT NULL,
 companyID INT(6) UNSIGNED,
 clientNumber VARCHAR(12),
 FOREIGN KEY (companyID) REFERENCES $companyTable(id)
@@ -176,7 +176,7 @@ if ($conn->query($sql)) {
 $sql = "CREATE TABLE $projectTable(
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 clientID INT(6) UNSIGNED,
-name VARCHAR(30) NOT NULL,
+name VARCHAR(60) NOT NULL,
 hours DECIMAL(5,2),
 status VARCHAR(30),
 hourlyPrice DECIMAL(4,2) DEFAULT 0,
@@ -230,7 +230,7 @@ if ($conn->query($sql)) {
 
 $sql = "CREATE TABLE $companyDefaultProjectTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(32) NOT NULL,
+  name VARCHAR(60) NOT NULL,
   companyID INT(6) UNSIGNED,
   hours INT(3),
   status VARCHAR(30),
