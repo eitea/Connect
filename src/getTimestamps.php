@@ -179,9 +179,13 @@
               $break = $break - $row['hoursOfRest'];
             } //else means that this timestamp has 0 dynamic lunchbreak, so we do not change the value.
           }
-          $sql = "UPDATE $logTable SET breakCredit = $break WHERE indexIM = $imm";
-          $conn->query($sql);
-          echo mysqli_error($conn);
+          if($break >= 0){
+            $sql = "UPDATE $logTable SET breakCredit = $break WHERE indexIM = $imm";
+            $conn->query($sql);
+            echo mysqli_error($conn);
+          } else {
+            echo "<br> A Negative or illegal Value was entered, please make sure the times match the criterias.<br>";
+          }
         }
       } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
         $index = $_POST["index"];
