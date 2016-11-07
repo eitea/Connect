@@ -195,7 +195,7 @@ if($row['version'] < 27){
       echo mysqli_error($conn);
 
       //update timestamp
-      $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
+      $sql = "UPDATE $logTable SET breakCredit = ".$row['hoursOfRest']." WHERE indexIM = $indexIM";
       $conn->query($sql);
       echo mysqli_error($conn);
     }
