@@ -178,6 +178,7 @@ if($row['version'] < 26){
 }
 
 if($row['version'] < 27){
+  //add the lunchbreak bookings for each log of a normal user
   $sql = "SELECT time, timeEnd, pauseAfterHours, hoursOfRest, indexIM, id FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE enableProjecting = 'TRUE' AND status = '0'"; //kek
   $result = $conn->query($sql);
   while($row = $result->fetch_assoc()){
@@ -199,6 +200,20 @@ if($row['version'] < 27){
       echo mysqli_error($conn);
     }
   }
+
+  //repair the unlogs
+  $sql = "SELECT * FROM $userTable";
+  $result = $conn->query($sql);
+  while($row = $result->fetch_assoc()){
+    $userID = $row['id'];
+
+    //fix1: remove all unlogs before entry date
+    $entryDate = $row['beginningDate'];
+    $sql = "DELETE FROM $negative_logTable WHERE userID = $userID AND time < '$entryDate'";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
+
 }
 
 //------------------------------------------------------------------------------

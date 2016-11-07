@@ -178,6 +178,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
               <li><a href="fixVacations.php" target='_blank'><span><?php echo $lang['VACATION_REPAIR']; ?></span></a></li>
               <li><a href="fixAccumulatedVacation.php" target='_blank'><span><?php echo $lang['RECALCULATE_VACATION']; ?></span></a></li>
               <li><a href="fixAbsentLogTable.php" target='_blank'><span>Repair Expected Hours</span></a></li>
+              <li><a href="fixUnLogs.php" target='_blank'><span>Repair Absent Log</span></a></li>
             </ul>
           </li>
 
