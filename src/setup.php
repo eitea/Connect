@@ -31,7 +31,7 @@ $sql = "CREATE TABLE $userTable (
   overTimeLump INT(3) DEFAULT 0,
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
-  beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+  beginningDate DATETIME DEFAULT UTC_TIMESTAMP,
   enableProjecting ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   coreTime TIME DEFAULT '8:00'
@@ -94,7 +94,7 @@ if ($conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$require 'version_number.php';
+require 'version_number.php';
 $sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
 if ($conn->query($sql)) {
   echo "Insert into ldap table. <br>";
@@ -279,7 +279,7 @@ ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENAB
 COMMENT 'Log absent sessions at 23:00 daily!'
 DO
 INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-SELECT CURRENT_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
+SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
 FROM $userTable u
 INNER JOIN $bookingTable ON u.id = $bookingTable.userID
 WHERE u.id != 1
