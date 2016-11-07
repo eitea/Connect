@@ -163,7 +163,12 @@
           $timeStart = $_POST['timesFrom'][$i] .':00';
           $timeFin = $_POST['timesTo'][$i] .':00';
 
-          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $imm";
+          if($timeFin != '0000-00-00 00:00:00'){
+            $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $imm";
+          } else {
+            $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin' WHERE indexIM = $imm";
+          }
+
           $conn->query($sql);
           echo mysqli_error($conn);
 
@@ -312,9 +317,9 @@ $k = $calculator->indecesIM[$i];
   echo "<td><input type='checkbox' name='index[]' value= ".$i."></td>";
   echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
 
-  echo "<td><input size='16' type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
+  echo "<td><input size='16'  maxlength=16  type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
   echo "<td><input type=number step=any onkeydown='if (event.keyCode == 13) return false;' name='lunchiTime[]' value='" . sprintf('%.2f', $calculator->lunchTime[$i]) . "'></td>";
-  echo "<td><input type=text size='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
+  echo "<td><input type=text size='16' maxlength=16 onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
 
   echo "<td>" . $calculator->shouldTime[$i] . "</td>";
   echo "<td>" . sprintf('%.2f', $difference) . "</td>";
