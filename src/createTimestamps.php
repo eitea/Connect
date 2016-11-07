@@ -46,21 +46,30 @@ function checkOut($userID, $status) {
 
   $start = $row['time'];
 
-  //if user cannot book, was here for over 6h and has no break called 'Lunchbreak For <user>', give him a lunchbreak booking.
+  //if user cannot book, and was here for over 6h give him a lunchbreak booking, but only if he doesnt already have one.
   $sql = "SELECT * FROM $userTable
   WHERE $userTable.id = $userID
   AND $userTable.enableProjecting = 'FALSE'
-  AND TIMESTAMPDIFF('$start', UTC_TIMESTAMP) > pauseAfterHours
+  AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM AND infoText = 'Lunchbreak For $userID');
   ";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
     $row = $result->fetch_assoc();
     $minutes = $row['hoursOfRest'] * 60;
+    //create the lunchbreak booking
     $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', DATE_ADD('$start', INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID')";
     $conn->query($sql);
     echo mysqli_error($conn);
+
+    //update timestamp
+    $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  } else {
+    echo mysqli_error($conn);
   }
+
 }
 
 //$to - $from in Hours.
