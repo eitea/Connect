@@ -266,7 +266,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
   $lang['READY_STATUS'] = 'Bereitschaftsstatus';
-  $lang['RECALCULATE_VACATION'] = 'Akkumultierten Urlaub Rekalkulieren';
+  $lang['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
   $lang['REGISTER_FROM_FORM'] = 'Formular Registrierung';
   $lang['REGISTER_NEW_USER'] = 'Registrieren';
