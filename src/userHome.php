@@ -49,9 +49,10 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
   }
 }
 $userID = $_SESSION['userid'];
-require 'createTimestamps.php';
 require "connection.php";
 require "language.php";
+require 'createTimestamps.php';
+require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
 
 ?>
 <title>Home</title>
@@ -113,15 +114,9 @@ require "language.php";
 
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
               if (isset($_POST['stampIn'])) {
-                $activityA = checkIn($userID, '0');
+                $activityA = checkIn($userID);
               } elseif (isset($_POST['stampOut'])) {
-                $activityB = checkOut($userID, '0');
-              }
-
-              if (isset($_POST['leaveIn'])) {
-                $activityA = checkIn($userID, '2');
-              } elseif (isset($_POST['leaveOut'])) {
-                $activityB = checkOut($userID, '2');
+                $activityB = checkOut($userID);
               }
             }
 
@@ -137,14 +132,15 @@ require "language.php";
             $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";
             $result = mysqli_query($conn, $query);
             if ($result && $result->num_rows > 0) {
+              //both are UTC
               $row = $result->fetch_assoc();
               $now = getCurrentTimestamp();
-              //both are UTC
               if(timeDiff_Hours($row['time'],$now)  > $cd/60){
-                echo '<input type="submit" class="button" name="stampOut" value="'.$lang['CHECK_OUT'].'"/>';
+                $disabled = '';
               } else {
-                echo '<input disabled type="submit" class="button" name="stampOut" value="'.$lang['CHECK_OUT'].'"/>';
+                $disabled = 'disabled';
               }
+              echo '<input '.$disabled.' type="submit" class="button" name="stampOut" value="'.$lang['CHECK_OUT'].'"/>';
               $showProjectBookingLink = TRUE;
             } else {
               echo '<input type="submit" class="button" name="stampIn" value= "'.$lang['CHECK_IN'].'"/>';

@@ -70,9 +70,6 @@ tr td:nth-child(1) { /* not 0 based */
         case 0:
           $absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
           $breakCreditHours += $row['breakCredit'];
-          if($userRow['enableProjecting'] == 'FALSE' && timeDiff_Hours($row['time'], $timeEnd) > $userRow['pauseAfterHours']){
-            $breakCreditHours += $userRow['hoursOfRest'];
-          }
           break;
         case 1:
           $vacationHours += timeDiff_Hours($row['time'], $timeEnd);

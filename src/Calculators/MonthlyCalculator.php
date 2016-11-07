@@ -54,22 +54,8 @@ class Monthly_Calculator{
           $this->shouldTime[] = $row['expectedHours'];
           $this->timeToUTC[] = $row['timeToUTC'];
           $this->indecesIM[] = $row['indexIM'];
-          $this->lunchTime[$count-1] = $row['breakCredit']; //initial value
+          $this->lunchTime[$count-1] = $row['breakCredit']; //for any status
 
-          //he can only have lunch when he was actually here
-          $sql="SELECT * FROM $userTable WHERE id = $id";
-          $result = $conn->query($sql);
-          $row2 = $result->fetch_assoc();
-          //is he supposed to have lunch?
-          if($row['status'] == 0 && timeDiff_Hours($row['time'], $row['timeEnd']) >= $row2['pauseAfterHours']){
-            if($row2['enableProjecting'] == 'TRUE'){
-              //he has access? leave it at the breakCredit, since thats the accumulated breaktime.
-              $this->canBook = 'TRUE';
-            } else {
-              //he has no access? just add his default value of lunch break.
-              $this->lunchTime[$count-1] += $row2['hoursOfRest'];
-            }
-          }
           if(isHoliday($row['time'])){
             $this->shouldTime[$count-1] = 0;
           }

@@ -177,6 +177,30 @@ if($row['version'] < 26){
   }
 }
 
+if($row['version'] < 27){
+  $sql = "SELECT time, timeEnd, pauseAfterHours, hoursOfRest, indexIM, id FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE enableProjecting = 'TRUE' AND status = '0'"; //kek
+  $result = $conn->query($sql);
+  while($row = $result->fetch_assoc()){
+    //for every single log if status = 0, and time lies over 6h and user cant book -> add the lunchbreak booking
+    if(timeDiff_Hours($row['time'], $row['timeEnd']) > $row['pauseAfterHours']){
+      //create the lunchbreak booking
+      $start = $row['time'];
+      $minutes = $row['hoursOfRest'] * 60;
+      $indexIM = $row['indexIM'];
+      $userID = $row['id'];
+
+      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', DATE_ADD('$start', INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID')";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+
+      //update timestamp
+      $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+    }
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
