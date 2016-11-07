@@ -60,8 +60,8 @@ $userID = 0;
 $booked = 0;
 
 if(isset($_GET['filterDay'])){
-  $filterDay = substr($_GET['filterDay'], 0, 10);
-  $userID = substr($_GET['filterDay'], 10, strlen($_GET['filterDay']));
+  $filterDay = $_GET['filterDay'];
+  $userID = $_GET['userID'];
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){

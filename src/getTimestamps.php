@@ -289,14 +289,14 @@ for($i = 0; $i < $calculator->days; $i++){
   $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
   $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
 
-$k = $calculator->indecesIM[$i];
+  $k = $calculator->indecesIM[$i];
   $sql="SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText
-        FROM $projectBookingTable, $logTable, $userTable, $projectTable, $companyTable, $clientTable
-        WHERE $projectBookingTable.timeStampID = $logTable.indexIM
-        AND $projectBookingTable.projectID = $projectTable.id
-        AND $projectTable.clientID = $clientTable.id
-        AND $clientTable.companyID = $companyTable.id
-        AND $logTable.indexIM = $k";
+  FROM $projectBookingTable, $logTable, $userTable, $projectTable, $companyTable, $clientTable
+  WHERE $projectBookingTable.timeStampID = $k
+  AND $projectBookingTable.projectID = $projectTable.id
+  AND $projectTable.clientID = $clientTable.id
+  AND $clientTable.companyID = $companyTable.id
+  ";
 
   $result2 = $conn->query($sql);
   $popOverContent = "";
@@ -324,7 +324,7 @@ $k = $calculator->indecesIM[$i];
   echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
   echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
 
-  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10) . $filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
+  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10).'&userID='.$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
   echo "</tr>";
 
   echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '">';
