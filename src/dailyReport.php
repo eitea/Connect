@@ -174,7 +174,7 @@ myCalendar.setDateFormat("%Y-%m-%d");
 <select name="filterUserID">
   <option value=0>Select User...</option>
 <?php
-$sql = "SELECT * FROM $userTable WHERE enableProjecting = 'TRUE'";
+$sql = "SELECT * FROM $userTable";
 $result = mysqli_query($conn, $sql);
 if($result && $result->num_rows > 0) {
   $row = $result->fetch_assoc();
@@ -254,18 +254,21 @@ function showProjects(str) {
 }
 </script>
 
+</form>
+
+<form method='post' action='getProject.php'>
 <table id='blank' class="table table-striped table-bordered">
   <thead>
 <tr>
   <th><?php echo $lang['CLIENT']; ?></th>
   <th><?php echo $lang['PROJECT']; ?></th>
-  <th>Info</th>
-  <th><?php echo $lang['DATE']; ?></th>
-  <th><?php echo $lang['TIME']; ?></th>
+  <th width=25%>Info</th>
+  <th width=200px><?php echo $lang['TIME']; ?></th>
   <th><?php echo $lang['SUM']; ?> (min)</th>
   <th><?php echo $lang['SUM']; ?> (0.25h)</th>
-  <th><?php echo $lang['CHARGED']; ?> <input type="checkbox" onClick="toggle(this)" /></th>
+  <th><?php echo $lang['CHARGED']; ?></th>
   <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
+  <th><?php echo $lang['EDIT']; ?></th>
 </tr>
 </thead>
 
@@ -277,6 +280,14 @@ if($booked == '2'){
 } else {
   $bookedQuery = "";
 }
+
+/*
+$sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
+LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
+WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
+OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
+
 
   $sql="SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.id AS projectBookingID,
                         $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText, $logTable.timeToUTC,
@@ -291,6 +302,19 @@ if($booked == '2'){
         $bookedQuery
         ORDER BY $projectBookingTable.start DESC";
 
+reminder: looking for bugs? try to figure out why this sql thing works and if it is supposed to work cuz IDK (it works, but im not sure if its supposed to)...
+        */
+  $sql = "SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.id AS projectBookingID,
+                        $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText, $logTable.timeToUTC,
+                        $projectTable.hours, $projectBookingTable.booked, $projectTable.hourlyPrice, $logTable.indexIM
+          FROM $projectBookingTable
+          LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+          LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
+          LEFT JOIN $logTable ON ($projectBookingTable.timestampID = $logTable.indexIM)
+          LEFT JOIN $companyTable ON ($clientTable.companyID = $companyTable.id)
+          WHERE ($projectBookingTable.start LIKE '$filterDay %' AND $logTable.userID = $userID)
+          OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$filterDay %'  AND $logTable.userID = $userID ) ORDER BY end ASC;";
+
   $result = mysqli_query($conn, $sql);
   if($result && $result->num_rows >0) {
     while($row = $result->fetch_assoc()) {
@@ -300,102 +324,25 @@ if($booked == '2'){
       echo "<tr>";
       echo "<td>" .$row['clientName']. "</td>";
       echo "<td>" .$row['projectName']. "</td>";
-      echo "<td style='text-align:left'><textarea name='infoTextArea[]' onkeyup='textAreaAdjust(this)'>" .$row['infoText']. "</textarea></td>";
-      echo "<td><input type='text' style='max-width:85px; background:none;' readonly name='dateFrom[]' value='".substr($row['start'], 0, 10)."'></td>";
+      echo "<td style='text-align:left'>" .$row['infoText']. "</td>";
 
-      echo "<td><input onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesFrom[]' value='". substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),11,5) ."'>
-      - <input onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesTo[]' value='". substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']),11,5) ."'></td>";
+      echo "<td>". carryOverAdder_Hours($row['start'],$row['timeToUTC']) ."<br>". carryOverAdder_Hours($row['end'],$row['timeToUTC']) ."</td>";
       echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '') . "</td>";
       echo "<td>$t</td>";
 
-      $selected = ($row['booked'] != 'TRUE') ? "":"checked";
+      $selected = ($row['booked'] != 'TRUE') ? "No":"Yes";
 
-      echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'></td>";
+      echo "<td>$selected</td>";
       echo "<td>".$row['hourlyPrice']."</td>";
+      echo "<td><button type=submit style=background:none;border:none;><img src='../images/pencil.png' alt='edit' style='width:25px;height:25px;border:0;margin-bottom:5px'></button></td>";
+
       echo "</tr>";
-
-      echo '<input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '">';
-
     }
   } else {
     echo mysqli_error($conn);
-    echo "-";
   }
 
 ?>
 </table>
-<span class="blockInput">
-
-<?php
-$query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
-$result = mysqli_query($conn, $query);
-if($result->num_rows == 1):
-
-  $row = $result->fetch_assoc();
-  $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
-  $result = mysqli_query($conn, $query);
-  if ($result && $result->num_rows > 0) {
-    echo '<select id="clientHint" name="client" onchange="showProjects(this.value)">';
-    echo "<option name='act' value=0>Select...</option>";
-    while ($row = $result->fetch_assoc()) {
-      $cmpnyID = $row['id'];
-      $cmpnyName = $row['name'];
-      echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
-    }
-  }
-  echo '</select>';
-else:
-?>
-
-<select name="company" onchange="showClients(this.value)">
-<option name=cmp value=0>Select...</option>
-<?php
-$query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
-$result = mysqli_query($conn, $query);
-if ($result && $result->num_rows > 1) {
-  while ($row = $result->fetch_assoc()) {
-    $cmpnyID = $row['id'];
-    $cmpnyName = $row['name'];
-    echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
-  }
-}
-?>
-</select>
-
-<select id="clientHint" name="client" onchange="showProjects(this.value)">
-</select>
-
-<?php endif; ?>
-
-<select id="txtHint" name="project">
-</select>
-
-<textarea rows="1" onkeyup="textAreaAdjust(this)" placeholder="Info" name="addInfoText">
-</textarea>
-
-<input type="time" onkeydown='if (event.keyCode == 13) return false;' name="addStart" size="4" >
-- <input type="time" onkeydown='if (event.keyCode == 13) return false;' name="addEnd" size=4>
-
-<?php echo $lang['CHARGED']; ?> <input type="checkbox" name="addBooked">
-
-<input type="submit" name="addBooking" value="+"/>
-
-</span>
-
-
-<br><br>
-<?php
-if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'){
-  echo "<input type='submit' name='saveChanges' value='Save Changes'>";
-}
-?>
-<br>
-
-<script>
-for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
-  textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
-}
-</script>
-
 </form>
 </body>
