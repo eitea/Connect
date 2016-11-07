@@ -131,12 +131,23 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
 
             $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";
             $result = mysqli_query($conn, $query);
-            if ($result && $result->num_rows > 0) {
-              //both are UTC
+            if ($result && $result->num_rows > 0) { //open timestamps must be closed
               $row = $result->fetch_assoc();
               $now = getCurrentTimestamp();
-              if(timeDiff_Hours($row['time'],$now)  > $cd/60){
-                $disabled = '';
+              $indexIM = $row['indexIM'];
+              if(timeDiff_Hours($row['time'],$now)  > $cd/60){ //he either has waited long enough
+                $sql = "SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM AND projectID IS NULL ORDER BY end DESC"; //but what if he just came from a break
+                $result = mysqli_query($conn, $sql);
+                if ($result && $result->num_rows > 0) { //he did a break
+                  $row = $result->fetch_assoc();
+                  if(timeDiff_Hours($row['end'],$now)  > $cd/60){ //and that break was NOT recently
+                    $disabled = '';
+                  } else { //but if it was just recently:
+                    $disabled = 'disabled';
+                  }
+                } else { //he has no breaks at all & he waited -> fine
+                  $disabled = '';
+                }
               } else {
                 $disabled = 'disabled';
               }
