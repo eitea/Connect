@@ -173,6 +173,7 @@
           $result = mysqli_query($conn, $sql);
           $row = $result->fetch_assoc();
 
+/*
           if($row['enableProjecting'] != 'TRUE'){//'normal' users get their lunchbreak calculated dynamically, since it cannot be added/maintained to breakCredit that easily:
              //meaning: he should have these 0.5 as dynamic lunchbreak if he actually was here for longer than 6 hours
             if(timeDiff_Hours($timeStart, $timeFin) >= $row['pauseAfterHours']){
@@ -186,6 +187,7 @@
           } else {
             echo "<br> A Negative or illegal Value was entered, please make sure the times match the criterias.<br>";
           }
+          */
         }
       } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
         $index = $_POST["index"];

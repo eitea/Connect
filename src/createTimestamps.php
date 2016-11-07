@@ -17,9 +17,14 @@ function checkIn($userID, $status) {
      if($diff <= 0){
        $diff = 0;
      }
+     //create a break stamping
+     $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break')";
+     $conn->query($sql);
+     echo mysqli_error($conn);
+     //update timestamp
      $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
-      $conn->query($sql);
-      echo mysqli_error($conn);
+     $conn->query($sql);
+     echo mysqli_error($conn);
    } else { //create new stamp
      $sql = "SELECT * FROM $bookingTable WHERE userID = $userID";
      $result = $conn->query($sql);
@@ -38,6 +43,24 @@ function checkOut($userID, $status) {
   $indexIM = $row['indexIM'];
   $sql = "UPDATE $logTable SET timeEND = UTC_TIMESTAMP WHERE indexIM = $indexIM;";
   $conn->query($sql);
+
+  $start = $row['time'];
+
+  //if user cannot book, was here for over 6h and has no break called 'Lunchbreak For <user>', give him a lunchbreak booking.
+  $sql = "SELECT * FROM $userTable
+  WHERE $userTable.id = $userID
+  AND $userTable.enableProjecting = 'FALSE'
+  AND TIMESTAMPDIFF('$start', UTC_TIMESTAMP) > pauseAfterHours
+  AND !EXISTS(SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM AND infoText = 'Lunchbreak For $userID');
+  ";
+  $result = $conn->query($sql);
+  if($result && $result->num_rows > 0){
+    $row = $result->fetch_assoc();
+    $minutes = $row['hoursOfRest'] * 60;
+    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', DATE_ADD('$start', INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID')";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
 }
 
 //$to - $from in Hours.
