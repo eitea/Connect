@@ -8,6 +8,10 @@ if (isset($_SESSION['userid'])) {
   }
 }
 
+if(!file_exists('src/connection_config.php')){
+  header("Location: src/setup_getInput.php");
+}
+
 require 'src/connection.php';
 
 $headers = apache_request_headers();
