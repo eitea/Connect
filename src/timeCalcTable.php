@@ -88,7 +88,7 @@
     <th><?php echo $lang['SHOULD_TIME']?></th>
     <th><?php echo $lang['IS_TIME']?></th>
     <th><?php echo $lang['DIFFERENCE']?></th>
-    <th>Saldo</th>
+    <th>Saldo <?php echo $lang['ACCUMULATED']?></th>
   </tr>
 
 <?php
@@ -96,6 +96,7 @@
   $calculator->calculateValues();
 
   $absolvedHours = array();
+  $accumulatedSaldo = 0;
   for($i = 0; $i < $calculator->days; $i++){
     if($calculator->end[$i] == '0000-00-00 00:00:00'){
       $endTime = getCurrentTimestamp();
@@ -118,6 +119,8 @@
       $B = $calculator->end[$i];
     }
 
+    $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+
     echo "<tr>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
@@ -126,9 +129,9 @@
     echo "<td>" . substr($B,11,5) . "</td>";
     echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";
-    echo "<td>" . sprintf('%.2f', $difference) . "</td>";
-    echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i]) . "</td>";
+    echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
     echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
+    echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
     echo "</tr>";
 
 }
