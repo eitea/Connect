@@ -13,6 +13,7 @@
   <link rel="stylesheet" type="text/css" href="../css/inputTypeTime.css">
   <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
   <link rel="stylesheet" type="text/css" href="../plugins/datepicker/codebase/dhtmlxcalendar.css">
+  <link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css">
 
   <script src="../plugins/datepicker/codebase/dhtmlxcalendar.js"> </script>
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
@@ -172,68 +173,70 @@
           $conn->query($sql);
           echo mysqli_error($conn);
 
-          /*
-          $sql = "SELECT enableProjecting, pauseAfterHours, hoursOfRest FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE indexIM = $imm";
-          $result = mysqli_query($conn, $sql);
-          $row = $result->fetch_assoc();
-
-          if($row['enableProjecting'] != 'TRUE'){//'normal' users get their lunchbreak calculated dynamically, since it cannot be added/maintained to breakCredit that easily:
-             //meaning: he should have these 0.5 as dynamic lunchbreak if he actually was here for longer than 6 hours
-            if(timeDiff_Hours($timeStart, $timeFin) >= $row['pauseAfterHours']){
-              $break = $break - $row['hoursOfRest'];
-            } //else means that this timestamp has 0 dynamic lunchbreak, so we do not change the value.
-          }
-          if($break >= 0){
-            $sql = "UPDATE $logTable SET breakCredit = $break WHERE indexIM = $imm";
-            $conn->query($sql);
-            echo mysqli_error($conn);
-          } else {
-            echo "<br> A Negative or illegal Value was entered, please make sure the times match the criterias.<br>";
-          }
-          */
         }
       } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
         $index = $_POST["index"];
         foreach ($index as $x) {
           $sql = "DELETE FROM " . $logTable . " WHERE indexIM=$x;";
-          if (!$conn->query($sql)) {
-            echo mysqli_error($conn);
-          }
+          $conn->query($sql);
+          echo mysqli_error($conn);
+
         }
-      } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime'])) {
-        if($filterID != 0) {
+      } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime']) && $_POST['creatFromTime'] != '0000-00-00 00:00') {
+        if($_POST['creatToTime'] == '0000-00-00 00:00' || timeDiff_Hours($_POST['creatFromTime'], $_POST['creatToTime']) > 0) {
+
           $activtiy = $_POST['action'];
-
-          $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'], ($_POST['creatTimeZone']*-1)); //UTC time
-          $timeEnd = carryOverAdder_Hours($_POST['creatToTime'], ($_POST['creatTimeZone']*-1)); //UTC time
-
-          $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) ." %";
+          $timeIsLike = substr($_POST['creatFromTime'], 0, 10) ." %";
           $timeToUTC = $_POST['creatTimeZone'];
+
+          $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'] .':00', ($_POST['creatTimeZone']*-1)); //UTC
+
+          if($_POST['creatToTime'] != '0000-00-00 00:00'){
+            $timeEnd = carryOverAdder_Hours($_POST['creatToTime'] .':00', ($_POST['creatTimeZone']*-1)); //UTC
+          } else {
+            $timeEnd = '0000-00-00 00:00:00';
+          }
 
           $sql = "SELECT * FROM $logTable WHERE userID = $filterID
            AND status = '$activtiy'
-           AND time LIKE '$timeIsLikeToday'";
+           AND time LIKE '$timeIsLike'";
 
            $result = mysqli_query($conn, $sql);
            if($result && $result->num_rows > 0){ //user already stamped in today
              $row = $result->fetch_assoc();
-             $diff = timeDiff_Hours($row['timeEnd'], $timeBegin);
-             if($diff <= 0){
-               $diff = 0;
-             }
-             $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
-              $conn->query($sql);
-              echo mysqli_error($conn);
-           } else { //create new stamp
-             //get expected Hours
-             $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
-             $result = $conn->query($sql);
-             $row=$result->fetch_assoc();
-             $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
-             $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activtiy', '$creatTimeZone', '$expectedHours');";
-             $conn->query($sql);
-           }
 
+               $start = $row['timeEnd'];
+               $indexIM = $row['indexIM'];
+
+               $diff = timeDiff_Hours($start, $timeBegin);
+               if($start != '0000-00-00 00:00:00' && $diff > 0){
+
+               //create break stamp only if its about status 0
+               if($activity == 0){
+                 $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', '$timeBegin', $indexIM, 'Create auto-break')";
+                 $conn->query($sql);
+                 echo mysqli_error($conn);
+               }
+
+               //update breakCredit and new endTime
+               $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
+                $conn->query($sql);
+                echo mysqli_error($conn);
+              } else {
+                echo "ERROR - Merging timestamps of same dates: time difference was less or equal 0. Check your times and see if existing timestamp has been closed.";
+              }
+            } else { //create new stamp
+
+               //get expected Hours
+               $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
+               $result = $conn->query($sql);
+               $row=$result->fetch_assoc();
+               $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
+               $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activtiy', '$timeToUTC', '$expectedHours');";
+               $conn->query($sql);
+          }
+        } else {
+          echo "Invalid Timestamps or no user selected";
         }
       }
     }
@@ -308,11 +311,12 @@ for($i = 0; $i < $calculator->days; $i++){
       $popOverContent .= "<dd>" .$roww['companyName']." > " .$roww['clientName']." > " .$roww['projectName']."</dd>";
       $popOverContent .= "<dd>" .$roww['infoText']."</dd>";
     }
+
     $popOverContent .= "</dl>";
   }
 
   echo "<tr>";
-  echo "<td><input type='checkbox' name='index[]' value= ".$i."></td>";
+  echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
   echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
 
   echo "<td><input size='16'  maxlength=16  type=text onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
@@ -324,7 +328,8 @@ for($i = 0; $i < $calculator->days; $i++){
   echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
   echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
 
-  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($B,0,10).'&userID='.$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'"><img width=15px height=15px src="../images/Question_Circle.jpg"></a></td>';
+  echo '<td><a target="_self" href="getProjects.php?filterDay='.substr($A,0,10).'&userID='.$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'">
+  <i class="fa fa-question-circle-o"></a></td>';
   echo "</tr>";
 
   echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '">';
@@ -363,9 +368,9 @@ $("[data-toggle=popover]").popover({html:true})
       <option name="act" value="3">Sick</option>
     </select>
 
-    From:    <input type="text" id="calendar" size="19" name="creatFromTime">
+    From:    <input type="text" size='16' maxlength=16 id="calendar" name="creatFromTime">
 
-    To:      <input type="text" id="calendar2" size="19" name="creatToTime">
+    To:      <input type="text" size='16' maxlength=16 id="calendar2" name="creatToTime">
 
     UTC:
 
@@ -384,7 +389,7 @@ $("[data-toggle=popover]").popover({html:true})
     <script>
     var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
     myCalendar.setSkin("material");
-    myCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+    myCalendar.setDateFormat("%Y-%m-%d %H:%i");
     </script>
 
     <input type="submit" class="button" name="create" value="+">
