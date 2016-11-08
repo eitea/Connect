@@ -256,7 +256,7 @@ function showProjects(str) {
 
 </form>
 
-<form method='post' action='getProject.php'>
+<form method='post' action='getProjects.php'>
 <table id='blank' class="table table-striped table-bordered">
   <thead>
 <tr>
