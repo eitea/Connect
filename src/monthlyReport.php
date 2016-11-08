@@ -72,12 +72,12 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     <th>Beginn</th>
     <th>Pause (h)</th>
     <th>Ende</th>
-    <th></th>
+    <th><?php echo $lang['LAST_BOOKING']; ?></th>
     <th><?php echo $lang['ACTIVITY']; ?></th>
     <th>Soll (h)</th>
     <th>Ist (h)</th>
     <th>Differenz (h)</th>
-    <th>Saldo</th>
+    <th>Saldo - <?php echo $lang['ACCUMULATED']; ?></th>
   </tr>
 
 <?php
@@ -88,6 +88,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   $calculator = new Monthly_Calculator($filterMonth, $filterUserID);
   $calculator->calculateValues();
 
+  $accumulatedSaldo = 0;
   for($i = 0; $i < $calculator->days; $i++){
     if($calculator->end[$i] == '0000-00-00 00:00:00'){
       $endTime = getCurrentTimestamp();
@@ -146,6 +147,8 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
       $B = $calculator->end[$i];
     }
 
+    $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+
     echo "<tr $style>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
@@ -155,9 +158,9 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     echo "<td style='font-size:small; text-align:left;'>" . $tinyEndTime . "</td>";
     echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";
-    echo "<td>" . sprintf('%.2f', $difference) . "</td>";
-    echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i]) . "</td>";
+    echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
     echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
+    echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
     echo "</tr>";
 
 /* TODO: continue here

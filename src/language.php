@@ -46,6 +46,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
+  $lang['ACCUMULATED'] = 'Accumulated';
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
@@ -103,7 +104,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['INVALID_LOGIN'] = 'Invalid e-mail or password';
   $lang['IS_TIME'] = 'Is';
 
-  $lang['LASTNAME'] = 'Last Name';
+  $lang['LAST_BOOKING'] = 'Last Booking'; //I gave u my heeart
+  $lang['LASTNAME'] = 'Lastname';
   $lang['LUNCHBREAK'] = 'Lunchbreak';
   $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
   $lang['LANGUAGE_SETTING'] = 'Language';
@@ -190,6 +192,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
   $lang['ACTIVITY'] = 'Aktivität';
+  $lang['ACCUMULATED'] = 'Akkumuliert';
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
@@ -247,6 +250,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
   $lang['IS_TIME'] = 'Ist';
 
+  $lang['LAST_BOOKING'] = 'Letzte Buchung';
   $lang['LASTNAME'] = 'Nachname';
   $lang['LANGUAGE_SETTING'] = 'Sprache';
   $lang['LUNCHBREAK'] = 'Mittagspause';
