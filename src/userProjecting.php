@@ -61,8 +61,10 @@ $insertInfoText = '';
     if(isset($_POST["add"]) && isset($_POST['end']) && !empty($_POST['infoText'])) {
       $startDate = $_POST['date']." ".$_POST['start'];
       $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+
       $endDate = $_POST['date']." ".$_POST['end'];
       $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+
       if(timeDiff_Hours($startDate, $endDate) > 0){
         $info = test_input($_POST['infoText']);
         if(!isset( $_POST['project'])){
@@ -80,6 +82,10 @@ $insertInfoText = '';
         }
       } else {
         $insertInfoText = $_POST['infoText'];
+        echo '<div class="alert alert-danger fade in">';
+        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>Could not create entry: </strong>Times were not valid.';
+        echo '</div>';
       }
     } elseif(isset($_POST['addBreak']) && isset($_POST['startBreak']) && !empty($_POST['infoTextBreak'])){
       $startDate = $_POST['date']." ".$_POST['start'];
@@ -211,7 +217,7 @@ function showProjects(str) {
 }
 </script><br><br>
 <span>
-    <input type="time" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" size="4" value="<?php echo $start; ?>" >
+    <input type="time" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" size="4" value="<?php echo substr($start,0,5); ?>" >
   - <input type="time" min="<?php echo substr($start,0,5); ?>" max="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end" size=4>
 
   <input type="date" readonly onkeydown='if (event.keyCode == 13) return false;' name="date" value= <?php echo $date; ?> >
@@ -269,7 +275,7 @@ function showProjects(str) {
 
 <span>
   Add break until:
-  <input type="time" min="<?php echo substr($start,0,5); ?>" max="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="startBreak" size="4" value= <?php echo $start; ?> >
+  <input type="time" min="<?php echo substr($start,0,5); ?>" max="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="startBreak" size="4" value=''>
   <input type="text" placeholder="Info" onkeydown='if (event.keyCode == 13) return false;' name="infoTextBreak">
   <input type="submit" class="button" name="addBreak" value="+">
 </span>
