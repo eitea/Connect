@@ -44,7 +44,7 @@ class Monthly_Calculator{
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
 
-      $sql = "SELECT * FROM $logTable WHERE $logTable.userID = $id AND $logTable.time LIKE'". substr($i, 0, 10) ." %'";
+      $sql = "SELECT $logTable.*, $userTable.enableProjecting FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE $logTable.userID = $id AND $logTable.time LIKE'". substr($i, 0, 10) ." %'";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){ //guy checked in today
           $row = $result->fetch_assoc();
@@ -55,6 +55,7 @@ class Monthly_Calculator{
           $this->timeToUTC[] = $row['timeToUTC'];
           $this->indecesIM[] = $row['indexIM'];
           $this->lunchTime[$count-1] = $row['breakCredit']; //for any status
+          $this->canBook = $row['enableProjecting'];
 
           if(isHoliday($row['time'])){
             $this->shouldTime[$count-1] = 0;
