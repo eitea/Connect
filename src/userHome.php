@@ -80,7 +80,7 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
         <div class="navbar-custom-menu">
           <ul class="nav navbar-nav">
             <li>
-              <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH - <?php include 'version_number.php'; echo $VERSION_TEXT; ?></a> <br> 
+              <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH - <?php include 'version_number.php'; echo $VERSION_TEXT; ?></a> <br>
               The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor, the Software will perform substantially in accordance with the functional specifications set forth in the documentation.">
               <i class="fa fa-info"></i></a>
             </li>
@@ -155,7 +155,19 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
               echo '<input '.$disabled.' type="submit" class="button" name="stampOut" value="'.$lang['CHECK_OUT'].'"/>';
               $showProjectBookingLink = TRUE;
             } else {
-              echo '<input type="submit" class="button" name="stampIn" value= "'.$lang['CHECK_IN'].'"/>';
+              $today = getCurrentTimestamp();
+              $timeIsLikeToday = substr($today, 0, 10) ." %";
+              $disabled = '';
+
+              $sql = "SELECT * FROM $logTable WHERE userID = $userID
+                     AND status = '0'
+                     AND time LIKE '$timeIsLikeToday'
+                     AND TIMESTAMPDIFF(MINUTE, timeEnd, '$today') < $cd";
+               $result = mysqli_query($conn, $sql);
+               if($result && $result->num_rows > 0){
+                 $disabled = 'disabled';
+               }
+               echo '<input '.$disabled.' type="submit" class="button" name="stampIn" value= "'.$lang['CHECK_IN'].'"/>';
             }
             ?>
 
@@ -230,7 +242,7 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
           }
         }
 
-        if(isset($_POST['stampIn']) || isset($_POST['leaveIn'])){
+        if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
           echo '<div class="alert alert-info fade in">';
           echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
           echo "<strong>Stamping recognized! </strong> Refresh in $cd minutes.";
