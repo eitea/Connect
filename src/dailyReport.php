@@ -77,80 +77,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['booked'])){
     $booked = $_POST['booked'];
   }
-
-  if (isset($_POST['saveChanges']) && isset($_POST['editingIndeces'])) {
-    for ($i = 0; $i < count($_POST['editingIndeces']); $i++) {
-      $imm = $_POST['editingIndeces'][$i]; //projectBookingTable ID
-
-      $query = "SELECT $logTable.timeToUTC
-      FROM $logTable, $projectBookingTable
-      WHERE $projectBookingTable.id = $imm
-      AND $projectBookingTable.timestampID = $logTable.indexIM";
-      $result = mysqli_query($conn, $query);
-
-      if($result && $result->num_rows>0){
-        $row = $result->fetch_assoc();
-        $toUtc = $row['timeToUTC'] * -1;
-
-        $timeStart = carryOverAdder_Hours($_POST['dateFrom'][$i]." ".$_POST['timesFrom'][$i], $toUtc);
-        $timeFin = carryOverAdder_Hours($_POST['dateFrom'][$i]." ".$_POST['timesTo'][$i], $toUtc);
-        $infoText = test_input($_POST['infoTextArea'][$i]);
-
-        $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText' WHERE id = $imm";
-        $conn->query($sql);
-        echo mysqli_error($conn);
-      }
-      echo mysqli_error($conn);
-    }
-  }
-
-  if(isset($_POST['saveChanges']) && isset($_POST['checkingIndeces'])  && $_POST['booked'] == 1){
-    foreach ($_POST["checkingIndeces"] as $e) {
-      $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
-      $conn->query($sql);
-
-      $sql = "SELECT start, end, projectID FROM $projectBookingTable WHERE id = $e";
-
-      if($result = $conn->query($sql)){
-        $row = $result->fetch_assoc();
-        $hours = timeDiff_Hours($row['start'], $row['end']);
-
-        $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
-        $conn->query($sql);
-        echo mysqli_error($conn);
-      }
-    }
-  }
-
-  if(isset($_POST['addBooking']) && isset($_POST['project']) && isset($_POST['addStart']) && isset($_POST['addEnd']) && $userID != 0){
-    $sql = "SELECT * FROM $logTable WHERE time LIKE '$filterDay %' AND status = '0' AND userID = $userID";
-    $result = mysqli_query($conn, $sql);
-    if($result && $result->num_rows >0){
-      $row = $result->fetch_assoc();
-
-      $timeToUTC = $row['timeToUTC'];
-      $start = carryOverAdder_Hours($filterDay. " " . $_POST['addStart'], $timeToUTC * -1);
-      $end = carryOverAdder_Hours($filterDay. " " . $_POST['addEnd'], $timeToUTC * -1);
-      $infoText = $_POST['addInfoText'];
-      $projectID = $_POST['project'];
-      $isBooked = (isset($_POST['addBooked']))?'TRUE':'FALSE';
-      $indexIM = $row['indexIM'];
-
-      $sql = "INSERT INTO $projectBookingTable(start, end, projectID, timestampID, infoText, booked) VALUES('$start', '$end', $projectID, $indexIM, '$infoText', '$isBooked');";
-
-      $conn->query($sql);
-
-      echo mysqli_error($conn);
-    }
-  }
 }
+
 
 //variables needed for getTimestamp.php to work:
 //$_POST['filteredYear']
 //$_POST['filteredMonth']
 //$_POST['filteredUserID']
 ?>
-
 <form method='post' action='getTimestamps.php'>
 <h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['DAILY_USER_PROJECT']?></h1>
 
@@ -161,8 +95,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <br><br>
 </form>
-<form method='post'>
 
+
+
+<form method='post'>
 <input id="filterDateInput" style="border-style:solid; border-color:rgb(233, 233, 233)" type="text" size="11" name="filterDay" value="<?php echo $filterDay; ?>">
 
 <script>
@@ -200,59 +136,6 @@ if($result && $result->num_rows > 0) {
 <input type="submit" name="filter" value="Filter"><br><br>
 
 <br><br>
-
-<script>
-function textAreaAdjust(o) {
-    o.style.height = "1px";
-    o.style.height = (o.scrollHeight)+"px";
-}
-
-function toggle(source) {
-  checkboxes = document.getElementsByName('checkingIndeces[]');
-  for(var i = 0; i<checkboxes.length; i++) {
-    checkboxes[i].checked = source.checked;
-  }
-}
-
-function showClients(str) {
-  if (str != "") {
-    if (window.XMLHttpRequest) {
-      // code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp = new XMLHttpRequest();
-    } else {
-      // code for IE6, IE5
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("clientHint").innerHTML = xmlhttp.responseText;
-        showProjects(xmlhttp.responseText);
-      }
-    };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?company="+str,true);
-    xmlhttp.send();
-  }
-}
-
-function showProjects(str) {
-  if (str != "") {
-    if (window.XMLHttpRequest) {
-      // code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp = new XMLHttpRequest();
-    } else {
-      // code for IE6, IE5
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-      }
-    };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?q="+str,true);
-    xmlhttp.send();
-  }
-}
-</script>
 
 </form>
 
@@ -302,7 +185,7 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
         $bookedQuery
         ORDER BY $projectBookingTable.start DESC";
 
-reminder: looking for bugs? try to figure out why this sql thing works and if it is supposed to work cuz IDK (it works, but im not sure if its supposed to)...
+reminder: looking for bugs? try to figure out why this sql thing works and if it is supposed to work (it works, but im not sure if its supposed to)...
         */
   $sql = "SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.id AS projectBookingID,
                         $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText, $logTable.timeToUTC,
