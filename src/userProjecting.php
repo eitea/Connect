@@ -58,7 +58,7 @@
 $showUndoButton = 0;
 $insertInfoText = '';
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(isset($_POST["add"]) && isset($_POST['end']) && !empty($_POST['infoText'])) {
+    if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
       $startDate = $_POST['date']." ".$_POST['start'];
       $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
@@ -87,7 +87,7 @@ $insertInfoText = '';
         echo '<strong>Could not create entry: </strong>Times were not valid.';
         echo '</div>';
       }
-    } elseif(isset($_POST['addBreak']) && isset($_POST['startBreak']) && !empty($_POST['infoTextBreak'])){
+    } elseif(isset($_POST['addBreak']) && isset($_POST['startBreak']) && !empty(trim($_POST['infoTextBreak']))){
       $startDate = $_POST['date']." ".$_POST['start'];
       $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
       $endDate = $_POST['date']." ".$_POST['startBreak'];
