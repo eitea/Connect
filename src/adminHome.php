@@ -81,7 +81,9 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <li>
-            <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH</a> <br> The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor, the Software will perform substantially in accordance with the functional specifications set forth in the documentation.">
+            <a href="#" data-trigger="focus" title='Information' data-placement="left" data-toggle="popover" data-content="<a href='http://www.eitea.at'>EI-TEA Partner GmbH - <?php include 'version_number.php'; echo $VERSION_TEXT; ?></a>
+            <br> The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
+            the Software will perform substantially in accordance with the functional specifications set forth in the documentation.">
             <i class="fa fa-info"></i></a>
           </li>
 

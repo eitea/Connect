@@ -1,3 +1,4 @@
 <?php
 $VERSION_NUMBER=27;
+$VERSION_TEXT='A0.2.112016';
 ?>
