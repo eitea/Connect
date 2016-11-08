@@ -31,7 +31,7 @@ $sql = "CREATE TABLE $userTable (
   overTimeLump INT(3) DEFAULT 0,
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
-  beginningDate DATETIME DEFAULT UTC_TIMESTAMP,
+  beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   enableProjecting ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   coreTime TIME DEFAULT '8:00'
