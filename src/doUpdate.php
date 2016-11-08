@@ -179,7 +179,7 @@ if($row['version'] < 26){
 
 if($row['version'] < 27){
   //add the lunchbreak bookings for each log of a normal user
-  $sql = "SELECT time, timeEnd, pauseAfterHours, hoursOfRest, indexIM, id FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE enableProjecting = 'TRUE' AND status = '0'"; //kek
+  $sql = "SELECT time, timeEnd, pauseAfterHours, hoursOfRest, indexIM, id FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE enableProjecting = 'FALSE' AND status = '0'"; //kek
   $result = $conn->query($sql);
   while($row = $result->fetch_assoc()){
     //for every single log if status = 0, and time lies over 6h and user cant book -> set the lunchbreak booking

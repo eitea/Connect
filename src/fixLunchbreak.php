@@ -1,15 +1,16 @@
 <?php
 require 'connection.php';
+require 'createTimestamps.php';
 
-//recalculates lunchbreak based on booking
-//get all logs with the breakCredit
+//recalculates lunchbreak based on bookings
+//check all logs
 $sql = "SELECT * FROM $logTable WHERE $logTable.status = '0'";
 $result = $conn->query($sql);
 
 //fix 1 : update breakCredit to fit booked lunchbreaks
 while($row = $result->fetch_assoc()){
-  //get all the break bookings made for that log
   $indexIM = $row['indexIM'];
+  //get all the break bookings made for that log
   $sql = "SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM AND projectID IS NULL";
   $result2 = $conn->query($sql);
   $correctBreakCredit = 0;
@@ -31,7 +32,16 @@ AND status = '0'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
+    //update breakcredit
     $sql = "UPDATE $logTable SET breakCredit = '". $row['hoursOfRest'] . "' WHERE indexIM = " . $row['indexIM'];
+    $conn->query($sql);
+    echo mysqli_error($conn);
+
+    $diff = $row['hoursOfRest'] - $row['breakCredit'];
+    $newTime = carryOverAdder_Hours($row['time'], floor($diff));
+    $newTime = carryOverAdder_Minutes($newTime, (($diff * 60) % 60));
+    //create booking
+    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('".$row['time']."', '$newTime', ".$row['indexIM'].", 'Fixing lunch auto-break')";
     $conn->query($sql);
     echo mysqli_error($conn);
   }
@@ -39,10 +49,4 @@ if($result && $result->num_rows > 0){
 
 echo mysqli_error($conn);
 
-//$to - $from in Hours.
-function timeDiff_Hours($from, $to) {
-  $timeEnd = strtotime($to) / 3600;
-  $timeBegin = strtotime($from) /3600;
-  return $timeEnd - $timeBegin;
-}
 ?>
