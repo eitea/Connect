@@ -72,12 +72,6 @@
         if (isset($_POST['submit'.$x])) {
           $userid = $x;
 
-          //TODO: get submitDate -> date restriction (is in future)
-          //create event that changes desired values on that day, at idk.. 1am?
-          if($_POST['submitDate'. $x] != substr(getCurrentTimestamp(), 0, 10)){
-
-          }
-
           if (!empty($_POST['firstname'.$x])) {
             $firstname = $_POST['firstname'.$x];
             $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$userid';";
@@ -107,21 +101,7 @@
             $sql = "UPDATE $userTable SET email = '$email' WHERE id = '$userid';";
             $conn->query($sql);
           }
-
-/*
-          if (isset($_POST['coreTime'.$x])){
-            $coreTime = $_POST['coreTime'.$x];
-            $sql = "UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$userid';";
-            $conn->query($sql);
-          }
-*/
-          if (!empty($_POST['vacDays'.$x]) && is_numeric($_POST['vacDays'.$x])) {
-            $vacDaysPerYear = $_POST['vacDays'.$x];
-            $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDays' WHERE userID = '$userid';";
-            $conn->query($sql);
-            echo mysqli_error($conn);
-          }
-
+          
           if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))) {
             $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
             $sql = "UPDATE $userTable SET overTimeLump= '$overTimeAll' WHERE id = '$userid';";
