@@ -35,11 +35,6 @@ iframe {
 }
 </style>
 
-<script>
-  function resizeIframe(obj) {
-    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-  }
-</script>
 </head>
 
 <?php
@@ -232,7 +227,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
           ?>
 
-          <iframe id="myFrame" frameborder="0" scrolling="no" onload="resizeIframe(this)"  src= <?php echo $URL?>></iframe>
+          <iframe id="myFrame" frameborder="0" scrolling="no" onload="this.style.height=this.contentWindow.document.body.scrollHeight + 'px';"  src= <?php echo $URL?>></iframe>
 
         </section>
       </div>

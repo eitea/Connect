@@ -15,10 +15,11 @@
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
 
-<!--
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
+
   <script src='../plugins/select2/js/select2.js'></script>
--->
+  <script type="text/css" src='../js/autoScale.js'></script>
+
 <style>
   textarea {
     border-style: hidden;
@@ -34,6 +35,11 @@
     padding:2px;
     border-radius:5px;
     min-width:90px;
+  }
+  div{
+    float:left;
+    margin:5px;
+    display:block;
   }
 </style>
 </head>
@@ -58,17 +64,25 @@ require "language.php";
 <h1><?php echo $lang['VIEW_PROJECTS']?></h1>
 <br><br>
 
-<?php
-$filterMonth = substr(getCurrentTimestamp(),0,7);
-$booked = '0';
 
+<?php
+$filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year and month
+$booked = '0';
 $filterCompany = 0;
 $filterClient = 0;
 $filterProject = 0;
+$filterUserID = 0;
 
+//careful stairs
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['filterMonth'])){
-    $filterMonth = $_POST['filterMonth'];
+  if(!empty($_POST['filterYear'])){
+    $filterDate = $_POST['filterYear'];
+    if(!empty($_POST['filterMonth'])){
+      $filterDate .= '-' . $_POST['filterMonth'];
+      if(!empty($_POST['filterDay'])){
+        $filterDate .= '-' . $_POST['filterDay'];
+      }
+    }
   }
 
   if(isset($_POST['filterCompany'])){
@@ -79,13 +93,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $booked = $_POST['filterBooked'];
   }
 
-  //OPTIONAL:
   if(isset($_POST['filterClient'])){
     $filterClient = $_POST['filterClient'];
   }
 
   if(isset($_POST['filterProject'])){
     $filterProject = $_POST['filterProject'];
+  }
+
+  if(isset($_POST['filterUserID'])){
+    $filterUserID = $_POST['filterUserID'];
   }
 
   if (isset($_POST['saveChanges']) && isset($_POST['editingIndeces'])) {
@@ -135,11 +152,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     }
   }
-} //end if post
+}
 ?>
-
-<div id='myContent'>
-</div>
 
 <script>
 function showClients(company, client){
@@ -168,62 +182,126 @@ function showProjects(client, project){
     });
 };
 
+function showUsers(company, user){
+    $.ajax({
+        url:'ajaxQuery/AJAX_user.php',
+        data:{companyID:company, userID:user},
+        type: 'post',
+        success : function(resp){
+            $("#filterUserID").html(resp);
+        },
+        error : function(resp){}
+    });
+};
+
 
 function textAreaAdjust(o) {
     o.style.height = "1px";
     o.style.height = (o.scrollHeight)+"px";
 }
 
-</script>
-
-<input type="month" name="filterMonth" value="<?php echo $filterMonth; ?>">
-
-
-<select id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0)'>
-
-<option value="0">Select Company...</option>
-<?php
-$sql = "SELECT * FROM $companyTable";
-$result = mysqli_query($conn, $sql);
-if($result && $result->num_rows > 0) {
-  $row = $result->fetch_assoc();
-  do {
-    $checked = '';
-    if($filterCompany == $row['id']) {
-      $checked = 'selected';
-    }
-    echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
-
-  } while($row = $result->fetch_assoc());
+function showFilters(){
+  $('#myFilters').fadeIn('slow');
 }
 
-?>
-</select>
 
-
-<select name="filterBooked">
-  <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
-  <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
-  <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
-</select>
-
-<input type="submit" name="filter" value="Filter"><br><br>
-
-Optional:
-
-<!--script type="text/javascript">
 $(document).ready(function() {
   $(".js-example-basic-single").select2();
 });
-</script-->
-
-<select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:250px' onchange='showProjects(this.value, 0)' >
-</select>
+</script>
 
 
-<select id="filterProject" name="filterProject">
-</select>
+<!----------------------------------------------------------------------------->
 
+  <div name='mandatory' stlye=clear:both;>
+    <select style='width:200px' class="js-example-basic-single" name="filterYear">
+      <?php
+      for($i = substr($filterDate,0,4)-5; $i < substr($filterDate,0,4)+5; $i++){
+        $selected = ($i == substr($filterDate,0,4))?'selected':'';
+        echo "<option $selected value=$i>$i</option>";
+      }
+       ?>
+    </select>
+      <br><br>
+    <select style='width:200px' class="js-example-basic-single" name="filterMonth">
+      <?php
+      for($i = 1; $i < 13; $i++) {
+        $selected= '';
+        if ($i == substr($filterDate,5,2)) {
+          $selected = 'selected';
+        }
+        $dateObj = DateTime::createFromFormat('!m', $i);
+        $option = $dateObj->format('F');
+        echo "<option $selected name=filterUserID value=".sprintf("%02d",$i).">$option</option>";
+      }
+       ?>
+    </select>
+      <br><br>
+    <select style='width:200px' class="js-example-basic-single" name="filterDay">
+      <?php
+      for($i = 1; $i < 32; $i++){
+        echo "<option value=".sprintf("%02d",$i).">$i</option>";
+      }
+       ?>
+    </select>
+      <br><br>
+    <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showUsers(this.value, 0); showFilters()' class="js-example-basic-single">
+      <option value="0">Select Company...</option>
+      <?php
+      $sql = "SELECT * FROM $companyTable";
+      $result = mysqli_query($conn, $sql);
+      if($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        do {
+          $checked = '';
+          if($filterCompany == $row['id']) {
+            $checked = 'selected';
+          }
+          echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
+
+        } while($row = $result->fetch_assoc());
+      }
+      ?>
+    </select>
+
+  </div>
+
+<span id='myFilters' style='display:none;float:left'>
+
+  <div name='neededToEdit'>
+      <select name="filterBooked" style='width:200px' class="js-example-basic-single">
+        <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
+        <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
+        <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
+      </select>
+  </div>
+
+
+  <div name='clientAndProject'>
+    <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects(this.value, 0)' >
+    </select>
+      <br><br>
+    <select id="filterProject" name="filterProject" class="js-example-basic-single" style='width:200px'>
+    </select>
+
+  </div>
+
+
+  <div name='theUser'>
+    <select id="filterUserID" name="filterUserID" class="js-example-basic-single" style='width:200px'>
+    </select>
+  </div>
+
+
+  <div style=clear:both;>
+    <br>
+    <input type="submit" name="filter" value="Filter"><br><br>
+  </div>
+
+</span>
+<!----------------------------------------------------------------------------->
+
+<br><br><br><br>
 <?php
 if($filterCompany != 0):
 ?>
@@ -231,6 +309,7 @@ if($filterCompany != 0):
 <script>
 showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
 showProjects(<?php echo $filterClient; ?>, <?php echo $filterProject; ?>);
+showUsers(<?php echo $filterCompany; ?>, <?php echo $filterUserID; ?>);
 </script>
 
 <?php endif; ?>
@@ -252,6 +331,7 @@ function toggle2(source) {
 }
 </script>
 
+<div style=float:left;clear:both;margin-top:50px;>
 <?php
 if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
 <fieldset disabled>
@@ -268,7 +348,7 @@ if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
 <th><?php echo $lang['SUM']; ?> (0.25h)</th>
 <th><?php echo $lang['HOURS_CREDIT']; ?></th>
 <th>Person</th>
-<th><?php echo $lang['CHARGED']; ?><input type="checkbox" onClick="toggle(this)" /> / <?php echo $lang['NOT_CHARGEABLE']; ?><input type="checkbox" onClick="toggle2(this)" /></th>
+<th><?php echo $lang['CHARGED']; ?> <input type="checkbox" onClick="toggle(this)" /> / <?php echo $lang['NOT_CHARGEABLE']; ?> <input type="checkbox" onClick="toggle2(this)" /></th>
 <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
 </tr>
 </thead>
@@ -306,6 +386,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterProjectAdd = "AND $projectTable.id = $filterProject";
   }
 
+  if($filterUserID == 0){
+    $filterUserIDAdd = '';
+  } else {
+    $filterUserIDAdd = "AND $userTable.id = $filterUserID";
+  }
+
   $sql="SELECT DISTINCT $projectTable.id AS projectID,
               $clientTable.id AS clientID,
               $clientTable.name AS clientName,
@@ -326,9 +412,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         AND $projectBookingTable.projectID = $projectTable.id
         AND $projectBookingTable.timestampID = $logTable.indexIM
         AND $userTable.id = $logTable.userID
-        AND $projectBookingTable.start LIKE '$filterMonth-%'
+        AND $projectBookingTable.start LIKE '$filterDate%'
         $bookedQuery
-        $filterClientAdd $filterProjectAdd
+        $filterClientAdd $filterProjectAdd $filterUserIDAdd
         AND $projectBookingTable.projectID IS NOT NULL
         ORDER BY $projectBookingTable.start DESC";
 
@@ -402,6 +488,7 @@ for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
 if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
 </fieldset>
 <?php endif; ?>
+</div>
 
 <br><br>
 <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
@@ -409,11 +496,11 @@ if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
 <?php endif; ?>
 
 </form>
-
+<div style=clear:both;float:left; >
 <form action="csvDownload.php" method="post" target='_blank'>
 <button type='submit' name=csv value=<?php echo rawurlencode($csv->compile()); ?>> Download as CSV </a>
 </form>
-
+</div>
 
 <br><br>
 </body>
