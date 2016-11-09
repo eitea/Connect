@@ -355,7 +355,7 @@ if ($conn->query($sql)) {
 
 
 $sql = "CREATE TABLE $adminGitHubTable(
-  sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+  sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
 )";
 if ($conn->query($sql)) {
   echo "Added gitConfigTable <br>";
@@ -363,7 +363,7 @@ if ($conn->query($sql)) {
   echo mysqli_error($conn) .'<br>';
 }
 
-$sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('TRUE')";
+$sql = "INSERT INTO $adminGitHubTable (sslVerify) VALUES('FALSE')";
 if ($conn->query($sql)) {
   echo "Insert into gitConfigTable <br>";
 } else {
