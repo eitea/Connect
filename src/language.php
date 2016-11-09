@@ -3,6 +3,7 @@ $lang = array();
 
 //english-----------------------------------------------------------------------
 if($_SESSION['language'] == 'ENG'){
+
   $activityToString = array(
     "arrival" => "Work",
     "vacation" => "Vacation",
@@ -19,14 +20,12 @@ if($_SESSION['language'] == 'ENG'){
     "sat" => "Saturday",
     "sun" => "Sunday"
   );
-
   /*
   0 ..... open
   1 ..... declined
   2 ..... accepted
   */
   $lang_vacationRequestStatus = array("Open", "Declined", "Accepted");
-
   /*
   -1 .... absent (should not occur!)
   0 ..... arrival
