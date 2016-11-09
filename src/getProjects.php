@@ -101,13 +101,13 @@ $filterUserID = 0;
 ?>
 
 
-<form method='post' action='getTimestamps.php'>
+<form method='post' action='dailyReport.php'>
   <?php if($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
 <h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['VIEW_PROJECTS']?></h1>
 
-<input type=text name=filteredYear style=display:none; value="<?php echo substr($filterDate,0,4); ?>" >
-<input type=text name=filteredMonth style=display:none; value="<?php echo substr($filterDate,5,2); ?>" >
-<input type=text name=filteredUserID style=display:none; value="<?php echo $filterUserID; ?>" >
+<input type=text name=filterDay style=display:none; value="<?php echo $filterDate .'-01-01' ?>" >
+<input type=text name=booked style=display:none; value="<?php echo $booked; ?>" >
+<input type=text name=filterUserID style=display:none; value="<?php echo $filterUserID; ?>" >
 <?php else : ?>
   <h1><?php echo $lang['VIEW_PROJECTS']?></h1>
 <?php endif; ?>

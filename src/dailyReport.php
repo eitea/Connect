@@ -67,7 +67,6 @@ if(isset($_GET['filterDay'])){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterDay'])){
     $filterDay = substr($_POST['filterDay'], 0, 10);
-    $userID = substr($_POST['filterDay'], 10, strlen($_POST['filterDay']));
   }
 
   if(isset($_POST['filterUserID'])){
