@@ -23,7 +23,7 @@ require "language.php";
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $sql = "SELECT $userRequests.*, $bookingTable.* FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE status = '0'";
   $result = $conn->query($sql);
-  if($result->num_rows > 0){
+  if($result && $result->num_rows > 0){
     while($row = $result->fetch_assoc()){
       if(isset($_POST['okay'. $row['id']])){
         $answerText = $_POST['answerText'. $row['id']];
@@ -77,7 +77,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <?php
     $sql = "SELECT $userTable.firstname, $userTable.lastname, $userRequests.id, $userRequests.fromDate, $userRequests.toDate, $userRequests.requestText FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
     $result = $conn->query($sql);
-    if($result->num_rows > 0){
+    if($result && $result->num_rows > 0){
       while($row = $result->fetch_assoc()){
         echo '<tr>';
         echo '<td>'. $row['firstname']. ' ' .$row['lastname'] . '</td>';
