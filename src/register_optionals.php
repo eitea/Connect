@@ -120,7 +120,7 @@ if(isset($_POST['create'])){
     //create user
     $psw = password_hash($pass, PASSWORD_BCRYPT);
     $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, enableProjecting)
-    VALUES ('$firstname',' $lastname ','$psw ','$gender','$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin', '$allowAccess');";
+    VALUES ('$firstname',' $lastname ','$psw','$gender','$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin', '$allowAccess');";
     $conn->query($sql);
     $userID = mysqli_insert_id($conn);
 
