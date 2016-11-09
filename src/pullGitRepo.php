@@ -39,19 +39,17 @@ exec($command, $output, $returnValue);
 $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
 exec($command, $output, $returnValue);
 
-
 echo implode('<br>', $output);
 
 session_destroy();
+echo "<br><br><input type=submit name=okey value='O.K & Continue' /></form>";
+
 die($lang['LOGOUT_MESSAGE']);
 ?>
-<input type=submit name=okey value='O.K & Continue' />
+
 <?php endif;
-
 echo $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] .'<br><br>';
-
 echo $lang['MAY_TAKE_A_WHILE'] .'<br><br>';
-
 ?>
 
 <input type=submit name=imtotallyFineWithThisOK value="<?php echo $lang['YES_I_WILL']?>" />
