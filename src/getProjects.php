@@ -237,6 +237,7 @@ $(document).ready(function() {
     </select>
       <br><br>
     <select style='width:200px' class="js-example-basic-single" name="filterMonth">
+        <option value="">-</option>
       <?php
       for($i = 1; $i < 13; $i++) {
         $selected= '';
@@ -251,9 +252,14 @@ $(document).ready(function() {
     </select>
       <br><br>
     <select style='width:200px' class="js-example-basic-single" name="filterDay">
+      <option value="">-</option>
       <?php
       for($i = 1; $i < 32; $i++){
-        echo "<option value=".sprintf("%02d",$i).">$i</option>";
+        $selected= '';
+        if ($i == intval(substr($filterDate,8,2))) {
+          $selected = 'selected';
+        }
+        echo "<option $selected value=".sprintf("%02d",$i).">$i</option>";
       }
        ?>
     </select>

@@ -388,7 +388,7 @@ if($conn->query($sql)){
 }
 
 
-$repositoryPath = (dirname(realpath("letsgo.php")));
+$repositoryPath = dirname(dirname(realpath("setup.php")));
 
 //git init
 $command = 'git -C ' .$repositoryPath. ' init 2>&1';
