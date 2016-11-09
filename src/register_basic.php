@@ -50,10 +50,12 @@
 
     if (!empty($_POST["email"]) && filter_var(test_input($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
       $email = test_input($_POST["email"]);
-      $result = $conn->query("SELECT * FROM $userTable WHERE email = $email");
-      if($result->num_rows > 0 ){
+      $result = $conn->query("SELECT * FROM $userTable WHERE email = '$email'");
+      if($result && $result->num_rows > 0){
         $accept = FALSE;
         $emailErr = "*Email already in Use";
+      } else {
+        echo mysqli_error($conn);
       }
     } else {
       $emailErr = "*Email invalid";
@@ -61,7 +63,7 @@
     }
 
     if ($accept) {
-      header("refresh:0;url=register_optionals.php?gn=$firstname&sn=$lastname&mail=$email" );
+      header("Location: register_optionals.php?gn=$firstname&sn=$lastname&mail=$email" );
     }
   }
 

@@ -118,6 +118,8 @@ if(isset($_POST['create'])){
 
   if($accept){
     //create user
+    $pass = $_POST['yourPas'];
+    echo $pass;
     $psw = password_hash($pass, PASSWORD_BCRYPT);
     $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, enableProjecting)
     VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin', '$allowAccess');";
@@ -169,7 +171,7 @@ if(isset($_POST['create'])){
         $i = carryOverAdder_Hours($i, 24);
       }
     }
-    header('refresh:0;url=editUsers.php');
+    header('Location: editUsers.php');
   }
 
 }
@@ -191,7 +193,7 @@ if(isset($_POST['create'])){
   </tr>
 
   <tr>
-    <td> Psw.: </td><td> <?php echo $pass; ?> </td> <br>
+    <td> Psw.: </td><td> <input type="text" style=display:none value="<?php echo $pass; ?>" name="yourPas"> <?php echo $pass; ?> </td> <br>
   </tr>
 </table><br><br>
 
@@ -270,14 +272,14 @@ if(isset($_POST['create'])){
 </form>
 </body>
 <?php
-function randomPassword() {
+function randomPassword(){
   $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  $pass = array(); //remember to declare $pass as an array
+  $psw = array();
   $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
   for ($i = 0; $i < 8; $i++) {
     $n = rand(0, $alphaLength);
-    $pass[] = $alphabet[$n];
+    $psw[] = $alphabet[$n];
   }
-  return implode($pass); //turn the array into a string
+  return implode($psw); //turn the array into a string
 }
  ?>
