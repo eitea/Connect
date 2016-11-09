@@ -45,7 +45,6 @@
 </head>
 <body>
 
-<form method='post'>
 
 <?php
 session_start();
@@ -61,10 +60,6 @@ require "createTimestamps.php";
 require "language.php";
 ?>
 
-<h1><?php echo $lang['VIEW_PROJECTS']?></h1>
-<br><br>
-
-
 <?php
 $filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year and month
 $booked = '0';
@@ -74,7 +69,6 @@ $filterProject = 0;
 $filterUserID = 0;
 
 //careful stairs
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['filterYear'])){
     $filterDate = $_POST['filterYear'];
     if(!empty($_POST['filterMonth'])){
@@ -104,7 +98,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterUserID'])){
     $filterUserID = $_POST['filterUserID'];
   }
+?>
 
+
+<form method='post' action='getTimestamps.php'>
+  <?php if($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
+<h1><button type=submit style=background:none;border:none;><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></button><?php echo $lang['VIEW_PROJECTS']?></h1>
+
+<input type=text name=filteredYear style=display:none; value="<?php echo substr($filterDate,0,4); ?>" >
+<input type=text name=filteredMonth style=display:none; value="<?php echo substr($filterDate,5,2); ?>" >
+<input type=text name=filteredUserID style=display:none; value="<?php echo $filterUserID; ?>" >
+<?php else : ?>
+  <h1><?php echo $lang['VIEW_PROJECTS']?></h1>
+<?php endif; ?>
+
+<br><br>
+</form>
+
+<form method='post'>
+<?php
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if (isset($_POST['saveChanges']) && isset($_POST['editingIndeces'])) {
     for ($i = 0; $i < count($_POST['editingIndeces']); $i++) {
       $imm = $_POST['editingIndeces'][$i];
@@ -310,6 +323,7 @@ if($filterCompany != 0):
 showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
 showProjects(<?php echo $filterClient; ?>, <?php echo $filterProject; ?>);
 showUsers(<?php echo $filterCompany; ?>, <?php echo $filterUserID; ?>);
+$('#myFilters').fadeIn('fast');
 </script>
 
 <?php endif; ?>

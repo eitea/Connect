@@ -139,7 +139,6 @@ if($result && $result->num_rows > 0) {
 
 </form>
 
-<form method='post' action='getProjects.php'>
 <table id='blank' class="table table-striped table-bordered">
   <thead>
 <tr>
@@ -187,9 +186,10 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
 
 reminder: looking for bugs? try to figure out why this sql thing works and if it is supposed to work (it works, but im not sure if its supposed to)...
         */
-  $sql = "SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName, $projectBookingTable.id AS projectBookingID,
+  $sql = "SELECT DISTINCT $clientTable.name AS clientName, $companyTable.name AS companyName, $projectTable.name AS projectName,
                         $projectBookingTable.start, $projectBookingTable.end, $projectBookingTable.infoText, $logTable.timeToUTC,
-                        $projectTable.hours, $projectBookingTable.booked, $projectTable.hourlyPrice, $logTable.indexIM
+                        $projectBookingTable.booked, $projectTable.hourlyPrice, $projectBookingTable.projectID, $logTable.userID,
+                        $projectTable.clientID, $clientTable.companyID
           FROM $projectBookingTable
           LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
           LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
@@ -209,7 +209,9 @@ reminder: looking for bugs? try to figure out why this sql thing works and if it
       echo "<td>" .$row['projectName']. "</td>";
       echo "<td style='text-align:left'>" .$row['infoText']. "</td>";
 
-      echo "<td>". carryOverAdder_Hours($row['start'],$row['timeToUTC']) ."<br>". carryOverAdder_Hours($row['end'],$row['timeToUTC']) ."</td>";
+      $A =  carryOverAdder_Hours($row['start'],$row['timeToUTC']);
+      $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+      echo "<td>$A<br>$B</td>";
       echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '') . "</td>";
       echo "<td>$t</td>";
 
@@ -217,7 +219,23 @@ reminder: looking for bugs? try to figure out why this sql thing works and if it
 
       echo "<td>$selected</td>";
       echo "<td>".$row['hourlyPrice']."</td>";
-      echo "<td><button type=submit style=background:none;border:none;><img src='../images/pencil.png' alt='edit' style='width:25px;height:25px;border:0;margin-bottom:5px'></button></td>";
+
+      if(!empty($row['projectID'])):
+      echo '<td>';
+      echo "<form method='post' action='getProjects.php'>";
+      echo "<button type=submit style=background:none;border:none;><img src='../images/pencil.png' alt='edit' style='width:25px;height:25px;border:0;margin-bottom:5px'></button>";
+      echo "<input name=filterCompany type=text style=display:none value=" .$row['companyID'].' />'; //filterCompany
+      echo "<input name=filterYear type=text style=display:none value= " .substr($A,0,4).' />'; //Year
+      echo "<input name=filterMonth type=text style=display:none value= " .substr($A,5,2).' />'; //Month
+      echo "<input name=filterDay type=text style=display:none value= " .substr($A,8,2).' />'; //Day
+      echo "<input name=filterUserID type=text style=display:none value= " .$row['userID'].' />'; //userID
+      echo "<input name=filterClient type=text style=display:none value= " .$row['clientID'].' />';
+      echo "<input name=filterProject type=text style=display:none value= " .$row['projectID'].' />';
+      echo "</form>";
+      echo '</td>';
+      else :
+        echo '<td></td>';
+      endif;
 
       echo "</tr>";
     }
@@ -227,5 +245,4 @@ reminder: looking for bugs? try to figure out why this sql thing works and if it
 
 ?>
 </table>
-</form>
 </body>

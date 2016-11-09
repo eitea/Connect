@@ -328,7 +328,7 @@ for($i = 0; $i < $calculator->days; $i++){
   echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
   echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
 
-  echo '<td><a target="_self" href="getProjects.php?filterDay='.substr($A,0,10).'&userID='.$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'">
+  echo '<td><a target="_self" href="dailyReport.php?filterDay='.substr($A,0,10).'&userID='.$filterID.'" title="Bookings" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="'.$popOverContent.'">
   <i class="fa fa-question-circle-o"></a></td>';
   echo "</tr>";
 
