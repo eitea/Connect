@@ -76,6 +76,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DESCRIPTION'] = 'Description';
   $lang['DIFFERENCE'] = 'Difference';
   $lang['DISPLAY_INFORMATION'] = 'Display Infos';
+  $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
 
   $lang['EDIT'] = 'Edit';
   $lang['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
@@ -104,12 +105,14 @@ if($_SESSION['language'] == 'ENG'){
   $lang['INVALID_LOGIN'] = 'Invalid e-mail or password';
   $lang['IS_TIME'] = 'Is';
 
+  $lang['LANGUAGE_SETTING'] = 'Language';
   $lang['LAST_BOOKING'] = 'Last Booking'; //I gave u my heeart
   $lang['LASTNAME'] = 'Lastname';
+  $lang['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
   $lang['LUNCHBREAK'] = 'Lunchbreak';
   $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
-  $lang['LANGUAGE_SETTING'] = 'Language';
 
+  $lang['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
   $lang['MONTHLY_REPORT'] ='Monthly Report';
 
   $lang['NEW_PASSWORD'] = 'New Password';
@@ -160,6 +163,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
   $lang['WEEKLY_DAY'] = 'Day of Week';
   $lang['WEEKLY_HOURS'] = 'Weekly Hours';
+
+  $lang['YES_I_WILL'] = 'Yes, I do.';
 
 //------------------------------------------------------------------------------
 
@@ -222,6 +227,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DESCRIPTION'] = 'Beschreibung';
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
+  $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
 
   $lang['EDIT'] = 'Bearbeiten';
   $lang['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
@@ -250,12 +256,14 @@ if($_SESSION['language'] == 'ENG'){
   $lang['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
   $lang['IS_TIME'] = 'Ist';
 
+  $lang['LANGUAGE_SETTING'] = 'Sprache';
   $lang['LAST_BOOKING'] = 'Letzte Buchung';
   $lang['LASTNAME'] = 'Nachname';
-  $lang['LANGUAGE_SETTING'] = 'Sprache';
+  $lang['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
   $lang['LUNCHBREAK'] = 'Mittagspause';
   $lang['LUNCHBREAK_REPAIR'] = 'Pausen Rekalkulieren';
 
+  $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
@@ -307,4 +315,6 @@ if($_SESSION['language'] == 'ENG'){
   $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';
   $lang['WEEKLY_DAY'] = 'Wochentag';
   $lang['WEEKLY_HOURS'] = 'Wochenstunden';
+
+  $lang['YES_I_WILL'] = 'Ja, ich will.';
 }
