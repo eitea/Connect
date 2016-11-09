@@ -388,6 +388,29 @@ if($conn->query($sql)){
 }
 
 
+$repositoryPath = (dirname(realpath("letsgo.php")));
+
+//git init
+$command = 'git -C ' .$repositoryPath. ' init 2>&1';
+exec($command, $output, $returnValue);
+
+//sslyverify false
+$command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
+exec($command, $output, $returnValue);
+
+//remote add
+$command = "git -C $repositoryPath remote add -t master origin https://github.com/eitea/T-Time.git 2>&1";
+exec($command, $output, $returnValue);
+
+$command = "git -C $repositoryPath fetch --force 2>&1";
+exec($command, $output, $returnValue);
+
+$command = "git -C $repositoryPath reset --hard origin/master 2>&1";
+exec($command, $output, $returnValue);
+
+echo implode('<br>', $output);
+
+
 //------------------------------------------------------------------------------
 
 function icsToArray($paramUrl) {
@@ -410,7 +433,6 @@ function icsToArray($paramUrl) {
   }
   return $icsDates;
 }
-
 
 //------------------------------------------------------------------------------
 header("refresh:10;url=adminHome.php");
