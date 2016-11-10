@@ -62,7 +62,7 @@
 ?>
 </select>
 
-<input type="submit" class="button" name="applyFilter" value="Apply" />
+<input type="submit" class="button" name="applyFilter" value="Filter" />
 </form>
 
 <br><br>

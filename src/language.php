@@ -58,6 +58,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BEGIN'] = 'Begin';
   $lang['BLESSING'] = 'Have a nice day!';
   $lang['BOOK_PROJECTS'] = 'Book Projects';
+  $lang['BREAK'] = 'Break';
 
   $lang['CHARGED'] = 'Charged';
   $lang['CHECK_IN'] = 'Check In';
@@ -73,6 +74,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DEFAULT'] = 'Default';
   $lang['DELETE'] = 'Delete';
   $lang['DESCRIPTION'] = 'Description';
+  $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS'] = 'For forgotten checkouts: Set end-time to match expected hours';
   $lang['DIFFERENCE'] = 'Difference';
   $lang['DISPLAY_INFORMATION'] = 'Display Infos';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
@@ -101,6 +103,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['HOURS_CREDIT'] = 'Hours Credit';
   $lang['HOURS_OF_REST'] = 'Hours of Rest';
 
+  $lang['ILLEGAL_LUNCHBREAK'] = 'Invalid Lunchbreaks';
+  $lang['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
   $lang['INVALID_LOGIN'] = 'Invalid e-mail or password';
   $lang['IS_TIME'] = 'Is';
 
@@ -131,6 +135,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_NEW_USER'] ='Register new User';
   $lang['REGISTER_USERS'] = "Register LDAP Users";
   $lang['REPLY_TEXT'] = 'Answer';
+  $lang['REQUESTS'] = "Request";
 
   $lang['SETTINGS'] = 'Settings';
   $lang['SHOULD_TIME'] = 'Should';
@@ -146,6 +151,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TO'] = 'To';
 
   $lang['UNDO'] ='Undo';
+  $lang['UNANSWERED_REQUESTS'] ='Unanswered Requests';
   $lang['UPDATE_REQUIRED'] = 'Update required. ';
   $lang['UPTODATE'] = 'Version is up tp date. ';
   $lang['USED_DAYS'] ='Used Days';
@@ -209,6 +215,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BEGIN'] = 'Anfang';
   $lang['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
   $lang['BOOK_PROJECTS'] = 'Projektbuchung';
+  $lang['BREAK'] = 'Pause';
 
   $lang['CHARGED'] = 'Verrechnet';
   $lang['CHECK_IN'] = 'Einstempeln';
@@ -224,6 +231,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
   $lang['DESCRIPTION'] = 'Beschreibung';
+  $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS'] = 'Für vergessene checkouts: Endzeit wird den erwarteten Stunden angepasst';
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
@@ -252,6 +260,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['HOURS_CREDIT'] = 'Stundenkonto';
   $lang['HOURS_OF_REST'] = 'Mittagspause in Stunden';
 
+  $lang['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
+  $lang['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
   $lang['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
   $lang['IS_TIME'] = 'Ist';
 
@@ -260,7 +270,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LASTNAME'] = 'Nachname';
   $lang['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
   $lang['LUNCHBREAK'] = 'Mittagspause';
-  $lang['LUNCHBREAK_REPAIR'] = 'Pausen Rekalkulieren';
+  $lang['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 
   $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
@@ -283,6 +293,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_NEW_USER'] = 'Registrieren';
   $lang['REGISTER_USERS'] = "LDAP Registrierung";
   $lang['REPLY_TEXT'] = 'Antwort';
+  $lang['REQUESTS'] = "Anfragen";
 
   $lang['SETTINGS'] = 'Einstellungen';
   $lang['SHOULD_TIME'] = 'Soll';
@@ -298,6 +309,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TO'] = 'Bis';
 
   $lang['UNDO'] = 'Rückgängig';
+  $lang['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
   $lang['UPDATE_REQUIRED'] = 'Update benötigt. ';
   $lang['UPTODATE'] = 'Version ist aktuell. ';
   $lang['USED_DAYS'] ='Verbrauchte Tage';

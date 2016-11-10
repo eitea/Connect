@@ -5,7 +5,6 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
   <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="../css/homeMenu.css">
   <link rel="stylesheet" href="../css/readonly.css">
 
@@ -112,7 +111,7 @@ $insertInfoText = '';
 ?>
 
 <form method="post">
-  <h1>Timestamps</h1>
+  <h1><?php echo $lang['BOOK_PROJECTS']; ?></h1>
   <br>
   <?php if($showUndoButton): ?>
 <div style='text-align:right;'><input type='submit' value='Undo' name='undo'></input></div>
@@ -121,10 +120,10 @@ $insertInfoText = '';
   <thead>
   <tr>
     <th>Start</th>
-    <th>End</th>
-    <th>Date</th>
-    <th>Client</th>
-    <th>Project</th>
+    <th><?php echo $lang['END']; ?></th>
+    <th><?php echo $lang['DATE']; ?></th>
+    <th><?php echo $lang['CLIENT']; ?></th>
+    <th><?php echo $lang['PROJECT']; ?></th>
     <th>Info</th>
   </tr>
   </thead>
@@ -274,7 +273,7 @@ function showProjects(str) {
 </span><br>
 
 <span>
-  Add break until:
+  <?php echo $lang['BREAK'] . ' '. $lang['TO'] ; ?>:
   <input type="time" min="<?php echo substr($start,0,5); ?>" max="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="startBreak" size="4" value=''>
   <input type="text" placeholder="Info" onkeydown='if (event.keyCode == 13) return false;' name="infoTextBreak">
   <input type="submit" class="button" name="addBreak" value="+">

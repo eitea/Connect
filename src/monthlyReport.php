@@ -69,14 +69,14 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   <tr>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
     <th><?php echo $lang['DATE']; ?></th>
-    <th>Beginn</th>
-    <th>Pause (h)</th>
-    <th>Ende</th>
-    <th><?php echo $lang['LAST_BOOKING']; ?></th>
+    <th><?php echo $lang['BEGIN']?></th>
+    <th><?php echo $lang['LUNCHBREAK']?> (h)</th>
+    <th><?php echo $lang['END']?></th>
+    <th style='font-size:small; text-align:left; width:40px'><?php echo $lang['LAST_BOOKING']; ?></th>
     <th><?php echo $lang['ACTIVITY']; ?></th>
-    <th>Soll (h)</th>
-    <th>Ist (h)</th>
-    <th>Differenz (h)</th>
+    <th><?php echo $lang['SHOULD_TIME']?></th>
+    <th><?php echo $lang['IS_TIME']?></th>
+    <th><?php echo $lang['DIFFERENCE']?></th>
     <th>Saldo - <?php echo $lang['ACCUMULATED']; ?></th>
   </tr>
 
@@ -121,13 +121,13 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
         $bookingTimeDifference = timeDiff_Hours($config2['end'], $calculator->end[$i]) * 60;
 
         if($bookingTimeDifference <= $config['bookingTimeBuffer']){
-          $style = "style=background-color:#abff99";
+          $style = "color:#6fcf2c"; //green
         }
         if($bookingTimeDifference > $config['bookingTimeBuffer']){
-          $style = "style=background-color:#ffdf5b";
+          $style = "color:#ffdf5b"; //yellow
         }
         if($bookingTimeDifference > $config['bookingTimeBuffer'] * 2){
-          $style = "style=background-color:#fc8542";
+          $style = "color:#fc8542"; //red
         }
         if($calculator->end[$i] != '-'){
           $tinyEndTime = substr(carryOverAdder_Hours($config2['end'], $calculator->timeToUTC[$i]),11,5);
@@ -149,17 +149,26 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
 
     $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
 
-    echo "<tr $style>";
+    $theSaldo = round($difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i], 2);
+    $saldoStyle = '';
+    if($theSaldo < 0){
+      $saldoStyle = 'style=color:#fc8542;'; //red
+    } elseif($theSaldo > 0) {
+      $saldoStyle = 'style=color:#6fcf2c;'; //green
+    }
+
+
+    echo "<tr>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
     echo "<td>" . substr($A,11,5) . "</td>";
     echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
     echo "<td>" . substr($B,11,5)  . "</td>";
-    echo "<td style='font-size:small; text-align:left;'>" . $tinyEndTime . "</td>";
+    echo "<td style='font-size:small; text-align:left; $style'>" . $tinyEndTime . "</td>";
     echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";
     echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
-    echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
+    echo "<td $saldoStyle>" . sprintf('%+.2f', $theSaldo) . "</td>";
     echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
     echo "</tr>";
 

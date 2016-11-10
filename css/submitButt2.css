@@ -1,0 +1,19 @@
+input[type="submit"]{
+  background-color: white;
+  border-style:solid;
+  border-radius:8px;
+  border-color:#58a2cb;
+  border-width: thin;
+  color:#4089cc;
+  padding:5px 10px;
+  font-weight: bold;
+  display:inline-block;
+}
+
+input[type="submit"]:hover{
+  background-color: white;
+  color:#d13918;
+  border-color:#d47335;
+  display:inline-block;
+  padding:5px 10px;
+}

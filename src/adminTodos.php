@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
   <link rel="stylesheet" href="../css/table.css">
-  <link rel="stylesheet" href="../css/submitButt.css">
+  <link rel="stylesheet" href="../css/submitButt2.css">
   <link rel="stylesheet" href="../css/homeMenu.css">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
@@ -34,22 +34,28 @@ require 'language.php';
 
 if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
   foreach($_POST['autoCorrects'] as $indexIM){
-    $sql = "SELECT $logTable.*, $userTable.hoursOfRest FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
+    $sql = "SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
     $result = $conn->query($sql);
     $row = $result->fetch_assoc();
 
     $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
     $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
-    $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
+
+    if($row['expectedHours'] > $row['pauseAfterHours']){
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
+    }
 
     $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
     $conn->query($sql);
     echo mysqli_error($conn);
   }
 } elseif(isset($_POST['autoCorrectBreaks']) && isset($_POST['lunchbreakIndeces'])){
-  for($i=0; $i < $_POST['lunchbreakIndeces'].count(); $i++){
-    if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]){
-      echo "Invalid setting of new lunchbreak, please try again";
+  for($i=0; $i < count($_POST['lunchbreakIndeces']); $i++){
+    if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i] <= 0 || $_POST['lunchbreaks'][$i] == 0){
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>Invalid setting of new lunchbreak, please try again.';
+      echo '</div>';
       break;
     }
     $breakTime = ($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]) * 60;
@@ -69,7 +75,7 @@ $sql ="SELECT * FROM $userRequests WHERE status = '0'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
-  <p> Unanswered Requests: </p>
+  <p> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </p>
 
 <?php
 echo $result->num_rows . " Vacation Request/s: ";
@@ -86,7 +92,7 @@ WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > 
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
-<p> Illegal Lunchbreaks: </p>
+<p> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>: </p>
 <br>
 <table>
   <th>Name</th>
@@ -129,7 +135,7 @@ $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
 
-<p>Illegal Timestamps: </p>
+<p><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: </p>
 
 <table id='illTS'>
   <th>User</th>
@@ -153,7 +159,7 @@ if($result && $result->num_rows > 0):
 
 </table>
 <br>
-<input type='submit' name='autoCorrect' value='Autocorrect'><small> - For forgotten checkouts: Set end-time to match expected hours </small></input>
+<input type='submit' name='autoCorrect' value='Autocorrect'><small> - <?php echo $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS']; ?> </small></input>
 <br><br>
 <br><br>
 

@@ -45,13 +45,13 @@ if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end
 <div style=float:left;padding-bottom:250px>
 <table>
   <tr>
-    <td>From: *</td><td> <input id="calendar" type='date' name='start' value=''> </td>
+    <td><?php echo $lang['FROM']; ?>: *</td><td> <input id="calendar" type='date' name='start' value=''> </td>
   </tr>
   <tr>
-    <td>Until: *</td><td> <input id="calendar2" type='date' name='end' value=''> </td>
+    <td><?php echo $lang['TO']; ?>: *</td><td> <input id="calendar2" type='date' name='end' value=''> </td>
   </tr>
   <tr>
-    <td><input type='submit' name='makeRequest' value='Request Vacation' ></td> <td> <input type="text" name="requestText" value="" placeholder = "Info Text"> </td>
+    <td><input type='submit' name='makeRequest' value='<?php echo $lang['REQUESTS']; ?>' ></td> <td> <input type="text" name="requestText" value="" placeholder = "Info Text"> </td>
   </tr>
   <tr>
     <td><small>*<?php echo $lang['FIELDS_REQUIRED']; ?></small></td>

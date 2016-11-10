@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
       $companyName = $_POST['companyName'];
-      header("refresh:0;url=setup.php?companyName=$companyName&psw=$psw");
+      header("Location: setup.php?companyName=$companyName&psw=$psw");
     }
   } else {
     echo 'Missing Fields. <br><br>';
