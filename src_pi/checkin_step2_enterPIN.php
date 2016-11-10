@@ -1,6 +1,8 @@
 <?php
 require "../src/connection.php";
 require "../src/createTimestamps.php";
+require "../src/ckInOut.php";
+
 
 $headers = apache_request_headers();
 $userAgentHead =  $headers['User-Agent'];
@@ -13,7 +15,7 @@ if(!$result || $result->num_rows <= 0){
 
 $userID = $_GET['id'];
 if(isset($_POST['cancel'])){
-  header("refresh:0;url=checkin_step1_select.php");
+  header("Location: checkin_step1_select.php");
 }
 
 if(isset($_POST['enter']) && !empty($_POST['mvar'])){
@@ -27,11 +29,12 @@ if(isset($_POST['enter']) && !empty($_POST['mvar'])){
     $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '". substr(getCurrentTimestamp(),0,10) . " %' ";
     $result = $conn->query($sql);
     if($result && $result->num_rows > 0){ //determine checkin or checkout
-      checkOut($userID, 0);
+      checkOut($userID);
     } else {
-      checkIn($userID, 0);
+      checkIn($userID);
     }
-    echo "O.K.";
+    session_destroy();
+    echo "<div style=color:green;font-size:large > O.K </div>";
     header("refresh:2;url=checkin_step1_select.php");
   } else {
     echo 'false pin';

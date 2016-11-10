@@ -11,7 +11,6 @@
 <body>
 <?php
   require "../src/connection.php";
-
   $headers = apache_request_headers();
   $userAgentHead =  $headers['User-Agent'];
   //EI-TEA Zeiterfassung v13 Code3A5B
