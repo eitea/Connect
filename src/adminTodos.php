@@ -67,6 +67,12 @@ if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
      $conn->query($sql);
      echo mysqli_error($conn);
   }
+} elseif(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
+  foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
+    $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
 }
 ?>
 
@@ -161,14 +167,55 @@ if($result && $result->num_rows > 0):
 <br>
 <input type='submit' name='autoCorrect' value='Autocorrect'><small> - <?php echo $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS']; ?> </small></input>
 <br><br>
-<br><br>
 
 <?php
 endif;
 ?>
 <!-- --------------------------------------------------------------------------><br><br><br>
+<?php
+$sql = "SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id
+AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
+
+$result = $conn->query($sql);
+if($result && $result->num_rows > 0):
+?>
+<p><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: Gemini</p>
+
+<table id='dubble'>
+  <th>User</th>
+  <th width=40%><?php echo $lang['VIEW_TIMESTAMPS']; ?> 1</th>
+  <th width=40%><?php echo $lang['VIEW_TIMESTAMPS']; ?> 2</th>
+
+<?php
+  while(($row = $result->fetch_assoc()) && ( $row2 = $result->fetch_assoc())){
+    echo '<tr>';
+    echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
+    echo '<td>';
+    echo '<input type=checkbox name="geminiIndeces[]" value="'.$row['indexIM'].'" />';
+    echo $lang_activityToString[$row['status']] .' - '.$row['indexIM']. ' - ';
+    echo carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
+    echo '</td>';
 
 
+    echo '<td>';
+    echo '<input type=checkbox name="geminiIndeces[]" value="'.$row2['indexIM'].'" />';
+    echo $lang_activityToString[$row2['status']] .' - '.$row2['indexIM']. ' - ';
+    echo carryOverAdder_Hours($row2['time'], $row2['timeToUTC']) .' - '. carryOverAdder_Hours($row2['timeEnd'], $row2['timeToUTC']);
+    echo '</td>';
+    echo '</tr>';
+  }
 
+?>
+
+</table>
+<br>
+<input type='submit' name='deleteGemini' value='<?php echo $lang['DELETE']; ?>'></input>
+<br><br>
+
+<?php
+endif;
+echo mysqli_error($conn);
+?>
+<!-- --------------------------------------------------------------------------><br><br><br>
 </form>
 </body>

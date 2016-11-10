@@ -162,7 +162,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION_REQUESTS'] = 'Vacation Requests';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
   $lang['VIEW_PROJECTS'] = 'View Projects';
-  $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
+  $lang['VIEW_TIMESTAMPS'] = 'Timestamps';
   $lang['VIEW_USER'] = 'Users';
 
   $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
