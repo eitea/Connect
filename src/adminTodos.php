@@ -34,19 +34,20 @@ require 'language.php';
 
 if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
   foreach($_POST['autoCorrects'] as $indexIM){
-    $sql = "SELECT * FROM $logTable WHERE indexIM = $indexIM";
+    $sql = "SELECT $logTable.*, $userTable.hoursOfRest FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
     $result = $conn->query($sql);
     $row = $result->fetch_assoc();
 
     $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
     $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
+    $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
 
     $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
     $conn->query($sql);
     echo mysqli_error($conn);
   }
 } elseif(isset($_POST['autoCorrectBreaks']) && isset($_POST['lunchbreakIndeces'])){
-  foreach($i=0; $i<$_POST['lunchbreakIndeces'].count(); $i++){
+  for($i=0; $i < $_POST['lunchbreakIndeces'].count(); $i++){
     if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]){
       echo "Invalid setting of new lunchbreak, please try again";
       break;
@@ -80,7 +81,7 @@ endif;
 
 <?php
 $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
-WHERE enableProjecting = 'TRUE' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
+WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
 
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
