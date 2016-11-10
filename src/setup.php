@@ -343,6 +343,8 @@ $sql = "CREATE TABLE $userRequests(
   fromDate DATETIME NOT NULL,
   toDate DATETIME NOT NULL,
   status ENUM('0', '1', '2') DEFAULT '0',
+  requestText VARCHAR(150),
+  answerText VARCHAR(150),
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE

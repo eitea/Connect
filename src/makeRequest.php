@@ -76,7 +76,7 @@ myCalendar.setDateFormat("%Y-%m-%d");
     <?php
     $sql = "SELECT * FROM $userRequests WHERE userID = $userID";
     $result = $conn->query($sql);
-    if($result->num_rows > 0){
+    if($result && $result->num_rows > 0){
       while($row = $result->fetch_assoc()){
         $style = "";
         if($row['status'] == 0) {

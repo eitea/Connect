@@ -14,6 +14,7 @@ $companyToUserRelationshipTable = "companyToClientRelationshipData";
 $companyDefaultProjectTable = "companyDefaultProjects";
 $negative_logTable = "unlogs";
 $userRequests = "userRequestsData";
+$sessionTab = "php_session";
 
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
