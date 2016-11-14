@@ -37,7 +37,7 @@ $sql = "CREATE TABLE $userTable (
   coreTime TIME DEFAULT '8:00'
 )";
 if ($conn->query($sql)) {
-  echo "created user table. <br>";
+  echo "created user table. - ";
 } else {
   echo mysqli_error($conn);
 }
@@ -89,7 +89,7 @@ $sql = "CREATE TABLE  $adminLDAPTable (
   ON DELETE CASCADE
 )";
 if ($conn->query($sql)) {
-  echo "Ldap config table created. <br>";
+  echo "Ldap config table created. - ";
 } else {
   echo mysqli_error($conn);
 }
@@ -145,7 +145,7 @@ $sql = "CREATE TABLE $companyTable (
   name VARCHAR(60) NOT NULL
 )";
 if ($conn->query($sql)) {
-  echo "CompanyTable created. <br>";
+  echo "CompanyTable created. - ";
 } else {
   echo mysqli_error($conn);
 }
@@ -360,7 +360,7 @@ $sql = "CREATE TABLE $adminGitHubTable(
   sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
 )";
 if ($conn->query($sql)) {
-  echo "Added gitConfigTable <br>";
+  echo "Added gitConfigTable - ";
 } else {
   echo mysqli_error($conn) .'<br>';
 }
@@ -377,7 +377,7 @@ $sql = "CREATE TABLE $piConnTable(
   header VARCHAR(50)
 )";
 if($conn->query($sql)){
-  echo "Created config table for  terminals. <br>";
+  echo "Created config table for  terminals. - ";
 } else {
   echo mysqli_error($conn);
 }
@@ -389,6 +389,28 @@ if($conn->query($sql)){
   echo mysqli_error($conn);
 }
 
+
+$sql = "CREATE TABLE $roleTable(
+userID INT(6) UNSIGNED,
+isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+FOREIGN KEY (userID) REFERENCES $userTable(id)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+)";
+if($conn->query($sql)){
+  echo "Created Role Table. - ";
+} else {
+  echo mysqli_error($conn);
+}
+
+$sql = "INSERT INTO $roleTabe (userID, isCoreAdmin) VALUES (1, 'TRUE')";
+if($conn->query($sql)){
+  echo "Insert Admin. <br>";
+} else {
+  echo mysqli_error($conn);
+}
 
 $repositoryPath = dirname(dirname(realpath("setup.php")));
 

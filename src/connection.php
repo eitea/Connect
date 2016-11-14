@@ -15,6 +15,8 @@ $companyDefaultProjectTable = "companyDefaultProjects";
 $negative_logTable = "unlogs";
 $userRequests = "userRequestsData";
 $sessionTab = "php_session";
+$roleTable = "roles";
+
 
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
