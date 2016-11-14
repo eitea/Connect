@@ -145,7 +145,9 @@ if($_SESSION['language'] == 'ENG'){
   $lang['SUM'] = 'Sum';
 
   $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
+  $lang['THIS_IS_A_BREAK'] = 'This is a break';
   $lang['TIME'] = 'From - To';
+  $lang['TIMES'] = 'Time';
   $lang['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
   $lang['TIMETABLE'] = 'Timetable';
   $lang['TO'] = 'To';
@@ -303,7 +305,9 @@ if($_SESSION['language'] == 'ENG'){
   $lang['SUM'] ='Summe';
 
   $lang['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
+  $lang['THIS_IS_A_BREAK'] = 'Das ist eine Pause';
   $lang['TIME'] = 'Von - Bis';
+  $lang['TIMES'] = 'Zeit';
   $lang['TIME_CALCULATION_TABLE'] = 'Stundenplan';
   $lang['TIMETABLE'] = 'Stundenplan';
   $lang['TO'] = 'Bis';

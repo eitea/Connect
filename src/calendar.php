@@ -25,7 +25,7 @@ $result = $conn->query($sql);
 $vacs = '';
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
-    $title = 'Vacation: ' . $row['firstname'] . ' ' . $row['lastname'];
+    $title = $lang['VACATION'] . ': ' . $row['firstname'] . ' ' . $row['lastname'];
     $start = substr($row['fromDate'], 0, 16);
     $end = substr($row['toDate'], 0, 16);
 

@@ -175,15 +175,12 @@
     });
     </script>
 
-  </div>
-
   <!-- menu division  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
   <div id="menu2" class="tab-pane fade"><br>
     <?php
     $calculator = new Yearly_Calculator($currentTimeStamp, $userID);
     $calculator->calculateValues();
-
     ?>
 
     <canvas id="yearChart" width="500" height="250px"></canvas>

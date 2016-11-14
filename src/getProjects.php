@@ -378,7 +378,11 @@ require "../vendor/deblan/Csv.php";
 use Deblan\Csv\Csv;
 
 $csv = new Csv();
-$csv->setLegend(array('Kunde', 'Projekt', 'Info', 'Datum', 'Summe (min)', 'Summe (0.25h)', 'Stundenkonto', 'Person', 'Stundenrate'));
+$csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
+$lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
+$lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
+$lang['SUM'].' (min)', $lang['SUM'].' (0.25h)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE']));
+
 $csv->setEncoding("UTF-8");
 
 $sum_min = $sum25 = 0;
@@ -453,12 +457,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo "<td>" .$row['projectName']. "</td>";
       $csv_Add[] = $row['infoText'];
       echo "<td style='text-align:left'><textarea name='infoTextArea[]' onkeyup='textAreaAdjust(this)'>" .$row['infoText']. "</textarea></td>";
-      $csv_Add[] = $row['start'] . " - " . $row['end'];
+      $csv_Add[] = substr($row['start'],0,10);
+      $csv_Add[] = substr($row['end'],0,10);
+      $csv_Add[] = substr($row['start'],11,8);
+      $csv_Add[] = substr($row['end'],11,8);
       echo "<td><input type='text' style='max-width:90px; background:none;' readonly name='dateFrom[]' value='".substr($row['start'], 0, 10)."'>
-      <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesFrom[]' value='". substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),11,19) ."'>
+      <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesFrom[]' value='". substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),11,8) ."'>
       -
       <input type='text' style='max-width:90px; background:none;' readonly name='dateTo[]' value='".substr($row['end'], 0, 10)."'>
-      <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesTo[]' value='". substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']),11,19) ."'></td>";
+      <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesTo[]' value='". substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']),11,8) ."'></td>";
       $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '');
       echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '') . "</td>";
       $csv_Add[] = $t;

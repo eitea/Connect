@@ -41,7 +41,7 @@ if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
     $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
     $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
 
-    if($row['expectedHours'] > $row['pauseAfterHours']){
+    if($row['expectedHours'] > $row['pauseAfterHours']){ //dont have check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
       $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
     }
 
