@@ -232,7 +232,7 @@ $(document).ready(function() {
 <span>
   <div>
     <input type="time" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" size="4" value="<?php echo substr($start,0,5); ?>" >
-  - <input type="time" min="<?php echo substr($start,0,5); ?>" max="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end" size=4>
+  - <input type="time" min="<?php echo substr($start,0,5); ?>" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end" size=4>
 
   <input type="date" readonly onkeydown='if (event.keyCode == 13) return false;' name="date" value= <?php echo $date; ?> >
 </div>
