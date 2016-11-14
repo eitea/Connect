@@ -459,8 +459,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo "<td style='text-align:left'><textarea name='infoTextArea[]' onkeyup='textAreaAdjust(this)'>" .$row['infoText']. "</textarea></td>";
       $csv_Add[] = substr($row['start'],0,10);
       $csv_Add[] = substr($row['end'],0,10);
-      $csv_Add[] = substr($row['start'],11,8);
-      $csv_Add[] = substr($row['end'],11,8);
+      $csv_Add[] = substr($row['start'],11,6);
+      $csv_Add[] = substr($row['end'],11,6);
       echo "<td><input type='text' style='max-width:90px; background:none;' readonly name='dateFrom[]' value='".substr($row['start'], 0, 10)."'>
       <input maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' type='time' name='timesFrom[]' value='". substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),11,8) ."'>
       -
