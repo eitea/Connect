@@ -1,32 +1,12 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-</head>
+<div class="page-header">
+<h3><?php echo $lang['MONTHLY_REPORT']; ?></h3>
+</div>
 
-<body>
-  <form method="post">
-  <?php
-  session_start();
-  if (!isset($_SESSION['userid'])) {
-    die('Please <a href="login.php">login</a> first.');
-  }
-  if ($_SESSION['userid'] != 1) {
-    die('Access denied. <a href="logout.php">return</a>');
-  }
-
-  require "connection.php";
-  require "createTimestamps.php";
-  require "language.php";
-  ?>
-<h1><?php echo $lang['MONTHLY_REPORT']; ?></h1>
-<br>
+<form method="post">
 
 <?php
 $filterMonth = substr(getCurrentTimestamp(),0,7);
@@ -41,31 +21,48 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
 }
 ?>
 
-<input type="month" name="filterMonth" value=<?php echo $filterMonth; ?> >
-
-<select name='filterUserID'>
-<?php
-  $sql = "SELECT * FROM $userTable";
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0){
-    $result->fetch_assoc(); //admin
-    echo "<option value=0>Select...</option>";
-    while($row = $result->fetch_assoc()){
-      $selected = "";
-      if($filterUserID == $row['id']){
-        $selected = "selected";
+<div class="row">
+  <div class="col-md-3">
+  <select name='filterUserID' class='js-example-basic-single' style="width:220px">
+  <?php
+    $sql = "SELECT * FROM $userTable";
+    $result = $conn->query($sql);
+    if($result && $result->num_rows > 0){
+      $result->fetch_assoc(); //admin
+      echo "<option value=0>Select...</option>";
+      while($row = $result->fetch_assoc()){
+        $selected = "";
+        if($filterUserID == $row['id']){
+          $selected = "selected";
+        }
+        echo "<option $selected value=".$row['id'].">";
+        echo $row['firstname'] . " " . $row['lastname'];
+        echo "</option>";
       }
-      echo "<option $selected value=".$row['id'].">";
-      echo $row['firstname'] . " " . $row['lastname'];
-      echo "</option>";
     }
-  }
-?>
-</select>
+  ?>
+  </select>
+</div>
 
-<input type="submit" class="button" name="filter" value="Display">
+  <div class="col-md-6">
+    <div class="input-group">
+      <input type="month" class="form-control" name="filterMonth" value=<?php echo $filterMonth; ?> >
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-warning" name="filter">Display</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+  $(".js-example-basic-single").select2();
+});
+</script>
+
 <br><br>
-<table>
+<table class="table table-hover table-striped">
   <tr>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
     <th><?php echo $lang['DATE']; ?></th>
@@ -108,7 +105,13 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     */
     $style = "";
     $tinyEndTime = '-';
-    if($calculator->end[$i] != '-' && $calculator->end[$i] != '0000-00-00 00:00:00' && $calculator->activity[$i] == 0 && $calculator->canBook == 'TRUE'){
+
+    $sql = "SELECT * FROM $roleTable WHERE userID =".$_POST['filterUserID'];
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $canBook = $row['canBook'];
+
+    if($calculator->end[$i] != '-' && $calculator->end[$i] != '0000-00-00 00:00:00' && $calculator->activity[$i] == 0 && $canBook == 'TRUE'){
       $sql = "SELECT bookingTimeBuffer FROM $configTable";
       $result = $conn->query($sql);
       $config = $result->fetch_assoc();
@@ -184,8 +187,8 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
 
 </table>
 </form>
-</body>
-<br>
 
-</body>
-<br>
+
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

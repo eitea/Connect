@@ -2,15 +2,78 @@
 <html>
 <head>
   <title>Tea-time</title>
-  <link rel="stylesheet" href="../css/login.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-</head>
+  <style>
+  @font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat-Regular'), url(http://fonts.gstatic.com/s/montserrat/v7/zhcz-_WihjSQC0oHJ9TCYPk_vArhqVIZ0nv9q090hN8.woff2) format('woff2');
+}
 
+#footer {
+  clear: both;
+  position:fixed;
+  bottom:20%;
+  width:100%;
+  right;
+  padding-top:20px;
+  padding-bottom:20px;
+  text-align: right;
+  background-color: rgba(74, 70, 138, 0.37);
+  border-top:solid;
+  border-bottom:solid;
+}
+
+body{
+  color:white;
+  overflow:hidden;
+  background-image:url(../images/linz.jpg);
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-attachment: fixed;
+}
+
+label{
+  color:white;
+  font-family:sans-serif;
+  font-size:10pt;
+  letter-spacing:1px;
+}
+
+input[name="cancelButton"]{
+  background-color:#ab325a;
+}
+input[name="login"]{
+  background-color:#51a33c;
+  margin-right:10%;
+}
+
+input[type=submit]{
+  border:none;
+  color:white;
+  width:100px;
+  padding:8px;
+  font-family:'Montserrat';
+  text-transform: uppercase;
+  font-weight: 400;
+  box-shadow: 0 3px 5px #282828;
+  font-size:8pt;
+  letter-spacing:1px;
+}
+
+input[type=text], input[type=password]{
+  margin-bottom:5px;
+  width:240px;
+  margin-right:10%;
+}
+
+  </style>
+</head>
 
 <?php
 include 'version_number.php';
 if(!file_exists('connection_config.php')){
-  header("refresh:0;url=setup_getInput.php");
+  header("Location: setup_getInput.php");
 }
 $invalidLogin = "";
   if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
@@ -24,25 +87,21 @@ $invalidLogin = "";
     if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
       session_start();
       $_SESSION['userid'] = $row['id'];
+      $_SESSION['firstname'] = $row['firstname'];
       $_SESSION['language'] = $row['preferredLang'];
       $timeZone = $_POST['funZone'];
       $_SESSION['timeToUTC'] = $timeZone;
       require "language.php";
-      if ($row['id'] != 1){
-        header( "refresh:0;url=userHome.php?link=userSummary.php");
-        die ($lang['AUTOREDIRECT'] . '<a href="userHome.php?link=userSummary.php">redirect</a>');
-      } else {
+      if ($row['id'] == 1){
         $sql = "SELECT * FROM $adminLDAPTable;";
         $result = mysqli_query($conn, $sql);
           $row = $result->fetch_assoc();
           if($row['version'] < $VERSION_NUMBER){
             header("refresh:3;url=doUpdate.php");
             die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="doUpdate.php">update</a>');
-          } else {
-           header("refresh:0;url=adminHome.php?link=adminTodos.php");
-            die ($lang['AUTOREDIRECT']. '<a href="adminHome.php?link=adminTodos.php">redirect</a>');
           }
         }
+        header('Location: home.php');
     } else {
       $invalidLogin = "Invalid Username/ Password!";
     }
@@ -87,6 +146,9 @@ Date.prototype.dst = function() {
 
 <div style="position: absolute; bottom: 5px;">
     <a href=http://www.eitea.at target='_blank' style="color:white;text-decoration: none;">EI-TEA Partner GmbH - <?php echo $VERSION_TEXT; ?></a>
+</div>
+</body>
+</html>
 </div>
 </body>
 </html>

@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-</head>
+<div class="page-header">
+<h3><?php echo $lang['ADVANCED_OPTIONS']; ?></h3>
+</div>
 
-<body>
   <form method=post>
 <?php
 session_start();
@@ -76,4 +74,6 @@ $checked = $row['sslVerify']=='TRUE'?'checked':'';
 </fieldset>
 
 </form>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

@@ -49,6 +49,9 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
+  $lang['ADMIN_CORE_OPTIONS'] = 'System Options';
+  $lang['ADMIN_TIME_OPTIONS'] = 'Time Records';
+  $lang['ADMIN_PROJECT_OPTIONS'] = 'Project Bookings';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
   $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
@@ -60,6 +63,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BOOK_PROJECTS'] = 'Book Projects';
   $lang['BREAK'] = 'Break';
 
+  $lang['CALENDAR'] = 'Calendar';
   $lang['CHARGED'] = 'Charged';
   $lang['CHECK_IN'] = 'Check In';
   $lang['CHECK_OUT'] = 'Check Out';
@@ -73,6 +77,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DATE'] = 'Date';
   $lang['DEFAULT'] = 'Default';
   $lang['DELETE'] = 'Delete';
+  $lang['DELETE_COMPANY'] = 'Delete Company';
   $lang['DESCRIPTION'] = 'Description';
   $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS'] = 'For forgotten checkouts: Set end-time to match expected hours';
   $lang['DIFFERENCE'] = 'Difference';
@@ -125,6 +130,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NUMBER'] = 'Number';
 
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
+  $lang['OVERVIEW'] = 'Overview';
 
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -134,6 +140,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
   $lang['REGISTER_NEW_USER'] ='Register new User';
   $lang['REGISTER_USERS'] = "Register LDAP Users";
+  $lang['REMOVE_USER'] = 'Remove User';
   $lang['REPLY_TEXT'] = 'Answer';
   $lang['REQUESTS'] = "Request";
 
@@ -150,6 +157,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIMES'] = 'Time';
   $lang['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
   $lang['TIMETABLE'] = 'Timetable';
+  $lang['TIMESTAMPS'] = 'Timestamps';
   $lang['TO'] = 'To';
 
   $lang['UNDO'] ='Undo';
@@ -157,6 +165,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UPDATE_REQUIRED'] = 'Update required. ';
   $lang['UPTODATE'] = 'Version is up tp date. ';
   $lang['USED_DAYS'] ='Used Days';
+  $lang['USERS'] = 'Users';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
@@ -164,8 +173,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION_REQUESTS'] = 'Vacation Requests';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
   $lang['VIEW_PROJECTS'] = 'View Projects';
-  $lang['VIEW_TIMESTAMPS'] = 'Timestamps';
-  $lang['VIEW_USER'] = 'Users';
+  $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
+  $lang['VIEW_USER'] = 'View Users';
 
   $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
   $lang['WEEKLY_DAY'] = 'Day of Week';
@@ -208,6 +217,10 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
+  $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
+  $lang['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
+  $lang['ADMIN_PROJECT_OPTIONS'] = 'Projektbuchungen';
+
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
   $lang['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
@@ -216,9 +229,10 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['BEGIN'] = 'Anfang';
   $lang['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
-  $lang['BOOK_PROJECTS'] = 'Projektbuchung';
+  $lang['BOOK_PROJECTS'] = 'Projekte Buchen';
   $lang['BREAK'] = 'Pause';
 
+  $lang['CALENDAR'] = 'Kalender';
   $lang['CHARGED'] = 'Verrechnet';
   $lang['CHECK_IN'] = 'Einstempeln';
   $lang['CHECK_OUT'] = 'Ausstempeln';
@@ -232,6 +246,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DATE'] = 'Datum';
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
+  $lang['DELETE_COMPANY'] = 'Firma Löschen';
   $lang['DESCRIPTION'] = 'Beschreibung';
   $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS'] = 'Für vergessene checkouts: Endzeit wird den erwarteten Stunden angepasst';
   $lang['DIFFERENCE'] = 'Differenz';
@@ -284,6 +299,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NUMBER'] = 'Number';
 
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
+  $lang['OVERVIEW'] = 'Übersicht';
 
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -294,6 +310,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_FROM_FORM'] = 'Formular Registrierung';
   $lang['REGISTER_NEW_USER'] = 'Registrieren';
   $lang['REGISTER_USERS'] = "LDAP Registrierung";
+  $lang['REMOVE_USER'] = 'Benutzer Entfernen';
   $lang['REPLY_TEXT'] = 'Antwort';
   $lang['REQUESTS'] = "Anfragen";
 
@@ -310,6 +327,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIMES'] = 'Zeit';
   $lang['TIME_CALCULATION_TABLE'] = 'Stundenplan';
   $lang['TIMETABLE'] = 'Stundenplan';
+  $lang['TIMESTAMPS'] = 'Zeitstempel';
   $lang['TO'] = 'Bis';
 
   $lang['UNDO'] = 'Rückgängig';
@@ -317,6 +335,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UPDATE_REQUIRED'] = 'Update benötigt. ';
   $lang['UPTODATE'] = 'Version ist aktuell. ';
   $lang['USED_DAYS'] ='Verbrauchte Tage';
+  $lang['USERS'] = 'Benutzer';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';
@@ -324,8 +343,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Wochen Urlaub im Jahr';
   $lang['VIEW_PROJECTS'] = 'Projekte';
-  $lang['VIEW_TIMESTAMPS'] = 'Zeitstempel';
-  $lang['VIEW_USER'] = 'Benutzer';
+  $lang['VIEW_TIMESTAMPS'] = 'Zeitstempel Ansehen';
+  $lang['VIEW_USER'] = 'Benutzer Ansehen';
 
   $lang['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';
   $lang['WEEKLY_DAY'] = 'Wochentag';

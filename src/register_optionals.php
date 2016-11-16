@@ -1,32 +1,13 @@
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; enableToCore($userID); ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
+<div class="page-header">
+<h3>Register</h3>
+</div>
 
-<style>
-td{
-  width:50%;
-}
-</style>
-</head>
-
-<body>
 <form method=post>
 <?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-
-require 'connection.php';
-require 'createTimestamps.php';
-require 'language.php';
 
 $firstname = $_GET['gn'];
 $lastname = $_GET['sn'];
@@ -42,118 +23,164 @@ if(isset($_POST['create'])){
   $accept = true;
   if(!empty($_POST['entryDate']) && test_Date($_POST['entryDate'] ." 05:00:00")){
     $gender = $_POST['gender'];
-    $allowAccess = $_POST['enableProjecting'];
     $begin = $_POST['entryDate'] ." 05:00:00";
+
+    if(!empty($_POST['mail']) && filter_var(test_input($_POST['mail']), FILTER_VALIDATE_EMAIL)){
+      $email = $_POST['mail'];
+    }
+
+    if(!empty($_POST['yourPas'])){
+      $pass = test_input($_POST['yourPas']);
+    } else {
+      $accept = false;
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Failed: </strong>Missing Password.';
+      echo '</div>';
+    }
 
     if(!empty($_POST['vacDaysPerYear']) && is_numeric($_POST['vacDaysPerYear'])){
       $vacDaysPerYear = $_POST['vacDaysPerYear'];
     } else {
-      $vacDaysPerYear = 25;
+      $accept = false;
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Failed: </strong>Invalid vacation value.';
+      echo '</div>';
     }
 
-    if(!empty($_POST['vacDaysCredit']) && is_numeric($_POST['vacDaysCredit'])){
-      $vacDaysCredit = $_POST['vacDaysCredit'];
-    }
-
-    if(!empty($_POST['overTimeLump']) && is_numeric($_POST['overTimeLump'])){
+    if(is_numeric($_POST['overTimeLump'])){
       $overTimeLump = $_POST['overTimeLump'];
+    } else {
+      $accept = false;
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Failed: </strong>Invalid overtime value.';
+      echo '</div>';
     }
 
     if(!empty($_POST['pauseAfter']) && is_numeric($_POST['pauseAfter'])){
       $pauseAfter = $_POST['pauseAfter'];
     } else {
-      $pauseAfter = 6;
+       $accept = false;
+       echo '<div class="alert alert-danger fade in">';
+       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+       echo '<strong>Failed: </strong>Invalid Lunchbreak value.';
+       echo '</div>';
     }
+
     if(!empty($_POST['hoursOfRest']) && is_numeric($_POST['hoursOfRest'])){
       $hoursOfRest = $_POST['hoursOfRest'];
     } else {
-      $hoursOfRest = 0.5;
+      $accept = false;
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Failed: </strong>Invalid hours of lunchbreak.';
+      echo '</div>';
     }
 
-    if (isset($_POST['mon']) && is_numeric($_POST['mon'])) {
+    if (is_numeric($_POST['mon'])) {
       $mon = $_POST['mon'];
     } else {
-      $mon = 8.5;
+      $accept = false;
     }
 
-    if (isset($_POST['tue']) && is_numeric($_POST['tue'])) {
+    if (is_numeric($_POST['tue'])) {
       $tue = $_POST['tue'];
     } else {
-      $tue = 8.5;
+      $accept = false;
     }
 
-    if (isset($_POST['wed']) && is_numeric($_POST['wed'])) {
+    if (is_numeric($_POST['wed'])) {
       $wed = $_POST['wed'];
     } else {
-      $wed = 8.5;
+      $accept = false;
     }
 
-    if (isset($_POST['thu']) && is_numeric($_POST['thu'])) {
+    if (is_numeric($_POST['thu'])) {
       $thu = $_POST['thu'];
     } else {
-      $thu = 8.5;
+      $accept = false;
     }
 
-    if (isset($_POST['fri']) && is_numeric($_POST['fri'])) {
+    if (is_numeric($_POST['fri'])) {
       $fri = $_POST['fri'];
     } else {
-      $fri = 4.5;
+      $accept = false;
     }
 
-    if (isset($_POST['sat']) && is_numeric($_POST['sat'])) {
+    if (is_numeric($_POST['sat'])) {
       $sat = $_POST['sat'];
     } else {
-      $sat = 0;
+      $accept = false;
     }
 
-    if (isset($_POST['sun']) && is_numeric($_POST['sun'])) {
+    if (is_numeric($_POST['sun'])) {
       $sun = $_POST['sun'];
     } else {
-      $sun = 0;
+      $accept = false;
     }
-
   } else {
     $accept = false;
   }
 
+  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = 'FALSE';
+  $canBook = $canStamp = 'FALSE';
+  if(isset($_POST['isCoreAdmin'])){
+    $isCoreAdmin = 'TRUE';
+  }
+  if(isset($_POST['isTimeAdmin'])){
+    $isTimeAdmin = 'TRUE';
+  }
+  if(isset($_POST['isProjectAdmin'])){
+    $isProjectAdmin = 'TRUE';
+  }
+  if(isset($_POST['canStamp'])){
+    $canStamp = 'TRUE';
+  }
+  if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
+    $canBook = 'TRUE';
+  }
+
   if($accept){
     //create user
-    $pass = $_POST['yourPas'];
-    echo $pass;
     $psw = password_hash($pass, PASSWORD_BCRYPT);
     $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, enableProjecting)
     VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin', '$allowAccess');";
     $conn->query($sql);
-    $userID = mysqli_insert_id($conn);
+    $curID = mysqli_insert_id($conn);
 
     //create bookingtable
-    $sql = "INSERT INTO $bookingTable (mon, tue, wed, thu, fri, sat, sun, userID) VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $userID);";
+    $sql = "INSERT INTO $bookingTable (mon, tue, wed, thu, fri, sat, sun, userID) VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID);";
     $conn->query($sql);
 
     //create vacationtable
-    $sql = "INSERT INTO $vacationTable (userID, vacationHoursCredit, daysPerYear) VALUES($userID, '$vacDaysCredit', '$vacDaysPerYear');";
+    $sql = "INSERT INTO $vacationTable (userID, vacationHoursCredit, daysPerYear) VALUES($curID, '$vacDaysCredit', '$vacDaysPerYear');";
+    $conn->query($sql);
+
+    //create roletable
+    $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
     $conn->query($sql);
 
     //add relationships
     if(isset($_POST['company'])){
       foreach($_POST['company'] as $cmp){
-        $sql = "INSERT INTO $companyToUserRelationshipTable (userID, companyID) VALUES($userID, $cmp)";
+        $sql = "INSERT INTO $companyToUserRelationshipTable (userID, companyID) VALUES($curID, $cmp)";
         $conn->query($sql);
       }
     }
-
     //check if entry date lies before/after today
     //future: just reset unlogs and vacationcredit on that day, instead of creating the user on that date. (my gosh...)
     //past: re-calculate vacationcredit until today and insert unlogs
     $difference = timeDiff_Hours(substr(getCurrentTimestamp(),0,10) . ' 05:00:00', $begin);
     if($difference > 0){ //future
-      $sql = "CREATE EVENT create$userID ON SCHEDULE AT '$begin'
+      $sql = "CREATE EVENT create$curID ON SCHEDULE AT '$begin'
       ON COMPLETION NOT PRESERVE ENABLE
       COMMENT 'Removing unlogs on entry date'
       DO
       BEGIN
-      DELETE FROM $negative_logTable WHERE userID = $userID;
-      UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $userID;
+      DELETE FROM $negative_logTable WHERE userID = $curID;
+      UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $curID;
       END
       ";
       $conn->query($sql);
@@ -161,114 +188,169 @@ if(isset($_POST['create'])){
 
     } elseif($difference < 0) { //past
       $credit = ($vacDaysPerYear/365) * timeDiff_Hours($begin, substr(getCurrentTimestamp(),0,10) . ' 05:00:00');
-      $sql = "INSERT INTO $vacationTable SET vacationHoursCredit = $credit WHERE userID = $userID";
+      $sql = "INSERT INTO $vacationTable SET vacationHoursCredit = $credit WHERE userID = $curID";
       $conn->query($sql);
       $i = $begin;
       while(substr($i, 0, 10) != substr(getCurrentTimestamp(), 0, 10)){
         $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-        VALUES('$i', $userID, $mon, $tue, $wed, $thu, $fri, $sat, $sun)";
+        VALUES('$i', $curID, $mon, $tue, $wed, $thu, $fri, $sat, $sun)";
         $conn->query($sql);
         $i = carryOverAdder_Hours($i, 24);
       }
     }
-    header('Location: editUsers.php');
-  }
-
-}
+    redirect('editUsers.php');
+  } //end if accept
+} //end if post
 
 ?>
-<?php echo $lang['ENTRANCE_DATE']; ?>: <input type="date" value="<?php echo substr($begin,0,10); ?>" name="entryDate">
 
-<table>
-  <tr>
-    <td><?php echo $lang['FIRSTNAME'] .': </td><td>' . $firstname; ?> </td> <br>
-  </tr>
+<div class=container-fluid>
+  <div class="row form-group">
+    <div class="input-group">
+      <span class="input-group-addon" style=min-width:150px><?php echo $lang['ENTRANCE_DATE'] ?></span>
+      <input type="date" class="form-control" name="entryDate" value="<?php echo substr($begin,0,10); ?>">
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="input-group">
+      <span class="input-group-addon" style=min-width:150px>E-Mail</span>
+      <input type="email" class="form-control" name="mail" value="<?php echo $email; ?>">
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="input-group">
+      <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD']?></span>
+      <input type="text" class="form-control" name="yourPas" placeholder="Password" value="<?php echo $pass; ?>">
+    </div>
+  </div>
+</div>
+<br><br>
+<div class=container-fluid>
+  <div class=col-md-3>
+    <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
+    <input type="number" class="form-control" name="vacDaysPerYear" value="25">
+  </div>
+  <div class=col-md-3>
+    <?php echo $lang['OVERTIME_ALLOWANCE']; ?>
+    <input type="number" step="any" class="form-control" name="overTimeLump" value="0">
+  </div>
+  <div class=col-md-3>
+    <?php echo $lang['HOURS_OF_REST']; ?>
+    <input type="number" step="any" class="form-control" name="hoursOfRest" value="0.5">
+  </div>
+  <div class=col-md-3>
+    <?php echo $lang['TAKE_BREAK_AFTER']; ?>
+    <input type="number" step="any" class="form-control" name="pauseAfter" value="6.0">
+  </div>
+</div>
+<br><br>
 
-  <tr>
-    <td><?php echo $lang['LASTNAME'] .': </td><td>' . $lastname; ?> </td> <br>
-  </tr>
 
-  <tr>
-    <td> E-Mail: </td><td> <?php echo $email; ?> </td> <br>
-  </tr>
+<div class=container-fluid>
+  <div class="col-md-3">
+    <?php echo $lang['GENDER']; ?>: <br>
+    <div class="radio">
+      <label>
+        <input type="radio" name="gender" value="female" checked>Female <br>
+      </label>
+    </div>
+    <div class="radio">
+      <label>
+        <input type="radio" name="gender" value="male" >Male <br>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-3">
+    Module: <br>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="isCoreAdmin"><?php echo $lang['ADMIN_CORE_OPTIONS'];?><br>
+      </label>
+      <label>
+        <input type="checkbox" name="isTimeAdmin"><?php echo $lang['ADMIN_TIME_OPTIONS']; ?><br>
+      </label>
+      <label>
+        <input type="checkbox" name="isProjectAdmin"><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><br>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <?php echo $lang['ALLOW_PRJBKING_ACCESS']; ?>: <br>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" checked name="canStamp">Can Checkin <br>
+      </label>
+      <label>
+        <input type="checkbox" name="canBook">Can Book
+      </label>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <?php echo $lang['COMPANIES']; ?>: <br>
+    <div class="checkbox">
+      <?php
+      $sql = "SELECT * FROM $companyTable";
+      $companyResult = $conn->query($sql);
+      while($companyRow = $companyResult->fetch_assoc()){
+        echo "<input type='checkbox' name='company[]' value=" .$companyRow['id']. "> " . $companyRow['name'] ."<br>";
+      }
+      ?>
+    </div>
+  </div>
 
-  <tr>
-    <td> Psw.: </td><td> <input type="text" style=display:none value="<?php echo $pass; ?>" name="yourPas"> <?php echo $pass; ?> </td> <br>
-  </tr>
-</table><br><br>
+</div>
 
-<table>
-<tr>
-  <td>
-
- <?php echo $lang['VACATION_DAYS_PER_YEAR']?>: <br>
-
- <input type="number" name="vacDaysPerYear" value="25" ><br><br>
-
- <?php echo $lang['AMOUNT_VACATION_DAYS']?>: <br>
- <input type="number" step="any" name="vacDaysCredit" value="0.0" ><br><br>
-
- <?php echo $lang['OVERTIME_ALLOWANCE']?>: <br>
- <input type="number" step="any" name="overTimeLump" value="0" ><br><br>
-
- <?php echo $lang['TAKE_BREAK_AFTER']?>: <br>
- <input type="number" name="pauseAfter" value="6" ><br><br>
-
- <?php echo $lang['HOURS_OF_REST']?>: <br>
- <input type="number" step="any" name="hoursOfRest" value="0.5" ><br><br>
-
-</td>
-
-<td> <br>
-  <table>
-    <tr>
-      <th>Mon</th>
-      <th>Tue</th>
-      <th>Wed</th>
-      <th>Thu</th>
-      <th>Fri</th>
-      <th>Sat</th>
-      <th>Sun</th>
-    </tr>
-    <tr>
-      <td> <input type="text" name="mon" size=2 value='8.5' ></td>
-      <td> <input type="text" name="tue" size=2 value='8.5' ></td>
-      <td> <input type="text" name="wed" size=2 value='8.5' ></td>
-      <td> <input type="text" name="thu" size=2 value='8.5' ></td>
-      <td> <input type="text" name="fri" size=2 value='4.5' ></td>
-      <td> <input type="text" name="sat" size=2 value=0 ></td>
-      <td> <input type="text" name="sun" size=2 value=0 ></td>
-    </tr>
-  </table><br>
-
- <?php echo $lang['GENDER']?>: <br>
- <input type="radio" name="gender" value="female" checked>Female <br>
- <input type="radio" name="gender" value="male" >Male <br>
-
+ <br><br>
+ <div class=container-fluid>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Mon</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="mon" size=2 value='8.5'>
+     </div>
+   </div>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Tue</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="tue" size=2 value='8.5'>
+     </div>
+   </div>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Wed</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="wed" size=2 value='8.5'>
+     </div>
+   </div>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Thu</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="thu" size=2 value='8.5'>
+     </div>
+   </div>
+ </div>
  <br>
- <?php echo $lang['ALLOW_PRJBKING_ACCESS']?>: <br>
- <input type="radio" name="enableProjecting" value="TRUE" >Yes <br>
- <input type="radio" name="enableProjecting" value="FALSE" checked >No <br>
- <br>
-
- Assign: <br>
-
- <?php
- $sql = "SELECT * FROM $companyTable";
- $companyResult = $conn->query($sql);
- while($companyRow = $companyResult->fetch_assoc()){
-   echo "<input type='checkbox' name='company[]' value=" .$companyRow['id']. "> " . $companyRow['name'] ."<br>";
- }
- ?>
+ <div class=container-fluid>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Fri</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="fri" size=2 value='4.5'>
+     </div>
+   </div>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Sat</span>
+       <input type="text" class="form-control" aria-describedby="sizing-addon2" name="sat" size=2 value='0'>
+     </div>
+   </div>
+   <div class="col-md-3">
+     <div class="input-group">
+       <span class="input-group-addon">Sun</span>
+       <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="sun" size=2 value='0'>
+     </div>
+   </div>
+ </div>
  <br><br>
 
-</td>
-</tr>
-</table>
-
- <br><br>
-
- <input type="submit" value="Create User" name="create">
+ <button type="submit" class="btn btn-warning" name=create><?php echo $lang['REGISTER_NEW_USER']; ?></button>
 </form>
 </body>
 <?php
@@ -283,3 +365,5 @@ function randomPassword(){
   return implode($psw); //turn the array into a string
 }
  ?>
+ <!-- /BODY -->
+ <?php include 'footer.php'; ?>

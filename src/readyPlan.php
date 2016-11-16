@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" href="../css/table.css">
-</head>
-<body>
-<form method=post>
-
-  <?php
-  session_start();
-  if (!isset($_SESSION['userid'])) {
-    die('Please <a href="login.php">login</a> first.');
-  }
-  if ($_SESSION['userid'] != 1) {
-    die('Access denied. <a href="logout.php"> return</a>');
-  }
-  require 'connection.php';
-  require 'createTimestamps.php';
-  ?>
+<div class="page-header">
+<h3><?php echo $lang['READY_STATUS']; ?></h3>
+</div>
 
   <table>
     <tr>
@@ -42,5 +26,6 @@
     ?>
   </table>
 
-</form>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

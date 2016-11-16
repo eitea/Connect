@@ -1,58 +1,35 @@
-<!DOCTYPE html>
-<head>
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" href="../css/submitButt.css">
+<link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
+<script src="../plugins/datatables/js/jquery.js"></script>
+<script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
-  <script src="../plugins/datatables/js/jquery.js"></script>
-  <script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
+<div class="page-header">
+  <h3><?php echo $lang['HOLIDAYS']; ?></h3>
+</div>
 
-<style>
-.createEntry{
-  display:block;
-  padding:10px;
-  background:#f4f4f4;
-  padding-left: 20px;
-  border:none;
-}
-</style>
-
-</head>
-<body>
-
-  <?php
-
-  require "connection.php";
-  if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
-    $index = $_POST["checkingIndeces"];
-    foreach ($index as $x) {
-      $sql = "DELETE FROM " . $holidayTable . " WHERE begin='$x';";
-      if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-      }
+<?php
+if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
+  $index = $_POST["checkingIndeces"];
+  foreach ($index as $x) {
+    $sql = "DELETE FROM " . $holidayTable . " WHERE begin='$x';";
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
     }
-  } elseif(isset($_POST['holidayAdd'])){
-      if(!empty($_POST['holidayName']) && isset($_POST['holidayStart'])) {
-        $holidayName = test_input($_POST['holidayName']);
-        $holidayStart = $_POST['holidayStart'];
-        $sql = "INSERT INTO $holidayTable (name, begin, end) VALUES('$holidayName', '$holidayStart', '$holidayStart')";
-        $conn->query($sql);
-        echo mysqli_error($conn);
-      }
   }
-
-  function test_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-
-    return $data;
+} elseif(isset($_POST['holidayAdd'])){
+  if(!empty($_POST['holidayName']) && isset($_POST['holidayStart'])) {
+    $holidayName = test_input($_POST['holidayName']);
+    $holidayStart = $_POST['holidayStart'];
+    $sql = "INSERT INTO $holidayTable (name, begin, end) VALUES('$holidayName', '$holidayStart', '$holidayStart')";
+    $conn->query($sql);
+    echo mysqli_error($conn);
   }
-
-   ?>
+}
+?>
 
 <form method="post">
   <table id="holidayTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -74,19 +51,38 @@
     }
     ?>
 
-  </table><br>
+  </table>
+  <br><br><br>
 
-  <span class="createEntry">
-  <input type="submit" name="holidayDelete" value="Delete" style="margin-bottom:5px;"/><br>
-  <input type="text" name="holidayName" placeholder="name" /> <input type="date" name="holidayStart" /> <input type="submit" value="+" name="holidayAdd" />
-  </span>
-<form>
-</body>
+  <div class="container">
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-primary" name="holidayDelete">Delete</button>
+    </div>
+    <div class="col-md-4">
+      <div class="input-group">
+        <span class="input-group-addon">Date</span>
+        <input type="date" class="form-control" name="holidayStart" >
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="input-group">
+        <span class="input-group-addon" id="sizing-addon2">Name</span>
+        <input type="text" class="form-control" name="holidayName" >
+        <span class="input-group-btn">
+          <button class="btn btn-primary" type="submit" name="holidayAdd"> + </button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <form>
 
-<script>
-$(document).ready(function() {
-  $('#holidayTable').DataTable({
-    "order": [[ 2, "asc" ]]
-  });
-});
-</script>
+    <script>
+    $(document).ready(function() {
+      $('#holidayTable').DataTable({
+        "order": [[ 2, "asc" ]]
+      });
+    });
+    </script>
+
+    <!-- /BODY -->
+    <?php include 'footer.php'; ?>

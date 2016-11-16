@@ -17,7 +17,7 @@ if ($conn->query($sql)) {
 }
 $conn->close();
 
-require 'connection.php';
+require  __DIR__.'/../inc/connection.php';
 
 $sql = "CREATE TABLE $userTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -32,7 +32,6 @@ $sql = "CREATE TABLE $userTable (
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-  enableProjecting ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   coreTime TIME DEFAULT '8:00'
 )";
@@ -395,6 +394,8 @@ userID INT(6) UNSIGNED,
 isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 FOREIGN KEY (userID) REFERENCES $userTable(id)
 ON UPDATE CASCADE
 ON DELETE CASCADE
@@ -407,7 +408,7 @@ if($conn->query($sql)){
 
 $sql = "INSERT INTO $roleTabe (userID, isCoreAdmin) VALUES (1, 'TRUE')";
 if($conn->query($sql)){
-  echo "Insert Admin. <br>";
+  echo "Insert Admin for CORE. <br>";
 } else {
   echo mysqli_error($conn);
 }

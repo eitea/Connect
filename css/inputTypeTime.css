@@ -1,9 +1,0 @@
-input[type="time"]{
-  color:darkblue;
-  font-family: monospace;
-  border-style: hidden;
-  width:55px;
-  padding:2px;
-  border-radius:5px;
-  min-width:90px;
-}

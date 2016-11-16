@@ -61,6 +61,20 @@ function test_Date($date){
   return $dt !== false && !array_sum($dt->getLastErrors());
 }
 
+function redirect($url){
+  if (!headers_sent()) {
+    header('Location: '.$url);
+    exit;
+  } else {
+    echo '<script type="text/javascript">';
+    echo 'window.location.href="'.$url.'";';
+    echo '</script>';
+    echo '<noscript>';
+    echo '<meta http-equiv="refresh" content="0;url='.$url.'" />';
+    echo '</noscript>'; exit;
+  }
+}
+
 
 /*
 echo $test=strtotime('2016-02-3 05:44:21');

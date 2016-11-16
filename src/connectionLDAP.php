@@ -1,5 +1,4 @@
 <?php
-require "connection.php";
 $query = "SELECT * FROM $adminLDAPTable WHERE adminID = 1";
 $result = mysqli_query($conn, $query);
 if ($result && $result->num_rows > 0) {

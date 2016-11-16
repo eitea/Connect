@@ -1,53 +1,46 @@
-<!DOCTYPE html>
-<head>
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-<style>
-.createEntry{
-  display:block;
-  padding:10px;
-  background:#E8E8F1;
-  padding-left: 20px;
-}
-input[type="text"]{
-  color:black;
-  font-family: monospace;
-  border-style: hidden;
-  border: none;
-  display:inline-block;
-  border-radius:6px;
-  padding:5px 10px;
-}
-</style>
-</head>
-<body>
-<?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
+<div class="page-header">
+  <h3><?php echo $lang['COMPANY']; ?></h3>
+</div>
 
-require "connection.php";
-require "createTimestamps.php";
-require "language.php";
-?>
-
-<h1><?php echo $lang['COMPANY']; ?></h1>
 <br>
 
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-  if (isset($_POST['delete']) && isset($_POST['index'])) {
-    $x = $_POST["index"][0];
-    $sql = "DELETE FROM $companyTable WHERE id=$x;";
-    if (!$conn->query($sql)) {
+  //deleteSelectionX deleteCompanyX indexProjectX indexUserX
+  $sql = "SELECT id FROM $userTable;";
+  $result = $conn->query($sql);
+  while ($row = $result->fetch_assoc()) {
+    $x = $row['id'];
+    if (isset($_POST['deleteCompany'.$x])) {
+      $sql = "DELETE FROM $companyTable WHERE id=$x;";
+      $conn->query($sql);
       echo mysqli_error($conn);
     }
+    if (isset($_POST['deleteSelection'.$x])) {
+      if(isset($_POST['indexProject'.$x])){
+        foreach ($_POST['indexProject'.$x] as $i) {
+          $sql = "DELETE FROM $companyDefaultProjectTable WHERE id = $i";
+          $conn->query($sql);
+        }
+      }
+      if(isset($_POST['indexUser'.$x])){
+        foreach ($_POST['indexUser'.$x] as $x) {
+          $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = $companyID";
+          $conn->query($sql);
+        }
+      }
+    }
+
+  }
+
+
+  if (isset($_POST['delete']) && isset($_POST['index'])) {
+    $x = $_POST["index"][0];
+
 
   } elseif(isset($_POST['create']) && !empty($_POST['name'])){
     $name = test_input($_POST['name']);
@@ -71,150 +64,117 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $conn->query($sql);
       echo mysqli_error($conn);
     }
-  } elseif(isset($_POST['deleteProject']) && isset($_POST['indexProject'])){
-    $index = $_POST["indexProject"];
-    foreach ($index as $x) {
-      $sql = "DELETE FROM $companyDefaultProjectTable WHERE id = $x";
-      $conn->query($sql);
-    }
+  }
   } elseif(isset($_POST['createUser']) && isset($_POST['index'])){
     $userID = $_POST['selectUser'];
     $companyID = $_POST['index'][0];
     $sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES($companyID, $userID)";
     $conn->query($sql);
-  } elseif(isset($_POST['deleteUser']) && isset($_POST['indexUser']) && isset($_POST['index'])){
-    $companyID = $_POST['index'][0];
-    $index = $_POST["indexUser"];
-    foreach ($index as $x) {
-      $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = $companyID";
-      $conn->query($sql);
-    }
   }
-}
+
 ?>
-
-<form method="post">
-  <table>
-    <tr>
-      <th style="width:10%;"> <?php echo $lang['DELETE']; ?> </th>
-      <th> Name </th>
-    </tr>
-
-<?php
-$query = "SELECT * FROM $companyTable";
-$result = mysqli_query($conn, $query);
-if ($result && $result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    $i = $row['id'];
-    $postDataChecked = "";
-    if(isset($_POST['index']) && $_POST['index'][0] == $i){
-      $postDataChecked = "checked";
-    }
-    echo "<tr><td><input type='radio' name='index[]' $postDataChecked value=$i></td>";
-    echo "<td>".$row['name']."</td></tr>";
-  }
-}
-?>
-
-</table><br><br>
-
-<div class="createEntry">
-  <input type="submit" class="button" name="delete" value="<?php echo $lang['DELETE']; ?>">
-  <input type="submit" class="button" name="showProjects" value="<?php echo $lang['DISPLAY_INFORMATION']; ?>">
-
-  Create:
-  <input type="text" name="name" placeholder="name" onkeydown='if (event.keyCode == 13) return false;'>
-  <input type="submit" class="button" name="create" value="+"/><br><br>
-
-</div><br><br>
-
-<?php if(isset($_POST['index'])): ?>
-
-<p><?php echo $lang['DEFAULT'] . " " . $lang['PROJECT']; ?>: </p>
-
-<br><br>
-  <table>
-    <tr>
-      <th><?php echo $lang['DELETE']; ?></th>
-      <th>Name</th>
-      <th>Status</th>
-    </tr>
-
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
-  if(isset($_POST['index'])){
-    $query = "SELECT * FROM $companyDefaultProjectTable WHERE companyID =" .$_POST['index'][0];
-    $result = mysqli_query($conn, $query);
-    if ($result && $result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $i = $row['id'];
-        echo "<tr><td><input type='checkbox' name='indexProject[]' value= ".$i."></td>";
-        echo "<td>".$row['name']."</td>";
-        echo "<td>".$row['status']."</td></tr>";
-      }
-    }
-  }
-  ?>
-  </table><br><br>
-
-<div class="createEntry">
-  Options:
-    <input type="submit" class="button" name="deleteProject" value="<?php echo $lang['DELETE']; ?>">
-<br><br>
-    Create:
-    <input type="text" name="nameProject" placeholder="name" onkeydown='if (event.keyCode == 13) return false;'>
-    <input type="text" name="statusProject" placeholder = "status" onkeydown='if (event.keyCode == 13) return false;' style="width:100px;">
-    <input type="text" name="hoursProject" placeholder = "hours" onkeydown='if (event.keyCode == 13) return false;' style="width:40px;">
-    <input type="text" name="hourlyPriceProject" placeholder = "€" style="width:40px;">
-    <input type="submit" class="button" name="createProject" value="+"/>
-</div>
-<br><br>
-
-<p> <?php echo $lang['ASSIGNED'] . " " . $lang['VIEW_USER']; ?>: </p>
-
-<br><br>
-  <table>
-    <tr>
-      <th><?php echo $lang['DELETE']; ?> (id)</th>
-      <th>Name</th>
-    </tr>
-
-  <?php
-  if(isset($_POST['index'])){
-    $query = "SELECT DISTINCT * FROM $userTable INNER JOIN $companyToUserRelationshipTable ON $userTable.id = $companyToUserRelationshipTable.userID WHERE $companyToUserRelationshipTable.companyID = " .$_POST['index'][0];
-    $result = mysqli_query($conn, $query);
-    if ($result && $result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $i = $row['id'];
-        echo "<tr><td><input type='checkbox' name='indexUser[]' value= $i> ($i)</td>";
-        echo "<td>".$row['firstname']." ".$row['lastname']."</td></tr>";
-      }
-    }
-  }
-  ?>
-  </table><br><br>
-
-  <div class="createEntry">
-    Options:
-    <input type="submit" class="button" name="deleteUser" value="Fire">
-<br><br>
-    Hire:
-    <select name="selectUser">
-      <?php
-      $sql = "SELECT * FROM $userTable";
-      $result = mysqli_query($conn, $sql);
-      if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-          $id = $row['id'];
-          $name = $row['firstname'] . " " . $row['lastname'];
-          echo "<option name='opt' value=$id>$id - $name</option>";
-        }
-      }
+  $query = "SELECT * FROM $companyTable";
+  $result = mysqli_query($conn, $query);
+  if ($result && $result->num_rows > 0):
+    while ($row = $result->fetch_assoc()):
+      $x = $row['id'];
       ?>
-    </select>
-    <input type="submit" class="button" name="createUser" value="+"/>
-  </div><br>
 
-<?php endif; ?>
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingMenu<?php echo $x; ?>">
+          <h4 class="panel-title">
+            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseMenu<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseTwo">
+              <?php echo $row['name']; ?>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseMenu<?php echo $x; ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingMenu<?php echo $x; ?>">
+          <div class="panel-body">
+            <form method="POST">
+              <!-- #########  CONTENT ######## -->
 
-</form>
-</body>
+              <p><?php echo $lang['DEFAULT'] . " " . $lang['PROJECT']; ?>: </p>
+              <table class="table table-hover table-condensed">
+                <thead>
+                  <tr>
+                    <th><?php echo $lang['DELETE']; ?></th>
+                    <th>Name</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  $query = "SELECT * FROM $companyDefaultProjectTable WHERE companyID = $x";
+                  $projectResult = mysqli_query($conn, $query);
+                  if ($projectResult && $projectResult->num_rows > 0) {
+                    while ($projectRow = $projectResult->fetch_assoc()) {
+                      $i = $projectRow['id'];
+                      echo "<tr><td><input type='checkbox' name='indexProject".$x."[]' value='$i'></td>";
+                      echo "<td>".$projectRow['name']."</td>";
+                      echo "<td>".$projectRow['status']."</td></tr>";
+                    }
+                  }
+                  ?>
+                </tbody>
+              </table>
+
+              <br><br>
+              <p> <?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>: </p>
+              <table class="table table-hover table-condensed" >
+                  <tr>
+                    <th><?php echo $lang['DELETE']; ?></th>
+                    <th>Name</th>
+                  </tr>
+                <tbody>
+                  <?php
+                    $query = "SELECT DISTINCT * FROM $userTable
+                    INNER JOIN $companyToUserRelationshipTable ON $userTable.id = $companyToUserRelationshipTable.userID
+                    WHERE $companyToUserRelationshipTable.companyID = $x";
+                    $usersResult = mysqli_query($conn, $query);
+                    if ($usersResult && $usersResult->num_rows > 0) {
+                      while ($usersRow = $usersResult->fetch_assoc()) {
+                        $i = $usersRow['id'];
+                        echo "<tr><td><input type='checkbox' name='indexUser".$x."[]' value= $i></td>";
+                        echo "<td>".$usersRow['firstname']." ".$usersRow['lastname']."</td></tr>";
+                      }
+                    }
+                  ?>
+                </tbody>
+              </table>
+              <br><br>
+
+              <div class="container-fluid text-right">
+              <div class="btn-group" role="group">
+                  <div class="btn-group" role="group">
+                    <div class="dropup">
+                      <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Option
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a href="editCompanies_projects?cmp=<?php echo $x; ?>">Add Default Project</a></li>
+                        <li><a href="editCompanies_users?cmp=<?php echo $x; ?>">Hire Users</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><button type="submit" class="btn btn-link" name="deleteSelection<?php echo $x; ?>">Delete Selection</button></li>
+                      </ul>
+                  </div>
+                </div>
+                    <button class="btn btn-danger" type='submit' name='deleteCompany<?php echo $x; ?>'><?php echo $lang['DELETE_COMPANY']; ?></button>
+
+              </div>
+            </div>
+
+
+              <!-- #########  /CONTENT ######## -->
+            </form>
+          </div>
+        </div>
+      </div>
+
+    <?php endwhile; endif; ?>
+  </div>
+
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

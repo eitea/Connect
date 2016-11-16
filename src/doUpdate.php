@@ -1,6 +1,7 @@
 <?php
-require "connection.php";
-require "createTimestamps.php";
+require  __DIR__."/../inc/connection.php";
+require  __DIR__."/../inc/createTimestamps.php";
+
 session_start();
 if (!isset($_SESSION['userid'])) {
   die('Please <a href="login.php">login</a> first.');
@@ -133,13 +134,42 @@ if($row['version'] < 28){
   } else {
     echo mysqli_error($conn);
   }
-
 }
+
+if($row['version'] < 29){
+  $sql = "ALTER TABLE $roleTable ADD COLUMN canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";
+  if($conn->query($sql)){
+    echo "Updated roles - Add user role 1. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $roleTable ADD COLUMN canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo "Updated roles - Add user role 2. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "UPDATE $roleTable INNER JOIN $userTable ON $roleTable.userID = $userTable.id SET canBook = 'TRUE' WHERE enableProjecting = 'TRUE'";
+  if($conn->query($sql)){
+    echo "Copy data to match user role.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql ="ALTER TABLE $userTable DROP COLUMN enableProjecting";
+  if($conn->query($sql)){
+    echo "Drop enableProjecting column <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
 $conn->query($sql);
-header("refresh:8;url=adminHome.php");
-die ('<br>Update Finished. Click here if not redirected automatically: <a href="adminHome.php">redirect</a>');
+header("refresh:6;url=home.php");
+die ('<br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>');

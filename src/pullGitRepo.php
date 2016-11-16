@@ -1,25 +1,16 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-</head>
+
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
+
+<div class="page-header">
+<h3>Update</h3>
+</div>
+
+
 <form method=post>
 
 <?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-require "connection.php";
-require 'language.php';
-
-
 if(isset($_POST['imtotallyFineWithThisOK'])):
 
 $sql = "SELECT * FROM $adminGitHubTable WHERE sslVerify = 'TRUE'";
@@ -54,3 +45,6 @@ echo $lang['MAY_TAKE_A_WHILE'] .'<br><br>';
 
 <input type=submit name=imtotallyFineWithThisOK value="<?php echo $lang['YES_I_WILL']?>" />
 </form>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

@@ -204,52 +204,7 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
 
     <!-- Main content -->
     <section class="content">
-      <?php
-      if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
-          $password = $_POST['password'];
-          $passwordConfirm = $_POST['passwordConfirm'];
-          if (strcmp($password, $passwordConfirm) == 0) {
-            $psw = password_hash($password, PASSWORD_BCRYPT);
-            $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$userID';";
-            $conn->query($sql);
-            echo '<div class="alert alert-success fade in">';
-            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Success! </strong>Password successfully changed.';
-            echo '</div>';
-          } else {
-            echo '<div class="alert alert-danger fade in">';
-            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Failed! </strong>Passwords did not match.';
-            echo '</div>';
-          }
-        }
 
-        if (isset($_POST['submitPIN'])) {
-          if(is_numeric($_POST['pinCode']) && !empty($_POST['pinCode'])){
-
-            $sql = "UPDATE $userTable SET terminalPin = '".$_POST['pinCode']."' WHERE id = '$userID';";
-            $conn->query($sql);
-            echo '<div class="alert alert-success fade in">';
-            echo '<a href="userHome.php?link=userSummary.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Success! </strong>Your Pincode was changed.';
-            echo '</div>';
-          } else {
-            echo '<div class="alert alert-danger fade in">';
-            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Failed: </strong>Invalid PIN.';
-            echo '</div>';
-          }
-        }
-
-        if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-          echo '<div class="alert alert-info fade in">';
-          echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-          echo "<strong>Stamping recognized! </strong> Refresh in $cd minutes.";
-          echo '</div>';
-        }
-      }
-      ?>
 
       <!-- Page Content Here -->
       <iframe frameborder="0" scrolling="no" onload="resizeIframe(this)" src= <?php echo $URL?>></iframe>
@@ -262,16 +217,7 @@ require 'ckInOut.php'; //needs createTimestamps redecleared beforehand
 </footer>
 
   <?php
-  if(isset($_POST["GERMAN"])){
-    $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
-    $conn->query($sql);
-    $_SESSION['language'] = 'GER';
-  } elseif(isset($_POST['ENGLISH'])){
-    $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = 1";
-    $conn->query($sql);
-    $_SESSION['language'] = 'ENG';
-  }
-  echo mysqli_error($conn);
+
   ?>
 
 <!-- Control Sidebar -->

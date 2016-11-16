@@ -1,37 +1,24 @@
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+<div class="page-header">
+<h3>Register</h3>
+</div>
 
-
-</head>
-
-<body>
   <div style=text-align:center>
    <br><br>
   <?php
-  require "connection.php";
-  session_start();
-  if (!isset($_SESSION['userid'])) {
-    die('Please <a href="login.php">login</a> first.');
-  }
-  if ($_SESSION['userid'] != 1) {
-    die('Access denied. <a href="logout.php"> return</a>');
-  }
-
   require 'connectionLDAP.php';
-  require 'language.php';
 
   if($ldapConnect != ""): ?>
   <a href="register_ldap.php"><?php echo $lang['REGISTER_FROM_ACTIVE_DIR'] . ' [Detail]'; ?></a> <br><br>
-  <a href="ldapGet.php"><?php echo $lang['REGISTER_USERS'] . ' [Quick]'; ?></a> <br><br>
+  <a href="ldapGet.php"><?php echo $lang['REGISTER_FROM_ACTIVE_DIR']  . ' [Quick]'; ?></a> <br><br>
   <?php else: header("refresh:0;url=register_basic.php" ); endif; ?>
 
   <a href="register_basic.php"><?php echo $lang['REGISTER_FROM_FORM']; ?></a><br>
-
-
-
 </div>
 </body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

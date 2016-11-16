@@ -1,71 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeTime.css">
-  <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datepicker/codebase/dhtmlxcalendar.css">
-  <link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css">
-
-  <script src="../plugins/datepicker/codebase/dhtmlxcalendar.js"> </script>
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
-  <script src="../plugins/chartjs/Chart.min.js"></script>
-
-  <style>
-  .popover{
-      max-width: 60%; /* Max Width of the popover (depending on the container!) */
-      font-size:11px;
-  }
-  iframe {
-    width:100%;
-    border:none;
-  }
-  input[type="number"]{
-    color:darkblue;
-    font-family: monospace;
-    border-style: hidden;
-    width:55px;
-    padding:2px;
-    border-radius:5px;
-  }
-  </style>
-</head>
-<body>
+<div class="page-header">
+<h3><?php echo $lang['VIEW_TIMESTAMPS']; ?></h3>
+</div>
 
 <form method="post">
 
 <div class="container">
 
-    <br>
     <?php
-    session_start();
-    if (!isset($_SESSION['userid'])) {
-      die('Please <a href="login.php">login</a> first.');
-    }
-    if ($_SESSION['userid'] != 1) {
-      die('Access denied. <a href="logout.php"> return</a>');
-    }
-
-    require "connection.php";
-    require "createTimestamps.php";
-    require "language.php";
-
-
     require "Calculators/MonthlyCalculator.php";
     require "Calculators/YearlyCalculator.php";
     ?>
-
-    <h1><?php echo $lang['VIEW_TIMESTAMPS']?></h1>
-    <br><br>
 
     <select name='filteredUserID'>
       <?php
@@ -147,10 +95,7 @@
   <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
 
   <?php if($filterID != 0): ?>
-
-  <li><a data-toggle="tab" href="#menu1"><?php $dateObj=DateTime::createFromFormat('!m', $filterMonth); echo $dateObj->format('F');?></a></li>
-  <li><a data-toggle="tab" href="#menu2"><?php echo $filterYear; ?></a></li>
-  <li><a data-toggle="tab" href="#menu3">Summary</a></li>
+  <li><a data-toggle="tab" href="#overviewMenu"><?php echo $filterYear; ?></a></li>
   <?php endif; ?>
 </ul>
 
@@ -398,109 +343,10 @@ $("[data-toggle=popover]").popover({html:true})
   type="submit" class="button" name="saveChanges" value="Save Changes"><br>
 <?php endif; ?>
 
-</div> <!-- HOME menu content ###############################################-->
-
-<div id="menu1" class="tab-pane fade">
-  <canvas id="myChart" width="500" height="250px"></canvas>
-
-  <?php
-
-  $absolvedHours = array();
-  for($i = 0; $i < $calculator->days; $i++){
-    if($calculator->end[$i] == '0000-00-00 00:00:00'){
-      $endTime = getCurrentTimestamp();
-    } else {
-      $endTime = $calculator->end[$i];
-    }
-
-    $difference = timeDiff_Hours($calculator->start[$i], $endTime );
-    $absolvedHours[] = $difference - $calculator->lunchTime[$i];
-  }
-  ?>
-
-  <script>
-  var ctx = document.getElementById("myChart");
-  var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [<?php echo implode(", ", $calculator->daysAsNumber); ?>],
-      datasets: [
-        {
-          label: "Absolved",
-          data: [<?php echo implode(", ", $absolvedHours); ?>],
-          backgroundColor: 'rgb(255, 144, 214)'
-        },
-        {
-          label: "Expected",
-          data: [<?php echo implode(", ", $calculator->shouldTime); ?>],
-          backgroundColor: 'rgb(255, 0, 168)'
-        }
-      ]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero:true
-          }
-        }]
-      }
-    }
-  });
-  </script>
 </div>
 
 <!-- menu division HERE ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-
-<div id="menu2" class="tab-pane fade">
-  <br><br>
-  <?php
-  $calculator = new Yearly_Calculator(getCurrentTimestamp(), $filterID);
-  $calculator->calculateValues();
-
-  ?>
-
-  <canvas id="yearChart" width="500" height="250px"></canvas>
-  <script>
-  var ctx = document.getElementById("yearChart");
-  var my2ndChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [<?php echo implode(", ", $calculator->monthShortName); ?>],
-      datasets: [
-        {
-          label: "Absolved",
-          data: [<?php echo implode(", ", $calculator->actualTime); ?>],
-          backgroundColor: 'rgb(255, 144, 214)'
-        },
-        {
-          label: "Expected",
-          data: [<?php echo implode(", ", $calculator->shouldTime); ?>],
-          backgroundColor: 'rgb(255, 0, 168)'
-        },
-        {
-          label: "Lunch",
-          data: [<?php echo implode(", ", $calculator->lunchTime); ?>],
-          backgroundColor: 'rgb(178, 0, 207)'
-        }
-      ]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero:true
-          }
-        }]
-      }
-    }
-  });
-  </script>
-</div>
-
-<!-- menu division HERE ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-
-<div id="menu3" class="tab-pane fade">
+<div id="overviewMenu" class="tab-pane fade">
   <br><br>
 <iframe onload="resizeIframe(this)" scrolling=no src=userSummary.php?userID=<?php echo $filterID; ?>></iframe>
 <script>
@@ -515,5 +361,6 @@ $("[data-toggle=popover]").popover({html:true})
 </div> <!--tab container -->
 
 </form>
-</body>
-</html>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

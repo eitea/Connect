@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
+<div class="page-header">
+<h3>LDAP</h3>
+</div>
 
-</head>
-<body>
   <?php
-  require "connection.php";
-  require "connectionLDAP.php";
-  session_start();
-  if (!isset($_SESSION['userid'])) {
-    die('Please <a href="login.php">login</a> first.');
-  }
-  if ($_SESSION['userid'] != 1) {
-    die('Access denied. <a href="logout.php"> return</a>');
-  }
-
+  require 'connectionLDAP.php';
   $query = "SELECT * FROM $configTable;";
   $row = mysqli_query($conn, $query)->fetch_assoc();
   $cd = $row['cooldownTimer'];
@@ -60,33 +48,51 @@
   }
   ?>
 
-  <h1>LDAP</h1>
-
   <form method="post">
 
-    LDAP Configuration Settings<br>
+    <div class=container-fluid>
+      LDAP Configuration Settings: <br><br>
+      <div class=form-group>
+        <div class="input-group">
+          <span class="input-group-addon" style=min-width:150px>Ldap Domain</span>
+          <input type="text" class="form-control" name="ldapDomain" value="<?php echo $newConn; ?>">
+        </div>
+      </div>
+      <div class=form-group>
+        <div class="input-group">
+          <span class="input-group-addon" style=min-width:150px>Ldap Username</span>
+          <input type="text" class="form-control" name="ldap_user" value="<?php echo $newUser; ?>">
+        </div>
+      </div>
+      <div class=form-group>
+        <div class="input-group">
+          <span class="input-group-addon" style=min-width:150px>Ldap Password</span>
+          <input type="password" class="form-control" name="ldap_pass" value="<?php echo $newPass; ?>">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-warning" name="ldapSubmit">Save<br>
+    </div>
 
-    <fieldset><br><br>
+    <br><br><br>
 
-      Ldap Domain:    <input type="text" name="ldapDomain" value="<?php echo $newConn; ?>"><br><br>
+    <div class=container-fluid>
+      <div class=col-md-6>
+        Disable-time for In/Out Buttons:
+        <input type="number" class="form-control" name="cd" value="<?php echo $cd; ?>">
+      </div>
+      <div class=col-md-6>
+        Project-Time Buffer
+        <input type="number" class="form-control" name="bufferTime" value="<?php echo $bufferTime ?>" >
+      </div>
+    </div>
+<br>
+    <div class=container-fluid>
+      <div class="form-group">
+        <button type="submit" class="btn btn-warning" name="ldapSubmit">Save </button>
+      </div>
+    </div>
 
-      Ldap Username:  <input type="text" name="ldap_user" value="<?php echo $newUser; ?>"><br><br>
-
-      Ldap Password:  <input type="password" name="ldap_pass" value="<?php echo $newPass; ?>"><br><br><br>
-
-
-      <input type="submit" name= "ldapSubmit" value="Submit"><br>
-    </fieldset>
-    <br>
-    <fieldset><br><br>
-
-      Disable-time for In/Out Buttons:    <input type="number" name="cd" value="<?php echo $cd; ?>"><br><br>
-
-      Project-Time Buffer:                <input type="number" name="bufferTime" value="<?php echo $bufferTime ?>" ><br><br>
-
-
-      <input type="submit" name="cdSubmit" value="Submit"> <br><br>
-    </fieldset>
-    <br><br>
   </form>
-</body>
+
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

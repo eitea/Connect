@@ -1,57 +1,12 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
-  <script src="../plugins/datatables/js/jquery.js"></script>
-  <script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
-
-
-  <style>
-  input[type="number"]{
-    color:darkblue;
-    font-family: monospace;
-    border-style: hidden;
-    width:55px;
-    padding:2px;
-    border-radius:5px;
-    min-width:90px;
-  }
-  .columnDiv {
-    -webkit-column-count: 3; /* Chrome, Safari, Opera */
-    -moz-column-count: 3; /* Firefox */
-    column-count: 3;
-  }
-
-  </style>
-</head>
-
-<body>
+<div class="page-header">
+<h3><?php echo $lang['CLIENT']; ?></h3>
+</div>
 
   <?php
-  session_start();
-  if (!isset($_SESSION['userid'])) {
-    die('Please <a href="login.php">login</a> first.');
-  }
-  if ($_SESSION['userid'] != 1) {
-    die('Access denied. <a href="logout.php"> return</a>');
-  }
-
-  require "connection.php";
-  require "createTimestamps.php";
-  require "language.php";
-
-  echo "<h1>". $lang['CLIENT'] ."</h1>";
 
 $filterCompanyID = 0;
   if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -150,11 +105,11 @@ $filterCompanyID = 0;
       <input type="text" name="clientNumber" placeholder="#" style="width:100px;" />
       <input type="submit" class="button" name="create" value="+" />
     </div>
-    
+
   <?php endif; ?>
 
   </form>
-</body>
+
 
 <script>
 $(document).ready(function() {
@@ -163,3 +118,7 @@ $(document).ready(function() {
   });
 } );
 </script>
+
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

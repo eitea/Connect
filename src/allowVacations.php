@@ -1,24 +1,12 @@
-<!DOCTYPE html>
-<head>
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitFlags.css">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-</head>
+<div class="page-header">
+<h3><?php echo $lang['VACATION']; ?></h3>
+</div>
+
 <?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-require "connection.php";
-require "createTimestamps.php";
-require "language.php";
-
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $sql = "SELECT $userRequests.*, $bookingTable.* FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE status = '0'";
@@ -93,4 +81,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </table>
 
 </form>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

@@ -1,28 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<div class="page-header">
+<h3>LDAP Query</h3>
+</div>
+
   <form method="post">
-    <h1 style=''>LDAP Query</h1><br>
     <?php
-    session_start();
-    if (!isset($_SESSION['userid'])) {
-      die('Please <a href="login.php">login</a> first.');
-    }
-    if($_SESSION['userid'] != 1){
-      die('Access denied. <a href="logout.php"> return</a>');
-    }
-
-    require 'connection.php';
     require 'connectionLDAP.php';
-
-    $conn = new mysqli($servername, $username, $password, $dbName);
     $ldap_connection = ldap_connect($ldapConnect);
 
     // We have to set this option for the version of Active Directory we are using.
@@ -73,5 +59,6 @@
     ?>
     <br>
   </form>
-</body>
-</html>
+
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

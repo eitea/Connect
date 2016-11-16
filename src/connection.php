@@ -1,5 +1,5 @@
 <?php
-require 'connection_config.php';
+require "connection_config.php";
 
 $userTable = "UserData";
 $logTable = "logs";
@@ -17,12 +17,10 @@ $userRequests = "userRequestsData";
 $sessionTab = "php_session";
 $roleTable = "roles";
 
-
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
 $configTable = "configurationData";
 $piConnTable = "piConnectionData";
-
 
 $conn = new mysqli($servername, $username, $password, $dbName);
 if ($conn->connect_error) {

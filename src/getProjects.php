@@ -1,64 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
-  <link rel="stylesheet" type="text/css" href="../css/textArea.css">
-  <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
+<div class="page-header">
+<h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
+</div>
 
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
-
-  <script src='../plugins/select2/js/select2.js'></script>
-  <script type="text/css" src='../js/autoScale.js'></script>
-
-<style>
-  textarea {
-    border-style: hidden;
-    border-radius:5px;
-    width:200px;
-  }
-
-  input[type="number"],input[type="time"]{
-    color:darkblue;
-    font-family: monospace;
-    border-style: hidden;
-    width:55px;
-    padding:2px;
-    border-radius:5px;
-    min-width:90px;
-  }
-  div{
-    float:left;
-    margin:5px;
-    display:block;
-  }
-</style>
-</head>
-<body>
-
-
-<?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php">return</a>');
-}
-
-require "connection.php";
-require "createTimestamps.php";
-require "language.php";
-?>
 
 <?php
 $filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year and month
@@ -109,7 +56,7 @@ $filterUserID = 0;
 <input type=text name=booked style=display:none; value="<?php echo $booked; ?>" >
 <input type=text name=filterUserID style=display:none; value="<?php echo $filterUserID; ?>" >
 <?php else : ?>
-  <h1><?php echo $lang['VIEW_PROJECTS']?></h1>
+
 <?php endif; ?>
 
 <br><br>
@@ -529,5 +476,6 @@ if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
 </form>
 </div>
 
-<br><br>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

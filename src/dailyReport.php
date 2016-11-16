@@ -1,58 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeTime.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
-  <link rel="stylesheet" type="text/css" href="../css/textArea.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-
-  <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datepicker/codebase/dhtmlxcalendar.css">
-
-  <script rel="stylesheet" src="../plugins/datepicker/codebase/dhtmlxcalendar.js"> </script>
-
-<style>
-  textarea{
-    border-style: hidden;
-    width:200px;
-    display:inline-block;
-    vertical-align:middle;
-  }
-
-  input[type="number"]{
-    color:darkblue;
-    font-family: monospace;
-    border-style: hidden;
-    width:55px;
-    padding:2px;
-    border-radius:5px;
-    min-width:90px;
-  }
-</style>
-
-</head>
-<body>
-<?php
-
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php">return</a>');
-}
-
-require "connection.php";
-require "createTimestamps.php";
-require "language.php";
-?>
+<div class="page-header">
+<h3><?php echo $lang['CLIENT']; ?></h3>
+</div>
 
 <?php
 $filterDay = substr(getCurrentTimestamp(), 0, 10);
@@ -244,4 +196,6 @@ reminder: looking for bugs? try to figure out why this sql thing works and if it
 
 ?>
 </table>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>
