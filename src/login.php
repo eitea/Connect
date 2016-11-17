@@ -91,6 +91,7 @@ $invalidLogin = "";
       $_SESSION['language'] = $row['preferredLang'];
       $timeZone = $_POST['funZone'];
       $_SESSION['timeToUTC'] = $timeZone;
+
       require "language.php";
       if ($row['id'] == 1){
         $sql = "SELECT * FROM $adminLDAPTable;";

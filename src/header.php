@@ -17,7 +17,7 @@
 
     <title>T-Time</title>
   </head>
-  
+
   <script>
     $(document).ready(function() {
       $(".js-example-basic-single").select2();
@@ -50,6 +50,15 @@ if($result && $result->num_rows > 0){
 
   $canBook = $row['canBook'];
   $canStamp = $row['canStamp'];
+}
+
+if (isset($_POST) && !empty($_POST)){
+  if (isset($_SESSION['posttimer'])){
+    if ( (time() - $_SESSION['posttimer']) <= 2){
+      unset($_POST);
+    }
+  }
+  $_SESSION['posttimer'] = time();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -256,7 +265,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                  $disabled = 'disabled';
                }
                $buttonVal = $lang['CHECK_IN'];
-               echo "<li><br><div class=container-fluid><form method=post><button $disabled type='submit' class='btn btn-primary' name='stampIn'>$buttonVal</button></form></div><br></li>";
+               echo "<li><br><div class=container-fluid><form method=post><button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button></form></div><br></li>";
             }
             ?>
 

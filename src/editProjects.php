@@ -1,44 +1,11 @@
-<!DOCTPYE html>
-<header>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; ?>
+<!-- BODY -->
 
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" type="text/css" href="../css/table.css">
-  <link rel="stylesheet" type="text/css" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../css/spanBlockInput.css">
-  <link rel="stylesheet" type="text/css" href="../css/inputTypeText.css">
+<div class="page-header">
+<h3>Navigation</h3>
+</div>
 
-<style>
-input[type="number"]{
-  color:darkblue;
-  font-family: monospace;
-  border-style: hidden;
-  width:55px;
-  padding:2px;
-  border-radius:5px;
-  min-width:90px;
-}
-</style>
-</header>
-
-<?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-
-require "connection.php";
-require "createTimestamps.php";
-require "language.php";
-?>
-
-<body>
 <form method='post'>
 <?php
 
@@ -108,4 +75,6 @@ echo "<h1>"."<a href=editCustomers.php><img src='../images/return.png' alt='retu
   <input type=number name='price' placeholder='price' step="any">
 </div>
 </form>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

@@ -296,6 +296,7 @@ function toggle2(source) {
   <?php
   if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
   <fieldset disabled>
+    <br><br>
     <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
   <?php endif; ?>
 

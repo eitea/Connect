@@ -65,12 +65,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       echo mysqli_error($conn);
     }
   }
-  } elseif(isset($_POST['createUser']) && isset($_POST['index'])){
-    $userID = $_POST['selectUser'];
-    $companyID = $_POST['index'][0];
-    $sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES($companyID, $userID)";
-    $conn->query($sql);
-  }
+} elseif(isset($_POST['createUser']) && isset($_POST['index'])){
+  $userID = $_POST['selectUser'];
+  $companyID = $_POST['index'][0];
+  $sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES($companyID, $userID)";
+  $conn->query($sql);
+}
 
 ?>
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -123,30 +123,30 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <br><br>
               <p> <?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>: </p>
               <table class="table table-hover table-condensed" >
-                  <tr>
-                    <th><?php echo $lang['DELETE']; ?></th>
-                    <th>Name</th>
-                  </tr>
+                <tr>
+                  <th><?php echo $lang['DELETE']; ?></th>
+                  <th>Name</th>
+                </tr>
                 <tbody>
                   <?php
-                    $query = "SELECT DISTINCT * FROM $userTable
-                    INNER JOIN $companyToUserRelationshipTable ON $userTable.id = $companyToUserRelationshipTable.userID
-                    WHERE $companyToUserRelationshipTable.companyID = $x";
-                    $usersResult = mysqli_query($conn, $query);
-                    if ($usersResult && $usersResult->num_rows > 0) {
-                      while ($usersRow = $usersResult->fetch_assoc()) {
-                        $i = $usersRow['id'];
-                        echo "<tr><td><input type='checkbox' name='indexUser".$x."[]' value= $i></td>";
-                        echo "<td>".$usersRow['firstname']." ".$usersRow['lastname']."</td></tr>";
-                      }
+                  $query = "SELECT DISTINCT * FROM $userTable
+                  INNER JOIN $companyToUserRelationshipTable ON $userTable.id = $companyToUserRelationshipTable.userID
+                  WHERE $companyToUserRelationshipTable.companyID = $x";
+                  $usersResult = mysqli_query($conn, $query);
+                  if ($usersResult && $usersResult->num_rows > 0) {
+                    while ($usersRow = $usersResult->fetch_assoc()) {
+                      $i = $usersRow['id'];
+                      echo "<tr><td><input type='checkbox' name='indexUser".$x."[]' value= $i></td>";
+                      echo "<td>".$usersRow['firstname']." ".$usersRow['lastname']."</td></tr>";
                     }
+                  }
                   ?>
                 </tbody>
               </table>
               <br><br>
 
               <div class="container-fluid text-right">
-              <div class="btn-group" role="group">
+                <div class="btn-group" role="group">
                   <div class="btn-group" role="group">
                     <div class="dropup">
                       <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -154,18 +154,35 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a href="editCompanies_projects?cmp=<?php echo $x; ?>">Add Default Project</a></li>
-                        <li><a href="editCompanies_users?cmp=<?php echo $x; ?>">Hire Users</a></li>
+                        <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Add Default Project</a></li>
+                        <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Hire Users</a></li>
                         <li role="separator" class="divider"></li>
                         <li><button type="submit" class="btn btn-link" name="deleteSelection<?php echo $x; ?>">Delete Selection</button></li>
                       </ul>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm"><?php echo $lang['DELETE_COMPANY']; ?></button>
+                </div>
+              </div>
+              
+              <!-- Small modal -->
+              <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+                <div class="modal-dialog modal-sm" role="document">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
+                    </div>
+                    <div class="modal-body">
+                      All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
+                      <button type="button" type='submit' name='deleteCompany<?php echo $x; ?>' class="btn btn-primary">Yes, delete it.</button>
+                    </div>
                   </div>
                 </div>
-                    <button class="btn btn-danger" type='submit' name='deleteCompany<?php echo $x; ?>'><?php echo $lang['DELETE_COMPANY']; ?></button>
-
               </div>
-            </div>
-
 
               <!-- #########  /CONTENT ######## -->
             </form>

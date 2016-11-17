@@ -26,7 +26,7 @@ $insertInfoText = '';
 <form method="post">
   <br>
   <?php if($showUndoButton): ?>
-    <div style='text-align:right;'><input type='submit' value='Undo' name='undo'></input></div>
+    <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Undo</button></div>
   <?php endif; ?>
 
   <div class="row">
