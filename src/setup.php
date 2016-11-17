@@ -413,7 +413,7 @@ if($conn->query($sql)){
   echo mysqli_error($conn);
 }
 
-$sql = "INSERT INTO $roleTabe (userID, isCoreAdmin) VALUES (1, 'TRUE')";
+$sql = "INSERT INTO $roleTable (userID, isCoreAdmin) VALUES (1, 'TRUE')";
 if($conn->query($sql)){
   echo "Insert Admin for CORE. <br>";
 } else {
@@ -467,5 +467,5 @@ function icsToArray($paramUrl) {
 }
 
 //------------------------------------------------------------------------------
-header("refresh:10;url=adminHome.php");
+header("refresh:10;url=home.php");
 die ('<br>Setup Finished. Click here if not redirected automatically: <a href="login.php">redirect</a>');
