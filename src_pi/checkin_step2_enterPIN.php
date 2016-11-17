@@ -6,7 +6,7 @@ require "../src/ckInOut.php";
 
 $headers = apache_request_headers();
 $userAgentHead =  $headers['User-Agent'];
-//EI-TEA Zeiterfassung v13 Code3A5B
+
 $sql = "SELECT * FROM $piConnTable WHERE header = '$userAgentHead'";
 $result = $conn->query($sql);
 if(!$result || $result->num_rows <= 0){
