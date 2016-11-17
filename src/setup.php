@@ -17,7 +17,14 @@ if ($conn->query($sql)) {
 }
 $conn->close();
 
-require  __DIR__.'/../inc/connection.php';
+require 'connection.php';
+
+$psw = $_GET['psw'];
+$companyName = rawurldecode($_GET['companyName']);
+$firstname = rawurldecode($_GET['first']);
+$lastname = rawurldecode($_GET['last']);
+$loginname = rawurldecode($_GET['login']);
+
 
 $sql = "CREATE TABLE $userTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -41,7 +48,7 @@ if ($conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('Admin', 'Admin', 'Admin', '".$_GET['psw']."');";
+$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 if ($conn->query($sql)) {
   echo "registered admin as first user. <br>";
 } else {
@@ -150,7 +157,7 @@ if ($conn->query($sql)) {
 }
 
 
-$sql = "INSERT INTO $companyTable (name) VALUES ('".$_GET['companyName']."')";
+$sql = "INSERT INTO $companyTable (name) VALUES ('$companyName')";
 if ($conn->query($sql)) {
   echo "Insert default Administration company. <br>";
 } else {

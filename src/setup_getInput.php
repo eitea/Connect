@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-    <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.min.js"></script>
 
 </head>
 
@@ -32,13 +32,13 @@ function test_input($data) {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['companyName']) && !empty($_POST['adminPass'])){
+  if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['loginname'])){
     $myfile = fopen('connection_config.php', 'w');
     $txt = '<?php
-            $servername = "'.test_input($_POST['serverName']).'";
-            $username = "'.test_input($_POST['userName']).'";
-            $password = "'.test_input($_POST['pass']).'";
-            $dbName = "'.test_input($_POST['dbName']).'";';
+    $servername = "'.test_input($_POST['serverName']).'";
+    $username = "'.test_input($_POST['mysqlUsername']).'";
+    $password = "'.test_input($_POST['pass']).'";
+    $dbName = "'.test_input($_POST['dbName']).'";';
     fwrite($myfile, $txt);
     fclose($myfile);
 
@@ -46,8 +46,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       die('Permission denied. Please grant PHP permission to create files.');
     } else {
       $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
-      $companyName = $_POST['companyName'];
-      redirect("setup.php?companyName=$companyName&psw=$psw");
+      $companyName = rawurlencode(test_input($_POST['companyName']));
+      $firstname = rawurlencode(test_input($_POST['firstname']));
+      $lastname = rawurlencode(test_input($_POST['lastname']));
+      $loginname = rawurlencode(test_input($_POST['loginname']));
+
+      redirect("setup.php?companyName=$companyName&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
     }
   } else {
     echo 'Missing Fields. <br><br>';
@@ -57,86 +61,128 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <body class="text-center">
   <form method='post'>
-  <h1>Login Data</h1><br><br>
+    <h1>Login Data</h1><br><br>
 
-<div class="row">
-  <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon" style=min-width:150px>
-        Firstname
-      </span>
-      <input type="text" class="form-control" name="firstname" placeholder="Firstname..">
+    <div class="row">
+      <div class="col-md-3 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              Firstname
+            </span>
+            <input type="text" class="form-control" name="firstname" placeholder="Firstname..">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              Lastname
+            </span>
+            <input type="text" class="form-control" name="lastname" placeholder="Lastname..">
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon" style=min-width:150px>
-        Lastname
-      </span>
-      <input type="text" class="form-control" name="lastname" placeholder="Lastname..">
+
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon text-warning" style=min-width:150px>
+              Login Name:
+            </span>
+            <input type="text" class="form-control" name="loginname" value="Admin">
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon text-warning" style=min-width:150px>
-        Login Name:
-      </span>
-      <input type="text" class="form-control" name="userName" value="Admin">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon text-warning" style=min-width:150px>
+              Login Password
+            </span>
+            <input type='password' class="form-control" name='adminPass' value=''>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon text-warning" style=min-width:150px>
-        Login Password
-      </span>
-        <input type='password' class="form-control" name='adminPass' value=''>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon text-warning" style=min-width:150px>
+              Company Name
+            </span>
+            <input type='text' class="form-control" name='companyName' placeholder='Company Name'>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon text-warning" style=min-width:150px>
-        Company Name
-      </span>
-        <input type='text' class="form-control" name='companyName' placeholder='Company Name'>
+
+    <br><hr><br>
+
+    <h1>MySQL Database Connection</h1><br><br>
+
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              Server Address
+            </span>
+            <input type="text" class="form-control" name='serverName' value = "localhost">
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              Username
+            </span>
+            <input type="text" class="form-control" name='mysqlUsername' value = 'root'>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              Password
+            </span>
+            <input type="text" class="form-control" name='pass' value = ''>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon" style=min-width:150px>
+              DB Name
+            </span>
+            <input type="text" class="form-control" name='dbName' value = 'Zeit1'>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <br><hr><br>
 
-  <h1>MySQL Database Connection</h1><br><br>
+    <br><hr><br>
 
-  Server Address: <br>
-  <input type='text' name='serverName' value = "localhost"> <br><br>
-
-  Username: <br>
-  <input type='text' name='userName' value = 'root'> <br><br>
-
-  Password: <br>
-  <input type='password' name='pass' value = ''> <br><br>
-
-  DB Name: <br>
-  <input type='text' name='dbName' value = 'Zeit1'> <br><br>
-
-  <input type='submit' name'submit' value = 'Continue'>
-
-</form>
+    <div class="container">
+      <div class="col-md-3 col-md-offset-9">
+        <button type='submit' name'submit' class="btn btn-warning">Continue</button>
+      </div>
+    </div>
+  </form>
 </body>
