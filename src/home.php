@@ -12,6 +12,8 @@
 
   if(isset($_GET['userID'])){
     $curID = $_GET['userID'];
+  } else {
+    $curID = $userID;
   }
 
   $sql = "SELECT * FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE $userTable.id = $curID";

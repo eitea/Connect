@@ -85,19 +85,10 @@
   <button type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
 
   <br><br>
-
+  <br><br>
   <!-- ####################################################################### -->
+  <?php if($filterID != 0): ?>
 
-  <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
-
-    <?php if($filterID != 0): ?>
-      <li><a data-toggle="tab" href="#overviewMenu"><?php echo $filterYear; ?></a></li>
-    <?php endif; ?>
-  </ul>
-
-  <div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
       <?php
       if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['saveChanges'])) {
@@ -190,13 +181,13 @@
       });
       </script>
 
-      <table class="table table-striped">
+      <table class="table table-striped table-condensed text-center">
         <tr>
           <th><?php echo $lang['DELETE']; ?></th>
           <th><?php echo $lang['ACTIVITY']; ?></th>
-          <th><?php echo $lang['FROM']; ?></th>
+          <th width=140px><?php echo $lang['FROM']; ?></th>
           <th><?php echo $lang['LUNCHBREAK']; ?></th>
-          <th><?php echo $lang['TO']; ?></th>
+          <th width=140px><?php echo $lang['TO']; ?></th>
 
           <th><?php echo $lang['SHOULD_TIME']; ?></th>
           <th><?php echo $lang['IS_TIME']; ?></th>
@@ -206,8 +197,6 @@
           <th><?php echo $lang['BOOKINGS']; ?></th>
         </tr>
         <?php
-
-
 
         if($filterMonth == 0){
           $filterMonth = getCurrentTimestamp();
@@ -241,9 +230,9 @@
             echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
             echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
 
-            echo "<td><input size='16' maxlength='16' type='text' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
-            echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
-            echo "<td><input type=text class='form-control input-sm' size='16' maxlength=16 onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
+            echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
+            echo "<td class='text-center'>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
+            echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
 
             echo "<td>" . $calculator->shouldTime[$i] . "</td>";
             echo "<td>" . sprintf('%.2f', $difference) . "</td>";
@@ -269,7 +258,7 @@
         <td>".sprintf('%.2f',$expectedHoursSUM)."</td>
         <td>".sprintf('%.2f', $isTimeSUM)."</td>
         <td>".sprintf('%.2f',$absolvedHoursSUM)."</td>
-        <td>".sprintf('%+.2f',$saldoSUM)."</td> </tr>";
+        <td>".sprintf('%+.2f',$saldoSUM)."</td> <td></td></tr>";
 
         ?>
 
@@ -324,23 +313,7 @@
 
 
       <?php endif; ?>
-
-    </div>
-
-    <!-- menu division HERE ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-    <div id="overviewMenu" class="tab-pane fade">
-      <br><br>
-      <iframe onload="resizeIframe(this)" scrolling=no src=home.php?userID=<?php echo $filterID; ?>></iframe>
-      <script>
-      function resizeIframe(obj) {
-        obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-      }
-      </script>
-    </div>
-
-
-  </div> <!-- tab content -->
-
+    <?php endif; ?>
 </form>
 
 <!-- /BODY -->
