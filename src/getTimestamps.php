@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToTime($userID);?>
+<?php include 'validate.php';?>
 <!-- BODY -->
 
 <div class="page-header">
