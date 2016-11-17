@@ -1,6 +1,6 @@
 <?php
-require  __DIR__."/../inc/connection.php";
-require  __DIR__."/../inc/createTimestamps.php";
+require  "connection.php";
+require  "createTimestamps.php";
 
 session_start();
 if (!isset($_SESSION['userid'])) {

@@ -161,12 +161,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       </ul>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm"><?php echo $lang['DELETE_COMPANY']; ?></button>
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button>
                 </div>
               </div>
-              
+
               <!-- Small modal -->
-              <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+              <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
                 <div class="modal-dialog modal-sm" role="document">
                   <div class="modal-content">
 

@@ -154,26 +154,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
         }
 
+
         if(isset($_POST['isCoreAdmin'.$x])){
           $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
-          $conn->query($sql);
+        } else {
+          if($x != 1){
+            $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
+          } else {
+            $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
+          }
         }
+        $conn->query($sql);
+
         if(isset($_POST['isTimeAdmin'.$x])){
           $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = $x";
-          $conn->query($sql);
+        } else {
+          $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = $x";
         }
+        $conn->query($sql);
+
         if(isset($_POST['isProjectAdmin'.$x])){
           $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = $x";
-          $conn->query($sql);
+        } else {
+          $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = $x";
         }
+        $conn->query($sql);
         if(isset($_POST['canStamp'.$x])){
           $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = $x";
-          $conn->query($sql);
+        } else {
+          $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = $x";
         }
+        $conn->query($sql);
         if(isset($_POST['canStamp'.$x]) && isset($_POST['canBook'.$x])){
           $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = $x";
-          $conn->query($sql);
+        } else {
+          $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = $x";
         }
+        $conn->query($sql);
 
       }//end if isset submitX
     }
@@ -236,8 +253,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="panel-body">
 
             <!-- #########  CONTENT ######## -->
-            <form method="POST" onsubmit="return confirm('Are you sure you want to proceed?');">
 
+            <form method="POST">
               <div class=container-fluid>
                 <div class=form-group>
                   <div class="input-group">
@@ -412,12 +429,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
               <div class="container-fluid">
                 <div class="text-right">
-                  <button class="btn btn-danger" type='submit' name='dele_<?php echo $x; ?>'><?php echo $lang['REMOVE_USER']; ?></button>
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['REMOVE_USER']; ?></button>
                   <button class="btn btn-warning" type="submit" name="submit<?php echo $x; ?>" > Save Changes </button>
                 </div>
               </div>
             <br><br>
             </form>
+
+            <!-- Small modal -->
+            <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+              <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h4 class="modal-title">Do you really wish to delete <?php $firstname.' '.$lastname; ?> ?</h4>
+                  </div>
+                  <div class="modal-body">
+                    All Stamps and Bookings belonging to this User will be lost forever. Do you still wish to proceed?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
+                    <button class="btn btn-danger" type='submit' name='dele_<?php echo $x; ?>'><?php echo $lang['REMOVE_USER']; ?></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
             <!-- /CONTENT -->
           </div>
         </div>

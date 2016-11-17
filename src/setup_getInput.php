@@ -1,4 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+
 <?php
+function redirect($url){
+  if (!headers_sent()) {
+    header('Location: '.$url);
+    exit;
+  } else {
+    echo '<script type="text/javascript">';
+    echo 'window.location.href="'.$url.'";';
+    echo '</script>';
+    echo '<noscript>';
+    echo '<meta http-equiv="refresh" content="0;url='.$url.'" />';
+    echo '</noscript>'; exit;
+  }
+}
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['companyName']) && !empty($_POST['adminPass'])){
     $myfile = fopen('connection_config.php', 'w');
@@ -15,43 +47,80 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
       $companyName = $_POST['companyName'];
-      header("Location: setup.php?companyName=$companyName&psw=$psw");
+      redirect("setup.php?companyName=$companyName&psw=$psw");
     }
   } else {
     echo 'Missing Fields. <br><br>';
   }
 }
-
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
 ?>
-<head>
-    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-    <style>
-    body{
-      text-align: center;
-    }
-    </style>
-</head>
-<body>
+
+<body class="text-center">
   <form method='post'>
   <h1>Login Data</h1><br><br>
 
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon" style=min-width:150px>
+        Firstname
+      </span>
+      <input type="text" class="form-control" name="firstname" placeholder="Firstname..">
+    </div>
+  </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon" style=min-width:150px>
+        Lastname
+      </span>
+      <input type="text" class="form-control" name="lastname" placeholder="Lastname..">
+    </div>
+  </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon text-warning" style=min-width:150px>
+        Login Name:
+      </span>
+      <input type="text" class="form-control" name="userName" value="Admin">
+    </div>
+  </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon text-warning" style=min-width:150px>
+        Login Password
+      </span>
+        <input type='password' class="form-control" name='adminPass' value=''>
+    </div>
+  </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon text-warning" style=min-width:150px>
+        Company Name
+      </span>
+        <input type='text' class="form-control" name='companyName' placeholder='Company Name'>
+    </div>
+  </div>
+  </div>
+</div>
 
-  Login Username: Admin <br><br>
-
-  * Login Password: <br>
-  <input type='password' name='adminPass' value=''> <br><br>
-
-  * Company Name: <br>
-  <input type="text" name='companyName' placeholder='Company Name' >  <br><br>
-
-
-  <br><hr><div style='text-align:right; margin-right:200px'><small>* required</small></div><br>
+  <br><hr><br>
 
   <h1>MySQL Database Connection</h1><br><br>
 
