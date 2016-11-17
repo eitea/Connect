@@ -189,11 +189,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       document.getElementById('mySelections').style.visibility='visible';
     }
   }
-
-  $(document).ready(function() {
-    $(".js-example-basic-single").select2();
-  });
-
   </script><br><br>
 
   <br>

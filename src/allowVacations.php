@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
 
           //only insert if expectedHours != 0
-          if($expected != 0.0){
+          if($expected != 0){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, expectedHours, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', '$expected', 0)";
             $conn->query($sql);
             echo mysqli_error($conn);
@@ -57,11 +57,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <body>
 <form method=post>
 
-  <table>
+  <table class="table table-hover">
     <th>Name</th>
     <th><?php echo $lang['TIME']?></th>
     <th>Reason</th>
-    <th><?php echo $lang['REPLY_TEXT']; ?></th>
+    <th class=text-center><?php echo $lang['REPLY_TEXT']; ?></th>
+    <tbody>
     <?php
     $sql = "SELECT $userTable.firstname, $userTable.lastname, $userRequests.id, $userRequests.fromDate, $userRequests.toDate, $userRequests.requestText FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
     $result = $conn->query($sql);
@@ -71,13 +72,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<td>'. $row['firstname']. ' ' .$row['lastname'] . '</td>';
         echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
         echo '<td>'. $row['requestText'].'</td>';
-        echo '<td><input type=text name="answerText'. $row['id'] .'" placeholder=Reply </td>';
-        echo '<td style=text-align:left><button type=submit name=okay'. $row['id'] .' > <img width=20px height=20px src="../images/okay.png"> </button>';
-        echo '<button type=submit name=nokay'. $row['id'] . ' > <img width=20px height=20px src="../images/not_okay.png"> </button></td>';
+        echo '<td>'; ?>
+          <div class="form-group">
+              <div class="input-group">
+                <input type=text class="form-control" name="answerText<?php echo $row['id']; ?>" placeholder="Reply... (Optional)">
+
+                <span class="input-group-btn">
+                  <button type=submit class="btn btn-default" name="okay<?php echo $row['id']; ?>" > <img width=18px height=18px src="../images/okay.png"> </button>
+                  <button type=submit class="btn btn-default" name="nokay<?php echo $row['id']; ?>" > <img width=18px height=18px src="../images/not_okay.png"> </button>
+                </span>
+              </div><!-- /input-group -->
+          </div>
+        <?php echo '</td>';
+
         echo '</tr>';
       }
     }
      ?>
+   </tbody>
   </table>
 
 </form>

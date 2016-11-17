@@ -9,20 +9,22 @@
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
 
-    <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
-
     <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
-    <script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
 
     <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
     <script src='../plugins/select2/js/select2.js'></script>
 
-
     <title>T-Time</title>
   </head>
-<body>
+  
+  <script>
+    $(document).ready(function() {
+      $(".js-example-basic-single").select2();
+    });
+  </script>
 
+<body>
 <?php
 session_start();
 if(empty($_SESSION['userid'])){

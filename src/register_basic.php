@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; ?>
+<?php include 'validate.php'; enableToCore($userID)?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -46,7 +46,7 @@
   }
 
   ?>
-  
+
 <form method="post">
   <div class=container>
   <div class="col-md-8">

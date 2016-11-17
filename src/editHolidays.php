@@ -74,7 +74,7 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
       </div>
     </div>
   </div>
-  <form>
+
 
     <script>
     $(document).ready(function() {

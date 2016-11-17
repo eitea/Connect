@@ -61,6 +61,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BEGIN'] = 'Begin';
   $lang['BLESSING'] = 'Have a nice day!';
   $lang['BOOK_PROJECTS'] = 'Book Projects';
+  $lang['BOOKINGS'] = 'Bookings';
   $lang['BREAK'] = 'Break';
 
   $lang['CALENDAR'] = 'Calendar';
@@ -230,6 +231,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BEGIN'] = 'Anfang';
   $lang['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
   $lang['BOOK_PROJECTS'] = 'Projekte Buchen';
+  $lang['BOOKINGS'] = 'Buchungen';
   $lang['BREAK'] = 'Pause';
 
   $lang['CALENDAR'] = 'Kalender';

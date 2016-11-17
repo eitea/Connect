@@ -1,6 +1,6 @@
 src/connection_config.php
-tmp.php
+template.php
 test.php
 aws
-.gitignore
+
 images/Thumbs.db

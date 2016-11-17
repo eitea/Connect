@@ -1,7 +1,7 @@
 /* make sidebar nav vertical */
 @media (min-width: 768px){
   .affix-content .container {
-    width: 700px;
+    width: 90%
   }
 
   html,body{
@@ -50,7 +50,7 @@
 
 @media (min-width: 769px){
   .affix-content .container {
-    width: 600px;
+    width: 90%;
   }
     .affix-content .container .page-header{
     margin-top: 0;
@@ -59,7 +59,7 @@
 
 @media (min-width: 992px){
   .affix-content .container {
-  width: 900px;
+  width: 90%;
   }
     .affix-content .container .page-header{
     margin-top: 0;
@@ -72,7 +72,7 @@
   }
 
   .affix-content .container {
-    width: 1000px;
+    width: 90%;
   }
 
   .affix-content .container .page-header{

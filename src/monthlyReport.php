@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; ?>
+<?php include 'validate.php'; enableToTime($userID);?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -53,13 +53,6 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     </div>
   </div>
 </div>
-
-
-<script>
-$(document).ready(function() {
-  $(".js-example-basic-single").select2();
-});
-</script>
 
 <br><br>
 <table class="table table-hover table-striped">

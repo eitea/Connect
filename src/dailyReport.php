@@ -2,8 +2,11 @@
 <?php include 'validate.php'; ?>
 <!-- BODY -->
 
+<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
+<script rel="stylesheet" src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
+
 <div class="page-header">
-<h3><?php echo $lang['CLIENT']; ?></h3>
+<h3><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></h3>
 </div>
 
 <?php
@@ -30,7 +33,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 
-
 //variables needed for getTimestamp.php to work:
 //$_POST['filteredYear']
 //$_POST['filteredMonth']
@@ -50,7 +52,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 <form method='post'>
-<input id="filterDateInput" style="border-style:solid; border-color:rgb(233, 233, 233)" type="text" size="11" name="filterDay" value="<?php echo $filterDay; ?>">
+  <div class="container">
+    <div class="col-xs-3">
+<input id="filterDateInput" type="text" class="form-control" size="11" name="filterDay" value="<?php echo $filterDay; ?>">
+</div>
 
 <script>
 var myCalendar = new dhtmlXCalendarObject(["filterDateInput"]);
@@ -58,7 +63,7 @@ myCalendar.setSkin("material");
 myCalendar.setDateFormat("%Y-%m-%d");
 </script>
 
-<select name="filterUserID">
+<select name="filterUserID" class="js-example-basic-single">
   <option value=0>Select User...</option>
 <?php
 $sql = "SELECT * FROM $userTable";
@@ -78,33 +83,35 @@ if($result && $result->num_rows > 0) {
 ?>
 </select>
 
-<select name="booked">
+<select name="booked" class="js-example-basic-single">
   <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
   <option value='1' <?php if($booked == 1){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
   <option value='2' <?php if($booked == 2){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
 </select>
 
-<input type="submit" name="filter" value="Filter"><br><br>
+<button type="submit" class="btn btn-sm btn-warning" name="filter" >Filter</button><br><br>
+
+</div>
 
 <br><br>
 
 </form>
 
-<table id='blank' class="table table-striped table-bordered">
+<table id='blank' class="table table-hover table-condensed">
   <thead>
 <tr>
   <th><?php echo $lang['CLIENT']; ?></th>
   <th><?php echo $lang['PROJECT']; ?></th>
-  <th width=25%>Info</th>
-  <th width=200px><?php echo $lang['TIME']; ?></th>
+  <th>Info</th>
+  <th width=150px><?php echo $lang['TIME']; ?></th>
   <th><?php echo $lang['SUM']; ?> (min)</th>
   <th><?php echo $lang['SUM']; ?> (0.25h)</th>
   <th><?php echo $lang['CHARGED']; ?></th>
-  <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
+  <th><?php echo $lang['HOURLY_RATE'];?></th>
   <th><?php echo $lang['EDIT']; ?></th>
 </tr>
 </thead>
-
+<tbody>
 <?php
 if($booked == '2'){
   $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
@@ -195,6 +202,7 @@ reminder: looking for bugs? try to figure out why this sql thing works and if it
   }
 
 ?>
+</tbody>
 </table>
 
 <!-- /BODY -->
