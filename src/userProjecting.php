@@ -215,7 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       else:
         ?>
 
-        <select name="company" style='width:200px' class="" onchange="showClients(this.value)">
+        <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value)">
           <option name=cmp value=0>Select...</option>
           <?php
           $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
