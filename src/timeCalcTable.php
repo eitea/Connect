@@ -14,23 +14,20 @@ require 'Calculators/MonthlyCalculator.php';
 require 'Calculators/YearlyCalculator.php';
 
 $currentTimeStamp = getCurrentTimestamp();
-$currentYear = substr($currentTimeStamp, 0, 4);
-$currentMonth = substr($currentTimeStamp, 5, 2);
 ?>
 
 <form method=post>
   <?php
   if(isset($_POST['filterMonth'])){
-    $currentYear = substr($_POST['newMonth'],0,4);
-    $currentMonth = substr($_POST['newMonth'],5,2);
+    $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
   }
   ?>
 
-  <div class="form-group">
+  <div class="row form-group">
     <div class="col-lg-6">
       <div class="input-group">
 
-        <input id="calendar" type="text" class="form-control from" name="newMonth" value= <?php echo $currentYear.'-'.$currentMonth; ?> >
+        <input id="calendar" readonly type="text" class="form-control from" name="newMonth" value= <?php echo substr($currentTimeStamp,0,7); ?> >
 
         <span class="input-group-btn">
           <button class="btn btn-warning" type="submit" name='filterMonth'>Filter</button>
@@ -49,15 +46,6 @@ $currentMonth = substr($currentTimeStamp, 5, 2);
 
 </form>
 
-<div class="container">
-  <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home"><?php $dateObj=DateTime::createFromFormat('!m', $currentMonth); echo $dateObj->format('F');?></a></li>
-    <li><a data-toggle="tab" href="#menu1"><?php echo $lang['OVERVIEW']; ?></a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
-      <br>
       <div class="table-responsive">
         <table class="table table-hover table-striped">
           <tr>
@@ -119,12 +107,7 @@ $currentMonth = substr($currentTimeStamp, 5, 2);
             }
             ?>
           </tbody>
-        </div>
       </table>
-
-    </div> <!-- menu content ###############################################-->
-    <div id="menu1" class="tab-pane fade"><br>
-
     </div>
 
     <!-- /BODY -->

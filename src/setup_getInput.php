@@ -91,7 +91,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
-              Login Name:
+              E-Mail (Login):
             </span>
             <input type="text" class="form-control" name="loginname" value="Admin">
           </div>

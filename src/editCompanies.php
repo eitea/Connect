@@ -146,7 +146,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <br><br>
 
               <div class="container-fluid text-right">
-                <div class="btn-group" role="group">
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button>
+
                   <div class="btn-group" role="group">
                     <div class="dropup">
                       <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -161,9 +162,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       </ul>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button>
                 </div>
-              </div>
 
               <!-- Small modal -->
               <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">

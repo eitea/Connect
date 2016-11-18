@@ -242,16 +242,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 
   <br>
-  <textarea class="form-control" rows="3" name="infoText">
-    <?php echo $insertInfoText; ?>
-  </textarea>
+  <textarea class="form-control" rows="3" name="infoText"><?php echo $insertInfoText; ?></textarea>
   <br>
 
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
         <span class="input-group-addon">
-          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak">
+          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
         </span>
         <input type="time" class="form-control" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
@@ -262,14 +260,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
   </div>
-
-<div class="row">
-  <div class="checkbox col-xs-3">
-    <label>
-      <input type="checkbox" onclick='hideMyDiv(this)'> <?php echo $lang['THIS_IS_A_BREAK'];?> </input>
-    </label>
-  </div>
-</div>
 
 </form>
 

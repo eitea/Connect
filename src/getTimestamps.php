@@ -6,11 +6,12 @@
   <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
 </div>
 
-<form method="post">
 
   <?php
   require "Calculators/MonthlyCalculator.php";
   ?>
+
+  <form method="post">
 
   <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
     <?php
@@ -85,9 +86,18 @@
   <button type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
 
   <br><br>
-  <br><br>
+
   <!-- ####################################################################### -->
   <?php if($filterID != 0): ?>
+
+      <div class="container-fluid">
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#home"><?php $dateObj=DateTime::createFromFormat('!m', $currentMonth); echo $dateObj->format('F');?></a></li>
+          <li><a data-toggle="tab" href="#menu1"><?php echo $lang['OVERVIEW']; ?></a></li>
+        </ul>
+        <div class="tab-content">
+          <div id="home" class="tab-pane fade in active">
+            <br>
 
       <?php
       if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -310,11 +320,17 @@
           </div>
 
         </span>
-
-
       <?php endif; ?>
     <?php endif; ?>
 </form>
+
+
+    </div> <!-- menu content ###############################################-->
+    <div id="menu1" class="tab-pane fade"><br>
+
+    </div>
+
+
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
