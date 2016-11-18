@@ -1,4 +1,5 @@
 <?php include 'header.php'; ?>
+<?php include "../vendor/deblan/Csv.php"; use Deblan\Csv\Csv; ?>
 <?php include 'validate.php'; enableToProject($userID)?>
 <!-- BODY -->
 
@@ -176,7 +177,8 @@ if(isset($_POST['filterUserID'])){
         }
         ?>
       </select>
-
+      <br><br>
+      <button type="submit" class="btn btn-warning" name="filter">Filter</button><br><br>
     </div>
     <div id="myFilters" class="invisible">
       <div class="col-md-3">
@@ -256,17 +258,13 @@ if(isset($_POST['filterUserID'])){
   <br>
 
   <br>
-  <div class="row">
-    <div class="col-md-12">
-      <button type="submit" class="btn btn-warning" name="filter">Filter</button><br><br>
-    </div>
-  </div>
 </div>
+
 <!----------------------------------------------------------------------------->
 
 <?php
 if($filterCompany != 0):
-  ?>
+?>
 
   <script>
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
@@ -292,6 +290,7 @@ function toggle2(source) {
 }
 </script>
 
+<?php if($filterCompany != 0): ?>
 <div>
   <?php
   if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
@@ -317,9 +316,6 @@ function toggle2(source) {
     </thead>
 
     <?php
-    require "../vendor/deblan/Csv.php";
-    use Deblan\Csv\Csv;
-
     $csv = new Csv();
     $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
     $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
@@ -468,5 +464,6 @@ function toggle2(source) {
 <form action="csvDownload.php" method="post" target='_blank'>
   <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
 </form>
+  <?php endif; ?>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
