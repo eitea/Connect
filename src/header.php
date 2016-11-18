@@ -52,13 +52,13 @@ if($result && $result->num_rows > 0){
   $canStamp = $row['canStamp'];
 }
 
-if (isset($_POST) && !empty($_POST)){
-  if (isset($_SESSION['posttimer'])){
-    if ( (time() - $_SESSION['posttimer']) <= 2){
-      unset($_POST);
-    }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+  if ((time() - $_SESSION['posttimer']) <= 2){
+    unset($_POST);
+  } else {
+    $_SESSION['posttimer'] = time();
   }
-  $_SESSION['posttimer'] = time();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -146,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </ul>
 
       <div class="navbar-right" style="margin-right:10px">
-        <p class="navbar-text">Signed in as <?php echo $_SESSION['firstname']; ?></p>
+        <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
         <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-info"></i></a>
         <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
         <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>

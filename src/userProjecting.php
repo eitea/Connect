@@ -15,13 +15,61 @@ if ($result && $result->num_rows > 0) {
   $date = substr($row['time'], 0, 10);
   $indexIM = $row['indexIM']; //this value cannot change
 } else {
-  header("refresh:1;url=userHome.php");
-  die("Automatic Redirecting... Invalid Access, Check In First.");
+  redirect("home.php");
 }
 
 $showUndoButton = 0;
 $insertInfoText = '';
 ?>
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+    $startDate = $date." ".$_POST['start'];
+    $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+
+    $endDate = $date." ".$_POST['end'];
+    $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+
+    $info = test_input($_POST['infoText']);
+
+    if(timeDiff_Hours($startDate, $endDate) > 0){
+      if(isset($_POST['addBreak'])){
+        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
+        $conn->query($sql);
+        $duration = timeDiff_Hours($startDate, $endDate);
+        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+        $conn->query($sql);
+        $showUndoButton = TRUE;
+      } else {
+        if(isset( $_POST['project'])){
+          $projectID = $_POST['project'];
+          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$info')";
+          $conn->query($sql);
+          $showUndoButton = TRUE;
+        } else {
+          echo '<div class="alert alert-danger fade in">';
+          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+          echo '<strong>Could not create entry: </strong>No Project selected.';
+          echo '</div>';
+        }
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Could not create entry: </strong>Times were not valid.';
+      echo '</div>';
+    }
+  } elseif(isset($_POST['add'])) {
+    echo '<div class="alert alert-danger fade in">';
+    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
+    echo '</div>';
+  }
+  echo '<br>';
+}
+ ?>
+
 
 <form method="post">
   <br>
@@ -90,53 +138,6 @@ $insertInfoText = '';
     </div>
   </div>
 
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
-    $startDate = $date." ".$_POST['start'];
-    $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-
-    $endDate = $date." ".$_POST['end'];
-    $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-
-    $info = test_input($_POST['infoText']);
-
-    if(timeDiff_Hours($startDate, $endDate) > 0){
-      if(isset($_POST['addBreak'])){
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
-        $conn->query($sql);
-        $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
-        $conn->query($sql);
-        $showUndoButton = TRUE;
-      } else {
-        if(isset( $_POST['project'])){
-          $projectID = $_POST['project'];
-          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$info')";
-          $conn->query($sql);
-          $showUndoButton = TRUE;
-        } else {
-          echo '<div class="alert alert-danger fade in">';
-          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-          echo '<strong>Could not create entry: </strong>No Project selected.';
-          echo '</div>';
-        }
-      }
-    } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Could not create entry: </strong>Times were not valid.';
-      echo '</div>';
-    }
-  } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
-    echo '</div>';
-  }
-  echo '<br>';
-}
- ?>
 
   <script>
   function showClients(str) {
