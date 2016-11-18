@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToStamps($userID);?>
+<?php include 'validate.php';?>
 
 
 <div class="page-header">

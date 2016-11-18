@@ -349,8 +349,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   <?php echo $lang['ALLOW_PRJBKING_ACCESS']; ?>: <br>
                   <div class="checkbox">
                     <label>
-                      <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>>Can Checkin <br>
+                      <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>>Can Checkin
                     </label>
+                     <br>
                     <label>
                       <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?>>Can Book
                     </label>

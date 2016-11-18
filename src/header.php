@@ -26,6 +26,7 @@
 
 <body>
 <?php
+
 session_start();
 if(empty($_SESSION['userid'])){
   die('Please <a href="login.php">login</a> first.');
@@ -35,6 +36,7 @@ $timeToUTC = $_SESSION['timeToUTC'];
 
 $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = FALSE;
 $canBook = $canStamp = FALSE;
+$actual_link = $_SERVER['PHP_SELF'];
 
 require "connection.php";
 require "createTimestamps.php";
@@ -139,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form method=post class="navbar-form navbar-left">
               <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
               <li role="separator" class="divider"></li>
-              <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> German</li>
+              <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
             </form>
           </ul>
         </li>
@@ -338,7 +340,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   </ul>
                 </div>
               </li>
-              <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span>Calendar</span></a></li>
+              <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
             <?php endif; ?>
 
 

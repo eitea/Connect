@@ -1,14 +1,14 @@
 <?php
 require  "connection.php";
 require  "createTimestamps.php";
+include 'validate.php';
 
 session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
+enableToCore($_SESSION['userid']);
+
+ini_set('session.gc_max_lifetime', 0);
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 1);
 
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
