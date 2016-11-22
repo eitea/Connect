@@ -15,7 +15,7 @@ $email = $_GET['mail'];
 $begin = substr(getCurrentTimestamp(),0,10) . ' 05:00:00';
 
 $vacDaysCredit = $overTimeLump = 0;
-$allowAccess = $gender = "";
+$gender = "";
 
 $pass = randomPassword();
 
@@ -145,11 +145,12 @@ if(isset($_POST['create'])){
   if($accept){
     //create user
     $psw = password_hash($pass, PASSWORD_BCRYPT);
-    $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, enableProjecting)
-    VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin', '$allowAccess');";
+    $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate)
+    VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
     $conn->query($sql);
     $curID = mysqli_insert_id($conn);
 
+    echo mysqli_error($conn);
     //create bookingtable
     $sql = "INSERT INTO $bookingTable (mon, tue, wed, thu, fri, sat, sun, userID) VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID);";
     $conn->query($sql);

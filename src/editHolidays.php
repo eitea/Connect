@@ -1,6 +1,8 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; ?>
 <!-- BODY -->
+<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
+<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
 
 <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
 <script src="../plugins/datatables/js/jquery.js"></script>
@@ -23,7 +25,7 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
 } elseif(isset($_POST['holidayAdd'])){
   if(!empty($_POST['holidayName']) && isset($_POST['holidayStart'])) {
     $holidayName = test_input($_POST['holidayName']);
-    $holidayStart = $_POST['holidayStart'];
+    $holidayStart = $_POST['holidayStart'] .' 08:00:00';
     $sql = "INSERT INTO $holidayTable (name, begin, end) VALUES('$holidayName', '$holidayStart', '$holidayStart')";
     $conn->query($sql);
     echo mysqli_error($conn);
@@ -61,7 +63,7 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
     <div class="col-md-4">
       <div class="input-group">
         <span class="input-group-addon">Date</span>
-        <input type="date" class="form-control" name="holidayStart" >
+        <input id="calendar" type="text" readonly class="form-control" name="holidayStart" >
       </div>
     </div>
     <div class="col-md-4">
@@ -75,14 +77,17 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
     </div>
   </div>
 
+  <script>
+  var myCalendar = new dhtmlXCalendarObject(["calendar"]);
+  myCalendar.setSkin("material");
+  myCalendar.setDateFormat("%Y-%m-%d");
 
-    <script>
-    $(document).ready(function() {
-      $('#holidayTable').DataTable({
-        "order": [[ 2, "asc" ]]
-      });
+  $(document).ready(function() {
+    $('#holidayTable').DataTable({
+      "order": [[ 2, "asc" ]]
     });
-    </script>
+  });
+  </script>
 
     <!-- /BODY -->
     <?php include 'footer.php'; ?>

@@ -1,6 +1,8 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; enableToStamps($userID); ?>
 <!-- BODY -->
+<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
+<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
 
 <div class="page-header">
   <h3><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']?></h3>
@@ -8,16 +10,30 @@
 
 <form method="post">
   <?php
-  if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
-    if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start'].' 04:00:00'."', '" .$_POST['end'].' 04:00:00' . "', '".$_POST['requestText']."')";
-      $conn->query($sql);
-      echo mysqli_error($conn);
+  if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
+      if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
+        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start'].' 04:00:00'."', '" .$_POST['end'].' 04:00:00' . "', '".$_POST['requestText']."')";
+        $conn->query($sql);
+        echo mysqli_error($conn);
+      } else {
+        echo '<div class="alert alert-danger fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>Failed! </strong>Invalid Dates.';
+        echo '</div>';
+      }
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Failed! </strong>Invalid Dates.';
-      echo '</div>';
+      $sql = "SELECT * FROM $userRequests WHERE userID = $userID";
+      $result = $conn->query($sql);
+      if($result && $result->num_rows > 0){
+        while($row = $result->fetch_assoc()){
+          if(isset($_POST['del'.$row['id']])){
+            $sql = "DELETE FROM $userRequests WHERE id =". $row['id'];
+            $conn->query($sql);
+            echo mysqli_error($conn);
+          }
+        }
+      }
     }
   }
   ?>
@@ -31,9 +47,9 @@
         <span class="input-group-btn">
           <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
         </span>
-        <input id='calendar' type="text" class="form-control" value="" placeholder="Von" name="start">
+        <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
         <span class="input-group-addon"> - </span>
-        <input id='calendar2' type="text" class="form-control" value="" placeholder="Bis" name="end">
+        <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
       </div>
     </div>
   </div>
@@ -45,12 +61,9 @@
   </div>
 
   <script>
-  $('.input-daterange input').each(function() {
-    $(this).datepicker({
-      format: "yyyy-mm-dd",
-      viewMode: "days"
-    });
-  });
+  var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+  myCalendar.setSkin("material");
+  myCalendar.setDateFormat("%Y-%m-%d");
   </script>
 
 <?php
@@ -85,7 +98,7 @@ if($result && $result->num_rows > 0): ?>
               echo '<td>' . substr($row['toDate'],0,10) . '</td>';
               echo '<td>' . $lang_vacationRequestStatus[$row['status']] .'</td>';
               echo '<td>' . $row['answerText'] . '</td>';
-              echo '<td  class="text-center"> <button type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!"> x </button> </td>';
+              echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!"> x </button> </td>';
               echo '</tr>';
             }
           ?>
