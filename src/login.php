@@ -31,6 +31,7 @@ body{
   background-repeat: no-repeat;
   background-origin: content-box;
   background-attachment: fixed;
+  background-size:cover;
 }
 
 label{
