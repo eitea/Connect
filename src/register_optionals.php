@@ -352,7 +352,6 @@ if(isset($_POST['create'])){
 
  <button type="submit" class="btn btn-warning" name=create><?php echo $lang['REGISTER_NEW_USER']; ?></button>
 </form>
-</body>
 <?php
 function randomPassword(){
   $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';

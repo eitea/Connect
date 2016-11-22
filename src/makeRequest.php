@@ -76,7 +76,7 @@ if($result && $result->num_rows > 0): ?>
               if($row['status'] == 0) {
                 $style="";
               } elseif ($row['status'] == 1) {
-                $style="style=danger";
+                $style="danger";
               } elseif ($row['status'] == 2) {
                 $style="success";
               }

@@ -127,7 +127,8 @@ function strip_input($data) {
 
   <input type="submit" name="cancelButton" value="Cancel"> <input type="submit" name="login" value="Submit"><br>
 
-  <input type="text" name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>"> <input type="text" id="funZone" name="funZone" style="display:none" value="">
+  <input type="text" name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
+  <input type="number" id="funZone" name="funZone" style="display:none" readonly>
   </form>
 </div>
 

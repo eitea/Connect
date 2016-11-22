@@ -291,13 +291,13 @@ function toggle2(source) {
 </script>
 
 <?php if($filterCompany != 0): ?>
-<div>
-  <?php
-  if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
+<div class="container-fluid">
+  <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
   <fieldset disabled>
     <br><br>
     <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
   <?php endif; ?>
+
 
   <table class="table table-striped table-condensed">
     <thead>
@@ -305,12 +305,13 @@ function toggle2(source) {
         <th><?php echo $lang['CLIENT']; ?></th>
         <th><?php echo $lang['PROJECT']; ?></th>
         <th>Info</th>
+        <th>Intern</th>
         <th width=140px><?php echo $lang['DATE']; ?></th>
         <th><?php echo $lang['SUM']; ?> (min)</th>
         <th><?php echo $lang['SUM']; ?> (0.25h)</th>
         <th><?php echo $lang['HOURS_CREDIT']; ?></th>
         <th>Person</th>
-        <th><?php echo $lang['CHARGED']; ?> <input type="checkbox" onClick="toggle(this)" /> / <?php echo $lang['NOT_CHARGEABLE']; ?> <input type="checkbox" onClick="toggle2(this)" /></th>
+        <th><input type="checkbox" onClick="toggle(this)"> <?php echo $lang['CHARGED']; ?> <br> <input type="checkbox" onClick="toggle2(this)" > <?php echo $lang['NOT_CHARGEABLE']; ?></th>
         <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
       </tr>
     </thead>
@@ -361,6 +362,7 @@ function toggle2(source) {
       $projectBookingTable.id AS projectBookingID,
       $logTable.timeToUTC,
       $projectBookingTable.infoText,
+      $projectBookingTable.internInfo,
       $projectBookingTable.start,
       $projectBookingTable.end,
       $userTable.firstname, $userTable.lastname,
@@ -394,6 +396,7 @@ function toggle2(source) {
           echo "<td>" .$row['projectName']. "</td>";
           $csv_Add[] = $row['infoText'];
           echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this)'>" .$row['infoText']. "</textarea></td>";
+          echo '<td>'.$row['internInfo'].'</td>';
           $csv_Add[] = substr($row['start'],0,10);
           $csv_Add[] = substr($row['end'],0,10);
           $csv_Add[] = substr($row['start'],11,6);

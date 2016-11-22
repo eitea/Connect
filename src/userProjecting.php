@@ -19,7 +19,7 @@ if ($result && $result->num_rows > 0) {
 }
 
 $showUndoButton = 0;
-$insertInfoText = '';
+$insertInfoText = $insertInternInfoText = '';
 ?>
 
 <?php
@@ -32,9 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
     $info = test_input($_POST['infoText']);
+    $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
-      if(isset($_POST['addBreak'])){
+      if(isset($_POST['addBreak'])){ //checkbox
         $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
@@ -42,9 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->query($sql);
         $showUndoButton = TRUE;
       } else {
-        if(isset( $_POST['project'])){
+        if(isset($_POST['project'])){
           $projectID = $_POST['project'];
-          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$info')";
+          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$info', '$insertInternInfoText')";
           $conn->query($sql);
           $showUndoButton = TRUE;
         } else {
@@ -68,15 +69,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   echo '<br>';
 }
- ?>
+?>
 
 
 <form method="post">
-  <br>
   <?php if($showUndoButton): ?>
     <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Undo</button></div>
   <?php endif; ?>
 
+  <br>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-hover table-striped">
@@ -241,15 +242,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
 
-  <br>
-  <textarea class="form-control" rows="3" name="infoText"><?php echo $insertInfoText; ?></textarea>
-  <br>
+  <div class="row">
+    <div class="col-md-8">
+      <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."><?php echo $insertInfoText; ?></textarea><br>
+    </div>
+    <div class="col-md-4">
+      <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"><?php echo $insertInternInfoText; ?></textarea><br>
+    </div>
+  </div>
 
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
         <span class="input-group-addon">
-          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
+          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
         </span>
         <input type="time" class="form-control" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>

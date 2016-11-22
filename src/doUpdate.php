@@ -165,7 +165,14 @@ if($row['version'] < 29){
   }
 }
 
-
+if($row['version'] < 30){
+  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN internInfo VARCHAR(500)";
+  if($conn->query($sql)){
+    echo "Expand booking table by internInfo.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

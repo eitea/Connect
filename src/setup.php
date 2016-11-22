@@ -203,6 +203,7 @@ $sql = "CREATE TABLE $projectBookingTable (
   timestampID INT(10) UNSIGNED,
   infoText VARCHAR(500),
   booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  internInfo VARCHAR(500),
   FOREIGN KEY (projectID) REFERENCES $projectTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE,
@@ -210,7 +211,7 @@ $sql = "CREATE TABLE $projectBookingTable (
   ON UPDATE CASCADE
   ON DELETE CASCADE
 )";
-if ($conn->query($sql)) {
+if ($conn->query($sql)){
   echo "ProjectBookingTable created! <br>";
 } else {
   echo mysqli_error($conn);
