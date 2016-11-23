@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endDate = $date." ".$_POST['end'];
     $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-    $info = test_input($_POST['infoText']);
+    $insertInfoText = test_input($_POST['infoText']);
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
@@ -45,9 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
         if(isset($_POST['project'])){
           $projectID = $_POST['project'];
-          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$info', '$insertInternInfoText')";
+          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
           $conn->query($sql);
           $showUndoButton = TRUE;
+          $insertInfoText = $insertInternInfoText = '';
         } else {
           echo '<div class="alert alert-danger fade in">';
           echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -89,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <th><?php echo $lang['CLIENT']; ?></th>
             <th><?php echo $lang['PROJECT']; ?></th>
             <th>Info</th>
+            <th>Intern</th>
           </tr>
         </thead>
         <tbody>
@@ -116,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               echo "<td>". $row['name'] ."</td>";
               echo "<td>". $row['projectName'] ."</td>";
               echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
+              echo "<td style='text-align:left'>". $row['internInfo'] ."</td>";
               echo "</tr>";
 
               $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);

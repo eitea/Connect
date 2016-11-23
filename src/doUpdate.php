@@ -6,10 +6,6 @@ include 'validate.php';
 session_start();
 enableToCore($_SESSION['userid']);
 
-ini_set('session.gc_max_lifetime', 0);
-ini_set('session.gc_probability', 1);
-ini_set('session.gc_divisor', 1);
-
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
   $row = $result->fetch_assoc();

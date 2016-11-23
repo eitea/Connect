@@ -65,9 +65,10 @@ if(isset($_POST['filterUserID'])){
 
           $timeStart = carryOverAdder_Hours($_POST['timesFrom'][$i], $toUtc);
           $timeFin = carryOverAdder_Hours($_POST['timesTo'][$i], $toUtc);
-
           $infoText = test_input($_POST['infoTextArea'][$i]);
-          $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText' WHERE id = $imm";
+          $newProjectID = test_input($_POST['projectIDs'][$i]);
+
+          $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText',projectID = $newProjectID WHERE id = $imm";
           $conn->query($sql);
           echo mysqli_error($conn);
         }
@@ -139,15 +140,14 @@ if(isset($_POST['filterUserID'])){
     });
   };
 
-
-  function textAreaAdjust(o) {
-    o.style.height = "1px";
-    o.style.height = (o.scrollHeight)+"px";
-  }
-
   function showFilters(){
     document.getElementById("myFilters").style.visibility='visible';
   }
+
+  function textAreaAdjust(o) {
+  o.style.height = "1px";
+  o.style.height = (o.scrollHeight)+"px";
+}
 
 
   $(document).ready(function() {
@@ -264,7 +264,7 @@ if(isset($_POST['filterUserID'])){
 
 <?php
 if($filterCompany != 0):
-?>
+  ?>
 
   <script>
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
@@ -273,200 +273,245 @@ if($filterCompany != 0):
   document.getElementById("myFilters").style.visibility='visible';
   </script>
 
-<?php endif; ?>
+  <?php endif; ?>
 
-<script>
-function toggle(source) {
-  checkboxes = document.getElementsByName('checkingIndeces[]');
-  for(var i = 0; i<checkboxes.length; i++) {
-    checkboxes[i].checked = source.checked;
+  <script>
+  function toggle(source) {
+    checkboxes = document.getElementsByName('checkingIndeces[]');
+    for(var i = 0; i<checkboxes.length; i++) {
+      checkboxes[i].checked = source.checked;
+    }
   }
-}
-function toggle2(source) {
-  checkboxes = document.getElementsByName('noCheckCheckingIndeces[]');
-  for(var i = 0; i<checkboxes.length; i++) {
-    checkboxes[i].checked = source.checked;
+  function toggle2(source) {
+    checkboxes = document.getElementsByName('noCheckCheckingIndeces[]');
+    for(var i = 0; i<checkboxes.length; i++) {
+      checkboxes[i].checked = source.checked;
+    }
   }
-}
-</script>
 
-<?php if($filterCompany != 0): ?>
-<div class="container-fluid">
+  function showNewProjects(selectID, client, project){
+    $.ajax({
+      url:'ajaxQuery/AJAX_project.php',
+      data:{clientID:client, projectID:project},
+      type: 'post',
+      success : function(resp){
+        $(selectID).html(resp);
+      },
+      error : function(resp){}
+    });
+  };
+
+  </script>
+
+  <?php if($filterCompany != 0): ?>
+  <div class="container-fluid">
   <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
   <fieldset disabled>
-    <br><br>
-    <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
+  <br><br>
+  <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
   <?php endif; ?>
 
 
   <table class="table table-striped table-condensed">
-    <thead>
-      <tr>
-        <th><?php echo $lang['CLIENT']; ?></th>
-        <th><?php echo $lang['PROJECT']; ?></th>
-        <th>Info</th>
-        <th>Intern</th>
-        <th width=140px><?php echo $lang['DATE']; ?></th>
-        <th><?php echo $lang['SUM']; ?> (min)</th>
-        <th><?php echo $lang['SUM']; ?> (0.25h)</th>
-        <th><?php echo $lang['HOURS_CREDIT']; ?></th>
-        <th>Person</th>
-        <th><input type="checkbox" onClick="toggle(this)"> <?php echo $lang['CHARGED']; ?> <br> <input type="checkbox" onClick="toggle2(this)" > <?php echo $lang['NOT_CHARGEABLE']; ?></th>
-        <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
-      </tr>
-    </thead>
-
-    <?php
-    $csv = new Csv();
-    $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
-    $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
-    $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
-    $lang['SUM'].' (min)', $lang['SUM'].' (0.25h)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE']));
-
-    $sum_min = $sum25 = 0;
-
-    if($_SERVER['REQUEST_METHOD'] == 'POST'){
-      $filterCompany = $_POST['filterCompany'];
-
-      if($booked == '2'){
-        $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
-      } elseif($booked == '1'){
-        $bookedQuery= "AND $projectBookingTable.booked = 'FALSE'";
-      } else {
-        $bookedQuery = "";
-      }
-
-      if($filterClient == 0){
-        $filterClientAdd = "";
-      } else {
-        $filterClientAdd = "AND $clientTable.id = $filterClient";
-      }
-
-      if($filterProject == 0){
-        $filterProjectAdd = "";
-      } else {
-        $filterProjectAdd = "AND $projectTable.id = $filterProject";
-      }
-
-      if($filterUserID == 0){
-        $filterUserIDAdd = '';
-      } else {
-        $filterUserIDAdd = "AND $userTable.id = $filterUserID";
-      }
-
-      $sql="SELECT DISTINCT $projectTable.id AS projectID,
-      $clientTable.id AS clientID,
-      $clientTable.name AS clientName,
-      $projectTable.name AS projectName,
-      $projectBookingTable.booked,
-      $projectBookingTable.id AS projectBookingID,
-      $logTable.timeToUTC,
-      $projectBookingTable.infoText,
-      $projectBookingTable.internInfo,
-      $projectBookingTable.start,
-      $projectBookingTable.end,
-      $userTable.firstname, $userTable.lastname,
-      $projectTable.hours,
-      $projectTable.hourlyPrice
-      FROM $projectBookingTable, $logTable, $userTable, $clientTable, $projectTable, $companyTable
-      WHERE $companyTable.id = $filterCompany
-      AND $projectTable.clientID = $clientTable.id
-      AND $clientTable.companyID = $companyTable.id
-      AND $projectBookingTable.projectID = $projectTable.id
-      AND $projectBookingTable.timestampID = $logTable.indexIM
-      AND $userTable.id = $logTable.userID
-      AND $projectBookingTable.start LIKE '$filterDate%'
-      $bookedQuery
-      $filterClientAdd $filterProjectAdd $filterUserIDAdd
-      AND $projectBookingTable.projectID IS NOT NULL
-      ORDER BY $projectBookingTable.start DESC";
-
-      $result = mysqli_query($conn, $sql);
-      if($result && $result->num_rows >0) {
-        while($row = $result->fetch_assoc()) {
-
-          $timeDiff = timeDiff_Hours($row['start'], $row['end']);
-          $t = ceil($timeDiff * 4) / 4;
-
-          $csv_Add = array();
-          echo "<tr>";
-          $csv_Add[] = $row['clientName'];
-          echo "<td>" .$row['clientName']. "</td>";
-          $csv_Add[] = $row['projectName'];
-          echo "<td>" .$row['projectName']. "</td>";
-          $csv_Add[] = $row['infoText'];
-          echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this)'>" .$row['infoText']. "</textarea></td>";
-          echo '<td>'.$row['internInfo'].'</td>';
-          $csv_Add[] = substr($row['start'],0,10);
-          $csv_Add[] = substr($row['end'],0,10);
-          $csv_Add[] = substr($row['start'],11,6);
-          $csv_Add[] = substr($row['end'],11,6);
-          echo "<td>
-          <input type='text' class='form-control input-sm' style='background:none;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),0,16)."'>
-          -
-          <input type='text' class='form-control input-sm' style='background:none;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']),0,16)."'>";
-
-          $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '');
-          echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 2, '.', '') . "</td>";
-          $csv_Add[] = $t;
-          echo "<td>$t</td>";
-          $csv_Add[] = $row['hours'];
-          echo "<td>" .$row['hours']. "</td>";
-          $csv_Add[] = $row['firstname']." ".$row['lastname'];
-          echo "<td>" .$row['firstname']." ".$row['lastname']. "</td>" ;
-
-          if($row['booked'] != 'TRUE'){
-            $selected = "";
-          } else {
-            $selected = "checked";
-          }
-          echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-          echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
-          $csv_Add[] = $row['hourlyPrice'];
-          echo "<td>".$row['hourlyPrice']."</td>";
-          echo "</tr>";
-
-          $csv->addLine($csv_Add);
-          echo '<input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '">'; //since we dont know what has been edited: save all.
-
-          $sum_min += timeDiff_Hours($row['start'], $row['end']);
-          $sum25 += $t;
-        }
-      } else {
-        echo mysqli_error($conn);
-        echo "-";
-      }
-    }
-
-    echo "<tr>";
-    echo "<td style='font-weight:bold'>Summary</td><td></td><td></td><td></td>";
-    echo "<td>".number_format($sum_min*60, 2, '.', '')."</td><td>$sum25</td>";
-    echo "</tr>";
-
-    ?>
-
-    <script>
-    for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
-      textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
-    }
-    </script>
-  </table>
+  <thead>
+  <tr>
+  <th><?php echo $lang['CLIENT']; ?></th>
+  <th><?php echo $lang['PROJECT']; ?></th>
+  <th>Info</th>
+  <th>Intern</th>
+  <th><?php echo $lang['DATE']; ?></th>
+  <th><?php echo $lang['MINUTES']; ?></th>
+  <th>0.25h</th>
+  <th><?php echo $lang['HOURS_CREDIT']; ?></th>
+  <th>Person</th>
+  <th><input type="checkbox" onClick="toggle(this)"> <?php echo $lang['CHARGED']; ?> <br> <input type="checkbox" onClick="toggle2(this)" > <?php echo $lang['NOT_CHARGEABLE']; ?></th>
+  <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
+  </tr>
+  </thead>
   <?php
-  if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
-</fieldset>
-<?php endif; ?>
-</div>
+  $csv = new Csv();
+  $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
+  $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
+  $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
+  $lang['SUM'].' (min)', $lang['SUM'].' (0.25h)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE']));
 
-<br><br>
-<?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
-  <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
-<?php endif; ?>
+  $sum_min = $sum25 = 0;
 
-</form>
+  if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $filterCompany = $_POST['filterCompany'];
 
-<form action="csvDownload.php" method="post" target='_blank'>
-  <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-</form>
+    if($booked == '2'){
+      $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
+    } elseif($booked == '1'){
+      $bookedQuery= "AND $projectBookingTable.booked = 'FALSE'";
+    } else {
+      $bookedQuery = "";
+    }
+
+    if($filterClient == 0){
+      $filterClientAdd = "";
+    } else {
+      $filterClientAdd = "AND $clientTable.id = $filterClient";
+    }
+
+    if($filterProject == 0){
+      $filterProjectAdd = "";
+    } else {
+      $filterProjectAdd = "AND $projectTable.id = $filterProject";
+    }
+
+    if($filterUserID == 0){
+      $filterUserIDAdd = '';
+    } else {
+      $filterUserIDAdd = "AND $userTable.id = $filterUserID";
+    }
+
+    $sql="SELECT DISTINCT $projectTable.id AS projectID,
+    $clientTable.id AS clientID,
+    $clientTable.name AS clientName,
+    $projectTable.name AS projectName,
+    $projectBookingTable.booked,
+    $projectBookingTable.id AS projectBookingID,
+    $logTable.timeToUTC,
+    $projectBookingTable.infoText,
+    $projectBookingTable.internInfo,
+    $projectBookingTable.start,
+    $projectBookingTable.end,
+    $userTable.firstname, $userTable.lastname,
+    $projectTable.hours,
+    $projectTable.hourlyPrice
+    FROM $projectBookingTable, $logTable, $userTable, $clientTable, $projectTable, $companyTable
+    WHERE $companyTable.id = $filterCompany
+    AND $projectTable.clientID = $clientTable.id
+    AND $clientTable.companyID = $companyTable.id
+    AND $projectBookingTable.projectID = $projectTable.id
+    AND $projectBookingTable.timestampID = $logTable.indexIM
+    AND $userTable.id = $logTable.userID
+    AND $projectBookingTable.start LIKE '$filterDate%'
+    $bookedQuery
+    $filterClientAdd $filterProjectAdd $filterUserIDAdd
+    AND $projectBookingTable.projectID IS NOT NULL
+    ORDER BY $projectBookingTable.start DESC";
+
+    $result = mysqli_query($conn, $sql);
+    if($result && $result->num_rows >0) {
+      while($row = $result->fetch_assoc()) {
+
+        $x = $row['projectBookingID'];
+        $timeDiff = timeDiff_Hours($row['start'], $row['end']);
+        $t = ceil($timeDiff * 4) / 4;
+
+        $csv_Add = array();
+        echo "<tr>";
+        $csv_Add[] = $row['clientName'];
+        $csv_Add[] = $row['projectName'];
+
+
+        echo "<td>";
+        echo "<select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+        $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany";
+        $clientResult = $conn->query($sql);
+        while($clientRow = $clientResult->fetch_assoc()){
+          $selected = '';
+          if($clientRow['id'] == $row['clientID']){
+            $selected = 'selected';
+          }
+          echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+        }
+        echo "</select></td>";
+
+
+        echo "<td>";
+        echo "<select style='width:150px' id='newProjectName$x' class='js-example-basic-single' name='projectIDs[]'>";
+        $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
+        $clientResult = $conn->query($sql);
+        while($clientRow = $clientResult->fetch_assoc()){
+          $selected = '';
+          if($clientRow['id'] == $row['projectID']){
+            $selected = 'selected';
+          }
+          echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+        }
+        echo "</select></td>";
+
+
+        $csv_Add[] = $row['infoText'];
+        echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
+        echo '<td>'.$row['internInfo'].'</td>';
+        $csv_Add[] = substr($row['start'],0,10);
+        $csv_Add[] = substr($row['end'],0,10);
+        $csv_Add[] = substr($row['start'],11,6);
+        $csv_Add[] = substr($row['end'],11,6);
+        echo "<td>
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),0,16)."'>
+        -
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']),0,16)."'>";
+
+        $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
+        echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
+        $csv_Add[] = $t;
+        echo "<td>$t</td>";
+        $csv_Add[] = $row['hours'];
+        echo "<td>" .$row['hours']. "</td>";
+        $csv_Add[] = $row['firstname']." ".$row['lastname'];
+        echo "<td>" .$row['firstname']." ".$row['lastname']. "</td>" ;
+
+        if($row['booked'] != 'TRUE'){
+          $selected = "";
+        } else {
+          $selected = "checked";
+        }
+        echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+        echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+        $csv_Add[] = $row['hourlyPrice'];
+        echo "<td>".$row['hourlyPrice']."</td>";
+        echo "</tr>";
+
+        $csv->addLine($csv_Add);
+        echo '<input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '">'; //since we dont know what has been edited: save all.
+
+        $sum_min += timeDiff_Hours($row['start'], $row['end']);
+        $sum25 += $t;
+      }
+      ?>
+
+      <?php
+    } else {
+      echo mysqli_error($conn);
+    }
+  }
+
+  echo "<tr>";
+  echo "<td style='font-weight:bold'>Summary</td><td></td><td></td><td></td>";
+  echo "<td>".number_format($sum_min*60, 2, '.', '')."</td><td>$sum25</td>";
+  echo "</tr>";
+  ?>
+
+  </table>
+  <script>
+  for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
+    textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
+  }
+  </script>
+  <?php if($filterUserID != 0): ?>
+
   <?php endif; ?>
-<!-- /BODY -->
-<?php include 'footer.php'; ?>
+
+  <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
+  </fieldset>
+  <?php endif; ?>
+  </div>
+
+  <br><br>
+  <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
+  <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
+  <?php endif; ?>
+
+  </form>
+
+  <form action="csvDownload.php" method="post" target='_blank'>
+  <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
+  </form>
+  <?php endif; ?>
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

@@ -122,6 +122,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
 
   $lang['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
+  $lang['MINUTES'] = 'Minutes';
   $lang['MONTHLY_REPORT'] ='Monthly Report';
 
   $lang['NEW_PASSWORD'] = 'New Password';
@@ -292,6 +293,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 
   $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
+  $lang['MINUTES'] = 'Minuten';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
   $lang['NEW_PASSWORD'] = 'Neues Passwort';

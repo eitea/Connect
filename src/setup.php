@@ -1,12 +1,14 @@
 <?php
-require 'connection_config.php';
-
-$conn = new mysqli($servername, $username, $password);
-if ($conn->connect_error) {
+if(!isset($_SERVER['RDS_HOSTNAME'])){
+  require 'connection_config.php';
+  $conn = new mysqli($servername, $username, $password);
+  if ($conn->connect_error) {
     echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
     die();
+  }
+} else {
+  require '';
 }
-
 // Create database
 $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
 if ($conn->query($sql)) {
@@ -19,12 +21,13 @@ $conn->close();
 
 require 'connection.php';
 
-$psw = $_GET['psw'];
-$companyName = rawurldecode($_GET['companyName']);
-$firstname = rawurldecode($_GET['first']);
-$lastname = rawurldecode($_GET['last']);
-$loginname = rawurldecode($_GET['login']);
-
+if(isset($_GET)){
+  $psw = $_GET['psw'];
+  $companyName = rawurldecode($_GET['companyName']);
+  $firstname = rawurldecode($_GET['first']);
+  $lastname = rawurldecode($_GET['last']);
+  $loginname = rawurldecode($_GET['login']);
+}
 
 $sql = "CREATE TABLE $userTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

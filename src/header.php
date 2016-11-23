@@ -382,10 +382,8 @@ $(document).ready(function() {
                             <div class="collapse" id="toggleAdminOption_PROJECT" style="height: 0px;">
                               <ul class="nav navbar-nav">
 
-
                                 <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="getProjects.php"><i class="fa fa-history"></i> <span><?php echo $lang['VIEW_PROJECTS']; ?></span></a></li>
                                 <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i> <span><?php echo $lang['CLIENTS']; ?></span></a></li>
-                                <li><a <?php if($this_page =='dailyReport.php'){echo $setActiveLink;}?> href="dailyReport.php"> <i class="fa fa-book"></i> <span><?php echo $lang['DAILY_USER_PROJECT']; ?></span></a></li>
 
                               </ul>
                             </div>
@@ -393,7 +391,7 @@ $(document).ready(function() {
                         <?php endif; ?>
 
                         <?php
-                        if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "dailyReport.php"){
+                        if($this_page == "getProjects.php" || $this_page == "editCustomers.php"){
                           echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
                         }
                         ?>
