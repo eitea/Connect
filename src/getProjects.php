@@ -47,6 +47,61 @@ if(isset($_POST['filterUserID'])){
 }
 ?>
 
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+    $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
+    $result = mysqli_query($conn, $sql);
+
+    $row = $result->fetch_assoc();
+    $indexIM = $row['indexIM']; //this value mustnt change
+
+    $startDate = $filterDate." ".$_POST['start'];
+    $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+
+    $endDate = $filterDate." ".$_POST['end'];
+    $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+
+    $insertInfoText = test_input($_POST['infoText']);
+    $insertInternInfoText = test_input($_POST['internInfoText']);
+
+    if(timeDiff_Hours($startDate, $endDate) > 0){
+      if(isset($_POST['addBreak'])){ //checkbox
+        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
+        $conn->query($sql);
+        $duration = timeDiff_Hours($startDate, $endDate);
+        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+        $conn->query($sql);
+        $showUndoButton = TRUE;
+      } else {
+        if(isset($_POST['project'])){
+          $projectID = $_POST['project'];
+          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
+          $conn->query($sql);
+        } else {
+          echo '<div class="alert alert-danger fade in">';
+          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+          echo '<strong>Could not create entry: </strong>No Project selected.';
+          echo '</div>';
+        }
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Could not create entry: </strong>Times were not valid.';
+      echo '</div>';
+    }
+  } elseif(isset($_POST['add'])) {
+    echo '<div class="alert alert-danger fade in">';
+    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
+    echo '</div>';
+  }
+  echo '<br>';
+}
+?>
+
 <form method='post'>
   <?php
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -301,6 +356,19 @@ if($filterCompany != 0):
     });
   };
 
+  function showNewClients(selectID, company, client){
+    $.ajax({
+      url:'ajaxQuery/AJAX_client.php',
+      data:{companyID:company, clientID:client},
+      type: 'post',
+      success : function(resp){
+        $(selectID).html(resp);
+      },
+      error : function(resp){}
+    });
+
+    showProjects(client, 0);
+  };
   </script>
 
   <?php if($filterCompany != 0): ?>
@@ -336,7 +404,7 @@ if($filterCompany != 0):
   $lang['SUM'].' (min)', $lang['SUM'].' (0.25h)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE']));
 
   $sum_min = $sum25 = 0;
-
+  $addTimeStart = 0;
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterCompany = $_POST['filterCompany'];
 
@@ -391,7 +459,7 @@ if($filterCompany != 0):
     $bookedQuery
     $filterClientAdd $filterProjectAdd $filterUserIDAdd
     AND $projectBookingTable.projectID IS NOT NULL
-    ORDER BY $projectBookingTable.start DESC";
+    ORDER BY $projectBookingTable.end ASC";
 
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
@@ -438,14 +506,16 @@ if($filterCompany != 0):
         $csv_Add[] = $row['infoText'];
         echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
         echo '<td>'.$row['internInfo'].'</td>';
-        $csv_Add[] = substr($row['start'],0,10);
-        $csv_Add[] = substr($row['end'],0,10);
+        $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
+        $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+        $csv_Add[] = substr($A,0,10);
+        $csv_Add[] = substr($B,0,10);
         $csv_Add[] = substr($row['start'],11,6);
         $csv_Add[] = substr($row['end'],11,6);
         echo "<td>
-        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),0,16)."'>
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr($A,0,16)."'>
         -
-        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']),0,16)."'>";
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr($B,0,16)."'>";
 
         $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
         echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
@@ -472,6 +542,8 @@ if($filterCompany != 0):
 
         $sum_min += timeDiff_Hours($row['start'], $row['end']);
         $sum25 += $t;
+
+        $addTimeStart = $B;
       }
       ?>
 
@@ -493,9 +565,88 @@ if($filterCompany != 0):
     textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
   }
   </script>
-  <?php if($filterUserID != 0): ?>
 
+
+  <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
+  <br><br>
+  <?php if($filterUserID != 0 && isset($_POST['filterDay']) && $addTimeStart != 0): ?>
+  <div class="row">
+    <div id=mySelections class="col-xs-9">
+      <?php
+      $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
+      $result = mysqli_query($conn, $query);
+      if($result->num_rows == 1):
+
+        $row = $result->fetch_assoc();
+        $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
+        $result = mysqli_query($conn, $query);
+        if ($result && $result->num_rows > 0) {
+          echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">';
+          echo "<option name='act' value=0>Select...</option>";
+          while ($row = $result->fetch_assoc()) {
+            $cmpnyID = $row['id'];
+            $cmpnyName = $row['name'];
+            echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
+          }
+        }
+        echo '</select>';
+      else:
+        ?>
+
+        <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients(\' #addSelectClient\', this.value, 0)">
+          <option name=cmp value=0>Select...</option>
+          <?php
+          $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
+          $result = mysqli_query($conn, $query);
+          if ($result && $result->num_rows > 1) {
+            while ($row = $result->fetch_assoc()) {
+              $cmpnyID = $row['id'];
+              $cmpnyName = $row['name'];
+              echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+            }
+          }
+          ?>
+        </select>
+
+        <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">
+        </select>
+
+      <?php endif; ?>
+
+      <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project">
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
+    </div>
+    <div class="col-md-4">
+      <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="input-group input-daterange">
+        <span class="input-group-addon">
+          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
+        </span>
+        <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
+        <span class="input-group-addon"> - </span>
+        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">
+        <div class="input-group-btn">
+          <button class="btn btn-warning" type="submit"  name="add"> + </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php else: ?>
+  <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (Check-in required).</div>
   <?php endif; ?>
+
+  <!-- END ADD-BOOKING FIELD -->
 
   <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
   </fieldset>
