@@ -51,45 +51,52 @@ if(isset($_POST['filterUserID'])){
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+    //get the timestamp. if it doesnt exist -> display a biiiig fat error
     $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
     $result = mysqli_query($conn, $sql);
+    if($result && $result->num_rows>0){
+      $row = $result->fetch_assoc();
+      $indexIM = $row['indexIM']; //this value mustnt change
 
-    $row = $result->fetch_assoc();
-    $indexIM = $row['indexIM']; //this value mustnt change
+      $startDate = $filterDate." ".$_POST['start'];
+      $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
-    $startDate = $filterDate." ".$_POST['start'];
-    $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+      $endDate = $filterDate." ".$_POST['end'];
+      $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-    $endDate = $filterDate." ".$_POST['end'];
-    $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+      $insertInfoText = test_input($_POST['infoText']);
+      $insertInternInfoText = test_input($_POST['internInfoText']);
 
-    $insertInfoText = test_input($_POST['infoText']);
-    $insertInternInfoText = test_input($_POST['internInfoText']);
-
-    if(timeDiff_Hours($startDate, $endDate) > 0){
-      if(isset($_POST['addBreak'])){ //checkbox
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
-        $conn->query($sql);
-        $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
-        $conn->query($sql);
-        $showUndoButton = TRUE;
-      } else {
-        if(isset($_POST['project'])){
-          $projectID = $_POST['project'];
-          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
+      if(timeDiff_Hours($startDate, $endDate) > 0){
+        if(isset($_POST['addBreak'])){ //checkbox
+          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
           $conn->query($sql);
+          $duration = timeDiff_Hours($startDate, $endDate);
+          $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+          $conn->query($sql);
+          $showUndoButton = TRUE;
         } else {
-          echo '<div class="alert alert-danger fade in">';
-          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-          echo '<strong>Could not create entry: </strong>No Project selected.';
-          echo '</div>';
+          if(isset($_POST['project'])){
+            $projectID = $_POST['project'];
+            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
+            $conn->query($sql);
+          } else {
+            echo '<div class="alert alert-danger fade in">';
+            echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Could not create entry: </strong>No Project selected.';
+            echo '</div>';
+          }
         }
+      } else {
+        echo '<div class="alert alert-danger fade in">';
+        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>Could not create entry: </strong>Times were not valid.';
+        echo '</div>';
       }
     } else {
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Could not create entry: </strong>Times were not valid.';
+      echo '<strong>TIMESTAMP REQUIRED: </strong>Could not create entry. No Timestamp found for that date and user, please create a check-in timestamp first.';
       echo '</div>';
     }
   } elseif(isset($_POST['add'])) {
@@ -112,7 +119,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         FROM $logTable, $projectBookingTable
         WHERE $projectBookingTable.id = $imm
         AND $projectBookingTable.timestampID = $logTable.indexIM";
-
         $result = mysqli_query($conn, $query);
         if($result && $result->num_rows>0){
           $row = $result->fetch_assoc();
@@ -464,7 +470,6 @@ if($filterCompany != 0):
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
       while($row = $result->fetch_assoc()) {
-
         $x = $row['projectBookingID'];
         $timeDiff = timeDiff_Hours($row['start'], $row['end']);
         $t = ceil($timeDiff * 4) / 4;
@@ -545,6 +550,18 @@ if($filterCompany != 0):
 
         $addTimeStart = $B;
       }
+      if(isset($_POST['undo'])){
+        $row = $result->fetch_assoc();
+        if(empty($row['projectID'])){ //undo breaks
+          $timeDiff = timeDiff_Hours($row['start'], $row['end']);
+          $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
+          $conn->query($sql);
+        }
+        echo "remove entry";
+        $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
+        $conn->query($sql);
+        break;
+      }
       ?>
 
       <?php
@@ -569,7 +586,9 @@ if($filterCompany != 0):
 
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
   <br><br>
-  <?php if($filterUserID != 0 && isset($_POST['filterDay']) && $addTimeStart != 0): ?>
+  <?php if($filterUserID != 0 && isset($_POST['filterDay'])): ?>
+
+  <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Remove last entry</button></div>
   <div class="row">
     <div id=mySelections class="col-xs-9">
       <?php

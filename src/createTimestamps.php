@@ -42,10 +42,11 @@ function carryOverAdder_Minutes($a, $b) {
 }
 
 function test_input($data) {
+  require "connection.php";
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
-
+  $data = $conn->real_escape_string($data);
   return $data;
 }
 
