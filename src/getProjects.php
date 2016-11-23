@@ -469,7 +469,13 @@ if($filterCompany != 0):
 
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
-      while($row = $result->fetch_assoc()) {
+      $numRows = $result->num_rows;
+      if(isset($_POST['undo'])){
+        $numRows--;
+      }
+      for ($i=0; $i<$numRows; $i++) {
+        $row = $result->fetch_assoc();
+
         $x = $row['projectBookingID'];
         $timeDiff = timeDiff_Hours($row['start'], $row['end']);
         $t = ceil($timeDiff * 4) / 4;
@@ -557,10 +563,8 @@ if($filterCompany != 0):
           $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
           $conn->query($sql);
         }
-        echo "remove entry";
-        $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
+        $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['projectBookingID'];
         $conn->query($sql);
-        break;
       }
       ?>
 
