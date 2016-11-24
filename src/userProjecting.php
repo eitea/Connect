@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
       if(isset($_POST['addBreak'])){ //checkbox
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
+        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
         $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";

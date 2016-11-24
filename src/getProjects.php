@@ -616,7 +616,7 @@ if($filterCompany != 0 || $filterUserID != 0):
     $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
     $result = mysqli_query($conn, $query);
     if ($result && $result->num_rows > 0) {
-      echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">';
+      echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\'#addSelectProject\', this.value, 0)">';
       echo "<option name='act' value=0>Select...</option>";
       while ($row = $result->fetch_assoc()) {
         $cmpnyID = $row['id'];
@@ -628,7 +628,7 @@ if($filterCompany != 0 || $filterUserID != 0):
   else:
     ?>
 
-    <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients(\' #addSelectClient\', this.value, 0)">
+    <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients('#addSelectClient', this.value, 0)">
     <option name=cmp value=0>Select...</option>
     <?php
     $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
@@ -643,7 +643,7 @@ if($filterCompany != 0 || $filterUserID != 0):
     ?>
     </select>
 
-    <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">
+    <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects('#addSelectProject', this.value, 0)">
     </select>
 
     <?php endif; ?>
