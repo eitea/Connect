@@ -298,7 +298,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['AMOUNT_VACATION_DAYS']; ?>: <br>
-                  <input type="number" class="form-control" step=any  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo $vacDaysCredit; ?>"/>
+                  <input type="number" class="form-control" step=any  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo $vacDaysCredit/24; ?>"/>
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>

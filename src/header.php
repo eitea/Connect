@@ -53,14 +53,6 @@ $(document).ready(function() {
     $canStamp = $row['canStamp'];
   }
 
-  if ($_SERVER["REQUEST_METHOD"] == "POST"){
-    if ((time() - $_SESSION['posttimer']) <= 2){
-      unset($_POST);
-    } else {
-      $_SESSION['posttimer'] = time();
-    }
-  }
-
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       $password = $_POST['password'];
@@ -124,7 +116,18 @@ $(document).ready(function() {
   }
 
   require "language.php";
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST"){
+      if ((time() - $_SESSION['posttimer']) <= 2){
+        unset($_POST);
+      } else {
+        $_SESSION['posttimer'] = time();
+      }
+    }
+
   ?>
+
+
 
   <!-- /navbar -->
   <nav class="navbar navbar-default navbar-fixed-top hidden-xs">

@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       if(timeDiff_Hours($startDate, $endDate) > 0){
         if(isset($_POST['addBreak'])){ //checkbox
-          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$info')";
+          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText')";
           $conn->query($sql);
           $duration = timeDiff_Hours($startDate, $endDate);
           $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
@@ -654,7 +654,7 @@ if($filterCompany != 0):
     <div class="col-md-6">
       <div class="input-group input-daterange">
         <span class="input-group-addon">
-          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
+          <input type="checkbox" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
         </span>
         <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
         <span class="input-group-addon"> - </span>
