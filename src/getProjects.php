@@ -8,7 +8,7 @@
 </div>
 
 <?php
-$filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year and month
+$filterDate = substr(getCurrentTimestamp(),0,10); //granularity: set the default to day
 $booked = '0';
 $filterCompany = 0;
 $filterClient = 0;
@@ -189,26 +189,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     });
   };
 
-  function showUsers(company, user){
-    $.ajax({
-      url:'ajaxQuery/AJAX_user.php',
-      data:{companyID:company, userID:user},
-      type: 'post',
-      success : function(resp){
-        $("#filterUserID").html(resp);
-      },
-      error : function(resp){}
-    });
-  };
-
-  function showFilters(){
-    document.getElementById("myFilters").style.visibility='visible';
+  function showFilters(divID){
+    document.getElementById(divID).style.visibility='visible';
   }
 
   function textAreaAdjust(o) {
-  o.style.height = "1px";
-  o.style.height = (o.scrollHeight)+"px";
-}
+    o.style.height = "1px";
+    o.style.height = (o.scrollHeight)+"px";
+  }
 
 
   $(document).ready(function() {
@@ -217,10 +205,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </script>
 
 
-  <!----------------------------------------------------------------------------->
+  <!-- ####################-FILTERS-######################################## -->
   <div class="row">
     <div class="col-md-3">
-      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showUsers(this.value, 0); showFilters();' class="js-example-basic-single">
+      <!-- SELECT COMPANY -->
+      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
         <option value="0">Select Company...</option>
         <?php
         $sql = "SELECT * FROM $companyTable";
@@ -239,9 +228,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ?>
       </select>
       <br><br>
+      <!-- SELECT USER -->
+      <select id="filterUserID" name="filterUserID" class="js-example-basic-single" style='width:200px' onchange='showFilters("dateDiv");'>
+        <?php
+        $query = "SELECT * FROM $userTable;";
+        $result = mysqli_query($conn, $query);
+        echo "<option name=filterUserID value=0>User...</option>";
+        while($row = $result->fetch_assoc()){
+          $i = $row['id'];
+          if ($filterUserID == $i) {
+            echo "<option value=$i selected>".$row['firstname'] . " " . $row['lastname']."</option>";
+          } else {
+            echo "<option value=$i>".$row['firstname'] . " " . $row['lastname']."</option>";
+          }
+        }
+        ?>
+      </select>
+      <br><br>
+
       <button type="submit" class="btn btn-warning" name="filter">Filter</button><br><br>
     </div>
-    <div id="myFilters" class="invisible">
+
+
+    <!-- SELECTS DATE -->
+    <div id="dateDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
           <input type=text style='width:200px' readonly class="form-control input-sm" value="Date: ">
@@ -283,10 +293,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           ?>
         </select>
       </div>
+    </div>
 
+    <div id="projectAndClientDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="Client - Project: ">
+          <input type=text style='width:200px' readonly class="form-control input-sm" value="Client, Project: ">
         </div>
         <div class='form-group'>
           <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects(this.value, 0)' >
@@ -297,22 +309,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </select>
         </div>
       </div>
+    </div>
 
-      <div class="col-md-3">
-        <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="Charged - User: ">
-        </div>
-        <div class='form-group'>
-          <select name="filterBooked" style='width:200px' class="js-example-basic-single">
-            <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
-            <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
-            <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
-          </select>
-        </div>
-        <div class='form-group'>
-          <select id="filterUserID" name="filterUserID" class="js-example-basic-single" style='width:200px'>
-          </select>
-        </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <input type=text style='width:200px' readonly class="form-control input-sm" value="Charged: ">
+      </div>
+      <div class='form-group'>
+        <select name="filterBooked" style='width:200px' class="js-example-basic-single">
+          <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
+          <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
+          <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
+        </select>
       </div>
     </div>
   </div>
@@ -324,14 +332,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!----------------------------------------------------------------------------->
 
 <?php
-if($filterCompany != 0):
+if($filterCompany != 0 || $filterUserID != 0):
   ?>
 
   <script>
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
   showProjects(<?php echo $filterClient; ?>, <?php echo $filterProject; ?>);
-  showUsers(<?php echo $filterCompany; ?>, <?php echo $filterUserID; ?>);
-  document.getElementById("myFilters").style.visibility='visible';
+  document.getElementById("projectAndClientDiv").style.visibility='visible';
+  document.getElementById("dateDiv").style.visibility='visible';
   </script>
 
   <?php endif; ?>
@@ -377,7 +385,7 @@ if($filterCompany != 0):
   };
   </script>
 
-  <?php if($filterCompany != 0): ?>
+  <?php if($filterCompany != 0 || $filterUserID != 0): ?>
   <div class="container-fluid">
   <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
   <fieldset disabled>
@@ -412,7 +420,6 @@ if($filterCompany != 0):
   $sum_min = $sum25 = 0;
   $addTimeStart = 0;
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $filterCompany = $_POST['filterCompany'];
 
     if($booked == '2'){
       $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
@@ -439,6 +446,11 @@ if($filterCompany != 0):
     } else {
       $filterUserIDAdd = "AND $userTable.id = $filterUserID";
     }
+    if($filterCompany == 0){
+      $filterCompanyAdd = "";
+    } else {
+      $filterCompanyAdd = "AND $companyTable.id = $filterCompany";
+    }
 
     $sql="SELECT DISTINCT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
@@ -455,13 +467,13 @@ if($filterCompany != 0):
     $projectTable.hours,
     $projectTable.hourlyPrice
     FROM $projectBookingTable, $logTable, $userTable, $clientTable, $projectTable, $companyTable
-    WHERE $companyTable.id = $filterCompany
-    AND $projectTable.clientID = $clientTable.id
+    WHERE $projectTable.clientID = $clientTable.id
     AND $clientTable.companyID = $companyTable.id
     AND $projectBookingTable.projectID = $projectTable.id
     AND $projectBookingTable.timestampID = $logTable.indexIM
     AND $userTable.id = $logTable.userID
     AND $projectBookingTable.start LIKE '$filterDate%'
+    $filterCompanyAdd
     $bookedQuery
     $filterClientAdd $filterProjectAdd $filterUserIDAdd
     AND $projectBookingTable.projectID IS NOT NULL
@@ -488,7 +500,7 @@ if($filterCompany != 0):
 
         echo "<td>";
         echo "<select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
-        $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany";
+        $sql = "SELECT * FROM $clientTable";
         $clientResult = $conn->query($sql);
         while($clientRow = $clientResult->fetch_assoc()){
           $selected = '';
@@ -526,7 +538,7 @@ if($filterCompany != 0):
         echo "<td>
         <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr($A,0,16)."'>
         -
-        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr($B,0,16)."'>";
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr($B,0,16)."'></td>";
 
         $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
         echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
@@ -594,98 +606,98 @@ if($filterCompany != 0):
 
   <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Remove last entry</button></div>
   <div class="row">
-    <div id=mySelections class="col-xs-9">
-      <?php
-      $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
-      $result = mysqli_query($conn, $query);
-      if($result->num_rows == 1):
+  <div id=mySelections class="col-xs-9">
+  <?php
+  $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
+  $result = mysqli_query($conn, $query);
+  if($result->num_rows == 1):
 
-        $row = $result->fetch_assoc();
-        $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
-        $result = mysqli_query($conn, $query);
-        if ($result && $result->num_rows > 0) {
-          echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">';
-          echo "<option name='act' value=0>Select...</option>";
-          while ($row = $result->fetch_assoc()) {
-            $cmpnyID = $row['id'];
-            $cmpnyName = $row['name'];
-            echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
-          }
-        }
-        echo '</select>';
-      else:
-        ?>
+    $row = $result->fetch_assoc();
+    $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
+    $result = mysqli_query($conn, $query);
+    if ($result && $result->num_rows > 0) {
+      echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">';
+      echo "<option name='act' value=0>Select...</option>";
+      while ($row = $result->fetch_assoc()) {
+        $cmpnyID = $row['id'];
+        $cmpnyName = $row['name'];
+        echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
+      }
+    }
+    echo '</select>';
+  else:
+    ?>
 
-        <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients(\' #addSelectClient\', this.value, 0)">
-          <option name=cmp value=0>Select...</option>
-          <?php
-          $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
-          $result = mysqli_query($conn, $query);
-          if ($result && $result->num_rows > 1) {
-            while ($row = $result->fetch_assoc()) {
-              $cmpnyID = $row['id'];
-              $cmpnyName = $row['name'];
-              echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
-            }
-          }
-          ?>
-        </select>
+    <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients(\' #addSelectClient\', this.value, 0)">
+    <option name=cmp value=0>Select...</option>
+    <?php
+    $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
+    $result = mysqli_query($conn, $query);
+    if ($result && $result->num_rows > 1) {
+      while ($row = $result->fetch_assoc()) {
+        $cmpnyID = $row['id'];
+        $cmpnyName = $row['name'];
+        echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+      }
+    }
+    ?>
+    </select>
 
-        <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">
-        </select>
+    <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects(\' #addSelectProject\', this.value, 0)">
+    </select>
 
-      <?php endif; ?>
+    <?php endif; ?>
 
-      <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project">
-      </select>
+    <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project">
+    </select>
     </div>
-  </div>
+    </div>
 
-  <div class="row">
+    <div class="row">
     <div class="col-md-8">
-      <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
+    <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
     </div>
     <div class="col-md-4">
-      <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
+    <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
     </div>
-  </div>
+    </div>
 
-  <div class="row">
+    <div class="row">
     <div class="col-md-6">
-      <div class="input-group input-daterange">
-        <span class="input-group-addon">
-          <input type="checkbox" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
-        </span>
-        <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
-        <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">
-        <div class="input-group-btn">
-          <button class="btn btn-warning" type="submit"  name="add"> + </button>
-        </div>
-      </div>
+    <div class="input-group input-daterange">
+    <span class="input-group-addon">
+    <input type="checkbox" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
+    </span>
+    <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
+    <span class="input-group-addon"> - </span>
+    <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">
+    <div class="input-group-btn">
+    <button class="btn btn-warning" type="submit"  name="add"> + </button>
     </div>
-  </div>
-  <?php else: ?>
-  <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (Check-in required).</div>
-  <?php endif; ?>
+    </div>
+    </div>
+    </div>
+    <?php else: ?>
+    <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (Check-in required).</div>
+    <?php endif; ?>
 
-  <!-- END ADD-BOOKING FIELD -->
+    <!-- END ADD-BOOKING FIELD -->
 
-  <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
-  </fieldset>
-  <?php endif; ?>
-  </div>
+    <?php if(!isset($_POST['filterBooked']) || $_POST['filterBooked'] != '1'): ?>
+    </fieldset>
+    <?php endif; ?>
+    </div>
 
-  <br><br>
-  <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
-  <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
-  <?php endif; ?>
+    <br><br>
+    <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
+    <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
+    <?php endif; ?>
 
-  </form>
+    </form>
 
-  <form action="csvDownload.php" method="post" target='_blank'>
-  <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-  </form>
-  <?php endif; ?>
-  <!-- /BODY -->
-  <?php include 'footer.php'; ?>
+    <form action="csvDownload.php" method="post" target='_blank'>
+    <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
+    </form>
+    <?php endif; ?>
+    <!-- /BODY -->
+    <?php include 'footer.php'; ?>

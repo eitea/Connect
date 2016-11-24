@@ -59,15 +59,15 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   <tr>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
     <th><?php echo $lang['DATE']; ?></th>
-    <th><?php echo $lang['BEGIN']?></th>
-    <th><?php echo $lang['LUNCHBREAK']?> (h)</th>
-    <th><?php echo $lang['END']?></th>
+    <th><?php echo $lang['BEGIN']; ?></th>
+    <th><?php echo $lang['BREAK']; ?></th>
+    <th><?php echo $lang['END']; ?></th>
     <th style='font-size:small; text-align:left; width:40px'><?php echo $lang['LAST_BOOKING']; ?></th>
     <th><?php echo $lang['ACTIVITY']; ?></th>
-    <th><?php echo $lang['SHOULD_TIME']?></th>
-    <th><?php echo $lang['IS_TIME']?></th>
-    <th><?php echo $lang['DIFFERENCE']?></th>
-    <th>Saldo - <?php echo $lang['ACCUMULATED']; ?></th>
+    <th><?php echo $lang['SHOULD_TIME']; ?></th>
+    <th><?php echo $lang['IS_TIME']; ?></th>
+    <th><?php echo $lang['DIFFERENCE']; ?></th>
+    <th>Saldo<br><?php echo $lang['ACCUMULATED']; ?></th>
   </tr>
 
 <?php
@@ -120,7 +120,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
           $style = "color:#6fcf2c"; //green
         }
         if($bookingTimeDifference > $config['bookingTimeBuffer']){
-          $style = "color:#ffdf5b"; //yellow
+          $style = "color:#facf1e"; //yellow
         }
         if($bookingTimeDifference > $config['bookingTimeBuffer'] * 2){
           $style = "color:#fc8542"; //red

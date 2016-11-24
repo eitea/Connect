@@ -1,6 +1,8 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php';?>
 <!-- BODY -->
+<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
+<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
 
 <div class="page-header">
   <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
@@ -172,7 +174,7 @@ if (!empty($_POST['filterStatus'])) {
 
                   //creating a new timestamp should delete absent file if it exists
                   $sql = "DELETE FROM $negative_logTable WHERE userID = $filterID AND time LIKE '$timeIsLike'";
-                  $conn->query($sql);                  
+                  $conn->query($sql);
 
                   //get expected Hours
                   $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
@@ -296,20 +298,24 @@ if (!empty($_POST['filterStatus'])) {
                     <span class="input-group-btn">
                       <button class="btn btn-warning" type="submit" name="create"> + </button>
                     </span>
-                    <input type="text" class="form-control datepick" value="" placeholder="Von" size='16' maxlength=16 name="creatFromTime">
+                    <input id="calendar" type="text" class="form-control datepick" value="" placeholder="Von" size='16' maxlength=16 name="creatFromTime">
                     <span class="input-group-addon"> - </span>
-                    <input type="text" class="form-control datepick" value="" placeholder="Bis" size='16' maxlength=16  name="creatToTime">
+                    <input id="calendar2" type="text" class="form-control datepick" value="" placeholder="Bis" size='16' maxlength=16  name="creatToTime">
                   </div>
                 </div>
+                <script>
+                var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+                myCalendar.setSkin("material");
+                myCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+                </script>
 
                 <div class="text-right">
                   <button type="submit" class="btn btn-warning" name="delete"><?php echo $lang['DELETE']; ?></button>
                   <button  type="submit" class="btn btn-warning" name="saveChanges"> Save </button>
                 </div>
-
               </div>
-
             </span>
+
           <?php endif; ?>
         <?php else: ?>
           <div class="alert alert-info" role="alert"><strong>Mandatory Settings: </strong>Select User and Year to display Information.</div>
