@@ -19,9 +19,8 @@ $vacs = '';
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     $title = $lang['VACATION'] . ': ' . $row['firstname'] . ' ' . $row['lastname'];
-    $start = substr($row['fromDate'], 0, 16);
-    $end = substr($row['toDate'], 0, 16);
-
+    $start = substr($row['fromDate'], 0, 10).' 04:00';
+    $end = substr($row['toDate'], 0, 10).' 23:00';
     $vacs .= "{ title: '$title', start: '$start', end: '$end'},";
   }
 }
