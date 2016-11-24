@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; ?>
+<?php include 'validate.php'; enableToCore($userID)?>
 <!-- BODY -->
 <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
 <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>

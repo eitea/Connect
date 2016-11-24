@@ -16,7 +16,7 @@ if(isset($_POST['filterMonth'])){
   $filterMonth = $_POST['filterMonth'];
 }
 
-if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
+if(isset($_POST['filterUserID'])){
   $filterUserID = $_POST['filterUserID'];
 }
 ?>
@@ -43,7 +43,6 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   ?>
   </select>
 </div>
-
   <div class="col-md-6">
     <div class="input-group">
       <input type="month" class="form-control" name="filterMonth" value=<?php echo $filterMonth; ?> >
@@ -53,9 +52,10 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     </div>
   </div>
 </div>
+</form>
 
 <br><br>
-<table class="table table-hover table-striped">
+<table class="table table-hover">
   <tr>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
     <th><?php echo $lang['DATE']; ?></th>
@@ -67,7 +67,8 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     <th><?php echo $lang['SHOULD_TIME']; ?></th>
     <th><?php echo $lang['IS_TIME']; ?></th>
     <th><?php echo $lang['DIFFERENCE']; ?></th>
-    <th>Saldo<br><?php echo $lang['ACCUMULATED']; ?></th>
+    <th>Saldo</th>
+    <th width=100px;><?php echo $lang['EDIT']; ?></th>
   </tr>
 
 <?php
@@ -166,6 +167,28 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
     echo "<td $saldoStyle>" . sprintf('%+.2f', $theSaldo) . "</td>";
     echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
+    echo "<td>";
+    ?>
+    <div class="col-xs-6">
+    <form method="post" action="getProjects.php" target="_blank">
+      <!--filteredUserID filterYear filterMonth filterDay filterBooked-->
+        <input type="text" name="filterUserID" style="display:none" value="<?php echo $filterUserID; ?>" >
+        <input type="text" name="filterYear" style="display:none" value="<?php echo $calculator->date[$i]; ?>" >
+
+      <button type="submit" class="btn btn-default" title="Project View"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+  <div class="col-xs-6">
+    <form method="post" action="getTimestamps.php" target="_blank">
+      <!--filteredUserID filterYear filterMonth filterStatus-->
+        <input type='text' name="filteredUserID" style="display:none" value="<?php echo $filterUserID; ?>" >
+        <input type='text' name="filterYear" style="display:none" value="<?php echo $calculator->date[$i]; ?>" >
+
+      <button type="submit" class="btn btn-default" title="Timestamp View"><i class="fa fa-pencil"></i></button>
+    </form>
+  </div>
+    <?php
+    echo "</td>";
     echo "</tr>";
 
 /* TODO: continue here
@@ -179,9 +202,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
 ?>
 
 </table>
-</form>
-
-
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
+'; ?>
