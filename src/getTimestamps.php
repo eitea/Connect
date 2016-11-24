@@ -13,7 +13,7 @@ $filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year 
 $filterID = 0;
 $filterStatus ='';
 
-if (isset($_POST['filteredUserID'])) {
+if (!empty($_POST['filteredUserID'])) {
   $filterID = $_POST['filteredUserID'];
 }
 
