@@ -7,76 +7,71 @@
 </div>
 
 <?php
-require "Calculators/MonthlyCalculator.php";
+$filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year and month
+$filterID = 0;
+$filterStatus ='';
+
+if (isset($_POST['filteredUserID'])) {
+  $filterID = $_POST['filteredUserID'];
+}
+
+if(!empty($_POST['filterYear'])){
+  $filterDate = $_POST['filterYear'];
+  if(!empty($_POST['filterMonth'])){
+    $filterDate .= '-' . $_POST['filterMonth'];
+  }
+}
+
+if (!empty($_POST['filterStatus'])) {
+  $filterStatus = $_POST['filterStatus'];
+}
 ?>
 
-<form method="post">  
+<form method="post">
   <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
     <?php
     $query = "SELECT * FROM $userTable;";
     $result = mysqli_query($conn, $query);
-    $userFilterOptions = array(array("id" => "0", "firstname" => "--Select", "lastname" => "User--"));
 
-    while($row=$result->fetch_assoc()){
-      array_push($userFilterOptions, $row);
-    }
-
-    foreach ($userFilterOptions as $row) {
+    echo "<option name=filterUserID value=0>User...</option>";
+    while($row = $result->fetch_assoc()){
       $i = $row['id'];
-      $option = $i . " - " . $row['firstname'] . " " . $row['lastname'];
-      if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $filterID = $_POST['filteredUserID'];
-      } else {
-        $filterID = 0;
-      }
       if ($filterID == $i) {
-        echo "<option name=filterUserID value=$i selected>$option</option>";
+        echo "<option name=filterUserID value=$i selected>".$row['firstname'] . " " . $row['lastname']."</option>";
       } else {
-        echo "<option name=filterUserID value=$i>$option</option>";
+        echo "<option name=filterUserID value=$i>".$row['firstname'] . " " . $row['lastname']."</option>";
       }
     }
     ?>
   </select>
+  <select name='filterStatus' style="width:100px" class="js-example-basic-single">
+    <option value="" >---</option>
+    <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang_activityToString[0]; ?></option>
+    <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang_activityToString[1]; ?></option>
+    <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang_activityToString[2]; ?></option>
+    <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang_activityToString[3]; ?></option>
+  </select>
 
-  <select name='filteredYear' style="width:200px" class="js-example-basic-single">
+  <select name='filterYear' style="width:100px" class="js-example-basic-single">
     <?php
-    $currentYear = substr(getCurrentTimestamp(), 0, 4);
-    $yearFilterOptions = array("---");
-    for ($i = $currentYear - 10; $i < $currentYear + 10; $i++){
-      array_push($yearFilterOptions, $i);
-    }
-    foreach ($yearFilterOptions as $i) {
-      if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $filterYear = $_POST['filteredYear'];
-      } else {
-        $filterYear = $currentYear;
-      }
-      if ($i == $filterYear) {
-        echo "<option name=filterYear value=$i selected>$i</option>";
-      } else {
-        echo "<option name=filterYear value=$i>$i</option>";
-      }
+    for($i = substr($filterDate,0,4)-4; $i < substr($filterDate,0,4)+4; $i++){
+      $selected = ($i == substr($filterDate,0,4))?'selected':'';
+      echo "<option $selected value=$i>$i</option>";
     }
     ?>
   </select>
 
-  <select name='filteredMonth' style="width:200px" class="js-example-basic-single">
+  <select name='filterMonth' style="width:100px" class="js-example-basic-single">
+    <option value="">---</option>
     <?php
-    $allMonths = array('---', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', '---');
-    $currentMonth = substr(getCurrentTimestamp(), 5, 2);
-    for($i = 0; $i < 13; $i++) {
-      $option = $allMonths[$i];
-      $stringMonthrep = sprintf("%02d", $i);
-      if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $filterMonth = $_POST['filteredMonth'];
-      } else {
-        $filterMonth = $currentMonth;
+    for($i = 1; $i < 13; $i++) {
+      $selected= '';
+      if ($i == substr($filterDate,5,2)) {
+        $selected = 'selected';
       }
-      if ($i == $filterMonth) {
-        echo "<option name=filterUserID value=$stringMonthrep selected>$option</option>";
-      } else {
-        echo "<option name=filterUserID value=$stringMonthrep>$option</option>";
-      }
+      $dateObj = DateTime::createFromFormat('!m', $i);
+      $option = $dateObj->format('F');
+      echo "<option $selected name=filterUserID value=".sprintf("%02d",$i).">$option</option>";
     }
     ?>
   </select>
@@ -87,10 +82,9 @@ require "Calculators/MonthlyCalculator.php";
 
   <!-- ####################################################################### -->
   <?php if($filterID != 0): ?>
-
     <div class="container-fluid">
       <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#home"><?php $dateObj=DateTime::createFromFormat('!m', $currentMonth); echo $dateObj->format('F');?></a></li>
+        <li class="active"><a data-toggle="tab" href="#home">Detail</a></li>
         <li><a data-toggle="tab" href="#menu1"><?php echo $lang['OVERVIEW']; ?></a></li>
       </ul>
       <div class="tab-content">
@@ -118,10 +112,18 @@ require "Calculators/MonthlyCalculator.php";
             } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
               $index = $_POST["index"];
               foreach ($index as $x) {
-                $sql = "DELETE FROM " . $logTable . " WHERE indexIM=$x;";
+                //deleting a timestamp should create an unlog
+                $sql = "SELECT expectedHours, userID, time FROM $logTable WHERE indexIM = $x";
+                $result = $conn->query($sql);
+                $row = $result->fetch_assoc();
+                $day = strtolower(date('D', strtotime($row['time'])));
+                $sql = "INSERT INTO $negative_logTable(userID, $day) VALUES(".$row['userID'].", '".$row['expectedHours']."')";
                 $conn->query($sql);
                 echo mysqli_error($conn);
 
+                $sql = "DELETE FROM $logTable WHERE indexIM=$x;";
+                $conn->query($sql);
+                echo mysqli_error($conn);
               }
             } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime']) && $_POST['creatFromTime'] != '0000-00-00 00:00') {
               if($_POST['creatToTime'] == '0000-00-00 00:00' || timeDiff_Hours($_POST['creatFromTime'], $_POST['creatToTime']) > 0) {
@@ -138,6 +140,7 @@ require "Calculators/MonthlyCalculator.php";
                   $timeEnd = '0000-00-00 00:00:00';
                 }
 
+                //gotta see if there already is a timestamp for that day
                 $sql = "SELECT * FROM $logTable WHERE userID = $filterID
                 AND status = '$activtiy'
                 AND time LIKE '$timeIsLike'";
@@ -149,10 +152,9 @@ require "Calculators/MonthlyCalculator.php";
                   $start = $row['timeEnd'];
                   $indexIM = $row['indexIM'];
 
-                  $diff = timeDiff_Hours($start, $timeBegin);
+                  $diff = timeDiff_Hours($start, $timeBegin); //beginning of new timestamp has to be later than the end of the existing timestamp and existing timestamp has to be be closed
                   if($start != '0000-00-00 00:00:00' && $diff > 0){
-
-                    //create break stamp only if its about status 0
+                    //create a break stamp only if its about status 0
                     if($activity == 0){
                       $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', '$timeBegin', $indexIM, 'Create auto-break')";
                       $conn->query($sql);
@@ -166,7 +168,11 @@ require "Calculators/MonthlyCalculator.php";
                   } else {
                     echo "ERROR - Merging timestamps of same dates: time difference was less or equal 0. Check your times and see if existing timestamp has been closed.";
                   }
-                } else { //create new stamp
+                } else { //no existing timestamp yet - create a new stamp
+
+                  //creating a new timestamp should delete absent file if it exists
+                  $sql = "DELETE FROM $negative_logTable WHERE userID = $filterID AND time LIKE '$timeIsLike'";
+                  $conn->query($sql);                  
 
                   //get expected Hours
                   $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
@@ -183,12 +189,6 @@ require "Calculators/MonthlyCalculator.php";
           }
           ?>
 
-          <script>
-          $(document).ready(function(){
-            $('[data-toggle="popover"]').popover();
-          });
-          </script>
-
           <table class="table table-striped table-condensed text-center">
             <tr>
               <th><?php echo $lang['DELETE']; ?></th>
@@ -201,63 +201,56 @@ require "Calculators/MonthlyCalculator.php";
               <th><?php echo $lang['IS_TIME']; ?></th>
               <th><?php echo $lang['SUM']; ?></th>
               <th><?php echo $lang['DIFFERENCE']; ?></th>
-
-              <th><?php echo $lang['BOOKINGS']; ?></th>
             </tr>
-            <?php
 
-            if($filterMonth == 0){
-              $filterMonth = getCurrentTimestamp();
+            <?php
+            if(empty($filterStatus)){
+              $filterStatusAdd = "";
+            } else {
+              $filterStatusAdd = "AND status = '$filterStatus'";
             }
 
-            $filterMonth = $filterYear ."-".$filterMonth."-01 05:00:00";
-
-            $calculator = new Monthly_Calculator($filterMonth, $filterID);
-            $calculator->calculateValues();
-
             $absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
-
-            for($i = 0; $i < $calculator->days; $i++){
-              if($calculator->start[$i] != '-' && $calculator->activity[$i] >= 0):
-
-                if($calculator->end[$i] == '0000-00-00 00:00:00'){
+            $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ";
+            $result = mysqli_query($conn, $sql);
+            if($result && $result->num_rows >0) {
+              while($row = $result->fetch_assoc()){
+                if($row['timeEnd'] == '0000-00-00 00:00:00'){
                   $endTime = getCurrentTimestamp();
                 } else {
-                  $endTime = $calculator->end[$i];
+                  $endTime = $row['timeEnd'];
                 }
 
-                $difference = timeDiff_Hours($calculator->start[$i], $endTime );
+                $A = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
+                $B = carryOverAdder_Hours($endTime, $row['timeToUTC']);
+                $difference = timeDiff_Hours($A, $B);
 
-                $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
-                $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
-
-                $k = $calculator->indecesIM[$i];
-
+                $k = $row['indexIM'];
 
                 echo "<tr>";
                 echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
-                echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
+                echo "<td>" . $lang_activityToString[$row['status']] . "</td>";
 
                 echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
-                echo "<td class='text-center'>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
+                echo "<td class='text-center'>" . $row['breakCredit'] . "</td>";
                 echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
 
-                echo "<td>" . $calculator->shouldTime[$i] . "</td>";
+                echo "<td>" . $row['expectedHours'] . "</td>";
                 echo "<td>" . sprintf('%.2f', $difference) . "</td>";
-                echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
-                echo "<td>" . sprintf('%+.2f', $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i]) . "</td>";
+                echo "<td>" . sprintf('%.2f', $difference - $row['breakCredit']) . "</td>";
+                echo "<td>" . sprintf('%+.2f', $difference - $row['expectedHours']  - $row['breakCredit']) . "</td>";
 
-                echo '<td class=text-center><a target="_self" href="dailyReport.php?filterDay='.substr($A,0,10).'&userID='.$filterID.'"><i class="fa fa-question-circle-o"></a></td>';
+                echo '<td class="hidden"><input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '"></td>';
                 echo "</tr>";
 
-                echo '<input type="text" style="display:none;" name="editingIndecesIM[]" value="' . $k . '">';
-                $absolvedHoursSUM += $difference - $calculator->lunchTime[$i];
-                $expectedHoursSUM += $calculator->shouldTime[$i];
-                $lunchbreakSUM += $calculator->lunchTime[$i];
-                $saldoSUM += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+                $absolvedHoursSUM += $difference -  $row['breakCredit'];
+                $expectedHoursSUM +=  $row['expectedHours'];
+                $lunchbreakSUM +=  $row['breakCredit'];
+                $saldoSUM += $difference -  $row['expectedHours'] -  $row['breakCredit'];
                 $isTimeSUM += $difference;
-              endif;
+              }
             }
+
 
             echo "<tr style=font-weight:bold;>
             <td>Sum: </td>
@@ -267,7 +260,6 @@ require "Calculators/MonthlyCalculator.php";
             <td>".sprintf('%.2f', $isTimeSUM)."</td>
             <td>".sprintf('%.2f',$absolvedHoursSUM)."</td>
             <td>".sprintf('%+.2f',$saldoSUM)."</td> <td></td></tr>";
-
             ?>
 
             <script>
@@ -319,6 +311,8 @@ require "Calculators/MonthlyCalculator.php";
 
             </span>
           <?php endif; ?>
+        <?php else: ?>
+          <div class="alert alert-info" role="alert"><strong>Mandatory Settings: </strong>Select User and Year to display Information.</div>
         <?php endif; ?>
       </form>
 
