@@ -172,7 +172,7 @@ if (!empty($_POST['filterStatus'])) {
                   }
                 } else { //no existing timestamp yet - create a new stamp
 
-                  //creating a new timestamp should delete absent file if it exists
+                  //creating a new timestamp should delete absent file if it exists, not caring about the status
                   $sql = "DELETE FROM $negative_logTable WHERE userID = $filterID AND time LIKE '$timeIsLike'";
                   $conn->query($sql);
 
@@ -293,7 +293,7 @@ if (!empty($_POST['filterStatus'])) {
                   ?>
                 </select>
 
-                <div class="col-xs-5">
+                <div class="col-xs-6 col-md-5">
                   <div class="input-group input-daterange">
                     <span class="input-group-btn">
                       <button class="btn btn-warning" type="submit" name="create"> + </button>
@@ -306,7 +306,7 @@ if (!empty($_POST['filterStatus'])) {
                 <script>
                 var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
                 myCalendar.setSkin("material");
-                myCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+                myCalendar.setDateFormat("%Y-%m-%d %H:%i");
                 </script>
 
                 <div class="text-right">
