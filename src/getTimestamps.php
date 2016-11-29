@@ -162,7 +162,7 @@ if (!empty($_POST['filterStatus'])) {
                       $conn->query($sql);
                       echo mysqli_error($conn);
                     }
-
+                    
                     //update breakCredit and new endTime
                     $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
                     $conn->query($sql);

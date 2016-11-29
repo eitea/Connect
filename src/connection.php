@@ -1,28 +1,13 @@
 <?php
 require "connection_config.php";
+require "connection_vars.php";
 
-$userTable = "UserData";
-$logTable = "logs";
-$holidayTable = "holidays";
-$vacationTable = "vacationData";
-$bookingTable = "bookingData";
-$projectTable = "projectData";
-$clientTable = "clientData";
-$companyTable = "companyData";
-$projectBookingTable = "projectBookingData";
-$companyToUserRelationshipTable = "companyToClientRelationshipData";
-$companyDefaultProjectTable = "companyDefaultProjects";
-$negative_logTable = "unlogs";
-$userRequests = "userRequestsData";
-$sessionTab = "php_session";
-$roleTable = "roles";
-
-$adminLDAPTable = "ldapConfigTab";
-$adminGitHubTable = "gitHubConfigTab";
-$configTable = "configurationData";
-$piConnTable = "piConnectionData";
-
-$conn = new mysqli($servername, $username, $password, $dbName);
+if(isset($_SESSION['dbConnect'])){
+  $conn = new mysqli("localhost", "root", "", $dbName);
+  //$conn = mysqli_connect($_SERVER['RDS_HOSTNAME'], $_SERVER['RDS_USERNAME'], $_SERVER['RDS_PASSWORD'], $dbName, $_SERVER['RDS_PORT']);
+} else {
+  $conn = new mysqli($servername, $username, $password, $dbName);
+}
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }

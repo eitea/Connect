@@ -96,6 +96,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIRSTNAME'] = 'First Name';
   $lang['FUNCTIONS'] = 'Functions';
   $lang['FROM'] ='From';
+  $lang['FOUNDERRORS'] = 'Found Errors';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
   $lang['GREETING_DAY'] = 'Hello';
@@ -267,6 +268,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIRSTNAME'] = 'Vorname';
   $lang['FUNCTIONS'] = 'Funktionen';
   $lang['FROM'] ='Von';
+  $lang['FOUNDERRORS'] = 'Gefundene Fehler';
 
   $lang['GENDER'] = 'Gender';
   $lang['GREETING_MORNING'] = 'Guten Morgen';

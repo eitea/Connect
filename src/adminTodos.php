@@ -1,36 +1,10 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; enableToCore($userID);?>
+<!-- BODY -->
+<title>TODOs</title>
 
-  <link rel="stylesheet" href="../css/table.css">
-  <link rel="stylesheet" href="../css/submitButt2.css">
-  <link rel="stylesheet" href="../css/homeMenu.css">
-
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
-
-  <style>
-  p{
-    font-size:24px;
-    color:#0078ab;
-  }
-  </style>
-</head>
-<body>
 <form method=post>
 <?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-require 'connection.php';
-require 'createTimestamps.php';
-require 'language.php';
 
 if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
   foreach($_POST['autoCorrects'] as $indexIM){
@@ -81,7 +55,7 @@ $sql ="SELECT * FROM $userRequests WHERE status = '0'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
-  <p> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </p>
+  <h4> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </h4>
 
 <?php
 echo $result->num_rows . " Vacation Request/s: ";
@@ -98,15 +72,15 @@ WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > 
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
-<p> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>: </p>
+<h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>: </h4>
 <br>
-<table>
+<table class="table table-hover">
   <th>Name</th>
   <th><?php echo $lang['TIME']; ?></th>
   <th><?php echo $lang['HOURS']; ?></th>
   <th><?php echo $lang['LUNCHBREAK']; ?></th>
   <th></th>
-
+<tbody>
 <?php
   while($row = $result->fetch_assoc()){
     echo '<tr>';
@@ -122,7 +96,7 @@ if($result && $result->num_rows > 0):
     echo '</tr>';
   }
 ?>
-
+</tbody>
 </table>
 <br>
 <input type='submit' name='autoCorrectBreaks' value='Save' />
@@ -141,15 +115,15 @@ $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
 
-<p><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: </p>
+<h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: </h4>
 
-<table id='illTS'>
+<table id='illTS' class="table table-hover">
   <th>User</th>
   <th>Status</th>
   <th><?php echo $lang['TIME']; ?></th>
   <th><?php echo $lang['HOURS']; ?></th>
   <th>Autocorrect</th>
-
+<tbody>
 <?php
   while($row = $result->fetch_assoc()){
     echo '<tr>';
@@ -162,10 +136,10 @@ if($result && $result->num_rows > 0):
   }
 
 ?>
-
+</tbody>
 </table>
 <br>
-<input type='submit' name='autoCorrect' value='Autocorrect'><small> - <?php echo $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS']; ?> </small></input>
+<button type='submit' class="btn btn-warning" name='autoCorrect'>Autocorrect</button><small> - <?php echo $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS']; ?> </small>
 <br><br>
 
 <?php
@@ -179,13 +153,13 @@ AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
 ?>
-<p><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: Gemini</p>
+<h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: Gemini</h4>
 
-<table id='dubble'>
+<table id='dubble' class="table table-hover">
   <th>User</th>
   <th width=40%><?php echo $lang['VIEW_TIMESTAMPS']; ?> 1</th>
   <th width=40%><?php echo $lang['VIEW_TIMESTAMPS']; ?> 2</th>
-
+<tbody>
 <?php
   while(($row = $result->fetch_assoc()) && ( $row2 = $result->fetch_assoc())){
     echo '<tr>';
@@ -206,10 +180,10 @@ if($result && $result->num_rows > 0):
   }
 
 ?>
-
+</tbody>
 </table>
 <br>
-<input type='submit' name='deleteGemini' value='<?php echo $lang['DELETE']; ?>'></input>
+<button type='submit' class="btn btn-warning" name='deleteGemini'><?php echo $lang['DELETE']; ?></button>
 <br><br>
 
 <?php
@@ -218,4 +192,7 @@ echo mysqli_error($conn);
 ?>
 <!-- --------------------------------------------------------------------------><br><br><br>
 </form>
-</body>
+
+<!-- /BODY -->
+<?php include 'footer.php'; ?>
+?>

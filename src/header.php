@@ -350,6 +350,7 @@ $(document).ready(function() {
                               <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-pencil"></i> <span><?php echo $lang['TIMESTAMPS'].' '.$lang['EDIT']; ?></span></a></li>
                               <li><a <?php if($this_page =='monhtlyReport.php'){echo $setActiveLink;}?> href="monthlyReport.php"><i class="fa fa-book"></i> <?php echo $lang['MONTHLY_REPORT']; ?></a></li>
                               <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-bell"></i> <?php echo $lang['VACATION']; ?></a></li>
+                              <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="adminTodos.php"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['FOUNDERRORS']; ?></a></li>
                               <li>
                                 <a id="timeFunctionSettings" href="#" data-toggle="collapse" data-target="#coreSettings" data-parent="#sidenav01" class="collapsed">
                                   <i class="fa fa-wrench"></i> <span><?php echo $lang['FUNCTIONS']; ?></span> <i class="fa fa-caret-down"></i>
@@ -371,7 +372,7 @@ $(document).ready(function() {
                       <?php endif; ?>
 
                       <?php
-                      if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php"){
+                      if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php"){
                         echo "<script>document.getElementById('adminOption_TIME').click();</script>";
                       }
                       ?>
