@@ -52,4 +52,10 @@ function enableToBookings($userID){
     die('Access denied. <a href="logout.php"> return</a>');
   }
 }
+
+function denyToCloud(){
+  if(isset($_SESSION['dbConnect']) || isset($_SERVER['RDS_HOSTNAME']) || isset($_SERVER['RDS_PORT'])){
+    die("Access Restricted");
+  }
+}
 ?>

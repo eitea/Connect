@@ -170,6 +170,24 @@ if($row['version'] < 30){
   }
 }
 
+if($row['version'] < 31){
+  $sql = "ALTER TABLE $companyTable ADD COLUMN companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'";
+  if($conn->query($sql)){
+    echo "Expand company table by type.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
+if($row['version'] < 32){
+  $sql = "ALTER TABLE $companyTable ADD COLUMN companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'";
+  if($conn->query($sql)){
+    echo "Expand company table by type.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

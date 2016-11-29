@@ -73,6 +73,7 @@
 
 <?php
 include 'version_number.php';
+require 'validate.php'; denyToCloud();
 if(!file_exists('connection_config.php')){
   header("Location: setup_getInput.php");
 }

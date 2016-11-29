@@ -8,7 +8,6 @@ if(!file_exists('src/connection_config.php')){
   header("Location: src/setup_getInput.php");
 }
 
-
 $headers = apache_request_headers();
 $userAgentHead =  $headers['User-Agent'];
 

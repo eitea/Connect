@@ -2,6 +2,9 @@
 <?php include 'validate.php'; enableToCore($userID);?>
 <!-- BODY -->
 <title>TODOs</title>
+<div class="page-header">
+  <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
+</div>
 
 <form method=post>
 <?php
@@ -63,7 +66,7 @@ echo "<a href=allowVacations.php > Answer</a>";
 endif;
 ?>
 
-<!-- --------------------------------------------------------------------------><br><br><br>
+<!-- -------------------------------------------------------------------------->
 
 <?php
 $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
@@ -195,4 +198,3 @@ echo mysqli_error($conn);
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
-?>

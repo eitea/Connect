@@ -9,9 +9,8 @@
 <form method=post>
 <?php
 
-$firstname = $_GET['gn'];
-$lastname = $_GET['sn'];
-$email = $_GET['mail'];
+$firstname = test_input($_GET['gn']);
+$lastname = test_input($_GET['sn']);
 $begin = substr(getCurrentTimestamp(),0,10) . ' 05:00:00';
 
 $vacDaysCredit = $overTimeLump = 0;
@@ -19,14 +18,20 @@ $gender = "";
 
 $pass = randomPassword();
 
+$sql = "SELECT * FROM $companyTable WHERE id = 1";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$cmpnyName = $row['name'];
+$cmpnyType = $row['companyType'];
+
 if(isset($_POST['create'])){
   $accept = true;
   if(!empty($_POST['entryDate']) && test_Date($_POST['entryDate'] ." 05:00:00")){
     $gender = $_POST['gender'];
     $begin = $_POST['entryDate'] ." 05:00:00";
 
-    if(!empty($_POST['mail']) && filter_var(test_input($_POST['mail']), FILTER_VALIDATE_EMAIL)){
-      $email = $_POST['mail'];
+    if(!empty($_POST['mail'])){
+      $email = test_input($_POST['mail']) .'@'. $cmpnyName .'.'. $cmpnyType;
     }
 
     if(!empty($_POST['yourPas'])){
@@ -215,7 +220,8 @@ if(isset($_POST['create'])){
   <div class="row form-group">
     <div class="input-group">
       <span class="input-group-addon" style=min-width:150px>E-Mail</span>
-      <input type="email" class="form-control" name="mail" value="<?php echo $email; ?>">
+      <input type="email" class="form-control" name="mail" value="<?php echo $firstname . '.' . $lastname; ?>">
+      <span class="input-group-addon" style=min-width:150px>@<?php echo $cmpnyName .'.'.$cmpnyType ?></span>
     </div>
   </div>
   <div class="row form-group">
@@ -282,7 +288,7 @@ if(isset($_POST['create'])){
         <input type="checkbox" checked name="canStamp">Can Checkin <br>
       </label>
       <label>
-        <input type="checkbox" name="canBook">Can Book
+        <input type="checkbox" name="canBook">Can Book <br>
       </label>
     </div>
   </div>

@@ -54,8 +54,7 @@
         }
       }
     }
-    ldap_unbind($ldap_connection); // Clean up after ourselves.
-
+    ldap_unbind($ldap_connection); // Clean up
     ?>
     <br>
   </form>

@@ -1,6 +1,7 @@
 <?php
 //this will only be called on the setup for persons with private hosting
 require 'connection_config.php';
+require "validate.php"; denyToCloud();
 
 $conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {

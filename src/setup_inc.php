@@ -83,7 +83,8 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(60) NOT NULL
+  name VARCHAR(60) NOT NULL,
+  companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

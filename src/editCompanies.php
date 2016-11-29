@@ -15,10 +15,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   $result = $conn->query($sql);
   while ($row = $result->fetch_assoc()) {
     $x = $row['id'];
-    if (isset($_POST['deleteCompany'.$x])) {
+    if (isset($_POST['deleteCompany'.$x]) && $x != 1) {
       $sql = "DELETE FROM $companyTable WHERE id=$x;";
       $conn->query($sql);
       echo mysqli_error($conn);
+    } elseif($x == 1){
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>Cannot delete first Company.';
+      echo '</div>';
     }
     if (isset($_POST['deleteSelection'.$x])) {
       if(isset($_POST['indexProject'.$x])){
@@ -86,7 +91,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="panel-heading" role="tab" id="headingMenu<?php echo $x; ?>">
           <h4 class="panel-title">
             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseMenu<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseTwo">
-              <?php echo $row['name']; ?>
+              <?php echo $row['name'] .' '. $row['companyType']; ?>
             </a>
           </h4>
         </div>
@@ -177,7 +182,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
-                      <button type="button" type='submit' name='deleteCompany<?php echo $x; ?>' class="btn btn-primary">Yes, delete it.</button>
+                      <button type="submit" name='deleteCompany<?php echo $x; ?>' class="btn btn-primary">Yes, delete it.</button>
                     </div>
                   </div>
                 </div>

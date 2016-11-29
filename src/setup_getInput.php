@@ -11,6 +11,7 @@
 </head>
 
 <?php
+require "validate.php"; denyToCloud();
 function redirect($url){
   if (!headers_sent()) {
     header('Location: '.$url);
