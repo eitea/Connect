@@ -1,6 +1,7 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; ?>
 <!-- BODY -->
+
 <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
 <script src="../plugins/datatables/js/jquery.js"></script>
 <script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
@@ -38,6 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 ?>
 <br>
+
 <form method="post">
   <select name="filterCompany" class="js-example-basic-single">
     <option value=0>Select Company..</option>
@@ -64,8 +66,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <button type="submit" class="btn btn-sm btn-primary" name='filter'>Filter</button><br>
   <br>
   <br>
-
-
 
   <table id="clientTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
     <thead>
@@ -121,13 +121,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       </div>
     </div>
 
-
-
   <?php endif; ?>
-
-
-
-
 
 </form>
 <script>

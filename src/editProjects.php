@@ -3,26 +3,24 @@
 <!-- BODY -->
 
 <div class="page-header">
-<h3>Navigation</h3>
+<h3><?php echo $lang['PROJECT']; ?></h3>
 </div>
 
-<form method='post'>
 <?php
-
 if(isset($_GET['customerID']) && is_numeric($_GET['customerID'])){
-  $customerID = $_GET['customerID'];
+  $customerID = test_input($_GET['customerID']);
 } else {
   $customerID = 0;
 }
 
 if(isset($_POST['add']) && !empty($_POST['name']) && $customerID != 0){
   $name = test_input($_POST['name']);
-  $hours = (empty($_POST['hours']))?0:$_POST['hours'];
-  $price = (empty($_POST['price']))?0:$_POST['price'];
+  $status = test_input($_POST['status']);
+  $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
+  $hours = floatval(test_input($_POST['hours']));
 
-  $sql="INSERT INTO $projectTable (clientID, name, hours, hourlyPrice) VALUES($customerID, '$name', '$hours', '$price')";
+  $sql="INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) VALUES($customerID, '$name', '$status', '$hours', '$hourlyPrice')";
   $conn->query($sql);
-
 }
 
 if (isset($_POST['delete']) && isset($_POST['index'])) {
@@ -38,26 +36,27 @@ if (isset($_POST['delete']) && isset($_POST['index'])) {
 if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   for($i = 0; $i < count($_POST['projectIndeces']); $i++){
   $projectID = test_input( $_POST['projectIndeces'][$i]);
-  $hours = test_input($_POST['boughtHours'][$i]);
-  $hourlyPrice = test_input($_POST['pricedHours'][$i]);
+  $hours = floatval(test_input($_POST['boughtHours'][$i]));
+  $hourlyPrice = floatval(test_input($_POST['pricedHours'][$i]));
   $sql = "UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice' WHERE id = $projectID";
   $conn->query($sql);
   echo mysqli_error($conn);
   }
 }
-
-//?companyID=$customerID vlavla..
-echo "<h1>"."<a href=editCustomers.php><img src='../images/return.png' alt='return' style='width:35px;height:35px;border:0;margin-bottom:5px'></a>" . $lang['PROJECT'] ."</h1><br><br>";
 ?>
 
-<table class="table table-striped">
-  <tr>
-    <th>Select</th>
-    <th>Name</th>
-    <th><?php echo $lang['HOURS']?></th>
-    <th><?php echo $lang['HOURLY_RATE']?></th>
-  </tr>
-
+<form method="post">
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th><?php echo $lang['DELETE']; ?></th>
+        <th>Name</th>
+        <th>Status</th>
+        <th><?php echo $lang['HOURS']; ?></th>
+        <th><?php echo $lang['HOURLY_RATE']; ?></th>
+      </tr>
+    </thead>
+    <tbody>
   <?php
   $customerQuery = ($customerID==0)?'':"WHERE clientID = $customerID";
   $sql = "SELECT * FROM $projectTable $customerQuery";
@@ -69,26 +68,36 @@ echo "<h1>"."<a href=editCustomers.php><img src='../images/return.png' alt='retu
     echo '<tr>';
     echo '<td><input type=checkbox name=index[] value='. $row['id'].'> </td>';
     echo '<td>'. $row['name'] .'</td>';
+    echo '<td>'. $row['status'] .'</td>';
     echo '<td><input type="number" class="form-control" step="any" name="boughtHours[]" value="'. $row['hours'] .'"></td>';
     echo '<td><input type="number" class="form-control" step="any" name="pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
     echo '<td><input type="text" class="hidden" name="projectIndeces[]" value="'.$row['id'].'"></td>';
     echo '</tr>';
   }
   ?>
-
+</tbody>
 </table>
+</form>
 
+
+  <a href="editCustomers.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
+
+
+<form method="post">
 <br><br>
-<div class="container-fluid">
+<div class="row">
   <div class="col-md-2">
-      <input type=text class="form-control" name='name' placeholder='projectname'>
+      <input type=text class="form-control" name='name' placeholder='Name'>
   </div>
   <div class="col-md-2">
-    <input type=number class="form-control" name='price' placeholder='price' step="any">
+      <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
+  </div>
+  <div class="col-md-2">
+    <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
   </div>
   <div class="col-md-2">
     <div class="input-group">
-      <input type=number class="form-control" name='hours' placeholder='hours' step="any">
+      <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
       <span class="input-group-btn">
         <button type=submit class="btn btn-warning" name='add'> + </button>
       </span>
@@ -100,8 +109,6 @@ echo "<h1>"."<a href=editCustomers.php><img src='../images/return.png' alt='retu
       <button type="submit" class="btn btn-warning" name='save'>Save Changes</button>
   </div>
 </div><br><br>
-
-
 </form>
 
 <!-- /BODY -->

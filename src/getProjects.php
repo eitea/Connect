@@ -198,10 +198,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     o.style.height = (o.scrollHeight)+"px";
   }
 
-
-  $(document).ready(function() {
-    $(".js-example-basic-single").select2();
-  });
   </script>
 
 

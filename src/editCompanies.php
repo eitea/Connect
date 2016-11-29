@@ -39,10 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
       }
     }
-
   }
-
-
   if (isset($_POST['delete']) && isset($_POST['index'])) {
     $x = $_POST["index"][0];
 
@@ -85,8 +82,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   if ($result && $result->num_rows > 0):
     while ($row = $result->fetch_assoc()):
       $x = $row['id'];
-      ?>
-
+  ?>
       <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="headingMenu<?php echo $x; ?>">
           <h4 class="panel-title">
@@ -104,9 +100,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <table class="table table-hover table-condensed">
                 <thead>
                   <tr>
-                    <th><?php echo $lang['DELETE']; ?></th>
+                    <th>Option</th>
                     <th>Name</th>
                     <th>Status</th>
+                    <th><?php echo $lang['HOURS']; ?></th>
+                    <th><?php echo $lang['HOURLY_RATE']; ?></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -118,7 +116,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       $i = $projectRow['id'];
                       echo "<tr><td><input type='checkbox' name='indexProject".$x."[]' value='$i'></td>";
                       echo "<td>".$projectRow['name']."</td>";
-                      echo "<td>".$projectRow['status']."</td></tr>";
+                      echo "<td>".$projectRow['status']."</td>";
+                      echo "<td>".$projectRow['hours']."</td>";
+                      echo "<td>".$projectRow['hourlyPrice']."</td></tr>";
                     }
                   }
                   ?>
@@ -129,7 +129,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <p> <?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>: </p>
               <table class="table table-hover table-condensed" >
                 <tr>
-                  <th><?php echo $lang['DELETE']; ?></th>
+                  <th>Option</th>
                   <th>Name</th>
                 </tr>
                 <tbody>
