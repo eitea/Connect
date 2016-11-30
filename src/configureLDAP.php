@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID);?>
+<?php include 'validate.php'; enableToCore($userID); denyToCloud();?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -17,7 +17,6 @@
   $newUser = $ldap_username;
   $newPass = $ldap_password;
 
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['ldapDomain'])) {
       $newConn = $_POST['ldapDomain'];
     }
@@ -35,17 +34,6 @@
       echo mysqli_error($conn);
     }
 
-    if(isset($_POST['cd'])){
-      $cd = $_POST['cd'];
-      $sql = "UPDATE $configTable SET cooldownTimer = '$cd';";
-      $conn->query($sql);
-    }
-    if(isset($_POST['bufferTime'])){
-      $bufferTime = $_POST['bufferTime'];
-      $sql = "UPDATE $configTable SET bookingTimeBuffer = '$bufferTime';";
-      $conn->query($sql);
-    }
-  }
   ?>
 
   <form method="post">
@@ -72,25 +60,8 @@
       </div>
       <button type="submit" class="btn btn-warning" name="ldapSubmit">Save<br>
     </div>
-
     <br><br><br>
 
-    <div class=container-fluid>
-      <div class=col-md-6>
-        Disable-time for In/Out Buttons:
-        <input type="number" class="form-control" name="cd" value="<?php echo $cd; ?>">
-      </div>
-      <div class=col-md-6>
-        Project-Time Buffer
-        <input type="number" class="form-control" name="bufferTime" value="<?php echo $bufferTime ?>" >
-      </div>
-    </div>
-<br>
-    <div class=container-fluid>
-      <div class="form-group">
-        <button type="submit" class="btn btn-warning" name="ldapSubmit">Save </button>
-      </div>
-    </div>
 
   </form>
 
