@@ -162,7 +162,7 @@ if (!empty($_POST['filterStatus'])) {
                       $conn->query($sql);
                       echo mysqli_error($conn);
                     }
-                    
+
                     //update breakCredit and new endTime
                     $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
                     $conn->query($sql);
@@ -217,15 +217,16 @@ if (!empty($_POST['filterStatus'])) {
             $result = mysqli_query($conn, $sql);
             if($result && $result->num_rows >0) {
               while($row = $result->fetch_assoc()){
-                if($row['timeEnd'] == '0000-00-00 00:00:00'){
-                  $endTime = getCurrentTimestamp();
-                } else {
-                  $endTime = $row['timeEnd'];
-                }
 
                 $A = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
-                $B = carryOverAdder_Hours($endTime, $row['timeToUTC']);
-                $difference = timeDiff_Hours($A, $B);
+
+                if($row['timeEnd'] == '0000-00-00 00:00:00'){
+                  $B = '0000-00-00 00:00:00';
+                  $difference = timeDiff_Hours($row['time'], getCurrentTimestamp());
+                } else {
+                  $B = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
+                  $difference = timeDiff_Hours($A, $B);
+                }
 
                 $k = $row['indexIM'];
 
