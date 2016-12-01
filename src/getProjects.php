@@ -250,7 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div id="dateDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="Date: ">
+          <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
         <select style='width:200px' class="js-example-basic-single" name="filterYear">
           <?php
@@ -294,7 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div id="projectAndClientDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="Client, Project: ">
+          <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
         </div>
         <div class='form-group'>
           <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects(this.value, 0)' >
@@ -309,7 +309,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="col-md-3">
       <div class="form-group">
-        <input type=text style='width:200px' readonly class="form-control input-sm" value="Charged: ">
+        <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
       </div>
       <div class='form-group'>
         <select name="filterBooked" style='width:200px' class="js-example-basic-single">
@@ -393,8 +393,7 @@ if($filterCompany != 0 || $filterUserID != 0):
   <table class="table table-striped table-condensed">
   <thead>
   <tr>
-  <th><?php echo $lang['CLIENT']; ?></th>
-  <th><?php echo $lang['PROJECT']; ?></th>
+  <th><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></th>
   <th>Info</th>
   <th>Intern</th>
   <th><?php echo $lang['DATE']; ?></th>
@@ -505,10 +504,8 @@ if($filterCompany != 0 || $filterUserID != 0):
           }
           echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
         }
-        echo "</select></td>";
+        echo "</select><br><br>";
 
-
-        echo "<td>";
         echo "<select style='width:150px' id='newProjectName$x' class='js-example-basic-single' name='projectIDs[]'>";
         $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
         $clientResult = $conn->query($sql);
@@ -524,7 +521,15 @@ if($filterCompany != 0 || $filterUserID != 0):
 
         $csv_Add[] = $row['infoText'];
         echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
-        echo '<td>'.$row['internInfo'].'</td>';
+
+        $interninfo = $row['internInfo'];
+
+        if(empty($interninfo)){
+          echo '<td> </td>';
+        } else {
+          echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo'><i class='fa fa-question-circle-o'></i></a></td>";
+        }
+
         $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
         $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
         $csv_Add[] = substr($A,0,10);
@@ -593,6 +598,9 @@ if($filterCompany != 0 || $filterUserID != 0):
   for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
     textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
   }
+  $(function () {
+  $('[data-toggle="popover"]').popover()
+})
   </script>
 
 
