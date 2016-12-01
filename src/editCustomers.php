@@ -2,11 +2,6 @@
 <?php include 'validate.php'; ?>
 <!-- BODY -->
 
-<link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
-<script src="../plugins/datatables/js/jquery.js"></script>
-<script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
-<script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
-
 <div class="page-header">
   <h3><?php echo $lang['CLIENT']; ?></h3>
 </div>
@@ -23,9 +18,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         echo mysqli_error($conn);
       }
     }
-  } elseif(isset($_POST['create']) && !empty($_POST['name']) && $_POST['filterCompany'] != 0){
+  } elseif(isset($_POST['create']) && !empty($_POST['name']) && $_POST['createCompany'] != 0){
     $name = test_input($_POST['name']);
-    $companyID = $_POST['filterCompany'];
+    $companyID = $_POST['createCompany'];
 
     $sql = "INSERT INTO $clientTable (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
     if($conn->query($sql)){
@@ -104,14 +99,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
   </div>
 
-  <?php if(isset($_POST['filterCompany']) && $_POST['filterCompany'] != 0):  ?>
     <br>
     <div class="container-fluid">
       <div class="col-md-4">
         <div class="input-group">
-          <span class="input-group-addon">Create: </span>
-          <input type="text" class="form-control" name="name" placeholder="name" onkeydown="if (event.keyCode == 13) return false;" >
+          <span class="input-group-addon">Create New Client: </span>
+          <input type="text" class="form-control" name="name" placeholder="Name" onkeydown="if (event.keyCode == 13) return false;" >
         </div>
+      </div>
+      <div class="col-md-3">
+        <select name="createCompany"  class="js-example-basic-single btn-block" class="" onchange="showClients(this.value)">
+          <option name=cmp value=0>Company...</option>
+          <?php
+          $query = "SELECT * FROM $companyTable";
+          $result = mysqli_query($conn, $query);
+          if ($result && $result->num_rows > 1) {
+            while ($row = $result->fetch_assoc()) {
+              $cmpnyID = $row['id'];
+              $cmpnyName = $row['name'];
+              echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+            }
+          }
+          ?>
+        </select>
       </div>
       <div class="col-md-2">
         <input type="text" class="form-control" name="clientNumber" placeholder="#" >
@@ -121,7 +131,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       </div>
     </div>
 
-  <?php endif; ?>
+<br><br>
 
 </form>
 <script>

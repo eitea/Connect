@@ -44,9 +44,6 @@
   <div class="row">
     <div class="col-xs-6">
       <div class="input-group input-daterange">
-        <span class="input-group-btn">
-          <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
-        </span>
         <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
         <span class="input-group-addon"> - </span>
         <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
@@ -57,6 +54,12 @@
   <div class="row">
     <div class="col-xs-6">
         <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-xs-6 text-right">
+      <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
     </div>
   </div>
 

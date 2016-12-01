@@ -12,10 +12,10 @@ if ($conn->connect_error) {
 // Create database
 $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
 if ($conn->query($sql)) {
-    echo "Database was created. <br>";
+  echo "Database was created. <br>";
 } else {
     echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
-    die();
+  die();
 }
 $conn->close();
 
@@ -26,12 +26,12 @@ if(isset($_GET)){
   $companyName = rawurldecode($_GET['companyName']);
   $firstname = rawurldecode($_GET['first']);
   $lastname = rawurldecode($_GET['last']);
-  $loginname = rawurldecode($_GET['login']);
+  $companyType = rawurldecode($_GET['login']);
+  $loginname = $firstname . $lastname .'@' .$companyName.$companyType;
 }
+echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
-
-require "setup_inc.php"; //create all tables
-
+require "setup_inc.php"; //creates all tables
 
 $sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 if ($conn->query($sql)) {
@@ -54,6 +54,23 @@ if ($conn->query($sql)) {
 } else {
   echo mysqli_error($conn);
 }
+
+//insert company-client relationship
+$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,1)";
+$conn->query($sql);
+
+//insert bookingtable
+$sql = "INSERT INTO $bookingTable (userID) VALUES (1);";
+$conn->query($sql);
+
+//insert vacationtable
+$sql = "INSERT INTO $vacationTable (userID) VALUES(1);";
+$conn->query($sql);
+
+//insert roletable
+$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, canStamp) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
+$conn->query($sql);
+
 
 $holi = icsToArray('../Feiertage.txt');
 for($i = 1; $i < count($holi); $i++){
@@ -116,5 +133,4 @@ exec($command, $output, $returnValue);
 echo implode('<br>', $output);
 
 //------------------------------------------------------------------------------
-header("refresh:10;url=home.php");
-die ('<br>Setup Finished. Click here if not redirected automatically: <a href="login.php">redirect</a>');
+die ('<br><br> Setup Finished. Click here after writing down your Login E-Mail: <a href="login.php">Next</a>');

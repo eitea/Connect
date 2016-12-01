@@ -8,7 +8,14 @@
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
+  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
+  <script src='../plugins/select2/js/select2.js'></script>
 </head>
+<script>
+$(document).ready(function() {
+  $(".js-example-basic-single").select2();
+});
+</script>
 
 <?php
 require "validate.php"; denyToCloud();
@@ -33,7 +40,7 @@ function test_input($data) {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['loginname'])){
+  if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type'])){
     $myfile = fopen('connection_config.php', 'w');
     $txt = '<?php
     $servername = "'.test_input($_POST['serverName']).'";
@@ -50,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $companyName = rawurlencode(test_input($_POST['companyName']));
       $firstname = rawurlencode(test_input($_POST['firstname']));
       $lastname = rawurlencode(test_input($_POST['lastname']));
-      $loginname = rawurlencode(test_input($_POST['loginname']));
+      $loginname = rawurlencode(test_input($_POST['type']));
 
       redirect("setup.php?companyName=$companyName&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
     }
@@ -92,18 +99,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
-              E-Mail (Login):
-            </span>
-            <input type="text" class="form-control" name="loginname" value="Admin">
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <div class="form-group">
-          <div class="input-group">
-            <span class="input-group-addon text-warning" style=min-width:150px>
               Login Password
             </span>
             <input type='password' class="form-control" name='adminPass' value=''>
@@ -112,7 +107,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-md-4 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -120,6 +115,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </span>
             <input type='text' class="form-control" name='companyName' placeholder='Company Name'>
           </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group">
+          <select name="type" class="js-example-basic-single btn-block">
+            <option selected>...</option>
+            <option value="GmbH">GmbH</option>
+            <option value="AG">AG</option>
+            <option value="OG">OG</option>
+            <option value="KG">KG</option>
+            <option value="EU">EU</option>
+            <option value="-">Sonstiges</option>
+          </select>
         </div>
       </div>
     </div>

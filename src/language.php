@@ -136,6 +136,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERVIEW'] = 'Overview';
 
   $lang['PROJECT'] = 'Project';
+  $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
   $lang['READY_STATUS'] = 'Ready Status';
@@ -308,6 +309,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERVIEW'] = 'Übersicht';
 
   $lang['PROJECT'] = 'Projekt';
+  $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
   $lang['READY_STATUS'] = 'Bereitschaftsstatus';

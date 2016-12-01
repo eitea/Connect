@@ -117,13 +117,13 @@ $(document).ready(function() {
 
   require "language.php";
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST"){
-      if ((time() - $_SESSION['posttimer']) <= 2){
-        unset($_POST);
-      } else {
-        $_SESSION['posttimer'] = time();
-      }
+  if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    if ((time() - $_SESSION['posttimer']) <= 2){
+      unset($_POST);
+    } else {
+      $_SESSION['posttimer'] = time();
     }
+  }
 
   ?>
 
@@ -346,7 +346,6 @@ $(document).ready(function() {
                           <div class="collapse" id="toggleAdminOption_TIME" style="height: 0px;">
                             <ul class="nav navbar-nav">
 
-
                               <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-pencil"></i> <span><?php echo $lang['TIMESTAMPS'].' '.$lang['EDIT']; ?></span></a></li>
                               <li><a <?php if($this_page =='monhtlyReport.php'){echo $setActiveLink;}?> href="monthlyReport.php"><i class="fa fa-book"></i> <?php echo $lang['MONTHLY_REPORT']; ?></a></li>
                               <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-bell"></i> <?php echo $lang['VACATION']; ?></a></li>
@@ -365,7 +364,6 @@ $(document).ready(function() {
                                 </div>
                               </li>
                               <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-
                             </ul>
                           </div>
                         </li>
@@ -383,28 +381,31 @@ $(document).ready(function() {
                       <?php if($isProjectAdmin == 'TRUE'): ?>
                         <li role="separator" class="active"><br><br>
                           <a id="adminOption_PROJECT" href="#" data-toggle="collapse" data-target="#toggleAdminOption_PROJECT" data-parent="#sidenav01" class="collapse in">
-                            <span><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></span> <i class="fa fa-caret-down"></i></a>
-                            <div class="collapse" id="toggleAdminOption_PROJECT" style="height: 0px;">
-                              <ul class="nav navbar-nav">
+                            <span><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></span> <i class="fa fa-caret-down"></i>
+                          </a>
+                          <div class="collapse" id="toggleAdminOption_PROJECT" style="height: 0px;">
+                            <ul class="nav navbar-nav">
+                              <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="getProjects.php"><i class="fa fa-history"></i>
+                                <span><?php echo $lang['PROJECT_BOOKINGS']; ?></span>
+                              </a></li>
+                              <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i>
+                                <span><?php echo $lang['CLIENTS'] .' & '. $lang['VIEW_PROJECTS']; ?></span>
+                              </a></li>
+                            </ul>
+                          </div>
+                        </li>
+                      <?php endif; ?>
 
-                                <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="getProjects.php"><i class="fa fa-history"></i> <span><?php echo $lang['VIEW_PROJECTS']; ?></span></a></li>
-                                <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i> <span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                      <?php
+                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php"){
+                        echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
+                      }
+                      ?>
 
-                              </ul>
-                            </div>
-                          </li>
-                        <?php endif; ?>
-
-                        <?php
-                        if($this_page == "getProjects.php" || $this_page == "editCustomers.php"){
-                          echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
-                        }
-                        ?>
-
-                      </ul>
-                    </div><!--/.nav-collapse -->
-                  </div>
+                    </ul>
+                  </div><!--/.nav-collapse -->
                 </div>
               </div>
-              <div class="col-sm-9 col-md-10 affix-content">
-                <div class="container">
+            </div>
+            <div class="col-sm-9 col-md-10 affix-content">
+              <div class="container">
