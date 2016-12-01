@@ -21,6 +21,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $logTable (
   indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   time DATETIME NOT NULL,
@@ -81,6 +82,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
@@ -89,6 +91,7 @@ $sql = "CREATE TABLE $companyTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $clientTable(
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -102,6 +105,32 @@ ON DELETE CASCADE
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
+
+/*
+$sql = "CREATE TABLE $clientDataTable(
+firstname VARCHAR(45) NOT NULL,
+lastname VARCHAR(45) NOT NULL,
+phone VARCHAR(20),
+gender ENUM('female', 'male'),
+title VARCHAR(30),
+address VARCHAR(100),
+taxnumber INT(50),
+debitNumber INT(10),
+datev INT(10),
+taxArea VARCHAR(50),
+paymentMethod VARCHAR(50),
+creditLimit DECIMAL(8,2),
+
+clientID INT(6) UNSIGNED,
+FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+*/
 
 
 $sql = "CREATE TABLE $projectTable(

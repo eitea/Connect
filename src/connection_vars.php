@@ -1,4 +1,4 @@
-<?php 
+<?php
     //do NOT change any value
    $userTable = "UserData";
    $logTable = "logs";
@@ -7,6 +7,7 @@
    $bookingTable = "bookingData";
    $projectTable = "projectData";
    $clientTable = "clientData";
+   $clientDataTable = "clientInfoData";
    $companyTable = "companyData";
    $projectBookingTable = "projectBookingData";
    $companyToUserRelationshipTable = "companyToClientRelationshipData";
