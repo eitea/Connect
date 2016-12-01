@@ -26,7 +26,7 @@ if(isset($_POST['hire']) && isset($_POST['userIDs'])){
     <?php
     $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $companyID)";
     $result = mysqli_query($conn, $sql);
-    if ($result && $result->num_rows > 1) {
+    if ($result && $result->num_rows > 0) {
       while ($row = $result->fetch_assoc()) {
         echo '<tr>';
         echo '<td><input type="checkbox" name="userIDs[]" value="'.$row['id'].'" ></td>';

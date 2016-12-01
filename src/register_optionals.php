@@ -220,7 +220,7 @@ if(isset($_POST['create'])){
   <div class="row form-group">
     <div class="input-group">
       <span class="input-group-addon" style=min-width:150px>E-Mail</span>
-      <input type="email" class="form-control" name="mail" value="<?php echo $firstname . '.' . $lastname; ?>">
+      <input type="text" class="form-control" name="mail" value="<?php echo $firstname . '.' . $lastname; ?>">
       <span class="input-group-addon" style=min-width:150px>@<?php echo $cmpnyName .'.'.$cmpnyType ?></span>
     </div>
   </div>

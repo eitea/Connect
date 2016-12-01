@@ -95,7 +95,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
   <div class="container-fluid">
     <div class="col-md-1">
-      <button type="submit" class="btn btn-primary" name="delete">Delete</button>
+      <button type="submit" class="btn btn-warning" name="delete">Delete</button>
     </div>
   </div>
 
@@ -113,7 +113,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <?php
           $query = "SELECT * FROM $companyTable";
           $result = mysqli_query($conn, $query);
-          if ($result && $result->num_rows > 1) {
+          if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
               $cmpnyID = $row['id'];
               $cmpnyName = $row['name'];
@@ -127,7 +127,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <input type="text" class="form-control" name="clientNumber" placeholder="#" >
       </div>
       <div class="col-md-1">
-        <button type="submit" class="btn btn-primary" name="create"> + </button>
+        <button type="submit" class="btn btn-warning" name="create"> + </button>
       </div>
     </div>
 

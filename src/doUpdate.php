@@ -188,6 +188,7 @@ if($row['version'] < 32){
   }
 }
 
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

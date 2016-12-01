@@ -9,7 +9,7 @@
 
 <?php
 $filterDate = substr(getCurrentTimestamp(),0,10); //granularity: set the default to day
-$booked = '0';
+$booked = '1';
 $filterCompany = 0;
 $filterClient = 0;
 $filterProject = 0;
@@ -291,6 +291,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
 
+
+<!-- SELECTS CLIENT AND PROJECT -->
     <div id="projectAndClientDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
@@ -307,13 +309,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
 
+<!-- SELECTS CHARGED -->
     <div class="col-md-3">
       <div class="form-group">
         <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
       </div>
       <div class='form-group'>
         <select name="filterBooked" style='width:200px' class="js-example-basic-single">
-          <option value='0' <?php if($booked == 0){echo 'selected';}?> >---</option>
+          <option value='0' <?php if($booked == '0'){echo 'selected';}?> >---</option>
           <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
           <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
         </select>
@@ -682,7 +685,7 @@ if($filterCompany != 0 || $filterUserID != 0):
     </div>
     </div>
     <?php else: ?>
-    <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (Check-in required).</div>
+    <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (<a href="getTimestamps.php">Check-in required</a>).</div>
     <?php endif; ?>
 
     <!-- END ADD-BOOKING FIELD -->
@@ -705,3 +708,4 @@ if($filterCompany != 0 || $filterUserID != 0):
     <?php endif; ?>
     <!-- /BODY -->
     <?php include 'footer.php'; ?>
+'; ?>

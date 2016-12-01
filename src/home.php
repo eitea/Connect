@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-<h3>Navigation</h3>
+<h3><?php echo $lang['OVERVIEW']; ?></h3>
 </div>
 
 <?php

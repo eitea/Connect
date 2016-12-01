@@ -9,6 +9,7 @@
    $clientTable = "clientData";
    $clientDataTable = "clientInfoData";
    $companyTable = "companyData";
+   $feedbackTable = "feedbacks";
    $projectBookingTable = "projectBookingData";
    $companyToUserRelationshipTable = "companyToClientRelationshipData";
    $companyDefaultProjectTable = "companyDefaultProjects";

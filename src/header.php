@@ -124,8 +124,7 @@ $(document).ready(function() {
       $_SESSION['posttimer'] = time();
     }
   }
-
-  ?>
+?>
 
 
 
