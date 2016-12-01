@@ -19,7 +19,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $sql = "DELETE FROM $companyTable WHERE id=$x;";
       $conn->query($sql);
       echo mysqli_error($conn);
-    } elseif($x == 1){
+    } elseif(isset($_POST['deleteCompany'.$x]) && $x == 1){
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
       echo '<strong>Error: </strong>Cannot delete first Company.';
@@ -33,8 +33,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
       }
       if(isset($_POST['indexUser'.$x])){
-        foreach ($_POST['indexUser'.$x] as $x) {
-          $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = $companyID";
+        foreach ($_POST['indexUser'.$x] as $i) {
+          $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $i AND companyID = $x";
           $conn->query($sql);
         }
       }
@@ -151,7 +151,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <br><br>
 
               <div class="container-fluid text-right">
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button>
+                <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
 
                   <div class="btn-group" role="group">
                     <div class="dropup">
@@ -160,10 +160,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Add Default Project</a></li>
-                        <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Hire Users</a></li>
+                        <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Neues Standardprojekt</a></li>
+                        <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Benutzer einstellen</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><button type="submit" class="btn btn-link" name="deleteSelection<?php echo $x; ?>">Delete Selection</button></li>
+                        <li><button type="button" class="btn btn-link text-warning" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
                       </ul>
                     </div>
                   </div>
