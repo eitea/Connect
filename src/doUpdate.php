@@ -188,6 +188,21 @@ if($row['version'] < 32){
   }
 }
 
+if($row['version'] < 33){
+  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00'";
+  if($conn->query($sql)){
+    echo "Expand booking table by correction date-start.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00'";
+  if($conn->query($sql)){
+    echo "Expand booking table by correction date-end.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

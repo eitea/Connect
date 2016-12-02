@@ -2,12 +2,17 @@
 <?php include 'validate.php'; ?>
 <!-- BODY -->
 
+<link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
+<script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
+
 <div class="page-header">
   <h3><?php echo $lang['CLIENT']; ?></h3>
 </div>
 
 <?php
 $filterCompanyID = 0;
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   $filterCompanyID = $_POST['filterCompany'];
   if (isset($_POST['delete']) && isset($_POST['index'])) {
@@ -34,9 +39,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 ?>
 <br>
-
 <form method="post">
-  <select name="filterCompany" class="js-example-basic-single">
+  <select name="filterCompany" class="js-example-basic-single" style="width:200px">
     <option value=0>Select Company..</option>
     <?php
     $filterCompanyQuery = "";
@@ -57,24 +61,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     ?>
   </select>
+  &nbsp <button type="submit" class="btn btn-warning btn-sm" name='filter'> Filter</button>
 
-  <button type="submit" class="btn btn-sm btn-primary" name='filter'>Filter</button><br>
-  <br>
-  <br>
+  <br><br>
+  <?php $query = "SELECT * FROM $clientTable $filterCompanyQuery ORDER BY name ASC";
+  $result = mysqli_query($conn, $query);
+  if ($result && $result->num_rows > 0):
+    ?>
+    <br><br>
 
-  <table id="clientTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
-    <thead>
-      <tr>
-        <th style="width:10%;"> Delete </th>
-        <th>Name </th>
-        <th><?php echo $lang['NUMBER']; ?></th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      $query = "SELECT * FROM $clientTable $filterCompanyQuery ORDER BY name ASC";
-      $result = mysqli_query($conn, $query);
-      if ($result && $result->num_rows > 0) {
+    <table id="clientTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th style="width:10%;"> Delete </th>
+          <th>Name </th>
+          <th><?php echo $lang['NUMBER']; ?></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+
         while ($row = $result->fetch_assoc()) {
           $i = $row['id'];
           $checked = "";
@@ -87,53 +93,67 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo "<td>" .$row['clientNumber']."</td>";
           echo '</tr>';
         }
-      }
-      ?>
-    </tbody>
-  </table>
-  <br><br>
 
-  <div class="container-fluid">
-    <div class="col-md-1">
-      <button type="submit" class="btn btn-warning" name="delete">Delete</button>
+        ?>
+      </tbody>
+    </table>
+    <br><br>
+  <?php else: ?>
+    <div class="alert alert-info" role="alert">
+      <strong>No Clients yet: </strong> Please create a client first, so you can start assigning projects.<br>
+      Clients can only be assigned to one company each. <br>
+      For project inheritance from company to client, visit <a href="editCompanies.php" class="alert-link"> the default project creation page</a>
+    </div>
+  <?php endif; ?>
+
+  <div class="row">
+    <div class="col-md-3">
+      <button class="btn btn-warning btn-block" type="button" data-toggle="collapse" data-target="#newcompanyDrop" aria-expanded="false" aria-controls="collapseExample">
+        Create New Client <i class="fa fa-caret-down"></i>
+      </button>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-danger" name="delete">Delete</button>
     </div>
   </div>
+  <br><br>
 
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-4">
-        <div class="input-group">
-          <span class="input-group-addon">Create New Client: </span>
-          <input type="text" class="form-control" name="name" placeholder="Name" onkeydown="if (event.keyCode == 13) return false;" >
+  <div class="collapse col-md-5 well" id="newcompanyDrop">
+    <form method="post">
+      <br>
+      <input type="text" class="form-control" name="name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;" >
+      <br>
+      <div class="row">
+        <div class="col-md-6">
+          <select name="createCompany" class="js-example-basic-single" onchange="showClients(this.value)">
+            <option name=cmp value=0>Company...</option>
+            <?php
+            $query = "SELECT * FROM $companyTable";
+            $result = mysqli_query($conn, $query);
+            if ($result && $result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $cmpnyID = $row['id'];
+                $cmpnyName = $row['name'];
+                echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+              }
+            }
+            ?>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <input type="text" class="form-control" name="clientNumber" placeholder="#" >
         </div>
       </div>
-      <div class="col-md-3">
-        <select name="createCompany"  class="js-example-basic-single btn-block" class="" onchange="showClients(this.value)">
-          <option name=cmp value=0>Company...</option>
-          <?php
-          $query = "SELECT * FROM $companyTable";
-          $result = mysqli_query($conn, $query);
-          if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-              $cmpnyID = $row['id'];
-              $cmpnyName = $row['name'];
-              echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
-            }
-          }
-          ?>
-        </select>
+      <br>
+      <div class="text-right">
+        <br>
+        <button type="submit" class="btn btn-warning btn-sm" name="create"> Hinzufügen </button>
       </div>
-      <div class="col-md-2">
-        <input type="text" class="form-control" name="clientNumber" placeholder="#" >
-      </div>
-      <div class="col-md-1">
-        <button type="submit" class="btn btn-warning" name="create"> + </button>
-      </div>
-    </div>
 
-<br><br>
-
+    </form>
+  </div>
 </form>
+
 <script>
 $(document).ready(function() {
   $('#clientTable').DataTable({

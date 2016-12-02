@@ -86,7 +86,8 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
   if($result){
     $row = $result->fetch_assoc();
   }
-  if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
+  if (crypt($_POST['password'], $row['psw']) == $row['psw']) {    
+    session_start();
     session_destroy();
     session_start();
     $_SESSION['userid'] = $row['id'];
@@ -97,7 +98,9 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
     $_SESSION['posttimer'] = time();
 
     require "language.php";
-    if ($row['id'] == 1){
+    $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
+    $result = $conn->query($sql);
+    if($result && $result->num_rows > 0){
       $sql = "SELECT * FROM $adminLDAPTable;";
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();

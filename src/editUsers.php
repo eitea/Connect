@@ -7,7 +7,7 @@
 </div>
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $query = "SELECT id FROM $userTable;";
+  $query = "SELECT id, email FROM $userTable;";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -49,8 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
         }
 
-        if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x]), FILTER_VALIDATE_EMAIL)){
-          $email = test_input($_POST['email'.$x]);
+        if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@'.explode('@', $row['email'])[1]), FILTER_VALIDATE_EMAIL)){
+          $email = test_input($_POST['email'.$x]). '@'. explode('@', $row['email'])[1];
           $sql = "UPDATE $userTable SET email = '$email' WHERE id = '$curID';";
           $conn->query($sql);
         } else {
@@ -271,7 +271,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class=form-group>
                   <div class="input-group">
                     <span class="input-group-addon" style=min-width:150px>E-Mail</span>
-                    <input type="email" class="form-control" name="email<?php echo $x; ?>" value="<?php echo $email; ?>"/>
+                    <input type="text" class="form-control" name="email<?php echo $x; ?>" value="<?php echo explode('@', $email)[0]; ?>"/>
+                    <span class="input-group-addon" style=min-width:150px>@<?php echo explode('@', $email)[1]; ?></span>
                   </div>
                 </div>
                 <div class=form-group>

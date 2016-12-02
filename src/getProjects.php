@@ -45,10 +45,7 @@ if(isset($_POST['filterProject'])){
 if(isset($_POST['filterUserID'])){
   $filterUserID = $_POST['filterUserID'];
 }
-?>
 
-
-<?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
     //get the timestamp. if it doesnt exist -> display a biiiig fat error
@@ -107,10 +104,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   echo '<br>';
 }
-?>
 
-<form method='post'>
-  <?php
+
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if (isset($_POST['saveChanges']) && isset($_POST['editingIndeces'])) {
       for ($i = 0; $i < count($_POST['editingIndeces']); $i++) {
@@ -120,45 +115,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE $projectBookingTable.id = $imm
         AND $projectBookingTable.timestampID = $logTable.indexIM";
         $result = mysqli_query($conn, $query);
+
         if($result && $result->num_rows>0){
           $row = $result->fetch_assoc();
           $toUtc = $row['timeToUTC'] * -1;
 
+          $chargedTimeStart= '0000-00-00 00:00:00';
+          $chargedTimeFin = '0000-00-00 00:00:00';
+
+          if($_POST['chargedTimesFrom'] != '0000-00-00 00:00'){
+            $chargedTimeStart = carryOverAdder_Hours($_POST['chargedTimesFrom'][$i], $toUtc);
+          }
+          if($_POST['chargedTimesTo'] != '0000-00-00 00:00'){
+            $chargedTimeFin = carryOverAdder_Hours($_POST['chargedTimesTo'][$i], $toUtc);
+          }
+
           $timeStart = carryOverAdder_Hours($_POST['timesFrom'][$i], $toUtc);
           $timeFin = carryOverAdder_Hours($_POST['timesTo'][$i], $toUtc);
+
           $infoText = test_input($_POST['infoTextArea'][$i]);
           $newProjectID = test_input($_POST['projectIDs'][$i]);
 
-          $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText',projectID = $newProjectID WHERE id = $imm";
-          $conn->query($sql);
+          $sql = "UPDATE $projectBookingTable SET
+          start='$timeStart', end='$timeFin',
+          infoText='$infoText',projectID = $newProjectID,
+          chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin'
+          WHERE id = $imm";
+
+          $conn->query($sql); //UPDATE projectBookingTable to NEW values
           echo mysqli_error($conn);
-        }
+        } //end if booking has corresponding timestamp
         echo mysqli_error($conn);
-      }
-    }
-    if(isset($_POST['saveChanges']) && isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
-      foreach ($_POST["noCheckCheckingIndeces"] as $e) {
-        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
-        $conn->query($sql);
-      }
-    }
-    if(isset($_POST['saveChanges']) && isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
-      foreach ($_POST["checkingIndeces"] as $e) {
-        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
-        $conn->query($sql);
+      } //end FOR each line
 
-        $sql = "SELECT start, end, projectID FROM $projectBookingTable WHERE id = $e";
-
-        if($result = $conn->query($sql)){
-          $row = $result->fetch_assoc();
-          $hours = timeDiff_Hours($row['start'], $row['end']);
-
-          $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
+      if(isset($_POST['saveChanges']) && isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
+        foreach ($_POST["noCheckCheckingIndeces"] as $e) {
+          $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
           $conn->query($sql);
-          echo mysqli_error($conn);
         }
       }
-    }
+      if(isset($_POST['saveChanges']) && isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
+        foreach ($_POST["checkingIndeces"] as $e) {
+          $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+          $conn->query($sql);
+
+          $sql = "SELECT start, end, chargedTimeStart, chargedTimeEnd, projectID FROM $projectBookingTable WHERE id = $e";
+          if($result = $conn->query($sql)){
+            $row = $result->fetch_assoc();
+            $A = $row['start'];
+            $B = $row['end'];
+
+            if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+              $A = $row['chargedTimeStart'];
+            }
+            if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+              $B = $row['chargedTimeEnd'];
+            }
+
+            $hours = timeDiff_Hours($A, $B);
+
+            $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
+            $conn->query($sql);
+            echo mysqli_error($conn);
+          }
+        }
+      }
+    } //end if isset save_changes
   }
   ?>
 
@@ -201,6 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </script>
 
 
+  <form method='post'>
   <!-- ####################-FILTERS-######################################## -->
   <div class="row">
     <div class="col-md-3">
@@ -392,20 +415,18 @@ if($filterCompany != 0 || $filterUserID != 0):
   <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
   <?php endif; ?>
 
-
   <table class="table table-striped table-condensed">
   <thead>
   <tr>
   <th><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></th>
-  <th>Info</th>
-  <th>Intern</th>
+  <th>Infotext</th>
   <th><?php echo $lang['DATE']; ?></th>
+  <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
   <th><?php echo $lang['MINUTES']; ?></th>
   <th>0.25h</th>
-  <th><?php echo $lang['HOURS_CREDIT']; ?></th>
-  <th>Person</th>
   <th><input type="checkbox" onClick="toggle(this)"> <?php echo $lang['CHARGED']; ?> <br> <input type="checkbox" onClick="toggle2(this)" > <?php echo $lang['NOT_CHARGEABLE']; ?></th>
-  <th><?php echo $lang['HOURLY_RATE'];?> (€)</th>
+  <th>Intern</th>
+  <th>Detail</th>
   </tr>
   </thead>
   <?php
@@ -418,7 +439,6 @@ if($filterCompany != 0 || $filterUserID != 0):
   $sum_min = $sum25 = 0;
   $addTimeStart = 0;
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
-
     if($booked == '2'){
       $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
     } elseif($booked == '1'){
@@ -461,6 +481,8 @@ if($filterCompany != 0 || $filterUserID != 0):
     $projectBookingTable.internInfo,
     $projectBookingTable.start,
     $projectBookingTable.end,
+    $projectBookingTable.chargedTimeStart,
+    $projectBookingTable.chargedTimeEnd,
     $userTable.firstname, $userTable.lastname,
     $projectTable.hours,
     $projectTable.hourlyPrice
@@ -496,8 +518,7 @@ if($filterCompany != 0 || $filterUserID != 0):
         $csv_Add[] = $row['projectName'];
 
 
-        echo "<td>";
-        echo "<select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+        echo "<td><select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
         $sql = "SELECT * FROM $clientTable";
         $clientResult = $conn->query($sql);
         while($clientRow = $clientResult->fetch_assoc()){
@@ -508,7 +529,6 @@ if($filterCompany != 0 || $filterUserID != 0):
           echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
         }
         echo "</select><br><br>";
-
         echo "<select style='width:150px' id='newProjectName$x' class='js-example-basic-single' name='projectIDs[]'>";
         $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
         $clientResult = $conn->query($sql);
@@ -521,37 +541,48 @@ if($filterCompany != 0 || $filterUserID != 0):
         }
         echo "</select></td>";
 
-
-        $csv_Add[] = $row['infoText'];
-        echo "<td><textarea name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
-
-        $interninfo = $row['internInfo'];
-
-        if(empty($interninfo)){
-          echo '<td> </td>';
-        } else {
-          echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo'><i class='fa fa-question-circle-o'></i></a></td>";
-        }
+        echo "<td><textarea style='resize: none;' name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
 
         $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
         $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+
+        if($row['chargedTimeStart'] == '0000-00-00 00:00:00'){
+          $A_charged = '0000-00-00 00:00:00';
+        } else {
+          $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
+        }
+        if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
+          $B_charged = '0000-00-00 00:00:00';
+        }else{
+          $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
+        }
+
+        $csv_Add[] = $row['infoText'];
         $csv_Add[] = substr($A,0,10);
         $csv_Add[] = substr($B,0,10);
         $csv_Add[] = substr($row['start'],11,6);
         $csv_Add[] = substr($row['end'],11,6);
+        $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
+        $csv_Add[] = $t;
+        $csv_Add[] = $row['hours'];
+        $csv_Add[] = $row['firstname']." ".$row['lastname'];
+
+
         echo "<td>
         <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr($A,0,16)."'>
         -
         <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='timesTo[]' value='".substr($B,0,16)."'></td>";
 
-        $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
+        echo "<td>
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='chargedTimesFrom[]' value='".substr($A_charged,0,16)."'>
+        -
+        <input type='text' class='form-control input-sm' style='width:125px;' maxlength='19' onkeydown='if(event.keyCode == 13){return false;}' name='chargedTimesTo[]' value='".substr($B_charged,0,16)."'></td>";
+
+
         echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
-        $csv_Add[] = $t;
+
         echo "<td>$t</td>";
-        $csv_Add[] = $row['hours'];
-        echo "<td>" .$row['hours']. "</td>";
-        $csv_Add[] = $row['firstname']." ".$row['lastname'];
-        echo "<td>" .$row['firstname']." ".$row['lastname']. "</td>" ;
+
 
         if($row['booked'] != 'TRUE'){
           $selected = "";
@@ -561,17 +592,27 @@ if($filterCompany != 0 || $filterUserID != 0):
         echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
         echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
         $csv_Add[] = $row['hourlyPrice'];
-        echo "<td>".$row['hourlyPrice']."</td>";
+
+        $interninfo = $row['internInfo'];
+        if(empty($interninfo)){
+          echo '<td> </td>';
+        } else {
+          echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a></td>";
+        }
+
+        $detailInfo = $row['hourlyPrice'] .' || '.$row['hours'] .' || '. $row['firstname']." ".$row['lastname'];
+        echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenrate - Stundenkonto - Person' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a></td>";
+
         echo "</tr>";
 
-        $csv->addLine($csv_Add);
         echo '<input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '">'; //since we dont know what has been edited: save all.
 
+        $csv->addLine($csv_Add);
         $sum_min += timeDiff_Hours($row['start'], $row['end']);
         $sum25 += $t;
-
         $addTimeStart = $B;
-      }
+      } //end while fetch_assoc
+
       if(isset($_POST['undo'])){
         $row = $result->fetch_assoc();
         if(empty($row['projectID'])){ //undo breaks
@@ -598,17 +639,26 @@ if($filterCompany != 0 || $filterUserID != 0):
 
   </table>
   <script>
-  for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
-    textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
-  }
   $(function () {
-  $('[data-toggle="popover"]').popover()
-})
+    $('[data-toggle="popover"]').popover()
+  })
+
+  $('document').ready(function(){
+    for(var i = 0; i < document.getElementsByName('infoTextArea[]').length; i++){
+      textAreaAdjust(document.getElementsByName('infoTextArea[]')[i]);
+    }
+  });
   </script>
 
+<br><br>
+
+<?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
+<button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
+<?php endif; ?>
+
+<br><br>
 
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
-  <br><br>
   <?php if($filterUserID != 0 && isset($_POST['filterDay'])): ?>
 
   <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Remove last entry</button></div>
@@ -694,18 +744,12 @@ if($filterCompany != 0 || $filterUserID != 0):
     </fieldset>
     <?php endif; ?>
     </div>
+    <?php endif; ?>
+    </form>
 
     <br><br>
-    <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
-    <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
-    <?php endif; ?>
-
-    </form>
-
     <form action="csvDownload.php" method="post" target='_blank'>
     <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-    </form>
-    <?php endif; ?>
-    <!-- /BODY -->
+    </form>    
+    <br><br>
     <?php include 'footer.php'; ?>
-'; ?>

@@ -152,7 +152,9 @@ if (!$conn->query($sql)) {
 $sql = "CREATE TABLE $projectBookingTable (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   start DATETIME NOT NULL,
-  end DATETIME DEFAULT '0000-00-00 00:00:00',
+  end DATETIME NOT NULL,
+  chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00',
+  chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00',
   projectID INT(6) UNSIGNED,
   timestampID INT(10) UNSIGNED,
   infoText VARCHAR(500),

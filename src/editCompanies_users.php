@@ -38,6 +38,8 @@ if(isset($_POST['hire']) && isset($_POST['userIDs'])){
   </tbody>
 </table>
 <br><br>
+<a href="editCompanies.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a>
+<br><br>
 <div class="text-right">
 <button type="submit" class="btn btn-warning" name="hire">Benutzer einstellen</button>
 </div>
