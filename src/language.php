@@ -122,6 +122,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK'] = 'Lunchbreak';
   $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
 
+  $lang['MANDATORY_SETTINGS'] = 'Mandatory Settings';
   $lang['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
   $lang['MINUTES'] = 'Minutes';
   $lang['MONTHLY_REPORT'] ='Monthly Report';
@@ -295,6 +296,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK'] = 'Mittagspause';
   $lang['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 
+  $lang['MANDATORY_SETTINGS'] = 'Pflichtfelder';
   $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
   $lang['MINUTES'] = 'Minuten';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';

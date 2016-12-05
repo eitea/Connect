@@ -24,7 +24,7 @@ if(!empty($_POST['filterYear'])){
   }
 }
 
-if (!empty($_POST['filterStatus'])) {
+if (isset($_POST['filterStatus'])) {
   $filterStatus = $_POST['filterStatus'];
 }
 ?>
@@ -319,7 +319,7 @@ if (!empty($_POST['filterStatus'])) {
 
           <?php endif; ?>
         <?php else: ?>
-          <div class="alert alert-info" role="alert"><strong>Mandatory Settings: </strong>Select User and Year to display Information.</div>
+          <div class="alert alert-info" role="alert"><strong><?php echo $lang['MANDATORY_SETTINGS']; ?>: </strong>Wähle Benutzer und Jahr um Informationen anzuzeigen.</div>
         <?php endif; ?>
       </form>
 

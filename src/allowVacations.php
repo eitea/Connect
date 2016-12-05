@@ -7,7 +7,6 @@
 </div>
 
 <?php
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $sql = "SELECT $userRequests.*, $bookingTable.* FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE status = '0'";
   $result = $conn->query($sql);
@@ -55,8 +54,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 ?>
 <body>
-<form method=post>
-
+<form method="POST">
   <table class="table table-hover">
     <th>Name</th>
     <th><?php echo $lang['TIME']?></th>
@@ -91,7 +89,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
      ?>
    </tbody>
   </table>
+</form>
 
+<form action="getTimestamps.php#" method="POST">
+  <div class="text-right">
+    <button type="submit" class="btn btn-warning" name="filterStatus" value="1">Urlaub bearbeiten <i class="fa fa-arrow-right"></i></button>
+  </div>
 </form>
 
 <!-- /BODY -->
