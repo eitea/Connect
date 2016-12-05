@@ -14,7 +14,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if($result && $result->num_rows > 0){
     while($row = $result->fetch_assoc()){
       if(isset($_POST['okay'. $row['id']])){
-        $answerText = $_POST['answerText'. $row['id']];
+        $answerText = test_input($_POST['answerText'. $row['id']]);
         $sql = "UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = " .$row['id'];
         $conn->query($sql);
         //vacation only exists in days at max.

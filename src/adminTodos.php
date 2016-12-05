@@ -5,8 +5,6 @@
 <div class="page-header">
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
-
-<form method=post>
   <?php
 
   if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
@@ -18,7 +16,7 @@
       $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
       $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
 
-      if($row['expectedHours'] > $row['pauseAfterHours']){ //dont have check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
+      if($row['expectedHours'] > $row['pauseAfterHours']){ //we dont have 2 check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
         $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
       }
 
@@ -26,8 +24,9 @@
       $conn->query($sql);
       echo mysqli_error($conn);
     }
-  } elseif(isset($_POST['autoCorrectBreaks']) && isset($_POST['lunchbreakIndeces'])){
-    for($i=0; $i < count($_POST['lunchbreakIndeces']); $i++){
+  }
+  if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
+    for($i=0; $i < count($_POST['lunchbreaks']); $i++){
       if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i] <= 0 || $_POST['lunchbreaks'][$i] == 0){
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -43,8 +42,15 @@
       VALUES($indexIM, '$date 08:00:00', DATE_ADD('$date 08:00:00', INTERVAL $breakTime MINUTE), 'Repaired lunchbreak', 'FALSE')";
       $conn->query($sql);
       echo mysqli_error($conn);
+
+      $breakTime = test_input($_POST['lunchbreaks'][$i]);
+      $sql = "UPDATE $logTable SET breakCredit = (breakCredit + $breakTime) WHERE indexIM = $indexIM";
+      $conn->query($sql);
+      echo mysqli_error($conn);
     }
-  } elseif(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
+  }
+
+  if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
     foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
       $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
       $conn->query($sql);
@@ -52,6 +58,7 @@
     }
   }
   ?>
+
 
   <?php
   $sql ="SELECT * FROM $userRequests WHERE status = '0'";
@@ -61,13 +68,13 @@
     <h4> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </h4>
 
     <?php
-    echo $result->num_rows . " Vacation Request/s: ";
-    echo "<a href=allowVacations.php > Answer</a><br><br><br>";
+    echo $result->num_rows . " Urlaubsanfrage: ";
+    echo "<a href=allowVacations.php > Beantworten</a><br><hr><br>";
   endif;
   ?>
 
   <!-- -------------------------------------------------------------------------->
-
+  <form method=post>
   <?php
   $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
   WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
@@ -75,8 +82,18 @@
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
     ?>
-    <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>: </h4>
-    <br>
+    <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="illegal_lunchbreak_info">
+      <div class="well">
+        Mittagspause stimmt nicht mit den festgelegten Parametern überein: Die für den Benutzer definierte Pause, wurde nach der für den Benutzer definierte Zeit nicht vollständig konsumiert.
+      </div>
+    </div>
+
     <table class="table table-hover">
       <th>Name</th>
       <th><?php echo $lang['TIME']; ?></th>
@@ -90,7 +107,7 @@
           echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-          echo '<td><input type=text size=2 name="lunchbreaks[]" value="'.$row['breakCredit'].'" ></td>';
+          echo '<td><input type="number" step="any" class="form-control" style="width:100px" name="lunchbreaks[]" value="'.$row['breakCredit'].'" ></td>';
           echo '<td>
           <input type=text style=display:none name="lunchbreakIndeces[]" value='.$row['indexIM'].' >
           <input type=text style=display:none name="oldBreakValue[]" value='.$row['breakCredit'].' >
@@ -102,10 +119,9 @@
       </tbody>
     </table>
     <br>
-    <input type='submit' name='autoCorrectBreaks' value='Save' />
-    <br><br><br>
+    <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Save</button>
+    <br><hr><br>
   <?php endif;?>
-
   <!-- -------------------------------------------------------------------------->
 
   <?php
@@ -116,10 +132,20 @@
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
-    ?>
+  ?>
 
-    <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: </h4>
-
+    <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>:</h4>
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#illegal_timestamp_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="illegal_timestamp_info">
+      <div class="well">
+        Die Anfangs- und Endzeit ergeben weniger 0, oder über 12 Stunden Zeitdifferenz. <br>
+        Die Autokorrektur passt die ausgewählten Zeitstempel einfach den erwarteten Stunden an. <br>
+      </div>
+    </div>
     <table id='illTS' class="table table-hover">
       <th>User</th>
       <th>Status</th>
@@ -142,13 +168,12 @@
       </tbody>
     </table>
     <br>
-    <button type='submit' class="btn btn-warning" name='autoCorrect'>Autocorrect</button><small> - <?php echo $lang['DESCRIPTION_AUTOCORRECT_TIMESTAMPS']; ?> </small>
-    <br><br><br>
+    <button type='submit' class="btn btn-warning" name='autoCorrect'>Autocorrect</button>
+    <br><hr><br>
+    <?php endif;  ?>
 
-    <?php
-  endif;
-  ?>
   <!-- -------------------------------------------------------------------------->
+
   <?php
   $sql = "SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id
   AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
@@ -157,7 +182,19 @@
   if($result && $result->num_rows > 0):
     ?>
     <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>: Gemini</h4>
-
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#illegal_gemini_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="illegal_gemini_info">
+      <div class="well">
+        Es existiert mehr als nur ein Zeitstempel für einen Benutzer an nur einem Tag.<br>
+        Ein Benutzer darf allerdings pro Tag nur eine Art von Zeitstempel besitzen. <br>
+        Bitte entscheiden Sie welcher der beiden Zeitstempel gelöscht werden soll, Sie können auch beide Stempel löschen. <br>
+        (Bemerkung: ZA ist kein eigener Stempel)
+      </div>
+    </div>
     <table id='dubble' class="table table-hover">
       <th>User</th>
       <th width=40%><?php echo $lang['TIMESTAMPS']; ?> 1</th>
@@ -207,8 +244,7 @@
     </table>
     <br>
     <button type='submit' class="btn btn-warning" name='deleteGemini'><?php echo $lang['DELETE']; ?></button>
-    <br><br><br>
-
+    <br><hr><br>
     <?php
   endif;
   echo mysqli_error($conn);

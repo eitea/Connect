@@ -24,7 +24,7 @@ $currentTimeStamp = getCurrentTimestamp();
   ?>
 
   <div class="row form-group">
-    <div class="col-lg-6">
+    <div class="col-xs-6">
       <div class="input-group">
 
         <input id="calendar" readonly type="text" class="form-control from" name="newMonth" value= <?php echo substr($currentTimeStamp,0,7); ?> >
@@ -59,7 +59,7 @@ $currentTimeStamp = getCurrentTimestamp();
             <th><?php echo $lang['SHOULD_TIME']?></th>
             <th><?php echo $lang['IS_TIME']?></th>
             <th><?php echo $lang['DIFFERENCE']?></th>
-            <th>Saldo <?php echo $lang['ACCUMULATED']?></th>
+            <th>Saldo</th>
           </tr>
           <tbody>
             <?php
