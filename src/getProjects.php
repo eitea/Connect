@@ -123,10 +123,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $chargedTimeStart= '0000-00-00 00:00:00';
         $chargedTimeFin = '0000-00-00 00:00:00';
 
-        if($_POST['chargedTimesFrom'][$i]) != '0000-00-00 00:00'){
+        if($_POST['chargedTimesFrom'][$i] != '0000-00-00 00:00'){
           $chargedTimeStart = carryOverAdder_Hours($_POST['chargedTimesFrom'][$i], $toUtc);
         }
-        if($_POST['chargedTimesTo'][$i]) != '0000-00-00 00:00'){
+        if($_POST['chargedTimesTo'][$i] != '0000-00-00 00:00'){
           $chargedTimeFin = carryOverAdder_Hours($_POST['chargedTimesTo'][$i], $toUtc);
         }
 
