@@ -148,13 +148,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo mysqli_error($conn);
     } //end FOR each line
 
-    if(isset($_POST['saveChanges']) && isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
+    if(isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
       foreach ($_POST["noCheckCheckingIndeces"] as $e) {
         $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
         $conn->query($sql);
       }
     }
-    if(isset($_POST['saveChanges']) && isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
+    if(isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
       foreach ($_POST["checkingIndeces"] as $e) {
         $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
         $conn->query($sql);
@@ -165,10 +165,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $A = $row['start'];
           $B = $row['end'];
 
-          if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+          if($row['chargedTimeStart'][$i] != '0000-00-00 00:00:00'){
             $A = $row['chargedTimeStart'];
           }
-          if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+          if($row['chargedTimeEnd'][$i] != '0000-00-00 00:00:00'){
             $B = $row['chargedTimeEnd'];
           }
 
