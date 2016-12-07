@@ -1,4 +1,5 @@
 /* make sidebar nav vertical */
+
 @media (min-width: 768px){
   .affix-content .container {
     width: 90%;

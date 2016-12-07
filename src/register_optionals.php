@@ -18,11 +18,10 @@ $gender = "";
 
 $pass = randomPassword();
 
-$sql = "SELECT * FROM $companyTable WHERE id = 1";
+$sql = "SELECT email FROM $userTable";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
-$cmpnyName = $row['name'];
-$cmpnyType = $row['companyType'];
+$emailpostfix = strrchr($row['email'], "@");
 
 if(isset($_POST['create'])){
   $accept = true;
@@ -31,7 +30,7 @@ if(isset($_POST['create'])){
     $begin = $_POST['entryDate'] ." 05:00:00";
 
     if(!empty($_POST['mail'])){
-      $email = test_input($_POST['mail']) .'@'. $cmpnyName .'.'. $cmpnyType;
+      $email = test_input($_POST['mail']) .$emailpostfix;
     }
 
     if(!empty($_POST['yourPas'])){
@@ -221,7 +220,7 @@ if(isset($_POST['create'])){
     <div class="input-group">
       <span class="input-group-addon" style=min-width:150px>E-Mail</span>
       <input type="text" class="form-control" name="mail" value="<?php echo $firstname . '.' . $lastname; ?>">
-      <span class="input-group-addon" style=min-width:150px>@<?php echo $cmpnyName .'.'.$cmpnyType ?></span>
+      <span class="input-group-addon" style=min-width:150px><?php echo $emailpostfix; ?></span>
     </div>
   </div>
   <div class="row form-group">
