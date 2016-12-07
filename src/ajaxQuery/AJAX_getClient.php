@@ -1,6 +1,5 @@
 
 <?php
-
 require "../connection.php";
 $q = intval($_GET['company']);
 

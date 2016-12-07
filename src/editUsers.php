@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php $lang['USERS']; ?></h3>
+  <h3><?php echo $lang['USERS']; ?></h3>
 </div>
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -26,25 +26,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $curID = $x;
 
         if (!empty($_POST['firstname'.$x])) {
-          $firstname = $_POST['firstname'.$x];
+          $firstname = test_input($_POST['firstname'.$x]);
           $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$curID';";
           $conn->query($sql);
         }
 
         if (!empty($_POST['lastname'.$x])) {
-          $lastname = $_POST['lastname'.$x];
+          $lastname = test_input($_POST['lastname'.$x]);
           $sql = "UPDATE $userTable SET lastname= '$lastname' WHERE id = '$curID';";
           $conn->query($sql);
         }
 
         if (!empty($_POST['gender'.$x])) {
-          $gender = $_POST['gender'.$x];
+          $gender = test_input($_POST['gender'.$x]);
           $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$curID';";
           $conn->query($sql);
         }
 
         if (!empty($_POST['enableProjecting'.$x])) {
-          $enableProjecting = $_POST['enableProjecting'.$x];
+          $enableProjecting = test_input($_POST['enableProjecting'.$x]);
           $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$curID';";
           $conn->query($sql);
         }
@@ -84,43 +84,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
         }
 
-        if(isset($_POST['mon'.$x])){
+        if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
           $mon = test_input($_POST['mon'.$x]);
           $sql = "UPDATE $bookingTable SET mon='$mon' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['tue'.$x])){
+        if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
           $tue = test_input($_POST['tue'.$x]);
           $sql = "UPDATE $bookingTable SET tue='$tue' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['wed'.$x])){
+        if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
           $wed = test_input($_POST['wed'.$x]);
           $sql = "UPDATE $bookingTable SET wed='$wed' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['thu'.$x])){
+        if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
           $thu = test_input($_POST['thu'.$x]);
           $sql = "UPDATE $bookingTable SET thu='$thu' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['fri'.$x])){
+        if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
           $fri = test_input($_POST['fri'.$x]);
           $sql = "UPDATE $bookingTable SET fri='$fri' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['sat'.$x])){
+        if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
           $sat = test_input($_POST['sat'.$x]);
           $sql = "UPDATE $bookingTable SET sat='$sat' WHERE userID = '$curID'";
           $conn->query($sql);
         }
 
-        if (isset($_POST['sun'.$x])){
+        if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
           $sun = test_input($_POST['sun'.$x]);
           $sql = "UPDATE $bookingTable SET sun='$sun' WHERE userID = '$curID'";
           $conn->query($sql);
@@ -144,10 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $sql = "SELECT * FROM $companyTable";
           $result = $conn->query($sql);
           while($row = $result->fetch_assoc()){
-            //just completely delete the relationship from table
+            //just completely delete the relationship from table to avoid duplicate entries.
             $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id'];
             $conn->query($sql);
-            if(in_array($row['id'], $_POST['company'.$x])){  //if company is checked, insert again to avoid duplicate entries.
+            if(in_array($row['id'], $_POST['company'.$x])){  //if company is checked, insert again
               $sql = "INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)";
               $conn->query($sql);
             }
@@ -238,7 +238,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
 
-      $eOut = "ID: $x - $firstname $lastname";
+      $eOut = "$firstname $lastname";
       ?>
 
       <div class="panel panel-default">
@@ -350,11 +350,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   <?php echo $lang['ALLOW_PRJBKING_ACCESS']; ?>: <br>
                   <div class="checkbox">
                     <label>
-                      <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>>Can Checkin
+                      <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
                     </label>
                      <br>
                     <label>
-                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?>>Can Book
+                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_BOOK']; ?>
                     </label>
                   </div>
                 </div>
@@ -384,25 +384,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Mon</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="mon<?php echo $x; ?>" size=2 value= <?php echo $mon; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="mon<?php echo $x; ?>" size=2 value= <?php echo $mon; ?>>
                   </div>
                 </div>
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Tue</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="tue<?php echo $x; ?>" size=2 value= <?php echo $tue; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="tue<?php echo $x; ?>" size=2 value= <?php echo $tue; ?>>
                   </div>
                 </div>
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Wed</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="wed<?php echo $x; ?>" size=2 value= <?php echo $wed; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="wed<?php echo $x; ?>" size=2 value= <?php echo $wed; ?>>
                   </div>
                 </div>
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Thu</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="thu<?php echo $x; ?>" size=2 value= <?php echo $thu; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="thu<?php echo $x; ?>" size=2 value= <?php echo $thu; ?>>
                   </div>
                 </div>
               </div>
@@ -411,19 +411,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Fri</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="fri<?php echo $x; ?>" size=2 value= <?php echo $fri; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="fri<?php echo $x; ?>" size=2 value= <?php echo $fri; ?>>
                   </div>
                 </div>
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Sat</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="sat<?php echo $x; ?>" size=2 value= <?php echo $sat; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="sat<?php echo $x; ?>" size=2 value= <?php echo $sat; ?>>
                   </div>
                 </div>
                 <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-addon">Sun</span>
-                    <input type="text" class="form-control" aria-describedby="sizing-addon2" name="sun<?php echo $x; ?>" size=2 value= <?php echo $sun; ?>>
+                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="sun<?php echo $x; ?>" size=2 value= <?php echo $sun; ?>>
                   </div>
                 </div>
               </div>
@@ -432,7 +432,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="container-fluid">
                 <div class="text-right">
                   <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['REMOVE_USER']; ?></button>
-                  <button class="btn btn-warning" type="submit" name="submit<?php echo $x; ?>" > Save Changes </button>
+                  <button class="btn btn-warning" type="submit" name="submit<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?> </button>
                 </div>
               </div>
             <br><br>
@@ -457,7 +457,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
             </div>
 
-
             <!-- /CONTENT -->
           </div>
         </div>
@@ -471,12 +470,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <div class="container-fluid">
-  <div class="col-xs-6 text-left">
-      <a class="btn btn-warning" href='register_choice.php'>Register New User</a>
+  <div class="text-right">
+      <a class="btn btn-warning" href='register_choice.php'><?php echo $lang['REGISTER_NEW_USER']; ?></a>
   </div>
-  <div class="col-xs-6 text-right">
+  <!--div class="col-xs-6 text-right">
       <a class="btn btn-warning" href='editUsers_onDate.php'>Make Changes on Date</a>
-  </div>
+  </div-->
 </div>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

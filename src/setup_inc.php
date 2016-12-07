@@ -158,8 +158,9 @@ $sql = "CREATE TABLE $projectBookingTable (
   projectID INT(6) UNSIGNED,
   timestampID INT(10) UNSIGNED,
   infoText VARCHAR(500),
-  booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   internInfo VARCHAR(500),
+  booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  bookingType ENUM('project', 'break', 'drive'),
   FOREIGN KEY (projectID) REFERENCES $projectTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE,
@@ -170,7 +171,6 @@ $sql = "CREATE TABLE $projectBookingTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $companyToUserRelationshipTable (
   companyID INT(6) UNSIGNED,

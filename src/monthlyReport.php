@@ -205,4 +205,3 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
-'; ?>

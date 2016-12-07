@@ -48,6 +48,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED'] = 'Accumulated';
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
+  $lang['ADD'] = 'Add';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADMIN_CORE_OPTIONS'] = 'System Options';
   $lang['ADMIN_TIME_OPTIONS'] = 'Time Records';
@@ -65,6 +66,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BREAK'] = 'Break';
 
   $lang['CALENDAR'] = 'Calendar';
+  $lang['CAN_CHECKIN'] = 'Can Checkin';
+  $lang['CAN_BOOK'] = 'Can create Bookings';
   $lang['CHARGED'] = 'Charged';
   $lang['CHECK_IN'] = 'Check In';
   $lang['CHECK_OUT'] = 'Check Out';
@@ -127,6 +130,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['MINUTES'] = 'Minutes';
   $lang['MONTHLY_REPORT'] ='Monthly Report';
 
+  $lang['NEW_CLIENT_CREATE'] = 'Create a new Client';
   $lang['NEW_PASSWORD'] = 'New Password';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
   $lang['NOT_CHARGED'] = 'Not charged';
@@ -149,6 +153,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REPLY_TEXT'] = 'Answer';
   $lang['REQUESTS'] = "Request";
 
+  $lang['SAVE'] = 'Save';
   $lang['SETTINGS'] = 'Settings';
   $lang['SHOULD_TIME'] = 'Should';
   $lang['SICK_LEAVE'] = 'Sick Leave';
@@ -221,6 +226,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED'] = 'Akkumuliert';
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
+  $lang['ADD'] = 'Hinzufügen';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
   $lang['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
@@ -239,6 +245,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BREAK'] = 'Pause';
 
   $lang['CALENDAR'] = 'Kalender';
+  $lang['CAN_CHECKIN'] = 'Kann Einstempeln';
+  $lang['CAN_BOOK'] = 'Kann Buchen';
   $lang['CHARGED'] = 'Verrechnet';
   $lang['CHECK_IN'] = 'Einstempeln';
   $lang['CHECK_OUT'] = 'Ausstempeln';
@@ -301,6 +309,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['MINUTES'] = 'Minuten';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
+  $lang['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
   $lang['NOT_CHARGED'] = 'Nicht Verrechnet';
@@ -324,6 +333,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REPLY_TEXT'] = 'Antwort';
   $lang['REQUESTS'] = "Anfragen";
 
+  $lang['SAVE'] = 'Speichern';
   $lang['SETTINGS'] = 'Einstellungen';
   $lang['SHOULD_TIME'] = 'Soll';
   $lang['SICK_LEAVE'] = 'Krankenstand';

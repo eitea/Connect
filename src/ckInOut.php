@@ -16,7 +16,7 @@ function checkIn($userID) {
        $diff = 0;
      }
      //create a break stamping
-     $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break')";
+     $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break', 'break')";
      $conn->query($sql);
      echo mysqli_error($conn);
      //update timestamp
@@ -61,7 +61,7 @@ function checkOut($userID) {
     //take the missing time to fulfill the lunchbreak
     $minutes = ($row['hoursOfRest'] - $breakCredit) * 60;
     //create the lunchbreak booking
-    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES(UTC_TIMESTAMP, DATE_ADD(UTC_TIMESTAMP, INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID')";
+    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES(UTC_TIMESTAMP, DATE_ADD(UTC_TIMESTAMP, INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID', 'break')";
     $conn->query($sql);
     echo mysqli_error($conn);
 

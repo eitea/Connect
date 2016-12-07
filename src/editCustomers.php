@@ -41,7 +41,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <br>
 <form method="post">
   <select name="filterCompany" class="js-example-basic-single" style="width:200px">
-    <option value=0>Select Company..</option>
+    <option value=0><?php echo $lang['COMPANY']; ?> ... </option>
     <?php
     $filterCompanyQuery = "";
     $query = "SELECT * FROM $companyTable";
@@ -109,7 +109,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <div class="row">
     <div class="col-md-3">
       <button class="btn btn-warning btn-block" type="button" data-toggle="collapse" data-target="#newcompanyDrop" aria-expanded="false" aria-controls="collapseExample">
-        Create New Client <i class="fa fa-caret-down"></i>
+        <?php echo $lang['NEW_CLIENT_CREATE']; ?> <i class="fa fa-caret-down"></i>
       </button>
     </div>
     <div class="col-md-2">
@@ -121,12 +121,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <div class="collapse col-md-5 well" id="newcompanyDrop">
     <form method="post">
       <br>
-      <input type="text" class="form-control" name="name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;" >
+      <input type="text" class="form-control" name="name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;">
       <br>
       <div class="row">
         <div class="col-md-6">
-          <select name="createCompany" class="js-example-basic-single" onchange="showClients(this.value)">
-            <option name=cmp value=0>Company...</option>
+          <select name="createCompany" class="js-example-basic-single btn-block" onchange="showClients(this.value)" style="width:150px">
             <?php
             $query = "SELECT * FROM $companyTable";
             $result = mysqli_query($conn, $query);
@@ -142,12 +141,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
         <div class="col-md-6">
           <input type="text" class="form-control" name="clientNumber" placeholder="#" >
+          <small> &nbsp Kundennummer - Optional</small>
         </div>
       </div>
       <br>
       <div class="text-right">
         <br>
-        <button type="submit" class="btn btn-warning btn-sm" name="create"> Hinzufügen </button>
+        <button type="submit" class="btn btn-warning btn-sm" name="create"> <?php echo $lang['ADD']; ?></button>
       </div>
 
     </form>
@@ -157,9 +157,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <script>
 $(document).ready(function() {
   $('#clientTable').DataTable({
-    "order": [[ 1, "asc" ]]
+    "order": [[ 1, "asc" ]],
+    "language": {
+      "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/German.json"
+    }
   });
-} );
+});
 </script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

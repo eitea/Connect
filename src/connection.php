@@ -2,6 +2,11 @@
 require "connection_config.php";
 require "connection_vars.php";
 
+
+if(!isset($_SESSION)){ //my gosh, PLEASE
+  session_start();
+}
+
 if(isset($_SESSION['dbConnect'])){
   if(isset($_SERVER['RDS_HOSTNAME'])){
     $conn = mysqli_connect($_SERVER['RDS_HOSTNAME'], $_SERVER['RDS_USERNAME'], $_SERVER['RDS_PASSWORD'], $_SESSION['dbConnect'], $_SERVER['RDS_PORT']);

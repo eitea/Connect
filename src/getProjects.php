@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       if(timeDiff_Hours($startDate, $endDate) > 0){
         if(isset($_POST['addBreak'])){ //checkbox
-          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText')";
+          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
           $conn->query($sql);
           $duration = timeDiff_Hours($startDate, $endDate);
           $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
@@ -74,9 +74,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $showUndoButton = TRUE;
         } else {
           if(isset($_POST['project'])){
-            $projectID = $_POST['project'];
-            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
+            $projectID = test_input($_POST['project']);
+            if(isset($_POST['addDrive'])){ //add as driving time
+              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive')";
+            } else { //normal booking
+              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project')";
+            }
             $conn->query($sql);
+            echo mysqli_error($conn);
+            $insertInfoText = $insertInternInfoText = '';
+            $showUndoButton = TRUE;
           } else {
             echo '<div class="alert alert-danger fade in">';
             echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -647,7 +654,7 @@ if($filterCompany != 0 || $filterUserID != 0):
   });
   </script>
 
-  <br><br>
+  <br><br><br>
 
   <?php if(isset($_POST['filterBooked']) && $_POST['filterBooked'] == '1'): ?>
   <button type='submit' class="btn btn-warning" name='saveChanges'>Save Changes</button><br><br>
@@ -658,9 +665,21 @@ if($filterCompany != 0 || $filterUserID != 0):
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
   <?php if($filterUserID != 0 && isset($_POST['filterDay'])): ?>
 
-  <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Remove last entry</button></div>
+  <div style='text-align:right;'><button type='submit' class="btn btn-primary" name='undo'>Remove last entry</button></div>
+
+  <div class="container-fluid">
+    <div class="checkbox">
+      <div class="col-sm-2">
+        <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
+      </div>
+      <div class="col-sm-3">
+        <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+      </div>
+    </div>
+  </div>
+
   <div class="row">
-  <div id=mySelections class="col-xs-9">
+  <div id=mySelections class="col-xs-9"><br>
   <?php
   $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
   $result = mysqli_query($conn, $query);
@@ -719,14 +738,12 @@ if($filterCompany != 0 || $filterUserID != 0):
     <div class="row">
     <div class="col-md-6">
     <div class="input-group input-daterange">
-    <span class="input-group-addon">
-    <input type="checkbox" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
-    </span>
+
     <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
     <span class="input-group-addon"> - </span>
     <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">
     <div class="input-group-btn">
-    <button class="btn btn-warning" type="submit"  name="add"> + </button>
+    <button class="btn btn-primary" type="submit"  name="add"> + </button>
     </div>
     </div>
     </div>

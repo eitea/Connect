@@ -3,9 +3,6 @@ require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
 
-session_start();
-enableToCore($_SESSION['userid']);
-
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
   $row = $result->fetch_assoc();
@@ -203,6 +200,19 @@ if($row['version'] < 33){
   }
 }
 
+if($row['version'] < 34){
+  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN bookingType ENUM('project', 'break', 'drive')";
+  if($conn->query($sql)){
+    echo "Expand booking table by type.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  
+  $conn->query("UPDATE $projectBookingTable SET bookingType = 'break' WHERE projectID IS NULL");
+  echo mysqli_error($conn);
+  $conn->query("UPDATE $projectBookingTable SET bookingType = 'project' WHERE projectID IS NOT NULL");
+  echo mysqli_error($conn);
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

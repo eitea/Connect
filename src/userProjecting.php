@@ -20,9 +20,8 @@ if ($result && $result->num_rows > 0) {
 
 $showUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
-?>
 
-<?php
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
     $startDate = $date." ".$_POST['start'];
@@ -35,21 +34,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
-      if(isset($_POST['addBreak'])){ //checkbox
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText')";
+      if(isset($_POST['addBreak'])){ //break
+        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
         $conn->query($sql);
         $showUndoButton = TRUE;
       } else {
         if(isset($_POST['project'])){
-          $projectID = $_POST['project'];
-          $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText')";
+          $projectID = test_input($_POST['project']);
+          if(isset($_POST['addDrive'])){ //add as driving time
+            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive')";
+          } else { //normal booking
+            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project')";
+          }
           $conn->query($sql);
-          $showUndoButton = TRUE;
-          $insertInfoText = $insertInternInfoText = '';
           echo mysqli_error($conn);
+          $insertInfoText = $insertInternInfoText = '';
+          $showUndoButton = TRUE;
         } else {
           echo '<div class="alert alert-danger fade in">';
           echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -95,7 +98,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </tr>
         </thead>
         <tbody>
-
           <?php
           $readOnly = "";
           $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
@@ -190,16 +192,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   function hideMyDiv(o){
     if(o.checked){
-      document.getElementById('mySelections').style.visibility='hidden';
+      document.getElementById('mySelections').style.display='none';
     } else {
-      document.getElementById('mySelections').style.visibility='visible';
+      document.getElementById('mySelections').style.display='inline';
     }
   }
-  </script><br><br>
+  </script>
 
-  <br>
+  <br><br><br>
+
+  <div class="container-fluid">
+    <div class="checkbox">
+      <div class="col-sm-2">
+        <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
+      </div>
+      <div class="col-sm-3">
+        <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECTS -->
   <div class="row">
-    <div id=mySelections class="col-xs-9">
+    <div id=mySelections class="col-xs-9"><br>
       <?php
       $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
       $result = mysqli_query($conn, $query);
@@ -210,7 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = mysqli_query($conn, $query);
         if ($result && $result->num_rows > 0) {
           echo '<select style="width:200px" class="js-example-basic-single" id="clientHint" name="client" onchange="showProjects(this.value)">';
-          echo "<option name='act' value=0>Select...</option>";
+          echo "<option name='act' value=0>Firma...</option>";
           while ($row = $result->fetch_assoc()) {
             $cmpnyID = $row['id'];
             $cmpnyName = $row['name'];
@@ -220,13 +235,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo '</select>';
       else:
         ?>
-
         <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value)">
-          <option name=cmp value=0>Select...</option>
+          <option name=cmp value=0>Firma...</option>
           <?php
           $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
           $result = mysqli_query($conn, $query);
-          if ($result && $result->num_rows > 1) {
+          if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
               $cmpnyID = $row['id'];
               $cmpnyName = $row['name'];
@@ -245,6 +259,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </select>
     </div>
   </div>
+  <!-- /SELECTS -->
 
   <div class="row">
     <div class="col-md-8">
@@ -258,9 +273,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
-        <span class="input-group-addon">
-          <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a>
-        </span>
         <input type="time" class="form-control" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
         <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">

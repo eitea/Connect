@@ -13,7 +13,10 @@
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
       if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '".$_POST['start'].' 04:00:00'."', '" .$_POST['end'].' 04:00:00' . "', '".$_POST['requestText']."')";
+        $begin = test_input($_POST['start']);
+        $end = test_input($_POST['end']);
+        $infoText = test_input($_POST['requestText']);
+        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '$begin 04:00:00', '$end 04:00:00', '$infoText')";
         $conn->query($sql);
         echo mysqli_error($conn);
       } else {
