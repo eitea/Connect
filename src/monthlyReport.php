@@ -22,13 +22,12 @@ if(isset($_POST['filterUserID'])){
 ?>
 
 <div class="row">
-  <div class="col-md-3">
+  <div class="col-lg-3">
   <select name='filterUserID' class='js-example-basic-single' style="width:220px">
   <?php
     $sql = "SELECT * FROM $userTable";
     $result = $conn->query($sql);
     if($result && $result->num_rows > 0){
-      $result->fetch_assoc(); //admin
       echo "<option value=0>Select...</option>";
       while($row = $result->fetch_assoc()){
         $selected = "";
@@ -43,7 +42,7 @@ if(isset($_POST['filterUserID'])){
   ?>
   </select>
 </div>
-  <div class="col-md-6">
+  <div class="col-lg-6">
     <div class="input-group">
       <input type="month" class="form-control" name="filterMonth" value=<?php echo $filterMonth; ?> >
       <span class="input-group-btn">
@@ -56,21 +55,21 @@ if(isset($_POST['filterUserID'])){
 
 <br><br>
 <table class="table table-hover">
-  <tr>
+  <thead>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
     <th><?php echo $lang['DATE']; ?></th>
     <th><?php echo $lang['BEGIN']; ?></th>
     <th><?php echo $lang['BREAK']; ?></th>
     <th><?php echo $lang['END']; ?></th>
-    <th style='font-size:small; text-align:left; width:40px'><?php echo $lang['LAST_BOOKING']; ?></th>
+    <th style='width:40px'><small><?php echo $lang['LAST_BOOKING']; ?></small></th>
     <th><?php echo $lang['ACTIVITY']; ?></th>
     <th><?php echo $lang['SHOULD_TIME']; ?></th>
     <th><?php echo $lang['IS_TIME']; ?></th>
     <th><?php echo $lang['DIFFERENCE']; ?></th>
     <th>Saldo</th>
     <th width=100px;><?php echo $lang['EDIT']; ?></th>
-  </tr>
-
+  </thead>
+  <tbody>
 <?php
 if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   require 'Calculators/MonthlyCalculator.php';
@@ -154,14 +153,18 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
       $saldoStyle = 'style=color:#6fcf2c;'; //green
     }
 
+$neutralStyle = '';
+    if($calculator->shouldTime[$i] == 0 && $difference == 0){
+      $neutralStyle = "style=color:#c7c6c6;";
+    }
 
-    echo "<tr>";
+    echo "<tr $neutralStyle>";
     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
     echo "<td>" . $calculator->date[$i] . "</td>";
     echo "<td>" . substr($A,11,5) . "</td>";
     echo "<td>" . sprintf('%.2f', $calculator->lunchTime[$i]) . "</td>";
     echo "<td>" . substr($B,11,5)  . "</td>";
-    echo "<td style='font-size:small; text-align:left; $style'>" . $tinyEndTime . "</td>";
+    echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
     echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
     echo "<td>" . $calculator->shouldTime[$i] . "</td>";
     echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
@@ -200,7 +203,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
   }
 }
 ?>
-
+</tbody>
 </table>
 
 <!-- /BODY -->

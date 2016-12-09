@@ -194,6 +194,7 @@ if (isset($_POST['filterStatus'])) {
           <table class="table table-striped table-condensed text-center">
             <tr>
               <th><?php echo $lang['DELETE']; ?></th>
+              <th><?php echo $lang['WEEKLY_DAY']; ?></th>
               <th><?php echo $lang['ACTIVITY']; ?></th>
               <th width=140px><?php echo $lang['FROM']; ?></th>
               <th><?php echo $lang['LUNCHBREAK']; ?></th>
@@ -232,6 +233,7 @@ if (isset($_POST['filterStatus'])) {
 
                 echo "<tr>";
                 echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
+                echo "<td>". $lang_weeklyDayToString[strtolower(date('D', strtotime($A)))] . "</td>";
                 echo "<td>" . $lang_activityToString[$row['status']] . "</td>";
 
                 echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";

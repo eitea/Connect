@@ -47,8 +47,8 @@ $currentTimeStamp = getCurrentTimestamp();
 </form>
 
       <div class="table-responsive">
-        <table class="table table-hover table-striped">
-          <tr>
+        <table class="table table-striped">
+          <thead>
             <th><?php echo $lang['WEEKLY_DAY']?></th>
             <th><?php echo $lang['DATE']?></th>
             <th><?php echo $lang['BEGIN']?></th>
@@ -60,7 +60,7 @@ $currentTimeStamp = getCurrentTimestamp();
             <th><?php echo $lang['IS_TIME']?></th>
             <th><?php echo $lang['DIFFERENCE']?></th>
             <th>Saldo</th>
-          </tr>
+          </thead>
           <tbody>
             <?php
             $calculator = new Monthly_Calculator($currentTimeStamp, $userID);
