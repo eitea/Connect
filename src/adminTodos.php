@@ -142,8 +142,8 @@
     </div>
     <div class="collapse" id="illegal_timestamp_info">
       <div class="well">
-        Die Anfangs- und Endzeit ergeben weniger 0, oder über 12 Stunden Zeitdifferenz. <br>
-        Die Autokorrektur passt die ausgewählten Zeitstempel einfach den erwarteten Stunden an. <br>
+        Die Differenz der Anfangs- und Endzeit ergibt weniger als 0, oder über 12 Stunden. <br>
+        Die Autokorrektur passt die ausgewählten Zeitstempel einfach den erwarteten Stunden inkl. Mittagspause an. <br>
       </div>
     </div>
     <table id='illTS' class="table table-hover">
@@ -191,8 +191,8 @@
       <div class="well">
         Es existiert mehr als nur ein Zeitstempel für einen Benutzer an nur einem Tag.<br>
         Ein Benutzer darf allerdings pro Tag nur eine Art von Zeitstempel besitzen. <br>
-        Bitte entscheiden Sie welcher der beiden Zeitstempel gelöscht werden soll, Sie können auch beide Stempel löschen. <br>
-        (Bemerkung: ZA ist kein eigener Stempel)
+        Bitte entscheiden Sie, welcher der beiden Zeitstempel gelöscht werden soll. Sie können auch beide Stempel löschen. <br>
+        (Bemerkung: ZA ist kein Stempel)
       </div>
     </div>
     <table id='dubble' class="table table-hover">

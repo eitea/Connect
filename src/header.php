@@ -93,7 +93,7 @@ $(document).ready(function() {
       require "ckInOut.php";
       echo '<div class="alert alert-info fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo "<strong>Stamping recognized! </strong> Refresh in a few minutes.";
+      echo "<strong>Checkin/out recognized: </strong> Refresh in a few minutes.";
       echo '</div>';
 
       if (isset($_POST['stampIn'])) {
