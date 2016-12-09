@@ -64,6 +64,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BOOK_PROJECTS'] = 'Book Projects';
   $lang['BOOKINGS'] = 'Bookings';
   $lang['BREAK'] = 'Break';
+  $lang['BREAKS'] = 'Breaks';
 
   $lang['CALENDAR'] = 'Calendar';
   $lang['CAN_CHECKIN'] = 'Can Checkin';
@@ -87,6 +88,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DIFFERENCE'] = 'Difference';
   $lang['DISPLAY_INFORMATION'] = 'Display Infos';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
+  $lang['DRIVES'] = 'Drives';
 
   $lang['EDIT'] = 'Edit';
   $lang['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
@@ -243,6 +245,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['BOOK_PROJECTS'] = 'Projekte Buchen';
   $lang['BOOKINGS'] = 'Buchungen';
   $lang['BREAK'] = 'Pause';
+  $lang['BREAKS'] = 'Pausen';
 
   $lang['CALENDAR'] = 'Kalender';
   $lang['CAN_CHECKIN'] = 'Kann Einstempeln';
@@ -266,6 +269,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
+  $lang['DRIVES'] = 'Fahrten';
 
   $lang['EDIT'] = 'Bearbeiten';
   $lang['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';

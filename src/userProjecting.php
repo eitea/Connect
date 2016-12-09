@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="col-md-12">
       <table class="table table-hover table-striped">
         <thead>
-          <tr>
+            <th></th>
             <th>Start</th>
             <th><?php echo $lang['END']; ?></th>
             <th><?php echo $lang['DATE']; ?></th>
@@ -95,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <th><?php echo $lang['PROJECT']; ?></th>
             <th>Info</th>
             <th>Intern</th>
-          </tr>
         </thead>
         <tbody>
           <?php
@@ -112,9 +111,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if(isset($_POST['undo'])){
               $numRows--;
             }
+
             for ($i=0; $i<$numRows; $i++) {
               $row = $result->fetch_assoc();
+
+              if($row['bookingType'] == 'break'){
+                $icon = "fa fa-cutlery";
+              } elseif($row['bookingType'] == 'drive'){
+                $icon = "fa fa-car";
+              } else {
+                $icon = "fa fa-star";
+              }
+
               echo "<tr>";
+              echo "<td><i class='$icon'></i></td>";
               echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 8) ."</td>";
               echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8) ."</td>";
               echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10) ."</td>";

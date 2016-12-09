@@ -15,6 +15,8 @@ $filterClient = 0;
 $filterProject = 0;
 $filterUserID = 0;
 
+$filterAddBreaks = $filterAddDrives = "";
+
 //careful stairs
 if(!empty($_POST['filterYear'])){
   $filterDate = $_POST['filterYear'];
@@ -44,6 +46,14 @@ if(isset($_POST['filterProject'])){
 
 if(isset($_POST['filterUserID'])){
   $filterUserID = $_POST['filterUserID'];
+}
+
+if(isset($_POST['filterAddBreaks'])){
+  $filterAddBreaks = "checked";
+}
+
+if(isset($_POST['filterAddDrives'])){
+  $filterAddDrives = "checked";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -271,7 +281,15 @@ function textAreaAdjust(o) {
         ?>
       </select>
       <br><br>
-
+      <div class="container">
+        <div class="checkbox">
+          <input type="checkbox" name="filterAddBreaks" <?php echo $filterAddBreaks; ?>> <?php echo $lang['BREAKS']; ?> <br><br>
+        </div>
+        <div class="checkbox">
+          <input type="checkbox" name="filterAddDrives" <?php echo $filterAddDrives; ?>> <?php echo $lang['DRIVES']; ?>
+        </div>
+      </div>
+      <br>
       <button type="submit" class="btn btn-warning" name="filter">Filter</button><br><br>
     </div>
 
@@ -477,35 +495,47 @@ if($filterCompany != 0 || $filterUserID != 0):
       $filterCompanyAdd = "AND $companyTable.id = $filterCompany";
     }
 
-    $sql="SELECT DISTINCT $projectTable.id AS projectID,
+    //filter activates if you dont(!) want breaks.
+    $filterNoBreakAdd = ""; //he wants breaks
+    if($filterAddBreaks == ""){
+      $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
+    }
+
+    $filterNoDriveAdd = ""; //he wants drives
+    if($filterAddDrives == ""){
+      $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
+    }
+
+    $sql="SELECT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
     $clientTable.name AS clientName,
     $projectTable.name AS projectName,
-    $projectBookingTable.booked,
+    $projectBookingTable.*,
     $projectBookingTable.id AS projectBookingID,
     $logTable.timeToUTC,
-    $projectBookingTable.infoText,
-    $projectBookingTable.internInfo,
-    $projectBookingTable.start,
-    $projectBookingTable.end,
-    $projectBookingTable.chargedTimeStart,
-    $projectBookingTable.chargedTimeEnd,
     $userTable.firstname, $userTable.lastname,
     $projectTable.hours,
     $projectTable.hourlyPrice
-    FROM $projectBookingTable, $logTable, $userTable, $clientTable, $projectTable, $companyTable
-    WHERE $projectTable.clientID = $clientTable.id
-    AND $clientTable.companyID = $companyTable.id
-    AND $projectBookingTable.projectID = $projectTable.id
-    AND $projectBookingTable.timestampID = $logTable.indexIM
-    AND $userTable.id = $logTable.userID
-    AND $projectBookingTable.start LIKE '$filterDate%'
+    FROM $projectBookingTable
+    INNER JOIN $logTable ON  $projectBookingTable.timeStampID = $logTable.indexIM
+    INNER JOIN $userTable ON $logTable.userID = $userTable.id
+    LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
+    LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
+    LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
+    WHERE $projectBookingTable.start LIKE '$filterDate%'
     $filterCompanyAdd
     $bookedQuery
     $filterClientAdd $filterProjectAdd $filterUserIDAdd
-    AND $projectBookingTable.projectID IS NOT NULL
+    $filterNoBreakAdd $filterNoDriveAdd
     ORDER BY $projectBookingTable.end ASC";
+/*
+$sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
+LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
 
+WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
+OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
+*/
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
       $numRows = $result->num_rows;
@@ -524,30 +554,32 @@ if($filterCompany != 0 || $filterUserID != 0):
         $csv_Add[] = $row['clientName'];
         $csv_Add[] = $row['projectName'];
 
-
-        echo "<td><select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
-        $sql = "SELECT * FROM $clientTable";
-        $clientResult = $conn->query($sql);
-        while($clientRow = $clientResult->fetch_assoc()){
-          $selected = '';
-          if($clientRow['id'] == $row['clientID']){
-            $selected = 'selected';
+        if($row['bookingType'] != 'break'){ //this is a break, do not display dis
+          echo "<td><select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+          $sql = "SELECT * FROM $clientTable";
+          $clientResult = $conn->query($sql);
+          while($clientRow = $clientResult->fetch_assoc()){
+            $selected = '';
+            if($clientRow['id'] == $row['clientID']){
+              $selected = 'selected';
+            }
+            echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
           }
-          echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
-        }
-        echo "</select><br><br>";
-        echo "<select style='width:150px' id='newProjectName$x' class='js-example-basic-single' name='projectIDs[]'>";
-        $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
-        $clientResult = $conn->query($sql);
-        while($clientRow = $clientResult->fetch_assoc()){
-          $selected = '';
-          if($clientRow['id'] == $row['projectID']){
-            $selected = 'selected';
+          echo "</select><br><br>";
+          echo "<select style='width:150px' id='newProjectName$x' class='js-example-basic-single' name='projectIDs[]'>";
+          $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
+          $clientResult = $conn->query($sql);
+          while($clientRow = $clientResult->fetch_assoc()){
+            $selected = '';
+            if($clientRow['id'] == $row['projectID']){
+              $selected = 'selected';
+            }
+            echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
           }
-          echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+          echo "</select></td>";
+        } else {
+          echo "<td></td>";
         }
-        echo "</select></td>";
-
         echo "<td><textarea style='resize: none;' name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
 
         $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
