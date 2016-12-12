@@ -15,7 +15,7 @@ $filterClient = 0;
 $filterProject = 0;
 $filterUserID = 0;
 
-$filterAddBreaks = $filterAddDrives = "";
+$filterAddBreaks = $filterAddDrives = "checked";
 
 //careful stairs
 if(!empty($_POST['filterYear'])){
@@ -48,12 +48,12 @@ if(isset($_POST['filterUserID'])){
   $filterUserID = $_POST['filterUserID'];
 }
 
-if(isset($_POST['filterAddBreaks'])){
-  $filterAddBreaks = "checked";
+if(!isset($_POST['filterAddBreaks'])){
+  $filterAddBreaks = "";
 }
 
-if(isset($_POST['filterAddDrives'])){
-  $filterAddDrives = "checked";
+if(!isset($_POST['filterAddDrives'])){
+  $filterAddDrives = "";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -378,9 +378,7 @@ function textAreaAdjust(o) {
 
 <!----------------------------------------------------------------------------->
 
-<?php
-if($filterCompany != 0 || $filterUserID != 0):
-  ?>
+<?php if($filterCompany != 0 || $filterUserID != 0): ?>
 
   <script>
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
@@ -497,25 +495,31 @@ if($filterCompany != 0 || $filterUserID != 0):
       $filterProjectAdd = "AND $projectTable.id = $filterProject $filterCompanyAdd $filterClientAdd";
     }
 
-    //filter activates if you DO NOT want breaks
+    $filterNoDriveAdd = ""; //he wants drives
+    if($filterAddDrives == ""){
+      $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
+    }
 
-    $filterNoBreakAdd = "";
-    if($filterAddBreaks == ""){
+
+
+    if($filterAddBreaks == ""){ // he does NOT want breaks
       $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
     } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
+      $filterNoBreakAdd = "";
       if($filterUserID != 0){
         //remove the company, client, project bs
-        $filterProjectAdd = substr($filterProjectAdd,3,-1);
-        $filterProjectAdd = " AND (($filterProjectAdd) OR ($projectTable.id IS NULL))";
+        if(strlen($filterProjectAdd) > 3){ //he filters for project or client or company -> care for other bookings
+          $filterProjectAdd = substr($filterProjectAdd,3);
+          $filterProjectAdd = " AND (($filterProjectAdd) OR ($projectTable.id IS NULL))";
+        } else { //he filters for user and date only -> care for other bookings
+          $filterProjectAdd = " AND (($projectTable.id IS NOT NULL) OR ($projectTable.id IS NULL))";
+        }
       } else {
         echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
       }
     }
 
-    $filterNoDriveAdd = ""; //he wants drives
-    if($filterAddDrives == ""){
-      $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
-    }
+
 
     $sql="SELECT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
