@@ -353,12 +353,13 @@ $(document).ready(function() {
                                   <i class="fa fa-wrench"></i> <span><?php echo $lang['FUNCTIONS']; ?></span> <i class="fa fa-caret-down"></i>
                                 </a>
                                 <div class="collapse" id="coreSettings" style="height: 0px;">
-                                  <ul class="nav nav-list">
-                                    <li><a href="fixLunchbreak.php" target='_blank'><span><?php echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
-                                    <li><a href="fixVacations.php" target='_blank'><span><?php echo $lang['VACATION_REPAIR']; ?></span></a></li>
+                                  <!--ul class="nav nav-list">
+                                    <li><a href="fixLunchbreak.php" target='_blank'><span><?php //echo $lang['LUNCHBREAK_REPAIR']; ?></span></a></li>
+                                    <li><a href="fixVacations.php" target='_blank'><span><?php //echo $lang['VACATION_REPAIR']; ?></span></a></li>
                                     <li><a href="fixAbsentLogTable.php" target='_blank'><span>Repair Expected Hours</span></a></li>
                                     <li><a href="fixUnLogs.php" target='_blank'><span>Repair Absent Log</span></a></li>
-                                  </ul>
+                                  </ul-->
+                                  Coming Soon.
                                 </div>
                               </li>
                               <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>

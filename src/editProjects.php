@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-<h3><?php echo $lang['PROJECT']; ?></h3>
+  <h3><?php echo $lang['PROJECT']; ?></h3>
 </div>
 
 <?php
@@ -46,7 +46,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
 ?>
 
 <form method="post">
-<table class="table table-hover">
+  <table class="table table-hover">
     <thead>
       <tr>
         <th><?php echo $lang['DELETE']; ?></th>
@@ -57,64 +57,64 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       </tr>
     </thead>
     <tbody>
-  <?php
-  $customerQuery = ($customerID==0)?'':"WHERE clientID = $customerID";
-  $sql = "SELECT * FROM $projectTable $customerQuery";
-  $result = $conn->query($sql);
+      <?php
+      $customerQuery = ($customerID==0)?'':"WHERE clientID = $customerID";
+      $sql = "SELECT * FROM $projectTable $customerQuery";
+      $result = $conn->query($sql);
 
-  echo mysqli_error($conn);
-  while($row = $result->fetch_assoc()){
-    echo '<tr>';
-    echo '<td><input type=checkbox name=index[] value='. $row['id'].'> </td>';
-    echo '<td>'. $row['name'] .'</td>';
-    echo '<td>'. $row['status'] .'</td>';
-    echo '<td><input type="number" class="form-control" step="any" name="boughtHours[]" value="'. $row['hours'] .'"></td>';
-    echo '<td><input type="number" class="form-control" step="any" name="pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
-    echo '<td><input type="text" class="hidden" name="projectIndeces[]" value="'.$row['id'].'"></td>';
-    echo '</tr>';
-  }
-  ?>
-</tbody>
-</table>
+      echo mysqli_error($conn);
+      while($row = $result->fetch_assoc()){
+        echo '<tr>';
+        echo '<td><input type=checkbox name=index[] value='. $row['id'].'> </td>';
+        echo '<td>'. $row['name'] .'</td>';
+        echo '<td>'. $row['status'] .'</td>';
+        echo '<td><input type="number" class="form-control" step="any" name="boughtHours[]" value="'. $row['hours'] .'"></td>';
+        echo '<td><input type="number" class="form-control" step="any" name="pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
+        echo '<td><input type="text" class="hidden" name="projectIndeces[]" value="'.$row['id'].'"></td>';
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+  </table>
 
   <a href="editCustomers.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
 
-<br><br>
+  <br><br>
 
-<div class="row">
-  <div class="col-md-4">
-  <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
-    New Project <i class="fa fa-caret-down"></i>
-  </button>
-</div>
-  <div class="text-right">
+  <div class="row">
+    <div class="col-md-4">
+      <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
+        New Project <i class="fa fa-caret-down"></i>
+      </button>
+    </div>
+    <div class="text-right">
       <button type="submit" class="btn btn-danger" name='delete'>Delete</button>
       <button type="submit" class="btn btn-warning" name='save'>Save Changes</button>
+    </div>
   </div>
-</div>
 
-<br><br>
-<div class="collapse col-md-5 well" id="newProjectDrop">
-  <form method="post">
-    <br>
-    <input type=text class="form-control" name='name' placeholder='Name'>
-    <br>
-    <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
-    <br>
-    <div class="row">
-    <div class="col-md-6">
-      <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
-    </div>
-    <div class="col-md-6">
-      <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
-    </div>
+  <br><br>
+  <div class="collapse col-md-5 well" id="newProjectDrop">
+    <form method="post">
+      <br>
+      <input type=text class="form-control" name='name' placeholder='Name'>
+      <br>
+      <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
+      <br>
+      <div class="row">
+        <div class="col-md-6">
+          <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
+        </div>
+        <div class="col-md-6">
+          <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
+        </div>
+      </div>
+      <br>
+      <div class="text-right">
+        <button type=submit class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
+      </div>
+    </form>
   </div>
-    <br>
-    <div class="text-right">
-    <button type=submit class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
-  </div>
-  </form>
-</div>
 </form>
 
 <!-- /BODY -->
