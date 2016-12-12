@@ -18,45 +18,45 @@ $filterUserID = 0;
 $filterAddBreaks = $filterAddDrives = "checked";
 
 //careful stairs
-if(!empty($_POST['filterYear'])){
-  $filterDate = $_POST['filterYear'];
-  if(!empty($_POST['filterMonth'])){
-    $filterDate .= '-' . $_POST['filterMonth'];
-    if(!empty($_POST['filterDay'])){
-      $filterDate .= '-' . $_POST['filterDay'];
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if(!empty($_POST['filterYear'])){
+    $filterDate = $_POST['filterYear'];
+    if(!empty($_POST['filterMonth'])){
+      $filterDate .= '-' . $_POST['filterMonth'];
+      if(!empty($_POST['filterDay'])){
+        $filterDate .= '-' . $_POST['filterDay'];
+      }
     }
   }
-}
 
-if(isset($_POST['filterCompany'])){
-  $filterCompany = $_POST['filterCompany'];
-}
+  if(isset($_POST['filterCompany'])){
+    $filterCompany = $_POST['filterCompany'];
+  }
 
-if(isset($_POST['filterBooked'])){
-  $booked = $_POST['filterBooked'];
-}
+  if(isset($_POST['filterBooked'])){
+    $booked = $_POST['filterBooked'];
+  }
 
-if(isset($_POST['filterClient'])){
-  $filterClient = $_POST['filterClient'];
-}
+  if(isset($_POST['filterClient'])){
+    $filterClient = $_POST['filterClient'];
+  }
 
-if(isset($_POST['filterProject'])){
-  $filterProject = $_POST['filterProject'];
-}
+  if(isset($_POST['filterProject'])){
+    $filterProject = $_POST['filterProject'];
+  }
 
-if(isset($_POST['filterUserID'])){
-  $filterUserID = $_POST['filterUserID'];
-}
+  if(isset($_POST['filterUserID'])){
+    $filterUserID = $_POST['filterUserID'];
+  }
 
-if(!isset($_POST['filterAddBreaks'])){
-  $filterAddBreaks = "";
-}
+  if(!isset($_POST['filterAddBreaks'])){
+    $filterAddBreaks = "";
+  }
 
-if(!isset($_POST['filterAddDrives'])){
-  $filterAddDrives = "";
-}
+  if(!isset($_POST['filterAddDrives'])){
+    $filterAddDrives = "";
+  }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
     //get the timestamp. if it doesnt exist -> display a biiiig fat error
     $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
@@ -495,24 +495,24 @@ function textAreaAdjust(o) {
       $filterProjectAdd = "AND $projectTable.id = $filterProject $filterCompanyAdd $filterClientAdd";
     }
 
+    //filter activates if he does NOT want to show drives or breaks
     $filterNoDriveAdd = ""; //he wants drives
     if($filterAddDrives == ""){
       $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
     }
 
-
-
+    //this is magic. do not touch.
     if($filterAddBreaks == ""){ // he does NOT want breaks
       $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
     } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
       $filterNoBreakAdd = "";
       if($filterUserID != 0){
         //remove the company, client, project bs
-        if(strlen($filterProjectAdd) > 3){ //he filters for project or client or company -> care for other bookings
+        if(strlen($filterProjectAdd) > 3){ //he filters for project or client or company
           $filterProjectAdd = substr($filterProjectAdd,3);
           $filterProjectAdd = " AND (($filterProjectAdd) OR ($projectTable.id IS NULL))";
-        } else { //he filters for user and date only -> care for other bookings
-          $filterProjectAdd = " AND (($projectTable.id IS NOT NULL) OR ($projectTable.id IS NULL))";
+        } else { //he filters for user and date only
+          $filterProjectAdd = " AND (($projectTable.id IS NOT NULL) OR ($projectTable.id IS NULL))"; //wat
         }
       } else {
         echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
