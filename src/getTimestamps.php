@@ -158,7 +158,7 @@ if (isset($_POST['filterStatus'])) {
                   if($start != '0000-00-00 00:00:00' && $diff > 0){
                     //create a break stamp only if its about status 0
                     if($activity == 0){
-                      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', '$timeBegin', $indexIM, 'Create auto-break')";
+                      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$start', '$timeBegin', $indexIM, 'Create auto-break', 'break')";
                       $conn->query($sql);
                       echo mysqli_error($conn);
                     }

@@ -80,30 +80,41 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   <a href="editCustomers.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
 
 <br><br>
-<div class="row">
-  <div class="col-md-2">
-      <input type=text class="form-control" name='name' placeholder='Name'>
-  </div>
-  <div class="col-md-2">
-      <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
-  </div>
-  <div class="col-md-2">
-    <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
-  </div>
-  <div class="col-md-2">
-    <div class="input-group">
-      <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
-      <span class="input-group-btn">
-        <button type=submit class="btn btn-warning" name='add'> + </button>
-      </span>
-    </div>
-  </div>
 
+<div class="row">
+  <div class="col-md-4">
+  <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
+    New Project <i class="fa fa-caret-down"></i>
+  </button>
+</div>
   <div class="text-right">
       <button type="submit" class="btn btn-danger" name='delete'>Delete</button>
       <button type="submit" class="btn btn-warning" name='save'>Save Changes</button>
   </div>
-</div><br><br>
+</div>
+
+<br><br>
+<div class="collapse col-md-5 well" id="newProjectDrop">
+  <form method="post">
+    <br>
+    <input type=text class="form-control" name='name' placeholder='Name'>
+    <br>
+    <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
+    <br>
+    <div class="row">
+    <div class="col-md-6">
+      <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
+    </div>
+    <div class="col-md-6">
+      <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
+    </div>
+  </div>
+    <br>
+    <div class="text-right">
+    <button type=submit class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
+  </div>
+  </form>
+</div>
 </form>
 
 <!-- /BODY -->
