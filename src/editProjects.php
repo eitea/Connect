@@ -33,11 +33,7 @@ if (isset($_POST['delete']) && isset($_POST['index'])) {
   }
 }
 
-echo isset($_POST['save']) .'<br>yea';
-echo isset($_POST['projectIndeces']);
-
 if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
-  echo "hi";
   for($i = 0; $i < count($_POST['projectIndeces']); $i++){
     $projectID = test_input( $_POST['projectIndeces'][$i]);
     $hours = floatval(test_input($_POST['boughtHours'][$i]));
@@ -64,7 +60,6 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   <?php
   $customerQuery = ($customerID==0)?'':"WHERE clientID = $customerID";
   $sql = "SELECT * FROM $projectTable $customerQuery";
-  // $sql = "SELECT $projectTable.name AS projectName, $projectTable.id AS projectID, $projectTable.hours, $projectTable.hourlyPrice, $clientTable.name  FROM $projectTable INNER JOIN $clientTable ON $projectTable.clientID = $clientTable.id $customerQuery";
   $result = $conn->query($sql);
 
   echo mysqli_error($conn);
@@ -81,13 +76,9 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   ?>
 </tbody>
 </table>
-</form>
-
 
   <a href="editCustomers.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
 
-
-<form method="post">
 <br><br>
 <div class="row">
   <div class="col-md-2">
