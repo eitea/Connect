@@ -125,8 +125,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
               echo "<tr>";
               echo "<td><i class='$icon'></i></td>";
-              echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 8) ."</td>";
-              echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8) ."</td>";
+              echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
+              echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
               echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10) ."</td>";
               echo "<td>". $row['name'] ."</td>";
               echo "<td>". $row['projectName'] ."</td>";

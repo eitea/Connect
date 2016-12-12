@@ -33,14 +33,18 @@ if (isset($_POST['delete']) && isset($_POST['index'])) {
   }
 }
 
+echo isset($_POST['save']) .'<br>yea';
+echo isset($_POST['projectIndeces']);
+
 if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
+  echo "hi";
   for($i = 0; $i < count($_POST['projectIndeces']); $i++){
-  $projectID = test_input( $_POST['projectIndeces'][$i]);
-  $hours = floatval(test_input($_POST['boughtHours'][$i]));
-  $hourlyPrice = floatval(test_input($_POST['pricedHours'][$i]));
-  $sql = "UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice' WHERE id = $projectID";
-  $conn->query($sql);
-  echo mysqli_error($conn);
+    $projectID = test_input( $_POST['projectIndeces'][$i]);
+    $hours = floatval(test_input($_POST['boughtHours'][$i]));
+    $hourlyPrice = floatval(test_input($_POST['pricedHours'][$i]));
+    $sql = "UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice' WHERE id = $projectID";
+    $conn->query($sql);
+    echo mysqli_error($conn);
   }
 }
 ?>
@@ -93,11 +97,11 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       <input type=text class="form-control" name='status' placeholder='Status... (Optional)'>
   </div>
   <div class="col-md-2">
-    <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
+    <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
   </div>
   <div class="col-md-2">
     <div class="input-group">
-      <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
+      <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
       <span class="input-group-btn">
         <button type=submit class="btn btn-warning" name='add'> + </button>
       </span>

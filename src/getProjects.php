@@ -443,6 +443,7 @@ if($filterCompany != 0 || $filterUserID != 0):
   <table class="table table-striped table-condensed">
   <thead>
   <tr>
+  <th></th>
   <th><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></th>
   <th>Infotext</th>
   <th><?php echo $lang['DATE']; ?></th>
@@ -472,6 +473,18 @@ if($filterCompany != 0 || $filterUserID != 0):
       $bookedQuery = "";
     }
 
+    if($filterUserID == 0){
+      $filterUserIDAdd = '';
+    } else {
+      $filterUserIDAdd = "AND $userTable.id = $filterUserID";
+    }
+
+    if($filterCompany == 0){
+      $filterCompanyAdd = "";
+    } else {
+      $filterCompanyAdd = "AND $companyTable.id = $filterCompany";
+    }
+
     if($filterClient == 0){
       $filterClientAdd = "";
     } else {
@@ -479,26 +492,24 @@ if($filterCompany != 0 || $filterUserID != 0):
     }
 
     if($filterProject == 0){
-      $filterProjectAdd = "";
+      $filterProjectAdd = "$filterCompanyAdd $filterClientAdd";
     } else {
-      $filterProjectAdd = "AND $projectTable.id = $filterProject";
+      $filterProjectAdd = "AND $projectTable.id = $filterProject $filterCompanyAdd $filterClientAdd";
     }
 
-    if($filterUserID == 0){
-      $filterUserIDAdd = '';
-    } else {
-      $filterUserIDAdd = "AND $userTable.id = $filterUserID";
-    }
-    if($filterCompany == 0){
-      $filterCompanyAdd = "";
-    } else {
-      $filterCompanyAdd = "AND $companyTable.id = $filterCompany";
-    }
+    //filter activates if you DO NOT want breaks
 
-    //filter activates if you dont(!) want breaks.
-    $filterNoBreakAdd = ""; //he wants breaks
+    $filterNoBreakAdd = "";
     if($filterAddBreaks == ""){
       $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
+    } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
+      if($filterUserID != 0){
+        //remove the company, client, project bs
+        $filterProjectAdd = substr($filterProjectAdd,3,-1);
+        $filterProjectAdd = " AND (($filterProjectAdd) OR ($projectTable.id IS NULL))";
+      } else {
+        echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
+      }
     }
 
     $filterNoDriveAdd = ""; //he wants drives
@@ -523,9 +534,8 @@ if($filterCompany != 0 || $filterUserID != 0):
     LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
     LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
     WHERE $projectBookingTable.start LIKE '$filterDate%'
-    $filterCompanyAdd
     $bookedQuery
-    $filterClientAdd $filterProjectAdd $filterUserIDAdd
+    $filterProjectAdd $filterUserIDAdd
     $filterNoBreakAdd $filterNoDriveAdd
     ORDER BY $projectBookingTable.end ASC";
 /*
@@ -549,12 +559,22 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
         $timeDiff = timeDiff_Hours($row['start'], $row['end']);
         $t = ceil($timeDiff * 4) / 4;
 
+        if($row['bookingType'] == 'break'){
+          $icon = "fa fa-cutlery";
+        } elseif($row['bookingType'] == 'drive'){
+          $icon = "fa fa-car";
+        } else {
+          $icon = "fa fa-bookmark";
+        }
+
         $csv_Add = array();
         echo "<tr>";
+        echo "<td><i class='$icon'></i></td>";
+
         $csv_Add[] = $row['clientName'];
         $csv_Add[] = $row['projectName'];
 
-        if($row['bookingType'] != 'break'){ //this is a break, do not display dis
+        if($row['bookingType'] != 'break'){ //if this is a break, do not display dis
           echo "<td><select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
           $sql = "SELECT * FROM $clientTable";
           $clientResult = $conn->query($sql);
@@ -578,7 +598,7 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
           }
           echo "</select></td>";
         } else {
-          echo "<td></td>";
+          echo "<td><select style='display:none' name='projectIDs[]'><option selected value='NULL'></option> - </td>";
         }
         echo "<td><textarea style='resize: none;' name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
 
@@ -622,14 +642,18 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
 
         echo "<td>$t</td>";
 
-
-        if($row['booked'] != 'TRUE'){
-          $selected = "";
+        if($row['bookingType'] != 'break'){ //if this is a break, do not display dis
+          if($row['booked'] != 'TRUE'){
+            $selected = "";
+          } else {
+            $selected = "checked";
+          }
+          echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+          echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
         } else {
-          $selected = "checked";
+          echo "<td> - </td>";
         }
-        echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-        echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+
         $csv_Add[] = $row['hourlyPrice'];
 
         $interninfo = $row['internInfo'];
