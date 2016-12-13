@@ -24,7 +24,10 @@ $piConnTable = "piConnectionData";
 
 $userTable = "UserData";
 $userRequests = "userRequestsData";
-$sessionTab = "php_session";
 $roleTable = "roles";
+$sessionTab = "php_session";
+
+$travelTable = "travelBookings";
+$travelCountryTable = "travelCountryData";
 
 $vacationTable = "vacationData";

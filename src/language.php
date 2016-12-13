@@ -20,6 +20,8 @@ if($_SESSION['language'] == 'ENG'){
     "sat" => "Saturday",
     "sun" => "Sunday"
   );
+
+  $lang_monthToString = array("", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
   /*
   0 ..... open
   1 ..... declined
@@ -171,6 +173,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIMETABLE'] = 'Timetable';
   $lang['TIMESTAMPS'] = 'Timestamps';
   $lang['TO'] = 'To';
+  $lang['TRAVEL_FORM'] = 'Traveling Expenses';
 
   $lang['UNDO'] ='Undo';
   $lang['UNANSWERED_REQUESTS'] ='Unanswered Requests';
@@ -222,6 +225,7 @@ if($_SESSION['language'] == 'ENG'){
     "4" => "Zeitausgleich",
   );
   $lang_vacationRequestStatus = array("Offen", "Abgelehnt", "Bewilligt");
+  $lang_monthToString = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 
   $lang['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
   $lang['ACTIVITY'] = 'Aktivität';
@@ -353,6 +357,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['TIMETABLE'] = 'Stundenplan';
   $lang['TIMESTAMPS'] = 'Zeitstempel';
   $lang['TO'] = 'Bis';
+  $lang['TRAVEL_FORM'] = 'Reisekosten';
 
   $lang['UNDO'] = 'Rückgängig';
   $lang['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';

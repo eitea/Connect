@@ -71,7 +71,7 @@ $conn->query($sql);
 $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, canStamp) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
 $conn->query($sql);
 
-
+//insert holidays
 $holi = icsToArray('../Feiertage.txt');
 for($i = 1; $i < count($holi); $i++){
   if($holi[$i]['BEGIN'] == 'VEVENT'){
@@ -83,6 +83,40 @@ for($i = 1; $i < count($holi); $i++){
     $conn->query($sql);
   }
 }
+
+//insert counries for travellinge xpenses
+$handle = fopen("../Laender.txt", "r");
+if ($handle) {
+    while (($line = fgets($handle)) !== false) {
+      $line = iconv('windows-1250', 'UTF-8', $line);
+      $thisLineIsNotOK = true;
+      while($thisLineIsNotOK){
+        $data = preg_split('/\s+/', $line);
+        array_pop($data);
+        if(count($data) == 4){
+          $short = test_Input($data[0]);
+          $name = test_Input($data[1]);
+          $dayPay = floatval($data[2]);
+          $nightPay = floatval($data[3]);
+          $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
+          $conn->query($sql);
+          echo mysqli_error($conn);
+          $thisLineIsNotOK = false;
+        } elseif(count($data) > 4) {
+          $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
+        } else {
+          echo 'Nope. <br>';
+          print_r ($data);
+          die();
+        }
+      }
+    }
+  fclose($handle);
+} else {
+    // error opening the file.
+}
+}
+
 
 
 //------------------------------------------------------------------------------

@@ -1,0 +1,177 @@
+0	Österreich	26,40	15,00
+AFG	Afghanistan	31,80	27,70
+AL	Albanien	27,90	20,90
+ANG	Angola	43,60	41,40
+ARM	Armenien	36,80	31,00
+AUS	Australien	47,30	39,90
+AZ	Aserbaidschan	36,80	31,00
+B	Belgien	35,30	22,70
+BD	Bangladesch	31,80	34,20
+BDP	Budapest	31,00	26,60
+BDS	Barbados	51,00	43,60
+BF	Burkina Faso	39,20	21,10
+BG	Bulgarien	31,00	22,70
+BIH	Bosnien-Herzegowina	31,00	23,30
+BOL	Bolivien	26,60	25,10
+BR	Brasilien	33,10	36,40
+BRN	Bahrain	54,10	37,50
+BRS	Brüssel	41,40	32,00
+BRU	Brunei	33,10	42,10
+BS	Bahamas	48,00	30,50
+BU	Burundi	37,90	37,90
+BY	Belarus	36,80	31,00
+C	Kuba	54,10	27,70
+CAM	Kamerun	45,80	25,30
+CDN	Kanada	41,00	34,20
+CH	Schweiz	36,80	32,70
+CH-GR	Schweiz-Grenzorte	30,70	18,10
+CI	Côte d'Ivoire	39,20	32,00
+CL	Sri Lanka	31,80	32,70
+CO	Kolumbien	33,10	35,10
+CR	Costa Rica	31,80	31,80
+CV	Kap Verde	27,90	19,60
+CY	Zypern	28,60	30,50
+CZ	Tschechien	31,00	24,40
+CZ-GR	Tschechien-Grenzorte	27,90	15,90
+D	Deutschland	35,30	27,90
+D-GR	Deutschland-Grenzorte	30,70	18,10
+DJI	Dschibuti	45,80	47,30
+DK	Dänemark	41,40	41,40
+DOM	Dominikanische Republik	39,20	43,60
+DRCB	Kongo, Demokr. Republik	47,30	33,10
+DROK	Korea, Demokr. Volksrepublik	32,50	32,50
+DY	Benin	36,20	26,60
+DZ	Algerien	41,40	27,00
+E	Spanien	34,20	30,50
+EAK	Kenia	34,90	32,00
+EAT	Tansania	43,60	32,00
+EAU	Uganda	41,40	32,00
+EC	Ecuador	26,60	21,60
+ES	El Salvador	31,80	26,20
+EST	Estland	36,80	31,00
+ET	Ägypten	37,90	41,40
+ETH	Äthiopien	37,90	41,40
+F	Frankreich	32,70	24,00
+FIN	Finnland	41,40	41,40
+FL	Liechtenstein	30,70	18,10
+G	Gabun	45,80	39,90
+GB	Großbritannien	36,80	36,40
+GCA	Guatemala	31,80	31,80
+GE	Georgien	36,80	31,00
+GH	Ghana	43,60	30,10
+GR	Griechenland	28,60	23,30
+GUY	Guyana	39,20	34,20
+H	Ungarn	26,60	26,60
+H-GR	Ungarn-Grenzorte	26,60	18,10
+HKG	Hongkong	46,40	37,90
+HN	Honduras	31,80	27,00
+HR	Kroatien	31,00	23,30
+I	Italien	35,80	27,90
+I-GR	Italien-Grenzorte	30,70	18,10
+IL	Israel	37,10	32,50
+IND	Indien	31,80	39,90
+IR	Iran	37,10	29,00
+IRL	Irland	36,80	33,10
+IRQ	Irak	54,10	36,40
+IS	Island	37,90	31,40
+J	Japan	65,60	42,90
+JA	Jamaika	47,10	47,10
+JOR	Jordanien	37,10	32,50
+K	Kambodscha	31,40	31,40
+KS	Kirgisistan	36,80	31,00
+KSA	Saudi-Arabien	54,10	37,50
+KWT	Kuwait	54,10	37,50
+KZ	Kasachstan	36,80	31,00
+L	Luxemburg	35,30	22,70
+LAO	Laos	31,40	31,40
+LAR	Libyen	43,60	36,40
+LB	Liberia	39,20	41,40
+LD	London	41,40	41,40
+LT	Litauen	36,80	31,00
+LV	Lettland	36,80	31,00
+M	Malta	30,10	30,10
+MA	Marokko	32,70	21,80
+MAL	Malaysia	43,60	45,10
+MD	Moldau	36,80	31,00
+MEX	Mexiko	41,00	36,40
+MLD	Mailand	40,60	36,40
+MNG	Mongolei	29,40	29,40
+MOC	Mosambik	43,60	41,40
+MS	Mauritius	36,40	36,40
+MSK	Moskau	40,60	31,00
+MW	Malawi	32,70	32,70
+MYA	Myanmar	29,40	29,40
+N	Norwegen	42,90	41,40
+NAM	Namibia	34,90	34,00
+NEP	Nepal	31,80	34,20
+NIC	Nicaragua	31,80	36,40
+NIRL	Nordirland	36,80	36,40
+NL	Niederlande	35,30	27,90
+NLA	Niederländische Antillen	43,60	27,70
+NY	New York	65,40	51,00
+NZ	Neuseeland	32,50	36,40
+OM	Oman	54,10	37,50
+PA	Panama	43,60	36,40
+PE	Peru	33,10	25,10
+PK	Pakistan	27,70	25,10
+PL	Polen	32,70	25,10
+PRB	Pressburg	31,00	24,40
+PRS	Paris	35,80	32,70
+PY	Paraguay	33,10	25,10
+Q	Katar	54,10	37,50
+RA	Argentinien	33,10	47,30
+RCA	Zentralafrikanische Republik	39,20	29,00
+RCB	Kongo, Republik	39,20	26,80
+RCH	Chile	37,50	36,40
+RG	Guinea	43,60	30,10
+RH	Haiti	39,20	27,70
+RI	Indonesien	39,20	32,00
+RIM	Mauretanien	33,80	31,20
+RL	Libanon	31,80	35,10
+RM	Madagaskar	36,40	36,40
+RMM	Mali	39,20	31,20
+RN	Niger	39,20	21,10
+RO	Rumänien	36,80	27,30
+ROK	Korea, Republik	45,30	32,50
+ROM	Rom	40,60	36,40
+ROU	Uruguay	33,10	25,10
+RP	Philippinen	32,50	32,50
+RT	Togo	36,20	26,60
+RUS	Russische Föderation	36,80	31,00
+RWA	Ruanda	37,90	37,90
+S	Schweden	42,90	41,40
+SA	Südafrika	34,90	34,00
+SGP	Singapur	43,60	44,70
+SK	Slowakei	27,90	15,90
+SLO	Slowenien	31,00	23,30
+SLO-GR	Slowenien-Grenzorte	27,90	15,90
+SME	Suriname	39,20	25,10
+SN	Senegal	49,30	31,20
+SP	Somalia	32,70	29,00
+STRB	Straßburg	35,80	32,70
+SUD	Sudan	43,60	41,40
+SY	Seychellen	36,40	36,40
+SYR	Syrien	32,70	29,00
+TCH	Tschad	36,20	26,60
+THA	Thailand	39,20	42,10
+TJ	Tadschikistan	36,80	31,00
+TM	Turkmenistan	36,80	31,00
+TN	Tunesien	36,20	29,20
+TR	Türkei	31,00	36,40
+TT	Trinidad und Tobago	51,00	43,60
+TW	Taiwan	39,20	37,50
+UA	Ukraine	36,80	31,00
+UAE	Vereinigte Arabische Emirate	54,10	37,50
+USA	USA	52,30	42,90
+UZB	Usbekistan	36,80	31,00
+VN	Vietnam	31,40	31,40
+VRC	China	35,10	30,50
+WAG	Gambia	43,60	30,10
+WAL	Sierra Leone	43,60	34,20
+WAN	Nigeria	39,20	34,20
+WSH	Washington	65,40	51,00
+YE	Jemen	54,10	37,50
+YU	Jugoslawien	31,00	23,30
+YV	Venezuela	39,20	35,10
+Z	Sambia	37,10	34,00
+ZW	Simbabwe	37,10	34,00

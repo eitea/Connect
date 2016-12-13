@@ -154,8 +154,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
               <br><br>
 
               <div class="container-fluid text-right">
-                <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
-
                   <div class="btn-group" role="group">
                     <div class="dropup">
                       <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -170,6 +168,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       </ul>
                     </div>
                   </div>
+
+                  <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
                 </div>
 
               <!-- Small modal -->

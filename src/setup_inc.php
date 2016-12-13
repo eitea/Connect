@@ -15,7 +15,8 @@ $sql = "CREATE TABLE $userTable (
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
-  coreTime TIME DEFAULT '8:00'
+  coreTime TIME DEFAULT '8:00',
+  kmMoney DECIMAL(4,2) DEFAULT 0.42
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -338,6 +339,41 @@ canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 FOREIGN KEY (userID) REFERENCES $userTable(id)
 ON UPDATE CASCADE
 ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+
+$sql = "CREATE TABLE $travelCountryTable(
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  identifier VARCHAR(10) NOT NULL,
+  countryName VARCHAR(50),
+  dayPay DECIMAL(6,2) DEFAULT 0,
+  nightPay DECIMAL(6,2) DEFAULT 0
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+
+$sql = "CREATE TABLE $travelTable(
+  id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  userID INT(6) UNSIGNED,
+  countryID INT(6) UNSIGNED,
+  travelDayStart DATETIME NOT NULL,
+  travelDayEnd DATETIME NOT NULL,
+  kmStart INT(8),
+  kmEnd INT(8),
+  infoText VARCHAR(500),
+  hotelCosts DECIMAL(8,2) DEFAULT 0,
+  hosting10 DECIMAL(6,2) DEFAULT 0,
+  hosting20 DECIMAL(6,2) DEFAULT 0,
+  expenses DECIMAL(8,2) DEFAULT 0,
+  FOREIGN KEY (userID) REFERENCES $userTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE,
+  FOREIGN KEY (countryID) REFERENCES $travelCountryTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

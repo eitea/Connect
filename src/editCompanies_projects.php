@@ -10,7 +10,11 @@
 $x = test_input($_GET['cmp']);
 if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
   $name = test_input($_POST['name']);
-  $status = test_input($_POST['status']);
+  if(isset($_POST['status'])){
+    $status = "checked";
+  } else {
+    $status = "";
+  }
   $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
   $hours = floatval(test_input($_POST['hours']));
 
@@ -22,6 +26,9 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
     echo '</div>';
   }
   echo mysqli_error($conn);
+
+
+
 }
 ?>
 <table class="table table-hover table-condensed">
@@ -51,22 +58,40 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
 </table>
 <br><br>
 <a href="editCompanies.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a>
-<br><br><br><br>
-Create a new Project: <br><br>
+<br><br><br>
 <div class="row">
+  <div class="col-md-4">
+    <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
+      New Project <i class="fa fa-caret-down"></i>
+    </button>
+  </div>
+</div>
+
+<br><br>
+<div class="container">
   <form method="post">
-    <div class="col-md-3">
-      <input type="text" class="form-control" name="name" placeholder="Name">
+    <div class="collapse col-md-5 well" id="newProjectDrop">
+      <form method="post">
+        <br>
+        <input type="text" class="form-control" name="name" placeholder="Name">
+        <br>
+        <div class="row">
+          <div class="col-md-6">
+            <input type="number" step="any" class="form-control" name="hours" placeholder="Hours">
+          </div>
+          <div class="col-md-6">
+            <input type="number" step="any" class="form-control" name="hourlyPrice" placeholder="Price/Hour">
+          </div>
+        </div>
+        <br>
+        <div style="margin-left:25px">
+          <div class="checkbox"><input type="checkbox" name="status" value="checked"> Productive</div>
+        </div>
+        <br>
+        <div class="text-right">
+          <button type=submit class="btn btn-warning" name='createNewProject'> <?php echo $lang['ADD']; ?> </button>
+        </div>
+      </form>
     </div>
-    <div class="col-md-3">
-      <input type="text" class="form-control" name="status" placeholder="Status... (Optional)">
-    </div>
-    <div class="col-md-2">
-      <input type="number" step="any" class="form-control" name="hourlyPrice" placeholder="Price/Hour">
-    </div>
-    <div class="col-md-2">
-      <input type="number" step="any" class="form-control" name="hours" placeholder="Hours">
-    </div>
-    <button type="submit" class="btn btn-warning" name="createNewProject">+</button>
   </form>
 </div>

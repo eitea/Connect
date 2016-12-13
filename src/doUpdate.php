@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 <?php
 require  "connection.php";
 require  "createTimestamps.php";
@@ -207,10 +214,88 @@ if($row['version'] < 34){
   } else {
     echo mysqli_error($conn);
   }
-  
+
   $conn->query("UPDATE $projectBookingTable SET bookingType = 'break' WHERE projectID IS NULL");
   echo mysqli_error($conn);
   $conn->query("UPDATE $projectBookingTable SET bookingType = 'project' WHERE projectID IS NOT NULL");
+  echo mysqli_error($conn);
+}
+
+if($row['version'] < 35){
+  $sql = "CREATE TABLE $travelCountryTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    identifier VARCHAR(10) NOT NULL,
+    countryName VARCHAR(50),
+    dayPay DECIMAL(6,2) DEFAULT 0,
+    nightPay DECIMAL(6,2) DEFAULT 0
+  )";
+  if($conn->query($sql)){
+    echo "Created countries for travelling expenses.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $travelTable(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    countryID INT(6) UNSIGNED,
+    travelDayStart DATETIME NOT NULL,
+    travelDayEnd DATETIME NOT NULL,
+    kmStart INT(8),
+    kmEnd INT(8),
+    infoText VARCHAR(500),
+    hotelCosts DECIMAL(8,2) DEFAULT 0,
+    hosting10 DECIMAL(6,2) DEFAULT 0,
+    hosting20 DECIMAL(6,2) DEFAULT 0,
+    expenses DECIMAL(8,2) DEFAULT 0,
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (countryID) REFERENCES $travelCountryTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo "Created table for travelling expenses.<br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $handle = fopen("../Laender.txt", "r");
+  if ($handle) {
+      while (($line = fgets($handle)) !== false) {
+        $line = iconv('windows-1250', 'UTF-8', $line);
+        $thisLineIsNotOK = true;
+        while($thisLineIsNotOK){
+          $data = preg_split('/\s+/', $line);
+          array_pop($data);
+          if(count($data) == 4){
+            $short = test_Input($data[0]);
+            $name = test_Input($data[1]);
+            $dayPay = floatval($data[2]);
+            $nightPay = floatval($data[3]);
+            $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
+            $conn->query($sql);
+            echo mysqli_error($conn);
+            $thisLineIsNotOK = false;
+          } elseif(count($data) > 4) {
+            $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
+          } else {
+            echo 'Nope. <br>';
+            print_r ($data);
+            die();
+          }
+        }
+      }
+    fclose($handle);
+  } else {
+      // error opening the file.
+  }
+}
+
+if($row['version'] < 36){
+  $sql = "ALTER TABLE $userTable ADD COLUMN kmMoney DECIMAL(4,2) DEFAULT 0.42";
+  $conn->query($sql);
   echo mysqli_error($conn);
 }
 
