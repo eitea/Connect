@@ -19,16 +19,19 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
   $hours = floatval(test_input($_POST['hours']));
 
   $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours) VALUES($x, '$name', '$status', '$hourlyPrice', '$hours')";
-  if($conn->query($sql)){
-    echo '<div class="alert alert-success fade in">';
-    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Success: </strong>New default project was created.';
-    echo '</div>';
+  if($conn->query($sql)){ //add default project to all clients with the company. pow.;
+    $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) SELECT id,'$name', '$status', '$hours', '$price' FROM $clientTable WHERE companyID = $companyID";
+    if($conn->query($sql)){
+      echo '<div class="alert alert-success fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Success: </strong>New default project was created.';
+      echo '</div>';
+    } else {
+      echo mysqli_error($conn);
+    }
   }
+
   echo mysqli_error($conn);
-
-
-
 }
 ?>
 <table class="table table-hover table-condensed">
