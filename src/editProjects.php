@@ -60,7 +60,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       <tr>
         <th><?php echo $lang['DELETE']; ?></th>
         <th>Name</th>
-        <th>Produktiv</th>
+        <th><?php echo $lang['PRODUCTIVE']; ?></th>
         <th><?php echo $lang['HOURS']; ?></th>
         <th><?php echo $lang['HOURLY_RATE']; ?></th>
       </tr>
@@ -76,7 +76,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
         echo '<tr>';
         echo '<td><input type=checkbox name=index[] value='. $row['id'].'> </td>';
         echo '<td>'. $row['name'] .'</td>';
-        echo '<td><div class="checkbox text-center"><input type="checkbox" name="statii[]" '. $row['status'] .' value="'.$row['id'].'"></div></td>';
+        echo '<td><div class="checkbox text-center"><input type="checkbox" name="statii[]" '. $row['status'] .' value="'.$row['id'].'"> <i class="fa fa-tags"></i></div></td>';
         echo '<td><input type="number" class="form-control" step="any" name="boughtHours[]" value="'. $row['hours'] .'"></td>';
         echo '<td><input type="number" class="form-control" step="any" name="pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
         echo '<td><input type="text" class="hidden" name="projectIndeces[]" value="'.$row['id'].'"></td>';
@@ -118,7 +118,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       </div>
       <br>
       <div style="margin-left:25px">
-        <div class="checkbox"><input type="checkbox" name="status" value="checked"> Productive</div>
+        <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
       </div>
       <br>
       <div class="text-right">

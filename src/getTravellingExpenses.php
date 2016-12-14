@@ -82,7 +82,6 @@ if($result && ($row = $result->fetch_assoc())){
 
       <th>Grund-Ort-Firma</th>
 
-
       <th style="background-color:#f1f3f4">Reisedauer</th>
       <th style="background-color:#f1f3f4">Land</th>
       <th style="background-color:#f1f3f4">Taggeld</th>

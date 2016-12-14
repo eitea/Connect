@@ -530,7 +530,8 @@ function textAreaAdjust(o) {
     $logTable.timeToUTC,
     $userTable.firstname, $userTable.lastname,
     $projectTable.hours,
-    $projectTable.hourlyPrice
+    $projectTable.hourlyPrice,
+    $projectTable.status
     FROM $projectBookingTable
     INNER JOIN $logTable ON  $projectBookingTable.timeStampID = $logTable.indexIM
     INNER JOIN $userTable ON $logTable.userID = $userTable.id
@@ -667,7 +668,8 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
           echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a></td>";
         }
 
-        $detailInfo = $row['hourlyPrice'] .' || '.$row['hours'] .' || '. $row['firstname']." ".$row['lastname'];
+        $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
+        $detailInfo = $row['hourlyPrice'] .' || '.$row['hours'] .' || '. $row['firstname']." ".$row['lastname'] .' || '. $projStat;
         echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenrate - Stundenkonto - Person' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a></td>";
 
         echo "</tr>";

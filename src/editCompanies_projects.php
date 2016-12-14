@@ -20,7 +20,7 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
 
   $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours) VALUES($x, '$name', '$status', '$hourlyPrice', '$hours')";
   if($conn->query($sql)){ //add default project to all clients with the company. pow.;
-    $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) SELECT id,'$name', '$status', '$hours', '$price' FROM $clientTable WHERE companyID = $companyID";
+    $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) SELECT id,'$name', '$status', '$hours', '$hourlyPrice' FROM $clientTable WHERE companyID = $x";
     if($conn->query($sql)){
       echo '<div class="alert alert-success fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -38,7 +38,7 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
   <thead>
     <tr>
       <th>Name</th>
-      <th>Status</th>
+      <th><?php echo $lang['PRODUCTIVE']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
       <th><?php echo $lang['HOURLY_RATE']; ?></th>
     </tr>
@@ -50,8 +50,9 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
     if ($projectResult && $projectResult->num_rows > 0) {
       while ($projectRow = $projectResult->fetch_assoc()) {
         $i = $projectRow['id'];
+        $projectRowStatus = (!empty($projectRow['status']))? $lang['PRODUCTIVE']:'';
         echo "<tr><td>".$projectRow['name']."</td>";
-        echo "<td>".$projectRow['status']."</td>";
+        echo "<td>$projectRowStatus</td>";
         echo "<td>".$projectRow['hours']."</td>";
         echo "<td>".$projectRow['hourlyPrice']."</td></tr>";
       }
@@ -88,7 +89,7 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
         </div>
         <br>
         <div style="margin-left:25px">
-          <div class="checkbox"><input type="checkbox" name="status" value="checked"> Productive</div>
+          <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
         </div>
         <br>
         <div class="text-right">

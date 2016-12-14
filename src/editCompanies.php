@@ -117,9 +117,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                   if ($projectResult && $projectResult->num_rows > 0) {
                     while ($projectRow = $projectResult->fetch_assoc()) {
                       $i = $projectRow['id'];
+
+                      $projectRowStatus = (!empty($projectRow['status']))? $lang['PRODUCTIVE']:'';
                       echo "<tr><td><input type='checkbox' name='indexProject".$x."[]' value='$i'></td>";
                       echo "<td>".$projectRow['name']."</td>";
-                      echo "<td>".$projectRow['status']."</td>";
+                      echo "<td> $projectRowStatus </td>";
                       echo "<td>".$projectRow['hours']."</td>";
                       echo "<td>".$projectRow['hourlyPrice']."</td></tr>";
                     }

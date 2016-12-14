@@ -144,6 +144,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
 
+  $lang['PRODUCTIVE'] = 'Productive';
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -327,6 +328,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
 
+  $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';
