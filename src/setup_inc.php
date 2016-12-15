@@ -379,4 +379,140 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+$sql = "CREATE TABLE $deactivatedUserTable (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  firstname VARCHAR(30) NOT NULL,
+  lastname VARCHAR(30) NOT NULL,
+  psw VARCHAR(60) NOT NULL,
+  terminalPin INT(8) DEFAULT 4321,
+  sid VARCHAR(50),
+  email VARCHAR(50) UNIQUE NOT NULL,
+  gender ENUM('female', 'male'),
+  overTimeLump INT(3) DEFAULT 0,
+  pauseAfterHours DECIMAL(4,2) DEFAULT 6,
+  hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
+  beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+  preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
+  coreTime TIME DEFAULT '8:00',
+  kmMoney DECIMAL(4,2) DEFAULT 0.42
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact usertab";
+}
+
+$sql = "CREATE TABLE $deactivatedUserLogs (
+  indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  time DATETIME NOT NULL,
+  timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  status ENUM('-1', '0', '1', '2', '3', '4'),
+  timeToUTC INT(2) DEFAULT '2',
+  breakCredit	DECIMAL(4,2),
+  userID INT(6) UNSIGNED,
+  expectedHours DECIMAL(4,2),
+  FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact userlogs";
+}
+
+$sql = "CREATE TABLE $deactivatedUserUnLogs(
+  negative_indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  time DATETIME NOT NULL,
+  userID INT(6) UNSIGNED,
+  mon DECIMAL(4,2) DEFAULT 8.5,
+  tue DECIMAL(4,2) DEFAULT 8.5,
+  wed DECIMAL(4,2) DEFAULT 8.5,
+  thu DECIMAL(4,2) DEFAULT 8.5,
+  fri DECIMAL(4,2) DEFAULT 4.5,
+  sat DECIMAL(4,2) DEFAULT 0,
+  sun DECIMAL(4,2) DEFAULT 0,
+  FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact unlogs";
+}
+
+
+$sql = "CREATE TABLE $deactivatedUserDataTable(
+  userID INT(6) UNSIGNED,
+  mon DECIMAL(4,2) DEFAULT 8.5,
+  tue DECIMAL(4,2) DEFAULT 8.5,
+  wed DECIMAL(4,2) DEFAULT 8.5,
+  thu DECIMAL(4,2) DEFAULT 8.5,
+  fri DECIMAL(4,2) DEFAULT 4.5,
+  sat DECIMAL(4,2) DEFAULT 0,
+  sun DECIMAL(4,2) DEFAULT 0,
+  vacationHoursCredit DECIMAL(6,2) DEFAULT 0,
+  daysPerYear INT(2) DEFAULT 25,
+  FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact datatable";
+}
+
+
+$sql = "CREATE TABLE $deactivatedUserProjects (
+  id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  start DATETIME NOT NULL,
+  end DATETIME NOT NULL,
+  chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00',
+  chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00',
+  projectID INT(6) UNSIGNED,
+  timestampID INT(10) UNSIGNED,
+  infoText VARCHAR(500),
+  internInfo VARCHAR(500),
+  booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  bookingType ENUM('project', 'break', 'drive'),
+  FOREIGN KEY (projectID) REFERENCES $projectTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE,
+  FOREIGN KEY (timestampID) REFERENCES $deactivatedUserLogs(indexIM)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact projectbookings";
+}
+
+$sql = "CREATE TABLE $deactivatedUserTravels(
+  id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  userID INT(6) UNSIGNED,
+  countryID INT(6) UNSIGNED,
+  travelDayStart DATETIME NOT NULL,
+  travelDayEnd DATETIME NOT NULL,
+  kmStart INT(8),
+  kmEnd INT(8),
+  infoText VARCHAR(500),
+  hotelCosts DECIMAL(8,2) DEFAULT 0,
+  hosting10 DECIMAL(6,2) DEFAULT 0,
+  hosting20 DECIMAL(6,2) DEFAULT 0,
+  expenses DECIMAL(8,2) DEFAULT 0,
+  FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE,
+  FOREIGN KEY (countryID) REFERENCES $travelCountryTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+} else {
+  echo "created deact travellogs";
+}
  ?>

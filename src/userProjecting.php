@@ -40,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $duration = timeDiff_Hours($startDate, $endDate);
         $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
         $conn->query($sql);
+        $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
       } else {
         if(isset($_POST['project'])){

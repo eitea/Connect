@@ -12,6 +12,13 @@ $clientTable = "clientData";
 $clientDataTable = "clientInfoData";
 $companyTable = "companyData";
 
+$deactivatedUserTable = "DeactivatedUsers";
+$deactivatedUserDataTable = "DeactivatedUserData"; //bookingtable, vacationtable
+$deactivatedUserLogs = "DeactivatedUserLogData";
+$deactivatedUserUnLogs = "DeactivatedUserUnLogData";
+$deactivatedUserProjects = "DeactivatedUserProjectData";
+$deactivatedUserTravels = "DeactivatedUserTravelData";
+
 $feedbackTable = "feedbacks";
 $holidayTable = "holidays";
 $logTable = "logs";
@@ -19,7 +26,6 @@ $negative_logTable = "unlogs";
 
 $projectTable = "projectData";
 $projectBookingTable = "projectBookingData";
-$projectDrivingTable = "projectDrivingData";
 $piConnTable = "piConnectionData";
 
 $userTable = "UserData";

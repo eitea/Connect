@@ -126,7 +126,6 @@ $(document).ready(function() {
   }
 ?>
 
-
   <!-- /navbar -->
   <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
     <div class="container-fluid">
