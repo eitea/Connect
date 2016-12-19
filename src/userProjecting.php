@@ -21,7 +21,6 @@ if ($result && $result->num_rows > 0) {
 $showUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
     $startDate = $date." ".$_POST['start'];
@@ -77,13 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
 <form method="post">
   <?php if($showUndoButton): ?>
     <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Undo</button></div>
   <?php endif; ?>
 
-  <br>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-hover table-striped">

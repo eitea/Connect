@@ -70,8 +70,8 @@ function checkOut($userID) {
     $conn->query($sql);
     echo mysqli_error($conn);
   } else {
-    echo mysqli_error($conn);
     //or all was good, & he did nuttin wong.
+    echo mysqli_error($conn);
   }
 }
 

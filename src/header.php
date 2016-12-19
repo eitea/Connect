@@ -305,6 +305,7 @@ $(document).ready(function() {
                                   <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['VIEW_USER']; ?></a></li>
                                   <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
                                   <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li>
+                                  <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
                                 </ul>
                               </div>
                             </li>
@@ -329,7 +330,7 @@ $(document).ready(function() {
                     <?php endif; ?>
 
                     <?php
-                    if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "readyPlan.php"){
+                    if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "readyPlan.php" || $this_page == "deactivatedUsers.php"){
                       echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
                     } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php"){
                       echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";

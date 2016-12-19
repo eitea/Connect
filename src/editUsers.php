@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //copy timetable and vacationtable
     $sql = "INSERT INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacationHoursCredit, daysPerYear)
-    SELECT $bookingTable.userID, mon, tue, wed, thu, fri, sat, sun, vacationHoursCredit, daysPerYear FROM $bookingTable, $vacationTable WHERE $bookingTable.userID = $x";
+    SELECT $bookingTable.userID, mon, tue, wed, thu, fri, sat, sun, vacationHoursCredit, daysPerYear FROM $bookingTable, $vacationTable WHERE $bookingTable.userID = $x AND $vacationTable.userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>dataErr: '.mysqli_error($conn);}
 
     //copy projectbookings
@@ -287,7 +287,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
               <div class="col-md-6 text-right">
                 <form method="post">
-                  <button type='submit' value="<?php echo $x; ?>" name='deactivate' style="background:none; border:none;" title="Deactivate a User">
+                  <button type='submit' value="<?php echo $x; ?>" name='deactivate' style="background:none; border:none;" title="<?php echo $lang['DEACTIVATE']; ?>">
                     <img width="10px" height="10px" src="../images/minus_circle.png" />
                   </button>
                 </form>

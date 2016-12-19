@@ -82,6 +82,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
   $lang['DATE'] = 'Date';
+  $lang['DEACTIVATE'] = 'Deactivate';
   $lang['DEFAULT'] = 'Default';
   $lang['DELETE'] = 'Delete';
   $lang['DELETE_COMPANY'] = 'Delete Company';
@@ -182,6 +183,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UPTODATE'] = 'Version is up tp date. ';
   $lang['USED_DAYS'] ='Used Days';
   $lang['USERS'] = 'Users';
+  $lang['USER_INACTIVE'] = 'Deactivated Users';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
@@ -266,6 +268,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';
+  $lang['DEACTIVATE'] = 'Deaktivieren';
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
   $lang['DELETE_COMPANY'] = 'Firma Löschen';
@@ -367,6 +370,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['UPTODATE'] = 'Version ist aktuell. ';
   $lang['USED_DAYS'] ='Verbrauchte Tage';
   $lang['USERS'] = 'Benutzer';
+  $lang['USER_INACTIVE'] = 'Deaktivierte Benutzer';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';

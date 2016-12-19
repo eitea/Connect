@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $expenses = floatval($_POST['addExpenses']);
     $hosting10 = floatval($_POST['addHosting10']);
-    $hosting20 = floatval($_POST['addHosting10']);
+    $hosting20 = floatval($_POST['addHosting20']);
     $hotel = floatval($_POST['addHotel']);
 
     $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
@@ -61,13 +61,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <thead style="border-width:medium; border-top-style:solid; border-color:#e8e8e8">
     <th>Reiseantritt</th>
     <th>Reiseende</th>
-    <th style="text-center">km-Stand Anfang</th>
-    <th style="text-center">km-Stand Ende</th>
+    <th style="text-center">km Anfang</th>
+    <th style="text-center">km Ende</th>
 
     <th>Grund-Ort-Firma</th>
 
 
-    <th style="background-color:#f1f3f4">Reisedauer</th>
+    <th style="background-color:#f1f3f4">Dauer</th>
     <th style="background-color:#f1f3f4">Land</th>
     <th style="background-color:#f1f3f4">Taggeld</th>
     <th style="background-color:#f1f3f4">km</th>
