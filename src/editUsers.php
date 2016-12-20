@@ -59,34 +59,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if (isset($_POST['submitUser'])) {
-    $curID = $x = $_POST['submitUser']; //what the... ?
+    $x = $_POST['submitUser'];
     if (!empty($_POST['firstname'.$x])) {
       $firstname = test_input($_POST['firstname'.$x]);
-      $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if (!empty($_POST['lastname'.$x])) {
       $lastname = test_input($_POST['lastname'.$x]);
-      $sql = "UPDATE $userTable SET lastname= '$lastname' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET lastname= '$lastname' WHERE id = '$x';";
       $conn->query($sql);
+    }
+
+    if(!empty($_POST['exitDate'.$x]) && test_Date($_POST['exitDate'.$x] .' 00:00:00')) {
+      $exitDate = test_Input($_POST['exitDate'.$x]) . ' 00:00:00';
+      $conn->query("UPDATE $userTable SET exitDate = '$exitDate' WHERE id = '$x'");
     }
 
     if (!empty($_POST['gender'.$x])) {
       $gender = test_input($_POST['gender'.$x]);
-      $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if (!empty($_POST['enableProjecting'.$x])) {
       $enableProjecting = test_input($_POST['enableProjecting'.$x]);
-      $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
       $email = test_input($_POST['email'.$x]).'@';
-      $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$x';";
       $conn->query($sql);
     } else {
       echo '<div class="alert alert-danger fade in">';
@@ -97,67 +102,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))) {
       $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
-      $sql = "UPDATE $userTable SET overTimeLump= '$overTimeAll' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET overTimeLump= '$overTimeAll' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if (isset($_POST['vacDaysCredit'.$x]) && is_numeric($_POST['vacDaysCredit'.$x])) {
       $vacDaysCredit = $_POST['vacDaysCredit'.$x];
-      $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$curID';";
+      $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$x';";
       $conn->query($sql);
     }
 
     if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])) {
       $pauseAfter = $_POST['pauseAfter'.$x];
-      $sql = "UPDATE $userTable SET pauseAfterHours= '$pauseAfter' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET pauseAfterHours= '$pauseAfter' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])) {
       $rest = $_POST['rest'.$x];
-      $sql = "UPDATE $userTable SET hoursOfRest= '$rest' WHERE id = '$curID';";
+      $sql = "UPDATE $userTable SET hoursOfRest= '$rest' WHERE id = '$x';";
       $conn->query($sql);
     }
 
     if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
       $mon = test_input($_POST['mon'.$x]);
-      $sql = "UPDATE $bookingTable SET mon='$mon' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET mon='$mon' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
       $tue = test_input($_POST['tue'.$x]);
-      $sql = "UPDATE $bookingTable SET tue='$tue' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET tue='$tue' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
       $wed = test_input($_POST['wed'.$x]);
-      $sql = "UPDATE $bookingTable SET wed='$wed' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET wed='$wed' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
       $thu = test_input($_POST['thu'.$x]);
-      $sql = "UPDATE $bookingTable SET thu='$thu' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET thu='$thu' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
       $fri = test_input($_POST['fri'.$x]);
-      $sql = "UPDATE $bookingTable SET fri='$fri' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET fri='$fri' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
       $sat = test_input($_POST['sat'.$x]);
-      $sql = "UPDATE $bookingTable SET sat='$sat' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET sat='$sat' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
     if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
       $sun = test_input($_POST['sun'.$x]);
-      $sql = "UPDATE $bookingTable SET sun='$sun' WHERE userID = '$curID'";
+      $sql = "UPDATE $bookingTable SET sun='$sun' WHERE userID = '$x'";
       $conn->query($sql);
     }
 
@@ -166,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $passwordConfirm = $_POST['passwordConfirm'.$x];
       if (strcmp($password, $passwordConfirm) == 0) {
         $psw = password_hash($password, PASSWORD_BCRYPT);
-        $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$curID';";
+        $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$x';";
         $conn->query($sql);
       } else {
         echo '<div class="alert alert-danger fade in">';
@@ -253,17 +258,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $fri = $row['fri'];
       $sat = $row['sat'];
       $sun = $row['sun'];
+
       $firstname = $row['firstname'];
       $lastname = $row['lastname'];
       $gender = $row['gender'];
       $email = $row['email'];
-      $coreTime = $row['coreTime'];
+      $begin = $row['beginningDate'];
+      $end = $row['exitDate'];
+
       $vacDaysPerYear = $row['daysPerYear'];
       $vacDaysCredit = $row['vacationHoursCredit'];
       $overTimeAll = $row['overTimeLump'];
       $pauseAfter = $row['pauseAfterHours'];
       $rest = $row['hoursOfRest'];
-      $begin = $row['beginningDate'];
 
       $isCoreAdmin = $row['isCoreAdmin'];
       $isTimeAdmin = $row['isTimeAdmin'];
@@ -333,9 +340,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
               </div>
               <br>
-              <div class=container-fluid>
+              <div class="container-fluid">
                 <div class=col-md-3>
-                  <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control">'. substr($begin,0,10); ?></p>
+                  <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($begin,0,10); ?></p>
+                </div>
+                <div class=col-md-3>
+                  <?php echo $lang['EXIT_DATE']; ?>
+                  <input type="text" class="form-control" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
@@ -345,37 +356,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   <?php echo $lang['AMOUNT_VACATION_DAYS']; ?>: <br>
                   <input type="number" class="form-control" step=any  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo number_format($vacDaysCredit/24, '.', ''); ?>"/>
                 </div>
+              </div>
+              <br>
+              <div class="container-fluid">
                 <div class=col-md-3>
                   <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
                   <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/>
                 </div>
-              </div>
-              <br>
-              <div class=container-fluid>
-                <div class=col-md-6>
+                <div class=col-md-3>
                   <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>
                 </div>
-                <div class=col-md-6>
+                <div class=col-md-3>
                   <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/>
                 </div>
               </div>
-              <br>
-
-              <br>
+              <br><br>
               <div class=container-fluid>
-                <div class="col-md-3">
-                  <?php echo $lang['GENDER']; ?>: <br>
-                  <div class="radio">
-                    <label>
-                      <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
-                    </label>
-                  </div>
-                  <div class="radio">
-                    <label>
-                      <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
-                    </label>
-                  </div>
-                </div>
                 <div class="col-md-3">
                   Module: <br>
                   <div class="checkbox">
@@ -409,16 +405,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sql = "SELECT * FROM $companyTable";
                     $companyResult = $conn->query($sql);
                     while($companyRow = $companyResult->fetch_assoc()){
-                      $sql = "SELECT * FROM $companyToUserRelationshipTable WHERE companyID = " . $companyRow['id'] . " AND userID = $x";
-                      $resultset2 = $conn->query($sql);
+                      $resultset2 = $conn->query("SELECT * FROM $companyToUserRelationshipTable WHERE companyID = " . $companyRow['id'] . " AND userID = $x");
                       if($resultset2 && $resultset2->num_rows >0){
                         $selected = 'checked';
                       } else {
                         $selected = '';
                       }
-                      echo "<input type='checkbox' $selected name='company".$x."[]' value=" .$companyRow['id']. ">" . $companyRow['name'] ."<br>";
+                      echo "<label><input type='checkbox' $selected name='company".$x."[]' value=" .$companyRow['id']. " />" . $companyRow['name'] ."</label><br>";
                     }
                     ?>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <?php echo $lang['GENDER']; ?>: <br>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
+                    </label>
+                  </div>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
+                    </label>
                   </div>
                 </div>
               </div>
@@ -519,6 +527,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
   <!--div class="col-xs-6 text-right">
   <a class="btn btn-warning" href='editUsers_onDate.php'>Make Changes on Date</a>
+</div-->
+</div>
+<!-- /BODY -->
+<?php include 'footer.php'; ?>
+on Date</a>
 </div-->
 </div>
 <!-- /BODY -->

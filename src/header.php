@@ -302,7 +302,7 @@ $(document).ready(function() {
                               <i class="fa fa-users"></i> <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i></a>
                               <div class="collapse" id="toggleUsers" style="height: 0px;">
                                 <ul class="nav nav-list">
-                                  <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['VIEW_USER']; ?></a></li>
+                                  <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
                                   <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
                                   <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li>
                                   <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>

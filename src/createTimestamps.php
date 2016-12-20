@@ -59,7 +59,7 @@ function isHoliday($ts){
 
 function test_Date($date){
   $dt = DateTime::createFromFormat("Y-m-d H:i:s", $date);
-  return $dt !== false && !array_sum($dt->getLastErrors());
+  return $dt && $dt->format("Y-m-d H:i:s") === $date;
 }
 
 function redirect($url){

@@ -94,9 +94,11 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DRIVES'] = 'Drives';
 
   $lang['EDIT'] = 'Edit';
+  $lang['EDIT_USERS'] = 'Edit Users';
   $lang['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
   $lang['END'] = 'End';
   $lang['ENTRANCE_DATE'] = 'Date of Entry';
+  $lang['EXIT_DATE'] = 'Date of Exit';
   $lang['EXPECTED'] = 'Expected';
   $lang['EXPECTED_HOURS'] = 'Expected Hours';
 
@@ -281,9 +283,11 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DRIVES'] = 'Fahrten';
 
   $lang['EDIT'] = 'Bearbeiten';
+  $lang['EDIT_USERS'] = 'Benutzer Editieren';
   $lang['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
   $lang['END'] = 'Ende';
   $lang['ENTRANCE_DATE'] = 'Eintrittsdatum';
+  $lang['EXIT_DATE'] = 'Austrittsdatum';
   $lang['EXPECTED'] = 'Erwartet';
   $lang['EXPECTED_HOURS'] = 'Erwartete Stunden';
 
