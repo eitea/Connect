@@ -128,7 +128,7 @@
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
   FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
-  WHERE TIMESTAMPDIFF(HOUR, time, timeEnd) > 12 OR TIMESTAMPDIFF(HOUR, time, timeEnd) < 0";
+  WHERE (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) > 12 OR (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) < 0";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):

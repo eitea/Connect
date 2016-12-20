@@ -45,8 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql  = "DELETE FROM $userTable WHERE id = $x";
       if(!$conn->query($sql)){echo mysqli_error($conn);}
     }
-  } else {
-    echo $lang['ADMIN_DELETE'] ."<br>";
   }
 
   if (isset($_POST['deleteUser'])) {
@@ -86,9 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $conn->query($sql);
     }
 
-    if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@'.explode('@', $row['email'])[1]), FILTER_VALIDATE_EMAIL)){
-      $email = test_input($_POST['email'.$x]). '@'. explode('@', $row['email'])[1];
-      $sql = "UPDATE $userTable SET email = '$email' WHERE id = '$curID';";
+    if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
+      $email = test_input($_POST['email'.$x]).'@';
+      $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$curID';";
       $conn->query($sql);
     } else {
       echo '<div class="alert alert-danger fade in">';

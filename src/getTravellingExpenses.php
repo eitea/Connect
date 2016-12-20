@@ -30,7 +30,6 @@ if($result && ($row = $result->fetch_assoc())){
 <form method = "post">
   <div class="row">
     <div class="col-md-6">
-
       <select style='width:200px' class="js-example-basic-single" name="filterYear">
         <?php
         for($i = substr($filterMonth,0,4)-5; $i < substr($filterMonth,0,4)+5; $i++){
@@ -39,7 +38,6 @@ if($result && ($row = $result->fetch_assoc())){
         }
         ?>
       </select>
-
       <select style="width:150px" class="js-example-basic-single" name="filterMonth">
         <?php
         for($i = 1; $i < 13; $i++) {
@@ -52,7 +50,6 @@ if($result && ($row = $result->fetch_assoc())){
         }
         ?>
       </select>
-
       <select name="filterUserID" class="js-example-basic-single">
         <option value=0>Benutzer... </option>
         <?php

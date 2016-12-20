@@ -26,7 +26,6 @@ class Monthly_Calculator{
     $this->days = date('t', strtotime($month));
   }
 
-
 //call this manually, will add different calculation methods in future
   public function calculateValues(){
     $month = $this->month;
@@ -36,16 +35,24 @@ class Monthly_Calculator{
     $month = substr_replace($month, $endOfMonth, 8, 2);
 
     require "connection.php";
+    $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
+    if($result && ($row = $result->fetch_assoc())){
+      $beginDate = $row['beginningDate'];
+      $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
+    } else { //should never occur
+      die("Invalid userID");
+    }
+
     $i = substr_replace($month, "01", 8, 2);
 
-    $count = 1;
-    while(substr($i,0, 10) != substr(carryOverAdder_Hours($month, 24),0,10)) { //from 1st to "31th", including last day
+    $count = 0;
+    while(substr($i,0, 10) != substr(carryOverAdder_Hours($month, 24),0,10)) { //for EVERY day of month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE $logTable.userID = $id AND $logTable.time LIKE'". substr($i, 0, 10) ." %'";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time > '$beginDate' AND time < '$exitDate' AND $logTable.time LIKE'". substr($i, 0, 10) ." %'";
       $result = $conn->query($sql);
-      if($result && $result->num_rows > 0){ //guy checked in today
+      if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
           $row = $result->fetch_assoc();
           $this->start[] = $row['time'];
           $this->end[] = $row['timeEnd'];
@@ -53,45 +60,34 @@ class Monthly_Calculator{
           $this->shouldTime[] = $row['expectedHours'];
           $this->timeToUTC[] = $row['timeToUTC'];
           $this->indecesIM[] = $row['indexIM'];
-          $this->lunchTime[$count-1] = $row['breakCredit']; //for any status
-
-          if(isHoliday($row['time'])){
-            $this->shouldTime[$count-1] = 0;
-          }
-
-        } else {
-          //if there is NO log entry for the day, fill out start and end with EMPTY STRING and expected hours from the absentLog
-          $sql = "SELECT * FROM $negative_logTable WHERE time LIKE '". substr($i, 0, 10) ." %' AND userID = $id";
+          $this->lunchTime[$count] = $row['breakCredit'];
+        } else { //user wasnt here today = 0 absolved hours
+          $this->start[] = '-';
+          $this->end[] = '-';
+          $this->activity[] = '-1';
+          $this->lunchTime[] = 0;
+          $this->timeToUTC[] = 0;
+          //check the absentLog
+          $sql = "SELECT * FROM $negative_logTable WHERE userID = $id AND $logTable.time > '$beginDate' AND $logTable.time < '$exitDate' AND time LIKE '". substr($i, 0, 10) ." %'";
           $result = $conn->query($sql);
-          // for today there is no entry: get the absentLog entry. there MUST be an entry for that, or the dates in the future/waay past.
-          if($result && $result->num_rows > 0){
+          if($result && $result->num_rows > 0){ //he has an absent entry -> fetch his expected hours
             $row = $result->fetch_assoc();
-            $this->start[] = '-';
-            $this->end[] = '-';
-            $this->activity[] = '-1';
-            $this->lunchTime[] = 0;
             $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
             $this->indecesIM[] = $row['negative_indexIM'];
-            $this->timeToUTC[] = 0;
-
-            if(isHoliday($row['time'])){
-              $this->shouldTime[$count-1] = 0;
-            }
-          } else { //future/past date
-            $this->start[] = '-';
-            $this->end[] = '-';
-            $this->activity[] = '-1';
-            $this->lunchTime[] = 0;
+          } else { //no absent entry means date lies before entry or after exit date
             $this->shouldTime[] = 0;
             $this->indecesIM[] = 0;
-            $this->timeToUTC[] = 0;
           }
+        }
+        //if today is a holiday, poot poot
+        if(isHoliday($i)){
+          $this->shouldTime[$count] = 0;
         }
 
         $i = carryOverAdder_Hours($i, 24);
-        $this->daysAsNumber[] = $count;
         $count++;
-    }
+    } //endwhile;
+    $this->daysAsNumber[] = $count;
   }
 
 private function timeDiff_Hours($from, $to) {
@@ -115,14 +111,11 @@ private function timeDiff_Hours($from, $to) {
     return $date->format('Y-m-d H:i:s');
   }
 
-private function isHoliday($ts){
-  require "connection.php";
-  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
-  $result = mysqli_query($conn, $sql);
-  return($result && $result->num_rows>0);
+  private function isHoliday($ts){
+    require "connection.php";
+    $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
+    $result = mysqli_query($conn, $sql);
+    return($result && $result->num_rows>0);
+  }
 }
-
-
-}
-
 ?>

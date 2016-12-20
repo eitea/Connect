@@ -437,7 +437,17 @@ if($row['version'] < 37){
   } else {
     echo "created deact travellogs";
   }
+}
 
+
+if($row['version'] < 38){
+  $sql = "ALTER TABLE $userTable ADD COLUMN exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'";
+  $conn->query($sql);
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Expanded Users by Exit Date";
+  }
 }
 
 //------------------------------------------------------------------------------

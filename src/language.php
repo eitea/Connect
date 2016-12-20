@@ -115,6 +115,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['HOLIDAYS'] = 'Holidays';
   $lang['HOURLY_RATE'] = 'Hourly Rate';
   $lang['HOURS'] = 'Hours';
+  $lang['HOURS_COMPLETE'] = 'All Hours';
   $lang['HOURS_CREDIT'] = 'Hours Credit';
   $lang['HOURS_OF_REST'] = 'Hours of Rest';
 
@@ -301,6 +302,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['HOLIDAYS'] = 'Feiertage';
   $lang['HOURLY_RATE'] = 'Stundenrate';
   $lang['HOURS'] = 'Stunden';
+  $lang['HOURS_COMPLETE'] = 'Alle Stunden';
   $lang['HOURS_CREDIT'] = 'Stundenkonto';
   $lang['HOURS_OF_REST'] = 'Mittagspause in Stunden';
 

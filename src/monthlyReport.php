@@ -6,7 +6,6 @@
 <h3><?php echo $lang['MONTHLY_REPORT']; ?></h3>
 </div>
 
-<form method="post">
 
 <?php
 $filterMonth = substr(getCurrentTimestamp(),0,7);
@@ -21,8 +20,9 @@ if(isset($_POST['filterUserID'])){
 }
 ?>
 
+<form method="post">
 <div class="row">
-  <div class="col-lg-3">
+  <div class="col-md-3">
   <select name='filterUserID' class='js-example-basic-single' style="width:220px">
   <?php
     $sql = "SELECT * FROM $userTable";
@@ -41,8 +41,9 @@ if(isset($_POST['filterUserID'])){
     }
   ?>
   </select>
+  <br>
 </div>
-  <div class="col-lg-6">
+  <div class="col-md-6">
     <div class="input-group">
       <input type="month" class="form-control" name="filterMonth" value=<?php echo $filterMonth; ?> >
       <span class="input-group-btn">
@@ -52,8 +53,8 @@ if(isset($_POST['filterUserID'])){
   </div>
 </div>
 </form>
-
-<br><br>
+<br>
+<br>
 <table class="table table-hover">
   <thead>
     <th><?php echo $lang['WEEKLY_DAY']; ?></th>
