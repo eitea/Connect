@@ -3,14 +3,15 @@
 <!-- BODY -->
 
 <div class="page-header">
-<h3><?php echo $lang['READY_STATUS']; ?></h3>
+  <h3><?php echo $lang['READY_STATUS']; ?></h3>
 </div>
 
-  <table>
-    <tr>
+<table class="table table-hover">
+  <thead>
     <th>Name</th>
     <th>Checkin</th>
-    </tr>
+  </thead>
+  <tbody>
     <?php
     $today = substr(getCurrentTimestamp(),0,10);
     $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEND = '0000-00-00 00:00:00'";
@@ -24,8 +25,8 @@
       echo mysqli_error($conn);
     }
     ?>
-  </table>
-
+  </tbody>
+</table>
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

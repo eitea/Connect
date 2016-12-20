@@ -11,8 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
-    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, preferredLang, terminalPin, kmMoney)
-    SELECT id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
+    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
+    SELECT id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
     //copy logs
     $sql = "INSERT INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, breakCredit, expectedHours, indexIM)

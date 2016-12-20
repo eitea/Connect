@@ -442,7 +442,13 @@ if($row['version'] < 37){
 
 if($row['version'] < 38){
   $sql = "ALTER TABLE $userTable ADD COLUMN exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'";
-  $conn->query($sql);
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Expanded Users by Exit Date";
+  }
+
+  $sql = "ALTER TABLE $deactivatedUserTable ADD COLUMN exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
