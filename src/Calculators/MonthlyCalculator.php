@@ -50,7 +50,7 @@ class Monthly_Calculator{
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time > '$beginDate' AND time < '$exitDate' AND $logTable.time LIKE'". substr($i, 0, 10) ." %'";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time > '$beginDate' AND time < '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %'";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
           $row = $result->fetch_assoc();
@@ -68,7 +68,7 @@ class Monthly_Calculator{
           $this->lunchTime[] = 0;
           $this->timeToUTC[] = 0;
           //check the absentLog
-          $sql = "SELECT * FROM $negative_logTable WHERE userID = $id AND $logTable.time > '$beginDate' AND $logTable.time < '$exitDate' AND time LIKE '". substr($i, 0, 10) ." %'";
+          $sql = "SELECT * FROM $negative_logTable WHERE userID = $id AND time > '$beginDate' AND time < '$exitDate' AND time LIKE '". substr($i, 0, 10) ." %'";
           $result = $conn->query($sql);
           if($result && $result->num_rows > 0){ //he has an absent entry -> fetch his expected hours
             $row = $result->fetch_assoc();

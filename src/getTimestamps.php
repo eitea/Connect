@@ -231,6 +231,10 @@ if (isset($_POST['filterStatus'])) {
 
                 $k = $row['indexIM'];
 
+                if(isHoliday($row['time'])){
+                  $row['expectedHours'] = 0;
+                }
+
                 echo "<tr>";
                 echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
                 echo "<td>". $lang_weeklyDayToString[strtolower(date('D', strtotime($A)))] . "</td>";
