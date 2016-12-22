@@ -29,29 +29,32 @@ if(isset($_GET)){
   $lastname = test_input(rawurldecode($_GET['last']));
   $loginname = test_input(rawurldecode($_GET['login']));
 }
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  $data = $conn->real_escape_string($data);
+  return $data;
+}
+
 echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
 require "setup_inc.php"; //creates all tables
 
 $sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
-if ($conn->query($sql)) {
-  echo "registered admin as first user. <br>";
-} else {
+if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
 require 'version_number.php';
 $sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
-if ($conn->query($sql)) {
-  echo "Insert into ldap table. <br>";
-} else {
+if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
 $sql = "INSERT INTO $companyTable (name) VALUES ('$companyName')";
-if ($conn->query($sql)) {
-  echo "Insert default Administration company. <br>";
-} else {
+if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
@@ -80,7 +83,9 @@ for($i = 1; $i < count($holi); $i++){
     $n = $holi[$i]['SUMMARY'];
 
     $sql = "INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');";
-    $conn->query($sql);
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    }
   }
 }
 
@@ -94,13 +99,14 @@ if ($handle) {
         $data = preg_split('/\s+/', $line);
         array_pop($data);
         if(count($data) == 4){
-          $short = test_Input($data[0]);
-          $name = test_Input($data[1]);
+          $short = test_input($data[0]);
+          $name = test_input($data[1]);
           $dayPay = floatval($data[2]);
           $nightPay = floatval($data[3]);
           $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
-          $conn->query($sql);
-          echo mysqli_error($conn);
+          if (!$conn->query($sql)) {
+            echo mysqli_error($conn);
+          }
           $thisLineIsNotOK = false;
         } elseif(count($data) > 4) {
           $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
