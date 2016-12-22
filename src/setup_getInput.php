@@ -144,11 +144,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="col-md-6 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
-            <input type='password' class="form-control" name='localPart' placeholder='name'  style=width:400px >
+            <input type='text' class="form-control" name='localPart' placeholder='name'  style=width:400px >
             <span class="input-group-addon text-warning">
               @
             </span>
-            <input type='password' class="form-control" name='domainPart' placeholder="domain.com">
+            <input type='text' class="form-control" name='domainPart' placeholder="domain.com">
           </div>
         </div>
         <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
