@@ -23,11 +23,11 @@ require 'connection.php';
 
 if(isset($_GET)){
   $psw = $_GET['psw'];
-  $companyName = rawurldecode($_GET['companyName']);
-  $firstname = rawurldecode($_GET['first']);
-  $lastname = rawurldecode($_GET['last']);
-  $companyType = rawurldecode($_GET['login']);
-  $loginname = $firstname . $lastname .'@' .$companyName.$companyType;
+  $companyName = test_input(rawurldecode($_GET['companyName']));
+  $companyType = test_input(rawurldecode($_GET['companyType']));
+  $firstname = test_input(rawurldecode($_GET['first']));
+  $lastname = test_input(rawurldecode($_GET['last']));
+  $loginname = test_input(rawurldecode($_GET['login']));
 }
 echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 

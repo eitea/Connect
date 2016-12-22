@@ -32,6 +32,11 @@ function redirect($url){
     echo '</noscript>'; exit;
   }
 }
+
+//leave only numbers and letters
+function clean($string) {
+  return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+}
 function test_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
@@ -40,7 +45,7 @@ function test_input($data) {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type'])){
+  if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
     $myfile = fopen('connection_config.php', 'w');
     $txt = '<?php
     $servername = "'.test_input($_POST['serverName']).'";
@@ -55,11 +60,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
       $companyName = rawurlencode(test_input($_POST['companyName']));
+      $companyType = rawurlencode(test_input($_POST['type']));
       $firstname = rawurlencode(test_input($_POST['firstname']));
       $lastname = rawurlencode(test_input($_POST['lastname']));
-      $loginname = rawurlencode(test_input($_POST['type']));
+      $loginname = rawurlencode(clean($_POST['localPart']) .'@'.clean($_POST['domainPart']));
 
-      redirect("setup.php?companyName=$companyName&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
+      redirect("setup.php?companyName=$companyName&companyType=$companyType&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
     }
   } else {
     echo 'Missing Fields. <br><br>';
@@ -131,7 +137,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </div>
     </div>
+    <br><br>
 
+    <p>Your Login E-Mail</p>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="form-group">
+          <div class="input-group">
+            <input type='password' class="form-control" name='localPart' placeholder='name'  style=width:400px >
+            <span class="input-group-addon text-warning">
+              @
+            </span>
+            <input type='password' class="form-control" name='domainPart' placeholder="domain.com">
+          </div>
+        </div>
+        <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
+      </div>
+    </div>
     <br><hr><br>
 
     <h1>MySQL Database Connection</h1><br><br>
