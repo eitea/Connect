@@ -1,42 +1,11 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" href="../css/submitButt.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
-  <link rel="stylesheet" type="text/css" href="../plugins/datatables/js/dataTables.bootstrap.css">
-
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-  <script src='../plugins/select2/js/select2.js'></script>
-
-</head>
-<style>
-input[type="number"] {
-   width:40px;
-}
-div{
-  float:left;
-  margin:10px;
-}
-</style>
-<body>
-<form method=post>
+<?php include 'header.php'; ?>
+<?php include 'validate.php'; enableToCore($userID); ?>
+<!-- BODY -->
+<div class="page-header">
+  <h3><?php echo $lang['USERS']; ?></h3>
+</div>
 
 <?php
-session_start();
-if (!isset($_SESSION['userid'])) {
-  die('Please <a href="login.php">login</a> first.');
-}
-if ($_SESSION['userid'] != 1) {
-  die('Access denied. <a href="logout.php"> return</a>');
-}
-
-require 'connection.php';
-require 'createTimestamps.php';
-
 if(isset($_POST['save']) && isset($_POST['userID']) && $_POST['userID'] != 0 && test_Date($_POST['saveOnDate'] .' 05:00:00')){
   if (!empty($_POST['mon']) && is_numeric($_POST['mon'])) {
     $mon = $_POST['mon'];
@@ -155,6 +124,9 @@ if(isset($_POST['save']) && isset($_POST['userID']) && $_POST['userID'] != 0 && 
 
 
 ?>
+
+
+<form method=post>
 <script type="text/javascript">
 $(document).ready(function() {
   $(".js-example-basic-single").select2({ width:'100%' });

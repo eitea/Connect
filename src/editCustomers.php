@@ -13,6 +13,13 @@
 <?php
 $filterCompanyID = 0;
 
+if(isset($_GET['custID'])){
+  $customerID = test_input($_GET['custID']);
+  $result = $conn->query("SELECT companyID FROM $clientTable WHERE id = $customerID");
+  $row = $result->fetch_assoc();
+  $filterCompanyID = $row['companyID'];
+}
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   $filterCompanyID = $_POST['filterCompany'];
   if (isset($_POST['delete']) && isset($_POST['index'])) {
@@ -67,7 +74,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <?php $query = "SELECT * FROM $clientTable $filterCompanyQuery ORDER BY name ASC";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0):
-    ?>
+  ?>
     <br><br>
 
     <table id="clientTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -80,7 +87,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       </thead>
       <tbody>
         <?php
-
         while ($row = $result->fetch_assoc()) {
           $i = $row['id'];
           $checked = "";
@@ -89,11 +95,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           }
           echo '<tr>';
           echo "<td><input type='checkbox' $checked name='index[]' value= $i></td>";
-          echo "<td><a href='editProjects.php?customerID=$i'>" .$row['name'] ."</a></td>";
+          echo "<td><a href='editProjects.php?custID=$i'>" .$row['name'] ."</a></td>";
           echo "<td>" .$row['clientNumber']."</td>";
           echo '</tr>';
         }
-
         ?>
       </tbody>
     </table>

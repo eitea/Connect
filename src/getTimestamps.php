@@ -171,7 +171,6 @@ if (isset($_POST['filterStatus'])) {
                     echo "ERROR - Merging timestamps of same dates: time difference was less or equal 0. Check your times and see if existing timestamp has been closed.";
                   }
                 } else { //no existing timestamp yet - create a new stamp
-
                   //creating a new timestamp should delete absent file if it exists, not caring about the status
                   $sql = "DELETE FROM $negative_logTable WHERE userID = $filterID AND time LIKE '$timeIsLike'";
                   $conn->query($sql);
@@ -236,13 +235,13 @@ if (isset($_POST['filterStatus'])) {
                 }
 
                 echo "<tr>";
-                echo "<td><input type='checkbox' name='index[]' value= ".$k."></td>";
+                echo "<td><input type='checkbox' name='index[]' value='$k' /></td>";
                 echo "<td>". $lang_weeklyDayToString[strtolower(date('D', strtotime($A)))] . "</td>";
                 echo "<td>" . $lang_activityToString[$row['status']] . "</td>";
 
-                echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "'></td>";
+                echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "' /></td>";
                 echo "<td class='text-center'>" . $row['breakCredit'] . "</td>";
-                echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "'></td>";
+                echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "' /></td>";
 
                 echo "<td>" . $row['expectedHours'] . "</td>";
                 echo "<td>" . sprintf('%.2f', $difference) . "</td>";

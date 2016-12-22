@@ -86,8 +86,7 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
   if($result){
     $row = $result->fetch_assoc();
   }
-  if (crypt($_POST['password'], $row['psw']) == $row['psw']) {    
-    session_start();
+  if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
     session_destroy();
     session_start();
     $_SESSION['userid'] = $row['id'];

@@ -7,8 +7,8 @@
 </div>
 
 <?php
-if(isset($_GET['customerID']) && is_numeric($_GET['customerID'])){
-  $customerID = test_input($_GET['customerID']);
+if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
+  $customerID = test_input($_GET['custID']);
 } else {
   $customerID = 0;
 }
@@ -86,7 +86,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
     </tbody>
   </table>
 
-  <a href="editCustomers.php" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
+  <a href="editCustomers.php?custID=<?php echo $customerID; ?>" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
 
   <br><br>
 

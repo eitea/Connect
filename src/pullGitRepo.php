@@ -43,7 +43,7 @@ echo $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] .'<br><br>';
 echo $lang['MAY_TAKE_A_WHILE'] .'<br><br>';
 ?>
 
-<input type=submit name=imtotallyFineWithThisOK value="<?php echo $lang['YES_I_WILL']?>" />
+<input type="submit" name="imtotallyFineWithThisOK" class="btn btn-warning" value="<?php echo $lang['YES_I_WILL']?>" />
 </form>
 
 <!-- /BODY -->

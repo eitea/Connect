@@ -25,28 +25,26 @@ if($result && $result->num_rows > 0){
   }
 }
 ?>
-  <div id='calendar' style='height: 900px;'></div>
-  <script>
-  $(document).ready(function() {
-    $('#calendar').fullCalendar({
-        height: 600,
-        firstDay: 1,
-        header: {
-          left: 'prev,next today',
-				      center: 'title',
-          right: 'month,agendaWeek,listMonth'
-        },
-        defaultView: 'month',
-        events: [<?php echo $vacs; ?>]
-    })
+<div id='calendar' style='height: 900px;'></div>
+<script>
+$(document).ready(function(){
+  $("#calendar").fullCalendar({
+    height: 600,
+    firstDay: 1,
+    header: {
+      left: "prev, next today",
+      center: "title",
+      right: "month, agendaWeek, listMonth"
+    },
+    defaultView: "month",
+    events: [<?php echo $vacs; ?>]
   });
-  </script>
+});
+</script>
 
-  <?php
-  if ($_SESSION['userid'] == 1) {
-    echo "<a href='allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
-  }
-  ?>
-
-  <!-- /BODY -->
-  <?php include 'footer.php'; ?>
+<?php
+if ($_SESSION['userid'] == 1) {
+  echo "<a href='allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
+}
+?>
+<?php include 'footer.php'; ?>
