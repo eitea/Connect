@@ -5,9 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -393,6 +393,9 @@ $(document).ready(function() {
                               </a></li>
                               <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="editProjects.php"><i class="fa fa-tags"></i>
                                 <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
+                              </a></li>
+                              <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"><i class="fa fa-clone"></i>
+                                <span>PDF Templates</span>
                               </a></li>
                             </ul>
                           </div>

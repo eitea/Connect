@@ -13,7 +13,7 @@ if ($result && $result->num_rows > 0) {
   $row = $result->fetch_assoc();
   $start = substr(carryOverAdder_Hours($row['time'], $timeToUTC), 11, 19);
   $date = substr($row['time'], 0, 10);
-  $indexIM = $row['indexIM']; //this value cannot change
+  $indexIM = $row['indexIM']; //this value must not change
 } else {
   redirect("home.php");
 }
@@ -137,12 +137,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             if(isset($_POST['undo'])){
               $row = $result->fetch_assoc();
-              if(empty($row['projectID'])){ //undo breaks
+              if($row['bookingType'] == 'break'){ //undo breaks
                 $timeDiff = timeDiff_Hours($row['start'], $row['end']);
                 $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
                 $conn->query($sql);
               }
-              echo "remove entry";
               $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
               $conn->query($sql);
             }

@@ -1,5 +1,10 @@
 /* make sidebar nav vertical */
 
+.required-field {
+  border: 1px solid #fbc871;
+  box-shadow: 0 0 2px #fbc871;
+}
+
 @media (min-width: 768px){
   .affix-content .container {
     width: 98%;

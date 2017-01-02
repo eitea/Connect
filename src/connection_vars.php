@@ -26,6 +26,7 @@ $holidayTable = "holidays";
 $logTable = "logs";
 $negative_logTable = "unlogs";
 
+$pdfTemplateTable = "templateData";
 $projectTable = "projectData";
 $projectBookingTable = "projectBookingData";
 $piConnTable = "piConnectionData";

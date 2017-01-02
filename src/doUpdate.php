@@ -14,128 +14,6 @@ $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
   $row = $result->fetch_assoc();
 
-if($row['version'] < 25){
-  $sql="SELECT userID, daysPerYear, beginningDate  FROM $userTable INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID";
-  $result = $conn->query($sql);
-  echo mysqli_error($conn);
-  while($row = $result->fetch_assoc()){
-    $time = $row['daysPerYear'] / 365;
-
-    $time *= timeDiff_Hours(substr($row['beginningDate'],0,11) .'05:00:00', substr(getCurrentTimestamp(),0,11) .'05:00:00');
-
-    $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
-    $conn->query($sql);
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 26){
-  $sql = "ALTER TABLE $clientTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger Name length for Clients. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "ALTER TABLE $projectTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger Name length for Projects. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $companyTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger Name length for Companies. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $holidayTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger Name length for Holidays. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $userTable MODIFY COLUMN email VARCHAR(50) UNIQUE NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger length for E-mails. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $companyDefaultProjectTable MODIFY COLUMN name VARCHAR(60) NOT NULL";
-  if($conn->query($sql)){
-    echo "Bigger name length for default projects. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 27){
-  //add the lunchbreak bookings for each log of a normal user
-  $sql = "SELECT time, timeEnd, pauseAfterHours, hoursOfRest, indexIM, id FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE enableProjecting = 'FALSE' AND status = '0'"; //kek
-  $result = $conn->query($sql);
-  while($row = $result->fetch_assoc()){
-    //for every single log if status = 0, and time lies over 6h and user cant book -> set the lunchbreak booking
-    if(timeDiff_Hours($row['time'], $row['timeEnd']) > $row['pauseAfterHours']){
-      //create the lunchbreak booking
-      $start = $row['time'];
-      $minutes = $row['hoursOfRest'] * 60;
-      $indexIM = $row['indexIM'];
-      $userID = $row['id'];
-
-      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText) VALUES('$start', DATE_ADD('$start', INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID')";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-
-      //update timestamp
-      $sql = "UPDATE $logTable SET breakCredit = ".$row['hoursOfRest']." WHERE indexIM = $indexIM";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-    }
-  }
-  //repair the unlogs
-  $sql = "SELECT * FROM $userTable";
-  $result = $conn->query($sql);
-  while($row = $result->fetch_assoc()){
-    $userID = $row['id'];
-    //fix1: remove all unlogs before entry date
-    $entryDate = $row['beginningDate'];
-    $sql = "DELETE FROM $negative_logTable WHERE userID = $userID AND time < '$entryDate'";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 28){
-  $sql = "CREATE TABLE $roleTable(
-  userID INT(6) UNSIGNED,
-  isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  FOREIGN KEY (userID) REFERENCES $userTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-  )";
-  if($conn->query($sql)){
-    echo "Created Role Table. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "INSERT INTO $roleTable (userID) (SELECT id FROM $userTable)";
-  if($conn->query($sql)){
-    echo "Filled role Table. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "UPDATE $roleTable SET isCoreAdmin='TRUE' WHERE userID = 1";
-  if($conn->query($sql)){
-    echo "Updated role for the existing Admin. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
 if($row['version'] < 29){
   $sql = "ALTER TABLE $roleTable ADD COLUMN canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";
   if($conn->query($sql)){
@@ -321,7 +199,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact usertab";
+    echo "Created deact. usertab <br>";
   }
 
   $sql = "CREATE TABLE $deactivatedUserLogs (
@@ -340,7 +218,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact userlogs";
+    echo "Created deact. userlogs <br>";
   }
 
   $sql = "CREATE TABLE $deactivatedUserUnLogs(
@@ -361,7 +239,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact unlogs";
+    echo "Created deact. unlogs <br>";
   }
 
 
@@ -383,7 +261,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact datatable";
+    echo "Created deact. datatable <br>";
   }
 
 
@@ -409,7 +287,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact projectbookings";
+    echo "Created deact. projectbookings <br>";
   }
 
   $sql = "CREATE TABLE $deactivatedUserTravels(
@@ -435,7 +313,7 @@ if($row['version'] < 37){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "created deact travellogs";
+    echo "Created deact. travellogs <br>";
   }
 }
 
@@ -445,14 +323,14 @@ if($row['version'] < 38){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "Expanded Users by Exit Date";
+    echo "Expanded Users by Exit Date <br>";
   }
 
   $sql = "ALTER TABLE $deactivatedUserTable ADD COLUMN exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "Expanded Users by Exit Date";
+    echo "Expanded Users by Exit Date <br>";
   }
 }
 
@@ -504,7 +382,7 @@ if($row['version'] < 39){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "Created Client detail Table";
+    echo "Created Client detail Table <br>";
   }
 
   $sql = "CREATE TABLE $clientDetailNotesTable(
@@ -519,7 +397,7 @@ if($row['version'] < 39){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "Created detail info";
+    echo "Created detail info <br>";
   }
 
   $sql = "CREATE TABLE $clientDetailBankTable(
@@ -535,9 +413,23 @@ if($row['version'] < 39){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "Created detail bank";
+    echo "Created detail bank <br>";
   }
 }
+
+if($row['version'] < 40){
+  $sql = "CREATE TABLE $pdfTemplateTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    htmlCode TEXT
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Created storage for pdf Templates <br>";
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

@@ -30,16 +30,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $hosting20 = floatval($_POST['addHosting20']);
     $hotel = floatval($_POST['addHotel']);
 
-    $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
-    VALUES($userID, $countryID, '$timeStart', '$timeEnd', '$kmStart', '$kmEnd', '$infotext', '$hotel', '$hosting10', '$hosting20', '$expenses')";
+    if($kmStart < $kmEnd){
+      $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
+      VALUES($userID, $countryID, '$timeStart', '$timeEnd', '$kmStart', '$kmEnd', '$infotext', '$hotel', '$hosting10', '$hosting20', '$expenses')";
 
-    if(!$conn->query($sql)){
-      echo mysqli_error($conn);
+      if(!$conn->query($sql)){
+        echo mysqli_error($conn);
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Falsche Eingabe: </strong>km-Stand Anfang muss kleiner sein als km-Stand Ende.';
+      echo '</div>';
     }
   } else {
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
+    echo '<strong>Fehler: </strong>Orange Felder dürfen nicht leer oder null sein.';
     echo '</div>';
   }
 }
@@ -118,7 +125,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         <td><?php echo $row['infoText']; ?></td>
 
-        <td style="background-color:#f2f4f5"><?php echo $timeDiff; ?></td>
+        <td style="background-color:#f2f4f5"><?php echo sprintf("%.2f", $timeDiff); ?></td>
         <td style="background-color:#f2f4f5"><?php if(!empty($row['identifier'])){echo $row['identifier'];} ?></td>
         <td style="background-color:#f2f4f5"><?php echo $dayPay; ?></td>
         <td style="background-color:#f2f4f5"><?php echo $drovenKM; ?></td>
@@ -138,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <td></td>
       <td></td>
       <td>Summen:</td>
-      <td><?php echo $durationSum;?></td>
+      <td><?php echo sprintf("%.2f",$durationSum); ?></td>
       <td><?php echo $daySum;?></td>
       <td></td>
       <td><?php echo $kmSum;?></td>
@@ -157,20 +164,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <form method="POST">
   <div class="row">
     <div class="col-md-3">
-      <input type="date" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
+      <input type="date" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
     </div>
     <div class="col-md-3">
       <div class="input-group input-daterange">
-        <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" >
+        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" >
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd">
+        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd">
       </div>
     </div>
     <div class="col-md-5">
       <div class="input-group input-daterange">
-        <input type="number" class="form-control" name="addKmStart" placeholder="km-Stand Anfang">
+        <input type="number" class="form-control required-field" name="addKmStart" placeholder="km-Stand Anfang">
         <span class="input-group-addon"> - </span>
-        <input type="number" class="form-control" name="addKmEnd" placeholder="km-Stand Ende">
+        <input type="number" class="form-control required-field" name="addKmEnd" placeholder="km-Stand Ende">
       </div>
     </div>
   </div>
@@ -190,7 +197,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <br>
   <div class="row">
     <div class="col-md-9">
-      <textarea class="form-control" rows="6" name="addInfoText" placeholder="Grund - Besuchte Orte - Firmen"></textarea><br>
+      <textarea class="form-control required-field" rows="6" name="addInfoText" placeholder="Grund - Besuchte Orte - Firmen"></textarea><br>
     </div>
     <div class="col-md-2">
       <input type="number" step="any" class="form-control" name="addHotel" placeholder="Hotelkosten">
