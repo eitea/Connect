@@ -456,6 +456,89 @@ if($row['version'] < 38){
   }
 }
 
+if($row['version'] < 39){
+  $sql = "CREATE TABLE $clientDetailTable(
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  contactType ENUM('person', 'company'),
+  gender ENUM('female', 'male'),
+  title VARCHAR(30),
+  name VARCHAR(45) NOT NULL,
+  nameAddition VARCHAR(45),
+  address_Street VARCHAR(100),
+  address_Country VARCHAR(100),
+  phone VARCHAR(20),
+
+  debitNumber INT(10),
+  datev INT(10),
+  accountName VARCHAR(100),
+  taxnumber INT(50),
+  taxArea VARCHAR(50),
+  customerGroup VARCHAR(50),
+  representative VARCHAR(50),
+  blockDelivery ENUM('true', 'false') DEFAULT 'false',
+
+  paymentMethod VARCHAR(100),
+  shipmentType VARCHAR(100),
+  creditLimit DECIMAL(10,2),
+  eBill ENUM('true', 'false') DEFAULT 'false',
+  lastFaktura DATETIME,
+
+  daysNetto INT(4),
+  skonto1 DECIMAL(6,2),
+  skonto2 DECIMAL(6,2),
+  skonto1Days INT(4),
+  skonto2Days INT(4),
+  warningEnabled ENUM('true', 'false') DEFAULT 'true',
+  karenztage INT(4),
+  lastWarning DATETIME,
+  warning1 DECIMAL(10,2),
+  warning2 DECIMAL(10,2),
+  warning3 DECIMAL(10,2),
+  calculateInterest ENUM('true', 'false'),
+
+  clientID INT(6) UNSIGNED,
+  FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Created Client detail Table";
+  }
+
+  $sql = "CREATE TABLE $clientDetailNotesTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    infoText VARCHAR(800),
+    createDate DATETIME,
+    parentID INT(6) UNSIGNED,
+    FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Created detail info";
+  }
+
+  $sql = "CREATE TABLE $clientDetailBankTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bic VARCHAR(20),
+    iban VARCHAR(50),
+    bankName VARCHAR(100),
+    parentID  INT(6) UNSIGNED,
+    FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Created detail bank";
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

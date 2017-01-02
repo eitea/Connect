@@ -7,13 +7,25 @@
 </div>
 
 <?php
+$filterCompany = 0;
+$filterClient = 0;
+
+
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
-  $customerID = test_input($_GET['custID']);
+  $filterClient = test_input($_GET['custID']);
 } else {
-  $customerID = 0;
+  $filterClient = 0;
 }
 
-if(isset($_POST['add']) && !empty($_POST['name']) && $customerID != 0){
+if(isset($_POST['filterCompany'])){
+  $filterCompany = $_POST['filterCompany'];
+}
+
+if(isset($_POST['filterClient'])){
+  $filterClient = $_POST['filterClient'];
+}
+
+if(isset($_POST['add']) && !empty($_POST['name']) && $filterClient != 0){
   $name = test_input($_POST['name']);
   if(isset($_POST['status'])){
     $status = "checked";
@@ -23,7 +35,7 @@ if(isset($_POST['add']) && !empty($_POST['name']) && $customerID != 0){
   $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
   $hours = floatval(test_input($_POST['hours']));
 
-  $sql="INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) VALUES($customerID, '$name', '$status', '$hours', '$hourlyPrice')";
+  $sql="INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice')";
   $conn->query($sql);
 }
 
@@ -38,6 +50,9 @@ if (isset($_POST['delete']) && isset($_POST['index'])) {
 }
 
 if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
+  if(empty($_POST['statii'])){
+    $_POST['statii'] = array();
+  }
   for($i = 0; $i < count($_POST['projectIndeces']); $i++){
     $projectID = test_input( $_POST['projectIndeces'][$i]);
     $hours = floatval(test_input($_POST['boughtHours'][$i]));
@@ -54,7 +69,51 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
 }
 ?>
 
+<script>
+function showClients(company, client){
+  $.ajax({
+    url:'ajaxQuery/AJAX_client.php',
+    data:{companyID:company, clientID:client},
+    type: 'post',
+    success : function(resp){
+      $("#filterClient").html(resp);
+    },
+    error : function(resp){}
+  });
+
+  showProjects(client, 0);
+};
+</script>
+<br>
 <form method="post">
+  <!-- SELECT COMPANY -->
+  <div class="row">
+    <div class="col-md-6">
+      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0);' class="js-example-basic-single">
+        <option value="0">Select Company...</option>
+        <?php
+        $sql = "SELECT * FROM $companyTable";
+        $result = mysqli_query($conn, $sql);
+        if($result && $result->num_rows > 0) {
+          $row = $result->fetch_assoc();
+          do {
+            $checked = '';
+            if($filterCompany == $row['id']) {
+              $checked = 'selected';
+            }
+            echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
+
+          } while($row = $result->fetch_assoc());
+        }
+        ?>
+      </select>
+      <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' >
+      </select>
+      <button type="submit" class="btn btn-warning btn-sm" name="filter">Filter</button><br><br>
+    </div>
+  </div>
+
+  <br><br>
   <table class="table table-hover">
     <thead>
       <tr>
@@ -67,8 +126,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
     </thead>
     <tbody>
       <?php
-      $customerQuery = ($customerID==0)?'':"WHERE clientID = $customerID";
-      $sql = "SELECT * FROM $projectTable $customerQuery";
+      $sql = "SELECT * FROM $projectTable WHERE clientID = $filterClient";
       $result = $conn->query($sql);
 
       echo mysqli_error($conn);
@@ -85,11 +143,7 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       ?>
     </tbody>
   </table>
-
-  <a href="editCustomers.php?custID=<?php echo $customerID; ?>" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
-
-  <br><br>
-
+  <br>
   <div class="row">
     <div class="col-md-4">
       <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
@@ -126,7 +180,11 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
       </div>
     </form>
   </div>
-</form>
 
-<!-- /BODY -->
-<?php include 'footer.php'; ?>
+  <script>
+  showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
+  </script>
+
+  </form>
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

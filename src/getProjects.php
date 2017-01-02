@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include "../vendor/deblan/Csv.php"; use Deblan\Csv\Csv; ?>
+<?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
 <?php include 'validate.php'; enableToProject($userID)?>
 <!-- BODY -->
 
@@ -480,19 +480,19 @@ function textAreaAdjust(o) {
     if($filterCompany == 0){
       $filterCompanyAdd = "";
     } else {
-      $filterCompanyAdd = "AND $companyTable.id = $filterCompany";
+      $filterCompanyAdd = " AND $companyTable.id = $filterCompany";
     }
 
     if($filterClient == 0){
       $filterClientAdd = "";
     } else {
-      $filterClientAdd = "AND $clientTable.id = $filterClient";
+      $filterClientAdd = " AND $clientTable.id = $filterClient";
     }
 
     if($filterProject == 0){
-      $filterProjectAdd = "$filterCompanyAdd $filterClientAdd";
+      $filterProjectAdd = "";
     } else {
-      $filterProjectAdd = "AND $projectTable.id = $filterProject $filterCompanyAdd $filterClientAdd";
+      $filterProjectAdd = " AND $projectTable.id = $filterProject";
     }
 
     //filter activates if he does NOT want to show drives or breaks
@@ -501,25 +501,20 @@ function textAreaAdjust(o) {
       $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
     }
 
-    //this is magic. do not touch.
-    if($filterAddBreaks == ""){ // he does NOT want breaks
+    $filterProjectClientCompany = $filterCompanyAdd . $filterClientAdd . $filterProjectAdd;
+    //he does NOT want breaks
+    if($filterAddBreaks == ""){
       $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
     } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
       $filterNoBreakAdd = "";
-      if($filterUserID != 0){
-        //remove the company, client, project bs
-        if(strlen($filterProjectAdd) > 3){ //he filters for project or client or company
-          $filterProjectAdd = substr($filterProjectAdd,3);
-          $filterProjectAdd = " AND (($filterProjectAdd) OR ($projectTable.id IS NULL))";
-        } else { //he filters for user and date only
-          $filterProjectAdd = " AND (($projectTable.id IS NOT NULL) OR ($projectTable.id IS NULL))"; //wat
+      if($filterUserID != 0){ //a break can only be assigned to a user
+        if(strlen($filterProjectClientCompany) > 3){ //he filters for something
+          $filterProjectClientCompany = " AND ((".substr($filterProjectClientCompany,4).") OR ($projectTable.id IS NULL))";
         }
       } else {
         echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
       }
     }
-
-
 
     $sql="SELECT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
@@ -540,7 +535,7 @@ function textAreaAdjust(o) {
     LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
     WHERE $projectBookingTable.start LIKE '$filterDate%'
     $bookedQuery
-    $filterProjectAdd $filterUserIDAdd
+    $filterProjectClientCompany $filterUserIDAdd
     $filterNoBreakAdd $filterNoDriveAdd
     ORDER BY $projectBookingTable.end ASC";
 /*
@@ -617,7 +612,7 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
         }
         if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
           $B_charged = '0000-00-00 00:00:00';
-        }else{
+        } else {
           $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
         }
 
@@ -630,7 +625,6 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
         $csv_Add[] = $t;
         $csv_Add[] = $row['hours'];
         $csv_Add[] = $row['firstname']." ".$row['lastname'];
-
 
         echo "<td>
         <input type='text' class='form-control input-sm' style='width:125px;' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='timesFrom[]' value='".substr($A,0,16)."'>

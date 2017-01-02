@@ -149,6 +149,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERVIEW'] = 'Overview';
 
   $lang['PRODUCTIVE'] = 'Productive';
+  $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -338,6 +339,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERVIEW'] = 'Übersicht';
 
   $lang['PRODUCTIVE'] = 'Produktiv';
+  $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';

@@ -262,7 +262,7 @@ if (isset($_POST['filterStatus'])) {
 
             echo "<tr style=font-weight:bold;>
             <td>Sum: </td>
-            <td>-</td> <td>-</td>
+            <td>-</td> <td>-</td> <td>-</td>
             <td>".sprintf('%.2f',$lunchbreakSUM)."</td> <td>-</td>
             <td>".sprintf('%.2f',$expectedHoursSUM)."</td>
             <td>".sprintf('%.2f', $isTimeSUM)."</td>

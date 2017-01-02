@@ -95,7 +95,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           }
           echo '<tr>';
           echo "<td><input type='checkbox' $checked name='index[]' value= $i></td>";
-          echo "<td><a href='editProjects.php?custID=$i'>" .$row['name'] ."</a></td>";
+          echo "<td><a href='editCustomer_detail.php?custID=$i'>" .$row['name'] ."</a></td>";
           echo "<td>" .$row['clientNumber']."</td>";
           echo '</tr>';
         }

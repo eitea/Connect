@@ -9,7 +9,9 @@ $configTable = "configurationData";
 $companyToUserRelationshipTable = "companyToClientRelationshipData";
 $companyDefaultProjectTable = "companyDefaultProjects";
 $clientTable = "clientData";
-$clientDataTable = "clientInfoData";
+$clientDetailTable = "clientInfoData";
+$clientDetailNotesTable = "clientInfoNotes";
+$clientDetailBankTable = "clientInfoBank";
 $companyTable = "companyData";
 
 $deactivatedUserTable = "DeactivatedUsers";

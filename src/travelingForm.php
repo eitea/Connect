@@ -49,7 +49,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <div class="col-md-4">
     Name: <?php echo $_SESSION['firstname']; ?>
     <br><br>
-    Monat: <?php echo $lang_monthToString[substr($currentMonth,5,2)]; ?>
+    Monat: <?php echo $lang_monthToString[intval(substr($currentMonth,5,2))]; ?>
   </div>
 
   <div class="col-md-4">

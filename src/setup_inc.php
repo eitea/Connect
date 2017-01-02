@@ -109,31 +109,6 @@ if (!$conn->query($sql)) {
 }
 
 
-/*
-$sql = "CREATE TABLE $clientDataTable(
-firstname VARCHAR(45) NOT NULL,
-lastname VARCHAR(45) NOT NULL,
-phone VARCHAR(20),
-gender ENUM('female', 'male'),
-title VARCHAR(30),
-address VARCHAR(100),
-taxnumber INT(50),
-debitNumber INT(10),
-datev INT(10),
-taxArea VARCHAR(50),
-paymentMethod VARCHAR(50),
-creditLimit DECIMAL(8,2),
-
-clientID INT(6) UNSIGNED,
-FOREIGN KEY (clientID) REFERENCES $clientTable(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-*/
-
 
 $sql = "CREATE TABLE $projectTable(
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -149,7 +124,6 @@ ON DELETE CASCADE
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $projectBookingTable (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -515,5 +489,75 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 } else {
   echo "created deact travellogs";
+}
+
+$sql = "CREATE TABLE $clientDetailTable(
+id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+contactType ENUM('person', 'company'),
+gender ENUM('female', 'male'),
+title VARCHAR(30),
+name VARCHAR(45) NOT NULL,
+nameAddition VARCHAR(45),
+address_Street VARCHAR(100),
+address_Country VARCHAR(100),
+phone VARCHAR(20),
+debitNumber INT(10),
+datev INT(10),
+accountName VARCHAR(100),
+taxnumber INT(50),
+taxArea VARCHAR(50),
+customerGroup VARCHAR(50),
+representative VARCHAR(50),
+blockDelivery ENUM('true', 'false') DEFAULT 'false',
+paymentMethod VARCHAR(100),
+shipmentType VARCHAR(100),
+creditLimit DECIMAL(10,2),
+eBill ENUM('true', 'false') DEFAULT 'false',
+lastFaktura DATETIME,
+daysNetto INT(4),
+skonto1 DECIMAL(6,2),
+skonto2 DECIMAL(6,2),
+skonto1Days INT(4),
+skonto2Days INT(4),
+warningEnabled ENUM('true', 'false') DEFAULT 'true',
+karenztage INT(4),
+lastWarning DATETIME,
+warning1 DECIMAL(10,2),
+warning2 DECIMAL(10,2),
+warning3 DECIMAL(10,2),
+calculateInterest ENUM('true', 'false'),
+clientID INT(6) UNSIGNED,
+FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+
+$sql = "CREATE TABLE $clientDetailNotesTable(
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  infoText VARCHAR(800),
+  createDate DATETIME,
+  parentID INT(6) UNSIGNED,
+  FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+$sql = "CREATE TABLE $clientDetailBankTable(
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  bic VARCHAR(20),
+  iban VARCHAR(50),
+  bankName VARCHAR(100),
+  parentID  INT(6) UNSIGNED,
+  FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
 }
  ?>

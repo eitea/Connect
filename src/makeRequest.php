@@ -95,16 +95,17 @@ if($result && $result->num_rows > 0): ?>
               if($row['status'] == 0) {
                 $style="";
               } elseif ($row['status'] == 1) {
-                $style="danger";
+                $style="#b52140";
               } elseif ($row['status'] == 2) {
-                $style="success";
+                $style="#13b436";
               }
-              echo "<tr class=$style>";
+              echo "<tr>";
               echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
               echo '<td>' . substr($row['toDate'],0,10) . '</td>';
-              echo '<td>' . $lang_vacationRequestStatus[$row['status']] .'</td>';
-              echo '<td>' . $row['answerText'] . '</td>';
-              echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!"> x </button> </td>';
+              echo "<td style='color:$style'>" . $lang_vacationRequestStatus[$row['status']] .'</td>';
+              echo "<td>" . $row['answerText'] . '</td>';
+              echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!">
+              <i class="fa fa-trash-o ></i>"</button> </td>';
               echo '</tr>';
             }
           ?>

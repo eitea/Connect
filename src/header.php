@@ -378,8 +378,6 @@ $(document).ready(function() {
                       ?>
 
                       <!-- Section Three: PROJECTS -->
-
-
                       <?php if($isProjectAdmin == 'TRUE'): ?>
                         <li role="separator" class="active"><br><br>
                           <a id="adminOption_PROJECT" href="#" data-toggle="collapse" data-target="#toggleAdminOption_PROJECT" data-parent="#sidenav01" class="collapse in">
@@ -391,7 +389,10 @@ $(document).ready(function() {
                                 <span><?php echo $lang['PROJECT_BOOKINGS']; ?></span>
                               </a></li>
                               <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i>
-                                <span><?php echo $lang['CLIENTS'] .' & '. $lang['VIEW_PROJECTS']; ?></span>
+                                <span><?php echo $lang['CLIENTS']; ?></span>
+                              </a></li>
+                              <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="editProjects.php"><i class="fa fa-tags"></i>
+                                <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
                               </a></li>
                             </ul>
                           </div>
@@ -399,7 +400,7 @@ $(document).ready(function() {
                       <?php endif; ?>
 
                       <?php
-                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php"){
+                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
                         echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
                       }
                       ?>
