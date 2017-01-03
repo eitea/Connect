@@ -15,7 +15,7 @@ $row = $result->fetch_assoc();
 $kmMoney = $row['kmMoney'];
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['addDrive']) && !empty($_POST['addInfoText']) && !empty($_POST['addTimeStart']) && !empty($_POST['addTimeEnd']) && !empty($_POST['addKmStart']) && !empty($_POST['addKmEnd'])){
+  if(isset($_POST['addDrive']) && !empty($_POST['addInfoText']) && !empty($_POST['addTimeStart']) && !empty($_POST['addTimeEnd'])){
     $timeStart = test_input($_POST['addDate'].' '.$_POST['addTimeStart']) .'.00';
     $timeEnd = test_input($_POST['addDate'].' '.$_POST['addTimeEnd']) .'.00';
 
@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $hosting20 = floatval($_POST['addHosting20']);
     $hotel = floatval($_POST['addHotel']);
 
-    if($kmStart < $kmEnd){
+    if($kmStart <= $kmEnd){
       $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
       VALUES($userID, $countryID, '$timeStart', '$timeEnd', '$kmStart', '$kmEnd', '$infotext', '$hotel', '$hosting10', '$hosting20', '$expenses')";
 
@@ -72,7 +72,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th style="text-center">km Ende</th>
 
     <th>Grund-Ort-Firma</th>
-
 
     <th style="background-color:#f1f3f4">Dauer</th>
     <th style="background-color:#f1f3f4">Land</th>
@@ -127,7 +126,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         <td style="background-color:#f2f4f5"><?php echo sprintf("%.2f", $timeDiff); ?></td>
         <td style="background-color:#f2f4f5"><?php if(!empty($row['identifier'])){echo $row['identifier'];} ?></td>
-        <td style="background-color:#f2f4f5"><?php echo $dayPay; ?></td>
+        <td style="background-color:#f2f4f5"><?php echo sprintf("%.2f", $dayPay); ?></td>
         <td style="background-color:#f2f4f5"><?php echo $drovenKM; ?></td>
         <td style="background-color:#f2f4f5"><?php echo $drovenKMPay; ?></td>
 
@@ -145,9 +144,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <td></td>
       <td></td>
       <td>Summen:</td>
-      <td><?php echo sprintf("%.2f",$durationSum); ?></td>
-      <td><?php echo $daySum;?></td>
+      <td><?php echo sprintf("%.2f", $durationSum); ?></td>
       <td></td>
+      <td><?php echo sprintf("%.2f", $daySum);?></td>
       <td><?php echo $kmSum;?></td>
       <td><?php echo $kmPaySum;?></td>
       <td><?php echo $hotelSum;?></td>
@@ -175,9 +174,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
     <div class="col-md-5">
       <div class="input-group input-daterange">
-        <input type="number" class="form-control required-field" name="addKmStart" placeholder="km-Stand Anfang">
+        <input type="number" class="form-control" name="addKmStart" placeholder="km-Stand Anfang">
         <span class="input-group-addon"> - </span>
-        <input type="number" class="form-control required-field" name="addKmEnd" placeholder="km-Stand Ende">
+        <input type="number" class="form-control" name="addKmEnd" placeholder="km-Stand Ende">
       </div>
     </div>
   </div>
