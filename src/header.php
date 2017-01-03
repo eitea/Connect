@@ -403,7 +403,7 @@ $(document).ready(function() {
                       <?php endif; ?>
 
                       <?php
-                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
+                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php" || $this_page == "templateSelect.php"){
                         echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
                       }
                       ?>

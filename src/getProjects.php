@@ -298,7 +298,7 @@ function textAreaAdjust(o) {
     <div id="dateDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
+          <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
         <select style='width:200px' class="js-example-basic-single" name="filterYear">
           <?php
@@ -344,7 +344,7 @@ function textAreaAdjust(o) {
     <div id="projectAndClientDiv" class="invisible">
       <div class="col-md-3">
         <div class="form-group">
-          <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
+          <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
         </div>
         <div class='form-group'>
           <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects(this.value, 0)' >
@@ -360,7 +360,7 @@ function textAreaAdjust(o) {
     <!-- SELECTS CHARGED -->
     <div class="col-md-3">
       <div class="form-group">
-        <input type=text style='width:200px' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
+        <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
       </div>
       <div class='form-group'>
         <select name="filterBooked" style='width:200px' class="js-example-basic-single">
@@ -538,14 +538,14 @@ function textAreaAdjust(o) {
     $filterProjectClientCompany $filterUserIDAdd
     $filterNoBreakAdd $filterNoDriveAdd
     ORDER BY $projectBookingTable.end ASC";
-/*
-$sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
-LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
-LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
+    /*
+    $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
+    LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+    LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
 
-WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
-OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
-*/
+    WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
+    OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
+    */
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
       $numRows = $result->num_rows;
@@ -724,14 +724,14 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
   <div style='text-align:right;'><button type='submit' class="btn btn-primary" name='undo'>Remove last entry</button></div>
 
   <div class="container-fluid">
-    <div class="checkbox">
-      <div class="col-sm-2">
-        <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
-      </div>
-      <div class="col-sm-3">
-        <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
-      </div>
-    </div>
+  <div class="checkbox">
+  <div class="col-sm-2">
+  <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
+  </div>
+  <div class="col-sm-3">
+  <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+  </div>
+  </div>
   </div>
 
   <div class="row">
@@ -819,9 +819,34 @@ OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '
 
     <br><br>
     <?php if($filterCompany != 0 || $filterUserID != 0): ?>
-    <form action="csvDownload.php" method="post" target='_blank'>
-    <button type='submit' class="btn btn-warning" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-    </form>
+    <div class="row">
+      <div class="col-xs-2">
+      <form action="csvDownload.php" method="post" target='_blank'>
+      <button type='submit' class="btn btn-warning btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
+      </form>
+      </div>
+
+      <div class="col-xs-2">
+        <form action="csvDownload.php" method="post" target='_blank'>
+        <div class="dropup">
+        <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Download in PDF
+        <span class="caret"></span>
+        </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+          <?php
+          $result = $conn->query("SELECT * FROM $pdfTemplateTable");
+          while($result && ($row = $result->fetch_assoc())){
+            echo "<li><button type='submit' value='".$row['id']."' >".$row['name']."</button></li>";
+
+          }
+           ?>
+          </ul>
+        </div>
+      </form>
+      </div>
+    </div>
+
     <?php endif;?>
 
     <br><br>

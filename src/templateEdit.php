@@ -1,16 +1,40 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; enableToProject($userID); ?>
 
+<script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
+
+<style>
+.draggable {
+    cursor: pointer;
+    background-color: #e9a954;
+    color:white;
+    margin-bottom: 1em;
+    padding: 10px;
+}
+.repeat{
+  background-color: #5fc8b5;
+}
+</style>
+
 <div class="page-header">
   <h3>PDF Template</h3>
 </div>
 <?php
+$templateContent = "<h1>This is a Header</h1> Create your template here and use it on the project page. Include a repeat pattern, name your template, and preview it!";
+$templateName = "";
+
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['firstPage']) && !empty($_POST['templateName'])){
-    $input = $conn->real_escape_string($_POST['firstPage']);
-    $namae = test_input($_POST['templateName']);
-    $conn->query("INSERT INTO $pdfTemplateTable (name, htmlCode) VALUES('$namae', '$input')");
+    $templateContent = $conn->real_escape_string($_POST['firstPage']);
+    $templateName = test_input($_POST['templateName']);
+    if(isset($_GET['id'])){ //did we edit?
+      $templateID = intval($_GET['id']);
+      $conn->query("UPDATE $pdfTemplateTable SET name = '$templateName', htmlCode = '$templateContent' WHERE id = $templateID");
+    } else { //or create a new one
+      $conn->query("INSERT INTO $pdfTemplateTable (name, htmlCode) VALUES('$templateName', '$templateContent')");
+    }
   } else {
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -18,48 +42,86 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '</div>';
   }
 }
+
+if(isset($_GET['id'])){
+  $templateID = intval($_GET['id']);
+  $result = $conn->query("SELECT * FROM $pdfTemplateTable WHERE id = $templateID");
+  if($result && ($row = $result->fetch_assoc())){
+    $templateContent = $row['htmlCode'];
+    $templateName = $row['name'];
+  } else {
+    $templateContent = "Do not fiddle with the URL. Thank you.";
+  }
+}
 ?>
+
 <form method="POST">
   <div class="container">
-    <input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" />
+    <div class="col-xs-10">
+      <input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $templateName; ?>" />
+    </div>
+    <div class="col-xs-2 text-right">
+      <a href='templateSelect.php' class='btn btn-info'>Return <i class='fa fa-arrow-right'></i></a>
+    </div>
   </div>
   <br>
   <div class="container">
-    <div class="col-md-9">
-      <textarea id="page1" name="firstPage">
-        <h1>This is a Header</h1>
-        Create your template here and use it on the project page!
-      </textarea>
+
+    <div class="col-sm-10" id="droppableDiv">
+      <textarea id="firstPage" name="firstPage"><?php echo $templateContent; ?></textarea>
     </div>
-    <div class="col-xs-2 text-right">
-      <br> Firstname
-      <br> Lastname
-      <br> Start
-      <br> Ende
-      <br> Text
-    </div>
-    <div class="col-xs-1">
-      <br> #FN#
-      <br> #LN#
-      <br> #PBStart#
-      <br> #PBEnd#
-      <br> #PBInfoText#
+
+    <div class="col-sm-2">
+      <br> Drag and Drop: <br><br>
+      <div class="draggable repeat">Repeat</div>
+      <div class="draggable">Firstname</div>
+      <div class="draggable">Lastname</div>
+      <div class="draggable">Date</div>
+      <div class="draggable">Company</div>
+      <div class="draggable">Client</div>
+      <div class="draggable">Project</div>
     </div>
   </form>
+</div>
 
-  <script>
-  tinymce.init({
-    selector: 'textarea#page1',
-    height: 350,
-    menubar: false,
-    plugins: [
-      'advlist autolink lists link image charmap print preview anchor',
-      'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table contextmenu paste code jbimages save'
-    ],
-    toolbar: 'undo redo | styleselect | outdent indent | numlist table | jbimages | save',
-    relative_urls: false
-  });
-  </script>
+<script>
+tinymce.init({
+  selector: 'textarea',
+  height: 400,
+  menubar: false,
+  plugins: [
+    'advlist autolink lists link image charmap print preview anchor',
+    'searchreplace visualblocks code fullscreen',
+    'insertdatetime media table contextmenu paste code jbimages save'
+  ],
+  toolbar: 'undo redo | styleselect | outdent indent | numlist table | jbimages | save',
+  relative_urls: false,
+  content_css: '../plugins/homeMenu/template.css'
+});
 
-  <?php include 'footer.php'; ?>
+$(function() {
+    $(".draggable").draggable({
+        helper: 'clone',
+        start: function(event, ui) {
+            $(this).fadeTo('fast', 0.5);
+        },
+        stop: function(event, ui) {
+            $(this).fadeTo(0, 1);
+        }
+    });
+
+    $("#droppableDiv").droppable({
+      hoverClass: 'active',
+      drop: function(event, ui) {
+        var inText = '[' + $(ui.draggable).text().toUpperCase()  + ']';
+
+        if($(ui.draggable).text() == "Repeat"){
+          inText += "<br>[REPEAT END]";
+        }
+        tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
+      }
+    });
+});
+</script>
+
+<?php include 'footer.php'; ?>
