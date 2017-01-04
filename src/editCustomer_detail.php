@@ -20,7 +20,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#home">Data</a></li>
   <li><a data-toggle="tab" href="#menuTaxes">Taxes</a></li>
-  <li><a data-toggle="tab" href="#menuBank">Account</a></li>
+  <li><a data-toggle="tab" href="#menuBank">Banking</a></li>
   <li><a data-toggle="tab" href="#menuBilling">Billing</a></li>
   <li><a data-toggle="tab" href="#menuPayment">Payment</a></li>
   <li><a data-toggle="tab" href="#menuContact">Notes</a></li>
@@ -151,7 +151,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
       </div>
     </div>
 
-<hr>
+    <hr>
 
     <div class="row form-group">
       <div class="col-xs-3">
@@ -199,28 +199,169 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   </div>
 
   <div id="menuBilling" class="tab-pane fade">
-    <h3>Billing</h3>
-    paymentMethod VARCHAR(100),
-    shipmentType VARCHAR(100),
-    creditLimit DECIMAL(10,2),
-    eBill ENUM('true', 'false') DEFAULT 'false',
-    lastFaktura DATETIME,
+    <div class="row checkbox">
+      <div class="col-xs-9">
+        <h3>Billing</h3>
+      </div>
+      <br>
+      <div class="col-xs-3">
+        <input type="checkbox" name="eBill" />
+        E-Rechnung
+      </div>
+    </div>
+    <hr>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Kreditlimit
+      </div>
+      <div class="col-xs-3">
+        <input type="number" step="any" class="form-control" name="creditLimit" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Letzte Faktura Buchung
+      </div>
+      <div class="col-xs-3">
+        <input type="text" class="form-control" name="lastFaktura" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Zahlungsweise
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="paymentmethod" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Versandart
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="shipmentType" />
+      </div>
+    </div>
   </div>
 
   <div id="menuPayment" class="tab-pane fade">
     <h3>Payment</h3>
-    daysNetto INT(4),
-    skonto1 DECIMAL(6,2),
-    skonto2 DECIMAL(6,2),
-    skonto1Days INT(4),
-    skonto2Days INT(4),
-    warningEnabled ENUM('true', 'false') DEFAULT 'true',
-    karenztage INT(4),
-    lastWarning DATETIME,
-    warning1 DECIMAL(10,2),
-    warning2 DECIMAL(10,2),
-    warning3 DECIMAL(10,2),
-    calculateInterest ENUM('true', 'false'),
+    <hr>
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Tage Netto
+      </div>
+      <div class="col-xs-6">
+        <input type="text" class="form-control" name="daysNetto" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Skonto 1
+      </div>
+      <div class="col-xs-3">
+        <input type="text" class="form-control" name="skonto1" />
+      </div>
+      <div class="col-xs-2">
+        % Innerhalb von
+      </div>
+      <div class="col-xs-3">
+        <input type="text" class="form-control" name="skonto1days" />
+      </div>
+      <div class="col-xs-1">
+        Tagen
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Skonto 2
+      </div>
+      <div class="col-xs-3">
+        <input type="text" class="form-control" name="skonto2" />
+      </div>
+      <div class="col-xs-2">
+        % Innerhalb von
+      </div>
+      <div class="col-xs-3">
+        <input type="text" class="form-control" name="skonto2days" />
+      </div>
+      <div class="col-xs-1">
+        Tagen
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Mahnungen erlaubt
+      </div>
+      <div class="col-xs-9">
+        <input type="checkbox" name="warningEnabled" />
+      </div>
+    </div>
+    <br>
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Karenztage
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="karenztage" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Letzte Mahnung am
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="lastWarning" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Mahnung 1
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="warning1" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Mahnung 2
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="warning2" />
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Mahnung 3
+      </div>
+      <div class="col-xs-9">
+        <input type="text" class="form-control" name="warning3" />
+      </div>
+    </div>
+
+    <hr>
+    <div class="row form-group">
+      <div class="col-xs-3">
+        Verzugszinsberechnung
+      </div>
+      <div class="col-xs-9">
+        <input type="checkbox" name="calculateInterest" />
+      </div>
+    </div>
+
   </div>
 
   <div id="menuContact" class="tab-pane fade">
