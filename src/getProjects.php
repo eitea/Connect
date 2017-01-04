@@ -820,25 +820,24 @@ function textAreaAdjust(o) {
     <br><br>
     <?php if($filterCompany != 0 || $filterUserID != 0): ?>
     <div class="row">
-      <div class="col-xs-2">
+      <div class="col-xs-3">
       <form action="csvDownload.php" method="post" target='_blank'>
       <button type='submit' class="btn btn-warning btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
       </form>
       </div>
 
-      <div class="col-xs-2">
+      <div class="col-xs-3">
         <form action="csvDownload.php" method="post" target='_blank'>
         <div class="dropup">
         <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Download in PDF
+        Download as PDF
         <span class="caret"></span>
         </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
           <?php
           $result = $conn->query("SELECT * FROM $pdfTemplateTable");
           while($result && ($row = $result->fetch_assoc())){
-            echo "<li><button type='submit' value='".$row['id']."' >".$row['name']."</button></li>";
-
+            echo "<li><button type='submit' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
           }
            ?>
           </ul>
