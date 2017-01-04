@@ -827,7 +827,7 @@ function textAreaAdjust(o) {
       </div>
 
       <div class="col-xs-3">
-        <form action="csvDownload.php" method="post" target='_blank'>
+        <form action="pdfDownload.php" method="post" target='_blank'>
         <div class="dropup">
         <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Download as PDF
@@ -837,9 +837,9 @@ function textAreaAdjust(o) {
           <?php
           $result = $conn->query("SELECT * FROM $pdfTemplateTable");
           while($result && ($row = $result->fetch_assoc())){
-            echo "<li><button type='submit' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
+            echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
           }
-           ?>
+          ?>
           </ul>
         </div>
       </form>
