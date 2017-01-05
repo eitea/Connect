@@ -2,7 +2,11 @@
 <?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
 <?php include 'validate.php'; enableToProject($userID)?>
 <!-- BODY -->
-
+<style>
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+}
+</style>
 <div class="page-header">
   <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
 </div>
@@ -336,6 +340,7 @@ function textAreaAdjust(o) {
           }
           ?>
         </select>
+        <br><br>
       </div>
     </div>
 
@@ -464,52 +469,52 @@ function textAreaAdjust(o) {
   $addTimeStart = 0;
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($booked == '2'){
-      $bookedQuery= "AND $projectBookingTable.booked = 'TRUE'";
+      $bookedQuery= " AND $projectBookingTable.booked = 'TRUE' ";
     } elseif($booked == '1'){
-      $bookedQuery= "AND $projectBookingTable.booked = 'FALSE'";
+      $bookedQuery= " AND $projectBookingTable.booked = 'FALSE' ";
     } else {
-      $bookedQuery = "";
+      $bookedQuery = " ";
     }
 
     if($filterUserID == 0){
       $filterUserIDAdd = '';
     } else {
-      $filterUserIDAdd = "AND $userTable.id = $filterUserID";
+      $filterUserIDAdd = " AND $userTable.id = $filterUserID ";
     }
 
     if($filterCompany == 0){
       $filterCompanyAdd = "";
     } else {
-      $filterCompanyAdd = " AND $companyTable.id = $filterCompany";
+      $filterCompanyAdd = " AND $companyTable.id = $filterCompany ";
     }
 
     if($filterClient == 0){
       $filterClientAdd = "";
     } else {
-      $filterClientAdd = " AND $clientTable.id = $filterClient";
+      $filterClientAdd = " AND $clientTable.id = $filterClient ";
     }
 
     if($filterProject == 0){
       $filterProjectAdd = "";
     } else {
-      $filterProjectAdd = " AND $projectTable.id = $filterProject";
+      $filterProjectAdd = " AND $projectTable.id = $filterProject ";
     }
 
     //filter activates if he does NOT want to show drives or breaks
     $filterNoDriveAdd = ""; //he wants drives
     if($filterAddDrives == ""){
-      $filterNoDriveAdd = "AND $projectBookingTable.bookingType != 'drive'"; //he doesnt want drives
+      $filterNoDriveAdd = " AND $projectBookingTable.bookingType != 'drive' "; //he doesnt want drives
     }
 
     $filterProjectClientCompany = $filterCompanyAdd . $filterClientAdd . $filterProjectAdd;
     //he does NOT want breaks
     if($filterAddBreaks == ""){
-      $filterNoBreakAdd = "AND $projectBookingTable.bookingType != 'break'"; //he doesnt want breaks
+      $filterNoBreakAdd = " AND $projectBookingTable.bookingType != 'break' "; //he doesnt want breaks
     } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
       $filterNoBreakAdd = "";
       if($filterUserID != 0){ //a break can only be assigned to a user
         if(strlen($filterProjectClientCompany) > 3){ //he filters for something
-          $filterProjectClientCompany = " AND ((".substr($filterProjectClientCompany,4).") OR ($projectTable.id IS NULL))";
+          $filterProjectClientCompany = " AND ((".substr($filterProjectClientCompany,4).") OR ($projectTable.id IS NULL)) ";
         }
       } else {
         echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
@@ -664,7 +669,7 @@ function textAreaAdjust(o) {
 
         $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
         $detailInfo = $row['hourlyPrice'] .' || '.$row['hours'] .' || '. $row['firstname']." ".$row['lastname'] .' || '. $projStat;
-        echo "<td><a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenrate - Stundenkonto - Person' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a></td>";
+        echo "<td><a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenrate - Stundenkonto - Person - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a></td>";
 
         echo "</tr>";
 
@@ -693,8 +698,8 @@ function textAreaAdjust(o) {
   }
 
   echo "<tr>";
-  echo "<td style='font-weight:bold'>Summary</td><td></td><td></td><td></td>";
-  echo "<td>".number_format($sum_min*60, 2, '.', '')."</td><td>$sum25</td>";
+  echo "<td style='font-weight:bold'>Summary</td> <td></td> <td></td> <td></td> <td></td>";
+  echo "<td>".number_format($sum_min*60, 2, '.', '')."</td><td>$sum25</td> <td></td> <td></td> <td></td>";
   echo "</tr>";
   ?>
   </table>
@@ -828,6 +833,7 @@ function textAreaAdjust(o) {
 
       <div class="col-xs-3">
         <form action="pdfDownload.php" method="post" target='_blank'>
+        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $filterDate. $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
         <div class="dropup">
         <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Download as PDF

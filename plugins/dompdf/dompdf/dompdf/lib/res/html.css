@@ -373,11 +373,8 @@ input[type=reset],
 input[type=file],
 button {
   background: #CCC;
-  text-align: center;
-}
-
-input[type=file] {
   width: 8em;
+  text-align: center;
 }
 
 input[type=text]:before,

@@ -47,8 +47,6 @@ class Inline extends AbstractRenderer
 
         $first_row = true;
 
-        $DEBUGLAYOUTINLINE = $this->_dompdf->getOptions()->getDebugLayout() && $this->_dompdf->getOptions()->getDebugLayoutInline();
-
         foreach ($frame->get_children() as $child) {
             list($child_x, $child_y, $child_w, $child_h) = $child->get_padding_box();
 
@@ -118,9 +116,9 @@ class Inline extends AbstractRenderer
 
             $h = max($h, $child_h);
 
-            if ($DEBUGLAYOUTINLINE) {
+            if ($this->_dompdf->get_option("debugLayout") && $this->_dompdf->get_option("debugLayoutInline")) {
                 $this->_debug_layout($child->get_border_box(), "blue");
-                if ($this->_dompdf->getOptions()->getDebugLayoutPaddingBox()) {
+                if ($this->_dompdf->get_option("debugLayoutPaddingBox")) {
                     $this->_debug_layout($child->get_padding_box(), "blue", array(0.5, 0.5));
                 }
             }
@@ -175,17 +173,12 @@ class Inline extends AbstractRenderer
             $this->$method($x + $w, $y, $h, $bp["right"]["color"], $widths, "right");
         }
 
-        $id = $frame->get_node()->getAttribute("id");
-        if (strlen($id) > 0)  {
-            $this->_canvas->add_named_dest($id);
-        }
-
         // Only two levels of links frames
         $link_node = null;
         if ($frame->get_node()->nodeName === "a") {
             $link_node = $frame->get_node();
 
-            if (($name = $link_node->getAttribute("name"))) {
+            if (($name = $link_node->getAttribute("name")) || ($name = $link_node->getAttribute("id"))) {
                 $this->_canvas->add_named_dest($name);
             }
         }

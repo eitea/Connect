@@ -8,7 +8,6 @@
  */
 namespace Dompdf\FrameDecorator;
 
-use DOMElement;
 use Dompdf\Dompdf;
 use Dompdf\Frame;
 use Dompdf\Exception;
@@ -46,10 +45,6 @@ class Inline extends AbstractFrameDecorator
         }
 
         $split = $this->copy($node->cloneNode());
-        // if this is a generated node don't propagate the content style
-        if ($split->get_node()->nodeName == "dompdf_generated") {
-            $split->get_style()->content = "normal";
-        }
         $this->get_parent()->insert_child_after($split, $this);
 
         // Unset the current node's right style properties

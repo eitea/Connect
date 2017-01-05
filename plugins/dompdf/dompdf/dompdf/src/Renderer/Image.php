@@ -115,16 +115,11 @@ class Image extends Block
             }
         }
 
-        if ($this->_dompdf->getOptions()->getDebugLayout() && $this->_dompdf->getOptions()->getDebugLayoutBlocks()) {
+        if ($this->_dompdf->get_option("debugLayout") && $this->_dompdf->get_option("debugLayoutBlocks")) {
             $this->_debug_layout($frame->get_border_box(), "blue");
-            if ($this->_dompdf->getOptions()->getDebugLayoutPaddingBox()) {
+            if ($this->_dompdf->get_option("debugLayoutPaddingBox")) {
                 $this->_debug_layout($frame->get_padding_box(), "blue", array(0.5, 0.5));
             }
-        }
-
-        $id = $frame->get_node()->getAttribute("id");
-        if (strlen($id) > 0)  {
-            $this->_canvas->add_named_dest($id);
         }
     }
 }

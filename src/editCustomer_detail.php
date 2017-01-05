@@ -11,6 +11,15 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
 } else {
   $filterClient = 0;
 }
+
+
+$result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
+if($result && ($row = $result->fetch_assoc())){
+  $detailID = $row['id'];
+} else {
+  $detailID = 0;
+}
+
 ?>
 
 <div class="text-right">
@@ -25,20 +34,22 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   <li><a data-toggle="tab" href="#menuPayment">Payment</a></li>
   <li><a data-toggle="tab" href="#menuContact">Notes</a></li>
 </ul>
+
+<form method="post">
 <div class="tab-content">
   <div id="home" class="tab-pane fade in active">
 
     <div class="row radio">
-      <div class="col-xs-3">
-        <h3>Address Data</h3>
+      <div class="col-xs-8">
+        <h3>Allgemeine Informationen</h3>
       </div>
-        <br>
-        <div class="col-xs-2 col-xs-offset-5">
-          <input type="radio" value="person" name="contactType" /> Person
-        </div>
-        <div class="col-xs-2">
-          <input type="radio" value="company" name="contactType" /> Company
-        </div>
+      <br>
+      <div class="col-xs-2">
+        <input type="radio" value="person" name="contactType" <?php if($row['contactType'] == 'person'){echo 'checked';} ?> /> Person
+      </div>
+      <div class="col-xs-2">
+        <input type="radio" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> Company
+      </div>
     </div>
 
     <hr>
@@ -48,12 +59,12 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         <div class="col-xs-3">
           Anrede
         </div>
-          <div class="col-xs-2">
-            <input type="radio" value="male" name="gender" /> Herr
-          </div>
-          <div class="col-xs-2">
-            <input type="radio" value="female" name="gender" /> Frau
-          </div>
+        <div class="col-xs-2">
+          <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> Herr
+        </div>
+        <div class="col-xs-2">
+          <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> Frau
+        </div>
       </div>
       <br>
 
@@ -62,7 +73,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
           Title
         </div>
         <div class="col-xs-3">
-          <input type="text" class="form-control" name="title" />
+          <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" />
         </div>
       </div>
 
@@ -71,7 +82,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
           Name
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="name" />
+          <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
         </div>
       </div>
 
@@ -80,7 +91,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
           Addition/Zusatz
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="nameAdditive" />
+          <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
         </div>
       </div>
 
@@ -89,7 +100,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
           Straße
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="street" />
+          <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
         </div>
       </div>
 
@@ -98,16 +109,16 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
           Land/PLZ/Ort
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="address" />
+          <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
         </div>
       </div>
 
       <div class="row form-group">
         <div class="col-xs-3">
-          Phone
+          Handy
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="phone" />
+          <input type="text" class="form-control" name="phone" value="<?php echo $row['phone']; ?>" />
         </div>
       </div>
     </div>
@@ -116,13 +127,13 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   <div id="menuTaxes" class="tab-pane fade">
     <div class="row checkbox">
       <div class="col-xs-9">
-      <h3>Taxing Information</h3>
-    </div>
-    <br>
-    <div class="col-xs-3">
-      <input type="checkbox" name="blockDelivery" />
-      Liefersperre
-    </div>
+        <h3>Steuerinformationen</h3>
+      </div>
+      <br>
+      <div class="col-xs-3">
+        <input type="checkbox" name="blockDelivery" <?php if($row['blockDelivery'] == 'true'){echo 'checked';} ?> />
+        Liefersperre
+      </div>
     </div>
     <hr>
     <div class="row form-group">
@@ -130,7 +141,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Debit Nr.
       </div>
       <div class="col-xs-4">
-        <input type="number" class="form-control" name="debit" />
+        <input type="number" class="form-control" name="debitNumber" value="<?php echo $row['debitNumber']; ?>" />
       </div>
     </div>
     <div class="row form-group">
@@ -138,7 +149,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         DATEV
       </div>
       <div class="col-xs-4">
-        <input type="number" class="form-control" name="datev" />
+        <input type="number" class="form-control" name="datev" value="<?php echo $row['datev']; ?>" />
       </div>
     </div>
 
@@ -147,7 +158,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Kontobezeichnung
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="accountName" />
+        <input type="text" class="form-control" name="accountName" value="<?php echo $row['accountName']; ?>" />
       </div>
     </div>
 
@@ -158,7 +169,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Steuernummer
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="taxNumber" />
+        <input type="text" class="form-control" name="taxnumber" value="<?php echo $row['taxnumber']; ?>" />
       </div>
     </div>
 
@@ -167,7 +178,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Steuergebiet
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="taxArea" />
+        <input type="text" class="form-control" name="taxArea" value="<?php echo $row['taxArea']; ?>" />
       </div>
     </div>
 
@@ -176,7 +187,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Kundengruppe
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="customerGroup" />
+        <input type="text" class="form-control" name="customerGroup" value="<?php echo $row['customerGroup']; ?>" />
       </div>
     </div>
 
@@ -185,13 +196,14 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Vertreter
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="representative" />
+        <input type="text" class="form-control" name="representative" value="<?php echo $row['representative']; ?>" />
       </div>
     </div>
   </div>
 
   <div id="menuBank" class="tab-pane fade">
-    <h3>Bank Account Info</h3>
+    <h3>Bankdaten</h3>
+    <hr>
     bic VARCHAR(20),
     iban VARCHAR(50),
     bankName VARCHAR(100),
@@ -201,22 +213,21 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   <div id="menuBilling" class="tab-pane fade">
     <div class="row checkbox">
       <div class="col-xs-9">
-        <h3>Billing</h3>
+        <h3>Rechnungsdaten</h3>
       </div>
       <br>
       <div class="col-xs-3">
-        <input type="checkbox" name="eBill" />
+        <input type="checkbox" name="eBill" <?php if($row['eBill'] == 'true'){echo 'checked';} ?> />
         E-Rechnung
       </div>
     </div>
     <hr>
-
     <div class="row form-group">
       <div class="col-xs-3">
         Kreditlimit
       </div>
       <div class="col-xs-3">
-        <input type="number" step="any" class="form-control" name="creditLimit" />
+        <input type="number" step="any" class="form-control" name="creditLimit" value="<?php echo $row['creditLimit']; ?>" />
       </div>
     </div>
 
@@ -225,7 +236,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Letzte Faktura Buchung
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="lastFaktura" />
+        <input type="text" class="form-control" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
       </div>
     </div>
 
@@ -234,7 +245,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Zahlungsweise
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="paymentmethod" />
+        <input type="text" class="form-control" name="paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
       </div>
     </div>
 
@@ -243,20 +254,20 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Versandart
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="shipmentType" />
+        <input type="text" class="form-control" name="shipmentType" value="<?php echo $row['shipmentType']; ?>" />
       </div>
     </div>
   </div>
 
   <div id="menuPayment" class="tab-pane fade">
-    <h3>Payment</h3>
+    <h3>Zahlungsdaten</h3>
     <hr>
     <div class="row form-group">
       <div class="col-xs-3">
         Tage Netto
       </div>
       <div class="col-xs-6">
-        <input type="text" class="form-control" name="daysNetto" />
+        <input type="text" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
       </div>
     </div>
 
@@ -265,13 +276,13 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Skonto 1
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="skonto1" />
+        <input type="text" class="form-control" name="skonto1" value="<?php echo $row['skonto1']; ?>" />
       </div>
       <div class="col-xs-2">
         % Innerhalb von
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="skonto1days" />
+        <input type="text" class="form-control" name="skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
       </div>
       <div class="col-xs-1">
         Tagen
@@ -283,13 +294,13 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Skonto 2
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="skonto2" />
+        <input type="text" class="form-control" name="skonto2" value="<?php echo $row['skonto2']; ?>" />
       </div>
       <div class="col-xs-2">
         % Innerhalb von
       </div>
       <div class="col-xs-3">
-        <input type="text" class="form-control" name="skonto2days" />
+        <input type="text" class="form-control" name="skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
       </div>
       <div class="col-xs-1">
         Tagen
@@ -303,7 +314,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Mahnungen erlaubt
       </div>
       <div class="col-xs-9">
-        <input type="checkbox" name="warningEnabled" />
+        <input type="checkbox" name="warningEnabled" <?php if($row['warningEnabled'] == 'true'){echo 'checked';} ?> />
       </div>
     </div>
     <br>
@@ -312,7 +323,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Karenztage
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="karenztage" />
+        <input type="text" class="form-control" name="karenztage" value="<?php echo $row['karenztage']; ?>" />
       </div>
     </div>
 
@@ -321,7 +332,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Letzte Mahnung am
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="lastWarning" />
+        <input type="text" class="form-control" name="lastWarning" value="<?php echo $row['lastWarning']; ?>" />
       </div>
     </div>
 
@@ -330,7 +341,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Mahnung 1
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="warning1" />
+        <input type="text" class="form-control" name="warning1" value="<?php echo $row['warning1']; ?>" />
       </div>
     </div>
 
@@ -339,7 +350,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Mahnung 2
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="warning2" />
+        <input type="text" class="form-control" name="warning2" value="<?php echo $row['warning2']; ?>" />
       </div>
     </div>
 
@@ -348,34 +359,48 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
         Mahnung 3
       </div>
       <div class="col-xs-9">
-        <input type="text" class="form-control" name="warning3" />
+        <input type="text" class="form-control" name="warning3" value="<?php echo $row['warning3']; ?>" />
       </div>
     </div>
 
     <hr>
+
     <div class="row form-group">
       <div class="col-xs-3">
         Verzugszinsberechnung
       </div>
       <div class="col-xs-9">
-        <input type="checkbox" name="calculateInterest" />
+        <input type="checkbox" name="calculateInterest" <?php if($row['calculateInterest'] == 'true'){echo 'checked';} ?> />
       </div>
     </div>
-
   </div>
 
   <div id="menuContact" class="tab-pane fade">
-    <h3>Notes</h3>
-    infoText VARCHAR(800),
-    createDate DATETIME,
-    parentID INT(6) UNSIGNED,
+    <h3>Bemerkungen</h3>
+    <hr>
+    <table class="table table-hover">
+      <thead>
+        <th>Löschen</th>
+        <th>Datum</th>
+        <th>Info</th>
+      </thead>
+      <tbody>
+        <?php
+        $result = $conn->query("SELECT infoText, createDate FROM $clientDetailNotesTable WHERE parentID = $detailID");
+        while($result && ($row = $result->fetch_assoc())){
+          echo "<tr><td><input type='checkbox' name='deleteNotes[]' /></td>";
+          echo "<td>".$row['createDate']."</td>";
+          echo "<td>".$row['infoText']."</td></tr>";
+        }
+        ?>
+      </tbody>
+    </table>
   </div>
 </div>
-
-
-<?php require "footer.php"; ?>
-
-</div>
-
+<br>
+<hr>
+<br>
+<button type="submit" class="btn btn-warning" disabled >Speichern</button>
+</form>
 
 <?php require "footer.php"; ?>

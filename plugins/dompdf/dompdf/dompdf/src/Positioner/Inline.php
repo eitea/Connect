@@ -21,20 +21,25 @@ use Dompdf\Exception;
 class Inline extends AbstractPositioner
 {
 
+    function __construct(AbstractFrameDecorator $frame)
+    {
+        parent::__construct($frame);
+    }
+
     //........................................................................
 
-    function position(AbstractFrameDecorator $frame)
+    function position()
     {
         /**
          * Find our nearest block level parent and access its lines property.
          * @var BlockFrameDecorator
          */
-        $p = $frame->find_block_parent();
+        $p = $this->_frame->find_block_parent();
 
         // Debugging code:
 
 //     Helpers::pre_r("\nPositioning:");
-//     Helpers::pre_r("Me: " . $frame->get_node()->nodeName . " (" . spl_object_hash($frame->get_node()) . ")");
+//     Helpers::pre_r("Me: " . $this->_frame->get_node()->nodeName . " (" . spl_object_hash($this->_frame->get_node()) . ")");
 //     Helpers::pre_r("Parent: " . $p->get_node()->nodeName . " (" . spl_object_hash($p->get_node()) . ")");
 
         // End debugging
@@ -42,7 +47,7 @@ class Inline extends AbstractPositioner
         if (!$p)
             throw new Exception("No block-level parent found.  Not good.");
 
-        $f = $frame;
+        $f = $this->_frame;
 
         $cb = $f->get_containing_block();
         $line = $p->get_current_line_box();
@@ -56,7 +61,7 @@ class Inline extends AbstractPositioner
             }
         }
 
-        $f = $frame;
+        $f = $this->_frame;
 
         if (!$is_fixed && $f->get_parent() &&
             $f->get_parent() instanceof InlineFrameDecorator &&

@@ -165,13 +165,6 @@ class CPDF implements Canvas
     private $_image_cache;
 
     /**
-     * Currently-applied opacity level (0 - 1)
-     *
-     * @var float
-     */
-    private $_current_opacity = 1;
-
-    /**
      * Class constructor
      *
      * @param mixed $paper The size of paper to use in this PDF ({@link CPDF::$PAPER_SIZES})
@@ -197,8 +190,8 @@ class CPDF implements Canvas
         $this->_pdf = new \Cpdf(
             $size,
             true,
-            $dompdf->getOptions()->getFontCache(),
-            $dompdf->getOptions()->getTempDir()
+            $dompdf->get_option("font_cache"),
+            $dompdf->get_option("temp_dir")
         );
 
         $this->_pdf->addInfo("Producer", sprintf("%s + CPDF", $dompdf->version));
@@ -238,8 +231,8 @@ class CPDF implements Canvas
                 continue;
             }
 
-            if ($this->_dompdf->getOptions()->getDebugPng()) print '[__destruct unlink ' . $img . ']';
-            if (!$this->_dompdf->getOptions()->getDebugKeepTemp()) unlink($img);
+            if ($this->_dompdf->get_option("debugPng")) print '[__destruct unlink ' . $img . ']';
+            if (!$this->_dompdf->get_option("debugKeepTemp")) unlink($img);
         }
     }
 
@@ -428,11 +421,6 @@ class CPDF implements Canvas
     protected function _set_stroke_color($color)
     {
         $this->_pdf->setStrokeColor($color);
-        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
-        if ($this->_current_opacity != 1) {
-            $alpha *= $this->_current_opacity;
-        }
-        $this->_set_line_transparency("Normal", $alpha);
     }
 
     /**
@@ -444,11 +432,6 @@ class CPDF implements Canvas
     protected function _set_fill_color($color)
     {
         $this->_pdf->setColor($color);
-        $alpha = isset($color["alpha"]) ? $color["alpha"] : 1;
-        if ($this->_current_opacity) {
-            $alpha *= $this->_current_opacity;
-        }
-        $this->_set_fill_transparency("Normal", $alpha);
     }
 
     /**
@@ -512,7 +495,6 @@ class CPDF implements Canvas
     {
         $this->_set_line_transparency($mode, $opacity);
         $this->_set_fill_transparency($mode, $opacity);
-        $this->_current_opacity = $opacity;
     }
 
     function set_default_view($view, $options = array())
@@ -578,7 +560,7 @@ class CPDF implements Canvas
         if ($im) {
             imageinterlace($im, false);
 
-            $tmp_dir = $this->_dompdf->getOptions()->getTempDir();
+            $tmp_dir = $this->_dompdf->get_option("temp_dir");
             $tmp_name = tempnam($tmp_dir, "{$type}dompdf_img_");
             @unlink($tmp_name);
             $filename = "$tmp_name.png";
@@ -687,7 +669,7 @@ class CPDF implements Canvas
     {
         list($width, $height, $type) = Helpers::dompdf_getimagesize($img, $this->get_dompdf()->getHttpContext());
 
-        $debug_png = $this->_dompdf->getOptions()->getDebugPng();
+        $debug_png = $this->_dompdf->get_option("debug_png");
 
         if ($debug_png) print "[image:$img|$width|$height|$type]";
 
@@ -724,7 +706,7 @@ class CPDF implements Canvas
     {
         $pdf = $this->_pdf;
 
-        $this->_set_fill_color($color);
+        $pdf->setColor($color);
 
         $font .= ".afm";
         $pdf->selectFont($font);
@@ -823,19 +805,19 @@ class CPDF implements Canvas
     {
         $this->_pdf->selectFont($font);
 
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_dompdf->get_option("font_height_ratio");
         return $this->_pdf->getFontHeight($size) * $ratio;
     }
 
     /*function get_font_x_height($font, $size) {
       $this->_pdf->selectFont($font);
-      $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+      $ratio = $this->_dompdf->get_option("font_height_ratio");
       return $this->_pdf->getFontXHeight($size) * $ratio;
     }*/
 
     function get_font_baseline($font, $size)
     {
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_dompdf->get_option("font_height_ratio");
         return $this->get_font_height($font, $size) / $ratio;
     }
 

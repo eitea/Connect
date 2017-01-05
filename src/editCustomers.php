@@ -40,6 +40,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $sql = "INSERT INTO $projectTable (clientID, name, status, hours)
       SELECT '$id', name, status, hours FROM $companyDefaultProjectTable WHERE companyID = $companyID";
       $conn->query($sql);
+
+      $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
+      $detailID = $conn->insert_id;
+      $conn->query("INSERT INTO $clientDetailNotesTable (parentID) VALUES($detailID)");
+      $conn->query("INSERT INTO $clientDetailBankTable (parentID) VALUES($detailID)");
     }
     echo mysqli_error($conn);
   }

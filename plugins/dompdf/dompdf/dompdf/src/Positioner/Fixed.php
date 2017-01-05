@@ -17,9 +17,15 @@ use Dompdf\FrameDecorator\AbstractFrameDecorator;
 class Fixed extends AbstractPositioner
 {
 
-    function position(AbstractFrameDecorator $frame)
+    function __construct(AbstractFrameDecorator $frame)
+    {
+        parent::__construct($frame);
+    }
+
+    function position()
     {
 
+        $frame = $this->_frame;
         $style = $frame->get_original_style();
         $root = $frame->get_root();
         $initialcb = $root->get_containing_block();
@@ -52,7 +58,7 @@ class Fixed extends AbstractPositioner
                 $y = $margin_top;
                 if (isset($bottom) && $bottom !== "auto") {
                     $y = $initialcb["h"] - $bottom - $margin_bottom;
-                    $margin_height = $frame->get_margin_height();
+                    $margin_height = $this->_frame->get_margin_height();
                     if ($margin_height !== "auto") {
                         $y -= $margin_height;
                     } else {
@@ -69,7 +75,7 @@ class Fixed extends AbstractPositioner
                 $x = $margin_left;
                 if (isset($right) && $right !== "auto") {
                     $x = $initialcb["w"] - $right - $margin_right;
-                    $margin_width = $frame->get_margin_width();
+                    $margin_width = $this->_frame->get_margin_width();
                     if ($margin_width !== "auto") {
                         $x -= $margin_width;
                     } else {

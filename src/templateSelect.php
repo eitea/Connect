@@ -2,14 +2,14 @@
 <?php include 'validate.php'; enableToProject($userID); ?>
 
 <div class="page-header">
-  <h3>Select or Preview a Template</h3>
+  <h3>PDF Templates</h3>
 </div>
 
 <?php
 $templatePreview = "Click on a Template above to preview it, or create a new One.";
 if(isset($_POST['prevTemplate'])){
   $tempelID = intval($_POST['prevTemplate']);
-  $templatePreview = "<iframe src='templatePreview.php?prevTemplate=$tempelID' style='width:100%; border:none;' onload='resizeIframe(this)'></iframe>";
+  $templatePreview = "<iframe src='templatePreview.php?prevTemplate=$tempelID' style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>";
 }
 if(isset($_POST['removeTemplate'])){
   $tempelID = $_POST['removeTemplate'];

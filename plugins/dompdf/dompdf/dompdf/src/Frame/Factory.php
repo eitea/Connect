@@ -15,7 +15,6 @@ use Dompdf\FrameDecorator\AbstractFrameDecorator;
 use DOMXPath;
 use Dompdf\FrameDecorator\Page as PageFrameDecorator;
 use Dompdf\FrameReflower\Page as PageFrameReflower;
-use Dompdf\Positioner\AbstractPositioner;
 
 /**
  * Contains frame decorating logic
@@ -31,13 +30,6 @@ use Dompdf\Positioner\AbstractPositioner;
 class Factory
 {
 
-     /**
-     * Array of positioners for specific frame types
-     *
-     * @var AbstractPositioner[]
-     */
-    protected static $_positioners;
-    
     /**
      * Decorate the root Frame
      *
@@ -213,13 +205,14 @@ class Factory
             $reflower = "Image";
         }
 
+        $positioner = "Dompdf\\Positioner\\$positioner";
         $decorator  = "Dompdf\\FrameDecorator\\$decorator";
         $reflower   = "Dompdf\\FrameReflower\\$reflower";
 
         /** @var AbstractFrameDecorator $deco */
         $deco = new $decorator($frame, $dompdf);
 
-        $deco->set_positioner(self::getPositionerInstance($positioner));
+        $deco->set_positioner(new $positioner($deco));
         $deco->set_reflower(new $reflower($deco, $dompdf->getFontMetrics()));
 
         if ($root) {
@@ -265,20 +258,5 @@ class Factory
         }
 
         return $deco;
-    }
-    
-    /**
-     * Creates Positioners
-     *
-     * @param string $type type of positioner to use
-     * @return AbstractPositioner
-     */
-    protected static function getPositionerInstance($type)
-    {
-        if (!isset(self::$_positioners[$type])) {
-            $class = '\\Dompdf\\Positioner\\'.$type;
-            self::$_positioners[$type] = new $class();
-        }
-        return self::$_positioners[$type];
     }
 }

@@ -430,6 +430,24 @@ if($row['version'] < 40){
   }
 }
 
+if($row['version'] < 41){
+ if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
+   echo "Added Customerdetails for every existing customer. <br>";
+ } else {
+   echo mysqli_error($conn);
+ }
+ if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
+   echo "Added Account Details for every existing customer. <br>";
+ } else {
+   echo mysqli_error($conn);
+ }
+ if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
+   echo "Added Info Details for every existing customer. <br>";
+ } else {
+   echo mysqli_error($conn);
+ }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

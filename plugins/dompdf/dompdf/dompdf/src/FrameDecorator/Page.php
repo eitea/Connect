@@ -497,7 +497,14 @@ class Page extends AbstractFrameDecorator
         // parents of $frame must fit on the page as well:
         $p = $frame->get_parent();
         while ($p) {
-            $max_y += $p->get_style()->computed_bottom_spacing();
+            $style = $p->get_style();
+            $max_y += $style->length_in_pt(
+                array(
+                    $style->margin_bottom,
+                    $style->padding_bottom,
+                    $style->border_bottom_width
+                )
+            );
             $p = $p->get_parent();
         }
 
@@ -635,17 +642,14 @@ class Page extends AbstractFrameDecorator
 
         $y = 0;
 
-        if ($float === "none") {
-            foreach ($this->_floating_frames as $key => $frame) {
-                if ($side === "both" || $frame->get_style()->float === $side) {
-                    $y = max($y, $frame->get_position("y") + $frame->get_margin_height());
-                }
-                $this->remove_floating_frame($key);
-            }
-        }
+        foreach ($this->_floating_frames as $key => $frame) {
+            if ($side === "both" || $frame->get_style()->float === $side) {
+                $y = max($y, $frame->get_position("y") + $frame->get_margin_height());
 
-        if ($y > 0) {
-            $y++; // add 1px buffer from float
+                if ($float !== "none") {
+                    $this->remove_floating_frame($key);
+                }
+            }
         }
 
         return $y;

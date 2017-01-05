@@ -34,7 +34,7 @@ class CanvasFactory
      */
     static function get_instance(Dompdf $dompdf, $paper = null, $orientation = null, $class = null)
     {
-        $backend = strtolower($dompdf->getOptions()->getPdfBackend());
+        $backend = strtolower($dompdf->get_option('pdf_backend'));
 
         if (isset($class) && class_exists($class, false)) {
             $class .= "_Adapter";

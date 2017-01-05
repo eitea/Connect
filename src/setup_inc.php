@@ -96,13 +96,13 @@ if (!$conn->query($sql)) {
 
 
 $sql = "CREATE TABLE $clientTable(
-id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(60) NOT NULL,
-companyID INT(6) UNSIGNED,
-clientNumber VARCHAR(12),
-FOREIGN KEY (companyID) REFERENCES $companyTable(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(60) NOT NULL,
+  companyID INT(6) UNSIGNED,
+  clientNumber VARCHAR(12),
+  FOREIGN KEY (companyID) REFERENCES $companyTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -111,15 +111,15 @@ if (!$conn->query($sql)) {
 
 
 $sql = "CREATE TABLE $projectTable(
-id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-clientID INT(6) UNSIGNED,
-name VARCHAR(60) NOT NULL,
-hours DECIMAL(5,2),
-status VARCHAR(30),
-hourlyPrice DECIMAL(4,2) DEFAULT 0,
-FOREIGN KEY (clientID) REFERENCES $clientTable(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  clientID INT(6) UNSIGNED,
+  name VARCHAR(60) NOT NULL,
+  hours DECIMAL(5,2),
+  status VARCHAR(30),
+  hourlyPrice DECIMAL(4,2) DEFAULT 0,
+  FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -305,15 +305,15 @@ if (!$conn->query($sql)) {
 
 
 $sql = "CREATE TABLE $roleTable(
-userID INT(6) UNSIGNED,
-isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-FOREIGN KEY (userID) REFERENCES $userTable(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE
+  userID INT(6) UNSIGNED,
+  isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  FOREIGN KEY (userID) REFERENCES $userTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -492,44 +492,44 @@ if (!$conn->query($sql)) {
 }
 
 $sql = "CREATE TABLE $clientDetailTable(
-id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-contactType ENUM('person', 'company'),
-gender ENUM('female', 'male'),
-title VARCHAR(30),
-name VARCHAR(45) NOT NULL,
-nameAddition VARCHAR(45),
-address_Street VARCHAR(100),
-address_Country VARCHAR(100),
-phone VARCHAR(20),
-debitNumber INT(10),
-datev INT(10),
-accountName VARCHAR(100),
-taxnumber INT(50),
-taxArea VARCHAR(50),
-customerGroup VARCHAR(50),
-representative VARCHAR(50),
-blockDelivery ENUM('true', 'false') DEFAULT 'false',
-paymentMethod VARCHAR(100),
-shipmentType VARCHAR(100),
-creditLimit DECIMAL(10,2),
-eBill ENUM('true', 'false') DEFAULT 'false',
-lastFaktura DATETIME,
-daysNetto INT(4),
-skonto1 DECIMAL(6,2),
-skonto2 DECIMAL(6,2),
-skonto1Days INT(4),
-skonto2Days INT(4),
-warningEnabled ENUM('true', 'false') DEFAULT 'true',
-karenztage INT(4),
-lastWarning DATETIME,
-warning1 DECIMAL(10,2),
-warning2 DECIMAL(10,2),
-warning3 DECIMAL(10,2),
-calculateInterest ENUM('true', 'false'),
-clientID INT(6) UNSIGNED,
-FOREIGN KEY (clientID) REFERENCES $clientTable(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  contactType ENUM('person', 'company'),
+  gender ENUM('female', 'male'),
+  title VARCHAR(30),
+  name VARCHAR(45) NOT NULL,
+  nameAddition VARCHAR(45),
+  address_Street VARCHAR(100),
+  address_Country VARCHAR(100),
+  phone VARCHAR(20),
+  debitNumber INT(10),
+  datev INT(10),
+  accountName VARCHAR(100),
+  taxnumber INT(50),
+  taxArea VARCHAR(50),
+  customerGroup VARCHAR(50),
+  representative VARCHAR(50),
+  blockDelivery ENUM('true', 'false') DEFAULT 'false',
+  paymentMethod VARCHAR(100),
+  shipmentType VARCHAR(100),
+  creditLimit DECIMAL(10,2),
+  eBill ENUM('true', 'false') DEFAULT 'false',
+  lastFaktura DATETIME,
+  daysNetto INT(4),
+  skonto1 DECIMAL(6,2),
+  skonto2 DECIMAL(6,2),
+  skonto1Days INT(4),
+  skonto2Days INT(4),
+  warningEnabled ENUM('true', 'false') DEFAULT 'true',
+  karenztage INT(4),
+  lastWarning DATETIME,
+  warning1 DECIMAL(10,2),
+  warning2 DECIMAL(10,2),
+  warning3 DECIMAL(10,2),
+  calculateInterest ENUM('true', 'false'),
+  clientID INT(6) UNSIGNED,
+  FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -560,4 +560,4 @@ $sql = "CREATE TABLE $clientDetailBankTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
- ?>
+?>

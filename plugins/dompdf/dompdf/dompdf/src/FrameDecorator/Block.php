@@ -74,17 +74,6 @@ class Block extends AbstractFrameDecorator
     }
 
     /**
-     * @param integer $line_number
-     * @return integer
-     */
-    function set_current_line_number($line_number)
-    {
-        $line_boxes_count = count($this->_line_boxes);
-        $cl = max(min($line_number, $line_boxes_count), 0);
-        return ($this->_cl = $line_number);
-    }
-
-    /**
      * @param integer $i
      */
     function clear_line($i)
@@ -148,9 +137,7 @@ class Block extends AbstractFrameDecorator
 
         $w = $frame->get_margin_width();
 
-        // FIXME: Why? Doesn't quite seem to be the correct thing to do, 
-        // but does appear to be necessary. Hack to handle wrapped white space?
-        if ($w === 0) {
+        if ($w == 0) {
             return;
         }
 
