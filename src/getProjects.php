@@ -833,7 +833,7 @@ function textAreaAdjust(o) {
 
       <div class="col-xs-3">
         <form action="pdfDownload.php" method="post" target='_blank'>
-        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $filterDate. $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
+        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
         <div class="dropup">
         <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Download as PDF

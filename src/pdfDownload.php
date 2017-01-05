@@ -13,12 +13,12 @@ if($result && ($row = $result->fetch_assoc())){
   $html = $row['htmlCode'];
 
   $pos1 = strpos($html, "[REPEAT]");
-  $pos2 = strpos($html, "[REPEAT END]") + 12; //strrchr($html, "[REPEAT END]") + 12;
+  $pos2 = strpos($html, "[REPEAT END]");
 
   $html_head = substr($html, 0, $pos1);
-  $html_foot = substr($html, $pos2);
+  $html_foot = substr($html, $pos2 + 12);
 
-  $repeat = substr($html, $pos1, $pos1 - $pos2);
+  $repeat = substr($html, $pos1 + 12 , $pos2 - $pos1 - 12);
 } else {
   die("Could not fetch template. Please make sure it exists. Contact support for further issues.");
 }
@@ -44,9 +44,7 @@ $filterQuery
 ORDER BY $projectBookingTable.end ASC";
 
 $result = $conn->query($sql);
-if(!$result){
-  echo $sql;
-}
+
 //replace all my findings
 while($result && ($row = $result->fetch_assoc())){
   $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
@@ -68,18 +66,13 @@ while($result && ($row = $result->fetch_assoc())){
 //glue my html back together
 $html = $html_head . $html_foot;
 
-
 //display the pdf
-/*
 require_once "../plugins/dompdf/autoload.php";
 use Dompdf\Dompdf;
 $dompdf = new DOMPDF();
 $dompdf->loadHtml($html);
 $dompdf->render();
 $dompdf->stream("sample.pdf", array("Attachment"=>0));
-*/
-
-
 
 function carryOverAdder_Hours($a, $b) {
   if($a == '0000-00-00 00:00:00'){
