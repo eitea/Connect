@@ -47,7 +47,7 @@
 
               $eOut = $entries[$x]['givenname'][0] . "\n" . $entries[$x]['sn'][0];
 
-              echo "<br><a href=register_optionals.php?gn=" . $entries[$x]['givenname'][0] . "&sn=" . $entries[$x]['sn'][0] . "&mail=" . $entries[$x]['mail'][0] . "> $eOut </a><br>";
+              echo "<br><a href=register_optionals.php?gn=" . $entries[$x]['givenname'][0] . "&sn=" . $entries[$x]['sn'][0] . "> $eOut </a><br>";
 
             }
           }

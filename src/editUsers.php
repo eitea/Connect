@@ -531,8 +531,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
-on Date</a>
-</div-->
-</div>
-<!-- /BODY -->
-<?php include 'footer.php'; ?>

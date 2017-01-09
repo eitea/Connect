@@ -66,7 +66,7 @@ if(isset($_GET['id'])){
   <br>
   <div class="container">
 
-    <div class="col-sm-10" id="droppableDiv">
+    <div class="col-sm-10" id="droppableDiv" style="max-width:780px;">
       <textarea id="firstPage" name="firstPage"><?php echo $templateContent; ?></textarea>
     </div>
 
@@ -95,7 +95,7 @@ tinymce.init({
     'searchreplace visualblocks code fullscreen',
     'insertdatetime media table contextmenu paste code jbimages save'
   ],
-  toolbar: 'undo redo | styleselect | outdent indent | numlist table | jbimages | save',
+  toolbar: 'undo redo | styleselect | outdent indent | bullist table | jbimages | save',
   relative_urls: false,
   content_css: '../plugins/homeMenu/template.css'
 });

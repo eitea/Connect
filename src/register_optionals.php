@@ -23,14 +23,24 @@ $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $emailpostfix = strrchr($row['email'], "@");
 
+if(empty($emailpostfix)){
+  echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+  echo 'Could not split Domain: Please check the email Adress of your admin Account in DB.</div>';
+  die();
+}
+
 if(isset($_POST['create'])){
   $accept = true;
   if(!empty($_POST['entryDate']) && test_Date($_POST['entryDate'] ." 05:00:00")){
     $gender = $_POST['gender'];
     $begin = $_POST['entryDate'] ." 05:00:00";
 
-    if(!empty($_POST['mail'])){
+    if(!empty($_POST['mail']) && filter_var($_POST['mail'].$emailpostfix, FILTER_VALIDATE_EMAIL)){
       $email = test_input($_POST['mail']) .$emailpostfix;
+    } else {
+      $accept = false;
+      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo 'Invalid E-Mail Address.</div>';
     }
 
     if(!empty($_POST['yourPas'])){
