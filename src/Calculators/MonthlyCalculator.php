@@ -50,7 +50,7 @@ class Monthly_Calculator{
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time > '$beginDate' AND time < '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %'";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time >= '$beginDate' AND time <= '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %'";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
           $row = $result->fetch_assoc();

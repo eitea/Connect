@@ -5,76 +5,114 @@
 <div class="page-header">
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
-  <?php
+<?php
 
-  if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
-    foreach($_POST['autoCorrects'] as $indexIM){
-      $sql = "SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
-      $result = $conn->query($sql);
-      $row = $result->fetch_assoc();
+//repair forgotten check outs
+if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
+  foreach($_POST['autoCorrects'] as $indexIM){
+    $sql = "SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
 
-      $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
-      $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
+    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
+    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
 
-      if($row['expectedHours'] > $row['pauseAfterHours']){ //we dont have 2 check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
-        $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
+    if($row['expectedHours'] > $row['pauseAfterHours']){ //we dont have 2 check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
+    }
+
+    $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
+}
+
+//illegal lunchbreaks
+if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
+  for($i=0; $i < count($_POST['lunchbreaks']); $i++){
+    if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i] <= 0 || $_POST['lunchbreaks'][$i] == 0){
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>Invalid setting of new lunchbreak, please try again.';
+      echo '</div>';
+      break;
+    }
+    $breakTime = ($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]) * 60;
+    $indexIM = $_POST['lunchbreakIndeces'][$i];
+    $date = substr($_POST['lunchbreakDate'][$i],0,10);
+
+    $sql = "INSERT INTO $projectBookingTable(timestampID, start, end, infoText, booked)
+    VALUES($indexIM, '$date 08:00:00', DATE_ADD('$date 08:00:00', INTERVAL $breakTime MINUTE), 'Repaired lunchbreak', 'FALSE')";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+
+    $breakTime = test_input($_POST['lunchbreaks'][$i]);
+    $sql = "UPDATE $logTable SET breakCredit = (breakCredit + $breakTime) WHERE indexIM = $indexIM";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
+}
+
+//gemini
+if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
+  foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
+    $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
+}
+
+//double expected hours
+if(isset($_POST['double_expected_delete'])){
+  if(!empty($_POST['double_expected_log'])){
+    foreach($_POST['double_expected_log'] as $id){
+      if(!$conn->query("DELETE FROM $logTable WHERE indexIM = $id")){
+        echo mysqli_error($conn);
       }
-
-      $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
-      $conn->query($sql);
-      echo mysqli_error($conn);
     }
   }
-  if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
-    for($i=0; $i < count($_POST['lunchbreaks']); $i++){
-      if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i] <= 0 || $_POST['lunchbreaks'][$i] == 0){
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Error: </strong>Invalid setting of new lunchbreak, please try again.';
-        echo '</div>';
-        break;
+
+  if(!empty($_POST['double_expected_absentlog'])){
+    foreach($_POST['double_expected_absentlog'] as $id){
+      if(!$conn->query("DELETE FROM $negative_logTable WHERE negative_indexIM = $id")){
+        echo mysqli_error($conn);
       }
-      $breakTime = ($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]) * 60;
-      $indexIM = $_POST['lunchbreakIndeces'][$i];
-      $date = substr($_POST['lunchbreakDate'][$i],0,10);
+    }
+  }
+}
 
-      $sql = "INSERT INTO $projectBookingTable(timestampID, start, end, infoText, booked)
-      VALUES($indexIM, '$date 08:00:00', DATE_ADD('$date 08:00:00', INTERVAL $breakTime MINUTE), 'Repaired lunchbreak', 'FALSE')";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-
-      $breakTime = test_input($_POST['lunchbreaks'][$i]);
-      $sql = "UPDATE $logTable SET breakCredit = (breakCredit + $breakTime) WHERE indexIM = $indexIM";
-      $conn->query($sql);
+//no expected hours
+if(isset($_POST['zero_expected_autocorrect']) && !empty($_POST['zero_expected_dates'])){
+  foreach($_POST['zero_expected_dates'] AS $val){
+    $date = substr($val,0,10);
+    $user = substr($val, 11, strlen($val)-11);
+    $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+    SELECT '$date 23:59:00', userID, mon, tue, wed, thu, fri, sat, sun FROM $bookingTable WHERE userID = $user";
+    if(!$conn->query($sql)){
       echo mysqli_error($conn);
     }
   }
+}
 
-  if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
-    foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
-      $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-    }
-  }
+?>
+
+<!-- -------------------------------------------------------------------------->
+
+<?php
+$sql ="SELECT * FROM $userRequests WHERE status = '0'";
+$result = $conn->query($sql);
+if($result && $result->num_rows > 0):
   ?>
-
+  <h4> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </h4>
 
   <?php
-  $sql ="SELECT * FROM $userRequests WHERE status = '0'";
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0):
-    ?>
-    <h4> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </h4>
+  echo $result->num_rows . " Urlaubsanfrage: ";
+  echo "<a href=allowVacations.php > Beantworten</a><br><hr><br>";
+endif;
+?>
 
-    <?php
-    echo $result->num_rows . " Urlaubsanfrage: ";
-    echo "<a href=allowVacations.php > Beantworten</a><br><hr><br>";
-  endif;
-  ?>
-
-  <!-- -------------------------------------------------------------------------->
-  <form method=post>
+<!-- -------------------------------------------------------------------------->
+<form method="POST">
   <?php
   $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
   WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
@@ -122,6 +160,7 @@
     <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Save</button>
     <br><hr><br>
   <?php endif;?>
+
   <!-- -------------------------------------------------------------------------->
 
   <?php
@@ -132,8 +171,7 @@
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
-  ?>
-
+    ?>
     <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#illegal_timestamp_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
@@ -163,14 +201,13 @@
           echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' ></td>';
           echo '</tr>';
         }
-
         ?>
       </tbody>
     </table>
     <br>
     <button type='submit' class="btn btn-warning" name='autoCorrect'>Autocorrect</button>
     <br><hr><br>
-    <?php endif;  ?>
+  <?php endif;  ?>
 
   <!-- -------------------------------------------------------------------------->
 
@@ -204,7 +241,7 @@
         $rowDP = $result->fetch_assoc();
         $rowDP2 = $result->fetch_assoc();
         $uneven = $rowDP;
-
+        //dis is magic. do not touch
         while(true) {
           //uneven row handling
           $row = $rowDP;
@@ -238,7 +275,6 @@
             $rowDP = $result->fetch_assoc();
           }
         }
-
         ?>
       </tbody>
     </table>
@@ -249,6 +285,138 @@
   endif;
   echo mysqli_error($conn);
   ?>
+  <!-- -------------------------------------------------------------------------->
+  <?php
+  //absentlog fix1 : see if there is an entry in logs AND unlogs
+  $sql = "SELECT $logTable.*, $userTable.firstname, $userTable.lastname, $logTable.time AS logTime, $negative_logTable.time AS unlogTime, negative_indexIM
+  FROM $logTable,$negative_logTable, $userTable
+  WHERE $logTable.userID = $userTable.id
+  AND $logTable.userID = $negative_logTable.userID
+  AND 0 = datediff($logTable.time, $negative_logTable.time)";
+
+  $result = $conn->query($sql);
+  if($result && $result->num_rows > 0):
+    ?>
+
+    <h4>Double Expected Hours:</h4>
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#double_expected_absent_log">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="double_expected_absent_log">
+      <div class="well">
+        Es wurde ein Eintrag in der Abwesenheitstabelle gefunden, der mit einem normalen Zeitstempel kollidiert.<br>
+        D.h. obwohl ein gewöhnlicher Zeitstempel in der DB vorhanden ist, existiert dennoch ein Eintrag für Abwesenheit (ZA). <br>
+        Kann dazu führen, dass in manchen Übersichten zu viele erwartete Stunden gerechnet werden. <br>
+      </div>
+    </div>
+    <table id='illTS' class="table table-hover">
+      <th>User</th>
+      <th><?php echo $lang['TIME']; ?></th>
+      <th>Absentlog - <?php echo $lang['TIMES']; ?></th>
+      <tbody>
+        <?php
+        while($row = $result->fetch_assoc()){
+          echo '<tr>';
+          echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
+          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_log[]" value="'.$row['indexIM'].'"> '. $row['logTime'] . ' - '. $row['timeEnd'] .'</div></td>';
+          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_absentlog[]" value="'.$row['negative_indexIM'].'"> '. $row['unlogTime'] .'</div></td>';
+          echo '</tr>';
+        }
+        ?>
+      </tbody>
+    </table>
+    <br>
+    <button type='submit' class="btn btn-warning" name='double_expected_delete'><?php echo $lang['DELETE']; ?></button>
+    <br><hr><br>
+  <?php endif; echo mysqli_error($conn); ?>
+
+  <!-- -------------------------------------------------------------------------->
+
+  <?php
+  //absentlog fix2 : see if there is an absent log missing.
+  $conn->query("DELETE FROM $logTable WHERE time < '2016-01-01 00:00:00'");
+
+  $missingDates = array();
+  $result_userID = $conn->query("SELECT id FROM $userTable");
+  while($result_userID  && ($row = $result_userID ->fetch_assoc())){
+    $curUser = $row['id'];
+    $sql = "SELECT * FROM (
+      SELECT time, userID FROM $logTable
+      UNION ALL
+      SELECT time, userID FROM $negative_logTable
+    ) AS t1
+    WHERE t1.userID = $curUser
+    ORDER BY t1.time ASC";
+    $result = $conn->query($sql);
+    $arrMyDates = array();
+    while($result && ($A = $result->fetch_assoc())){
+      $arrMyDates[] = substr($A['time'],0,10);
+    }
+
+    $timeFrom = strtotime($arrMyDates[0]);
+    //avoid getting a timestamp (vacation) that lies in future, so tomorrow would be marked as "non existent date"
+    if(timeDiff_Hours(getCurrentTimestamp(), end($arrMyDates)) < 0){
+      $timeTo = strtotime(substr(end($arrMyDates),0,10));
+    } else {
+      $timeTo = strtotime(substr(carryOverAdder_Hours(getCurrentTimestamp(), -24),0,10));
+    }
+
+    $arrDateSpan = array();
+    for ($n = $timeFrom; $n <= $timeTo; $n += 86400){
+      $strDate = date("Y-m-d", $n);
+      array_push($arrDateSpan, $strDate);
+    }
+    $missingDates[$curUser] = array_diff($arrDateSpan, $arrMyDates);
+  }
+
+  if(!empty($missingDates)):
+    ?>
+
+    <script>
+    function toggle(source, target) {
+      checkboxes = document.getElementsByName(target + '[]');
+      for(var i = 0; i<checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+      }
+    }
+    </script>
+    <h4>No Expected Hours:</h4>
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#zero_expected_absent_log" aria-expanded="false" aria-controls="zero_expected_absent_log">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="zero_expected_absent_log">
+      <div class="well">
+        Es wurde weder ein Eintrag in der Abwesenheitstabelle noch ein Zeitstempel gefunden, dadurch fehlen Informationen über erwartete Stunden.<br>
+        Kann dazu führen, dass in manchen Übersichten zu wenig erwartete Stunden gerechnet werden. <br>
+        Die Auswahl erstellt für alle Selektierten Daten einen Abwesenheitseintrag. <br>
+      </div>
+    </div>
+    <table id='illTS' class="table table-hover">
+      <th>User</th>
+      <th><?php echo $lang['TIMES']; ?></th>
+      <th><div class="checkbox"><input type="checkbox" onclick="toggle(this, 'zero_expected_dates')" /> Select</div></th>
+      <tbody>
+        <?php
+        foreach(array_keys($missingDates) as $curUser){
+          foreach($missingDates[$curUser] as $date){
+            echo "<tr><td>$curUser</td>";
+            echo "<td>$date</td>";
+            echo "<td><input type='checkbox' name='zero_expected_dates[]' value='$date $curUser' /></td>";
+            echo '</tr>';
+          }
+        }
+        ?>
+      </tbody>
+    </table>
+    <br>
+    <button type='submit' class="btn btn-warning" name='zero_expected_autocorrect' >Mark as Absent</button>
+    <br><hr><br>
+  <?php endif; echo mysqli_error($conn); ?>
+
   <!-- -------------------------------------------------------------------------->
 </form>
 

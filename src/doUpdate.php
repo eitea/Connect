@@ -9,57 +9,11 @@
 require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
+denyToCloud();
 
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
-  $row = $result->fetch_assoc();
-
-if($row['version'] < 29){
-  $sql = "ALTER TABLE $roleTable ADD COLUMN canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";
-  if($conn->query($sql)){
-    echo "Updated roles - Add user role 1. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $roleTable ADD COLUMN canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
-  if($conn->query($sql)){
-    echo "Updated roles - Add user role 2. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "UPDATE $roleTable INNER JOIN $userTable ON $roleTable.userID = $userTable.id SET canBook = 'TRUE' WHERE enableProjecting = 'TRUE'";
-  if($conn->query($sql)){
-    echo "Copy data to match user role.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-
-  $sql ="ALTER TABLE $userTable DROP COLUMN enableProjecting";
-  if($conn->query($sql)){
-    echo "Drop enableProjecting column <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 30){
-  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN internInfo VARCHAR(500)";
-  if($conn->query($sql)){
-    echo "Expand booking table by internInfo.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 31){
-  $sql = "ALTER TABLE $companyTable ADD COLUMN companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'";
-  if($conn->query($sql)){
-    echo "Expand company table by type.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
+$row = $result->fetch_assoc();
 
 if($row['version'] < 32){
   $sql = "ALTER TABLE $companyTable ADD COLUMN companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'";
@@ -141,33 +95,33 @@ if($row['version'] < 35){
 
   $handle = fopen("../Laender.txt", "r");
   if ($handle) {
-      while (($line = fgets($handle)) !== false) {
-        $line = iconv('windows-1250', 'UTF-8', $line);
-        $thisLineIsNotOK = true;
-        while($thisLineIsNotOK){
-          $data = preg_split('/\s+/', $line);
-          array_pop($data);
-          if(count($data) == 4){
-            $short = test_Input($data[0]);
-            $name = test_Input($data[1]);
-            $dayPay = floatval($data[2]);
-            $nightPay = floatval($data[3]);
-            $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
-            $conn->query($sql);
-            echo mysqli_error($conn);
-            $thisLineIsNotOK = false;
-          } elseif(count($data) > 4) {
-            $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
-          } else {
-            echo 'Nope. <br>';
-            print_r ($data);
-            die();
-          }
+    while (($line = fgets($handle)) !== false) {
+      $line = iconv('windows-1250', 'UTF-8', $line);
+      $thisLineIsNotOK = true;
+      while($thisLineIsNotOK){
+        $data = preg_split('/\s+/', $line);
+        array_pop($data);
+        if(count($data) == 4){
+          $short = test_Input($data[0]);
+          $name = test_Input($data[1]);
+          $dayPay = floatval($data[2]);
+          $nightPay = floatval($data[3]);
+          $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
+          $conn->query($sql);
+          echo mysqli_error($conn);
+          $thisLineIsNotOK = false;
+        } elseif(count($data) > 4) {
+          $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
+        } else {
+          echo 'Nope. <br>';
+          print_r ($data);
+          die();
         }
       }
+    }
     fclose($handle);
   } else {
-      // error opening the file.
+    // error opening the file.
   }
 }
 
@@ -336,48 +290,44 @@ if($row['version'] < 38){
 
 if($row['version'] < 39){
   $sql = "CREATE TABLE $clientDetailTable(
-  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  contactType ENUM('person', 'company'),
-  gender ENUM('female', 'male'),
-  title VARCHAR(30),
-  name VARCHAR(45) NOT NULL,
-  nameAddition VARCHAR(45),
-  address_Street VARCHAR(100),
-  address_Country VARCHAR(100),
-  phone VARCHAR(20),
-
-  debitNumber INT(10),
-  datev INT(10),
-  accountName VARCHAR(100),
-  taxnumber INT(50),
-  taxArea VARCHAR(50),
-  customerGroup VARCHAR(50),
-  representative VARCHAR(50),
-  blockDelivery ENUM('true', 'false') DEFAULT 'false',
-
-  paymentMethod VARCHAR(100),
-  shipmentType VARCHAR(100),
-  creditLimit DECIMAL(10,2),
-  eBill ENUM('true', 'false') DEFAULT 'false',
-  lastFaktura DATETIME,
-
-  daysNetto INT(4),
-  skonto1 DECIMAL(6,2),
-  skonto2 DECIMAL(6,2),
-  skonto1Days INT(4),
-  skonto2Days INT(4),
-  warningEnabled ENUM('true', 'false') DEFAULT 'true',
-  karenztage INT(4),
-  lastWarning DATETIME,
-  warning1 DECIMAL(10,2),
-  warning2 DECIMAL(10,2),
-  warning3 DECIMAL(10,2),
-  calculateInterest ENUM('true', 'false'),
-
-  clientID INT(6) UNSIGNED,
-  FOREIGN KEY (clientID) REFERENCES $clientTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    contactType ENUM('person', 'company'),
+    gender ENUM('female', 'male'),
+    title VARCHAR(30),
+    name VARCHAR(45),
+    nameAddition VARCHAR(45),
+    address_Street VARCHAR(100),
+    address_Country VARCHAR(100),
+    phone VARCHAR(20),
+    debitNumber INT(10),
+    datev INT(10),
+    accountName VARCHAR(100),
+    taxnumber INT(50),
+    taxArea VARCHAR(50),
+    customerGroup VARCHAR(50),
+    representative VARCHAR(50),
+    blockDelivery ENUM('true', 'false') DEFAULT 'false',
+    paymentMethod VARCHAR(100),
+    shipmentType VARCHAR(100),
+    creditLimit DECIMAL(10,2),
+    eBill ENUM('true', 'false') DEFAULT 'false',
+    lastFaktura DATETIME,
+    daysNetto INT(4),
+    skonto1 DECIMAL(6,2),
+    skonto2 DECIMAL(6,2),
+    skonto1Days INT(4),
+    skonto2Days INT(4),
+    warningEnabled ENUM('true', 'false') DEFAULT 'true',
+    karenztage INT(4),
+    lastWarning DATETIME,
+    warning1 DECIMAL(10,2),
+    warning2 DECIMAL(10,2),
+    warning3 DECIMAL(10,2),
+    calculateInterest ENUM('true', 'false'),
+    clientID INT(6) UNSIGNED,
+    FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -431,23 +381,93 @@ if($row['version'] < 40){
 }
 
 if($row['version'] < 41){
- if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
-   echo "Added Customerdetails for every existing customer. <br>";
- } else {
-   echo mysqli_error($conn);
- }
- if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
-   echo "Added Account Details for every existing customer. <br>";
- } else {
-   echo mysqli_error($conn);
- }
- if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
-   echo "Added Info Details for every existing customer. <br>";
- } else {
-   echo mysqli_error($conn);
- }
+  if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
+    echo "Added Customerdetails for every existing customer. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
+    echo "Added Account Details for every existing customer. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
+  if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
+    echo "Added Info Details for every existing customer. <br>";
+  } else {
+    echo mysqli_error($conn);
+  }
 }
 
+if($row['version'] < 42){
+  if($conn->query("ALTER TABLE $userTable MODIFY COLUMN preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER'")){
+    echo "<br> Changed preferred language to default GER";
+  }
+
+  //upsie.
+  $sql = "DROP EVENT daily_logs_event";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Updated Daily log event.";
+  }
+
+  $sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
+  ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENABLE
+  COMMENT 'Log absent sessions at 23:00 daily!'
+  DO
+  INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+  SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
+  FROM $userTable u
+  INNER JOIN $bookingTable ON u.id = $bookingTable.userID
+  WHERE !EXISTS (
+    SELECT * FROM $logTable, $userTable u2
+    WHERE DATE(time) = CURDATE()
+    AND $logTable.userID = u2.id
+    AND u.id = u2.id
+  );";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  // remove all unlogs and logs before entry date
+  $sql = "SELECT * FROM $userTable";
+  $result = $conn->query($sql);
+  while($row = $result->fetch_assoc()){
+    $user = $row['id'];
+    $entryDate = $row['beginningDate'];
+
+    $sql = "DELETE FROM $negative_logTable WHERE userID = $user AND time < '$entryDate'";
+    $conn->query($sql);
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    }
+
+    $sql = "DELETE FROM $logTable WHERE userID = $user AND time <= '$entryDate'";
+    $conn->query($sql);
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    }
+  }
+  echo "<br> Removed all Absent logs before entrance date.";
+  echo "<br> Removed all check ins before entrance date.";
+
+    //fix unlogs for id = 1
+    for($i = '2016-06-01 23:59:00'; substr($i,0, 10) != substr(carryOverAdder_Hours(getCurrentTimestamp(), 24),0, 10); $i = carryOverAdder_Hours($i, 24)){
+      $conn->query("INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+      SELECT '$i', userID, mon, tue, wed, thu, fri, sat, sun
+      FROM $userTable u
+      INNER JOIN $bookingTable ON u.id = $bookingTable.userID
+      WHERE u.id = 1
+      AND !EXISTS (
+        SELECT * FROM $logTable, $userTable u2
+        WHERE DATE(time) = DATE('$i')
+        AND $logTable.userID = u2.id
+        AND u.id = u2.id
+      );");
+      echo mysqli_error($conn);
+    }
+    echo "<br> Repaired absent log for admin.";
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

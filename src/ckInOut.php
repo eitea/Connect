@@ -51,8 +51,7 @@ function checkOut($userID) {
   $sql = "SELECT * FROM $userTable
   WHERE $userTable.id = $userID
   AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
-  AND hoursOfrest > $breakCredit
-  ";
+  AND hoursOfrest > $breakCredit";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){

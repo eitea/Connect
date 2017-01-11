@@ -212,8 +212,7 @@ INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
 SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
 FROM $userTable u
 INNER JOIN $bookingTable ON u.id = $bookingTable.userID
-WHERE u.id != 1
-AND !EXISTS (
+WHERE !EXISTS (
   SELECT * FROM $logTable, $userTable u2
   WHERE DATE(time) = CURDATE()
   AND $logTable.userID = u2.id
@@ -496,7 +495,7 @@ $sql = "CREATE TABLE $clientDetailTable(
   contactType ENUM('person', 'company'),
   gender ENUM('female', 'male'),
   title VARCHAR(30),
-  name VARCHAR(45) NOT NULL,
+  name VARCHAR(45),
   nameAddition VARCHAR(45),
   address_Street VARCHAR(100),
   address_Country VARCHAR(100),
