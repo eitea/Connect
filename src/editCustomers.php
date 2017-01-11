@@ -32,21 +32,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   } elseif(isset($_POST['create']) && !empty($_POST['name']) && $_POST['createCompany'] != 0){
     $name = test_input($_POST['name']);
-    $companyID = $_POST['createCompany'];
+    $companyID = intval($_POST['createCompany']);
 
     $sql = "INSERT INTO $clientTable (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
-    if($conn->query($sql)){
+    if($conn->query($sql)){//if ok, give him default projects
       $id = $conn->insert_id;
       $sql = "INSERT INTO $projectTable (clientID, name, status, hours)
       SELECT '$id', name, status, hours FROM $companyDefaultProjectTable WHERE companyID = $companyID";
       $conn->query($sql);
 
+      //and his details
       $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
+        echo mysqli_error($conn);
       $detailID = $conn->insert_id;
       $conn->query("INSERT INTO $clientDetailNotesTable (parentID) VALUES($detailID)");
+        echo mysqli_error($conn);
       $conn->query("INSERT INTO $clientDetailBankTable (parentID) VALUES($detailID)");
+        echo mysqli_error($conn);
+    } else {
+      echo mysqli_error($conn);
     }
-    echo mysqli_error($conn);
   }
 }
 ?>

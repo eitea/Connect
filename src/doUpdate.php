@@ -15,30 +15,6 @@ $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
 $row = $result->fetch_assoc();
 
-if($row['version'] < 32){
-  $sql = "ALTER TABLE $companyTable ADD COLUMN companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'";
-  if($conn->query($sql)){
-    echo "Expand company table by type.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 33){
-  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00'";
-  if($conn->query($sql)){
-    echo "Expand booking table by correction date-start.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00'";
-  if($conn->query($sql)){
-    echo "Expand booking table by correction date-end.<br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
 if($row['version'] < 34){
   $sql = "ALTER TABLE $projectBookingTable ADD COLUMN bookingType ENUM('project', 'break', 'drive')";
   if($conn->query($sql)){
@@ -380,24 +356,6 @@ if($row['version'] < 40){
   }
 }
 
-if($row['version'] < 41){
-  if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
-    echo "Added Customerdetails for every existing customer. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
-    echo "Added Account Details for every existing customer. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-  if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
-    echo "Added Info Details for every existing customer. <br>";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
 if($row['version'] < 42){
   if($conn->query("ALTER TABLE $userTable MODIFY COLUMN preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER'")){
     echo "<br> Changed preferred language to default GER";
@@ -467,6 +425,34 @@ if($row['version'] < 42){
       echo mysqli_error($conn);
     }
     echo "<br> Repaired absent log for admin.";
+}
+
+if($row['version'] < 43){
+  $conn->query("ALTER TABLE $clientDetailTable MODIFY COLUMN name VARCHAR(45)");
+  echo mysqli_error($conn);
+
+  $conn->query("DELETE FROM $clientDetailTable");
+  $conn->query("DELETE FROM $clientDetailBankTable");
+  $conn->query("DELETE FROM $clientDetailNotesTable");
+
+  echo mysqli_error($conn);
+  echo "Cleared detail Table";
+
+  if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
+    echo "<br>Re-Added Customerdetails for every existing customer.";
+  } else {
+    echo mysqli_error($conn);
+  }
+  if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
+    echo "<br>Re-Added Account Details for every existing customer.";
+  } else {
+    echo mysqli_error($conn);
+  }
+  if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
+    echo "<br>Re-Added Info Details for every existing customer.";
+  } else {
+    echo mysqli_error($conn);
+  }
 }
 
 //------------------------------------------------------------------------------
