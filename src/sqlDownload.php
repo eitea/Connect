@@ -1,4 +1,12 @@
 <?php
+session_start();
+if(empty($_SESSION['userid'])){
+  die('Please <a href="login.php">login</a> first.');
+}
+$userID = $_SESSION['userid'];
+include 'validate.php';
+denyToCloud();
+enableToCore($userID);
 require_once 'connection_config.php';
 
 //ENTER THE RELEVANT INFO BELOW
