@@ -323,6 +323,7 @@ $(document).ready(function() {
                                 </ul>
                               </div>
                             </li>
+                            <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><i class="fa fa-database"></i> <span> DB Backup</span></a></li>
 
                           </ul>
                         </div>
@@ -334,6 +335,8 @@ $(document).ready(function() {
                       echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
                     } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php"){
                       echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+                    } elseif($this_page == "sqlDownload.php") {
+                      echo "<script>documkent.getElementById('adminOption_CORE').click();</script>";
                     }
                     ?>
 
