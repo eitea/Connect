@@ -92,10 +92,12 @@ if (isset($_POST['filterStatus'])) {
         $timeStart = $_POST['timesFrom'][$i] .':00';
         $timeFin = $_POST['timesTo'][$i] .':00';
 
+        $newBreakVal = floatval($_POST['newBreakValues'][$i]);
+
         if($timeFin != '0000-00-00 00:00:00'){
-          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $imm";
+          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal' WHERE indexIM = $imm";
         } else {
-          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin' WHERE indexIM = $imm";
+          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin', breakCredit = '$newBreakVal' WHERE indexIM = $imm";
         }
 
         $conn->query($sql);
@@ -240,7 +242,7 @@ if (isset($_POST['filterStatus'])) {
               echo "<td>" . $lang_activityToString[$row['status']] . "</td>";
 
               echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "' /></td>";
-              echo "<td class='text-center'>" . $row['breakCredit'] . "</td>";
+              echo "<td><div style='display:inline-block;text-align:center'><input type='number' step='any' class='form-control input-sm' name='newBreakValues[]' value='" . $row['breakCredit']. "' style='width:70px' /></div></td>";
               echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo[]' value='" . substr($B,0,-3) . "' /></td>";
 
               echo "<td>" . $row['expectedHours'] . "</td>";
