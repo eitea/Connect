@@ -19,7 +19,7 @@
     if($result && $result->num_rows > 0){
       while($row = $result->fetch_assoc()){
         echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
-        echo '<td>'. substr($row['time'], 11, 5) . '</td></tr>';
+        echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
       }
     } else {
       echo mysqli_error($conn);
