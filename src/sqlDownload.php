@@ -7,7 +7,8 @@ $userID = $_SESSION['userid'];
 include 'validate.php';
 denyToCloud();
 enableToCore($userID);
-require_once 'connection_config.php';
+
+require 'connection_config.php';
 
 //ENTER THE RELEVANT INFO BELOW
 $mysqlUserName      = $username;
