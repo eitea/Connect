@@ -106,6 +106,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $conn->query($sql);
     }
 
+    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])) {
+      $vacDaysPerYear = $_POST['daysPerYear'.$x];
+      $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDaysPerYear' WHERE userID = '$x';";
+      $conn->query($sql);
+    }
+
     if (isset($_POST['vacDaysCredit'.$x]) && is_numeric($_POST['vacDaysCredit'.$x])) {
       $vacDaysCredit = $_POST['vacDaysCredit'.$x];
       $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$x';";
@@ -350,7 +356,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
-                  <input type="number" class="form-control" name="vacDays<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
+                  <input type="number" class="form-control" name="daysPerYear<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['AMOUNT_VACATION_DAYS']; ?>: <br>
