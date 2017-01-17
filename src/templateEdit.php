@@ -88,7 +88,7 @@ if(isset($_GET['id'])){
 <script>
 tinymce.init({
   selector: 'textarea',
-  height: 400,
+  height: 1000,
   menubar: false,
   plugins: [
     'advlist autolink lists link image charmap print preview anchor',

@@ -36,6 +36,7 @@ $(document).ready(function() {
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = FALSE;
   $canBook = $canStamp = FALSE;
   $this_page = basename($_SERVER['PHP_SELF']);
+  $setActiveLink = 'style="color:#ed9c21;"';
 
   require "connection.php";
   require "createTimestamps.php";
@@ -53,6 +54,29 @@ $(document).ready(function() {
     $canStamp = $row['canStamp'];
   }
 
+  $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
+  $row = $result->fetch_assoc();
+  $showReadyPlan = $row['enableReadyCheck'];
+
+  if($isTimeAdmin){
+    $numberOfAlerts = 0;
+
+    $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
+    if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'");
+    if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) > 12 OR (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) < 0");
+    if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+    if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable,$negative_logTable, $userTable WHERE $logTable.userID = $userTable.id AND $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
+    if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+
+  }
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       $password = $_POST['password'];
@@ -126,7 +150,7 @@ $(document).ready(function() {
   }
 ?>
 
-  <!-- /navbar -->
+  <!-- navbar -->
   <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -148,6 +172,7 @@ $(document).ready(function() {
         </ul>
 
         <div class="navbar-right" style="margin-right:10px">
+          <?php if($isTimeAdmin): ?> <span class="badge" style="margin-left:20px;background-color:#ed9c21;"><a href="adminToDos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors by clicking this link. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
           <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
           <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
@@ -158,7 +183,6 @@ $(document).ready(function() {
   </nav>
   <!-- /navbar -->
 
-  <!-- collapse -->
   <div class="collapse" id="collapseExample">
     <div class="well">
       <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT; ?>
@@ -193,8 +217,8 @@ $(document).ready(function() {
           <div class="modal-body">
             PIN-Code: <br>
             <input type="number" class="form-control" name="pinCode" > <br><br>
-
           </div>
+
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-info" name="savePIN">Save PIN</button>
@@ -206,11 +230,7 @@ $(document).ready(function() {
     <!-- /modal -->
   </form>
 
-  <?php
-  $setActiveLink = 'style="color:#ed9c21;"';
-  ?>
-
-  <!-- menubar -->
+  <!-- side menu -->
   <div class="row affix-row">
     <div class="col-sm-3 col-md-2 affix-sidebar">
       <div class="sidebar-nav">
@@ -277,15 +297,14 @@ $(document).ready(function() {
                 <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
                 <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
                 <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
+                <?php if($showReadyPlan): ?><li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li><?php endif; ?>
               <?php endif; ?>
 
               <!-- User-Section: BOOKING -->
 
               <?php if($canStamp == 'TRUE' && $canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-
                 <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i>
                   <span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-
                 <?php endif; ?>
 
                 <!-- Section One: CORE -->
@@ -304,7 +323,6 @@ $(document).ready(function() {
                                 <ul class="nav nav-list">
                                   <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
                                   <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
-                                  <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li>
                                   <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
                                 </ul>
                               </div>
@@ -323,20 +341,24 @@ $(document).ready(function() {
                                 </ul>
                               </div>
                             </li>
-                            <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><i class="fa fa-database"></i> <span> DB Backup</span></a></li>
-
+                            <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank">
+                              <i class="fa fa-database"></i> <span> DB Backup</span>
+                            </a></li>
+                            <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php">
+                              <i class="fa fa-clone"></i> <span> PDF Templates</span>
+                            </a></li>
                           </ul>
                         </div>
                       </li>
                     <?php endif; ?>
 
                     <?php
-                    if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "readyPlan.php" || $this_page == "deactivatedUsers.php"){
+                    if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
                       echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
                     } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php"){
                       echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-                    } elseif($this_page == "sqlDownload.php") {
-                      echo "<script>documkent.getElementById('adminOption_CORE').click();</script>";
+                    } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
+                      echo "<script>document.getElementById('adminOption_CORE').click();</script>";
                     }
                     ?>
 
@@ -383,16 +405,13 @@ $(document).ready(function() {
                               <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="editProjects.php"><i class="fa fa-tags"></i>
                                 <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
                               </a></li>
-                              <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"><i class="fa fa-clone"></i>
-                                <span>PDF Templates</span>
-                              </a></li>
                             </ul>
                           </div>
                         </li>
                       <?php endif; ?>
 
                       <?php
-                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php" || $this_page == "templateSelect.php"){
+                      if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
                         echo "<script>document.getElementById('adminOption_PROJECT').click();</script>";
                       }
                       ?>

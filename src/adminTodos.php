@@ -336,12 +336,11 @@ endif;
 
   <?php
   //absentlog fix2 : see if there is an absent log missing.
-  $conn->query("DELETE FROM $logTable WHERE time < '2016-01-01 00:00:00'");
-
   $missingDates = array();
   $result_userID = $conn->query("SELECT id FROM $userTable");
-  while($result_userID  && ($row = $result_userID ->fetch_assoc())){
+  while($result_userID  && ($row = $result_userID ->fetch_assoc())){ //for each user
     $curUser = $row['id'];
+    //select all of that users logs and unlogs. all of them.
     $sql = "SELECT * FROM (
       SELECT time, userID FROM $logTable
       UNION ALL
@@ -351,10 +350,11 @@ endif;
     ORDER BY t1.time ASC";
     $result = $conn->query($sql);
     $arrMyDates = array();
-    while($result && ($A = $result->fetch_assoc())){
+    while($result && ($A = $result->fetch_assoc())){ //for each of his logs ans absentlogs -> save date in array
       $arrMyDates[] = substr($A['time'],0,10);
     }
 
+    //get first date and latest date
     $timeFrom = strtotime($arrMyDates[0]);
     //avoid getting a timestamp (vacation) that lies in future, so tomorrow would be marked as "non existent date"
     if(timeDiff_Hours(getCurrentTimestamp(), end($arrMyDates)) < 0){
@@ -363,15 +363,17 @@ endif;
       $timeTo = strtotime(substr(carryOverAdder_Hours(getCurrentTimestamp(), -24),0,10));
     }
 
+    //check which dates are NOT in the array
     $arrDateSpan = array();
-    for ($n = $timeFrom; $n <= $timeTo; $n += 86400){
+    for ($n = $timeFrom; $n <= $timeTo; $n += 86400){ //for each date that does NOT exist, save into final array
       $strDate = date("Y-m-d", $n);
       array_push($arrDateSpan, $strDate);
     }
     $missingDates[$curUser] = array_diff($arrDateSpan, $arrMyDates);
-  }
+  } //end while
 
-  if(!empty($missingDates)):
+//if this array contains values, some dates are missing.
+  if($missingDates):
     ?>
 
     <script>

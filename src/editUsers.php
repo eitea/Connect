@@ -100,31 +100,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '</div>';
     }
 
-    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))) {
+    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
       $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
       $sql = "UPDATE $userTable SET overTimeLump= '$overTimeAll' WHERE id = '$x';";
       $conn->query($sql);
     }
 
-    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])) {
+    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
       $vacDaysPerYear = $_POST['daysPerYear'.$x];
       $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDaysPerYear' WHERE userID = '$x';";
       $conn->query($sql);
     }
 
-    if (isset($_POST['vacDaysCredit'.$x]) && is_numeric($_POST['vacDaysCredit'.$x])) {
+    if (isset($_POST['vacDaysCredit'.$x]) && is_numeric($_POST['vacDaysCredit'.$x])){
       $vacDaysCredit = $_POST['vacDaysCredit'.$x];
       $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$x';";
       $conn->query($sql);
     }
 
-    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])) {
+    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
       $pauseAfter = $_POST['pauseAfter'.$x];
       $sql = "UPDATE $userTable SET pauseAfterHours= '$pauseAfter' WHERE id = '$x';";
       $conn->query($sql);
     }
 
-    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])) {
+    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
       $rest = $_POST['rest'.$x];
       $sql = "UPDATE $userTable SET hoursOfRest= '$rest' WHERE id = '$x';";
       $conn->query($sql);

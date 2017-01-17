@@ -1,7 +1,17 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; ?>
 <!-- BODY -->
+<?php
+$result = $conn->query("SELECT enableReadyCheck FROM $configTable");
+$row = $result->fetch_assoc();
 
+$isAdmin = $conn->query("SELECT * FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
+
+if(!$row['enableReadyCheck'] && !$isAdmin){
+  die("Access restricted, only a CORE Admin can view this page and enable it for others.");
+}
+
+ ?>
 <div class="page-header">
   <h3><?php echo $lang['READY_STATUS']; ?></h3>
 </div>
