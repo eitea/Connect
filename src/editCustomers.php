@@ -43,12 +43,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
       //and his details
       $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
-        echo mysqli_error($conn);
-      $detailID = $conn->insert_id;
-      $conn->query("INSERT INTO $clientDetailNotesTable (parentID) VALUES($detailID)");
-        echo mysqli_error($conn);
-      $conn->query("INSERT INTO $clientDetailBankTable (parentID) VALUES($detailID)");
-        echo mysqli_error($conn);
+      echo mysqli_error($conn);
     } else {
       echo mysqli_error($conn);
     }

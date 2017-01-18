@@ -172,7 +172,7 @@ $(document).ready(function() {
         </ul>
 
         <div class="navbar-right" style="margin-right:10px">
-          <?php if($isTimeAdmin): ?> <span class="badge" style="margin-left:20px;background-color:#ed9c21;"><a href="adminToDos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors by clicking this link. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+          <?php if($isTimeAdmin && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminToDos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
           <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
           <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>

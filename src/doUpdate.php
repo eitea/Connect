@@ -409,22 +409,22 @@ if($row['version'] < 42){
   echo "<br> Removed all Absent logs before entrance date.";
   echo "<br> Removed all check ins before entrance date.";
 
-    //fix unlogs for id = 1
-    for($i = '2016-06-01 23:59:00'; substr($i,0, 10) != substr(carryOverAdder_Hours(getCurrentTimestamp(), 24),0, 10); $i = carryOverAdder_Hours($i, 24)){
-      $conn->query("INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-      SELECT '$i', userID, mon, tue, wed, thu, fri, sat, sun
-      FROM $userTable u
-      INNER JOIN $bookingTable ON u.id = $bookingTable.userID
-      WHERE u.id = 1
-      AND !EXISTS (
-        SELECT * FROM $logTable, $userTable u2
-        WHERE DATE(time) = DATE('$i')
-        AND $logTable.userID = u2.id
-        AND u.id = u2.id
-      );");
-      echo mysqli_error($conn);
-    }
-    echo "<br> Repaired absent log for admin.";
+  //fix unlogs for id = 1
+  for($i = '2016-06-01 23:59:00'; substr($i,0, 10) != substr(carryOverAdder_Hours(getCurrentTimestamp(), 24),0, 10); $i = carryOverAdder_Hours($i, 24)){
+    $conn->query("INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+    SELECT '$i', userID, mon, tue, wed, thu, fri, sat, sun
+    FROM $userTable u
+    INNER JOIN $bookingTable ON u.id = $bookingTable.userID
+    WHERE u.id = 1
+    AND !EXISTS (
+      SELECT * FROM $logTable, $userTable u2
+      WHERE DATE(time) = DATE('$i')
+      AND $logTable.userID = u2.id
+      AND u.id = u2.id
+    );");
+    echo mysqli_error($conn);
+  }
+  echo "<br> Repaired absent log for admin.";
 }
 
 if($row['version'] < 43){
@@ -461,6 +461,12 @@ if($row['version'] < 44){
   } else {
     echo mysqli_error($conn);
   }
+}
+
+if($row['version'] < 45){
+  $conn->query("DELETE FROM $clientDetailNotesTable");
+  $conn->query("DELETE FROM $clientDetailBankTable");
+  echo "<br>Starting Process for short table cleanup.......  Process completed.<br>";
 }
 
 //------------------------------------------------------------------------------
