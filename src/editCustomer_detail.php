@@ -25,6 +25,8 @@ if($result && ($row = $result->fetch_assoc())){
 $activeTab = 'home';
 
 if(isset($_POST['saveAll'])){
+  $activeTab = $_POST['saveAll'];
+
   if(isset($_POST['contactType'])){
     $val = $_POST['contactType'];
     $conn->query("UPDATE $clientDetailTable SET contactType = '$val' WHERE id = $detailID");
@@ -237,8 +239,8 @@ $rowBank = $result->fetch_assoc();
 
 <form method="post">
   <div class="tab-content">
-    <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
 
+    <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
       <div class="row radio">
         <div class="col-xs-8">
           <h3>Allgemeine Informationen</h3>
@@ -265,7 +267,6 @@ $rowBank = $result->fetch_assoc();
           </div>
         </div>
         <br>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Title
@@ -274,7 +275,6 @@ $rowBank = $result->fetch_assoc();
             <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" />
           </div>
         </div>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Name
@@ -283,7 +283,6 @@ $rowBank = $result->fetch_assoc();
             <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
           </div>
         </div>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Addition/Zusatz
@@ -292,7 +291,6 @@ $rowBank = $result->fetch_assoc();
             <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
           </div>
         </div>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Straße
@@ -301,7 +299,6 @@ $rowBank = $result->fetch_assoc();
             <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
           </div>
         </div>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Land/PLZ/Ort
@@ -310,7 +307,6 @@ $rowBank = $result->fetch_assoc();
             <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
           </div>
         </div>
-
         <div class="row form-group">
           <div class="col-xs-3">
             Handy
@@ -320,6 +316,9 @@ $rowBank = $result->fetch_assoc();
           </div>
         </div>
       </div>
+
+      <br><hr><br>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="home">Speichern</button>
     </div>
 
     <div id="menuTaxes" class="tab-pane fade <?php if($activeTab == 'taxes'){echo 'in active';}?>">
@@ -350,7 +349,6 @@ $rowBank = $result->fetch_assoc();
           <input type="number" class="form-control" name="datev" value="<?php echo $row['datev']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Kontobezeichnung
@@ -359,9 +357,7 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="accountName" value="<?php echo $row['accountName']; ?>" />
         </div>
       </div>
-
       <hr>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Steuernummer
@@ -370,7 +366,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="taxnumber" value="<?php echo $row['taxnumber']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Steuergebiet
@@ -379,7 +374,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="taxArea" value="<?php echo $row['taxArea']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Kundengruppe
@@ -388,7 +382,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="customerGroup" value="<?php echo $row['customerGroup']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Vertreter
@@ -397,6 +390,8 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="representative" value="<?php echo $row['representative']; ?>" />
         </div>
       </div>
+      <br><hr><br>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="taxes">Speichern</button>
     </div>
 
     <div id="menuBank" class="tab-pane fade <?php if($activeTab == 'banking'){echo 'in active';}?>">
@@ -431,7 +426,6 @@ $rowBank = $result->fetch_assoc();
           <input type="number" step="any" class="form-control" name="creditLimit" value="<?php echo $row['creditLimit']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Letzte Faktura Buchung
@@ -440,7 +434,6 @@ $rowBank = $result->fetch_assoc();
           <input type="datetime-local" class="form-control" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Zahlungsweise
@@ -449,7 +442,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Versandart
@@ -458,7 +450,10 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="shipmentType" value="<?php echo $row['shipmentType']; ?>" />
         </div>
       </div>
+      <br><hr><br>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="billing">Speichern</button>
     </div>
+
 
     <div id="menuPayment" class="tab-pane fade <?php if($activeTab == 'payment'){echo 'in active';}?>">
       <h3>Zahlungsdaten</h3>
@@ -471,7 +466,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Skonto 1
@@ -489,7 +483,6 @@ $rowBank = $result->fetch_assoc();
           Tagen
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Skonto 2
@@ -507,9 +500,7 @@ $rowBank = $result->fetch_assoc();
           Tagen
         </div>
       </div>
-
       <hr>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Mahnungen erlaubt
@@ -527,7 +518,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="karenztage" value="<?php echo $row['karenztage']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Letzte Mahnung am
@@ -536,7 +526,6 @@ $rowBank = $result->fetch_assoc();
           <input type="datetime-local" class="form-control" name="lastWarning" value="<?php echo $row['lastWarning']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Mahnung 1
@@ -545,7 +534,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="warning1" value="<?php echo $row['warning1']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Mahnung 2
@@ -554,7 +542,6 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="warning2" value="<?php echo $row['warning2']; ?>" />
         </div>
       </div>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Mahnung 3
@@ -563,9 +550,7 @@ $rowBank = $result->fetch_assoc();
           <input type="text" class="form-control" name="warning3" value="<?php echo $row['warning3']; ?>" />
         </div>
       </div>
-
       <hr>
-
       <div class="row form-group">
         <div class="col-xs-3">
           Verzugszinsberechnung
@@ -574,6 +559,8 @@ $rowBank = $result->fetch_assoc();
           <input type="checkbox" name="calculateInterest" <?php if($row['calculateInterest'] == 'true'){echo 'checked';} ?> />
         </div>
       </div>
+      <br><hr><br>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="payment">Speichern</button>
     </div>
 
     <div id="menuContact" class="tab-pane fade <?php if($activeTab == 'notes'){echo 'in active';}?>">
@@ -605,9 +592,7 @@ $rowBank = $result->fetch_assoc();
       </div>
 
     </div>
-  </div>
-  <br><hr><br>
-  <button type="submit" class="btn btn-warning" name="saveAll">Speichern</button>
+  </div><br><br>
 </form>
 
 <?php require "footer.php"; ?>
