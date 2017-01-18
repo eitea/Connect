@@ -88,6 +88,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <th style="width:10%;"> Delete </th>
           <th>Name </th>
           <th><?php echo $lang['NUMBER']; ?></th>
+          <th>View projects</th>
         </tr>
       </thead>
       <tbody>
@@ -102,6 +103,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo "<td><input type='checkbox' $checked name='index[]' value= $i></td>";
           echo "<td><a href='editCustomer_detail.php?custID=$i'>" .$row['name'] ."</a></td>";
           echo "<td>" .$row['clientNumber']."</td>";
+          echo "<td><a href='editProjects.php?custID=$i'><i class='fa fa-arrow-right'></i></a></td>";
           echo '</tr>';
         }
         ?>

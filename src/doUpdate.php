@@ -443,16 +443,6 @@ if($row['version'] < 43){
   } else {
     echo mysqli_error($conn);
   }
-  if($conn->query("INSERT INTO $clientDetailBankTable (parentID) SELECT id FROM $clientDetailTable")){
-    echo "<br>Re-Added Account Details for every existing customer.";
-  } else {
-    echo mysqli_error($conn);
-  }
-  if($conn->query("INSERT INTO $clientDetailNotesTable (parentID) SELECT id FROM $clientDetailTable")){
-    echo "<br>Re-Added Info Details for every existing customer.";
-  } else {
-    echo mysqli_error($conn);
-  }
 }
 
 if($row['version'] < 44){

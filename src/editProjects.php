@@ -13,6 +13,11 @@ $filterClient = 0;
 
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = test_input($_GET['custID']);
+
+  $result = $conn->query("SELECT companyID FROM $clientTable WHERE id = $filterClient");
+  $row = $result->fetch_assoc();
+  $filterCompany = $row['companyID'];
+
 } else {
   $filterClient = 0;
 }
