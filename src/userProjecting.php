@@ -1,11 +1,6 @@
 <?php include 'header.php'; ?>
 <?php include 'validate.php'; enableToBookings($userID);?>
 
-
-<div class="page-header">
-  <h3><?php echo $lang['BOOK_PROJECTS']; ?></h3>
-</div>
-
 <?php
 $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
 $result = mysqli_query($conn, $sql);
@@ -17,7 +12,13 @@ if ($result && $result->num_rows > 0) {
 } else {
   redirect("home.php");
 }
+?>
 
+<div class="page-header">
+  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
+</div>
+
+<?php
 $showUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
 
@@ -88,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <th></th>
             <th>Start</th>
             <th><?php echo $lang['END']; ?></th>
-            <th><?php echo $lang['DATE']; ?></th>
             <th><?php echo $lang['CLIENT']; ?></th>
             <th><?php echo $lang['PROJECT']; ?></th>
             <th>Info</th>
@@ -125,7 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               echo "<td><i class='$icon'></i></td>";
               echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
               echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
-              echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10) ."</td>";
               echo "<td>". $row['name'] ."</td>";
               echo "<td>". $row['projectName'] ."</td>";
               echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
@@ -174,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
   function textAreaAdjust(o) {
-    o.style.height = "1px";
+    o.style.height = "90px";
     o.style.height = (o.scrollHeight)+"px";
   }
 
@@ -270,19 +269,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <div class="row">
     <div class="col-md-8">
-      <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."><?php echo $insertInfoText; ?></textarea><br>
+      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
     </div>
     <div class="col-md-4">
-      <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"><?php echo $insertInternInfoText; ?></textarea><br>
+      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
-        <input type="time" class="form-control" readonly onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($start,0,5); ?>" >
+        <input type="time" class="form-control" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>" onkeydown='if (event.keyCode == 13) return false;' name="end">
+        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>">
         <div class="input-group-btn">
           <button class="btn btn-warning" type="submit"  name="add"> + </button>
         </div>

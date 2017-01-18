@@ -226,7 +226,7 @@ if (!$conn->query($sql)) {
 $sql = "CREATE TABLE $configTable(
   bookingTimeBuffer INT(3) DEFAULT '5',
   cooldownTimer INT(3) DEFAULT '2',
-  enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

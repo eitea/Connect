@@ -456,7 +456,7 @@ if($row['version'] < 43){
 }
 
 if($row['version'] < 44){
-  if($conn->query("ALTER TABLE $configTable ADD COLUMN enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'")){
+  if($conn->query("ALTER TABLE $configTable ADD COLUMN enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'")){
     echo "<br>Added enable/disable Value for Ready Check.";
   } else {
     echo mysqli_error($conn);

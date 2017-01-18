@@ -605,7 +605,7 @@ function textAreaAdjust(o) {
         } else {
           echo "<td><select style='display:none' name='projectIDs[]'><option selected value='NULL'></option> - </td>";
         }
-        echo "<td><textarea style='resize: none;' name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
+        echo "<td><textarea style='resize:none;' name='infoTextArea[]' class='form-control input-sm' onkeyup='textAreaAdjust(this);'>" .$row['infoText']. "</textarea></td>";
 
         $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
         $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
