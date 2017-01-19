@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID);?>
+<?php include 'validate.php'; enableToTime($userID);?>
 <!-- BODY -->
 <title>TODOs</title>
 <div class="page-header">
