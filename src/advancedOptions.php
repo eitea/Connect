@@ -42,6 +42,8 @@
     }
     $sql = "UPDATE $configTable SET enableReadyCheck = '$status'";
     $conn->query($sql);
+
+    redirect("advancedOptions.php");
   }
 
 

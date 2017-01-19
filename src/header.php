@@ -180,7 +180,7 @@ $(document).ready(function() {
         </div>
       </div>
     </div> <!-- /container -->
-  </nav>  
+  </nav>
   <!-- /navbar -->
 
   <div class="collapse" id="collapseExample">
@@ -297,7 +297,7 @@ $(document).ready(function() {
                 <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
                 <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
                 <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
-                <?php if($showReadyPlan): ?><li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><?php echo $lang['READY_STATUS']; ?></a></li><?php endif; ?>
+                <?php if($showReadyPlan == 'TRUE'): ?><li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li><?php endif; ?>
               <?php endif; ?>
 
               <!-- User-Section: BOOKING -->
@@ -345,7 +345,7 @@ $(document).ready(function() {
                               <i class="fa fa-database"></i> <span> DB Backup</span>
                             </a></li>
                             <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php">
-                              <i class="fa fa-clone"></i> <span> PDF Templates</span>
+                              <i class="fa fa-file-pdf-o"></i> <span> Pdf Templates</span>
                             </a></li>
                           </ul>
                         </div>

@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToProject($userID); ?>
+<?php include 'validate.php'; enableToCore($userID); ?>
 
 <script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
@@ -33,6 +33,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("UPDATE $pdfTemplateTable SET name = '$templateName', htmlCode = '$templateContent' WHERE id = $templateID");
     } else { //or create a new one
       $conn->query("INSERT INTO $pdfTemplateTable (name, htmlCode) VALUES('$templateName', '$templateContent')");
+      $templateID = $conn->insert_id;
+      redirect("templateEdit.php?id=$templateID");
     }
   } else {
     echo '<div class="alert alert-danger fade in">';

@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToProject($userID); ?>
+<?php include 'validate.php'; enableToCore($userID); ?>
 
 <div class="page-header">
   <h3>PDF Templates</h3>
@@ -19,9 +19,8 @@ if(isset($_POST['removeTemplate'])){
 <form method="POST">
 <table class="table table-hover">
   <thead>
-    <th>Select</th>
+    <th style="width:40%">Options</th>
     <th>Name</th>
-    <th>Options</th>
   </thead>
   <tbody>
     <?php
@@ -29,11 +28,13 @@ if(isset($_POST['removeTemplate'])){
     while($result && ($row = $result->fetch_assoc())){
       $templID = $row['id'];
       echo '<tr>';
-      echo "<td><input type='checkbox'  /></td>";
+      echo '<td>';
+      echo "<button type='submit' class='btn btn-default' name='removeTemplate' value='$templID' title='Delete'><i class='fa fa-trash-o'></i></button> ";
+      echo "<a href='templateDownload.php?id=$templID' target='_blank' class='btn btn-default' title='Export'><i class='fa fa-download'></i></a> ";
+      echo "<a href='templateEdit.php?id=$templID' class='btn btn-default' title='Edit'><i class='fa fa-pencil'></i></a> ";
+      echo "<button type='submit' value='$templID' name='prevTemplate' class='btn btn-default' title='Preview'> <i class='fa fa-search'></i></button> ";
+      echo '</td>';
       echo "<td>" . $row['name'] . "</td>";
-      echo "<td><button type='submit' value='$templID' name='prevTemplate' class='btn btn-warning'>Preview</button> ";
-      echo " <button type='submit' class='btn btn-danger' name='removeTemplate' value='$templID'>Delete</button>";
-      echo " <a href='templateEdit.php?id=$templID' class='btn btn-primary' >Edit</a>";
       echo '</tr>';
     }
     ?>
@@ -41,8 +42,30 @@ if(isset($_POST['removeTemplate'])){
 </table>
 </form>
 
-<br><br><br><a href="templateEdit.php" class="btn btn-warning">Create a new Template</a><br>
-<br><br><br><hr><h4 style="color:grey; font-weight:bold;">Preview:</h4><hr>
+<br><br><br>
+<div class="row">
+  <div  class="col-md-6">
+    <div class="collapse" id="importTemplate">
+        <form action="templateUpload.php" method="post" enctype="multipart/form-data">
+          <div class="col-md-8">
+            <input type="file" name="fileToUpload" id="fileToUpload">
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-warning" name="templateUpload">Upload</button>
+          </div>
+        </form>
+    </div>
+  </div>
+  <div class="col-md-6 text-right">
+    <a href="templateEdit.php" class="btn btn-warning">Create a new Template</a>
+    <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#importTemplate" aria-expanded="false" aria-controls="collapseExample">
+      <i class='fa fa-upload'></i> <i class="fa fa-caret-down"></i>
+    </button>
+  </div>
+</div>
+<br><br><br>
+
+<hr><h4 style="color:grey; font-weight:bold;">Preview:</h4><hr>
 
 <div class="container text-center">
   <?php  echo $templatePreview;  ?>

@@ -5,3 +5,5 @@ comprehensive icon sets or copy and paste your own.
 Please. Check it out.
 
 -Dave Gandy
+
+4.7.0
