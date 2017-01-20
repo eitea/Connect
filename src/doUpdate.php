@@ -459,6 +459,22 @@ if($row['version'] < 45){
   echo "<br>Starting Process for short table cleanup.......  Process completed.<br>";
 }
 
+if($row['version'] < 46){
+  $conn->query("CREATE TABLE $moduleTable (
+    enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+  )");
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "Created module enable/disable function";
+  }
+  $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

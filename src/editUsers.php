@@ -175,17 +175,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['password'.$x]) && !empty($_POST['passwordConfirm'.$x])) {
       $password = $_POST['password'.$x];
       $passwordConfirm = $_POST['passwordConfirm'.$x];
-      if (strcmp($password, $passwordConfirm) == 0) {
+      if (strcmp($password, $passwordConfirm) == 0  && match_passwordpolicy($password)) {
         $psw = password_hash($password, PASSWORD_BCRYPT);
         $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$x';";
         $conn->query($sql);
       } else {
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Did not change Passwords! </strong>Passwords did not match.';
+        echo '<strong>Could not change Passwords! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
         echo '</div>';
       }
     }
+
     if (isset($_POST['company'.$x])){
       $sql = "SELECT * FROM $companyTable";
       $result = $conn->query($sql);

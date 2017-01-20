@@ -81,7 +81,7 @@ $(document).ready(function() {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
-      if (strcmp($password, $passwordConfirm) == 0) {
+      if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password)) {
         $psw = password_hash($password, PASSWORD_BCRYPT);
         $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$userID';";
         $conn->query($sql);
@@ -92,7 +92,7 @@ $(document).ready(function() {
       } else {
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Failed! </strong>Passwords did not match.';
+        echo '<strong>Failed! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
         echo '</div>';
       }
     }

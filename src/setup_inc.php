@@ -1,4 +1,11 @@
 <?php
+/* SETTING UP A NEW TABLE:
+1. Create your table name as variable in connection_vars.php
+3. Put your CREATE TABLE statement in setup_inc.php
+4. increment the version number in version_number.php by 1.
+5. for the new version number, put another if into the doUpdate.php, so your changes will be carried over to all existing databases.
+6. relog into T-Time with an admin account.
+*/
 require_once "connection_vars.php";
 
 $sql = "CREATE TABLE $userTable (
@@ -373,8 +380,6 @@ $sql = "CREATE TABLE $deactivatedUserTable (
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact usertab";
 }
 
 $sql = "CREATE TABLE $deactivatedUserLogs (
@@ -392,8 +397,6 @@ $sql = "CREATE TABLE $deactivatedUserLogs (
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact userlogs";
 }
 
 $sql = "CREATE TABLE $deactivatedUserUnLogs(
@@ -413,10 +416,7 @@ $sql = "CREATE TABLE $deactivatedUserUnLogs(
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact unlogs";
 }
-
 
 $sql = "CREATE TABLE $deactivatedUserDataTable(
   userID INT(6) UNSIGNED,
@@ -435,10 +435,7 @@ $sql = "CREATE TABLE $deactivatedUserDataTable(
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact datatable";
 }
-
 
 $sql = "CREATE TABLE $deactivatedUserProjects (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -461,8 +458,6 @@ $sql = "CREATE TABLE $deactivatedUserProjects (
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact projectbookings";
 }
 
 $sql = "CREATE TABLE $deactivatedUserTravels(
@@ -487,8 +482,6 @@ $sql = "CREATE TABLE $deactivatedUserTravels(
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
-} else {
-  echo "created deact travellogs";
 }
 
 $sql = "CREATE TABLE $clientDetailTable(
@@ -547,6 +540,7 @@ $sql = "CREATE TABLE $clientDetailNotesTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 $sql = "CREATE TABLE $clientDetailBankTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   bic VARCHAR(20),
@@ -560,4 +554,14 @@ $sql = "CREATE TABLE $clientDetailBankTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
+$conn->query("CREATE TABLE $moduleTable (
+  enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+)");
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
+}
+
+
 ?>

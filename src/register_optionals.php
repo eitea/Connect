@@ -43,13 +43,13 @@ if(isset($_POST['create'])){
       echo 'Invalid E-Mail Address.</div>';
     }
 
-    if(!empty($_POST['yourPas'])){
+    if(!empty($_POST['yourPas']) && match_passwordpolicy($_POST['yourPas'])){
       $pass = test_input($_POST['yourPas']);
     } else {
       $accept = false;
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Failed: </strong>Missing Password.';
+      echo '<strong>Failed: </strong>Invalid Password. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
       echo '</div>';
     }
 

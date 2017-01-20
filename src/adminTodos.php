@@ -369,10 +369,13 @@ endif;
       $strDate = date("Y-m-d", $n);
       array_push($arrDateSpan, $strDate);
     }
-    $missingDates[$curUser] = array_diff($arrDateSpan, $arrMyDates);
+    $value = array_diff($arrDateSpan, $arrMyDates);
+    if (!empty($value)) {
+      $missingDates[$curUser] = $value;
+    }
   } //end while
 
-//if this array contains values, some dates are missing.
+
   if($missingDates):
     ?>
 

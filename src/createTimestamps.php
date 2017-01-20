@@ -23,7 +23,7 @@ function carryOverAdder_Hours($a, $b) {
     $date->sub(new DateInterval("PT".$b."H"));
   } else {
     $date->add(new DateInterval("PT".$b."H"));
-}
+  }
   return $date->format('Y-m-d H:i:s');
 }
 
@@ -37,7 +37,7 @@ function carryOverAdder_Minutes($a, $b) {
     $date->sub(new DateInterval("PT".$b."M"));
   } else {
     $date->add(new DateInterval("PT".$b."M"));
-}
+  }
   return $date->format('Y-m-d H:i:s');
 }
 
@@ -76,6 +76,16 @@ function redirect($url){
   }
 }
 
+/*see if password matches policy and if not, returns error message.
+* has to contain at least 8 characters
+* at least one capital letter and one number
+*/
+function match_passwordpolicy($p){
+  if(strlen($p) < 8 || !preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
+    return false;
+  }
+  return true;
+}
 
 /*
 echo $test=strtotime('2016-02-3 05:44:21');

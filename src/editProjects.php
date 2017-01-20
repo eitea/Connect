@@ -10,10 +10,8 @@
 $filterCompany = 0;
 $filterClient = 0;
 
-
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = test_input($_GET['custID']);
-
   $result = $conn->query("SELECT companyID FROM $clientTable WHERE id = $filterClient");
   $row = $result->fetch_assoc();
   $filterCompany = $row['companyID'];
@@ -115,6 +113,9 @@ function showClients(company, client){
       <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' >
       </select>
       <button type="submit" class="btn btn-warning btn-sm" name="filter">Filter</button><br><br>
+    </div>
+    <div class="col-md-6 text-right">
+      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-info">Return <i class="fa fa-arrow-right"></i></a>
     </div>
   </div>
 
