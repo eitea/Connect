@@ -41,7 +41,7 @@ echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
 require "setup_inc.php"; //creates all tables
 
-//define
+//define rest of necessary variables so setup_ins.php works:
 $holidayFile = '../Feiertage.txt';
 $travellingFile = fopen("../Laender.txt", "r");
 require_once "version_number.php";

@@ -1,4 +1,20 @@
 <?php
+/*
+NECESSARY VARIABLES BEFORE INCLUDING THIS:
+$firstname
+$lastname
+$loginname
+$psw
+
+include version_number.php
+
+$companyName
+$companyType
+$holidayFile
+$travellingFile
+
+** SEE SETUP.PHP FOR MORE INFORMATION **
+*/
 //insert first core user
 $sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 $conn->query($sql);
