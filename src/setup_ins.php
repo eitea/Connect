@@ -30,8 +30,6 @@ $conn->query($sql);
 $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
 $conn->query($sql);
 
-
-
 //insert holidays
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
@@ -40,7 +38,7 @@ for($i = 1; $i < count($holidayFile); $i++){
     $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 23:59:59";
     $n = $holidayFile[$i]['SUMMARY'];
 
-    $sql = "INSERT INTO $holidayFiledayTable(begin, end, name) VALUES ('$start', '$end', '$n');";
+    $sql = "INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');";
     if (!$conn->query($sql)) {
       echo mysqli_error($conn);
     }

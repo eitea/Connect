@@ -1,4 +1,4 @@
-0	Österreich	26,40	15,00
+0	Ã–sterreich	26,40	15,00
 AFG	Afghanistan	31,80	27,70
 AL	Albanien	27,90	20,90
 ANG	Angola	43,60	41,40
@@ -15,7 +15,7 @@ BIH	Bosnien-Herzegowina	31,00	23,30
 BOL	Bolivien	26,60	25,10
 BR	Brasilien	33,10	36,40
 BRN	Bahrain	54,10	37,50
-BRS	Brüssel	41,40	32,00
+BRS	BrÃ¼ssel	41,40	32,00
 BRU	Brunei	33,10	42,10
 BS	Bahamas	48,00	30,50
 BU	Burundi	37,90	37,90
@@ -25,7 +25,7 @@ CAM	Kamerun	45,80	25,30
 CDN	Kanada	41,00	34,20
 CH	Schweiz	36,80	32,70
 CH-GR	Schweiz-Grenzorte	30,70	18,10
-CI	Côte d'Ivoire	39,20	32,00
+CI	Cote dIvoire	39,20	32,00
 CL	Sri Lanka	31,80	32,70
 CO	Kolumbien	33,10	35,10
 CR	Costa Rica	31,80	31,80
@@ -36,7 +36,7 @@ CZ-GR	Tschechien-Grenzorte	27,90	15,90
 D	Deutschland	35,30	27,90
 D-GR	Deutschland-Grenzorte	30,70	18,10
 DJI	Dschibuti	45,80	47,30
-DK	Dänemark	41,40	41,40
+DK	Denmark	41,40	41,40
 DOM	Dominikanische Republik	39,20	43,60
 DRCB	Kongo, Demokr. Republik	47,30	33,10
 DROK	Korea, Demokr. Volksrepublik	32,50	32,50
@@ -49,13 +49,13 @@ EAU	Uganda	41,40	32,00
 EC	Ecuador	26,60	21,60
 ES	El Salvador	31,80	26,20
 EST	Estland	36,80	31,00
-ET	Ägypten	37,90	41,40
-ETH	Äthiopien	37,90	41,40
+ET	Ã„gypten	37,90	41,40
+ETH	Ã„thiopien	37,90	41,40
 F	Frankreich	32,70	24,00
 FIN	Finnland	41,40	41,40
 FL	Liechtenstein	30,70	18,10
 G	Gabun	45,80	39,90
-GB	Großbritannien	36,80	36,40
+GB	GroÃŸbritannien	36,80	36,40
 GCA	Guatemala	31,80	31,80
 GE	Georgien	36,80	31,00
 GH	Ghana	43,60	30,10
@@ -107,7 +107,7 @@ NEP	Nepal	31,80	34,20
 NIC	Nicaragua	31,80	36,40
 NIRL	Nordirland	36,80	36,40
 NL	Niederlande	35,30	27,90
-NLA	Niederländische Antillen	43,60	27,70
+NLA	Niederlï¿½ndische Antillen	43,60	27,70
 NY	New York	65,40	51,00
 NZ	Neuseeland	32,50	36,40
 OM	Oman	54,10	37,50
@@ -131,16 +131,16 @@ RL	Libanon	31,80	35,10
 RM	Madagaskar	36,40	36,40
 RMM	Mali	39,20	31,20
 RN	Niger	39,20	21,10
-RO	Rumänien	36,80	27,30
+RO	Rumï¿½nien	36,80	27,30
 ROK	Korea, Republik	45,30	32,50
 ROM	Rom	40,60	36,40
 ROU	Uruguay	33,10	25,10
 RP	Philippinen	32,50	32,50
 RT	Togo	36,20	26,60
-RUS	Russische Föderation	36,80	31,00
+RUS	Russische Fï¿½deration	36,80	31,00
 RWA	Ruanda	37,90	37,90
 S	Schweden	42,90	41,40
-SA	Südafrika	34,90	34,00
+SA	Sï¿½dafrika	34,90	34,00
 SGP	Singapur	43,60	44,70
 SK	Slowakei	27,90	15,90
 SLO	Slowenien	31,00	23,30
@@ -148,7 +148,7 @@ SLO-GR	Slowenien-Grenzorte	27,90	15,90
 SME	Suriname	39,20	25,10
 SN	Senegal	49,30	31,20
 SP	Somalia	32,70	29,00
-STRB	Straßburg	35,80	32,70
+STRB	Straï¿½burg	35,80	32,70
 SUD	Sudan	43,60	41,40
 SY	Seychellen	36,40	36,40
 SYR	Syrien	32,70	29,00
@@ -157,7 +157,7 @@ THA	Thailand	39,20	42,10
 TJ	Tadschikistan	36,80	31,00
 TM	Turkmenistan	36,80	31,00
 TN	Tunesien	36,20	29,20
-TR	Türkei	31,00	36,40
+TR	Tï¿½rkei	31,00	36,40
 TT	Trinidad und Tobago	51,00	43,60
 TW	Taiwan	39,20	37,50
 UA	Ukraine	36,80	31,00

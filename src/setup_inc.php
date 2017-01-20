@@ -555,10 +555,10 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$conn->query("CREATE TABLE $moduleTable (
+$sql = "CREATE TABLE $moduleTable (
   enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-)");
+)";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
