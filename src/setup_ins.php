@@ -15,6 +15,8 @@ $travellingFile
 
 ** SEE SETUP.PHP FOR MORE INFORMATION **
 */
+
+//dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
 //insert first core user
 $sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 $conn->query($sql);

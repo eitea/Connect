@@ -6,6 +6,8 @@
 5. for the new version number, put another if into the doUpdate.php, so your changes will be carried over to all existing databases.
 6. relog into T-Time with an admin account.
 */
+
+//dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
 require_once "connection_vars.php";
 
 $sql = "CREATE TABLE $userTable (
