@@ -46,7 +46,7 @@ require "setup_inc.php"; //creates all tables
 $holidayFile = '../Feiertage.txt';
 $travellingFile = fopen("../Laender.txt", "r");
 
-require "setup_ins.php" //makes all necessary inserts
+require "setup_ins.php"; //makes all necessary inserts
 
 //------------------------------------------------------------------------------
 
