@@ -34,7 +34,6 @@ function test_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
-  $data = $conn->real_escape_string($data);
   return $data;
 }
 
@@ -45,7 +44,7 @@ require "setup_inc.php"; //creates all tables
 //define
 $holidayFile = '../Feiertage.txt';
 $travellingFile = fopen("../Laender.txt", "r");
-
+require_once "version_number.php";
 require "setup_ins.php"; //makes all necessary inserts
 
 //------------------------------------------------------------------------------

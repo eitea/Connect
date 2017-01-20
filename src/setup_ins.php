@@ -15,7 +15,6 @@ $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin
 $conn->query($sql);
 
 //insert ldap config
-require_once "../T-Time/src/version_number.php";
 $sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
 $conn->query($sql);
 
