@@ -21,16 +21,21 @@ $filterUserID = 0;
 
 $filterAddBreaks = $filterAddDrives = "checked";
 
-//careful stairs
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['filterYear'])){
     $filterDate = $_POST['filterYear'];
-    if(!empty($_POST['filterMonth'])){
-      $filterDate .= '-' . $_POST['filterMonth'];
-      if(!empty($_POST['filterDay'])){
-        $filterDate .= '-' . $_POST['filterDay'];
-      }
-    }
+  } else {
+    $filterDate = '____';
+  }
+  if(!empty($_POST['filterMonth'])){
+    $filterDate .= '-' . $_POST['filterMonth'];
+  } else {
+      $filterDate .= '-' . '__';
+  }
+  if(!empty($_POST['filterDay'])){
+    $filterDate .= '-' . $_POST['filterDay'];
+  } else {
+    $filterDate .= '-' . '__';
   }
 
   if(isset($_POST['filterCompany'])){
@@ -305,8 +310,9 @@ function textAreaAdjust(o) {
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
         <select style='width:200px' class="js-example-basic-single" name="filterYear">
+          <option value=""> --- </option>
           <?php
-          for($i = substr($filterDate,0,4)-5; $i < substr($filterDate,0,4)+5; $i++){
+          for($i = 2015; $i < 2025; $i++){
             $selected = ($i == substr($filterDate,0,4))?'selected':'';
             echo "<option $selected value=$i>$i</option>";
           }
@@ -314,7 +320,7 @@ function textAreaAdjust(o) {
         </select>
         <br><br>
         <select style='width:200px' class="js-example-basic-single" name="filterMonth">
-          <option value="">-</option>
+          <option value=""> --- </option>
           <?php
           for($i = 1; $i < 13; $i++) {
             $selected= '';
@@ -329,7 +335,7 @@ function textAreaAdjust(o) {
         </select>
         <br><br>
         <select style='width:200px' class="js-example-basic-single" name="filterDay">
-          <option value="">Day..</option>
+          <option value=""> --- </option>
           <?php
           for($i = 1; $i < 32; $i++){
             $selected= '';
@@ -395,16 +401,12 @@ function textAreaAdjust(o) {
   <?php endif; ?>
 
   <script>
-  function toggle(source) {
-    checkboxes = document.getElementsByName('checkingIndeces[]');
+  function toggle(checkId, uncheckId) {
+    checkboxes = document.getElementsByName(checkId + '[]');
+    checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
     for(var i = 0; i<checkboxes.length; i++) {
-      checkboxes[i].checked = source.checked;
-    }
-  }
-  function toggle2(source) {
-    checkboxes = document.getElementsByName('noCheckCheckingIndeces[]');
-    for(var i = 0; i<checkboxes.length; i++) {
-      checkboxes[i].checked = source.checked;
+      checkboxes[i].checked = true;
+      checkboxesUncheck[i].checked = false;
     }
   }
 
@@ -453,7 +455,7 @@ function textAreaAdjust(o) {
   <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
   <th><?php echo $lang['MINUTES']; ?></th>
   <th>0.25h</th>
-  <th><input type="checkbox" onClick="toggle(this)"> <?php echo $lang['CHARGED']; ?> <br> <input type="checkbox" onClick="toggle2(this)" > <?php echo $lang['NOT_CHARGEABLE']; ?></th>
+  <th><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?> <br> <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></th>
   <th>Intern</th>
   <th>Detail</th>
   </tr>
@@ -724,7 +726,7 @@ function textAreaAdjust(o) {
   <br><br>
 
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
-  <?php if($filterUserID != 0 && isset($_POST['filterDay'])): ?>
+  <?php if($filterUserID != 0 && !empty($_POST['filterDay']) && !empty($_POST['filterMonth'])&& !empty($_POST['filterYear'])): ?>
 
   <div style='text-align:right;'><button type='submit' class="btn btn-primary" name='undo'>Remove last entry</button></div>
 
@@ -810,7 +812,7 @@ function textAreaAdjust(o) {
     </div>
     </div>
     <?php else: ?>
-    <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day and user (<a href="getTimestamps.php">Check-in required</a>).</div>
+    <div class="alert alert-info" role="alert"><strong>Adding Disabled - </strong>You can only add entries on specifying day (exact year and month) and user (<a href="getTimestamps.php">Timestamp required</a>).</div>
     <?php endif; ?>
 
     <!-- END ADD-BOOKING FIELD -->
