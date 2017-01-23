@@ -248,6 +248,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $mon=$tue=$wed=$thu=$fri=$sat=$sun=0;
   $firstname=$lastname=$email=$gender=$vacDays=$overTimeAll = $vacDaysCredit = $pauseAfter = $rest = $begin = $passErr= $coreTime = "";
 
+  //enable/disable modules
+  $result = $conn->query("SELECT * FROM $moduleTable");
+  $moduleEnableRow = $result->fetch_assoc();
+
+  $moduleTime =  $moduleProject = '';
+
+  //timemodule will momentarily always be active, since projectm requires timem
+  if($moduleEnableRow['enableProject'] == 'FALSE'){
+    $moduleProject = 'disabled';
+  }
+
+
   $query = "SELECT *, $userTable.id AS userID
   FROM $userTable INNER JOIN $bookingTable ON $userTable.id = $bookingTable.userID
   INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID
@@ -383,13 +395,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   Module: <br>
                   <div class="checkbox">
                     <label>
-                      <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?><br>
-                    </label>
+                      <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
+                    </label><br>
                     <label>
-                      <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?><br>
-                    </label>
+                      <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
+                    </label><br>
                     <label>
-                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><br>
+                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?>><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                     </label>
                   </div>
                 </div>
@@ -401,7 +413,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label>
                     <br>
                     <label>
-                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_BOOK']; ?>
+                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> ?>><?php echo $lang['CAN_BOOK']; ?>
                     </label>
                   </div>
                 </div>

@@ -693,7 +693,6 @@ function textAreaAdjust(o) {
         $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['projectBookingID'];
         $conn->query($sql);
       }
-
     } else {
       echo mysqli_error($conn);
     }

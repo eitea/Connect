@@ -29,9 +29,9 @@ if(isset($_POST['removeTemplate'])){
       $templID = $row['id'];
       echo '<tr>';
       echo '<td>';
-      echo "<button type='submit' class='btn btn-default' name='removeTemplate' value='$templID' title='Delete'><i class='fa fa-trash-o'></i></button> ";
-      echo "<a href='templateDownload.php?id=$templID' target='_blank' class='btn btn-default' title='Export'><i class='fa fa-download'></i></a> ";
-      echo "<a href='templateEdit.php?id=$templID' class='btn btn-default' title='Edit'><i class='fa fa-pencil'></i></a> ";
+      echo "<button type='submit' class='btn btn-default' name='removeTemplate' value='$templID' title='Delete'> <i class='fa fa-trash-o'></i></button> ";
+      echo "<a href='templateDownload.php?id=$templID' target='_blank' class='btn btn-default' title='Export'> <i class='fa fa-download'></i></a> ";
+      echo "<a href='templateEdit.php?id=$templID' class='btn btn-default' title='Edit'> <i class='fa fa-pencil'></i></a> ";
       echo "<button type='submit' value='$templID' name='prevTemplate' class='btn btn-default' title='Preview'> <i class='fa fa-search'></i></button> ";
       echo '</td>';
       echo "<td>" . $row['name'] . "</td>";
