@@ -93,11 +93,12 @@ $('form').preventDoubleSubmission();
     $result = $conn->query("SELECT COUNT(*) FROM $logTable,$negative_logTable, $userTable WHERE $logTable.userID = $userTable.id AND $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   }
-  
+
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
+      $output = '';
       if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)) {
         $psw = password_hash($password, PASSWORD_BCRYPT);
         $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$userID';";

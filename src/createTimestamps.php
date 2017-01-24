@@ -81,7 +81,8 @@ function redirect($url){
 * has to contain at least 8 characters
 * at least one capital letter and one number
 */
-function match_passwordpolicy($p, $out = ''){
+function match_passwordpolicy($p, &$out = ''){
+  require "connection.php";
   $result = $conn->query("SELECT * FROM $policyTable");
   $row = $result->fetch_assoc();
 
