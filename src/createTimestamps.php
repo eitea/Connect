@@ -76,13 +76,31 @@ function redirect($url){
   }
 }
 
-/*see if password matches policy and if not, returns error message.
+/*see if password matches policy, returns true or false.
+* writes error message in optional output
 * has to contain at least 8 characters
 * at least one capital letter and one number
 */
-function match_passwordpolicy($p){
-  if(strlen($p) < 8 || !preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
+function match_passwordpolicy($p, $out = ''){
+  $result = $conn->query("SELECT * FROM $policyTable");
+  $row = $result->fetch_assoc();
+
+  if(strlen($p) < $row['passwordLength']){
+    $out = "Password must be at least " . $row['passwordLength'] . " Characters long.";
     return false;
+  }
+  if($row['complexity'] === '0'){ //whatever
+    return true;
+  } elseif($row['complexity'] === '1'){
+    if(!preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
+      $out = "Password must contain at least one captial letter and one number";
+      return false;
+    }
+  } elseif($row['complexity'] === '2'){
+    if(!preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p) || !preg_match('/[~\!@#\$%&\*_\-\+\.\?]/', $p)){
+      $out = "Password must contain at least one captial letter, one number and one special character (~ ! @ # $ % & * _ - + . ?)";
+      return false;
+    }
   }
   return true;
 }

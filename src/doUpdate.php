@@ -473,6 +473,30 @@ if($row['version'] < 46){
   echo mysqli_error($conn);
 }
 
+if($row['version'] < 47){
+  $sql = "CREATE TABLE $policyTable (
+    passwordLength INT(2) DEFAULT 0,
+    complexity ENUM('0', '1', '2') DEFAULT '0',
+    expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    expirationDuration INT(3),
+    expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
+    )";
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    } else {
+      echo "<br> Created Passwordpolicy table";
+    }
+
+    $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+    echo mysqli_error($conn);
+
+    $sql = "ALTER TABLE $userTable ADD COLUMN lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP";
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    } else {
+      echo "<br> Added expiration Date to PSW";
+    }
+}
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

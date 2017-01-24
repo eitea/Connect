@@ -32,6 +32,7 @@ $pdfTemplateTable = "templateData";
 $projectTable = "projectData"; //each customer can have projects
 $projectBookingTable = "projectBookingData"; //bookings made for each project
 $piConnTable = "piConnectionData"; //contains connection data for the raspberry pi terminal
+$policyTable = "policyData";
 
 $userTable = "UserData"; //users
 $userRequests = "userRequestsData"; //user requests for vacation

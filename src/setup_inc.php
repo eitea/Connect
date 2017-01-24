@@ -15,6 +15,7 @@ $sql = "CREATE TABLE $userTable (
   firstname VARCHAR(30) NOT NULL,
   lastname VARCHAR(30) NOT NULL,
   psw VARCHAR(60) NOT NULL,
+  lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP,
   terminalPin INT(8) DEFAULT 4321,
   sid VARCHAR(50),
   email VARCHAR(50) UNIQUE NOT NULL,

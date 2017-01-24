@@ -92,13 +92,13 @@ $('form').preventDoubleSubmission();
 
     $result = $conn->query("SELECT COUNT(*) FROM $logTable,$negative_logTable, $userTable WHERE $logTable.userID = $userTable.id AND $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
-
   }
+  
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
-      if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password)) {
+      if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)) {
         $psw = password_hash($password, PASSWORD_BCRYPT);
         $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$userID';";
         $conn->query($sql);
@@ -109,7 +109,7 @@ $('form').preventDoubleSubmission();
       } else {
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Failed! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
+        echo "<strong>Failed! </strong>Passwords did not match or were invalid. $output";
         echo '</div>';
       }
     }
@@ -273,12 +273,12 @@ $('form').preventDoubleSubmission();
                     $row = $result->fetch_assoc();
                     $now = getCurrentTimestamp();
                     $indexIM = $row['indexIM'];
-                    if(timeDiff_Hours($row['time'],$now)  > $cd/60){ //he either has waited long enough
+                    if(timeDiff_Hours($row['time'],$now) > $cd/60){ //he either has waited long enough
                       $sql = "SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM AND projectID IS NULL ORDER BY end DESC"; //but what if he just came from a break
                       $result = mysqli_query($conn, $sql);
                       if ($result && $result->num_rows > 0) { //he did a break
                         $row = $result->fetch_assoc();
-                        if(timeDiff_Hours($row['end'],$now)  > $cd/60){ //and that break was NOT recently
+                        if(timeDiff_Hours($row['end'],$now) > $cd/60){ //and that break was NOT recently
                           $disabled = '';
                         } else { //but if it was just recently:
                           $disabled = 'disabled';
@@ -354,6 +354,7 @@ $('form').preventDoubleSubmission();
                                       <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
                                       <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
                                       <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                                      <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span>Password Options</span></a></li>
                                       <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                                     </ul>
                                   </div>
@@ -372,7 +373,7 @@ $('form').preventDoubleSubmission();
                         <?php
                         if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
                           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-                        } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php"){
+                        } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
                           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
                         } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
                           echo "<script>document.getElementById('adminOption_CORE').click();</script>";

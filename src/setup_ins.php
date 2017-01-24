@@ -48,6 +48,9 @@ $conn->query($sql);
 $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
 $conn->query($sql);
 
+//insert password policy
+$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+
 //insert holidays
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
