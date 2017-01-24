@@ -460,19 +460,17 @@ if($row['version'] < 45){
 }
 
 if($row['version'] < 46){
-  $conn->query("CREATE TABLE $moduleTable (
+  $sql="CREATE TABLE $moduleTable (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-  )");
+  )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
     echo "Created module enable/disable function";
   }
   $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
+  echo mysqli_error($conn);
 }
 
 //------------------------------------------------------------------------------

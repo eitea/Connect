@@ -401,7 +401,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                       <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
                     </label><br>
                     <label>
-                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?>><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?>  /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                     </label>
                   </div>
                 </div>
@@ -413,7 +413,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label>
                     <br>
                     <label>
-                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> ?>><?php echo $lang['CAN_BOOK']; ?>
+                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['CAN_BOOK']; ?>
                     </label>
                   </div>
                 </div>
