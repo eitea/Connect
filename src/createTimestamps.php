@@ -108,6 +108,5 @@ function match_passwordpolicy($p, &$out = ''){
 
 /*
 echo $test=strtotime('2016-02-3 05:44:21');
-echo "<br>";
 echo date('Y-m-d H:i:s', $test);
 */

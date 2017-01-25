@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID); ?>
+<?php include 'validate.php'; enableToTemplate($userID); ?>
 
 <div class="page-header">
   <h3>PDF Templates</h3>

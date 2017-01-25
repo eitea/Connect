@@ -53,6 +53,15 @@ function enableToBookings($userID){
   }
 }
 
+function enableToTemplate($userID){
+  require 'connection.php';
+  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND (isCoreAdmin = 'TRUE' OR canEditTemplates = 'TRUE')";
+  $result = $conn->query($sql);
+  if(!$result || $result->num_rows <= 0){
+    die('Access denied. <a href="logout.php"> return</a>');
+  }
+}
+
 function denyToCloud(){
   if(isset($_SESSION['dbConnect']) || isset($_SERVER['RDS_HOSTNAME']) || isset($_SERVER['RDS_PORT'])){
     die("Restricted Access. <a href='logout.php'> Exit</a>");

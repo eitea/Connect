@@ -55,6 +55,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ADMIN_CORE_OPTIONS'] = 'System Options';
   $lang['ADMIN_TIME_OPTIONS'] = 'Time Records';
   $lang['ADMIN_PROJECT_OPTIONS'] = 'Project Bookings';
+  $lang['ADMIN_MODULES'] = 'Admin Modules';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
   $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
@@ -71,6 +72,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['CALENDAR'] = 'Calendar';
   $lang['CAN_CHECKIN'] = 'Can Checkin';
   $lang['CAN_BOOK'] = 'Can create Bookings';
+  $lang['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
   $lang['CHARGED'] = 'Charged';
   $lang['CHECK_IN'] = 'Check In';
   $lang['CHECK_OUT'] = 'Check Out';
@@ -106,6 +108,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIRSTNAME'] = 'First Name';
   $lang['FUNCTIONS'] = 'Functions';
   $lang['FROM'] ='From';
+  $lang['FORMS'] ='Forms';
   $lang['FOUNDERRORS'] = 'Found Errors';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
@@ -148,6 +151,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
 
+  $lang['PDF_TEMPLATES'] = 'Pdf Templates';
   $lang['PRODUCTIVE'] = 'Productive';
   $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
   $lang['PROJECT'] = 'Project';
@@ -188,6 +192,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['USED_DAYS'] ='Used Days';
   $lang['USERS'] = 'Users';
   $lang['USER_INACTIVE'] = 'Deactivated Users';
+  $lang['USER_MODULES'] = 'User Modules';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
@@ -244,7 +249,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
   $lang['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
   $lang['ADMIN_PROJECT_OPTIONS'] = 'Projektbuchungen';
-
+  $lang['ADMIN_MODULES'] = 'Admin Module';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
   $lang['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
@@ -261,6 +266,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['CALENDAR'] = 'Kalender';
   $lang['CAN_CHECKIN'] = 'Kann Einstempeln';
   $lang['CAN_BOOK'] = 'Kann Buchen';
+  $lang['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
   $lang['CHARGED'] = 'Verrechnet';
   $lang['CHECK_IN'] = 'Einstempeln';
   $lang['CHECK_OUT'] = 'Ausstempeln';
@@ -296,6 +302,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['FIRSTNAME'] = 'Vorname';
   $lang['FUNCTIONS'] = 'Funktionen';
   $lang['FROM'] ='Von';
+  $lang['FORMS'] ='Formulare';
   $lang['FOUNDERRORS'] = 'Gefundene Fehler';
 
   $lang['GENDER'] = 'Gender';
@@ -338,6 +345,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
 
+  $lang['PDF_TEMPLATES'] = 'Pdf Vorlagen';
   $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
   $lang['PROJECT'] = 'Projekt';
@@ -379,6 +387,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['USED_DAYS'] ='Verbrauchte Tage';
   $lang['USERS'] = 'Benutzer';
   $lang['USER_INACTIVE'] = 'Deaktivierte Benutzer';
+  $lang['USER_MODULES'] = 'Benutzer Module';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';

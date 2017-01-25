@@ -201,7 +201,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     }
 
-
     if(isset($_POST['isCoreAdmin'.$x])){
       $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
     } else {
@@ -238,6 +237,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = $x";
     }
     $conn->query($sql);
+    if(isset($_POST['canEditTemplates'.$x])){
+      $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = $x";
+    } else {
+      $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = $x";
+    }
+    $conn->query($sql);
 
   }//end if isset submitX
 }
@@ -252,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $result = $conn->query("SELECT * FROM $moduleTable");
   $moduleEnableRow = $result->fetch_assoc();
 
-  $moduleTime =  $moduleProject = '';
+  $moduleTime =  $moduleProject =  '';
 
   //timemodule will momentarily always be active, since projectm requires timem
   if($moduleEnableRow['enableProject'] == 'FALSE'){
@@ -296,6 +301,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $isProjectAdmin = $row['isProjectAdmin'];
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
+      $canEditTemplates = $row['canEditTemplates'];
 
       $eOut = "$firstname $lastname";
       ?>
@@ -392,7 +398,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <br><br>
               <div class=container-fluid>
                 <div class="col-md-3">
-                  Module: <br>
+                  <?php echo $lang['ADMIN_MODULES']; ?>: <br>
                   <div class="checkbox">
                     <label>
                       <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
@@ -406,7 +412,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   </div>
                 </div>
                 <div class="col-md-3">
-                  <?php echo $lang['ALLOW_PRJBKING_ACCESS']; ?>: <br>
+                  <?php echo $lang['USER_MODULES']; ?>:
                   <div class="checkbox">
                     <label>
                       <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
@@ -414,6 +420,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <br>
                     <label>
                       <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['CAN_BOOK']; ?>
+                    </label>
+                    <label>
+                      <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
                     </label>
                   </div>
                 </div>

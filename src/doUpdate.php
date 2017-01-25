@@ -497,6 +497,17 @@ if($row['version'] < 47){
       echo "<br> Added expiration Date to PSW";
     }
 }
+
+if($row['version'] < 48){
+  $sql = "ALTER TABLE $roleTable ADD COLUMN canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added new Role for editing PDF Templates";
+  }
+}
+
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

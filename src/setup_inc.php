@@ -321,6 +321,7 @@ $sql = "CREATE TABLE $roleTable(
   isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
