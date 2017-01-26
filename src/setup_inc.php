@@ -567,5 +567,15 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+$sql = "CREATE TABLE $policyTable (
+  passwordLength INT(2) DEFAULT 0,
+  complexity ENUM('0', '1', '2') DEFAULT '0',
+  expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  expirationDuration INT(3),
+  expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
 ?>
