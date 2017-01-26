@@ -69,7 +69,5 @@ exec($command, $output, $returnValue);
 $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
 exec($command, $output, $returnValue);
 
-echo implode('<br>', $output);
-
 //------------------------------------------------------------------------------
 die ('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="login.php">Next</a>');
