@@ -32,9 +32,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //copy projectbookings
     $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType)
     SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType
-    FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE $logTable.userID = $x";
+    FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID IS NOT NULL AND projectID != 0";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
 
+    //copy projectbookings - foreign key null gets cast to 0... idky.
+    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType)
+    SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType
+    FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID != 0 AND projectID IS NOT NULL";
+    if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
+
+    //copy projectbookings - null for every null, which is 0 #why
+    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType)
+    SELECT start, end, NULL, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType
+    FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND (projectID = 0 OR projectID IS NULL)";
+    if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
+    
     //copy taveldata
     $sql = "INSERT INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $travelTable WHERE userID = $x";
@@ -421,6 +433,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label>
                       <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['CAN_BOOK']; ?>
                     </label>
+                    <br>
                     <label>
                       <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
                     </label>

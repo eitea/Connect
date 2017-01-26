@@ -2,7 +2,7 @@
 <?php include 'validate.php'; enableToTemplate($userID); ?>
 
 <div class="page-header">
-  <h3>PDF Templates</h3>
+  <h3><?php echo $lang['PDF_TEMPLATES']; ?></h3>
 </div>
 
 <?php
@@ -19,7 +19,7 @@ if(isset($_POST['removeTemplate'])){
 <form method="POST">
 <table class="table table-hover">
   <thead>
-    <th style="width:40%">Options</th>
+    <th style="width:40%"><?php echo $lang['OPTIONS']; ?></th>
     <th>Name</th>
   </thead>
   <tbody>
@@ -57,7 +57,7 @@ if(isset($_POST['removeTemplate'])){
     </div>
   </div>
   <div class="col-md-6 text-right">
-    <a href="templateEdit.php" class="btn btn-warning">Create a new Template</a>
+    <a href="templateEdit.php" class="btn btn-warning"><?php echo $lang['NEW_TEMPLATE']; ?></a>
     <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#importTemplate" aria-expanded="false" aria-controls="collapseExample">
       <i class='fa fa-upload'></i> <i class="fa fa-caret-down"></i>
     </button>
@@ -65,7 +65,7 @@ if(isset($_POST['removeTemplate'])){
 </div>
 <br><br><br>
 
-<hr><h4 style="color:grey; font-weight:bold;">Preview:</h4><hr>
+<hr><h4 style="color:grey; font-weight:bold;"><?php echo $lang['PREVIEW']; ?>:</h4><hr>
 
 <div class="container text-center">
   <?php  echo $templatePreview;  ?>

@@ -18,7 +18,7 @@
 </style>
 
 <div class="page-header">
-  <h3>Edit PDF Template</h3>
+  <h3><?php echo $lang['PDF_TEMPLATES']; ?></h3>
 </div>
 <?php
 $templateContent = "<h1>This is a Header</h1> Create your template here and use it on the project page. Include a repeat pattern, name your template, and preview it!";

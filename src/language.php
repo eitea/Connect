@@ -93,6 +93,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DIFFERENCE'] = 'Difference';
   $lang['DISPLAY_INFORMATION'] = 'Display Infos';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
+  $lang['DOUBLE'] = 'Double';
   $lang['DRIVES'] = 'Drives';
 
   $lang['EDIT'] = 'Edit';
@@ -139,19 +140,23 @@ if($_SESSION['language'] == 'ENG'){
   $lang['MANDATORY_SETTINGS'] = 'Mandatory Settings';
   $lang['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
   $lang['MINUTES'] = 'Minutes';
+  $lang['MISSING'] = 'Missing';
   $lang['MONTHLY_REPORT'] ='Monthly Report';
 
   $lang['NEW_CLIENT_CREATE'] = 'Create a new Client';
   $lang['NEW_PASSWORD'] = 'New Password';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
+  $lang['NEW_TEMPLATE'] = 'New Template';
   $lang['NOT_CHARGED'] = 'Not charged';
   $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
 
+  $lang['OPTIONS'] = 'Options';
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
 
   $lang['PDF_TEMPLATES'] = 'Pdf Templates';
+  $lang['PREVIEW'] = 'Preview';
   $lang['PRODUCTIVE'] = 'Productive';
   $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
   $lang['PROJECT'] = 'Project';
@@ -287,6 +292,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['DIFFERENCE'] = 'Differenz';
   $lang['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
   $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
+  $lang['DOUBLE'] = 'Doppelt';
   $lang['DRIVES'] = 'Fahrten';
 
   $lang['EDIT'] = 'Bearbeiten';
@@ -333,19 +339,23 @@ if($_SESSION['language'] == 'ENG'){
   $lang['MANDATORY_SETTINGS'] = 'Pflichtfelder';
   $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
   $lang['MINUTES'] = 'Minuten';
+  $lang['MISSING'] = 'Fehlend';
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
   $lang['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
+  $lang['NEW_TEMPLATE'] = 'Neue Vorlage';
   $lang['NOT_CHARGED'] = 'Nicht Verrechnet';
   $lang['NOT_CHARGEABLE'] = 'Erlassen';
   $lang['NUMBER'] = 'Number';
 
+  $lang['OPTIONS'] = 'Optionen';
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
 
   $lang['PDF_TEMPLATES'] = 'Pdf Vorlagen';
+  $lang['PREVIEW'] = 'Vorschau';
   $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
   $lang['PROJECT'] = 'Projekt';

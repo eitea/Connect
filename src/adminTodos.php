@@ -298,7 +298,7 @@ endif;
   if($result && $result->num_rows > 0):
     ?>
 
-    <h4>Double Expected Hours:</h4>
+    <h4><?php echo $lang['DOUBLE'].' '.$lang['EXPECTED_HOURS'];?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#double_expected_absent_log">
         <i class="fa fa-info-circle"></i>
@@ -312,9 +312,9 @@ endif;
       </div>
     </div>
     <table id='illTS' class="table table-hover">
-      <th>User</th>
+      <th><?php echo $lang['USERS']; ?></th>
       <th><?php echo $lang['TIME']; ?></th>
-      <th>Absentlog - <?php echo $lang['TIMES']; ?></th>
+      <th><?php echo $lang_activityToString[-1].' - '.$lang['TIMES']; ?></th>
       <tbody>
         <?php
         while($row = $result->fetch_assoc()){
@@ -387,7 +387,7 @@ endif;
       }
     }
     </script>
-    <h4>No Expected Hours:</h4>
+    <h4><?php echo $lang['MISSING'].' '.$lang['EXPECTED_HOURS'];?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#zero_expected_absent_log" aria-expanded="false" aria-controls="zero_expected_absent_log">
         <i class="fa fa-info-circle"></i>
