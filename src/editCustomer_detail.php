@@ -197,31 +197,30 @@ if(isset($_POST['saveAll'])){
   }
 }
 
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['addNotes']) && !empty($_POST['infoText'])){
     $activeTab = 'notes';
     $val = test_input($_POST['infoText']);
     $conn->query("INSERT INTO $clientDetailNotesTable (infoText, createDate, parentID) VALUES ('$val', CURRENT_TIMESTAMP, $detailID)");
   }
-
   if(isset($_POST['deleteNotes']) && !empty($_POST['noteIndeces'])){
     $activeTab = 'notes';
     foreach($_POST['noteIndeces'] as $i){
       $conn->query("DELETE FROM $clientDetailNotesTable WHERE id = $i");
     }
   }
+
+  $unlockBanking = false;
+  if(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){ //TODO: after enabling master password, add this in here
+    
+  }
 }
-
-
 
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE id = $detailID");
 $row = $result->fetch_assoc();
 
 $resultNotes = $conn->query("SELECT * FROM $clientDetailNotesTable WHERE parentID = $detailID");
-
 $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID = $detailID");
-$rowBank = $result->fetch_assoc();
 ?>
 
 <div class="text-right">
@@ -229,17 +228,16 @@ $rowBank = $result->fetch_assoc();
 </div>
 
 <ul class="nav nav-tabs">
-  <li <?php if($activeTab == 'home'){echo 'class="active"';}?> ><a data-toggle="tab" href="#home">Data</a></li>
-  <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes">Taxes</a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['DATA']; ?></a></li>
+  <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes"><?php echo $lang['TAXES']; ?></a></li>
   <li <?php if($activeTab == 'banking'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBank">Banking</a></li>
-  <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling">Billing</a></li>
-  <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment">Payment</a></li>
-  <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact">Notes</a></li>
+  <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling"><?php echo $lang['BILLING']; ?></a></li>
+  <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment"><?php echo $lang['PAYMENT']; ?></a></li>
+  <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact"><?php echo $lang['NOTES']; ?></a></li>
 </ul>
 
 <form method="post">
   <div class="tab-content">
-
     <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
       <div class="row radio">
         <div class="col-xs-8">
@@ -395,15 +393,64 @@ $rowBank = $result->fetch_assoc();
     </div>
 
     <div id="menuBank" class="tab-pane fade <?php if($activeTab == 'banking'){echo 'in active';}?>">
-      <h3>Bankdaten</h3>
+      <div class="row form-group">
+        <h3>
+        <div class="col-xs-9">
+          Bankdaten
+        </div>
+        <div class="col-xs-3">
+          <div class="input-group">
+          <input type="password" class="form-control" name="displayBankingDetailPass" value="" />
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-warning" name="displayBank">Unlock</button>
+          </span>
+          </div>
+        </div>
+        </h3>
+      </div>
       <hr>
+
+      <?php
+      $result = $conn->query("SELECT * FROM $clientDetail");
+       ?>
+      <?php : ?>
+        RAWLRWAA!
+
+      <?php else: ?>
+      We
+      <?php endif; ?>
+
+      <table>
+        <thead>
+          <th>Name der Bank</th>
+          <th>Iban</th>
+          <th>BIC</th>
+        </thead>
+        <tbody>
+          <?php
+            while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
+              if($unlockBanking){ //If this is set, decrypt banking detail
+
+              } else { // **** it.
+                echo $row['bankName'];
+                echo '<td>**** **** **** ****</td>';
+                echo '<td>******** ***</td>';
+              }
+            }
+           ?>
+        </tbody>
+      </table>
+
+
       <!--
       bic VARCHAR(20),
       iban VARCHAR(50),
       bankName VARCHAR(100),
       parentID  INT(6) UNSIGNED,
       -->
-      Coming Soon.
+
+      <br><hr><br>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="billing">Speichern</button>
     </div>
 
     <div id="menuBilling" class="tab-pane fade <?php if($activeTab == 'billing'){echo 'in active';}?>">

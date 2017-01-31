@@ -410,6 +410,11 @@ function textAreaAdjust(o) {
     }
   }
 
+  function toggle2(uncheckID){
+      uncheckBox = document.getElementById(uncheckID);
+      uncheckBox.checked = false;
+  }
+
   function showNewProjects(selectID, client, project){
     $.ajax({
       url:'ajaxQuery/AJAX_project.php',
@@ -470,6 +475,7 @@ function textAreaAdjust(o) {
   $sum_min = $sum25 = 0;
   $addTimeStart = 0;
   if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    //build your query depending on filter options
     if($booked == '2'){
       $bookedQuery= " AND $projectBookingTable.booked = 'TRUE' ";
     } elseif($booked == '1'){
@@ -477,19 +483,16 @@ function textAreaAdjust(o) {
     } else {
       $bookedQuery = " ";
     }
-
     if($filterUserID == 0){
       $filterUserIDAdd = '';
     } else {
       $filterUserIDAdd = " AND $userTable.id = $filterUserID ";
     }
-
     if($filterCompany == 0){
       $filterCompanyAdd = "";
     } else {
       $filterCompanyAdd = " AND $companyTable.id = $filterCompany ";
     }
-
     if($filterClient == 0){
       $filterClientAdd = "";
     } else {
@@ -556,8 +559,17 @@ function textAreaAdjust(o) {
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
       $numRows = $result->num_rows;
+      if($numRows > 1000){
+        $numRows = 999;
+        $tooManyItems = true; //php.ini max input vars is 1000 per default, so just display a warning.
+      } else {
+        $tooManyItems = false;
+      }
       if(isset($_POST['undo'])){
         $numRows--;
+      }
+      if($tooManyItems){
+        echo "<div class='alert alert-warning' role='alert'>Warning: The Table below does not show the complete result set, since the number of items exceeds 1000. To display all results, please define more filters. </div>";
       }
       for ($i=0; $i<$numRows; $i++) {
         $row = $result->fetch_assoc();
@@ -654,8 +666,8 @@ function textAreaAdjust(o) {
           } else {
             $selected = "checked";
           }
-          echo "<td><input type='checkbox' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-          echo " / <input type='checkbox' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+          echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' onclick='toggle2(\"".$row['projectBookingID']."_02\")' $selected name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+          echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
         } else {
           echo "<td> - </td>";
         }

@@ -92,6 +92,36 @@ $row = $result->fetch_assoc();
 
   <br><hr><br>
 
+  <div class="col-xs-12">
+    <h4>Master Passwort Ändern</h4>
+  </div>
+  <br><br><br>
+  <div class="container">
+    <div class="col-md-4">
+      Aktuelles Passwort:
+    </div>
+    <div class="col-md-8">
+      <input type="password" class="form-control" name="masterPass_current" value=""/>
+    </div>
+    <br><br>
+    <div class="col-md-4">
+      Neues Passwort:
+    </div>
+    <div class="col-md-8">
+      <input type="password" class="form-control" name="masterPass_new" value=""/>
+    </div>
+    <br><br>
+    <div class="col-md-4">
+      Neues Passwort Wiederholen:
+    </div>
+    <div class="col-md-8">
+      <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
+    </div>
+    <br><br><br>
+  </div>
+
+  <br><hr><br>
+
   <div class="text-right">
     <button type="submit" class="btn btn-warning" name="saveButton">Speichern </button>
   </div>

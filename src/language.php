@@ -63,6 +63,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['AUTOREDIRECT'] = 'Click here if not redirected automatically: ';
 
   $lang['BEGIN'] = 'Begin';
+  $lang['BILLING'] = 'Billing';
   $lang['BLESSING'] = 'Have a nice day!';
   $lang['BOOK_PROJECTS'] = 'Book Projects';
   $lang['BOOKINGS'] = 'Bookings';
@@ -131,7 +132,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['IS_TIME'] = 'Is';
 
   $lang['LANGUAGE_SETTING'] = 'Language';
-  $lang['LAST_BOOKING'] = 'Last Booking'; //I gave u my heeart
+  $lang['LAST_BOOKING'] = 'Last Booking'; //I gave u my heaaart
   $lang['LASTNAME'] = 'Lastname';
   $lang['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
   $lang['LUNCHBREAK'] = 'Lunchbreak';
@@ -147,6 +148,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NEW_PASSWORD'] = 'New Password';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
   $lang['NEW_TEMPLATE'] = 'New Template';
+  $lang['NOTES'] = 'Notes';
   $lang['NOT_CHARGED'] = 'Not charged';
   $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
@@ -155,6 +157,8 @@ if($_SESSION['language'] == 'ENG'){
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
 
+  $lang['PASSWORD'] = 'Password';
+  $lang['PAYMENT'] = 'Payment';
   $lang['PDF_TEMPLATES'] = 'Pdf Templates';
   $lang['PREVIEW'] = 'Preview';
   $lang['PRODUCTIVE'] = 'Productive';
@@ -181,6 +185,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['SUM'] = 'Sum';
 
   $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
+  $lang['TAXES'] = 'Taxes';
   $lang['THIS_IS_A_BREAK'] = 'This is a break';
   $lang['TIME'] = 'From - To';
   $lang['TIMES'] = 'Time';
@@ -262,6 +267,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['AUTOREDIRECT'] = 'Klicken Sie hier, wenn Sie nicht automatisch weitergeleitet werden: ';
 
   $lang['BEGIN'] = 'Anfang';
+  $lang['BILLING'] = 'Abrechnung';
   $lang['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
   $lang['BOOK_PROJECTS'] = 'Projekte Buchen';
   $lang['BOOKINGS'] = 'Buchungen';
@@ -283,6 +289,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';
+  $lang['DATA'] = 'Daten';
   $lang['DEACTIVATE'] = 'Deaktivieren';
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
@@ -346,14 +353,17 @@ if($_SESSION['language'] == 'ENG'){
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
   $lang['NEW_TEMPLATE'] = 'Neue Vorlage';
+  $lang['NOTES'] = 'Notizen';
   $lang['NOT_CHARGED'] = 'Nicht Verrechnet';
   $lang['NOT_CHARGEABLE'] = 'Erlassen';
-  $lang['NUMBER'] = 'Number';
+  $lang['NUMBER'] = 'Nummer';
 
   $lang['OPTIONS'] = 'Optionen';
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
 
+  $lang['PASSWORD'] = 'Passwort';
+  $lang['PAYMENT'] = 'Zahlung';
   $lang['PDF_TEMPLATES'] = 'Pdf Vorlagen';
   $lang['PREVIEW'] = 'Vorschau';
   $lang['PRODUCTIVE'] = 'Produktiv';
@@ -381,6 +391,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['SUM'] ='Summe';
 
   $lang['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
+  $lang['TAXES'] = 'Steuern';
   $lang['THIS_IS_A_BREAK'] = 'Das ist eine Pause';
   $lang['TIME'] = 'Von - Bis';
   $lang['TIMES'] = 'Zeit';

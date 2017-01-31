@@ -1,5 +1,6 @@
 <?php
-//this will only be called on the setup for persons with private hosting
+//this page will only be called on the setup for persons with private hosting (open source version)
+
 require 'connection_config.php';
 require "validate.php"; denyToCloud();
 

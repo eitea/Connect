@@ -49,9 +49,7 @@ if(isset($_POST['enter']) && !empty($_POST['mvar'])){
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" href="../css/mobile.css">
-
+  <link rel="stylesheet" href="../plugins/homeMenu/homeMenu.css">
   <style>
   input[type=button]{
     width:150px;

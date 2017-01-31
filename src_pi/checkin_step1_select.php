@@ -4,8 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-  <link rel="stylesheet" href="../css/homeMenu.css">
-  <link rel="stylesheet" href="../css/mobile.css">
+  <link rel="stylesheet" href="../plugins/homeMenu/homeMenu.css">
 </head>
 
 <body>
@@ -13,7 +12,7 @@
   require "../src/connection.php";
   $headers = apache_request_headers();
   $userAgentHead =  $headers['User-Agent'];
-  
+
   $sql = "SELECT * FROM $piConnTable WHERE header = '$userAgentHead'";
   $result = $conn->query($sql);
   if(!$result || $result->num_rows <= 0){

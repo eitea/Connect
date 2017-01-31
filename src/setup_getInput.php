@@ -78,7 +78,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <h1>Login Data</h1><br><br>
 
     <div class="row">
-      <div class="col-md-3 col-md-offset-3">
+      <div class="col-xs-3 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -88,7 +88,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-xs-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -101,7 +101,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
 
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -113,7 +113,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-4 col-md-offset-3">
+      <div class="col-xs-4 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -123,7 +123,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-xs-2">
         <div class="form-group">
           <select name="type" class="js-example-basic-single btn-block">
             <option selected>...</option>
@@ -141,7 +141,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     <p>Your Login E-Mail</p>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <input type='text' class="form-control" name='localPart' placeholder='name'  style=width:400px >
@@ -159,7 +159,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <h1>MySQL Database Connection</h1><br><br>
 
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -171,7 +171,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -183,7 +183,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -195,7 +195,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -211,7 +211,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <br><hr><br>
 
     <div class="container">
-      <div class="col-md-3 col-md-offset-9">
+      <div class="col-xs-3 col-xs-offset-9">
         <button type='submit' name'submit' class="btn btn-warning">Continue</button>
       </div>
     </div>

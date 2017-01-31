@@ -33,7 +33,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $logTable (
   indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   time DATETIME NOT NULL,
@@ -51,7 +50,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE  $adminLDAPTable (
   ldapConnect VARCHAR(30),
   ldapPassword VARCHAR(30),
@@ -66,7 +64,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $holidayTable(
   begin DATETIME,
   end DATETIME,
@@ -75,7 +72,6 @@ $sql = "CREATE TABLE $holidayTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $bookingTable(
   mon DECIMAL(4,2) DEFAULT 8.5,
@@ -94,7 +90,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
@@ -103,7 +98,6 @@ $sql = "CREATE TABLE $companyTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $clientTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -117,8 +111,6 @@ $sql = "CREATE TABLE $clientTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
-
 
 $sql = "CREATE TABLE $projectTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -172,7 +164,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $companyDefaultProjectTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
@@ -208,11 +199,11 @@ if (!$conn->query($sql)) {
 }
 
 
+
 $sql = "SET GLOBAL event_scheduler=ON";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
 ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENABLE
@@ -236,7 +227,8 @@ if (!$conn->query($sql)) {
 $sql = "CREATE TABLE $configTable(
   bookingTimeBuffer INT(3) DEFAULT '5',
   cooldownTimer INT(3) DEFAULT '2',
-  enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+  enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  masterPassword VARCHAR(100)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -260,7 +252,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE EVENT IF NOT EXISTS `daily_vacation_event`
 ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:30:00' ON COMPLETION PRESERVE ENABLE
 COMMENT 'Adding hours to vacationTable 23:00 daily!'
@@ -269,7 +260,6 @@ UPDATE $vacationTable SET vacationHoursCredit = vacationHoursCredit + ((daysPerY
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $userRequests(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -287,7 +277,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $adminGitHubTable(
   sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
 )";
@@ -300,7 +289,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "CREATE TABLE $piConnTable(
   header VARCHAR(50)
 )";
@@ -312,7 +300,6 @@ $sql = "INSERT INTO $piConnTable(header) VALUES (' ')";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $roleTable(
   userID INT(6) UNSIGNED,

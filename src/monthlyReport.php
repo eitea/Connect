@@ -88,7 +88,6 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     }
     $difference = timeDiff_Hours($calculator->start[$i], $endTime );
 
-
     /*
     -1 .... absent (should not occur!)
     0 ..... arrival
@@ -97,6 +96,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     3 .... sickness
     4 ..... time balancing
     */
+    
     $style = "";
     $tinyEndTime = '-';
 

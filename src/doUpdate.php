@@ -507,6 +507,15 @@ if($row['version'] < 48){
   }
 }
 
+if($row['version'] < 48){
+  $sql = "ALTER TABLE $configTable ADD COLUMN masterPassword VARCHAR(100)";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added master Password for encrypting banking information.";
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
