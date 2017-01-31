@@ -3,20 +3,59 @@
 
 <?php
 if(isset($_POST['saveButton'])){
+  //allgemein
   $length = intval($_POST['passwordLength']);
   $compl = intval($_POST['passwordComplexity']);
-
+  //erweitert
+  $exp = 'FALSE';
+  $dur = 0;
   if(isset($_POST['enableTimechange'])){
-    $exp = 'TRUE';
-  } else {
-    $exp = 'FALSE';
+    if(isset($_POST['enableTimechange_months'])){
+      $exp = 'TRUE';
+      $dur = intval($_POST['enableTimechange_months']);
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>Please define months when activating password expiration .';
+      echo '</div>';
+    }
   }
-
   $type = test_input($_POST['enableTimechange_type']);
-
-  $dur = intval($_POST['enableTimechange_months']);
   $conn->query("UPDATE $policyTable SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
   echo mysqli_error($conn);
+  //master
+  if(isset($_POST['masterPass_current']) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
+    $passwordCurrent = test_input($_POST['masterPass_current']);
+    $password = $_POST['masterPass_new'];
+    $passwordConfirm = $_POST['masterPass_newConfirm'];
+    $output = '';
+    $acceptMasterPassword = true;
+    //check if password is clean, but not really necessary, since password will be hashed anyways.
+    if(test_input($password) != $password){
+      $acceptMasterPassword = false;
+    }
+    //check if old password matches
+    $result = $conn->query("SELECT masterPassword FROM $configTable");
+    $row = $result->fetch_assoc();
+    if(crypt($passwordCurrent, $row['masterPassword']) != $row['masterPassword'] && !empty($row['masterPassword'])){ //skip this validation if pass in DB is NULL (not been initialized yet)
+      //will be set to false if a hash is in the DB and the hash doesnt crypt (doesnt match)
+      $acceptMasterPassword = false;
+    }
+    //check if new passwords matches
+    if(strcmp($password, $passwordConfirm) != 0 || !match_passwordpolicy($_POST['masterPass_new'], $output)){
+      $acceptMasterPassword = false;
+    }
+    //if all matched:
+    if($acceptMasterPassword){
+      $password = password_hash($password, PASSWORD_BCRYPT);
+      $conn->query("UPDATE $configTable SET masterPassword = '$password'");
+    } else {
+      echo '<br><div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo "<strong>Error: </strong>Passwords were invalid. Please do not use any HTML, SQL or Javascript specific characters. $output";
+      echo '</div>';
+    }
+  }
 }
 
 $result = $conn->query("SELECT * FROM $policyTable");
@@ -65,7 +104,7 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
   <div class="col-xs-8">
-    <h4>Erweitert</h4>
+    <h4>Verfallsdatum</h4>
   </div>
   <div class="col-xs-2 checkbox">
     <input type="checkbox" value="person" name="enableTimechange"  <?php if($row['expiration'] == 'TRUE'){echo 'checked';} ?> /> Aktiv

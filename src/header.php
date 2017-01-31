@@ -82,7 +82,6 @@ $('form').preventDoubleSubmission();
 
   if($isTimeAdmin){
     $numberOfAlerts = 0;
-
     $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
 
