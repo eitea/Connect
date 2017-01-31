@@ -523,10 +523,17 @@ if($row['version'] < 49){
   } else {
     echo "<br> Added Report-Admin role.";
   }
-
-  $sql = "CREATE TABLE $mailOptionsTable"
 }
 
+if($row['version'] < 50){
+  $sql = "CREATE TABLE $mailOptionsTable(
+    host VARCHAR(50),
+    username VARCHAR(50),
+    password VARCHAR(50),
+    port VARCHAR(50)
+  )";
+
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
