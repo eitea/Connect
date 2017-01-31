@@ -507,7 +507,7 @@ if($row['version'] < 48){
   }
 }
 
-if($row['version'] < 48){
+if($row['version'] < 49){
   $sql = "ALTER TABLE $configTable ADD COLUMN masterPassword VARCHAR(100)";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

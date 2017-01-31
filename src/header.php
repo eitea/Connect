@@ -101,6 +101,9 @@ $('form').preventDoubleSubmission();
 
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
+      if(test_input($_POST['password']) != $_POST['password']){
+        die("Malicious Code Injection Detected, please do not use any HTML, SQL or Javascript specific characters.");
+      }
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
       $output = '';
