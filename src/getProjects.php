@@ -559,17 +559,8 @@ function textAreaAdjust(o) {
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows >0) {
       $numRows = $result->num_rows;
-      if($numRows > 1000){
-        $numRows = 999;
-        $tooManyItems = true; //php.ini max input vars is 1000 per default, so just display a warning.
-      } else {
-        $tooManyItems = false;
-      }
       if(isset($_POST['undo'])){
         $numRows--;
-      }
-      if($tooManyItems){
-        echo "<div class='alert alert-warning' role='alert'>Warning: The Table below does not show the complete result set, since the number of items exceeds 1000. To display all results, please define more filters. </div>";
       }
       for ($i=0; $i<$numRows; $i++) {
         $row = $result->fetch_assoc();
