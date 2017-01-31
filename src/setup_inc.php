@@ -1,13 +1,13 @@
 <?php
 /* SETTING UP A NEW TABLE:
-1. Create your table name as variable in connection_vars.php
-3. Put your CREATE TABLE statement in setup_inc.php
+1. Put the name of your table as a new variable in connection_vars.php
+3. Put your CREATE TABLE statement in setup_inc.php (this page), like in already existing code.
 4. increment the version number in version_number.php by 1.
-5. for the new version number, put another if into the doUpdate.php, so your changes will be carried over to all existing databases.
-6. relog into T-Time with an admin account.
+5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
+6. relog into T-Time with a core admin account.
 */
 
-//dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
+//dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into seperate functions so we do not mess around with includes too much... TODO for later.)
 require_once "connection_vars.php";
 
 $sql = "CREATE TABLE $userTable (
@@ -306,6 +306,7 @@ $sql = "CREATE TABLE $roleTable(
   isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',

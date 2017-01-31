@@ -397,7 +397,7 @@ endif;
       <div class="well">
         Es wurde weder ein Eintrag in der Abwesenheitstabelle noch ein Zeitstempel gefunden, dadurch fehlen Informationen über erwartete Stunden.<br>
         Kann dazu führen, dass in manchen Übersichten zu wenig erwartete Stunden gerechnet werden. <br>
-        Die Auswahl erstellt für alle Selektierten Daten einen Abwesenheitseintrag. <br>
+        Die Auswahl als Abwesend zu markieren erstellt für alle Selektierten Daten einen Abwesenheitseintrag. <br>
       </div>
     </div>
     <table id='illTS' class="table table-hover">
@@ -408,7 +408,9 @@ endif;
         <?php
         foreach(array_keys($missingDates) as $curUser){
           foreach($missingDates[$curUser] as $date){
-            echo "<tr><td>$curUser</td>";
+            $result = $conn->query("SELECT firstname, lastname FROM $userTable WHERE id = $curUser");
+            $row = $result->fetch_assoc();
+            echo "<tr><td>".$row['firstname'].' '.$row['lastname']."</td>";
             echo "<td>$date</td>";
             echo "<td><input type='checkbox' name='zero_expected_dates[]' value='$date $curUser' /></td>";
             echo '</tr>';
@@ -418,7 +420,7 @@ endif;
       </tbody>
     </table>
     <br>
-    <button type='submit' class="btn btn-warning" name='zero_expected_autocorrect' >Mark as Absent</button>
+    <button type='submit' class="btn btn-warning" name='zero_expected_autocorrect' > <?php echo $lang['MARK_AS_ABSENT']; ?> </button>
     <br><hr><br>
   <?php endif; echo mysqli_error($conn); ?>
 

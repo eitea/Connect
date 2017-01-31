@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     SELECT start, end, NULL, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND (projectID = 0 OR projectID IS NULL)";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
-    
+
     //copy taveldata
     $sql = "INSERT INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $travelTable WHERE userID = $x";
@@ -237,6 +237,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = $x";
     }
     $conn->query($sql);
+    if(isset($_POST['isReportAdmin'.$x])){
+      $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = $x";
+    } else {
+      $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = $x";
+    }
+    $conn->query($sql);
     if(isset($_POST['canStamp'.$x])){
       $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = $x";
     } else {
@@ -276,7 +282,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $moduleProject = 'disabled';
   }
 
-
   $query = "SELECT *, $userTable.id AS userID
   FROM $userTable INNER JOIN $bookingTable ON $userTable.id = $bookingTable.userID
   INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID
@@ -311,6 +316,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $isCoreAdmin = $row['isCoreAdmin'];
       $isTimeAdmin = $row['isTimeAdmin'];
       $isProjectAdmin = $row['isProjectAdmin'];
+      $isReportAdmin = $row['isReportAdmin'];
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
@@ -420,6 +426,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label><br>
                     <label>
                       <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?>  /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
                     </label>
                   </div>
                 </div>

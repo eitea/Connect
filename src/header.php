@@ -66,6 +66,7 @@ $('form').preventDoubleSubmission();
     $isCoreAdmin = $row['isCoreAdmin'];
     $isTimeAdmin = $row['isTimeAdmin'];
     $isProjectAdmin = $row['isProjectAdmin'];
+    $isReportAdmin = $row['isReportAdmin'];
 
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
@@ -447,6 +448,25 @@ $('form').preventDoubleSubmission();
                   }
                   ?>
 
+                  <!-- Section Four: E-Mail -->
+                  <?php if($isReportAdmin == 'TRUE'): ?>
+                    <li role="separator" class="active"><br><br>
+                      <a id="adminOption_REPORT" href="#" data-toggle="collapse" data-target="#toggleAdminOption_REPORT" data-parent="#sidenav01" class="collapse in">
+                        <span><?php echo $lang['REPORTS']; ?></span> <i class="fa fa-caret-down"></i>
+                      </a>
+                      <div class="collapse" id="toggleAdminOption_REPORT" style="height: 0px;">
+                        <ul class="nav navbar-nav">
+                          <li><a <?php if($this_page =='reportEmails.php'){echo $setActiveLink;}?> href="reportEmails.php"><i class="fa fa-envelope-o"></i><span> E-mail <?php echo $lang['REPORTS']; ?> </span></a></li>
+                          <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><i class="fa fa-gear"></i><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                        </ul>
+                      </div>
+                    </li>
+                  <?php endif; ?>
+                  <?php
+                  if($this_page == "reportOptions.php"){
+                    echo "<script>document.getElementById('adminOption_REPORT').click();</script>";
+                  }
+                  ?>
                 </ul>
               </div><!--/.nav-collapse -->
             </div>

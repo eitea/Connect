@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <?php
+/*
+* To add a new Update: increase the version number in version_number.php. For more information see head of setup_inc.php
+*/
 require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
@@ -514,6 +517,14 @@ if($row['version'] < 49){
   } else {
     echo "<br> Added master Password for encrypting banking information.";
   }
+  $sql = "ALTER TABLE $roleTable ADD COLUMN isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added Report-Admin role.";
+  }
+
+  $sql = "CREATE TABLE $mailOptionsTable"
 }
 
 

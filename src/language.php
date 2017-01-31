@@ -139,6 +139,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
 
   $lang['MANDATORY_SETTINGS'] = 'Mandatory Settings';
+  $lang['MARK_AS_ABSENT'] = 'Mark as Absent';
   $lang['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
   $lang['MINUTES'] = 'Minutes';
   $lang['MISSING'] = 'Missing';
@@ -174,6 +175,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_USERS'] = "Register LDAP Users";
   $lang['REMOVE_USER'] = 'Remove User';
   $lang['REPLY_TEXT'] = 'Answer';
+  $lang['REPORTS'] = 'Reports';
   $lang['REQUESTS'] = "Request";
 
   $lang['SAVE'] = 'Save';
@@ -257,9 +259,9 @@ if($_SESSION['language'] == 'ENG'){
   $lang['ADD'] = 'Hinzufügen';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
+  $lang['ADMIN_MODULES'] = 'Admin Module';
   $lang['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
   $lang['ADMIN_PROJECT_OPTIONS'] = 'Projektbuchungen';
-  $lang['ADMIN_MODULES'] = 'Admin Module';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
   $lang['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
@@ -344,6 +346,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 
   $lang['MANDATORY_SETTINGS'] = 'Pflichtfelder';
+  $lang['MARK_AS_ABSENT'] = 'Als Abwesend eintragen';
   $lang['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
   $lang['MINUTES'] = 'Minuten';
   $lang['MISSING'] = 'Fehlend';
@@ -380,6 +383,7 @@ if($_SESSION['language'] == 'ENG'){
   $lang['REGISTER_USERS'] = "LDAP Registrierung";
   $lang['REMOVE_USER'] = 'Benutzer Entfernen';
   $lang['REPLY_TEXT'] = 'Antwort';
+  $lang['REPORTS'] = 'Berichte';
   $lang['REQUESTS'] = "Anfragen";
 
   $lang['SAVE'] = 'Speichern';

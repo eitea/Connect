@@ -25,7 +25,10 @@ $deactivatedUserTravels = "DeactivatedUserTravelData";
 $feedbackTable = "feedbacks";
 $holidayTable = "holidays";
 $logTable = "logs"; //all loggings of user activity (checkin, vacation, sick..)
+
+$mailOptionsTable = "mailingOptions";
 $moduleTable = "modules"; //module enable/disable options set by systematic admin
+
 $negative_logTable = "unlogs"; //absent table
 
 $pdfTemplateTable = "templateData";
