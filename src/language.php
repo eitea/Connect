@@ -9,7 +9,7 @@ if($_SESSION['language'] == 'ENG'){
     "vacation" => "Vacation",
     "spLeave" => "Special Leave",
     "sick" => "Sick",
-    "ZA" => "Time Balance",
+    "ZA" => "Time Balance"
   );
   $lang_weeklyDayToString = array(
     "mon" => "Monday",
@@ -41,8 +41,7 @@ if($_SESSION['language'] == 'ENG'){
     "0" => "Work",
     "1" => "Vacation",
     "2" => "Special Leave",
-    "3" => "Sick",
-    "4" => "Time Balance"
+    "3" => "Sick"
   );
 
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
@@ -229,7 +228,7 @@ if($_SESSION['language'] == 'ENG'){
     "vacation" => "Urlaub",
     "spLeave" => "Sonderurlaub",
     "sick" => "Krank",
-    "ZA" => "Zeitausgleich",
+    "ZA" => "Zeitausgleich"
   );
   $lang_weeklyDayToString = array(
     "mon" => "Montag",
@@ -245,8 +244,7 @@ if($_SESSION['language'] == 'ENG'){
     "0" => "Dienst",
     "1" => "Urlaub",
     "2" => "Sonderurlaub",
-    "3" => "Krankenstand",
-    "4" => "Zeitausgleich",
+    "3" => "Krankenstand"
   );
   $lang_vacationRequestStatus = array("Offen", "Abgelehnt", "Bewilligt");
   $lang_monthToString = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
