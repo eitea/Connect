@@ -626,7 +626,7 @@ function textAreaAdjust(o) {
           $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
         }
 
-        $csv_Add[] = $row['infoText'];
+        $csv_Add[] = str_replace(';', ' ', $row['infoText']);
         $csv_Add[] = substr($A,0,10);
         $csv_Add[] = substr($B,0,10);
         $csv_Add[] = substr($row['start'],11,6);
