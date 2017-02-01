@@ -208,10 +208,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("DELETE FROM $clientDetailNotesTable WHERE id = $i");
     }
   }
+  if(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
+    //TODO: encrypt.
+
+  }
 
   $unlockBanking = false;
   if(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){ //TODO: after enabling master password, add this in here
-
+    $result = $conn->query("SELECT masterPassword FROM $configTable");
+    $row = $result->fetch_assoc();
+    if(crypt($_POST['displayBank'], $row['masterPassword']) == $row['masterPassword'] && !empty($row['masterPassword'])){ //unlock
+      $_SESSION['unlock'] = $_POST['displayBank'];
+    }
   }
 }
 
@@ -410,16 +418,10 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       <hr>
 
       <?php
-      $result = $conn->query("SELECT * FROM $clientDetail");
+      $result = $conn->query("SELECT * FROM $clientDetailBankTable");
        ?>
-      <?php : ?>
-        RAWLRWAA!
 
-      <?php else: ?>
-      We
-      <?php endif; ?>
-
-      <table>
+      <table class="table table-hover">
         <thead>
           <th>Name der Bank</th>
           <th>Iban</th>
@@ -439,8 +441,22 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
            ?>
         </tbody>
       </table>
+      <br><br><br>
 
-
+      <?php if(isset($_SESSION['unlock'])): ?>
+      <div class="container">
+        <div class="col-md-3">
+          <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />
+        </div>
+        <div class="col-md-5">
+          <input type="text" class="form-control" name="iban" placeholder="Iban" />
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" name="bic" placeholder="BIC" />
+        </div>
+        <button type="submit" class="btn btn-warning" name="addBankingDetail">+</button>
+      </div>
+      <?php endif; ?>
       <!--
       bic VARCHAR(20),
       iban VARCHAR(50),

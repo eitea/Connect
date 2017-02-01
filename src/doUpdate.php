@@ -540,6 +540,15 @@ if($row['version'] < 50){
   $conn->query("INSERT INTO $mailOptionsTable (port) VALUES ('80')");
 }
 
+if($row['version'] < 51){
+  $sql = "ALTER TABLE $clientDetailBankTable ADD COLUMN iv VARCHAR(100)";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added random key encryption.";
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

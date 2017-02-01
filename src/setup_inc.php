@@ -538,7 +538,8 @@ $sql = "CREATE TABLE $clientDetailBankTable(
   bic VARCHAR(20),
   iban VARCHAR(50),
   bankName VARCHAR(100),
-  parentID  INT(6) UNSIGNED,
+  parentID INT(6) UNSIGNED,
+  iv VARCHAR(100),
   FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
