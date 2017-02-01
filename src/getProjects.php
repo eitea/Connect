@@ -563,6 +563,10 @@ function textAreaAdjust(o) {
       if(isset($_POST['undo'])){
         $numRows--;
       }
+      if($numRows > 100){
+        $numRows = 100;
+        echo "<div class='alert alert-warning' role='alert'>Too many Entries: Cannot display every result. Please define further filters.</div>";
+      }
       for ($i=0; $i<$numRows; $i++) {
         $row = $result->fetch_assoc();
 
