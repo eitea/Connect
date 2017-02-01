@@ -16,20 +16,21 @@ $filterStatus ='';
 if (!empty($_POST['filteredUserID'])) {
   $filterID = $_POST['filteredUserID'];
 }
-
 if(!empty($_POST['filterYear'])){
   $filterDate = $_POST['filterYear'];
   if(!empty($_POST['filterMonth'])){
     $filterDate .= '-' . $_POST['filterMonth'];
   }
 }
-
 if (isset($_POST['filterStatus'])) {
   $filterStatus = $_POST['filterStatus'];
 }
 ?>
 
 <form method="post">
+
+  <!-- ############################### FILTER ################################### -->
+
   <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
     <?php
     $query = "SELECT * FROM $userTable;";
@@ -79,7 +80,6 @@ if (isset($_POST['filterStatus'])) {
   </select>
 
   <button type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
-
   <br><br>
 
   <!-- ############################### POST ################################### -->
@@ -91,18 +91,18 @@ if (isset($_POST['filterStatus'])) {
         $imm = $_POST['editingIndecesIM'][$i];
         $timeStart = $_POST['timesFrom'][$i] .':00';
         $timeFin = $_POST['timesTo'][$i] .':00';
+        $status = $_POST['newActivity'][$i];
 
         $newBreakVal = floatval($_POST['newBreakValues'][$i]);
 
         if($timeFin != '0000-00-00 00:00:00'){
-          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal' WHERE indexIM = $imm";
+          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
         } else {
-          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin', breakCredit = '$newBreakVal' WHERE indexIM = $imm";
+          $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
         }
 
         $conn->query($sql);
         echo mysqli_error($conn);
-
       }
     } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
       $index = $_POST["index"];
@@ -155,7 +155,6 @@ if (isset($_POST['filterStatus'])) {
               $conn->query($sql);
               echo mysqli_error($conn);
             }
-
             //update breakCredit and new endTime
             $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
             $conn->query($sql);
@@ -190,38 +189,33 @@ if (isset($_POST['filterStatus'])) {
     <div class="tab-content">
       <div id="home" class="tab-pane fade in active">
         <br>
-
-
         <table class="table table-striped table-condensed text-center">
           <tr>
             <th><?php echo $lang['DELETE']; ?></th>
             <th><?php echo $lang['WEEKLY_DAY']; ?></th>
             <th><?php echo $lang['ACTIVITY']; ?></th>
-            <th width=140px><?php echo $lang['FROM']; ?></th>
+            <th width="140px"><?php echo $lang['FROM']; ?></th>
             <th><?php echo $lang['LUNCHBREAK']; ?></th>
-            <th width=140px><?php echo $lang['TO']; ?></th>
+            <th width="140px"><?php echo $lang['TO']; ?></th>
 
             <th><?php echo $lang['SHOULD_TIME']; ?></th>
             <th><?php echo $lang['IS_TIME']; ?></th>
             <th><?php echo $lang['SUM']; ?></th>
             <th><?php echo $lang['DIFFERENCE']; ?></th>
           </tr>
-
           <?php
           if(empty($filterStatus)){
             $filterStatusAdd = "";
           } else {
             $filterStatusAdd = "AND status = '$filterStatus'";
           }
-
           $absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
           $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ";
+
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows >0) {
             while($row = $result->fetch_assoc()){
-
               $A = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
-
               if($row['timeEnd'] == '0000-00-00 00:00:00'){
                 $B = '0000-00-00 00:00:00';
                 $difference = timeDiff_Hours($row['time'], getCurrentTimestamp());
@@ -239,7 +233,16 @@ if (isset($_POST['filterStatus'])) {
               echo "<tr>";
               echo "<td><input type='checkbox' name='index[]' value='$k' /></td>";
               echo "<td>". $lang_weeklyDayToString[strtolower(date('D', strtotime($A)))] . "</td>";
-              echo "<td>" . $lang_activityToString[$row['status']] . "</td>";
+
+              echo "<td><select name='newActivity[]' class='js-example-basic-single'>";
+              for($j = 0; $j < 4; $j++){
+                if($row['status'] == $j){
+                  echo "<option value='$j' selected>". $lang_activityToString[$j] ."</option>";
+                } else {
+                  echo "<option value='$j'>". $lang_activityToString[$j] ."</option>";
+                }
+              }
+              echo "</select></td>";
 
               echo "<td><input type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom[]' value='" . substr($A,0,-3) . "' /></td>";
               echo "<td><div style='display:inline-block;text-align:center'><input type='number' step='any' class='form-control input-sm' name='newBreakValues[]' value='" . $row['breakCredit']. "' style='width:70px' /></div></td>";
