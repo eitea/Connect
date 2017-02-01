@@ -306,9 +306,9 @@ endif;
     </div>
     <div class="collapse" id="double_expected_absent_log">
       <div class="well">
-        Es wurde ein Eintrag in der Abwesenheitstabelle gefunden, der mit einem normalen Zeitstempel kollidiert.<br>
+        Es wurde ein Eintrag in der Abwesenheitstabelle gefunden, obwohl es einen Zeitstempel für dieses Datum gibt.
         D.h. obwohl ein gewöhnlicher Zeitstempel in der DB vorhanden ist, existiert dennoch ein Eintrag für Abwesenheit (ZA). <br>
-        Kann dazu führen, dass in manchen Übersichten zu viele erwartete Stunden gerechnet werden. <br>
+        Kann dazu führen, dass in manchen Übersichten zu viele erwartete Stunden gerechnet werden. Eines der beiden Einträge sollte daher gelöscht werden.<br>
       </div>
     </div>
     <table id='illTS' class="table table-hover">
@@ -320,7 +320,7 @@ endif;
         while($row = $result->fetch_assoc()){
           echo '<tr>';
           echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
-          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_log[]" value="'.$row['indexIM'].'"> '. $row['logTime'] . ' - '. $row['timeEnd'] .'</div></td>';
+          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_log[]" value="'.$row['indexIM'].'"> '. $row['logTime'] . ' - '. $row['timeEnd'] . ' - ' .$lang_activityToString[$row['status']] .'</div></td>';
           echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_absentlog[]" value="'.$row['negative_indexIM'].'"> '. $row['unlogTime'] .'</div></td>';
           echo '</tr>';
         }

@@ -7,8 +7,23 @@
 
 <form method=post>
   <?php
-  if(isset($_POST['saveButton'])){
+  $result = $conn->query("SELECT * FROM $mailOptionsTable");
+  $row = $result->fetch_assoc();
 
+  if(isset($_POST['saveButton'])){
+    if(!empty($_POST['smtp_host'])){
+
+    }
+    if(!empty($_POST['smtp_port'])){
+      $val = intval($_POST['smpt_port']);
+      $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
+    }
+    if(!empty($_POST['smtp_username'])){
+
+    }
+    if(!empty($_POST['smtp_password'])){
+    }
+    echo mysqli_error($conn);
   }
   ?>
 
@@ -19,28 +34,28 @@
       Host
     </div>
     <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_host" />
-    </div>
-    <br><br>
-    <div class="checkbox col-md-4">
-      Username
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_username" />
-    </div>
-    <br><br>
-    <div class="checkbox col-md-4">
-      Passwort
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_password" />
+      <input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>"/>
     </div>
     <br><br>
     <div class="checkbox col-md-4">
       Port
     </div>
     <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_port" />
+      <input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>"/>
+    </div>
+    <br><br><br>
+    <div class="checkbox col-md-4">
+      Username
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="text" class="form-control" name="smtp_username"  value="<?php echo $row['username']; ?>" />
+    </div>
+    <br><br>
+    <div class="checkbox col-md-4">
+      Passwort
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="password" class="form-control" name="smtp_password" />
     </div>
     <br>
   </div>

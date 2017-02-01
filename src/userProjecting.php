@@ -1,6 +1,10 @@
 <?php include 'header.php'; ?>
 <?php enableToBookings($userID);?>
-
+<style>
+.robot-control{
+  display:none;
+}
+</style>
 <?php
 $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
 $result = mysqli_query($conn, $sql);
@@ -23,6 +27,10 @@ $showUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if(!empty($_POST['captcha'])){
+    die("Bot detected. Aborting all Operations.");
+  }
+
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
@@ -288,7 +296,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
   </div>
-
+  <div class="robot-control"> <input type="text" name="captcha" value="" /></div>
 </form>
 
 <!-- /BODY -->

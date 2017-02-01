@@ -67,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
       echo $lang['ADMIN_DELETE'] ."<br>";
     }
-    break;
   }
 
   if (isset($_POST['submitUser'])) {
@@ -119,13 +118,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
-      $vacDaysPerYear = $_POST['daysPerYear'.$x];
+      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
       $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDaysPerYear' WHERE userID = '$x';";
       $conn->query($sql);
     }
 
-    if (isset($_POST['vacDaysCredit'.$x]) && is_numeric($_POST['vacDaysCredit'.$x])){
-      $vacDaysCredit = $_POST['vacDaysCredit'.$x];
+    if (isset($_POST['vacDaysCredit'.$x])){
+      $vacDaysCredit = floatval($_POST['vacDaysCredit'.$x]);
       $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$x';";
       $conn->query($sql);
     }
@@ -183,7 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $bookingTable SET sun='$sun' WHERE userID = '$x'";
       $conn->query($sql);
     }
-
+    echo mysqli_error($conn);
     if (!empty($_POST['password'.$x]) && !empty($_POST['passwordConfirm'.$x])) {
       $password = $_POST['password'.$x];
       $passwordConfirm = $_POST['passwordConfirm'.$x];
@@ -225,40 +224,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->query($sql);
 
     if(isset($_POST['isTimeAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
 
     if(isset($_POST['isProjectAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
     if(isset($_POST['isReportAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
     if(isset($_POST['canStamp'.$x])){
-      $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
     if(isset($_POST['canStamp'.$x]) && isset($_POST['canBook'.$x])){
-      $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
     if(isset($_POST['canEditTemplates'.$x])){
-      $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = $x";
+      $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
 
@@ -397,7 +396,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class=col-md-3>
                   <?php echo $lang['AMOUNT_VACATION_DAYS']; ?>: <br>
-                  <input type="number" class="form-control" step=any  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo number_format($vacDaysCredit/24, '.', ''); ?>"/>
+                  <input type="number" class="form-control" step="any"  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo sprintf('%.2f', $vacDaysCredit/24); ?>"/>
                 </div>
               </div>
               <br>

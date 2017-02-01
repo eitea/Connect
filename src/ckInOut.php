@@ -1,7 +1,7 @@
 <?php
 function checkIn($userID) {
   require 'connection.php';
-  $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) ." %";
+  $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) . ' %';
   $timeToUTC =  $_SESSION['timeToUTC'];
 
   $sql = "SELECT * FROM $logTable WHERE userID = $userID
@@ -28,7 +28,7 @@ function checkIn($userID) {
      $result = $conn->query($sql);
      $row=$result->fetch_assoc();
      $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
-     $sql = "INSERT INTO  $logTable (time, userID, status, timeToUTC, expectedHours) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC, $expectedHours);";
+     $sql = "INSERT INTO $logTable (time, userID, status, timeToUTC, expectedHours) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC, $expectedHours);";
      $conn->query($sql);
      echo mysqli_error($conn);
    }

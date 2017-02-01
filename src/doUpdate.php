@@ -537,9 +537,7 @@ if($row['version'] < 50){
   } else {
     echo "<br> Created table for email options.";
   }
-
   $conn->query("INSERT INTO $mailOptionsTable (port) VALUES ('80')");
-
 }
 
 //------------------------------------------------------------------------------
