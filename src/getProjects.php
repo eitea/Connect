@@ -759,7 +759,7 @@ function textAreaAdjust(o) {
       while ($row = $result->fetch_assoc()) {
         $cmpnyID = $row['id'];
         $cmpnyName = $row['name'];
-        echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
+        echo "<option name='act' value='$cmpnyID'>$cmpnyName</option>";
       }
     }
     echo '</select>';
@@ -775,7 +775,7 @@ function textAreaAdjust(o) {
       while ($row = $result->fetch_assoc()) {
         $cmpnyID = $row['id'];
         $cmpnyName = $row['name'];
-        echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+        echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
       }
     }
     ?>

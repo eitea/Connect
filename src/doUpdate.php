@@ -525,7 +525,7 @@ if($row['version'] < 49){
   }
 }
 
-if($row['version'] < 0){
+if($row['version'] < 50){
   $sql = "CREATE TABLE $mailOptionsTable(
     host VARCHAR(50),
     username VARCHAR(50),
