@@ -210,6 +210,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
     //TODO: encrypt.
+    //see encrypt decrypt SO
 
   }
 
