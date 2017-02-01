@@ -210,7 +210,7 @@ if (isset($_POST['filterStatus'])) {
             $filterStatusAdd = "AND status = '$filterStatus'";
           }
           $absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
-          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ";
+          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ORDER BY time ASC";
 
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows >0) {
@@ -263,7 +263,6 @@ if (isset($_POST['filterStatus'])) {
               $isTimeSUM += $difference;
             }
           }
-
 
           echo "<tr style=font-weight:bold;>
           <td>Sum: </td>
