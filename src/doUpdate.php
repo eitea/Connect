@@ -525,13 +525,20 @@ if($row['version'] < 49){
   }
 }
 
-if($row['version'] < 50){
+if($row['version'] < 0){
   $sql = "CREATE TABLE $mailOptionsTable(
     host VARCHAR(50),
     username VARCHAR(50),
     password VARCHAR(50),
     port VARCHAR(50)
   )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created table for email options.";
+  }
+
+  $conn->query("INSERT INTO $mailOptionsTable (port) VALUES ('80')");
 
 }
 

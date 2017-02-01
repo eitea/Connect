@@ -57,6 +57,7 @@ $('form').preventDoubleSubmission();
 
   require "connection.php";
   require "createTimestamps.php";
+  require 'validate.php';
   //language require is below
 
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
@@ -415,7 +416,7 @@ $('form').preventDoubleSubmission();
                   <?php endif; ?>
 
                   <?php
-                  if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php"){
+                  if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php"){
                     echo "<script>document.getElementById('adminOption_TIME').click();</script>";
                   }
                   ?>

@@ -1,5 +1,4 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; ?>
 <!-- BODY -->
 
 <link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">

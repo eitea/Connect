@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID); ?>
+<?php enableToCore($userID); ?>
 <!-- BODY -->
 
 <div class="page-header">

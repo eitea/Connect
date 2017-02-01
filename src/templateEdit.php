@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID); ?>
+<?php enableToCore($userID); ?>
 
 <script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>

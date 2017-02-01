@@ -1,5 +1,4 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; ?>
 <!-- BODY -->
 <?php
 $result = $conn->query("SELECT enableReadyCheck FROM $configTable");

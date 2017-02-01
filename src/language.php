@@ -427,5 +427,5 @@ if($_SESSION['language'] == 'ENG'){
   $lang['WEEKLY_DAY'] = 'Wochentag';
   $lang['WEEKLY_HOURS'] = 'Wochenstunden';
 
-  $lang['YES_I_WILL'] = 'Ja, ich will.';
+  $lang['YES_I_WILL'] = 'Ja, ich will.'; //ha-ha.
 }

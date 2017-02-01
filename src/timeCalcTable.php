@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToStamps($userID);?>
+<?php enableToStamps($userID);?>
 <!-- BODY -->
 
 <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">

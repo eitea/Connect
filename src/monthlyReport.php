@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToTime($userID);?>
+<?php enableToTime($userID);?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -96,7 +96,7 @@ if(isset($_POST['filterUserID']) && $_POST['filterUserID'] != 0){
     3 .... sickness
     4 ..... time balancing
     */
-    
+
     $style = "";
     $tinyEndTime = '-';
 

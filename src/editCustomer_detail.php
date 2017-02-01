@@ -1,5 +1,4 @@
 <?php include "header.php"; ?>
-<?php include "validate.php"; ?>
 
 <div class="page-header">
   <h3><?php echo $lang['CLIENT'] .' - Details'; ?></h3>
@@ -212,7 +211,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   $unlockBanking = false;
   if(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){ //TODO: after enabling master password, add this in here
-    
+
   }
 }
 

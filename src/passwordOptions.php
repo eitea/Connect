@@ -1,5 +1,5 @@
 <?php require 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID);?>
+<?php enableToCore($userID);?>
 
 <?php
 if(isset($_POST['saveButton'])){

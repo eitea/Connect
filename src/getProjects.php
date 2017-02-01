@@ -1,6 +1,6 @@
 <?php include 'header.php'; ?>
 <?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
-<?php include 'validate.php'; enableToProject($userID)?>
+<?php enableToProject($userID); ?>
 <!-- BODY -->
 <style>
 .popover{

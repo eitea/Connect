@@ -1,5 +1,4 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php';?>
 
 
 <div class="page-header">

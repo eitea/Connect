@@ -2,7 +2,7 @@
 //this page will only be called on the setup for persons with private hosting (open source version)
 
 require 'connection_config.php';
-require "validate.php"; denyToCloud();
+require_once "validate.php"; denyToCloud();
 
 $conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {

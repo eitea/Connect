@@ -1,5 +1,4 @@
-<?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID);?>
+<?php include 'header.php'; enableToCore($userID);?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -11,34 +10,45 @@
   if(isset($_POST['saveButton'])){
 
   }
-
   ?>
 
-  <h4>GitHub</h4>
+  <h4>SMTP Einstellungen</h4>
   <div class="container">
     <br>
-    <div class="checkbox col-md-12">
-      <input <?php if($rowGitHubTable['sslVerify'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='ssl' value='TRUE'>
-      SSL Certificate Validation
+    <div class="checkbox col-md-4">
+      Host
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="text" class="form-control" name="smtp_host" />
+    </div>
+    <br><br>
+    <div class="checkbox col-md-4">
+      Username
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="text" class="form-control" name="smtp_username" />
+    </div>
+    <br><br>
+    <div class="checkbox col-md-4">
+      Passwort
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="text" class="form-control" name="smtp_password" />
+    </div>
+    <br><br>
+    <div class="checkbox col-md-4">
+      Port
+    </div>
+    <div class="checkbox col-md-8">
+      <input type="text" class="form-control" name="smtp_port" />
     </div>
     <br>
-  </div>
-
-  <br><hr><br>
-
-  <h4>Terminal</h4>
-  <div class="container">
-    <br>
-    <div class="input-group">
-      <span class="input-group-addon"> User-Agent </span>
-      <input type=text class="form-control" name="userAgent" value="<?php echo $rowPiConnTable['header']; ?>" >
-    </div>
   </div>
 
   <br><hr><br>
 
   <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Save </button>
+    <button type="submit" class="btn btn-warning" name="saveButton"><?php echo $lang['SAVE']; ?> </button>
   </div>
 </form>
 

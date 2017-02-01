@@ -4,7 +4,7 @@ if(empty($_SESSION['userid'])){
   die('Please <a href="login.php">login</a> first.');
 }
 $userID = $_SESSION['userid'];
-include 'validate.php';
+require_once 'validate.php';
 denyToCloud();
 enableToCore($userID);
 

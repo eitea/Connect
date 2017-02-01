@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToCore($userID);?>
+<?php enableToCore($userID);?>
 
 <div class="page-header"><h3>Riesekostenabrechnung</h3></div>
 

@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToBookings($userID);?>
+<?php enableToBookings($userID);?>
 <!-- BODY -->
 <div class="page-header">
   <h3><?php echo $lang['TRAVEL_FORM']; ?></h3>

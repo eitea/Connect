@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'validate.php'; enableToTemplate($userID); ?>
+<?php enableToTemplate($userID); ?>
 
 <div class="page-header">
   <h3><?php echo $lang['PDF_TEMPLATES']; ?></h3>
