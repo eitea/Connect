@@ -1,4 +1,5 @@
 <?php include "header.php"; ?>
+<?php require_once 'utilities.php'; ?>
 
 <div class="page-header">
   <h3><?php echo $lang['CLIENT'] .' - Details'; ?></h3>
@@ -209,17 +210,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   if(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
-    //TODO: encrypt.
-    //see encrypt decrypt SO
+    $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
+    $keyValue = bin2hex($keyValue);
 
+    $bankName = test_input($_POST['bankName']);
+    $ibanVal = mc_encrypt(test_input($_POST['iban']), $keyValue);
+    $bicVal = mc_encrypt(test_input($_POST['bic']), $keyValue);
+
+    $ivValue = openssl_random_pseudo_bytes(8);
+    $ivValue = bin2hex($ivValue);
+
+    $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $_SESSION['unlock'], 0, $ivValue); //this did not need an iv since keyValue was random anyway, but silly php thinks its smarter than me.
+
+    $conn->query("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES ('$bankName', '$ibanVal', '$bicVal', '$keyValue', '$ivValue', $detailID)");
+    echo mysqli_error($conn);
+    $activeTab = 'banking';
   }
 
   $unlockBanking = false;
-  if(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){ //TODO: after enabling master password, add this in here
+  if(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){
+    $activeTab = 'banking';
     $result = $conn->query("SELECT masterPassword FROM $configTable");
     $row = $result->fetch_assoc();
-    if(crypt($_POST['displayBank'], $row['masterPassword']) == $row['masterPassword'] && !empty($row['masterPassword'])){ //unlock
-      $_SESSION['unlock'] = $_POST['displayBank'];
+    if(crypt($_POST['displayBankingDetailPass'], $row['masterPassword']) == $row['masterPassword'] && !empty($row['masterPassword'])){ //unlock
+      $_SESSION['unlock'] = $_POST['displayBankingDetailPass']; //TODO: this is no good.
+    } else {
+      unset($_SESSION['unlock']);
     }
   }
 }
@@ -418,10 +434,6 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       </div>
       <hr>
 
-      <?php
-      $result = $conn->query("SELECT * FROM $clientDetailBankTable");
-       ?>
-
       <table class="table table-hover">
         <thead>
           <th>Name der Bank</th>
@@ -431,13 +443,18 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         <tbody>
           <?php
             while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
-              if($unlockBanking){ //If this is set, decrypt banking detail
-
+              echo '<tr>';
+              echo '<td>' . $rowBank['bankName'] . '</td>';
+              if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
+                $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $_SESSION['unlock'], 0, $rowBank['iv2']);
+                echo "<br> Key: $keyValue <br>";
+                echo '<td>'.mc_decrypt($rowBank['iban'], $keyValue). '</td>';
+                echo '<td>'.mc_decrypt($rowBank['bic'], $keyValue). '</td>';
               } else { // **** it.
-                echo $row['bankName'];
                 echo '<td>**** **** **** ****</td>';
                 echo '<td>******** ***</td>';
               }
+              echo '</tr>';
             }
            ?>
         </tbody>

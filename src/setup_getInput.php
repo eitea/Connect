@@ -65,6 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $lastname = rawurlencode(test_input($_POST['lastname']));
       $loginname = rawurlencode(clean($_POST['localPart']) .'@'.clean($_POST['domainPart']));
 
+      echo "<script> var b = document.getElementById('continueButton'); b.disabled = true; b.innerHTML = 'Please wait...'; </script>";
       redirect("setup.php?companyName=$companyName&companyType=$companyType&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
     }
   } else {
@@ -212,7 +213,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     <div class="container">
       <div class="col-xs-3 col-xs-offset-9">
-        <button type='submit' name'submit' class="btn btn-warning">Continue</button>
+        <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
       </div>
     </div>
   </form>

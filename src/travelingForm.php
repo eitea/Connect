@@ -1,10 +1,17 @@
 <?php include 'header.php'; ?>
 <?php enableToBookings($userID);?>
+<style>
+.robot-control{
+  border:none;
+  background:none;
+  text-decoration: none;
+  box-shadow:none;
+}
+</style>
 <!-- BODY -->
 <div class="page-header">
   <h3><?php echo $lang['TRAVEL_FORM']; ?></h3>
 </div>
-
 <?php
 $currentMonth = substr(getCurrentTimestamp(),0,7);
 
@@ -15,6 +22,12 @@ $row = $result->fetch_assoc();
 $kmMoney = $row['kmMoney'];
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if (crypt($_POST['captcha'], $denyAndLogout) == $denyAndLogout) { quitAndLogout(); }
+
+   if(!empty($_POST['captcha'])){
+    die("Bot detected. Aborting all running Operations.");
+  }
+
   if(isset($_POST['addDrive']) && !empty($_POST['addInfoText']) && !empty($_POST['addTimeStart']) && !empty($_POST['addTimeEnd'])){
     $timeStart = test_input($_POST['addDate'].' '.$_POST['addTimeStart']) .'.00';
     $timeEnd = test_input($_POST['addDate'].' '.$_POST['addTimeEnd']) .'.00';
@@ -209,6 +222,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <div class="text-right">
     <button type="submit" class="btn btn-warning" name="addDrive"><?php echo $lang['ADD']; ?></button>
   </div>
+
+  <input class="robot-control" type="text" name="captcha" value="" />
 </form>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

@@ -9,7 +9,6 @@
     font-weight: 400;
     src: local('Montserrat-Regular'), url(http://fonts.gstatic.com/s/montserrat/v7/zhcz-_WihjSQC0oHJ9TCYPk_vArhqVIZ0nv9q090hN8.woff2) format('woff2');
   }
-
   #footer {
     clear: both;
     position:fixed;
@@ -23,7 +22,6 @@
     border-top:solid;
     border-bottom:solid;
   }
-
   body{
     color:white;
     overflow:hidden;
@@ -33,14 +31,12 @@
     background-attachment: fixed;
     background-size:cover;
   }
-
   label{
     color:white;
     font-family:sans-serif;
     font-size:10pt;
     letter-spacing:1px;
   }
-
   input[name="cancelButton"]{
     background-color:#ab325a;
   }
@@ -48,7 +44,6 @@
     background-color:#51a33c;
     margin-right:10%;
   }
-
   input[type=submit]{
     border:none;
     color:white;
@@ -61,13 +56,11 @@
     font-size:8pt;
     letter-spacing:1px;
   }
-
   input[type=text], input[type=password]{
     margin-bottom:5px;
     width:240px;
     margin-right:10%;
   }
-
   </style>
 </head>
 

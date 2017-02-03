@@ -23,6 +23,7 @@ if(isset($_POST['saveButton'])){
   $type = test_input($_POST['enableTimechange_type']);
   $conn->query("UPDATE $policyTable SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
   echo mysqli_error($conn);
+
   //master
   if(isset($_POST['masterPass_current']) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
     $passwordCurrent = test_input($_POST['masterPass_current']);
@@ -57,6 +58,8 @@ if(isset($_POST['saveButton'])){
     }
   }
 }
+
+$masterPasswordResult = $conn->query("SELECT masterPassword FROM $configTable");
 
 $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
@@ -131,8 +134,10 @@ $row = $result->fetch_assoc();
 
   <br><hr><br>
 
+<?php if(!$masterPasswordResult || $masterPasswordResult->num_rows <= 0): ?>
   <div class="col-xs-12">
-    <h4>Master Passwort Ändern</h4>
+    <h4>Master Passwort Setzen</h4>
+    <small>Achtung: Das Passwort kann momentan nur einmal gesetzt werden. Wählen sie daher ein starkes Passwort! Dabei gilt grundsätzlich: Länge > Komplexität. </small>
   </div>
   <br><br><br>
   <div class="container">
@@ -158,8 +163,8 @@ $row = $result->fetch_assoc();
     </div>
     <br><br><br>
   </div>
-
   <br><hr><br>
+<?php endif; ?>
 
   <div class="text-right">
     <button type="submit" class="btn btn-warning" name="saveButton">Speichern </button>

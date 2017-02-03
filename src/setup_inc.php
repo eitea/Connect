@@ -535,11 +535,12 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $clientDetailBankTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  bic VARCHAR(20),
-  iban VARCHAR(50),
-  bankName VARCHAR(100),
+  bic VARCHAR(200),
+  iban VARCHAR(200),
+  bankName VARCHAR(200),
   parentID INT(6) UNSIGNED,
-  iv VARCHAR(100),
+  iv VARCHAR(150),
+  iv2 VARCHAR(50),
   FOREIGN KEY (parentID) REFERENCES $clientDetailTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE

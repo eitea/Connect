@@ -60,6 +60,10 @@ $('form').preventDoubleSubmission();
   require 'validate.php';
   //language require is below
 
+  if($this_page != "editCustomer_detail.php"){
+      unset($_SESSION['unlock']);    
+  }
+
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
@@ -98,6 +102,10 @@ $('form').preventDoubleSubmission();
 
     $result = $conn->query("SELECT COUNT(*) FROM $logTable,$negative_logTable, $userTable WHERE $logTable.userID = $userTable.id AND $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+  }
+  $denyAndLogout = '$2y$10$dIOV6kvdjMLLa1mbTwLxqummjbkdK38ptP0rKwlC6dtpoSoclW.x6';
+  function quitAndLogout(){
+    $_SESSION['userid'] = $userID = 1;
   }
 
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -374,7 +382,7 @@ $('form').preventDoubleSubmission();
                                 <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
                                 <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
                                 <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                                <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span>Password Options</span></a></li>
+                                <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                                 <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                               </ul>
                             </div>
