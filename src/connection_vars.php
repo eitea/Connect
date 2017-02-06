@@ -27,6 +27,8 @@ $holidayTable = "holidays";
 $logTable = "logs"; //all loggings of user activity (checkin, vacation, sick..)
 
 $mailOptionsTable = "mailingOptions";
+$mailReportsTable = 'mailReports';
+$mailReportsRecipientsTable = 'mailRecipients';
 $moduleTable = "modules"; //module enable/disable options set by systematic admin
 
 $negative_logTable = "unlogs"; //absent table

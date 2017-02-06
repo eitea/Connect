@@ -61,7 +61,7 @@ $('form').preventDoubleSubmission();
   //language require is below
 
   if($this_page != "editCustomer_detail.php"){
-      unset($_SESSION['unlock']);    
+      unset($_SESSION['unlock']);
   }
 
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
@@ -472,7 +472,7 @@ $('form').preventDoubleSubmission();
                     </li>
                   <?php endif; ?>
                   <?php
-                  if($this_page == "reportOptions.php"){
+                  if($this_page == "reportOptions.php" || $this_page =='reportEmails.php'){
                     echo "<script>document.getElementById('adminOption_REPORT').click();</script>";
                   }
                   ?>

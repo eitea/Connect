@@ -196,7 +196,7 @@ if($row['version'] < 50){
   } else {
     echo "<br> Created table for email options.";
   }
-  $conn->query("INSERT INTO $mailOptionsTable (port) VALUES ('80')");
+  $conn->query("INSERT INTO $mailOptionsTable (port) VALUES ('25')");
 }
 
 if($row['version'] < 51){
@@ -224,8 +224,36 @@ if($row['version'] < 52){
   } else {
     echo "<br> Added random key random key encryption.";
   }
-
   $conn->query("ALTER TABLE $clientDetailBankTable MODIFY COLUMN iv VARCHAR(150)");
+}
+
+if($row['version'] < 53){
+  $sql = "CREATE TABLE $mailReportsTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    htmlMail TEXT,
+    repeatCount VARCHAR(50)
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added table for saving e-mail reports.";
+  }
+
+  $sql = "CREATE TABLE $mailReportsRecipientsTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reportID INT(6) UNSIGNED,
+    email VARCHAR(50) NOT NULL,
+    name VARCHAR(50),
+    FOREIGN KEY (reportID) REFERENCES $mailReportsTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created table for list of e-mail recipients. Report specific.";
+  }
 }
 
 //------------------------------------------------------------------------------

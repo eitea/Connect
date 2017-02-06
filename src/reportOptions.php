@@ -2,29 +2,33 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['ADVANCED_OPTIONS']; ?></h3>
+  <h3> E-mail <?php echo $lang['OPTIONS']; ?></h3>
 </div>
 
 <form method=post>
   <?php
-  $result = $conn->query("SELECT * FROM $mailOptionsTable");
-  $row = $result->fetch_assoc();
-
   if(isset($_POST['saveButton'])){
     if(!empty($_POST['smtp_host'])){
-
+      $val = test_input($_POST['smtp_host']);
+      $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
     }
     if(!empty($_POST['smtp_port'])){
-      $val = intval($_POST['smpt_port']);
+      $val = intval($_POST['smtp_port']);
       $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
     }
     if(!empty($_POST['smtp_username'])){
-
+      $val = test_input($_POST['smtp_username']);
+      $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
     }
     if(!empty($_POST['smtp_password'])){
+      $val = test_input($_POST['smtp_password']);
+      $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
     }
     echo mysqli_error($conn);
   }
+
+  $result = $conn->query("SELECT * FROM $mailOptionsTable");
+  $row = $result->fetch_assoc();
   ?>
 
   <h4>SMTP Einstellungen</h4>

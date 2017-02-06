@@ -568,4 +568,44 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE $mailOptionsTable(
+    host VARCHAR(50),
+    username VARCHAR(50),
+    password VARCHAR(50),
+    port VARCHAR(50)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $pdfTemplateTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    htmlCode TEXT
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $mailReportsTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    htmlMail TEXT,
+    repeatCount VARCHAR(50)
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $mailReportsRecipientsTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reportID INT(6) UNSIGNED,
+    email VARCHAR(50) NOT NULL,
+    FOREIGN KEY (reportID) REFERENCES $mailReportsTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
 ?>
