@@ -41,7 +41,6 @@ LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
 $filterQuery
 ORDER BY $projectBookingTable.end ASC";
-
 $result = $conn->query($sql);
 
 //replace all my findings

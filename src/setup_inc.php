@@ -572,7 +572,9 @@ $sql = "CREATE TABLE $policyTable (
     host VARCHAR(50),
     username VARCHAR(50),
     password VARCHAR(50),
-    port VARCHAR(50)
+    port VARCHAR(50),
+    smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
+    sender VARCHAR(50) DEFAULT 'noreplay@mail.com'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -581,19 +583,10 @@ $sql = "CREATE TABLE $policyTable (
   $sql = "CREATE TABLE $pdfTemplateTable(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
+    repeatCount VARCHAR(50),
     htmlCode TEXT
   )";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "CREATE TABLE $mailReportsTable(
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    htmlMail TEXT,
-    repeatCount VARCHAR(50)
-  )";
-  if (!$conn->query($sql)){
     echo mysqli_error($conn);
   }
 
@@ -601,7 +594,7 @@ $sql = "CREATE TABLE $policyTable (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     reportID INT(6) UNSIGNED,
     email VARCHAR(50) NOT NULL,
-    FOREIGN KEY (reportID) REFERENCES $mailReportsTable(id)
+    FOREIGN KEY (reportID) REFERENCES $pdfTemplateTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";

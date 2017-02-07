@@ -78,8 +78,9 @@ function redirect($url){
 
 /*see if password matches policy, returns true or false.
 * writes error message in optional output
-* has to contain at least 8 characters
-* at least one capital letter and one number
+* low - at least x characters (x from policy table)
+* medium - at least one capital letter and one number
+* high - at least one special character
 */
 function match_passwordpolicy($p, &$out = ''){
   require "connection.php";

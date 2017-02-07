@@ -227,25 +227,30 @@ if($row['version'] < 52){
   $conn->query("ALTER TABLE $clientDetailBankTable MODIFY COLUMN iv VARCHAR(150)");
 }
 
-if($row['version'] < 53){
-  $sql = "CREATE TABLE $mailReportsTable(
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    htmlMail TEXT,
-    repeatCount VARCHAR(50)
-  )";
+if($row['version'] < 54){
+  $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls'";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
   } else {
-    echo "<br> Added table for saving e-mail reports.";
+    echo "<br> Added smtpSecure option.";
   }
+
+  $sql = "ALTER TABLE $pdfTemplateTable ADD COLUMN repeatCount VARCHAR(50)";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added smtpSecure option.";
+  }
+
+  $conn->query("DROP TABLE $mailReportsRecipientsTable");
+  $conn->query("DROP TABLE $mailReportsTable");
 
   $sql = "CREATE TABLE $mailReportsRecipientsTable(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     reportID INT(6) UNSIGNED,
     email VARCHAR(50) NOT NULL,
     name VARCHAR(50),
-    FOREIGN KEY (reportID) REFERENCES $mailReportsTable(id)
+    FOREIGN KEY (reportID) REFERENCES $pdfTemplateTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
@@ -253,6 +258,13 @@ if($row['version'] < 53){
     echo mysqli_error($conn);
   } else {
     echo "<br> Created table for list of e-mail recipients. Report specific.";
+  }
+
+  $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN sender VARCHAR(50) DEFAULT 'noreplay@mail.com'";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added sending address.";
   }
 }
 
