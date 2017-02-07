@@ -467,6 +467,8 @@ $('form').preventDoubleSubmission();
                         <ul class="nav navbar-nav">
                           <li><a <?php if($this_page =='reportEmails.php'){echo $setActiveLink;}?> href="reportEmails.php"><i class="fa fa-envelope-o"></i><span> E-mail <?php echo $lang['REPORTS']; ?> </span></a></li>
                           <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><i class="fa fa-gear"></i><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                          <hr>
+                          <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
                         </ul>
                       </div>
                     </li>
