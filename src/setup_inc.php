@@ -228,7 +228,8 @@ $sql = "CREATE TABLE $configTable(
   bookingTimeBuffer INT(3) DEFAULT '5',
   cooldownTimer INT(3) DEFAULT '2',
   enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-  masterPassword VARCHAR(100)
+  masterPassword VARCHAR(100),
+  enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -574,7 +575,8 @@ $sql = "CREATE TABLE $policyTable (
     password VARCHAR(50),
     port VARCHAR(50),
     smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
-    sender VARCHAR(50) DEFAULT 'noreplay@mail.com'
+    sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
+    enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

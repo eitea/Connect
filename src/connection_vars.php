@@ -2,6 +2,7 @@
 
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
+$auditLogsTable = "auditLogs";
 
 $bookingTable = "bookingData"; //contains weekly schedule for each user
 
@@ -26,6 +27,7 @@ $feedbackTable = "feedbacks";
 $holidayTable = "holidays";
 $logTable = "logs"; //all loggings of user activity (checkin, vacation, sick..)
 
+$mailLogsTable = "mailLogs";
 $mailOptionsTable = "mailingOptions";
 $mailReportsTable = 'mailReports';
 $mailReportsRecipientsTable = 'mailRecipients';

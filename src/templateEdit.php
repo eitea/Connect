@@ -54,6 +54,10 @@ if(isset($_GET['id'])){
     $templateContent = "Do not fiddle with the URL. Thank you.";
   }
 }
+
+if($templateName == 'Example_Report'){
+  die("Cannot edit Main Report");
+}
 ?>
 
 <form method="POST">

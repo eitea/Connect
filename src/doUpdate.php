@@ -268,6 +268,47 @@ if($row['version'] < 54){
   }
 }
 
+if($row['version'] < 55){
+  //insert example report
+  $exampleTemplate = "<h1>Main Report</h1>
+  <p>[REPEAT]</p>
+  <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
+  <p>[INFOTEXT]</p>
+  <p><br />[REPEAT END]</p>";
+  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
+  echo "<br> Added Example Report";
+
+  $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Enabled Option for email logging.";
+  }
+
+  $sql = "CREATE TABLE $auditLogsTable(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    changeTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    changeStatement TEXT NOT NULL
+    )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created table for audit logging.";
+  }
+
+  $sql = "CREATE TABLE $mailLogsTable(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timeSent DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sentTo VARCHAR(100),
+    messageLog TEXT
+    )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created table for email logging.";
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

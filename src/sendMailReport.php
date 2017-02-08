@@ -77,7 +77,6 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   $mail->SMTPSecure = $row['smtpSecure'];
   $mail->setFrom($row['sender']);
 
-
   //add mail recipients
   $result = $conn->query("SELECT * FROM $mailReportsRecipientsTable WHERE reportID = $reportID");
   if(!$result || $result->num_rows <= 0){
@@ -85,14 +84,21 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   } else {
     echo "<script>window.close();</script>";
   }
+  $recipients = "";
   while($result && ($row = $result->fetch_assoc())){
     $mail->addAddress($row['email']);     // Add a recipient, name is optional
+    $recipients .= $row['email'] .' ';
   }
 
   $mail->isHTML(true);                       // Set email format to HTML
   $mail->Subject = $rowContent['name'];
   $mail->Body    = $content;
   $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
-  $mail->send();
+  $errorInfo = "";
+  if(!$mail->send()){
+    $errorInfo = $mail->ErrorInfo;
+  }
+  $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+
 }
 ?>

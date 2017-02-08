@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
               } else {
-                $icon = "fa fa-paw"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs
+                $icon = "fa fa-music"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music
               }
 
               echo "<tr>";

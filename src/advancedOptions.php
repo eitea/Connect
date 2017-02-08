@@ -68,7 +68,6 @@
     </div>
     <br>
   </div>
-
   <br><hr><br>
 
   <h4>Terminal</h4>
@@ -79,7 +78,6 @@
       <input type=text class="form-control" name="userAgent" value="<?php echo $rowPiConnTable['header']; ?>" >
     </div>
   </div>
-
   <br><hr><br>
 
   <h4>Buffers</h4>
@@ -96,7 +94,6 @@
     </div>
     <br>
   </div>
-
   <br><hr><br>
 
   <h4>Display</h4>
@@ -108,7 +105,6 @@
     </div>
     <br>
   </div>
-
   <br><hr><br>
 
   <div class="text-right">

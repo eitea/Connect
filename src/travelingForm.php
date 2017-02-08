@@ -22,8 +22,6 @@ $row = $result->fetch_assoc();
 $kmMoney = $row['kmMoney'];
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if (crypt($_POST['captcha'], $denyAndLogout) == $denyAndLogout) { quitAndLogout(); }
-
    if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all running Operations.");
   }
