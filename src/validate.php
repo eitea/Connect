@@ -63,7 +63,7 @@ function enableToTemplate($userID){
 }
 
 function enableToReport($userID){
-  $require 'connection.php';
+  require 'connection.php';
   $sql = "SELECT isReportAdmin FROM $roleTable WHERE userID = $userID AND isReportAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if(!$result || $result->num_rows <= 0){
