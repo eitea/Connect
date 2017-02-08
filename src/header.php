@@ -383,6 +383,7 @@ $('form').preventDoubleSubmission();
                                 <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
                                 <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                                 <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
+                                <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>                      
                                 <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                               </ul>
                             </div>
@@ -397,7 +398,7 @@ $('form').preventDoubleSubmission();
                   <?php
                   if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
                     echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-                  } elseif($this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+                  } elseif($this_page == "reportOptions.php" || $this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
                     echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
                   } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
                     echo "<script>document.getElementById('adminOption_CORE').click();</script>";
@@ -466,7 +467,6 @@ $('form').preventDoubleSubmission();
                       <div class="collapse" id="toggleAdminOption_REPORT" style="height: 0px;">
                         <ul class="nav navbar-nav">
                           <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"><i class="fa fa-envelope-o"></i><span> E-mail <?php echo $lang['REPORTS']; ?> </span></a></li>
-                          <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><i class="fa fa-gear"></i><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
                           <hr>
                           <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
                         </ul>
@@ -474,7 +474,7 @@ $('form').preventDoubleSubmission();
                     </li>
                   <?php endif; ?>
                   <?php
-                  if($this_page == "reportOptions.php" || $this_page =='templateSelect.php'){
+                  if($this_page =='templateSelect.php'){
                     echo "<script>document.getElementById('adminOption_REPORT').click();</script>";
                   }
                   ?>

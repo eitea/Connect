@@ -24,7 +24,7 @@ if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable, else do
   echo implode('<br>', $output) .'<br><br>';
 }
 
-$command = "git -C $repositoryPath fetch --force 2>&1";
+$command = "git -C $repositoryPath fetch --all 2>&1";
 exec($command, $output, $returnValue);
 
 $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
