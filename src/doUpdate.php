@@ -275,7 +275,7 @@ if($row['version'] < 55){
   <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
   <p>[INFOTEXT]</p>
   <p><br />[REPEAT END]</p>";
-  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
+  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
   echo "<br> Added Example Report";
 
   $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";

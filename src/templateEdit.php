@@ -55,7 +55,7 @@ if(isset($_GET['id'])){
   }
 }
 
-if($templateName == 'Example_Report'){
+if($templateName == 'Main_Report'){
   die("Cannot edit Main Report");
 }
 ?>

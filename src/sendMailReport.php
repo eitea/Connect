@@ -14,6 +14,11 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   $reportID = $rowContent['id'];
   $content = $rowContent['htmlCode'];
 
+  //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
+  if($rowContent['name'] == 'Main_Report' )){
+
+  }
+
   //grab positions
   $pos1 = strpos($content, "[REPEAT]");
   $pos2 = strpos($content, "[REPEAT END]");
