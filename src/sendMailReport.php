@@ -1,7 +1,7 @@
 
 <?php require_once "../plugins/phpMailer/class.phpmailer.php"; ?>
 <?php require_once "../plugins/phpMailer/class.smtp.php"; ?>
-<?php require_once "connection.php"; require_once "validate.php"; enableToReport($userID); ?>
+<?php require_once "connection.php"; ?>
 
 <?php
 $mail = new PHPMailer();
