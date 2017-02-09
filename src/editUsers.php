@@ -335,7 +335,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="col-md-6 text-right">
                 <form method="post">
                   <button type='submit' value="<?php echo $x; ?>" name='deactivate' style="background:none; border:none;" title="<?php echo $lang['DEACTIVATE']; ?>">
-                    <img width="10px" height="10px" src="../images/minus_circle.png" />
+                    <small><?php echo $lang['DEACTIVATE']; ?></small>
                   </button>
                 </form>
               </div>
