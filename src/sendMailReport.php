@@ -3,13 +3,18 @@
 <?php require_once "../plugins/phpMailer/class.smtp.php"; ?>
 <?php require_once "connection.php"; require_once "createTimestamps.php"; ?>
 <?php require_once "language.php"; ?>
-
+<?php require "../plugins/cssToInlineStyles/autoload.php"; ?>
 <?php
 $mail = new PHPMailer();
 $mail->IsSMTP();
 $mail->SMTPAuth   = true;
 
-//get all mail content
+//for css
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+$cssToInlineStyles = new CssToInlineStyles();
+$css = file_get_contents('../plugins/homeMenu/template.css');
+
+//get all mails
 $resultContent = $conn->query("SELECT * FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //<> == !=
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for each report, send a mail
   $reportID = $rowContent['id'];
@@ -26,32 +31,49 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   $t = localtime(time(), true);
   $today = $t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]);
   $today = '2017-01-26';
-    //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
-    if($rowContent['name'] == 'Main_Report'){
-      $html_head .= "<h4>Anwesenheit: (Name -Status- Von - Bis - Saldo (ohne ZA) )</h4>";
-      //select all users and select log from today if exists else log = null
-      $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
-      while($result && ($row = $result->fetch_assoc())){
-        $html_head .= "<p>".$row['firstname'].' '.$row['lastname']." - ";
-        //if a user did not check in, mark him as absent.
-        if(empty($row['time'])){
-          $row['status'] = '-1';
-          $row['time'] = ' - ';
-          $row['timeEnd'] = ' - ';
-        } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time (dont bother...)
-          $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
-          $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
-        }
-        //select count his Saldo
-        $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours - breakCredit) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
-        if(!$resultSaldo || !($rowSaldo = $resultSaldo->fetch_assoc())){
-          $rowSaldo['total'] = 'x';
-        }
-        //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
-        $html_head .= $lang_activityToString[$row['status']].' - '.substr($row['time'],11,5).' - '.substr($row['timeEnd'],11,5). ' | Saldo: ('.$rowSaldo['total']. ")</p>";
+  //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
+  if($rowContent['name'] == 'Main_Report'){
+    $html_head .= "<h4>Anwesenheit:</h4><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo</th></tr>";
+    //select all users and select log from today if exists else log = null
+    $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
+    while($result && ($row = $result->fetch_assoc())){
+      $beginDate = $row['beginningDate'];
+      $exitDate = ($userRow['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
+
+      $html_head .= "<tr><p><td>".$row['firstname'].' '.$row['lastname']."</td>";
+      //if a user did not check in, mark him as absent.
+      if(empty($row['time'])){
+        $row['status'] = '-1';
+        $row['time'] = ' - ';
+        $row['timeEnd'] = ' - ';
+      } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time (dont bother...)
+        $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
+        $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
       }
-      $html_head .= "<br><h4>Buchungen: </h4>";
+
+      //SALDO calculation:
+      $saldo = 0;
+      $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours - breakCredit) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
+      if(!$resultSaldo || !($rowSaldo = $resultSaldo->fetch_assoc())){
+        $rowSaldo['total'] = 'x';
+      }
+      $saldo = $rowSaldo['total'];
+      //extra expectedHours from unlogs:
+      $resultSaldo = $conn->query("SELECT * FROM $negative_logTable WHERE time > '$beginDate' AND time < '$exitDate' AND userID = ".$row['id']);
+      while($resultSaldo && ($rowSaldo = $resultSaldo->fetch_assoc())){
+        if(!isHoliday($rowSaldo['time'])){
+          $saldo -= $rowSaldo[strtolower(date('D', strtotime($rowSaldo['time'])))];
+        }
+      }
+
+      //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
+      $html_head .= '<td>'.$lang_activityToString[$row['status']].'</td> <td>'.substr($row['time'],11,5).'</td><td>'.substr($row['timeEnd'],11,5). "</td><td>$saldo</td></p></tr>";
     }
+    $html_head .= "</table><br><h4>Buchungen: </h4>";
+  }
+
+  //convert only table above to inline css style, or else <ul> will get removed by this little ****
+  $html_head = $cssToInlineStyles->convert($html_head, $css);
 
   $sql="SELECT $projectTable.id AS projectID,
   $clientTable.id AS clientID,
@@ -99,7 +121,8 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   }
 
   //glue my html back together
-  //'<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="../plugins/homeMenu/template.css" rel="stylesheet" /></head>' .
+  //'<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="" rel="stylesheet" /></head>' .
+
   $content = $html_head . $html_foot;
 
   //get mail server options
