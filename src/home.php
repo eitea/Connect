@@ -27,16 +27,17 @@ $overTimeAdditive = $userRow['overTimeLump'] * ceil(timeDiff_Hours(substr($userR
 $beginDate = $userRow['beginningDate'];
 $exitDate = ($userRow['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $userRow['exitDate'];
 
-$sql = "SELECT * FROM $logTable WHERE userID = $curID";
+$sql = "SELECT * FROM $logTable WHERE time > '$beginDate' AND time < '$exitDate' AND userID = $curID";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     if($row['timeEnd'] == '0000-00-00 00:00:00'){
+      //open timestamp lowers expected Hours according to how long user has been checked in
       $timeEnd = getCurrentTimestamp();
-      if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){
+      if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){//user has been checked in longer than his expected Hours
         $expectedHours += $row['expectedHours'];
       } else {
-        $expectedHours += timeDiff_Hours($row['time'], $timeEnd); //this may only happen for OPEN timestamps
+        $expectedHours += timeDiff_Hours($row['time'], $timeEnd); //alter expected hours to match time he has been here already
       }
     } else {
       $timeEnd = $row['timeEnd'];

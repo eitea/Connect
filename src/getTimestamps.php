@@ -210,8 +210,8 @@ if (isset($_POST['filterStatus'])) {
             $filterStatusAdd = "AND status = '$filterStatus'";
           }
           $absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
-          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ORDER BY time ASC";
 
+          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ORDER BY time ASC";          
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows >0) {
             while($row = $result->fetch_assoc()){

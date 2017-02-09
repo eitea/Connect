@@ -142,22 +142,22 @@ if($row['version'] < 47){
     expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     expirationDuration INT(3),
     expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    } else {
-      echo "<br> Created Passwordpolicy table";
-    }
-
-    $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+  )";
+  if (!$conn->query($sql)) {
     echo mysqli_error($conn);
+  } else {
+    echo "<br> Created Passwordpolicy table";
+  }
 
-    $sql = "ALTER TABLE $userTable ADD COLUMN lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    } else {
-      echo "<br> Added expiration Date to PSW";
-    }
+  $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+  echo mysqli_error($conn);
+
+  $sql = "ALTER TABLE $userTable ADD COLUMN lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added expiration Date to PSW";
+  }
 }
 
 if($row['version'] < 48){
@@ -288,7 +288,7 @@ if($row['version'] < 55){
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     changeTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     changeStatement TEXT NOT NULL
-    )";
+  )";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
   } else {
@@ -300,26 +300,12 @@ if($row['version'] < 55){
     timeSent DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     sentTo VARCHAR(100),
     messageLog TEXT
-    )";
+  )";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
   } else {
     echo "<br> Created table for email logging.";
   }
-}
-
-if($row['version'] < 56){
-  $conn->query("DELETE FROM $pdfTemplateTable WHERE name = 'Example_Report' OR name = 'Main_Report'");
-  $exampleTemplate = "<h1>Main Report</h1>
-  <p>[REPEAT]</p>
-  <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
-  <ul>
-  <li>[CLIENT] -&nbsp;[PROJECT]</li>
-  <li>[INFOTEXT]</li>
-  </ul>
-  <p>[REPEAT END]</p>";
-  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
-  echo "<br> Changed Main Report";
 }
 
 if($row['version'] < 57){
@@ -366,6 +352,21 @@ if($row['version'] < 57){
     $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
     $conn->query($sql);
     echo mysqli_error($conn);
+  }
+}
+
+if($row['version'] < 58){
+  $conn->query("DELETE FROM $pdfTemplateTable WHERE name = 'Example_Report' OR name = 'Main_Report'");
+  $exampleTemplate = "<h1>Main Report</h1>
+  <p>[REPEAT]</p>
+  <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
+  <ul>
+  <li>[CLIENT] -&nbsp;[PROJECT]</li>
+  <li>[INFOTEXT]</li>
+  </ul>
+  <p>[REPEAT END]</p>";
+  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
+  echo "<br> Changed Main Report";
 }
 
 //------------------------------------------------------------------------------

@@ -33,12 +33,13 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   $today = '2017-01-26';
   //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
   if($rowContent['name'] == 'Main_Report'){
-    $html_head .= "<h4>Anwesenheit:</h4><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo</th></tr>";
+    $html_head .= "<h4>Anwesenheit:</h4><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo (Stunden)</th></tr>";
     //select all users and select log from today if exists else log = null
     $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
+    echo mysqli_error($conn);
     while($result && ($row = $result->fetch_assoc())){
       $beginDate = $row['beginningDate'];
-      $exitDate = ($userRow['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
+      $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
 
       $html_head .= "<tr><p><td>".$row['firstname'].' '.$row['lastname']."</td>";
       //if a user did not check in, mark him as absent.
@@ -50,28 +51,30 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
         $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
         $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
       }
-
+      
       //SALDO calculation:
       $saldo = 0;
-      $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours - breakCredit) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
+      $resultSaldo = $conn->query("SELECT SUM(((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours - breakCredit) AS total FROM $logTable WHERE time > '$beginDate' AND time < '$exitDate' AND timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
+      echo mysqli_error($conn);
       if(!$resultSaldo || !($rowSaldo = $resultSaldo->fetch_assoc())){
         $rowSaldo['total'] = 'x';
       }
       $saldo = $rowSaldo['total'];
-      //extra expectedHours from unlogs:
+      //extra expectedHours from unlogs:   ||time > '$beginDate' AND time < '$exitDate' AND
       $resultSaldo = $conn->query("SELECT * FROM $negative_logTable WHERE time > '$beginDate' AND time < '$exitDate' AND userID = ".$row['id']);
+      echo mysqli_error($conn);
       while($resultSaldo && ($rowSaldo = $resultSaldo->fetch_assoc())){
         if(!isHoliday($rowSaldo['time'])){
           $saldo -= $rowSaldo[strtolower(date('D', strtotime($rowSaldo['time'])))];
         }
       }
+      //end saldo
 
-      //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
+      $saldo = sprintf('%.2f', $saldo);
       $html_head .= '<td>'.$lang_activityToString[$row['status']].'</td> <td>'.substr($row['time'],11,5).'</td><td>'.substr($row['timeEnd'],11,5). "</td><td>$saldo</td></p></tr>";
     }
     $html_head .= "</table><br><h4>Buchungen: </h4>";
   }
-
   //convert only table above to inline css style, or else <ul> will get removed by this little ****
   $html_head = $cssToInlineStyles->convert($html_head, $css);
 
