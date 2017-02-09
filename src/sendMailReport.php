@@ -29,7 +29,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
     //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
     if($rowContent['name'] == 'Main_Report'){
       $html_head .= "<h4>Anwesenheit: (Name -Status- Von - Bis - Saldo (ohne ZA) )</h4>";
-      //select all users and if they have a log, select that too (left join)    , SUM((timeEnd - time) - expectedHours) AS total
+      //select all users and if they have a log, select that too (left join)  , SUM((timeEnd - time) - expectedHours) AS total
       $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
       while($result && ($row = $result->fetch_assoc())){
         $html_head .= "<p>".$row['firstname'].' '.$row['lastname']." -";
@@ -38,13 +38,12 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
           $row['status'] = '-1';
           $row['time'] = ' - ';
           $row['timeEnd'] = ' - ';
-          //$row['total'] = ' - ';
-        } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time, dont bother...
+        } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time (dont bother...)
           $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
           $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
         }
         //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
-        $html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5)."</p>";
+        $html_head .= $lang_activityToStringsubstr[$row['status']].' - '.($row['time'],11,5).' '.substr($row['timeEnd'],11,5)."</p>";
       }
       $html_head .= "<br><h4>Buchungen: </h4>";
     }
@@ -70,22 +69,30 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   ORDER BY $projectBookingTable.end ASC";
 
   $result = $conn->query($sql);
-  while($result && ($row = $result->fetch_assoc())){
-    $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
-    $end = carryOverAdder_Hours($row['end'], $row['timeToUTC']);
+  $prevName = "";
+  if($result && ($row = $result->fetch_assoc())){
+    if($prevName != $row['name']){
+      $html_head .= '<br>';
+      $prevName = $row['name'];
+    }
+    do{
+      $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
+      $end = carryOverAdder_Hours($row['end'], $row['timeToUTC']);
 
-    $appendPattern = str_replace("[NAME]", $row['firstname'] . ' ' . $row['lastname'], $repeat);
-    $appendPattern = str_replace("[CLIENT]", $row['clientName'], $appendPattern);
-    $appendPattern = str_replace("[PROJECT]", $row['projectName'], $appendPattern);
-    $appendPattern = str_replace("[CLIENT]", $row['clientName'], $appendPattern);
-    $appendPattern = str_replace("[INFOTEXT]", $row['infoText'], $appendPattern);
-    $appendPattern = str_replace("[HOURLY RATE]", $row['hourlyPrice'], $appendPattern);
-    $appendPattern = str_replace("[DATE]", substr($start,0,10), $appendPattern);
-    $appendPattern = str_replace("[FROM]", substr($start,11,5), $appendPattern);
-    $appendPattern = str_replace("[TO]", substr($end,11,5), $appendPattern);
+      $appendPattern = str_replace("[NAME]", $row['firstname'] . ' ' . $row['lastname'], $repeat);
+      $appendPattern = str_replace("[CLIENT]", $row['clientName'], $appendPattern);
+      $appendPattern = str_replace("[PROJECT]", $row['projectName'], $appendPattern);
+      $appendPattern = str_replace("[CLIENT]", $row['clientName'], $appendPattern);
+      $appendPattern = str_replace("[INFOTEXT]", $row['infoText'], $appendPattern);
+      $appendPattern = str_replace("[HOURLY RATE]", $row['hourlyPrice'], $appendPattern);
+      $appendPattern = str_replace("[DATE]", substr($start,0,10), $appendPattern);
+      $appendPattern = str_replace("[FROM]", substr($start,11,5), $appendPattern);
+      $appendPattern = str_replace("[TO]", substr($end,11,5), $appendPattern);
 
-    $html_head .= $appendPattern;
+      $html_head .= $appendPattern;
+    } while($result && ($row = $result->fetch_assoc()));
   }
+
   //glue my html back together
   //'<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="../plugins/homeMenu/template.css" rel="stylesheet" /></head>' .
   $content = $html_head . $html_foot;

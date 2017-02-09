@@ -269,12 +269,11 @@ if($row['version'] < 54){
 }
 
 if($row['version'] < 55){
-  //insert example report
   $exampleTemplate = "<h1>Main Report</h1>
   <p>[REPEAT]</p>
   <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
   <p>[INFOTEXT]</p>
-  <p><br />[REPEAT END]</p>";
+  <p>[REPEAT END]</p>";
   $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
   echo "<br> Added Example Report";
 
@@ -307,6 +306,17 @@ if($row['version'] < 55){
   } else {
     echo "<br> Created table for email logging.";
   }
+}
+
+if($row['version'] < 56){
+  $conn->query("DELETE FROM $pdfTemplateTable WHERE name = 'Example_Report' OR name = 'Main_Report'");
+  $exampleTemplate = "<h1>Main Report</h1>
+  <p>[REPEAT]</p>
+  <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
+  <p>[INFOTEXT]</p>
+  <p>[REPEAT END]</p>";
+  $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
+  echo "<br> Changed Main Report";
 }
 
 //------------------------------------------------------------------------------
