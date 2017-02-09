@@ -313,11 +313,15 @@ if($row['version'] < 56){
   $exampleTemplate = "<h1>Main Report</h1>
   <p>[REPEAT]</p>
   <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
-  <p>[INFOTEXT]</p>
+  <ul>
+  <li>[CLIENT] -&nbsp;[PROJECT]</li>
+  <li>[INFOTEXT]</li>
+  </ul>
   <p>[REPEAT END]</p>";
   $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
   echo "<br> Changed Main Report";
 }
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

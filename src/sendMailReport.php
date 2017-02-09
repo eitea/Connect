@@ -25,14 +25,14 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   //replace all findings
   $t = localtime(time(), true);
   $today = $t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]);
-
+  $today = '2017-01-26';
     //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
     if($rowContent['name'] == 'Main_Report'){
       $html_head .= "<h4>Anwesenheit: (Name -Status- Von - Bis - Saldo (ohne ZA) )</h4>";
-      //select all users and if they have a log, select that too (left join)  , SUM((timeEnd - time) - expectedHours) AS total
+      //select all users and select log from today if exists else log = null
       $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
       while($result && ($row = $result->fetch_assoc())){
-        $html_head .= "<p>".$row['firstname'].' '.$row['lastname']." -";
+        $html_head .= "<p>".$row['firstname'].' '.$row['lastname']." - ";
         //if a user did not check in, mark him as absent.
         if(empty($row['time'])){
           $row['status'] = '-1';
@@ -42,8 +42,13 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
           $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
           $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
         }
+        //select count his Saldo
+        $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
+        if(!$resultSaldo || !($rowSaldo = $resultSaldo->fetch_assoc())){
+          $rowSaldo['total'] = 'x';
+        }
         //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
-        $html_head .= $lang_activityToStringsubstr[$row['status']].' - '.($row['time'],11,5).' '.substr($row['timeEnd'],11,5)."</p>";
+        $html_head .= $lang_activityToString[$row['status']].' - '.substr($row['time'],11,5).' - '.substr($row['timeEnd'],11,5). ' | Saldo: ('.$rowSaldo['total']. ")</p>";
       }
       $html_head .= "<br><h4>Buchungen: </h4>";
     }
@@ -62,20 +67,20 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   FROM $projectBookingTable
   INNER JOIN $logTable ON $projectBookingTable.timeStampID = $logTable.indexIM
   INNER JOIN $userTable ON $logTable.userID = $userTable.id
-  INNER JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
-  INNER JOIN $clientTable ON $projectTable.clientID = $clientTable.id
-  INNER JOIN $companyTable ON $clientTable.companyID = $companyTable.id
+  LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
+  LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
+  LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
   WHERE $projectBookingTable.start LIKE '$today %'
-  ORDER BY $projectBookingTable.end ASC";
+  ORDER BY $userTable.firstname, $projectBookingTable.end ASC";
 
   $result = $conn->query($sql);
-  $prevName = "";
   if($result && ($row = $result->fetch_assoc())){
-    if($prevName != $row['name']){
-      $html_head .= '<br>';
-      $prevName = $row['name'];
-    }
+    $prevName = $row['firstname'];
     do{
+      if($prevName != $row['firstname']){
+        $html_head .= '<p><hr><br /></p>';
+      }
+      $prevName = $row['firstname'];
       $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
       $end = carryOverAdder_Hours($row['end'], $row['timeToUTC']);
 
