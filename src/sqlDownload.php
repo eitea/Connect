@@ -24,21 +24,17 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
   $mysqli = new mysqli($host,$user,$pass,$name);
   $mysqli->select_db($name);
   $mysqli->query("SET NAMES 'utf8'");
-
   $queryTables    = $mysqli->query("SHOW TABLES");
-
   while($row = $queryTables->fetch_row()){
-    $target_tables[] = $row['0'];
+    $target_tables[] = $row['0']; //put each table name into array
   }
-
-  if($tables !== false){
-    $target_tables = array_intersect( $target_tables, $tables);
+  if($tables){
+    $target_tables = array_intersect($target_tables, $tables);
   }
-
   foreach($target_tables as $table){
     $result         =   $mysqli->query('SELECT * FROM '.$table);
     $fields_amount  =   $result->field_count;
-    $rows_num=$mysqli->affected_rows;
+    $rows_num       =   $mysqli->affected_rows;
     $res            =   $mysqli->query('SHOW CREATE TABLE '.$table);
     $TableMLine     =   $res->fetch_row();
     $content        = (!isset($content) ?  '' : $content) . "\n\n".$TableMLine[1].";\n\n";
@@ -72,11 +68,18 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
       }
     } $content .="\n\n\n";
   }
-  //$backup_name = $backup_name ? $backup_name : $name."___(".date('H-i-s')."_".date('d-m-Y').")__rand".rand(1,11111111).".sql";
+
+  $events = $mysqli->query("SHOW EVENTS");
+  while($row = $events->fetch_row()){
+    $res = $mysqli->query("SHOW CREATE EVENT ".$row[0].'.'.$row[1]);
+    $TableMLine = $res->fetch_row();
+    $content .= "\n\n".$TableMLine[3].";\n\n";
+  }
+
   $backup_name = $backup_name ? $backup_name : $name.".sql";
   header('Content-Type: application/octet-stream');
   header("Content-Transfer-Encoding: Binary");
   header("Content-disposition: attachment; filename=\"".$backup_name."\"");
-  echo $content; exit;
+  echo $content;  exit;
 }
 ?>

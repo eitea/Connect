@@ -70,10 +70,10 @@ if($result && $result->num_rows > 0){
   }
 }
 $theBigSum = $absolvedHours - $expectedHours - $breakCreditHours + $vacationHours + $specialLeaveHours - $overTimeAdditive;
-if($theBigSum > 0){
-  $color = 'style=color:#00ba29';
-} else {
+if($theBigSum < 0){
   $color = 'style=color:red';
+} else {
+  $color = 'style=color:#00ba29';
 }
 ?>
 

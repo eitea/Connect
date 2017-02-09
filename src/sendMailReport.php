@@ -43,7 +43,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
           $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
         }
         //select count his Saldo
-        $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
+        $resultSaldo = $conn->query("SELECT SUM( ((UNIX_TIMESTAMP(timeEnd) - UNIX_TIMESTAMP(time )) / 3600) - expectedHours - breakCredit) AS total FROM $logTable WHERE timeEnd != '0000-00-00 00:00:00' AND userID = ".$row['id']);
         if(!$resultSaldo || !($rowSaldo = $resultSaldo->fetch_assoc())){
           $rowSaldo['total'] = 'x';
         }

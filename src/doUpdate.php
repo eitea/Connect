@@ -322,6 +322,51 @@ if($row['version'] < 56){
   echo "<br> Changed Main Report";
 }
 
+if($row['version'] < 57){
+  $sql = "SET GLOBAL event_scheduler=ON";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
+  ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENABLE
+  COMMENT 'Log absent sessions at 23:00 daily!'
+  DO
+  INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
+  SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
+  FROM $userTable u
+  INNER JOIN $bookingTable ON u.id = $bookingTable.userID
+  WHERE !EXISTS (
+    SELECT * FROM $logTable, $userTable u2
+    WHERE DATE(time) = CURDATE()
+    AND $logTable.userID = u2.id
+    AND u.id = u2.id
+  );";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE EVENT IF NOT EXISTS `daily_vacation_event`
+  ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:30:00' ON COMPLETION PRESERVE ENABLE
+  COMMENT 'Adding hours to vacationTable 23:00 daily!'
+  DO
+  UPDATE $vacationTable SET vacationHoursCredit = vacationHoursCredit + ((daysPerYear / 365) * 24)";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  echo "<br>Recreated Events";
+
+  $sql="SELECT userID, daysPerYear, beginningDate  FROM $userTable INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID";
+  $result = $conn->query($sql);
+  echo mysqli_error($conn);
+  while($row = $result->fetch_assoc()){
+    $time = $row['daysPerYear'] / 365;
+    $time *= timeDiff_Hours(substr($row['beginningDate'],0,11) .'05:00:00', substr(getCurrentTimestamp(),0,11) .'05:00:00');
+    $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
+    $conn->query($sql);
+    echo mysqli_error($conn);
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
