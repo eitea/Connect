@@ -9,7 +9,7 @@ if(isset($_POST["templateUpload"])) {
   }
 
   $fp = file_get_contents($_FILES['fileToUpload']['tmp_name'], 'rb');
-  $name = basename($_FILES["fileToUpload"]["name"]);
+  $name = basename($_FILES["fileToUpload"]["name"], '.html');
   if($fp){
     include 'connection.php';
     $fp = $conn->real_escape_string($fp);

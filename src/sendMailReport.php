@@ -2,6 +2,7 @@
 <?php require_once "../plugins/phpMailer/class.phpmailer.php"; ?>
 <?php require_once "../plugins/phpMailer/class.smtp.php"; ?>
 <?php require_once "connection.php"; require_once "createTimestamps.php"; ?>
+<?php require_once "language.php"; ?>
 
 <?php
 $mail = new PHPMailer();
@@ -14,11 +15,6 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   $reportID = $rowContent['id'];
   $content = $rowContent['htmlCode'];
 
-  //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
-  if($rowContent['name'] == 'Main_Report' )){
-
-  }
-
   //grab positions
   $pos1 = strpos($content, "[REPEAT]");
   $pos2 = strpos($content, "[REPEAT END]");
@@ -29,6 +25,29 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){ //for ea
   //replace all findings
   $t = localtime(time(), true);
   $today = $t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]);
+
+    //Main Report consists of multiple Parts, first part covers Logs (Name - Checkin - Checkout - Saldo)
+    if($rowContent['name'] == 'Main_Report'){
+      $html_head .= "<h4>Anwesenheit: (Name -Status- Von - Bis - Saldo (ohne ZA) )</h4>";
+      //select all users and if they have a log, select that too (left join)    , SUM((timeEnd - time) - expectedHours) AS total
+      $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
+      while($result && ($row = $result->fetch_assoc())){
+        $html_head .= "<p>".$row['firstname'].' '.$row['lastname']." -";
+        //if a user did not check in, mark him as absent.
+        if(empty($row['time'])){
+          $row['status'] = '-1';
+          $row['time'] = ' - ';
+          $row['timeEnd'] = ' - ';
+          //$row['total'] = ' - ';
+        } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time, dont bother...
+          $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
+          $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
+        }
+        //$html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5).' -- '.$row['total']."</p>";
+        $html_head .= substr($row['time'],11,5).' '.substr($row['timeEnd'],11,5)."</p>";
+      }
+      $html_head .= "<br><h4>Buchungen: </h4>";
+    }
 
   $sql="SELECT $projectTable.id AS projectID,
   $clientTable.id AS clientID,
