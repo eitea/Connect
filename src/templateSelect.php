@@ -2,7 +2,7 @@
 <?php enableToTemplate($userID); ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['PDF_TEMPLATES']; ?></h3>
+  <h3><?php echo $lang['TEMPLATES']; ?></h3>
 </div>
 
 <?php
@@ -25,7 +25,7 @@ if(isset($_POST['addRecipient'])){
   } else {
     echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>Invalid E-Mail Address.</div>';
   }
-} elseif (isset($_POST['removeRecipient'])) {
+} elseif(isset($_POST['removeRecipient'])){
   $recipID = $_POST['removeRecipient'];
   $conn->query("DELETE FROM $mailReportsRecipientsTable WHERE id = $recipID");
 } elseif(isset($_POST['saveChanges'])){

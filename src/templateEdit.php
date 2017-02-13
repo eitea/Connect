@@ -4,21 +4,8 @@
 <script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
-<style>
-.draggable {
-    cursor: pointer;
-    background-color: #e9a954;
-    color:white;
-    margin-bottom: 1em;
-    padding: 10px;
-}
-.repeat{
-  background-color: #bf564c;
-}
-</style>
-
 <div class="page-header">
-  <h3><?php echo $lang['PDF_TEMPLATES']; ?></h3>
+  <h3><?php echo $lang['TEMPLATES']; ?></h3>
 </div>
 <?php
 $templateContent = "<h1>This is a Header</h1> Create your template here and use it on the project page. Include a repeat pattern, name your template, and preview it!";
@@ -43,7 +30,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '</div>';
   }
 }
-
 if(isset($_GET['id'])){
   $templateID = intval($_GET['id']);
   $result = $conn->query("SELECT * FROM $pdfTemplateTable WHERE id = $templateID");
@@ -59,6 +45,17 @@ if($templateName == 'Main_Report'){
   die("Cannot edit Main Report");
 }
 ?>
+<style>
+.draggable {
+  border:none;
+  background:none;
+  background-color: #e9a954;
+  color:white;
+  margin-bottom: 1em;
+  padding: 10px;
+  width: 150px;
+}
+</style>
 
 <form method="POST">
   <div class="container">
@@ -77,16 +74,9 @@ if($templateName == 'Main_Report'){
     </div>
 
     <div class="col-sm-2">
-      <br> Drag and Drop: <br><br>
-      <div class="draggable repeat">Repeat</div>
-      <div class="draggable">Name</div>
-      <div class="draggable">Infotext</div>
-      <div class="draggable">Date</div>
-      <div class="draggable">From</div>
-      <div class="draggable">To</div>
-      <div class="draggable">Client</div>
-      <div class="draggable">Project</div>
-      <div class="draggable">Hourly Rate</div>
+      <br><br>Click to Insert: <br><br>
+      <button type="button" class="draggable" value='[BOOKINGS]' onclick="addText(this);"><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
+      <button type="button" class="draggable" value='[TIMESTAMPS]' onclick="addText(this);"><?php echo $lang['TIMESTAMPS']; ?></button>
     </div>
   </form>
 </div>
@@ -106,29 +96,11 @@ tinymce.init({
   content_css: '../plugins/homeMenu/template.css'
 });
 
-$(function() {
-    $(".draggable").draggable({
-        helper: 'clone',
-        start: function(event, ui) {
-            $(this).fadeTo('fast', 0.5);
-        },
-        stop: function(event, ui) {
-            $(this).fadeTo(0, 1);
-        }
-    });
 
-    $("#droppableDiv").droppable({
-      hoverClass: 'active',
-      drop: function(event, ui) {
-        var inText = '[' + $(ui.draggable).text().toUpperCase()  + ']';
-
-        if($(ui.draggable).text() == "Repeat"){
-          inText += "<br>[REPEAT END]";
-        }
-        tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
-      }
-    });
-});
+function addText(o) {
+    var inText = o.value;
+    tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
+}
 </script>
 
 <?php include 'footer.php'; ?>

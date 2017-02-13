@@ -187,6 +187,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
   $lang['TAXES'] = 'Taxes';
+  $lang['TEMPLATES'] = 'Templates';
   $lang['THIS_IS_A_BREAK'] = 'This is a break';
   $lang['TIME'] = 'From - To';
   $lang['TIMES'] = 'Time';
@@ -394,6 +395,7 @@ if($_SESSION['language'] == 'ENG'){
 
   $lang['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
   $lang['TAXES'] = 'Steuern';
+  $lang['TEMPLATES'] = 'Vorlagen';
   $lang['THIS_IS_A_BREAK'] = 'Das ist eine Pause';
   $lang['TIME'] = 'Von - Bis';
   $lang['TIMES'] = 'Zeit';

@@ -1,4 +1,4 @@
-<?php
+<?php //may NOT contain any functions or classes
 require "connection_config.php";
 require "connection_vars.php";
 

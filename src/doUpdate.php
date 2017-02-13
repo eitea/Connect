@@ -355,16 +355,12 @@ if($row['version'] < 57){
   }
 }
 
-if($row['version'] < 58){
+if($row['version'] < 59){
   $conn->query("DELETE FROM $pdfTemplateTable WHERE name = 'Example_Report' OR name = 'Main_Report'");
   $exampleTemplate = "<h1>Main Report</h1>
-  <p>[REPEAT]</p>
-  <p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
-  <ul>
-  <li>[CLIENT] -&nbsp;[PROJECT]</li>
-  <li>[INFOTEXT]</li>
-  </ul>
-  <p>[REPEAT END]</p>";
+  [TIMESTAMPS]
+  [BOOKINGS]
+  ";
   $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");
   echo "<br> Changed Main Report";
 }

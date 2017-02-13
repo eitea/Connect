@@ -41,6 +41,13 @@ function carryOverAdder_Minutes($a, $b) {
   return $date->format('Y-m-d H:i:s');
 }
 
+function isHoliday($ts){
+  require "connection.php";
+  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
+  $result = mysqli_query($conn, $sql);
+  return($result && $result->num_rows>0);
+}
+
 function test_input($data) {
   require "connection.php";
   $data = trim($data);
@@ -48,13 +55,6 @@ function test_input($data) {
   $data = htmlspecialchars($data);
   $data = $conn->real_escape_string($data);
   return $data;
-}
-
-function isHoliday($ts){
-  require "connection.php";
-  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
-  $result = mysqli_query($conn, $sql);
-  return($result && $result->num_rows>0);
 }
 
 function test_Date($date){
