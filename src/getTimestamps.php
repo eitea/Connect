@@ -13,17 +13,19 @@ $filterDate = substr(getCurrentTimestamp(),0,7); //granularity: default is year 
 $filterID = 0;
 $filterStatus ='';
 
-if (!empty($_POST['filteredUserID'])) {
-  $filterID = $_POST['filteredUserID'];
-}
-if(!empty($_POST['filterYear'])){
-  $filterDate = $_POST['filterYear'];
-  if(!empty($_POST['filterMonth'])){
-    $filterDate .= '-' . $_POST['filterMonth'];
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if (!empty($_POST['filteredUserID'])) {
+    $filterID = $_POST['filteredUserID'];
   }
-}
-if (isset($_POST['filterStatus'])) {
-  $filterStatus = $_POST['filterStatus'];
+  if(!empty($_POST['filterYear'])){
+    $filterDate = $_POST['filterYear'];
+    if(!empty($_POST['filterMonth'])){
+      $filterDate .= '-' . $_POST['filterMonth'];
+    }
+  }
+  if (isset($_POST['filterStatus'])) {
+    $filterStatus = $_POST['filterStatus'];
+  }
 }
 ?>
 
@@ -211,7 +213,7 @@ if (isset($_POST['filterStatus'])) {
           }
           $absolvedHoursSUM = $expectedHoursSUM = $lunchbreakSUM = $saldoSUM = $isTimeSUM = 0;
 
-          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ORDER BY time ASC";          
+          $sql = "SELECT * FROM $logTable WHERE userID = $filterID AND time LIKE '$filterDate%' $filterStatusAdd ORDER BY time ASC";
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows >0) {
             while($row = $result->fetch_assoc()){

@@ -46,31 +46,35 @@ function checkOut($userID) {
 
   $sql = "UPDATE $logTable SET timeEND = UTC_TIMESTAMP WHERE indexIM = $indexIM;";
   $conn->query($sql);
+  //auto-insert lunchbreak if user cannot book it himself.
+  $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
+  $row = $result->fetch_assoc();
+  if($row['canBook'] == 'FALSE'){
+    //check if user was here for over 6h and didnt fullfill the lunchbreak.
+    $sql = "SELECT * FROM $userTable
+    WHERE $userTable.id = $userID
+    AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
+    AND hoursOfrest > $breakCredit";
 
-  //if user was here for over 6h and didnt fullfill the lunchbreak.
-  $sql = "SELECT * FROM $userTable
-  WHERE $userTable.id = $userID
-  AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
-  AND hoursOfrest > $breakCredit";
+    $result = $conn->query($sql);
+    if($result && $result->num_rows > 0){
+      $row = $result->fetch_assoc();
 
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0){
-    $row = $result->fetch_assoc();
+      //take the missing time to fulfill the lunchbreak
+      $minutes = ($row['hoursOfRest'] - $breakCredit) * 60;
+      //create the lunchbreak booking
+      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES(UTC_TIMESTAMP, DATE_ADD(UTC_TIMESTAMP, INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID', 'break')";
+      $conn->query($sql);
+      echo mysqli_error($conn);
 
-    //take the missing time to fulfill the lunchbreak
-    $minutes = ($row['hoursOfRest'] - $breakCredit) * 60;
-    //create the lunchbreak booking
-    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES(UTC_TIMESTAMP, DATE_ADD(UTC_TIMESTAMP, INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID', 'break')";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-
-    //update timestamp
-    $sql = "UPDATE $logTable SET breakCredit = (".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-  } else {
-    //or all was good, & he did nuttin wong.
-    echo mysqli_error($conn);
+      //update timestamp
+      $sql = "UPDATE $logTable SET breakCredit = (".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+    } else {
+      //or all was good, & he did nuttin wong.
+      echo mysqli_error($conn);
+    }
   }
 }
 

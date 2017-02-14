@@ -167,7 +167,7 @@ endif;
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
   FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
-  WHERE (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) > 12 OR (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) < 0";
+  WHERE (TIMESTAMPDIFF(HOUR, time, timeEnd)) > 22 OR (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) < 0";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
@@ -180,8 +180,8 @@ endif;
     </div>
     <div class="collapse" id="illegal_timestamp_info">
       <div class="well">
-        Die Differenz der Anfangs- und Endzeit ergibt weniger als 0, oder über 12 Stunden. <br>
-        Die Autokorrektur passt die ausgewählten Zeitstempel einfach den erwarteten Stunden inkl. Mittagspause an. <br>
+        Die Dauer des Zeitstempels beträgt über 22, oder weniger als 0 Stunden. <br>
+        Die Autokorrektur passt die Endzeit der Zeitstempel den erwarteten Stunden inkl. Mittagspause an. (Gedacht für vergessenes Ausstempeln) <br>
       </div>
     </div>
     <table id='illTS' class="table table-hover">
@@ -194,7 +194,7 @@ endif;
         <?php
         while($row = $result->fetch_assoc()){
           echo '<tr>';
-          echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
+          echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
           echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';

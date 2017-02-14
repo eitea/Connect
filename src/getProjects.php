@@ -12,13 +12,10 @@
 </div>
 
 <?php
-$filterDate = substr(getCurrentTimestamp(),0,10); //granularity: set the default to day
+$filterDate = substr(getCurrentTimestamp(),0,10); //granularity: day
 $booked = '1';
-$filterCompany = 0;
-$filterClient = 0;
-$filterProject = 0;
-$filterUserID = 0;
 
+$filterCompany = $filterClient = $filterProject = $filterUserID = 0;
 $filterAddBreaks = $filterAddDrives = "checked";
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -37,31 +34,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } else {
     $filterDate .= '-' . '__';
   }
-
   if(isset($_POST['filterCompany'])){
     $filterCompany = $_POST['filterCompany'];
   }
-
   if(isset($_POST['filterBooked'])){
     $booked = $_POST['filterBooked'];
   }
-
   if(isset($_POST['filterClient'])){
     $filterClient = $_POST['filterClient'];
   }
-
   if(isset($_POST['filterProject'])){
     $filterProject = $_POST['filterProject'];
   }
-
   if(isset($_POST['filterUserID'])){
     $filterUserID = $_POST['filterUserID'];
   }
-
   if(!isset($_POST['filterAddBreaks'])){
     $filterAddBreaks = "";
   }
-
   if(!isset($_POST['filterAddDrives'])){
     $filterAddDrives = "";
   }
@@ -129,10 +119,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '</div>';
   }
   echo '<br>';
-}
 
-
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if (isset($_POST['saveChanges']) && isset($_POST['editingIndeces'])) {
     for ($i = 0; $i < count($_POST['editingIndeces']); $i++) {
       $imm = $_POST['editingIndeces'][$i];
@@ -208,7 +195,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     }
   } //end if isset save_changes
-}
+} //end if requrest == post
 ?>
 
 <script>

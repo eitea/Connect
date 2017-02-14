@@ -26,7 +26,7 @@ function mc_decrypt($decrypt, $key){
 
 /*
 * requires createTimestamps.php
-* and LogCalculator
+* requires Calculator/LogCalculator
 */
 function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must contain WHERE clause
   require "connection.php";

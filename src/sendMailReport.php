@@ -42,7 +42,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   if(!$result || $result->num_rows <= 0){
     die("Please Define Recipients! ");
   } else {
-    //echo "<script>window.close();</script>";
+    echo "<script>window.close();</script>";
   }
   $recipients = "";
   while($result && ($row = $result->fetch_assoc())){
