@@ -7,26 +7,6 @@
 </div>
 <?php
 
-//repair forgotten check outs
-if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
-  foreach($_POST['autoCorrects'] as $indexIM){
-    $sql = "SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-
-    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
-    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
-
-    if($row['expectedHours'] > $row['pauseAfterHours']){ //we dont have 2 check to see if we have to create a project lunchbreak, that gets validated by the illegal lunchbreak todo anyways.
-      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['hoursOfRest'] * 60));
-    }
-
-    $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
-    $conn->query($sql);
-    echo mysqli_error($conn);
-  }
-}
-
 //illegal lunchbreaks
 if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
   for($i=0; $i < count($_POST['lunchbreaks']); $i++){
@@ -48,6 +28,48 @@ if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
 
     $breakTime = test_input($_POST['lunchbreaks'][$i]);
     $sql = "UPDATE $logTable SET breakCredit = (breakCredit + $breakTime) WHERE indexIM = $indexIM";
+    $conn->query($sql);
+    echo mysqli_error($conn);
+  }
+}
+
+//repair forgotten check outs
+if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
+  foreach($_POST['autoCorrects'] as $indexIM){
+    $result = $conn->query("SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id");
+    $row = $result->fetch_assoc();
+
+    $userID = $row['userID'];
+    $date = substr($row['time'],0,10);
+
+    //match expectedHours
+    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
+    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
+
+    //adjust to match expectedHours or last projectbooking, if any of these even exist
+    $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
+    if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
+      echo "Here!<br>";
+      $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
+      WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
+      $result = mysqli_query($conn, $sql);
+      if ($result && $result->num_rows > 0) { //does a booking exist?
+        echo "Booking exists!<br>";
+        $rowLastBooking = $result->fetch_assoc();
+        $adjustedTime = $rowLastBooking['end']; //adjust break later.
+      }
+    }
+    echo mysqli_error($conn);
+
+    //add expected lunchbreak
+    if($row['expectedHours'] > $row['pauseAfterHours']){ // does he need a lunchbreak?
+      $breakAdditive = $row['hoursOfRest'] - $row['breakCredit']; //adjust it to break he already made
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($breakAdditive * 60));
+    } else { //just take the break he already made
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['breakCredit'] * 60));
+    }
+
+    $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
     $conn->query($sql);
     echo mysqli_error($conn);
   }
@@ -96,7 +118,7 @@ if(isset($_POST['zero_expected_autocorrect']) && !empty($_POST['zero_expected_da
 
 ?>
 
-<!-- -------------------------------------------------------------------------->
+<!--VACATION REQUESTS -------------------------------------------------------------------------->
 
 <?php
 $sql ="SELECT * FROM $userRequests WHERE status = '0'";
@@ -111,7 +133,8 @@ if($result && $result->num_rows > 0):
 endif;
 ?>
 
-<!-- -------------------------------------------------------------------------->
+<!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
+
 <form method="POST">
   <?php
   $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
@@ -161,13 +184,13 @@ endif;
     <br><hr><br>
   <?php endif;?>
 
-  <!-- -------------------------------------------------------------------------->
+  <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
 
   <?php
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
   FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
-  WHERE (TIMESTAMPDIFF(HOUR, time, timeEnd)) > 22 OR (TIMESTAMPDIFF(HOUR, time, timeEnd) - breakCredit) < 0";
+  WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
@@ -181,13 +204,15 @@ endif;
     <div class="collapse" id="illegal_timestamp_info">
       <div class="well">
         Die Dauer des Zeitstempels beträgt über 22, oder weniger als 0 Stunden. <br>
-        Die Autokorrektur passt die Endzeit der Zeitstempel den erwarteten Stunden inkl. Mittagspause an. (Gedacht für vergessenes Ausstempeln) <br>
+        Die Autokorrektur passt die Endzeit der Zeitstempel den geleisteten bzw. erwarteten Stunden inkl. der Mittagspause an. <br>
+        Autokorrektur wird empfohlen für Zeitstempel, dessen Differenz von Anfangs- u. Endzeit nicht negativ ist.
       </div>
     </div>
     <table id='illTS' class="table table-hover">
       <th>User</th>
       <th>Status</th>
       <th><?php echo $lang['TIME']; ?></th>
+      <th><?php echo $lang['BREAK']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
       <th>Autocorrect</th>
       <tbody>
@@ -197,7 +222,8 @@ endif;
           echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
           echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
-          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
+          echo '<td>'. $row['breakCredit'].'</td>';
+          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']) - $row['breakCredit'], 2, '.', '') .'</td>';
           echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' ></td>';
           echo '</tr>';
         }
@@ -209,7 +235,7 @@ endif;
     <br><hr><br>
   <?php endif;  ?>
 
-  <!-- -------------------------------------------------------------------------->
+  <!--GEMINI -------------------------------------------------------------------------->
 
   <?php
   $sql = "SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id
@@ -285,7 +311,7 @@ endif;
   endif;
   echo mysqli_error($conn);
   ?>
-  <!-- -------------------------------------------------------------------------->
+  <!--DOUBLE EXPETED HOURS -------------------------------------------------------------------------->
   <?php
   //absentlog fix1 : see if there is an entry in logs AND unlogs
   $sql = "SELECT $logTable.*, $userTable.firstname, $userTable.lastname, $logTable.time AS logTime, $negative_logTable.time AS unlogTime, negative_indexIM
@@ -332,7 +358,7 @@ endif;
     <br><hr><br>
   <?php endif; echo mysqli_error($conn); ?>
 
-  <!-- -------------------------------------------------------------------------->
+  <!--MISSING EXPECTED HOURS -------------------------------------------------------------------------->
 
   <?php
   //absentlog fix2 : see if there is an absent log missing.
