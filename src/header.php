@@ -100,7 +100,7 @@ $('form').preventDoubleSubmission();
     $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 WHERE EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
 
-    $result = $conn->query("SELECT COUNT(*) FROM $logTable, $negative_logTable WHERE $logTable.userID = $userTable.id AND $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable, $negative_logTable WHERE $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   }
 

@@ -34,7 +34,7 @@ if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
 }
 
 //repair forgotten check outs
-if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
+if(isset($_POST['autoCorrect']) && !empty($_POST['autoCorrects'])){
   foreach($_POST['autoCorrects'] as $indexIM){
     $result = $conn->query("SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id");
     $row = $result->fetch_assoc();
@@ -49,12 +49,10 @@ if(isset($_POST['autoCorrect']) && isset($_POST['autoCorrects'])){
     //adjust to match expectedHours or last projectbooking, if any of these even exist
     $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
     if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
-      echo "Here!<br>";
       $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
       WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
       $result = mysqli_query($conn, $sql);
       if ($result && $result->num_rows > 0) { //does a booking exist?
-        echo "Booking exists!<br>";
         $rowLastBooking = $result->fetch_assoc();
         $adjustedTime = $rowLastBooking['end']; //adjust break later.
       }
@@ -93,7 +91,6 @@ if(isset($_POST['double_expected_delete'])){
       }
     }
   }
-
   if(!empty($_POST['double_expected_absentlog'])){
     foreach($_POST['double_expected_absentlog'] as $id){
       if(!$conn->query("DELETE FROM $negative_logTable WHERE negative_indexIM = $id")){
@@ -151,7 +148,7 @@ endif;
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
-        Mittagspause stimmt nicht mit den festgelegten Parametern überein: Die für den Benutzer definierte Pause, wurde nach der für den Benutzer definierte Zeit nicht vollständig konsumiert.
+        Mittagspause stimmt nicht mit den festgelegten Parametern überein: Die für den Benutzer definierte Pause, wurde nach der für den Benutzer definierte Zeit nicht oder nur unvollständig konsumiert.
       </div>
     </div>
 
