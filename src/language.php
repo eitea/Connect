@@ -2,7 +2,7 @@
 $lang = array();
 
 //english-----------------------------------------------------------------------
-if(isset($_SESSION['language') && $_SESSION['language'] == 'ENG'){
+if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
 
   $activityToString = array(
     "arrival" => "Work",
@@ -223,7 +223,7 @@ if(isset($_SESSION['language') && $_SESSION['language'] == 'ENG'){
 
 //------------------------------------------------------------------------------
 
-} elseif(!isset($_SESSION['language') || $_SESSION['language'] == 'GER'){
+} elseif(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER'){
   $activityToString = array(
     "arrival" => "Dienst",
     "vacation" => "Urlaub",
