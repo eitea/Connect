@@ -63,7 +63,7 @@ function checkOut($userID) {
       //take the missing time to fulfill the lunchbreak
       $minutes = ($row['hoursOfRest'] - $breakCredit) * 60;
       //create the lunchbreak booking
-      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES(UTC_TIMESTAMP, DATE_ADD(UTC_TIMESTAMP, INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID', 'break')";
+      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$start', DATE_ADD('$start', INTERVAL $minutes MINUTE), $indexIM, 'Lunchbreak for $userID', 'break')";
       $conn->query($sql);
       echo mysqli_error($conn);
 

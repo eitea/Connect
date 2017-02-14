@@ -27,7 +27,8 @@ $sql = "CREATE TABLE $userTable (
   exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   coreTime TIME DEFAULT '8:00',
-  kmMoney DECIMAL(4,2) DEFAULT 0.42
+  kmMoney DECIMAL(4,2) DEFAULT 0.42,
+  emUndo DATETIME DEFAULT CURRENT_TIMESTAMP
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

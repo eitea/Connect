@@ -365,6 +365,15 @@ if($row['version'] < 59){
   echo "<br> Changed Main Report";
 }
 
+if($row['version'] < 60){
+  $sql = "ALTER TABLE $userTable ADD COLUMN emUndo DATETIME DEFAULT CURRENT_TIMESTAMP";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added column for emergency undos.";
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

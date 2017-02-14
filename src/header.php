@@ -171,14 +171,6 @@ $('form').preventDoubleSubmission();
   }
 
   require "language.php";
-
-  if ($_SERVER["REQUEST_METHOD"] == "POST"){
-    if ((time() - $_SESSION['posttimer']) <= 2){
-      unset($_POST);
-    } else {
-      $_SESSION['posttimer'] = time();
-    }
-  }
   ?>
 
   <!-- navbar -->

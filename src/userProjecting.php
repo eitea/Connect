@@ -23,7 +23,7 @@ if ($result && $result->num_rows > 0) {
 </div>
 
 <?php
-$showUndoButton = 0;
+$showUndoButton = $showEmergencyUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -83,11 +83,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   echo '<br>';
 }
+
+if(isset($_POST['undo']) && $_POST['undo'] == 'emergency'){
+  $conn->query("UPDATE $userTable SET emUndo = UTC_TIMESTAMP WHERE id = $userID");
+}
+
+$result = $conn->query("SELECT emUndo FROM $userTable WHERE id = $userID");
+$row = $result->fetch_assoc();
+if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
+  $showEmergencyUndoButton = TRUE;
+}
 ?>
 
 <form method="post">
   <?php if($showUndoButton): ?>
-    <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo'>Undo</button></div>
+    <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button></div>
+  <?php elseif($showEmergencyUndoButton): ?>
+    <div style='text-align:right;'><button type='submit' class="btn btn-danger" name='undo' value='emergency'>Undo</button></div>
   <?php endif; ?>
 
   <div class="row">

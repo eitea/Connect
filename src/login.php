@@ -87,7 +87,6 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
     $_SESSION['language'] = $row['preferredLang'];
     $timeZone = $_POST['funZone'];
     $_SESSION['timeToUTC'] = $timeZone;
-    $_SESSION['posttimer'] = time();
 
     require "language.php";
     $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
