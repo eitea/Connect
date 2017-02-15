@@ -99,7 +99,7 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   <?php if($showUndoButton): ?>
     <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button></div>
   <?php elseif($showEmergencyUndoButton): ?>
-    <div style='text-align:right;'><button type='submit' class="btn btn-danger" name='undo' value='emergency'>Undo</button></div>
+    <div style='text-align:right;'><button type='submit' class="btn btn-danger" name='undo' value='emergency' title='Emergency Undo. Can only be pressed every 2 Hours'>Undo</button></div>
   <?php endif; ?>
 
   <div class="row">

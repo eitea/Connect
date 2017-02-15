@@ -374,6 +374,22 @@ if($row['version'] < 60){
   }
 }
 
+if($row['version'] < 61){
+  $result = $conn->query("SELECT * FROM $projectBookingTable WHERE infoText LIKE 'Lunchbreak for %'");
+  while($result && ($row = $result->fetch_assoc())){
+    $id = $row['id'];
+    $indexIM = $row['timestampID'];
+    $minutes = timeDiff_Hours($row['start'], $row['end']) * 60;
+
+    $res2 = $conn->query("SELECT time FROM $logTable WHERE indexIM = $indexIM");
+    $rowTime = $res2->fetch_assoc();
+    $start = $rowTime['time'];
+    $conn->query("UPDATE $projectBookingTable SET start = '$start', end = DATE_ADD('$start', INTERVAL $minutes MINUTE) WHERE id = $id");
+
+    echo mysqli_error($conn);
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
