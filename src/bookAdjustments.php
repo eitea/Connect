@@ -1,5 +1,5 @@
 
-<?php include 'header.php'; ?>
+<?php include 'header.php'; enableToTime($userID); ?>
 <div class="page-header">
   <h3><?php echo $lang['ADJUSTMENTS']; ?></h3>
 </div>
@@ -11,8 +11,8 @@ if(isset($_POST['filterUserID'])){
 }
 
 if(isset($_POST['creatSign']) && !empty($_POST['creatInfoText']) && !empty($_POST['creatFromTime'])){
+  $hours = floatval($_POST['creatFromTime']);
   if($hours > 0){
-    $hours = floatval($_POST['creatFromTime']);
     $addOrSub = intval($_POST['creatSign']);
     $infoText = test_input($_POST['creatInfoText']);
     $conn->query("INSERT INTO $correctionTable (userID, hours, infoText, addOrSub, cOnDate) VALUES($filterID, $hours, '$infoText', '$addOrSub', UTC_TIMESTAMP)");
