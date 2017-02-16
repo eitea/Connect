@@ -255,7 +255,7 @@ if($row['version'] < 57){
 if($row['version'] < 59){
   $conn->query("DELETE FROM $pdfTemplateTable WHERE name = 'Example_Report' OR name = 'Main_Report'");
   $exampleTemplate = "<h1>Main Report</h1>
-  [TIMESTAMPS]
+  [TIMESTAMPS] <br>
   [BOOKINGS]
   ";
   $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Main_Report', '$exampleTemplate', 'TRUE')");

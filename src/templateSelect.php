@@ -111,7 +111,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
       </div>
       <form method="post">
         <div class="modal-body">
-          Select all users who's data should be included in your report.<br><br> Leave empty to include all. <br><br>
+          Select all users who's data should be included in your report. <br>Leave empty to include all. <br><br>
           <div class="container checkbox">
             <?php
             $users = explode(",", $row['userIDs']);
