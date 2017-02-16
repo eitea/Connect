@@ -6,6 +6,7 @@ class LogCalculator{
   public $vacationHours = 0;
   public $specialLeaveHours = 0;
   public $sickHours = 0;
+  public $correctionHours = 0;
   public $overTimeAdditive = 0;
   public $saldo = 0;
 
@@ -37,49 +38,52 @@ class LogCalculator{
 
     $sql = "SELECT * FROM $logTable WHERE time > '$beginDate' AND time < '$exitDate' AND userID = $curID";
     $result = $conn->query($sql);
-    if($result && $result->num_rows > 0){
-      while($row = $result->fetch_assoc()){
-        if($row['timeEnd'] == '0000-00-00 00:00:00'){
-          //open timestamp lowers expected Hours according to how long user has been checked in
-          $timeEnd = getCurrentTimestamp();
-          if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){//user has been checked in longer than his expected Hours
-            $this->expectedHours += $row['expectedHours'];
-          } else {
-            $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //alter expected hours to match time he has been here already
-          }
-        } else {
-          $timeEnd = $row['timeEnd'];
+    while($result && ($row = $result->fetch_assoc())){
+      if($row['timeEnd'] == '0000-00-00 00:00:00'){
+        //open timestamp lowers expected Hours according to how long user has been checked in
+        $timeEnd = getCurrentTimestamp();
+        if(timeDiff_Hours($row['time'], $timeEnd) >= $row['expectedHours']){//user has been checked in longer than his expected Hours
           $this->expectedHours += $row['expectedHours'];
+        } else {
+          $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //alter expected hours to match time he has been here already
         }
-        switch($row['status']){
-          case 0:
-          $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
-          $this->breakCreditHours += $row['breakCredit'];
-          break;
-          case 1:
-          $this->vacationHours += timeDiff_Hours($row['time'], $timeEnd);
-          $this->usedVacationDays++;
-          break;
-          case 2:
-          $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
-          break;
-          case 3:
-          $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
-        }
+      } else {
+        $timeEnd = $row['timeEnd'];
+        $this->expectedHours += $row['expectedHours'];
       }
-    }
-    //extra expectedHours from unlogs:
-    $sql = "SELECT * FROM $negative_logTable WHERE userID = $curID AND time > '$beginDate' AND time < '$exitDate'";
-    $result = $conn->query($sql);
-    if($result && $result->num_rows > 0){
-      while($row = $result->fetch_assoc()){
-        if(!isHoliday($row['time'])){
-          $this->expectedHours += $row[strtolower(date('D', strtotime($row['time'])))];
-        }
+      switch($row['status']){
+        case 0:
+        $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
+        $this->breakCreditHours += $row['breakCredit'];
+        break;
+        case 1:
+        $this->vacationHours += timeDiff_Hours($row['time'], $timeEnd);
+        $this->usedVacationDays++;
+        break;
+        case 2:
+        $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
+        break;
+        case 3:
+        $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
       }
     }
 
-    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours - $this->overTimeAdditive;
+    //correction Hours:
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID");
+    while($result && ($row = $result->fetch_assoc())){
+      $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
+    }
+
+    //extra expectedHours from unlogs:
+    $sql = "SELECT * FROM $negative_logTable WHERE userID = $curID AND time > '$beginDate' AND time < '$exitDate'";
+    $result = $conn->query($sql);
+    while($result && ($row = $result->fetch_assoc())){
+      if(!isHoliday($row['time'])){
+        $this->expectedHours += $row[strtolower(date('D', strtotime($row['time'])))];
+      }
+    }
+
+    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours - $this->overTimeAdditive + $this->correctionHours;
   }
 
   private function timeDiff_Hours($from, $to) {

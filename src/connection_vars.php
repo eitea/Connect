@@ -7,13 +7,14 @@ $auditLogsTable = "auditLogs";
 $bookingTable = "bookingData"; //contains weekly schedule for each user
 
 $configTable = "configurationData";
-$companyToUserRelationshipTable = "companyToClientRelationshipData"; //which user works for which companies (N:N)
-$companyDefaultProjectTable = "companyDefaultProjects";
 $clientTable = "clientData"; //customers
 $clientDetailTable = "clientInfoData";
 $clientDetailNotesTable = "clientInfoNotes";
 $clientDetailBankTable = "clientInfoBank";
+$companyToUserRelationshipTable = "companyToClientRelationshipData"; //which user works for which companies (N:N)
+$companyDefaultProjectTable = "companyDefaultProjects";
 $companyTable = "companyData";
+$correctionTable = "correctionData";
 
 //deactivated users disappear from the program like deleted ones, but keeps their data.
 $deactivatedUserTable = "DeactivatedUsers";

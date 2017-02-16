@@ -34,14 +34,15 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   1 ..... vacation
   2 ..... special leave
   3 .... sickness
-  4 ..... time balancing
+  4 ..... adjustments
   */
   $lang_activityToString = array(
     "-1" => "Absent",
     "0" => "Work",
     "1" => "Vacation",
     "2" => "Special Leave",
-    "3" => "Sick"
+    "3" => "Sick",
+    "4" => "Adjustment"
   );
 
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
@@ -50,6 +51,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
   $lang['ADD'] = 'Add';
+  $lang['ADJUSTMENTS'] = 'Adjustments';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADMIN_CORE_OPTIONS'] = 'System Options';
   $lang['ADMIN_TIME_OPTIONS'] = 'Time Records';
@@ -80,7 +82,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CLIENTS'] = 'Clients';
   $lang['COMPANIES'] = 'Companies';
   $lang['COMPANY'] = 'Company';
-  $lang['CORE_TIME'] ='Core Time';
+  $lang['CORE_TIME'] = 'Core Time';
+  $lang['CORRECTION'] = 'Correction';
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
   $lang['DATE'] = 'Date';
@@ -245,7 +248,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
     "0" => "Dienst",
     "1" => "Urlaub",
     "2" => "Sonderurlaub",
-    "3" => "Krankenstand"
+    "3" => "Krankenstand",
+    "4" => "Korrektur"
   );
   $lang_vacationRequestStatus = array("Offen", "Abgelehnt", "Bewilligt");
   $lang_monthToString = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
@@ -256,6 +260,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
   $lang['ADD'] = 'Hinzufügen';
+  $lang['ADJUSTMENTS'] = 'Anpassungen';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
   $lang['ADMIN_MODULES'] = 'Admin Module';
@@ -287,6 +292,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['COMPANY'] = 'Mandant';
   $lang['COMPANIES'] = 'Mandanten';
   $lang['CORE_TIME'] = 'Kernzeit';
+  $lang['CORRECTION'] = 'Korrektur';
 
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';

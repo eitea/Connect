@@ -604,4 +604,20 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
   }
+
+  $sql = "CREATE TABLE $correctionTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    hours DECIMAL(6,2),
+    infoText VARCHAR(350),
+    addOrSub ENUM('1', '-1') NOT NULL,
+    cOnDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
 ?>

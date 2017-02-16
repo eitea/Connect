@@ -18,109 +18,6 @@ $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
 $row = $result->fetch_assoc();
 
-if($row['version'] < 42){
-  if($conn->query("ALTER TABLE $userTable MODIFY COLUMN preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER'")){
-    echo "<br> Changed preferred language to default GER";
-  }
-
-  //upsie.
-  $sql = "DROP EVENT daily_logs_event";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Updated Daily log event.";
-  }
-
-  $sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
-  ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENABLE
-  COMMENT 'Log absent sessions at 23:00 daily!'
-  DO
-  INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-  SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
-  FROM $userTable u
-  INNER JOIN $bookingTable ON u.id = $bookingTable.userID
-  WHERE !EXISTS (
-    SELECT * FROM $logTable, $userTable u2
-    WHERE DATE(time) = CURDATE()
-    AND $logTable.userID = u2.id
-    AND u.id = u2.id
-  );";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-
-  // remove all unlogs and logs before entry date
-  $sql = "SELECT * FROM $userTable";
-  $result = $conn->query($sql);
-  while($row = $result->fetch_assoc()){
-    $user = $row['id'];
-    $entryDate = $row['beginningDate'];
-
-    $sql = "DELETE FROM $negative_logTable WHERE userID = $user AND time < '$entryDate'";
-    $conn->query($sql);
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
-
-    $sql = "DELETE FROM $logTable WHERE userID = $user AND time <= '$entryDate'";
-    $conn->query($sql);
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
-  }
-  echo "<br> Removed all Absent logs before entrance date.";
-  echo "<br> Removed all check ins before entrance date.";
-
-  //fix unlogs for id = 1
-  for($i = '2016-06-01 23:59:00'; substr($i,0, 10) != substr(carryOverAdder_Hours(getCurrentTimestamp(), 24),0, 10); $i = carryOverAdder_Hours($i, 24)){
-    $conn->query("INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-    SELECT '$i', userID, mon, tue, wed, thu, fri, sat, sun
-    FROM $userTable u
-    INNER JOIN $bookingTable ON u.id = $bookingTable.userID
-    WHERE u.id = 1
-    AND !EXISTS (
-      SELECT * FROM $logTable, $userTable u2
-      WHERE DATE(time) = DATE('$i')
-      AND $logTable.userID = u2.id
-      AND u.id = u2.id
-    );");
-    echo mysqli_error($conn);
-  }
-  echo "<br> Repaired absent log for admin.";
-}
-
-if($row['version'] < 43){
-  $conn->query("ALTER TABLE $clientDetailTable MODIFY COLUMN name VARCHAR(45)");
-  echo mysqli_error($conn);
-
-  $conn->query("DELETE FROM $clientDetailTable");
-  $conn->query("DELETE FROM $clientDetailBankTable");
-  $conn->query("DELETE FROM $clientDetailNotesTable");
-
-  echo mysqli_error($conn);
-  echo "Cleared detail Table";
-
-  if($conn->query("INSERT INTO $clientDetailTable (clientID) SELECT id FROM $clientTable")){
-    echo "<br>Re-Added Customerdetails for every existing customer.";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 44){
-  if($conn->query("ALTER TABLE $configTable ADD COLUMN enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'")){
-    echo "<br>Added enable/disable Value for Ready Check.";
-  } else {
-    echo mysqli_error($conn);
-  }
-}
-
-if($row['version'] < 45){
-  $conn->query("DELETE FROM $clientDetailNotesTable");
-  $conn->query("DELETE FROM $clientDetailBankTable");
-  echo "<br>Starting Process for short table cleanup.......  Process completed.<br>";
-}
-
 if($row['version'] < 46){
   $sql="CREATE TABLE $moduleTable (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
@@ -388,6 +285,26 @@ if($row['version'] < 61){
 
     echo mysqli_error($conn);
   }
+}
+
+if($row['version'] < 62){
+  $sql = "CREATE TABLE $correctionTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    hours DECIMAL(6,2),
+    infoText VARCHAR(350),
+    addOrSub ENUM('1', '-1') NOT NULL,
+    cOnDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added table for adjustments.";
+  }
+
 }
 
 //------------------------------------------------------------------------------
