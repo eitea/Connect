@@ -44,10 +44,16 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
     die("Could not fetch template. Please make sure it exists. Contact support for further issues."); //We dont actually have a support.
   }
 
+  if(empty($userIDs)){ //a template can define the user data it wants to display
+    $userIDs_query = "";
+  } else {
+    $userIDs_query = "WHERE id IN ($userIDs)";
+  }
+
   if(strpos($html, "[TIMESTAMPS]") !== false){ //0 = false, but 0 is valid position
     $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo (Stunden)</th></tr>";
     //select all users and select log from today if exists else log = null
-    $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %' WHERE id IN ($userIDs)");
+    $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %' $userIDs_query");
     echo mysqli_error($conn);
     while($result && ($row = $result->fetch_assoc())){
       $beginDate = $row['beginningDate'];
@@ -81,6 +87,12 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
     if(empty($bookingQuery)){
       $bookingQuery = "WHERE $projectBookingTable.start LIKE '$today %'";
     }
+    if(empty($userIDs)){ //a template can define the user data it wants to display
+      $userIDs_query = "";
+    } else {
+      $userIDs_query = "AND $userTable.id IN ($userIDs)";
+    }
+
     $html_bookings = "<h3>Buchungen</h3>";
     //grab projectbookings
     $sql="SELECT $projectTable.id AS projectID,
@@ -101,7 +113,8 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
     LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
     LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
     $bookingQuery
-    AND $userTable.id IN ($userIDs)
+    $userIDs_query
+
     ORDER BY $userTable.firstname, $projectBookingTable.end ASC";
 
     $result = $conn->query($sql);
