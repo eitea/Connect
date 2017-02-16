@@ -23,7 +23,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
 
 
   $mail->IsSMTP();
-  $mail->SMTPAuth   = true;
+
 
   $reportID = $rowContent['id'];
   $content = getFilledOutTemplate($reportID);
@@ -35,11 +35,20 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $result = $conn->query("SELECT * FROM $mailOptionsTable");
   $row = $result->fetch_assoc();
 
+  if(!empty($row['username']) && !empty($row['fristname'])){
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $row['username'];
+    $mail->Password   = $row['password'];
+  } else {
+    $mail->SMTPAuth   = false;
+  }
+
+  if(empty($row['smptSecure'])){
+    $mail->SMTPSecure = $row['smtpSecure'];
+  }
+
   $mail->Host       = $row['host'];
-  $mail->Username   = $row['username'];
-  $mail->Password   = $row['password'];
   $mail->Port       = $row['port'];
-  $mail->SMTPSecure = $row['smtpSecure'];
   $mail->setFrom($row['sender']);
 
   //check if mail has recipients
