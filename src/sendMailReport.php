@@ -17,13 +17,8 @@ $resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repe
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   //for each report, send a NEW mail
   $mail = new PHPMailer();
-
-
   $mail->SMTPDebug = 2;
-
-
   $mail->IsSMTP();
-
 
   $reportID = $rowContent['id'];
   $content = getFilledOutTemplate($reportID);
@@ -35,7 +30,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $result = $conn->query("SELECT * FROM $mailOptionsTable");
   $row = $result->fetch_assoc();
 
-  if(!empty($row['username']) && !empty($row['fristname'])){
+  if(!empty($row['username']) && !empty($row['password'])){
     $mail->SMTPAuth   = true;
     $mail->Username   = $row['username'];
     $mail->Password   = $row['password'];
@@ -56,7 +51,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   if(!$result || $result->num_rows <= 0){
     die("Please Define Recipients! ");
   } else {
-    //echo "<script>window.close();</script>";
+    echo "<script>window.close();</script>";
   }
   $recipients = "";
   while($result && ($row = $result->fetch_assoc())){
