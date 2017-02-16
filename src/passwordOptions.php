@@ -48,6 +48,7 @@ if(isset($_POST['saveButton'])){
     }
     //if all matched:
     if($acceptMasterPassword){
+      //TODO: decrypt all that has been encrypted with old password, and RE-ENCRYPT that with the new password. Yes.
       $password = password_hash($password, PASSWORD_BCRYPT);
       $conn->query("UPDATE $configTable SET masterPassword = '$password'");
     } else {

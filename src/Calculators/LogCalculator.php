@@ -33,6 +33,7 @@ class LogCalculator{
     }
 
     $this->overTimeAdditive = $userRow['overTimeLump'] * ceil(timeDiff_Hours(substr($userRow['beginningDate'],0,11).'05:00:00', substr(getCurrentTimestamp(),0,11).'05:00:00')/(24*30));
+
     $beginDate = $userRow['beginningDate'];
     $exitDate = ($userRow['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $userRow['exitDate'];
 

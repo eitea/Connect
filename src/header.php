@@ -338,7 +338,7 @@ $('form').preventDoubleSubmission();
 
                   <?php if($canEditTemplates == 'TRUE'):?>
                     <hr>
-                    <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span><?php echo $lang['PDF_TEMPLATES']; ?></span></a></li>
+                    <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
                   <?php endif; ?>
 
                   <!-- Section One: CORE -->
@@ -377,7 +377,7 @@ $('form').preventDoubleSubmission();
                             </div>
                           </li>
                           <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"> <i class="fa fa-database"></i> <span> DB Backup</span> </a></li>
-                          <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"> <i class="fa fa-file-pdf-o"></i> <span><?php echo $lang['PDF_TEMPLATES']; ?></span> </a></li>
+                          <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"> <i class="fa fa-file-pdf-o"></i> <span>Report Designer</span> </a></li><?php endif; ?>
                         </ul>
                       </div>
                     </li>
