@@ -455,18 +455,12 @@ $('form').preventDoubleSubmission();
                       </a>
                       <div class="collapse" id="toggleAdminOption_REPORT" style="height: 0px;">
                         <ul class="nav navbar-nav">
-                          <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"><i class="fa fa-envelope-o"></i><span> E-mail <?php echo $lang['REPORTS']; ?> </span></a></li>
-                          <hr>
                           <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
                         </ul>
                       </div>
                     </li>
                   <?php endif; ?>
-                  <?php
-                  if($this_page =='templateSelect.php'){
-                    echo "<script>document.getElementById('adminOption_REPORT').click();</script>";
-                  }
-                  ?>
+
                 </ul>
               </div><!--/.nav-collapse -->
             </div>

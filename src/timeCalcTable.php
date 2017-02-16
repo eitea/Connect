@@ -11,8 +11,6 @@
 
 <?php
 require 'Calculators/MonthlyCalculator.php';
-require 'Calculators/YearlyCalculator.php';
-
 $currentTimeStamp = getCurrentTimestamp();
 ?>
 
@@ -52,7 +50,7 @@ $currentTimeStamp = getCurrentTimestamp();
             <th><?php echo $lang['WEEKLY_DAY']?></th>
             <th><?php echo $lang['DATE']?></th>
             <th><?php echo $lang['BEGIN']?></th>
-            <th><?php echo $lang['LUNCHBREAK']?></th>
+            <th><?php echo $lang['BREAK']?></th>
             <th><?php echo $lang['END']?></th>
 
             <th><?php echo $lang['ACTIVITY']?></th>

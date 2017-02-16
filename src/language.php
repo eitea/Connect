@@ -172,6 +172,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
 
   $lang['READY_STATUS'] = 'Ready Status';
   $lang['RECALCULATE_VACATION'] = 'Recalculate Accumulated Vacation';
+  $lang['RECIPIENTS'] = 'Recipients';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
   $lang['REGISTER_NEW_USER'] ='Register new User';
   $lang['REGISTER_USERS'] = "Register LDAP Users";
@@ -382,6 +383,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
 
   $lang['READY_STATUS'] = 'Bereitschaftsstatus';
   $lang['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
+  $lang['RECIPIENTS'] = 'Empfänger';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
   $lang['REGISTER_FROM_FORM'] = 'Formular Registrierung';
   $lang['REGISTER_NEW_USER'] = 'Registrieren';

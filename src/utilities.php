@@ -36,9 +36,10 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
   $today = $t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]);
 
   //grab template
-  $result = $conn->query("SELECT htmlCode FROM $pdfTemplateTable WHERE id = $templateID");
+  $result = $conn->query("SELECT htmlCode, userIDs FROM $pdfTemplateTable WHERE id = $templateID");
   if($result && ($row = $result->fetch_assoc())){
     $html = $row['htmlCode'];
+    $userIDs = $row['userIDs'];
   } else {
     die("Could not fetch template. Please make sure it exists. Contact support for further issues."); //We dont actually have a support.
   }
@@ -46,7 +47,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
   if(strpos($html, "[TIMESTAMPS]") !== false){ //0 = false, but 0 is valid position
     $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo (Stunden)</th></tr>";
     //select all users and select log from today if exists else log = null
-    $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %'");
+    $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %' WHERE id IN ($userIDs)");
     echo mysqli_error($conn);
     while($result && ($row = $result->fetch_assoc())){
       $beginDate = $row['beginningDate'];
@@ -75,6 +76,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
     //replace
     $html = str_replace("[TIMESTAMPS]", $html_bookings, $html);
   }
+
   if(strpos($html, "[BOOKINGS]") !== false){
     if(empty($bookingQuery)){
       $bookingQuery = "WHERE $projectBookingTable.start LIKE '$today %'";
@@ -99,6 +101,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
     LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
     LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
     $bookingQuery
+    AND $userTable.id IN ($userIDs)
     ORDER BY $userTable.firstname, $projectBookingTable.end ASC";
 
     $result = $conn->query($sql);

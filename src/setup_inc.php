@@ -587,7 +587,8 @@ $sql = "CREATE TABLE $policyTable (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     repeatCount VARCHAR(50),
-    htmlCode TEXT
+    htmlCode TEXT,
+    userIDs VARCHAR(200)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

@@ -304,7 +304,15 @@ if($row['version'] < 62){
   } else {
     echo "<br> Added table for adjustments.";
   }
+}
 
+if($row['version'] < 63){
+  $sql = "ALTER TABLE $pdfTemplateTable ADD COLUMN userIDs VARCHAR(200)";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added column for userIDs to be included in reports.";
+  }
 }
 
 //------------------------------------------------------------------------------
