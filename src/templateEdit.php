@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php enableToCore($userID); ?>
+<?php enableToTemplate($userID); //template = core || reports ?>
 
 <script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
