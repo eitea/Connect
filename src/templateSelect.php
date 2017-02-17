@@ -13,7 +13,7 @@ if(isset($_POST['prevTemplate'])){
 }
 if(isset($_POST['removeTemplate'])){
   $tempelID = $_POST['removeTemplate'];
-  $conn->query("DELETE FROM $pdfTemplateTable WHERE id = $tempelID");
+  $conn->query("DELETE FROM $pdfTemplateTable WHERE id = $tempelID AND name != 'Main_Report'");
 }
 
 if(isset($_POST['addRecipient'])){
@@ -51,7 +51,7 @@ if(isset($_POST['addRecipient'])){
   </thead>
   <tbody>
     <?php
-    $result = $conn->query("SELECT * FROM $pdfTemplateTable"); //CARE: changes to this query must also be applied to modal query!
+    $result = $conn->query("SELECT * FROM $pdfTemplateTable"); //IMPORTANT: changes to this query must also be applied to modal query!
     while($result && ($row = $result->fetch_assoc())){
       $templID = $row['id'];
 
@@ -65,7 +65,7 @@ if(isset($_POST['addRecipient'])){
 
       echo '<tr>';
       echo '<td>';
-      echo "<button type='submit' class='btn btn-default' name='removeTemplate' value='$templID' title='Delete'> <i class='fa fa-trash-o'></i></button> ";
+      echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='#deleteUserModal$templID' title='Delete'> <i class='fa fa-trash-o'></i></button> ";
       echo "<a href='templateDownload.php?id=$templID' target='_blank' class='btn btn-default' title='Export'> <i class='fa fa-download'></i></a> ";
       echo "<a href='templateEdit.php?id=$templID' class='btn btn-default' title='Edit'> <i class='fa fa-pencil'></i></a> ";
       echo "<button type='submit' value='$templID' name='prevTemplate' class='btn btn-default' title='Preview'> <i class='fa fa-search'></i></button> ";
@@ -101,7 +101,27 @@ if(isset($_POST['modifyUserIDs'])){
 $result = $conn->query("SELECT * FROM $pdfTemplateTable"); //CARE: changes to this query must also be applied to above query!
 while($result && ($row = $result->fetch_assoc())):  //create a modal for every table above. So we don't mess it up.
 ?>
-<!-- Modal -->
+<!-- Modal: DELETE USERS -->
+<div class="modal fade" id="deleteUserModal<?php echo $row['id']; ?>" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
+      </div>
+      <form method="post">
+      <div class="modal-body">
+        You can still go back and download a safe copy.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind.</button>
+        <button type="submit" class="btn btn-danger" name='removeTemplate' value="<?php echo $row['id']; ?>"><?php echo $lang['DELETE']; ?></button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: ADD USERS -->
 <div class="modal fade" id="addUserModal<?php echo $row['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
