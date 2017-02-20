@@ -88,18 +88,19 @@ $('form').preventDoubleSubmission();
 
   if($isTimeAdmin){
     $numberOfAlerts = 0;
+    //vacation
     $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
-
+    //lunchbreaks
     $result = $conn->query("SELECT COUNT(*) FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
-
+    //forgotten checkouts
     $result = $conn->query("SELECT COUNT(*) FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
-
+    //gemini date in logs
     $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 WHERE EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
-
+    //double expected hours
     $result = $conn->query("SELECT COUNT(*) FROM $logTable, $negative_logTable WHERE $logTable.userID = $negative_logTable.userID AND 0 = datediff($logTable.time, $negative_logTable.time)");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   }

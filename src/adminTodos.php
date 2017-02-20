@@ -8,28 +8,16 @@
 <?php
 
 //illegal lunchbreaks
-if(isset($_POST['saveNewBreaks']) && isset($_POST['lunchbreaks'])){
-  for($i=0; $i < count($_POST['lunchbreaks']); $i++){
-    if($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i] <= 0 || $_POST['lunchbreaks'][$i] == 0){
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>Invalid setting of new lunchbreak, please try again.';
-      echo '</div>';
-      break;
+if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
+  foreach($_POST['lunchbreakIndeces'] as $indexIM){
+    $result = $conn->query("SELECT time, pauseAfterHours, hoursOfRest FROM $userTable, $logTable WHERE indexIM = $indexIM AND userID = $userTable.id");
+    if($result && ($row = $result->fetch_assoc())){
+      $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
+      $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
+      $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
+      $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM");
+      echo mysqli_error($conn);
     }
-    $breakTime = ($_POST['lunchbreaks'][$i] - $_POST['oldBreakValue'][$i]) * 60;
-    $indexIM = $_POST['lunchbreakIndeces'][$i];
-    $date = substr($_POST['lunchbreakDate'][$i],0,10);
-
-    $sql = "INSERT INTO $projectBookingTable(timestampID, start, end, infoText, booked)
-    VALUES($indexIM, '$date 08:00:00', DATE_ADD('$date 08:00:00', INTERVAL $breakTime MINUTE), 'Repaired lunchbreak', 'FALSE')";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-
-    $breakTime = test_input($_POST['lunchbreaks'][$i]);
-    $sql = "UPDATE $logTable SET breakCredit = (breakCredit + $breakTime) WHERE indexIM = $indexIM";
-    $conn->query($sql);
-    echo mysqli_error($conn);
   }
 }
 
@@ -134,9 +122,11 @@ endif;
 
 <form method="POST">
   <?php
-  $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id
-  WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'";
+  $sql = "SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
+  WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
+  AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end) )";
 
+  echo mysqli_error($conn);
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
     ?>
@@ -148,7 +138,8 @@ endif;
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
-        Mittagspause stimmt nicht mit den festgelegten Parametern überein: Die für den Benutzer definierte Pause, wurde nach der für den Benutzer definierte Zeit nicht oder nur unvollständig konsumiert.
+        Für die gelisteten Zeitstempel wurde keine Mittagspause gefunden.<br>
+        Die Autokorrektur trägt eine vollständige Mittagspause nach (Diese Pause wird dazugerechnet).
       </div>
     </div>
 
@@ -157,7 +148,8 @@ endif;
       <th><?php echo $lang['TIME']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
       <th><?php echo $lang['LUNCHBREAK']; ?></th>
-      <th></th>
+      <th><input type="checkbox" onclick="toggle(this, 'lunchbreakIndeces');" /></th>
+
       <tbody>
         <?php
         while($row = $result->fetch_assoc()){
@@ -165,19 +157,15 @@ endif;
           echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-          echo '<td><input type="number" step="any" class="form-control" style="width:100px" name="lunchbreaks[]" value="'.$row['breakCredit'].'" ></td>';
-          echo '<td>
-          <input type=text style=display:none name="lunchbreakIndeces[]" value='.$row['indexIM'].' >
-          <input type=text style=display:none name="oldBreakValue[]" value='.$row['breakCredit'].' >
-          <input type=text style=display:none name="lunchbreakDate[]" value="'.$row['time'].'" >
-          </td>';
+          echo '<td>'. $row['breakCredit'].'</td>';
+          echo '<td><input type="checkbox" name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';
           echo '</tr>';
         }
         ?>
       </tbody>
     </table>
     <br>
-    <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Save</button>
+    <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Autocorrect</button>
     <br><hr><br>
   <?php endif;?>
 
@@ -401,15 +389,6 @@ endif;
 
   if($missingDates):
     ?>
-
-    <script>
-    function toggle(source, target) {
-      checkboxes = document.getElementsByName(target + '[]');
-      for(var i = 0; i<checkboxes.length; i++) {
-        checkboxes[i].checked = source.checked;
-      }
-    }
-    </script>
     <h4><?php echo $lang['MISSING'].' '.$lang['EXPECTED_HOURS'];?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#zero_expected_absent_log" aria-expanded="false" aria-controls="zero_expected_absent_log">
@@ -449,6 +428,15 @@ endif;
 
   <!-- -------------------------------------------------------------------------->
 </form>
+
+<script>
+function toggle(source, target) {
+  checkboxes = document.getElementsByName(target + '[]');
+  for(var i = 0; i<checkboxes.length; i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

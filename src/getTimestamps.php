@@ -125,7 +125,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime']) && $_POST['creatFromTime'] != '0000-00-00 00:00') {
       if($_POST['creatToTime'] == '0000-00-00 00:00' || timeDiff_Hours($_POST['creatFromTime'], $_POST['creatToTime']) > 0) {
 
-        $activtiy = $_POST['action'];
+        $activity = $_POST['action'];
         $timeIsLike = substr($_POST['creatFromTime'], 0, 10) ." %";
         $timeToUTC = $_POST['creatTimeZone'];
 
@@ -139,7 +139,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         //gotta see if there already is a timestamp for that day
         $sql = "SELECT * FROM $logTable WHERE userID = $filterID
-        AND status = '$activtiy'
+        AND status = '$activity'
         AND time LIKE '$timeIsLike'";
 
         $result = mysqli_query($conn, $sql);
@@ -174,7 +174,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $result = $conn->query($sql);
           $row=$result->fetch_assoc();
           $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activtiy', '$timeToUTC', '$expectedHours');";
+          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activity', '$timeToUTC', '$expectedHours');";
           $conn->query($sql);
         }
       } else {

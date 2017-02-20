@@ -543,7 +543,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
               <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
-
                   <div class="modal-header">
                     <h4 class="modal-title">Do you really wish to delete <?php $firstname.' '.$lastname; ?> ?</h4>
                   </div>
@@ -557,7 +556,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
               </div>
             </div>
-
             <!-- /CONTENT -->
           </div>
         </div>

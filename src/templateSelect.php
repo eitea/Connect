@@ -113,7 +113,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
         You can still go back and download a safe copy.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind.</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
         <button type="submit" class="btn btn-danger" name='removeTemplate' value="<?php echo $row['id']; ?>"><?php echo $lang['DELETE']; ?></button>
       </div>
       </form>

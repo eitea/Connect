@@ -315,6 +315,45 @@ if($row['version'] < 63){
   }
 }
 
+if($row['version'] < 64){
+  $sql = "UPDATE $projectBookingTable SET bookingType = 'break' WHERE bookingType = '' OR bookingType IS NULL";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Repaired missing Bookingtypes.";
+  }
+
+
+}
+
+//repair lunchbreaks to FIT to ONE COMPLETE break booking.
+$result = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
+WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND (userID = 10 OR userID = 11)
+AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end) )");
+while($result && ($row = $result->fetch_assoc())){
+  $indexIM = $row['indexIM'];
+  $start = $row['time'];
+  $breakValue = $row['breakCredit'];
+  $breakHasBeenAdded = false;
+  $conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM");
+  $result2 = $conn->query("SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM ORDER BY start ASC");
+  while($result2 && ($row2 = $result2->fetch_assoc())){
+    if(!$breakHasBeenAdded && timeDiff_Hours($row['time'], $start) >= ($row['pauseAfterHours'] - 2)){ //enter the break as SOON as the next booking comes after 4h
+      $end = carryOverAdder_Minutes($start, intval($breakValue * 60));
+      $conn->query("INSERT INTO $projectBookingTable (start, end, bookingType, infoText, timestampID) VALUES('$start', '$end', 'break', 'Mittagspause', $indexIM)");
+      $breakHasBeenAdded = true;
+    } else {
+      $id = $row2['id'];
+      $duration = timeDiff_Hours($row2['start'], $row2['end']);
+      $end = carryOverAdder_Minutes($start, intval($duration * 60));
+      $conn->query("UPDATE $projectBookingTable SET start='$start', end = '$end' WHERE id = $id");
+    }
+    $start = $end;
+  }
+  echo mysqli_error($conn);
+}
+
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

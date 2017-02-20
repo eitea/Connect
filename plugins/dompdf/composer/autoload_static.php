@@ -4,9 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64
+class ComposerStaticInit675f651b0b058928bc5678947053c9a5
 {
     public static $prefixLengthsPsr4 = array (
+        'F' => 
+        array (
+            'FontLib\\' => 8,
+        ),
         'D' => 
         array (
             'Dompdf\\' => 7,
@@ -14,6 +18,10 @@ class ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64
     );
 
     public static $prefixDirsPsr4 = array (
+        'FontLib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phenx/php-font-lib/src/FontLib',
+        ),
         'Dompdf\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
@@ -27,12 +35,9 @@ class ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64
             array (
                 0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src',
             ),
-        ),
-        'F' => 
-        array (
-            'FontLib\\' => 
+            'Sabberworm\\CSS' => 
             array (
-                0 => __DIR__ . '/..' . '/phenx/php-font-lib/src',
+                0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/lib',
             ),
         ),
     );
@@ -49,10 +54,10 @@ class ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit3d6cccb61da9d3a751ded3a14970cf64::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit675f651b0b058928bc5678947053c9a5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit675f651b0b058928bc5678947053c9a5::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit675f651b0b058928bc5678947053c9a5::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit675f651b0b058928bc5678947053c9a5::$classMap;
 
         }, null, ClassLoader::class);
     }
