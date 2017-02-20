@@ -354,10 +354,10 @@ if($row['version'] < 64){
     echo "<br>Deleted all old automatic lunchbreaks.";
   }
 
-  $result = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
+  $resultParent = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
   WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end) )");
-  while($resultParent && ($rowP = $result->fetch_assoc())){
+  while($resultParent && ($rowP = $resultParent->fetch_assoc())){
     $indexIM = $rowP['indexIM'];
     $result = $conn->query("SELECT time, pauseAfterHours, hoursOfRest FROM $userTable, $logTable WHERE indexIM = $indexIM AND userID = $userTable.id");
     if($result && ($row = $result->fetch_assoc())){
@@ -373,9 +373,9 @@ if($row['version'] < 64){
   $result = $conn->query("SELECT indexIM FROM $logTable WHERE status = '0'");
   while($result && ($row = $result->fetch_assoc())){
     $indexIM = $row['indexIM'];
-    $resultBreak = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS sum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break'");
-    if($result && ($row = $result->fetch_assoc())){
-      $hours = sprintf("%.2f", $row['sum'] / 60);
+    $resultBreak = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS mySum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break'");
+    if($resultBreak && ($rowBreak = $resultBreak->fetch_assoc())){
+      $hours = sprintf("%.2f", $rowBreak['mySum'] / 60);
       $conn->query("UPDATE $logTable SET breakCredit = '$hours' WHERE indexIM = $indexIM");
     }
   }
