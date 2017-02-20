@@ -379,6 +379,7 @@ if($row['version'] < 64){
       $conn->query("UPDATE $logTable SET breakCredit = '$hours' WHERE indexIM = $indexIM");
     }
   }
+  echo "<br>Recalculated all breaks.";
 
   //correct missing expectedHours
   $result = $conn->query("SELECT userID, time, indexIM FROM $logTable WHERE expectedHours = '' OR expectedHours IS NULL");
@@ -392,6 +393,11 @@ if($row['version'] < 64){
     $sql = "UPDATE $logTable SET expectedHours = '$expectedHours' WHERE indexIM = $indexIM";
     $conn->query($sql);
   }
+  echo "<br>Filled in missing expectedHours";
+
+  //correct wrong expectedHours on all timestamps that are not 0s.
+  $conn->query("UPDATE $logTable SET expectedHours = (TIMESTAMPDIFF(MINUTE, time, timeEnd) / 60) WHERE status != '0' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) - expectedHours*60 != 0 ");
+  echo "<br>Corrected wrong expected hours to all not-checkin timestamps ";
 }
 
 
