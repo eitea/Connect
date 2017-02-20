@@ -12,10 +12,15 @@ if(isset($_POST['filterUserID'])){
 
 if(isset($_POST['creatSign']) && !empty($_POST['creatInfoText']) && !empty($_POST['creatFromTime'])){
   $hours = floatval($_POST['creatFromTime']);
+  if(isset($_POST['creatTimeTime']) && test_Date($_POST['creatTimeTime']. ":00")){
+    $date = "'".$_POST['creatTimeTime']. ":00'";
+  } else {
+    $date = 'UTC_TIMESTAMP';
+  }
   if($hours > 0){
     $addOrSub = intval($_POST['creatSign']);
     $infoText = test_input($_POST['creatInfoText']);
-    $conn->query("INSERT INTO $correctionTable (userID, hours, infoText, addOrSub, cOnDate) VALUES($filterID, $hours, '$infoText', '$addOrSub', UTC_TIMESTAMP)");
+    $conn->query("INSERT INTO $correctionTable (userID, hours, infoText, addOrSub, cOnDate) VALUES($filterID, $hours, '$infoText', '$addOrSub', $date)");
   } else {
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -54,16 +59,18 @@ echo mysqli_error($conn);
 
   <?php if($filterID != 0): ?>
     <div class="col-xs-5">
-      <input type="text" class="form-control" placeholder="Infotext" name="creatInfoText"/>
+      <input type="text" class="form-control" placeholder="Infotext" name="creatInfoText" />
+    </div>
+    <div class="col-xs-3">
+      <input id="calendar" type="text" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,16); ?>' />
     </div>
     <div class="col-xs-2">
-      <input id="calendar" type="number" step="any" class="form-control" placeholder="Hours" size='2' name="creatFromTime" />
+      <input type="number" step="any" class="form-control" placeholder="Hours" size='2' name="creatFromTime" />
     </div>
-    <div class="col-xs-5">
+    <div class="col-xs-2">
       <div class="dropdown">
-        <a href="#" class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-          ( + / - )
-          <span class="caret"></span>
+        <a href="#" class="btn btn-warning dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+         ( + / - )
         </a>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
           <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSign" value="1"><?php echo $lang['ABSOLVED_HOURS']; ?> (+)</button></li>
