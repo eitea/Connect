@@ -379,7 +379,21 @@ if($row['version'] < 64){
       $conn->query("UPDATE $logTable SET breakCredit = '$hours' WHERE indexIM = $indexIM");
     }
   }
+
+  //correct missing expectedHours
+  $result = $conn->query("SELECT userID, time, indexIM FROM $logTable WHERE expectedHours = '' OR expectedHours IS NULL");
+  while($result && ($row = $result->fetch_assoc())){
+    $indexIM = $row['indexIM'];
+    $filterID = $row['userID'];
+    $resultHours = $conn->query("SELECT * FROM $bookingTable WHERE userID = $filterID");
+    $rowHours = $resultHours->fetch_assoc();
+    $expectedHours = $rowHours[strtolower(date('D', strtotime($row['time'])))];
+
+    $sql = "UPDATE $logTable SET expectedHours = '$expectedHours' WHERE indexIM = $indexIM";
+    $conn->query($sql);
+  }
 }
+
 
 
 //------------------------------------------------------------------------------

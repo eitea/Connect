@@ -165,15 +165,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "ERROR - Merging timestamps of same dates: time difference was less or equal 0. Check your times and see if existing timestamp has been closed.";
           }
         } else { //no existing timestamp yet - create a new stamp
-          //creating a new timestamp should delete absent file if it exists, not caring about the status
+          //creating a new timestamp should delete absent file (if it exists, which it should)
           $sql = "DELETE FROM $negative_logTable WHERE userID = $filterID AND time LIKE '$timeIsLike'";
           $conn->query($sql);
 
           //get expected Hours
           $sql = "SELECT * FROM $bookingTable WHERE userID = $filterID";
           $result = $conn->query($sql);
-          $row=$result->fetch_assoc();
-          $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
+          $row = $result->fetch_assoc();
+          $expectedHours = $row[strtolower(date('D', strtotime($timeBegin)))];
           $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC, expectedHours) VALUES('$timeBegin', '$timeEnd', $filterID, '$activity', '$timeToUTC', '$expectedHours');";
           $conn->query($sql);
         }
