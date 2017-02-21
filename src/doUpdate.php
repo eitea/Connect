@@ -391,15 +391,13 @@ if($row['version'] < 65){
     echo "<br> Added column for correction vacation / log";
   }
 
-  $sql = "ALTER TABLE $correctionTable ADD COLUMN createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP'";
+  $sql = "ALTER TABLE $correctionTable ADD COLUMN createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
   } else {
     echo "<br> Added column for correction date / log";
   }
 }
-
-
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
