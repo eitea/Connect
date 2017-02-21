@@ -92,7 +92,8 @@ $('form').preventDoubleSubmission();
     $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
     //lunchbreaks
-    $result = $conn->query("SELECT COUNT(*) FROM $logTable INNER JOIN $userTable ON $logTable.userID = $userTable.id WHERE timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(HOUR, time, timeEnd) > pauseAfterHours AND breakCredit < hoursOfRest AND status = '0'");
+    $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
+                            AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end))");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
     //forgotten checkouts
     $result = $conn->query("SELECT COUNT(*) FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0");

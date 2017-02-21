@@ -58,6 +58,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ADMIN_PROJECT_OPTIONS'] = 'Project Bookings';
   $lang['ADMIN_MODULES'] = 'Admin Modules';
   $lang['ADVANCED_OPTIONS'] = 'Advanced Options';
+  $lang['AFFECTED_MONTH'] = 'Affected Month';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
   $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
   $lang['ASSIGNED'] = 'Assigned';
@@ -87,6 +88,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
   $lang['DATE'] = 'Date';
+  $lang['DAYS'] = 'Days';
   $lang['DEACTIVATE'] = 'Deactivate';
   $lang['DEFAULT'] = 'Default';
   $lang['DELETE'] = 'Delete';
@@ -268,6 +270,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
   $lang['ADMIN_PROJECT_OPTIONS'] = 'Projektbuchungen';
   $lang['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
+  $lang['AFFECTED_MONTH'] = 'Betroffener Monat';
   $lang['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
   $lang['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
   $lang['ASSIGNED'] = 'Zugewiesene';
@@ -298,6 +301,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';
   $lang['DATA'] = 'Daten';
+  $lang['DAYS'] = 'Tage';
   $lang['DEACTIVATE'] = 'Deaktivieren';
   $lang['DEFAULT'] = 'Standard';
   $lang['DELETE'] = 'Löschen';
