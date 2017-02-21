@@ -322,7 +322,6 @@ if($row['version'] < 64){
   } else {
     echo "<br> Repaired missing Bookingtypes.";
   }
-
   //repair lunchbreaks to FIT to ONE COMPLETE break booking.
   $result = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
   WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND (userID = 10 OR userID = 11)
@@ -349,11 +348,9 @@ if($row['version'] < 64){
     }
     echo mysqli_error($conn);
   }
-
   if($conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND infoText LIKE 'Lunchbreak for %' ")){
     echo "<br>Deleted all old automatic lunchbreaks.";
   }
-
   $resultParent = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
   WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end) )");
@@ -368,7 +365,6 @@ if($row['version'] < 64){
     }
   }
   echo "<br>Inserted complete (!) lunchbreaks";
-
   //recalculate all break values that need recalculating.
   $result = $conn->query("SELECT indexIM FROM $logTable WHERE status = '0'");
   while($result && ($row = $result->fetch_assoc())){
@@ -380,7 +376,6 @@ if($row['version'] < 64){
     }
   }
   echo "<br>Recalculated all breaks.";
-
   //correct missing expectedHours
   $result = $conn->query("SELECT userID, time, indexIM FROM $logTable WHERE expectedHours = '' OR expectedHours IS NULL");
   while($result && ($row = $result->fetch_assoc())){
@@ -394,10 +389,26 @@ if($row['version'] < 64){
     $conn->query($sql);
   }
   echo "<br>Filled in missing expectedHours";
-
   //correct wrong expectedHours on all timestamps that are not 0s.
   $conn->query("UPDATE $logTable SET expectedHours = (TIMESTAMPDIFF(MINUTE, time, timeEnd) / 60) WHERE status != '0' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) - expectedHours*60 != 0 ");
   echo "<br>Corrected wrong expected hours to all not-checkin timestamps ";
+}
+
+
+if($row['version'] < 65){
+  $sql = "ALTER TABLE $correctionTable ADD COLUMN cType VARCHAR(10) NOT NULL DEFAULT 'log'";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added column for correction vacation / log";
+  }
+
+  $sql = "ALTER TABLE $correctionTable ADD COLUMN createdOn NOT NULL DATETIME DEFAULT CURRENT_TIMESTAMP'";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added column for correction date / log";
+  }
 }
 
 

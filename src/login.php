@@ -67,6 +67,7 @@
 <?php
 include 'version_number.php';
 require 'validate.php'; denyToCloud();
+//check if this is the first time this app runs
 if(!file_exists('connection_config.php')){
   header("Location: setup_getInput.php");
 }
@@ -88,6 +89,7 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
     $timeZone = $_POST['funZone'];
     $_SESSION['timeToUTC'] = $timeZone;
 
+    //check for updates, if core admin
     require "language.php";
     $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
     $result = $conn->query($sql);

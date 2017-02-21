@@ -70,7 +70,7 @@ class LogCalculator{
     }
 
     //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID");
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log'");
     while($result && ($row = $result->fetch_assoc())){
       $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
     }
