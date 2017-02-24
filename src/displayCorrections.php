@@ -43,7 +43,8 @@ function test_input($data) {
 <table class="table table-hover">
   <thead>
     <th>Info</th>
-    <th><?php echo $lang['CORRECTION'].' '. $lang['HOURS']; ?></th>
+    <th><?php echo $lang['CORRECTION']; ?></th>
+    <th>Unit</th>
   </thead>
   <tbody>
     <?php
@@ -54,6 +55,13 @@ function test_input($data) {
       echo '<tr>';
       echo '<td>'.$row['infoText'].'</td>';
       echo '<td>'.sprintf("%+.2f",$hours).'</td>';
+      echo '<td>';
+      if($row['cType'] == 'log'){
+        echo $lang['HOURS'];
+      } else {
+        echo $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION'];
+      }
+      echo '</td>';
       echo '</tr>';
     }
     ?>

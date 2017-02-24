@@ -49,4 +49,6 @@ $roleTable = "roles"; //all roles (admin/canBook)
 $travelTable = "travelBookings";
 $travelCountryTable = "travelCountryData"; //for calculation of travel expenses
 
+$intervalTable = "intervalData";
+
 $vacationTable = "vacationData"; //each users info on his vacation data

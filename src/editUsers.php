@@ -6,27 +6,23 @@
   <h3><?php echo $lang['USERS']; ?></h3>
 </div>
 <?php
+$activeTab = 0;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1){
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
-    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
-    SELECT id, firstname, lastname, psw, sid, email, gender, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
+    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
+    SELECT id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
     //copy logs
-    $sql = "INSERT INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, breakCredit, expectedHours, indexIM)
-    SELECT userID, time, timeEnd, status, timeToUTC, breakCredit, expectedHours, indexIM FROM $logTable WHERE userID = $x";
+    $sql = "INSERT INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, breakCredit, indexIM)
+    SELECT userID, time, timeEnd, status, timeToUTC, breakCredit, indexIM FROM $logTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo 'logErr: '.mysqli_error($conn);}
 
-    //copy unlogs
-    $sql = "INSERT INTO $deactivatedUserUnLogs(userID, time, mon, tue, wed, thu, fri, sat, sun)
-    SELECT userID, time, mon, tue, wed, thu, fri, sat, sun FROM $negative_logTable WHERE userID = $x";
-    if(!$conn->query($sql)){$acc = false; echo '<br>unlogErr: '.mysqli_error($conn);}
-
-    //copy timetable and vacationtable
-    $sql = "INSERT INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacationHoursCredit, daysPerYear)
-    SELECT $bookingTable.userID, mon, tue, wed, thu, fri, sat, sun, vacationHoursCredit, daysPerYear FROM $bookingTable, $vacationTable WHERE $bookingTable.userID = $x AND $vacationTable.userID = $x";
+    //copy intervalTable
+    $sql = "INSERT INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, daysPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate)
+    SELECT userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate FROM $intervalTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>dataErr: '.mysqli_error($conn);}
 
     //copy projectbookings
@@ -52,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $travelTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>travelErr: '.mysqli_error($conn);}
 
-    //if successful, delete the user
+    //if successful, delete the user, On Cascade Delete does the rest.
     if($acc){
       $sql  = "DELETE FROM $userTable WHERE id = $x";
       if(!$conn->query($sql)){echo mysqli_error($conn);}
@@ -69,8 +65,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+  if(isset($_POST['addNewInterval']) && !empty($_POST['intervalEnd']) && test_Date($_POST['intervalEnd'].' 05:00:00')){
+    $activeTab = $x = $_POST['addNewInterval'];
+    $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
+    $intervalEnd = $_POST['intervalEnd'].' 05:00:00';
+
+    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
+      $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
+    }
+
+    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
+      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
+    }
+
+    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
+      $pauseAfter = $_POST['pauseAfter'.$x];
+    }
+
+    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
+      $rest = $_POST['rest'.$x];
+    }
+
+    if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
+      $mon = test_input($_POST['mon'.$x]);
+    }
+
+    if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
+      $tue = test_input($_POST['tue'.$x]);
+    }
+
+    if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
+      $wed = test_input($_POST['wed'.$x]);
+    }
+
+    if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
+      $thu = test_input($_POST['thu'.$x]);
+    }
+
+    if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
+      $fri = test_input($_POST['fri'.$x]);
+    }
+
+    if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
+      $sat = test_input($_POST['sat'.$x]);
+    }
+
+    if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
+      $sun = test_input($_POST['sun'.$x]);
+    }
+
+    //close up the old one
+    $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
+      vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest', endDate='$intervalEnd'
+      WHERE userID = $x AND endDate IS NULL");
+    //create a new one
+    $conn->query("INSERT INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate)
+    VALUES($x, '$mon', '$tue', '$wed', '$thu', '$fri', '$sat', '$sun', '$vacDaysPerYear', '$overTimeAll', '$pauseAfter', '$rest', '$intervalEnd')");
+
+    echo mysqli_error($conn);
+  }
+
   if (isset($_POST['submitUser'])) {
-    $x = $_POST['submitUser'];
+    $activeTab = $x = $_POST['submitUser'];
     if (!empty($_POST['firstname'.$x])) {
       $firstname = test_input($_POST['firstname'.$x]);
       $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$x';";
@@ -88,18 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $conn->query("UPDATE $userTable SET exitDate = '$exitDate' WHERE id = '$x'");
     }
 
-    if (!empty($_POST['gender'.$x])) {
-      $gender = test_input($_POST['gender'.$x]);
-      $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if (!empty($_POST['enableProjecting'.$x])) {
-      $enableProjecting = test_input($_POST['enableProjecting'.$x]);
-      $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
     if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
       $email = test_input($_POST['email'.$x]).'@';
       $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$x';";
@@ -111,78 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '</div>';
     }
 
-    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
-      $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
-      $sql = "UPDATE $userTable SET overTimeLump= '$overTimeAll' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
-      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
-      $sql = "UPDATE $vacationTable SET daysPerYear= '$vacDaysPerYear' WHERE userID = '$x';";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['vacDaysCredit'.$x])){
-      $vacDaysCredit = floatval($_POST['vacDaysCredit'.$x]);
-      $sql = "UPDATE $vacationTable SET vacationHoursCredit= '$vacDaysCredit' WHERE userID = '$x';";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
-      $pauseAfter = $_POST['pauseAfter'.$x];
-      $sql = "UPDATE $userTable SET pauseAfterHours= '$pauseAfter' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
-      $rest = $_POST['rest'.$x];
-      $sql = "UPDATE $userTable SET hoursOfRest= '$rest' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
-      $mon = test_input($_POST['mon'.$x]);
-      $sql = "UPDATE $bookingTable SET mon='$mon' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
-      $tue = test_input($_POST['tue'.$x]);
-      $sql = "UPDATE $bookingTable SET tue='$tue' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
-      $wed = test_input($_POST['wed'.$x]);
-      $sql = "UPDATE $bookingTable SET wed='$wed' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
-      $thu = test_input($_POST['thu'.$x]);
-      $sql = "UPDATE $bookingTable SET thu='$thu' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
-      $fri = test_input($_POST['fri'.$x]);
-      $sql = "UPDATE $bookingTable SET fri='$fri' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
-      $sat = test_input($_POST['sat'.$x]);
-      $sql = "UPDATE $bookingTable SET sat='$sat' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-
-    if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
-      $sun = test_input($_POST['sun'.$x]);
-      $sql = "UPDATE $bookingTable SET sun='$sun' WHERE userID = '$x'";
-      $conn->query($sql);
-    }
-    echo mysqli_error($conn);
     if (!empty($_POST['password'.$x]) && !empty($_POST['passwordConfirm'.$x])) {
       $password = $_POST['password'.$x];
       $passwordConfirm = $_POST['passwordConfirm'.$x];
@@ -210,6 +182,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
         }
       }
+    }
+
+    if (!empty($_POST['enableProjecting'.$x])) {
+      $enableProjecting = test_input($_POST['enableProjecting'.$x]);
+      $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$x';";
+      $conn->query($sql);
+    }
+
+    if (!empty($_POST['gender'.$x])) {
+      $gender = test_input($_POST['gender'.$x]);
+      $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$x';";
+      $conn->query($sql);
     }
 
     if(isset($_POST['isCoreAdmin'.$x])){
@@ -261,43 +245,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $conn->query($sql);
 
+    $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
+
+    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
+      $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
+    }
+
+    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
+      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
+    }
+
+    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
+      $pauseAfter = $_POST['pauseAfter'.$x];
+    }
+
+    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
+      $rest = $_POST['rest'.$x];
+    }
+
+    if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
+      $mon = test_input($_POST['mon'.$x]);
+    }
+
+    if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
+      $tue = test_input($_POST['tue'.$x]);
+    }
+
+    if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
+      $wed = test_input($_POST['wed'.$x]);
+    }
+
+    if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
+      $thu = test_input($_POST['thu'.$x]);
+    }
+
+    if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
+      $fri = test_input($_POST['fri'.$x]);
+    }
+
+    if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
+      $sat = test_input($_POST['sat'.$x]);
+    }
+
+    if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
+      $sun = test_input($_POST['sun'.$x]);
+    }
+
+    //close up the old one
+    $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
+      vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest'
+      WHERE userID = $x AND endDate IS NULL");
+
+    echo mysqli_error($conn);
   }//end if isset submitX
 }
 ?>
 
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
-  $mon=$tue=$wed=$thu=$fri=$sat=$sun=0;
-  $firstname=$lastname=$email=$gender=$vacDays=$overTimeAll = $vacDaysCredit = $pauseAfter = $rest = $begin = $passErr= $coreTime = "";
-
   //enable/disable modules
   $result = $conn->query("SELECT * FROM $moduleTable");
   $moduleEnableRow = $result->fetch_assoc();
-
   $moduleTime =  $moduleProject =  '';
-
-  //timemodule will momentarily always be active, since projectm requires timem
+  //timemodule will momentarily always be active, since projectM requires timeM
   if($moduleEnableRow['enableProject'] == 'FALSE'){
     $moduleProject = 'disabled';
   }
 
-  $query = "SELECT *, $userTable.id AS userID
-  FROM $userTable INNER JOIN $bookingTable ON $userTable.id = $bookingTable.userID
-  INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID
+  $query = "SELECT *, $userTable.id AS user_id FROM $userTable
   INNER JOIN $roleTable ON $roleTable.userID = $userTable.id
+  INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE endDate IS NULL
   ORDER BY $userTable.id ASC";
-
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-      $x = $row['userID'];
-      $mon = $row['mon'];
-      $tue = $row['tue'];
-      $wed = $row['wed'];
-      $thu = $row['thu'];
-      $fri = $row['fri'];
-      $sat = $row['sat'];
-      $sun = $row['sun'];
+      $x = $row['user_id'];
 
       $firstname = $row['firstname'];
       $lastname = $row['lastname'];
@@ -306,8 +328,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $begin = $row['beginningDate'];
       $end = $row['exitDate'];
 
-      $vacDaysPerYear = $row['daysPerYear'];
-      $vacDaysCredit = $row['vacationHoursCredit'];
+      $intervalStart = $row['startDate'];
+
+      $mon = $row['mon'];
+      $tue = $row['tue'];
+      $wed = $row['wed'];
+      $thu = $row['thu'];
+      $fri = $row['fri'];
+      $sat = $row['sat'];
+      $sun = $row['sun'];
+
+      $vacDaysPerYear = $row['vacPerYear'];
       $overTimeAll = $row['overTimeLump'];
       $pauseAfter = $row['pauseAfterHours'];
       $rest = $row['hoursOfRest'];
@@ -328,7 +359,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <h4 class="panel-title">
             <div class="row">
               <div class="col-md-6">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>" aria-expanded="false">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>">
                   <?php echo $eOut; ?>
                 </a>
               </div>
@@ -342,7 +373,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </h4>
         </div>
-        <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<?php echo $x; ?>">
+        <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>" role="tabpanel" aria-labelledby="heading<?php echo $x; ?>">
           <div class="panel-body">
 
             <!-- #########  CONTENT ######## -->
@@ -351,70 +382,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class=container-fluid>
                 <div class=form-group>
                   <div class="input-group">
-                    <span class="input-group-addon" style=min-width:150px><?php echo $lang['FIRSTNAME'] ?></span>
+                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
                     <input type="text" class="form-control" name="firstname<?php echo $x; ?>" value="<?php echo $firstname; ?>">
                   </div>
                 </div>
                 <div class=form-group>
                   <div class="input-group">
-                    <span class="input-group-addon" style=min-width:150px><?php echo $lang['LASTNAME'] ?></span>
+                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
                     <input type="text" class="form-control" name="lastname<?php echo $x; ?>" value="<?php echo $lastname; ?>">
                   </div>
                 </div>
                 <div class=form-group>
                   <div class="input-group">
-                    <span class="input-group-addon" style=min-width:150px>E-Mail</span>
+                    <span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
                     <input type="text" class="form-control" name="email<?php echo $x; ?>" value="<?php echo explode('@', $email)[0]; ?>"/>
-                    <span class="input-group-addon" style=min-width:150px>@<?php echo explode('@', $email)[1]; ?></span>
+                    <span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $email)[1]; ?></span>
                   </div>
                 </div>
                 <div class=form-group>
                   <div class="input-group">
                     <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD']; ?></span>
-                    <input type="password" class="form-control" name="password<?php echo $x; ?>" placeholder="Password">
+                    <input type="password" class="form-control" name="password<?php echo $x; ?>" placeholder="* * * *">
                   </div>
                 </div>
                 <div class=form-group>
                   <div class="input-group">
-                    <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
-                    <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="Password Confirm">
+                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
+                    <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="* * * *">
                   </div>
                 </div>
               </div>
-              <br>
+              <div class="container-fluid radio">
+                <div class="col-md-2">
+                  <?php echo $lang['GENDER']; ?>:
+                </div>
+                <div class="col-md-2">
+                  <label>
+                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
+                  </label>
+                </div>
+                <div class="col-md-8">
+                  <label>
+                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
+                  </label>
+                </div>
+              </div>
               <div class="container-fluid">
-                <div class=col-md-3>
+                <div class=col-md-6>
                   <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($begin,0,10); ?></p>
                 </div>
-                <div class=col-md-3>
+                <div class=col-md-6>
                   <?php echo $lang['EXIT_DATE']; ?>
                   <input type="text" class="form-control" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
                 </div>
-                <div class=col-md-3>
-                  <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
-                  <input type="number" class="form-control" name="daysPerYear<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
-                </div>
-                <div class=col-md-3>
-                  <?php echo $lang['AMOUNT_VACATION_DAYS']; ?>: <br>
-                  <input type="number" class="form-control" step="any"  name="vacDaysCredit<?php echo $x; ?>" value="<?php echo sprintf('%.2f', $vacDaysCredit/24); ?>"/>
-                </div>
               </div>
               <br>
-              <div class="container-fluid">
-                <div class=col-md-3>
-                  <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
-                  <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/>
-                </div>
-                <div class=col-md-3>
-                  <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>
-                </div>
-                <div class=col-md-3>
-                  <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/>
-                </div>
-              </div>
-              <br><br>
               <div class=container-fluid>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <?php echo $lang['ADMIN_MODULES']; ?>: <br>
                   <div class="checkbox">
                     <label>
@@ -431,7 +455,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label>
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <?php echo $lang['USER_MODULES']; ?>:
                   <div class="checkbox">
                     <label>
@@ -447,7 +471,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label>
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <?php echo $lang['COMPANIES']; ?>: <br>
                   <div class="checkbox">
                     <?php
@@ -465,71 +489,119 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ?>
                   </div>
                 </div>
-                <div class="col-md-3">
-                  <?php echo $lang['GENDER']; ?>: <br>
-                  <div class="radio">
-                    <label>
-                      <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
-                    </label>
-                  </div>
-                  <div class="radio">
-                    <label>
-                      <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
-                    </label>
-                  </div>
-                </div>
               </div>
               <br><br>
-
-              <div class=container-fluid>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Mon</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="mon<?php echo $x; ?>" size=2 value= <?php echo $mon; ?>>
+              <!-- Interval table -->
+              <div class="container well">
+                <div class="row">
+                  <div class="col-md-3">
+                    <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
+                    <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/>
+                  </div>
+                  <div class="col-md-3">
+                    <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>
+                  </div>
+                  <div class="col-md-3">
+                    <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/>
+                  </div>
+                  <div class="col-md-3">
+                    <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
+                    <input type="number" class="form-control" name="daysPerYear<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
                   </div>
                 </div>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Tue</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="tue<?php echo $x; ?>" size=2 value= <?php echo $tue; ?>>
+                <br>
+                <div class="row">
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['mon']; ?>
+                    <input type="number" step="any" class="form-control" name="mon<?php echo $x; ?>" size="2" value= "<?php echo $mon; ?>" />
                   </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Wed</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="wed<?php echo $x; ?>" size=2 value= <?php echo $wed; ?>>
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['tue']; ?>
+                    <input type="number" step="any" class="form-control" name="tue<?php echo $x; ?>" size="2" value= "<?php echo $tue; ?>" />
                   </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Thu</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="thu<?php echo $x; ?>" size=2 value= <?php echo $thu; ?>>
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['wed']; ?>
+                    <input type="number" step="any" class="form-control" name="wed<?php echo $x; ?>" size="2" value= "<?php echo $wed; ?>" />
+                  </div>
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['thu']; ?>
+                    <input type="number" step="any" class="form-control" name="thu<?php echo $x; ?>" size="2" value= "<?php echo $thu; ?>" />
+                  </div>
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['fri']; ?>
+                    <input type="number" step="any" class="form-control" name="fri<?php echo $x; ?>" size="2" value= "<?php echo $fri; ?>" />
+                  </div>
+                  <div style="width:11%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['sat']; ?>
+                    <input type="number" step="any" class="form-control" name="sat<?php echo $x; ?>" size="2" value= "<?php echo $sat; ?>" />
+                  </div>
+                  <div style="width:10%; float:left; margin-left:3%">
+                    <?php echo $lang_weeklyDayToString['sun']; ?>
+                    <input type="number" step="any" class="form-control" name="sun<?php echo $x; ?>" size="2" value= "<?php echo $sun; ?>" />
                   </div>
                 </div>
               </div>
-              <br>
-              <div class=container-fluid>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Fri</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="fri<?php echo $x; ?>" size=2 value= <?php echo $fri; ?>>
+              <div class="container well">
+                <div class="row">
+                  <div class="col-md-4">
+                    <?php echo $lang['VALID_PERIOD'].' ('.$lang['FROM'].' - '.$lang['TO'].')'; ?>:
+                  </div>
+                  <div class="col-xs-3">
+                    <input type="text" readonly class="form-control" value="<?php echo substr($intervalStart,0,10); ?>" />
+                  </div>
+                  <div class="col-xs-3">
+                    <input type="text" class="form-control" name="intervalEnd" placeholder="yyyy-mm-dd" />
+                  </div>
+                  <div class="col-xs-2">
+                    <button type="submit" class="btn btn-warning" name="addNewInterval" value="<?php echo $x; ?>"> Close Interval</button>
                   </div>
                 </div>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Sat</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="sat<?php echo $x; ?>" size=2 value= <?php echo $sat; ?>>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-addon">Sun</span>
-                    <input type="number" step="any" class="form-control" aria-describedby="sizing-addon2" name="sun<?php echo $x; ?>" size=2 value= <?php echo $sun; ?>>
-                  </div>
-                </div>
+              </div>
+
+              <div class="container">
+                <a class="btn btn-link" data-toggle="collapse" href="#intervalCollapse<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseExample">Show all intervals</a>
+              </div>
+              <!-- Corrections table -->
+              <div class="container-fluid collapse" id="intervalCollapse<?php echo $x; ?>">
+                <table class="table table-hover">
+                  <thead>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                    <th>Sun</th>
+                    <th>Vacation (d)</th>
+                    <th>Overtime (h)</th>
+                    <th>Pause (h)</th>
+                  </thead>
+                  <tbody>
+                    <?php
+                    $intervalR = $conn->query("SELECT * FROM $intervalTable WHERE userID = $x AND endDate IS NOT NULL");
+                    while($intervalR && $intRow =  $intervalR->fetch_assoc()){
+                      echo "<tr>";
+                      echo "<td>".substr($intRow['startDate'],0,10)."</td>";
+                      echo "<td>".substr($intRow['endDate'],0,10)."</td>";
+                      echo "<td>".$intRow['mon']."</td>";
+                      echo "<td>".$intRow['tue']."</td>";
+                      echo "<td>".$intRow['wed']."</td>";
+                      echo "<td>".$intRow['thu']."</td>";
+                      echo "<td>".$intRow['fri']."</td>";
+                      echo "<td>".$intRow['sat']."</td>";
+                      echo "<td>".$intRow['sun']."</td>";
+                      echo "<td>".$intRow['vacPerYear']."</td>";
+                      echo "<td>".$intRow['overTimeLump']."</td>";
+                      echo "<td>".$intRow['hoursOfRest'] .'h after '. $intRow['pauseAfterHours']."h</td>";
+                      echo "</tr>";
+                    }
+                     ?>
+                  </tbody>
+                </table>
               </div>
               <br><br>
-
               <div class="container-fluid">
                 <div class="text-right">
                   <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['REMOVE_USER']; ?></button>
@@ -539,7 +611,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <br><br>
             </form>
 
-            <!-- Small modal -->
+            <!-- Delete confirm modal -->
             <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
               <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
@@ -572,9 +644,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="text-right">
     <a class="btn btn-warning" href='register_choice.php'><?php echo $lang['REGISTER_NEW_USER']; ?></a>
   </div>
-  <!--div class="col-xs-6 text-right">
-  <a class="btn btn-warning" href='editUsers_onDate.php'>Make Changes on Date</a>
-</div-->
 </div>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

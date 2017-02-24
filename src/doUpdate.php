@@ -322,32 +322,6 @@ if($row['version'] < 64){
   } else {
     echo "<br> Repaired missing Bookingtypes.";
   }
-  //repair lunchbreaks to FIT to ONE COMPLETE break booking.
-  $result = $conn->query("SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
-  WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND (userID = 10 OR userID = 11)
-  AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end) )");
-  while($result && ($row = $result->fetch_assoc())){
-    $indexIM = $row['indexIM'];
-    $start = $row['time'];
-    $breakValue = $row['breakCredit'];
-    $breakHasBeenAdded = false;
-    $conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM");
-    $result2 = $conn->query("SELECT * FROM $projectBookingTable WHERE timestampID = $indexIM ORDER BY start ASC");
-    while($result2 && ($row2 = $result2->fetch_assoc())){
-      if(!$breakHasBeenAdded && timeDiff_Hours($row['time'], $start) >= ($row['pauseAfterHours'] - 2)){ //enter the break as SOON as the next booking comes after 4h
-        $end = carryOverAdder_Minutes($start, intval($breakValue * 60));
-        $conn->query("INSERT INTO $projectBookingTable (start, end, bookingType, infoText, timestampID) VALUES('$start', '$end', 'break', 'Mittagspause', $indexIM)");
-        $breakHasBeenAdded = true;
-      } else {
-        $id = $row2['id'];
-        $duration = timeDiff_Hours($row2['start'], $row2['end']);
-        $end = carryOverAdder_Minutes($start, intval($duration * 60));
-        $conn->query("UPDATE $projectBookingTable SET start='$start', end = '$end' WHERE id = $id");
-      }
-      $start = $end;
-    }
-    echo mysqli_error($conn);
-  }
   if($conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND infoText LIKE 'Lunchbreak for %' ")){
     echo "<br>Deleted all old automatic lunchbreaks.";
   }
@@ -382,7 +356,6 @@ if($row['version'] < 64){
   echo "<br>Corrected wrong expected hours to all not-checkin timestamps ";
 }
 
-
 if($row['version'] < 65){
   $sql = "ALTER TABLE $correctionTable ADD COLUMN cType VARCHAR(10) NOT NULL DEFAULT 'log'";
   if (!$conn->query($sql)){
@@ -397,6 +370,127 @@ if($row['version'] < 65){
   } else {
     echo "<br> Added column for correction date / log";
   }
+}
+
+if($row['version'] < 66){
+  $sql = "CREATE TABLE $intervalTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    endDate DATETIME,
+    mon DECIMAL(4,2) DEFAULT 8.5,
+    tue DECIMAL(4,2) DEFAULT 8.5,
+    wed DECIMAL(4,2) DEFAULT 8.5,
+    thu DECIMAL(4,2) DEFAULT 8.5,
+    fri DECIMAL(4,2) DEFAULT 4.5,
+    sat DECIMAL(4,2) DEFAULT 0,
+    sun DECIMAL(4,2) DEFAULT 0,
+    vacPerYear INT(2) DEFAULT 25,
+    overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+    pauseAfterHours DECIMAL(4,2) DEFAULT 6,
+    hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
+    userID INT(6) UNSIGNED,
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created interval table";
+  }
+
+  $sql = "INSERT INTO $intervalTable (startDate, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, userID)
+  SELECT beginningDate, mon, tue, wed, thu, fri, sat, sun, daysPerYear, overTimeLump, pauseAfterHours, hoursOfRest, $userTable.id
+  FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Inserted $intervalTable";
+  }
+
+  $sql = "DROP TABLE $negative_logTable";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped unlogs";
+  }
+  $sql = "DROP EVENT IF EXISTS daily_logs_event ";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped unlog event";
+  }
+  $sql = "DROP EVENT IF EXISTS daily_vacation_event ";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped vacation event";
+  }
+  $sql = "DROP TABLE $bookingTable";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped bookingTable";
+  }
+  $sql = "DROP TABLE $vacationTable";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped vacationTable";
+  }
+
+  $sql = "ALTER TABLE $deactivatedUserDataTable DROP COLUMN vacationHoursCredit;
+   ALTER TABLE $deactivatedUserDataTable ADD COLUMN overTimeLump DECIMAL(4,2) DEFAULT 0.0;
+   ALTER TABLE $deactivatedUserDataTable ADD COLUMN pauseAfterHours DECIMAL(4,2) DEFAULT 6;
+   ALTER TABLE $deactivatedUserDataTable ADD COLUMN hoursOfRest DECIMAL(4,2) DEFAULT 0.5;
+   ALTER TABLE $deactivatedUserDataTable ADD COLUMN startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+   ALTER TABLE $deactivatedUserDataTable ADD COLUMN endDate DATETIME;";
+  if (!$conn->multi_query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Modified table for deactivated intervaldata";
+  }
+
+  $sql = "ALTER TABLE $logTable DROP COLUMN expectedHours";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Removed expected Hours from logs.";
+  }
+
+  $sql = "ALTER TABLE $userTable DROP COLUMN overTimeLump;
+  ALTER TABLE $userTable DROP COLUMN amVacDays;
+  ALTER TABLE $userTable DROP COLUMN pauseAfterHours;
+  ALTER TABLE $userTable DROP COLUMN hoursOfrest;";
+  if (!$conn->multi_query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Removed a few interval-columns from usertable";
+  }
+
+  $sql = "DROP TABLE $deactivatedUserUnLogs";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Dropped deactivated negative logs";
+  }
+
+  $sql = "ALTER TABLE $deactivatedUserTable DROP COLUMN overTimeLump;
+  ALTER TABLE $deactivatedUserTable DROP COLUMN pauseAfterHours;
+  ALTER TABLE $deactivatedUserTable DROP COLUMN hoursOfrest;";
+  if (!$conn->multi_query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Removed a few interval-columns from usertable";
+  }
+
+  $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN expectedHours";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Removed expected Hours from negative logs.";
+  }
+
 }
 
 //------------------------------------------------------------------------------

@@ -233,6 +233,12 @@ function textAreaAdjust(o) {
   o.style.height = (o.scrollHeight)+"px";
 }
 
+function changeValue(cVal, id, val){
+  if(cVal == ''){
+    document.getElementById(id).selectedIndex = val;
+    $('#' + id).val(val).change();
+  }
+}
 </script>
 
 
@@ -296,7 +302,7 @@ function textAreaAdjust(o) {
         <div class="form-group">
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
-        <select style='width:200px' class="js-example-basic-single" name="filterYear">
+        <select style='width:200px' onchange="changeValue(this.value, 'filterMonth', '')" class="js-example-basic-single" name="filterYear">
           <option value=""> --- </option>
           <?php
           for($i = 2015; $i < 2025; $i++){
@@ -306,7 +312,7 @@ function textAreaAdjust(o) {
           ?>
         </select>
         <br><br>
-        <select style='width:200px' class="js-example-basic-single" name="filterMonth">
+        <select style='width:200px' onchange="changeValue(this.value, 'filterDay', '')" class="js-example-basic-single" name="filterMonth" id="filterMonth">
           <option value=""> --- </option>
           <?php
           for($i = 1; $i < 13; $i++) {
@@ -321,7 +327,7 @@ function textAreaAdjust(o) {
           ?>
         </select>
         <br><br>
-        <select style='width:200px' class="js-example-basic-single" name="filterDay">
+        <select style='width:200px' class="js-example-basic-single" name="filterDay" id="filterDay">
           <option value=""> --- </option>
           <?php
           for($i = 1; $i < 32; $i++){
@@ -654,7 +660,7 @@ function showNewClients(selectID, company, client){
                 echo "<td> - </td>";
               }
 
-              $csv_Add[] = $row['hourlyPrice'];
+              $csv_Add[] = ' '.$row['hourlyPrice'].' ';
 
               $interninfo = $row['internInfo'];
               if(empty($interninfo)){

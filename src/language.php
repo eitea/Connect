@@ -63,6 +63,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
   $lang['ASSIGNED'] = 'Assigned';
   $lang['AUTOREDIRECT'] = 'Click here if not redirected automatically: ';
+  $lang['AVAILABLE'] = 'Available';
 
   $lang['BEGIN'] = 'Begin';
   $lang['BILLING'] = 'Billing';
@@ -217,6 +218,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['VACATION_REPAIR'] = 'Repair Vacations';
   $lang['VACATION_REQUESTS'] = 'Vacation Requests';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
+  $lang['VALID_PERIOD'] = 'Validity Period';
+  $lang['VIEW'] = 'View';
   $lang['VIEW_PROJECTS'] = 'View Projects';
   $lang['VIEW_TIMESTAMPS'] = 'View Timestamps';
   $lang['VIEW_USER'] = 'View Users';
@@ -275,6 +278,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
   $lang['ASSIGNED'] = 'Zugewiesene';
   $lang['AUTOREDIRECT'] = 'Klicken Sie hier, wenn Sie nicht automatisch weitergeleitet werden: ';
+  $lang['AVAILABLE'] = 'Verfügbar';
 
   $lang['BEGIN'] = 'Anfang';
   $lang['BILLING'] = 'Abrechnung';
@@ -431,6 +435,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['VACATION_REQUESTS'] = 'Urlaubsanfragen';
   $lang['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
   $lang['VACATION_WEEKS_PER_YEAR'] = 'Wochen Urlaub im Jahr';
+  $lang['VALID_PERIOD'] = 'Gültigkeitszeitraum';
+  $lang['VIEW'] = 'Ansehen';
   $lang['VIEW_PROJECTS'] = 'Projekte';
   $lang['VIEW_TIMESTAMPS'] = 'Zeitstempel Ansehen';
   $lang['VIEW_USER'] = 'Benutzer Ansehen';

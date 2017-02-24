@@ -35,6 +35,8 @@
   $overTimeAdditive = $logSums->overTimeAdditive;
   $correctionHours = $logSums->correctionHours;
 
+  $availableVacationDays = $logSums->vacationDays;
+
   $beginDate = $logSums->beginDate;
   $theBigSum = $logSums->saldo;
 
@@ -45,7 +47,7 @@
   }
 
 
-  $sql = "SELECT * FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id WHERE $userTable.id = $curID";
+  $sql = "SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $curID AND endDate IS NULL";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
     $userRow = $result->fetch_assoc();
@@ -117,9 +119,8 @@
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td>'. $lang['ACCUMULATED_DAYS'] .': '. $lang['VACATION']. '</td><td>'. number_format($userRow['vacationHoursCredit']/24, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'. $lang['USED_DAYS'] .': ' .$lang['VACATION']. '</td><td>'. $logSums->usedVacationDays .'</td></tr>';
-        echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['daysPerYear'] .'</td></tr>';
+        echo '<tr><td>'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</td><td>'. sprintf('%.2f', $availableVacationDays) .'</td></tr>';
+        echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>
       </tbody>

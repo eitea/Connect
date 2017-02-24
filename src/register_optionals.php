@@ -159,24 +159,21 @@ if(isset($_POST['create'])){
   if($accept){
     //create user
     $psw = password_hash($pass, PASSWORD_BCRYPT);
-    $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, overTimeLump, pauseAfterHours, hoursOfRest, beginningDate)
-    VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
+    $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate)
+    VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin');";
     $conn->query($sql);
     $curID = mysqli_insert_id($conn);
 
     echo mysqli_error($conn);
-    //create bookingtable
-    $sql = "INSERT INTO $bookingTable (mon, tue, wed, thu, fri, sat, sun, userID) VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID);";
+    //create interval
+    $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
+     VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
     $conn->query($sql);
-
-    //create vacationtable
-    $sql = "INSERT INTO $vacationTable (userID, vacationHoursCredit, daysPerYear) VALUES($curID, '$vacDaysCredit', '$vacDaysPerYear');";
-    $conn->query($sql);
-
+    echo mysqli_error($conn);
     //create roletable
     $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
     $conn->query($sql);
-
+    echo mysqli_error($conn);
     //add relationships
     if(isset($_POST['company'])){
       foreach($_POST['company'] as $cmp){
@@ -184,35 +181,8 @@ if(isset($_POST['create'])){
         $conn->query($sql);
       }
     }
+    echo mysqli_error($conn);
     //check if entry date lies before/after today
-    //future: just reset unlogs and vacationcredit on that day, instead of creating the user on that date. (my gosh...)
-    //past: re-calculate vacationcredit until today and insert unlogs
-    $difference = timeDiff_Hours(substr(getCurrentTimestamp(),0,10) . ' 05:00:00', $begin);
-    if($difference > 0){ //future
-      $sql = "CREATE EVENT create$curID ON SCHEDULE AT '$begin'
-      ON COMPLETION NOT PRESERVE ENABLE
-      COMMENT 'Removing unlogs on entry date'
-      DO
-      BEGIN
-      DELETE FROM $negative_logTable WHERE userID = $curID;
-      UPDATE $vacationTable SET vacationHoursCredit = 0 WHERE userID = $curID;
-      END
-      ";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-
-    } elseif($difference < 0) { //past
-      $credit = ($vacDaysPerYear/365) * timeDiff_Hours($begin, substr(getCurrentTimestamp(),0,10) . ' 05:00:00');
-      $sql = "INSERT INTO $vacationTable SET vacationHoursCredit = $credit WHERE userID = $curID";
-      $conn->query($sql);
-      $i = $begin;
-      while(substr($i, 0, 10) != substr(getCurrentTimestamp(), 0, 10)){
-        $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-        VALUES('$i', $curID, $mon, $tue, $wed, $thu, $fri, $sat, $sun)";
-        $conn->query($sql);
-        $i = carryOverAdder_Hours($i, 24);
-      }
-    }
     redirect('editUsers.php');
   } //end if accept
 } //end if post

@@ -7,10 +7,10 @@
 </div>
 <?php
 
-//illegal lunchbreaks
+//illegal lunchbreaks (happens to bookers only)
 if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
   foreach($_POST['lunchbreakIndeces'] as $indexIM){
-    $result = $conn->query("SELECT time, pauseAfterHours, hoursOfRest FROM $userTable, $logTable WHERE indexIM = $indexIM AND userID = $userTable.id");
+    $result = $conn->query("SELECT pauseAfterHours, hoursOfRest FROM $intervalTable WHERE userID = $uId AND endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
       $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
       $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
@@ -69,38 +69,6 @@ if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
     echo mysqli_error($conn);
   }
 }
-
-//double expected hours
-if(isset($_POST['double_expected_delete'])){
-  if(!empty($_POST['double_expected_log'])){
-    foreach($_POST['double_expected_log'] as $id){
-      if(!$conn->query("DELETE FROM $logTable WHERE indexIM = $id")){
-        echo mysqli_error($conn);
-      }
-    }
-  }
-  if(!empty($_POST['double_expected_absentlog'])){
-    foreach($_POST['double_expected_absentlog'] as $id){
-      if(!$conn->query("DELETE FROM $negative_logTable WHERE negative_indexIM = $id")){
-        echo mysqli_error($conn);
-      }
-    }
-  }
-}
-
-//no expected hours
-if(isset($_POST['zero_expected_autocorrect']) && !empty($_POST['zero_expected_dates'])){
-  foreach($_POST['zero_expected_dates'] AS $val){
-    $date = substr($val,0,10);
-    $user = substr($val, 11, strlen($val)-11);
-    $sql = "INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-    SELECT '$date 23:59:00', userID, mon, tue, wed, thu, fri, sat, sun FROM $bookingTable WHERE userID = $user";
-    if(!$conn->query($sql)){
-      echo mysqli_error($conn);
-    }
-  }
-}
-
 ?>
 
 <!--VACATION REQUESTS -------------------------------------------------------------------------->
@@ -122,11 +90,9 @@ endif;
 
 <form method="POST">
   <?php
-  $sql = "SELECT * FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id
-  WHERE status = '0' AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
+  $sql = "SELECT indexIM, $logTable.userID, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id $intervalTable ON l1.userID = $intervalTable.userID
+  WHERE status = '0' endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end))";
-
-  echo mysqli_error($conn);
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
     ?>
@@ -149,7 +115,6 @@ endif;
       <th><?php echo $lang['HOURS']; ?></th>
       <th><?php echo $lang['LUNCHBREAK']; ?></th>
       <th><input type="checkbox" onclick="toggle(this, 'lunchbreakIndeces');" /></th>
-
       <tbody>
         <?php
         while($row = $result->fetch_assoc()){
@@ -167,7 +132,7 @@ endif;
     <br>
     <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Autocorrect</button>
     <br><hr><br>
-  <?php endif;?>
+  <?php echo mysqli_error($conn); endif;?>
 
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
 
@@ -296,136 +261,6 @@ endif;
   endif;
   echo mysqli_error($conn);
   ?>
-  <!--DOUBLE EXPETED HOURS -------------------------------------------------------------------------->
-  <?php
-  //absentlog fix1 : see if there is an entry in logs AND unlogs
-  $sql = "SELECT $logTable.*, $userTable.firstname, $userTable.lastname, $logTable.time AS logTime, $negative_logTable.time AS unlogTime, negative_indexIM
-  FROM $logTable,$negative_logTable, $userTable
-  WHERE $logTable.userID = $userTable.id
-  AND $logTable.userID = $negative_logTable.userID
-  AND 0 = datediff($logTable.time, $negative_logTable.time)";
-
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0):
-    ?>
-
-    <h4><?php echo $lang['DOUBLE'].' '.$lang['EXPECTED_HOURS'];?>:</h4>
-    <div class="h4 text-right">
-      <a role="button" data-toggle="collapse" href="#double_expected_absent_log">
-        <i class="fa fa-info-circle"></i>
-      </a>
-    </div>
-    <div class="collapse" id="double_expected_absent_log">
-      <div class="well">
-        Es wurde ein Eintrag in der Abwesenheitstabelle gefunden, obwohl es einen Zeitstempel für dieses Datum gibt.
-        D.h. obwohl ein gewöhnlicher Zeitstempel in der DB vorhanden ist, existiert dennoch ein Eintrag für Abwesenheit (ZA). <br>
-        Kann dazu führen, dass in manchen Übersichten zu viele erwartete Stunden gerechnet werden. Eines der beiden Einträge sollte daher gelöscht werden.<br>
-      </div>
-    </div>
-    <table id='illTS' class="table table-hover">
-      <th><?php echo $lang['USERS']; ?></th>
-      <th><?php echo $lang['TIME']; ?></th>
-      <th><?php echo $lang_activityToString[-1].' - '.$lang['TIMES']; ?></th>
-      <tbody>
-        <?php
-        while($row = $result->fetch_assoc()){
-          echo '<tr>';
-          echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
-          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_log[]" value="'.$row['indexIM'].'"> '. $row['logTime'] . ' - '. $row['timeEnd'] . ' - ' .$lang_activityToString[$row['status']] .'</div></td>';
-          echo '<td><div class="checkbox"><input type="checkbox" name="double_expected_absentlog[]" value="'.$row['negative_indexIM'].'"> '. $row['unlogTime'] .'</div></td>';
-          echo '</tr>';
-        }
-        ?>
-      </tbody>
-    </table>
-    <br>
-    <button type='submit' class="btn btn-warning" name='double_expected_delete'><?php echo $lang['DELETE']; ?></button>
-    <br><hr><br>
-  <?php endif; echo mysqli_error($conn); ?>
-
-  <!--MISSING EXPECTED HOURS -------------------------------------------------------------------------->
-
-  <?php
-  //absentlog fix2 : see if there is an absent log missing.
-  $missingDates = array();
-  $result_userID = $conn->query("SELECT id FROM $userTable");
-  while($result_userID  && ($row = $result_userID ->fetch_assoc())){ //for each user
-    $curUser = $row['id'];
-    //select all of that users logs and unlogs. all of them.
-    $sql = "SELECT * FROM (
-      SELECT time, userID FROM $logTable
-      UNION ALL
-      SELECT time, userID FROM $negative_logTable
-    ) AS t1
-    WHERE t1.userID = $curUser
-    ORDER BY t1.time ASC";
-    $result = $conn->query($sql);
-    $arrMyDates = array();
-    while($result && ($A = $result->fetch_assoc())){ //for each of his logs ans absentlogs -> save date in array
-      $arrMyDates[] = substr($A['time'],0,10);
-    }
-
-    //get first date and latest date
-    $timeFrom = strtotime($arrMyDates[0]);
-    //avoid getting a timestamp (vacation) that lies in future, so tomorrow would be marked as "non existent date"
-    if(timeDiff_Hours(getCurrentTimestamp(), end($arrMyDates)) < 0){
-      $timeTo = strtotime(substr(end($arrMyDates),0,10));
-    } else {
-      $timeTo = strtotime(substr(carryOverAdder_Hours(getCurrentTimestamp(), -24),0,10));
-    }
-
-    //check which dates are NOT in the array
-    $arrDateSpan = array();
-    for ($n = $timeFrom; $n <= $timeTo; $n += 86400){ //for each date that does NOT exist, save into final array
-      $strDate = date("Y-m-d", $n);
-      array_push($arrDateSpan, $strDate);
-    }
-    $value = array_diff($arrDateSpan, $arrMyDates);
-    if (!empty($value)) {
-      $missingDates[$curUser] = $value;
-    }
-  } //end while
-
-
-  if($missingDates):
-    ?>
-    <h4><?php echo $lang['MISSING'].' '.$lang['EXPECTED_HOURS'];?>:</h4>
-    <div class="h4 text-right">
-      <a role="button" data-toggle="collapse" href="#zero_expected_absent_log" aria-expanded="false" aria-controls="zero_expected_absent_log">
-        <i class="fa fa-info-circle"></i>
-      </a>
-    </div>
-    <div class="collapse" id="zero_expected_absent_log">
-      <div class="well">
-        Es wurde weder ein Eintrag in der Abwesenheitstabelle noch ein Zeitstempel gefunden, dadurch fehlen Informationen über erwartete Stunden.<br>
-        Kann dazu führen, dass in manchen Übersichten zu wenig erwartete Stunden gerechnet werden. <br>
-        Die Auswahl als Abwesend zu markieren erstellt für alle Selektierten Daten einen Abwesenheitseintrag. <br>
-      </div>
-    </div>
-    <table id='illTS' class="table table-hover">
-      <th>User</th>
-      <th><?php echo $lang['TIMES']; ?></th>
-      <th><div class="checkbox"><input type="checkbox" onclick="toggle(this, 'zero_expected_dates')" /> Select</div></th>
-      <tbody>
-        <?php
-        foreach(array_keys($missingDates) as $curUser){
-          foreach($missingDates[$curUser] as $date){
-            $result = $conn->query("SELECT firstname, lastname FROM $userTable WHERE id = $curUser");
-            $row = $result->fetch_assoc();
-            echo "<tr><td>".$row['firstname'].' '.$row['lastname']."</td>";
-            echo "<td>$date</td>";
-            echo "<td><input type='checkbox' name='zero_expected_dates[]' value='$date $curUser' /></td>";
-            echo '</tr>';
-          }
-        }
-        ?>
-      </tbody>
-    </table>
-    <br>
-    <button type='submit' class="btn btn-warning" name='zero_expected_autocorrect' > <?php echo $lang['MARK_AS_ABSENT']; ?> </button>
-    <br><hr><br>
-  <?php endif; echo mysqli_error($conn); ?>
-
   <!-- -------------------------------------------------------------------------->
 </form>
 

@@ -1,9 +1,14 @@
 <?php
-class Monthly_Calculator{
+/*
+* This Calculator is the same as the monthly calculator, it only accepts an interval instead.
+*/
+class Interval_Calculator{
   public $days = 0;
   public $overTimeLump = 0;
+  public $correctionHours = 0;
 
-  private $month = 0;
+  private $from = 0;
+  private $to = 0;
   private $id = 0;
 
   public $dayOfWeek = array();
@@ -19,17 +24,17 @@ class Monthly_Calculator{
   public $shouldTime = array();
   public $activity = array();
 
-//month like yyyy-mm-dd hh-mm-ss
-  public function __construct($ts, $userid){
-    $this->month = $ts;
+  //month like yyyy-mm-dd hh-mm-ss
+  public function __construct($from, $to, $userid){
+    $this->from = substr($from, 0, 10).' 12:00:00';
+    $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = date('t', strtotime($ts));
+    $this->days = intval(timeDiff_Hours($from, $to) / 24) + 1;
     $this->calculateValues();
   }
 
   public function calculateValues(){
-    $i = substr($this->month, 0,7).'-01 12:00:00';
-    $j = date('Y-m-d H:i:s', strtotime('+1 month', strtotime($i)));
+    $fromDate = $i = $this->from;
     $id = $this->id;
 
     require "connection.php";
@@ -38,25 +43,30 @@ class Monthly_Calculator{
       $beginDate = $row['beginningDate'];
       $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
     } else { //should never occur
-      die("Invalid userID");
+      return "Invalid userID";
     }
 
     $count = 0;
-    while(substr($i,0, 10) != substr($j,0,10)) { //for EVERY day of the month (excluding the last day of j of course)
+    $oldMonth = 0;
+    for($j = 0; $j <= $this->days && $this->days > 0; $j++){ //for EVERY day of the month (excluding the last day of j of course)
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
+      $currentMonth = substr($i, 0, 7);
       //get the expectedHours from the matching interval
       $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ( (DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)) )";
       $result = $conn->query($sql);
       if($result && $result->num_rows == 1){
         $row = $result->fetch_assoc();
         $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
-        $this->overTimeLump = $row['overTimeLump'];
+        if($oldMonth != $currentMonth){ //add overTimeLump if month changes
+          $this->overTimeLump += $row['overTimeLump'];
+          $oldMonth = $currentMonth;
+        }
       } else {
         die("No values available.");
       }
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time >= '$beginDate' AND time <= '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %'";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time >= '$beginDate' AND time <= '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %' ";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
         $row = $result->fetch_assoc();
@@ -72,7 +82,7 @@ class Monthly_Calculator{
         $this->activity[] = '-1';
         $this->lunchTime[] = 0;
         $this->timeToUTC[] = 0;
-        $this->indecesIM[] = 0;
+        $this->indecesIM[] = "$id, $count";
       }
       //if today is a holiday, poot poot
       if(isHoliday($i)){
@@ -82,15 +92,21 @@ class Monthly_Calculator{
       $count++;
     } //endwhile;
     $this->daysAsNumber[] = $count;
+
+    //correction Hours:
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE('$fromDate') <= DATE(createdOn) AND DATE('$i') >= DATE(createdOn)");
+    while($result && ($row = $result->fetch_assoc())){
+      $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
+    }
   }
 
-private function timeDiff_Hours($from, $to) {
+  private function timeDiff_Hours($from, $to) {
     $timeEnd = strtotime($to) / 3600;
     $timeBegin = strtotime($from) /3600;
     return $timeEnd - $timeBegin;
   }
 
-//$a = timestamp in form of Y-m-d H:i:s, $b = amount of hours;
+  //$a = timestamp in form of Y-m-d H:i:s, $b = amount of hours;
   private function carryOverAdder_Hours($a, $b) {
     if($a == '0000-00-00 00:00:00'){
       return $a;

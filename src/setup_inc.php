@@ -15,18 +15,14 @@ $sql = "CREATE TABLE $userTable (
   firstname VARCHAR(30) NOT NULL,
   lastname VARCHAR(30) NOT NULL,
   psw VARCHAR(60) NOT NULL,
-  lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP,
   terminalPin INT(8) DEFAULT 4321,
-  sid VARCHAR(50),
-  email VARCHAR(50) UNIQUE NOT NULL,
-  gender ENUM('female', 'male'),
-  overTimeLump INT(3) DEFAULT 0,
-  pauseAfterHours DECIMAL(4,2) DEFAULT 6,
-  hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
+  lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  email VARCHAR(50) UNIQUE NOT NULL,
+  sid VARCHAR(50),
+  gender ENUM('female', 'male'),
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
-  coreTime TIME DEFAULT '8:00',
   kmMoney DECIMAL(4,2) DEFAULT 0.42,
   emUndo DATETIME DEFAULT CURRENT_TIMESTAMP
 )";
@@ -42,7 +38,6 @@ $sql = "CREATE TABLE $logTable (
   timeToUTC INT(2) DEFAULT '2',
   breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
-  expectedHours DECIMAL(4,2),
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
@@ -74,22 +69,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "CREATE TABLE $bookingTable(
-  mon DECIMAL(4,2) DEFAULT 8.5,
-  tue DECIMAL(4,2) DEFAULT 8.5,
-  wed DECIMAL(4,2) DEFAULT 8.5,
-  thu DECIMAL(4,2) DEFAULT 8.5,
-  fri DECIMAL(4,2) DEFAULT 4.5,
-  sat DECIMAL(4,2) DEFAULT 0,
-  sun DECIMAL(4,2) DEFAULT 0,
-  userID INT(6) UNSIGNED,
-  FOREIGN KEY (userID) REFERENCES $userTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
 
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -99,6 +78,7 @@ $sql = "CREATE TABLE $companyTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $clientTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -112,6 +92,7 @@ $sql = "CREATE TABLE $clientTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $projectTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -127,6 +108,7 @@ $sql = "CREATE TABLE $projectTable(
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $projectBookingTable (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -151,6 +133,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $companyToUserRelationshipTable (
   companyID INT(6) UNSIGNED,
   userID INT(6) UNSIGNED,
@@ -164,6 +147,7 @@ $sql = "CREATE TABLE $companyToUserRelationshipTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $companyDefaultProjectTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -180,50 +164,6 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "CREATE TABLE $negative_logTable(
-  negative_indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  time DATETIME NOT NULL,
-  userID INT(6) UNSIGNED,
-  mon DECIMAL(4,2) DEFAULT 8.5,
-  tue DECIMAL(4,2) DEFAULT 8.5,
-  wed DECIMAL(4,2) DEFAULT 8.5,
-  thu DECIMAL(4,2) DEFAULT 8.5,
-  fri DECIMAL(4,2) DEFAULT 4.5,
-  sat DECIMAL(4,2) DEFAULT 0,
-  sun DECIMAL(4,2) DEFAULT 0,
-  FOREIGN KEY (userID) REFERENCES $userTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-
-
-
-$sql = "SET GLOBAL event_scheduler=ON";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-
-$sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
-ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:00:00' ON COMPLETION PRESERVE ENABLE
-COMMENT 'Log absent sessions at 23:00 daily!'
-DO
-INSERT INTO $negative_logTable (time, userID, mon, tue, wed, thu, fri, sat, sun)
-SELECT UTC_TIMESTAMP, userID, mon, tue, wed, thu, fri, sat, sun
-FROM $userTable u
-INNER JOIN $bookingTable ON u.id = $bookingTable.userID
-WHERE !EXISTS (
-  SELECT * FROM $logTable, $userTable u2
-  WHERE DATE(time) = CURDATE()
-  AND $logTable.userID = u2.id
-  AND u.id = u2.id
-);";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-
 
 $sql = "CREATE TABLE $configTable(
   bookingTimeBuffer INT(3) DEFAULT '5',
@@ -236,32 +176,9 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-
 $sql = "INSERT INTO $configTable (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
 $conn->query($sql);
 
-
-$sql = "CREATE TABLE $vacationTable(
-  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  userID INT(6) UNSIGNED,
-  vacationHoursCredit DECIMAL(6,2) DEFAULT 0,
-  daysPerYear INT(2) DEFAULT 25,
-  FOREIGN KEY (userID) REFERENCES $userTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-
-$sql = "CREATE EVENT IF NOT EXISTS `daily_vacation_event`
-ON SCHEDULE EVERY 1 DAY STARTS '2016-09-01 23:30:00' ON COMPLETION PRESERVE ENABLE
-COMMENT 'Adding hours to vacationTable 23:00 daily!'
-DO
-UPDATE $vacationTable SET vacationHoursCredit = vacationHoursCredit + ((daysPerYear / 365) * 24)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
 
 $sql = "CREATE TABLE $userRequests(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -291,6 +208,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $piConnTable(
   header VARCHAR(50)
 )";
@@ -302,6 +220,7 @@ $sql = "INSERT INTO $piConnTable(header) VALUES (' ')";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $roleTable(
   userID INT(6) UNSIGNED,
@@ -364,9 +283,6 @@ $sql = "CREATE TABLE $deactivatedUserTable (
   sid VARCHAR(50),
   email VARCHAR(50) UNIQUE NOT NULL,
   gender ENUM('female', 'male'),
-  overTimeLump INT(3) DEFAULT 0,
-  pauseAfterHours DECIMAL(4,2) DEFAULT 6,
-  hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   coreTime TIME DEFAULT '8:00',
@@ -384,26 +300,6 @@ $sql = "CREATE TABLE $deactivatedUserLogs (
   timeToUTC INT(2) DEFAULT '2',
   breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
-  expectedHours DECIMAL(4,2),
-  FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-  echo mysqli_error($conn);
-}
-
-$sql = "CREATE TABLE $deactivatedUserUnLogs(
-  negative_indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  time DATETIME NOT NULL,
-  userID INT(6) UNSIGNED,
-  mon DECIMAL(4,2) DEFAULT 8.5,
-  tue DECIMAL(4,2) DEFAULT 8.5,
-  wed DECIMAL(4,2) DEFAULT 8.5,
-  thu DECIMAL(4,2) DEFAULT 8.5,
-  fri DECIMAL(4,2) DEFAULT 4.5,
-  sat DECIMAL(4,2) DEFAULT 0,
-  sun DECIMAL(4,2) DEFAULT 0,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
@@ -414,6 +310,8 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $deactivatedUserDataTable(
   userID INT(6) UNSIGNED,
+  startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  endDate DATETIME,
   mon DECIMAL(4,2) DEFAULT 8.5,
   tue DECIMAL(4,2) DEFAULT 8.5,
   wed DECIMAL(4,2) DEFAULT 8.5,
@@ -421,7 +319,9 @@ $sql = "CREATE TABLE $deactivatedUserDataTable(
   fri DECIMAL(4,2) DEFAULT 4.5,
   sat DECIMAL(4,2) DEFAULT 0,
   sun DECIMAL(4,2) DEFAULT 0,
-  vacationHoursCredit DECIMAL(6,2) DEFAULT 0,
+  overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+  pauseAfterHours DECIMAL(4,2) DEFAULT 6,
+  hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
   daysPerYear INT(2) DEFAULT 25,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
   ON UPDATE CASCADE
@@ -606,6 +506,11 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  /*
+  * cOnDate is Date this correction was created On
+  * createdOn defines Month this corrections accounts for
+  * (used names were swapped by mistake.)
+  */
   $sql = "CREATE TABLE $correctionTable(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
@@ -615,6 +520,30 @@ $sql = "CREATE TABLE $policyTable (
     cOnDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     cType VARCHAR(10) NOT NULL DEFAULT 'log',
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $intervalTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    endDate DATETIME,
+    mon DECIMAL(4,2) DEFAULT 8.5,
+    tue DECIMAL(4,2) DEFAULT 8.5,
+    wed DECIMAL(4,2) DEFAULT 8.5,
+    thu DECIMAL(4,2) DEFAULT 8.5,
+    fri DECIMAL(4,2) DEFAULT 4.5,
+    sat DECIMAL(4,2) DEFAULT 0,
+    sun DECIMAL(4,2) DEFAULT 0,
+    vacPerYear INT(2) DEFAULT 25,
+    overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+    pauseAfterHours DECIMAL(4,2) DEFAULT 6,
+    hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
+    userID INT(6) UNSIGNED,
     FOREIGN KEY (userID) REFERENCES $userTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

@@ -24,11 +24,7 @@ function checkIn($userID) {
     $conn->query($sql);
     echo mysqli_error($conn);
   } else { //create new stamp
-    $sql = "SELECT * FROM $bookingTable WHERE userID = $userID";
-    $result = $conn->query($sql);
-    $row=$result->fetch_assoc();
-    $expectedHours = $row[strtolower(date('D', strtotime(getCurrentTimestamp())))];
-    $sql = "INSERT INTO $logTable (time, userID, status, timeToUTC, expectedHours) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC, $expectedHours);";
+    $sql = "INSERT INTO $logTable (time, userID, status, timeToUTC) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC);";
     $conn->query($sql);
     echo mysqli_error($conn);
   }
@@ -50,8 +46,8 @@ function checkOut($userID) {
   $row = $result->fetch_assoc();
   if($row['canBook'] == 'FALSE'){
     //check if user was here for over 6h
-    $sql = "SELECT * FROM $userTable
-    WHERE $userTable.id = $userID
+    $sql = "SELECT hoursOfRest, pauseAfterHours FROM $intervaltable
+    WHERE userID = $userID AND endDate IS NULL
     AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
     AND hoursOfRest > 0";
     $result = $conn->query($sql);
