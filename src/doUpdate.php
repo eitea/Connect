@@ -472,11 +472,9 @@ if($row['version'] < 67){
   $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN overTimeLump;");
   $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN pauseAfterHours;");
   $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN hoursOfrest;");
-  if (!$conn->multi_query($sql)){
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Removed a few interval-columns from usertable";
-  }
+
+  echo "<br> Removed a few interval-columns from usertable";
+
 
   $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN expectedHours";
   if (!$conn->query($sql)){

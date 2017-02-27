@@ -350,6 +350,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           ?>
         </tbody>
       </table>
+      <script>
+      var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+      myCalendar.setSkin("material");
+      myCalendar.setDateFormat("%Y-%m-%d %H:%i");
+      </script>
       <div class="container text-right">
         <br>
         <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>">Delete</button>
@@ -362,9 +367,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <script>
 $(document).ready(function() {
-  var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-  myCalendar.setSkin("material");
-  myCalendar.setDateFormat("%Y-%m-%d %H:%i");
   // If cookie is set, scroll to the position saved in the cookie.
   if ( $.cookie("scroll") !== null ) {
     $(document).scrollTop( $.cookie("scroll") );
