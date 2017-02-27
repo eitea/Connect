@@ -346,7 +346,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<td>".sprintf('%.2f',$differenceSUM)."</td>";
           echo "<td>".sprintf('%.2f',$accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
-
           ?>
         </tbody>
       </table>

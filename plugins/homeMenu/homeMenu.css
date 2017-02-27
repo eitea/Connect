@@ -1,4 +1,10 @@
-/* make sidebar nav vertical */
+.panel > .panel-heading a:link {
+   color: #6f6f6f;
+ }
+
+.panel-borderless {
+     border: 0;
+ }
 
 .required-field {
   border: 1px solid #fbc871;
