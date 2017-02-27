@@ -24,18 +24,16 @@ if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
 //repair forgotten check outs
 if(isset($_POST['autoCorrect']) && !empty($_POST['autoCorrects'])){
   foreach($_POST['autoCorrects'] as $indexIM){
-    $result = $conn->query("SELECT $logTable.*, $userTable.hoursOfRest,$userTable.pauseAfterHours FROM $logTable,$userTable WHERE indexIM = $indexIM AND $logTable.userID = $userTable.id");
+    $result = $conn->query("SELECT $intervalTable.*, $logTable.time FROM $logTable, $intervalTable WHERE indexIM = $indexIM AND $logTable.userID = $intervalTable.userID AND endDate IS NULL");
     $row = $result->fetch_assoc();
-
-    $userID = $row['userID'];
+    //date for query in projectbookingTable
     $date = substr($row['time'],0,10);
+    //first, match expectedHours. if user has booking, overwrite this var
+    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row[strtolower(date('D', strtotime($row['time'])))]));
+    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row[strtolower(date('D', strtotime($row['time'])))] * 60) % 60));
 
-    //match expectedHours
-    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row['expectedHours']));
-    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row['expectedHours'] * 60) % 60));
-
-    //adjust to match expectedHours or last projectbooking, if any of these even exist
-    $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
+    //adjust to match expectedHours OR last projectbooking, if any of these even exist
+    $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
     if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
       $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
       WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
@@ -45,18 +43,7 @@ if(isset($_POST['autoCorrect']) && !empty($_POST['autoCorrects'])){
         $adjustedTime = $rowLastBooking['end']; //adjust break later.
       }
     }
-    echo mysqli_error($conn);
-
-    //add expected lunchbreak
-    if($row['expectedHours'] > $row['pauseAfterHours']){ // does he need a lunchbreak?
-      $breakAdditive = $row['hoursOfRest'] - $row['breakCredit']; //adjust it to break he already made
-      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($breakAdditive * 60));
-    } else { //just take the break he already made
-      $adjustedTime = carryOverAdder_Minutes($adjustedTime, ($row['breakCredit'] * 60));
-    }
-
-    $sql = "UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM =" .$row['indexIM'];
-    $conn->query($sql);
+    $conn->query("UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM = $indexIM");
     echo mysqli_error($conn);
   }
 }

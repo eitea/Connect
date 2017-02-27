@@ -368,6 +368,7 @@ $('form').preventDoubleSubmission();
             </div>
           </div>
         </div>
+        <br>
         <?php
         if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -401,6 +402,7 @@ $('form').preventDoubleSubmission();
             </div>
           </div>
         </div>
+        <br>
         <?php
         if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php"){
           echo "<script>document.getElementById('adminOption_TIME').click();</script>";
@@ -432,6 +434,7 @@ $('form').preventDoubleSubmission();
               </div>
             </div>
           </div>
+          <br>
         <?php
           if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
             echo "<script>$('#adminOption_PROJECT').click();</script>";
@@ -454,8 +457,8 @@ $('form').preventDoubleSubmission();
               </div>
             </div>
           </div>
+          <br>
         <?php endif; ?>
-
       </div> <!-- /accordions -->
     </div>
   </div>
