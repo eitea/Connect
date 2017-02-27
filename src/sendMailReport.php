@@ -10,13 +10,15 @@
 //for css
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 $cssToInlineStyles = new CssToInlineStyles();
-$css = file_get_contents('../plugins/homeMenu/template.css');
+$css = file_get_contents('../plugins/homeMenu/compactMail.css');
 
 //get all mails
 $resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //<> == !=
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   //for each report, send a NEW mail
   $mail = new PHPMailer();
+  $mail->CharSet = 'UTF-8';
+  $mail->Encoding = "base64";
   $mail->SMTPDebug = 2;
   $mail->IsSMTP();
 

@@ -27,8 +27,10 @@ function mc_decrypt($decrypt, $key){
 /*
 * requires createTimestamps.php
 * requires Calculator/LogCalculator
+*
+* query must contain WHERE clause
 */
-function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must contain WHERE clause
+function getFilledOutTemplate($templateID, $bookingQuery = ""){
   require "connection.php";
   require "language.php";
 
@@ -51,32 +53,46 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){ //query must con
   }
 
   if(strpos($html, "[TIMESTAMPS]") !== false){ //0 = false, but 0 is valid position
-    $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Saldo (Stunden)</th></tr>";
+    $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Differenz</th><th>Saldo (Stunden)</th></tr>";
     //select all users and select log from today if exists else log = null
     $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %' $userIDs_query");
     echo mysqli_error($conn);
     while($result && ($row = $result->fetch_assoc())){
-      $beginDate = $row['beginningDate'];
-      $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
-
-      $html_bookings .= "<tr><p><td>".$row['firstname'].' '.$row['lastname']."</td>";
-      //if a user did not check in, mark him as absent.
-      if(empty($row['time'])){
-        $row['status'] = '-1';
-        $row['time'] = ' - ';
-        $row['timeEnd'] = ' - ';
-      } elseif($row['timeEnd'] != '0000-00-00 00:00:00'){ //if he hasnt checked out yet, just display his UTC time (dont bother...)
-        $row['time'] = carryOverAdder_Hours($row['time'], $row['timeToUTC']);
-        $row['timeEnd'] = carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
+      $html_bookings .= "<tr><td>".$row['firstname'].' '.$row['lastname']."</td>";
+       //did he check out?
+      if(!empty($row['timeEnd']) && $row['timeEnd'] != '0000-00-00 00:00:00'){
+        $timeEnd_Cell = '<td>'.substr(carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']),11,5).'</td>';
+        $diff = displayAsHoursMins(timeDiff_Hours($row['time'], $row['timeEnd']));
+      } else {
+        $timeEnd_Cell = '<td style="color:gold;">00:00</td>';
+        $diff = ' - ';
       }
 
-      $curID = $row['id'];
-      //SALDO calculation:
-      $logSums = new LogCalculator($curID);
-      $saldo = $logSums->saldo;
+      //if a user did not check in at all, mark him as absent.
+      if(empty($row['time'])){
+        $row['status'] = '-1';
+        $time_Cell = '<td> - </td>';
+        $timeEnd_Cell = '<td> - </td>';
+      } else {
+        $time_Cell = '<td>'.substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']),11,5).'</td>';
+      }
 
-      $saldo = sprintf('%.2f', $saldo);
-      $html_bookings .= '<td>'.$lang_activityToString[$row['status']].'</td><td>'.substr($row['time'],11,5).'</td><td>'.substr($row['timeEnd'],11,5). "</td><td>$saldo</td></p></tr>";
+      //SALDO calculation:
+      $curID = $row['id'];
+      $logSums = new LogCalculator($curID);
+      $saldo = sprintf('%.2f', $logSums->saldo);
+      if($saldo > 20 || $saldo < -5){
+        $saldo_Cell = "<td style=\"color:red;\">$saldo</td>";
+      } else {
+        $saldo_Cell = "<td>$saldo</td>";
+      }
+
+      if($diff > 10 && $diff != ' - '){ //user was checked in for over 10 hours
+        $diff_Cell = '<td style="color:red;">'.$diff.'</td>';
+      } else {
+        $diff_Cell = "<td>$diff</td>";
+      }
+      $html_bookings .= '<td>'.$lang_activityToString[$row['status']].'</td>'."$time_Cell $timeEnd_Cell $diff_Cell $saldo_Cell</tr>";
     }
     $html_bookings .= "</table>";
     //replace
