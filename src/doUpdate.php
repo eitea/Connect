@@ -439,18 +439,16 @@ if($row['version'] < 66){
     echo "<br> Dropped vacationTable";
   }
 
-  $sql = "ALTER TABLE $deactivatedUserDataTable DROP COLUMN vacationHoursCredit;
-   ALTER TABLE $deactivatedUserDataTable ADD COLUMN overTimeLump DECIMAL(4,2) DEFAULT 0.0;
-   ALTER TABLE $deactivatedUserDataTable ADD COLUMN pauseAfterHours DECIMAL(4,2) DEFAULT 6;
-   ALTER TABLE $deactivatedUserDataTable ADD COLUMN hoursOfRest DECIMAL(4,2) DEFAULT 0.5;
-   ALTER TABLE $deactivatedUserDataTable ADD COLUMN startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-   ALTER TABLE $deactivatedUserDataTable ADD COLUMN endDate DATETIME;";
-  if (!$conn->multi_query($sql)){
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Modified table for deactivated intervaldata";
-  }
+  $conn->query("ALTER TABLE $deactivatedUserDataTable DROP COLUMN vacationHoursCredit");
+  $conn->query("ALTER TABLE $deactivatedUserDataTable ADD COLUMN overTimeLump DECIMAL(4,2) DEFAULT 0.0;");
+  $conn->query("ALTER TABLE $deactivatedUserDataTable ADD COLUMN pauseAfterHours DECIMAL(4,2) DEFAULT 6;");
+  $conn->query("ALTER TABLE $deactivatedUserDataTable ADD COLUMN hoursOfRest DECIMAL(4,2) DEFAULT 0.5;");
+  $conn->query("ALTER TABLE $deactivatedUserDataTable ADD COLUMN startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;");
+  $conn->query("ALTER TABLE $deactivatedUserDataTable ADD COLUMN endDate DATETIME;");
+  echo "<br> Modified table for deactivated intervaldata";
+}
 
+if($row['version'] < 67){
   $sql = "ALTER TABLE $logTable DROP COLUMN expectedHours";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
@@ -458,15 +456,11 @@ if($row['version'] < 66){
     echo "<br> Removed expected Hours from logs.";
   }
 
-  $sql = "ALTER TABLE $userTable DROP COLUMN overTimeLump;
-  ALTER TABLE $userTable DROP COLUMN amVacDays;
-  ALTER TABLE $userTable DROP COLUMN pauseAfterHours;
-  ALTER TABLE $userTable DROP COLUMN hoursOfrest;";
-  if (!$conn->multi_query($sql)){
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Removed a few interval-columns from usertable";
-  }
+  $conn->query("ALTER TABLE $userTable DROP COLUMN overTimeLump");
+  $conn->query("ALTER TABLE $userTable DROP COLUMN amVacDays;");
+  $conn->query("ALTER TABLE $userTable DROP COLUMN pauseAfterHours;");
+  $conn->query("ALTER TABLE $userTable DROP COLUMN hoursOfrest;");
+  echo "<br> Removed a few interval-columns from usertable";
 
   $sql = "DROP TABLE $deactivatedUserUnLogs";
   if (!$conn->query($sql)){
@@ -475,9 +469,9 @@ if($row['version'] < 66){
     echo "<br> Dropped deactivated negative logs";
   }
 
-  $sql = "ALTER TABLE $deactivatedUserTable DROP COLUMN overTimeLump;
-  ALTER TABLE $deactivatedUserTable DROP COLUMN pauseAfterHours;
-  ALTER TABLE $deactivatedUserTable DROP COLUMN hoursOfrest;";
+  $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN overTimeLump;");
+  $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN pauseAfterHours;");
+  $conn->query("ALTER TABLE $deactivatedUserTable DROP COLUMN hoursOfrest;");
   if (!$conn->multi_query($sql)){
     echo mysqli_error($conn);
   } else {
@@ -490,7 +484,6 @@ if($row['version'] < 66){
   } else {
     echo "<br> Removed expected Hours from negative logs.";
   }
-
 }
 
 //------------------------------------------------------------------------------

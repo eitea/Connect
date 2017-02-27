@@ -1,25 +1,12 @@
 body {
-    /* Serif options */
-    /*font-family: "Times New Roman", Times, serif;*/
-    /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif    */
-
-    /*Sans Serif options */
-    /*font-family: "Helvetica", Arial, Freesans, clean, sans-serif;*/
-    /*font-family: "Helvetica Neue", Arial, Freesans, clean, sans-serif;*/
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-    /*font-family: "Trebuchet MS", Helvetica, sans-serif;*/
-    /*font-family: Verdana, Geneva, sans-serif;*/
-    /*font-family: Tahoma, Geneva, sans-serif;*/
-    /*font-family: Baskerville, 'Times New Roman', Times, serif;*/
-
-    padding:25px;
-    font-size: 12px;
-    font-weight:lighter;
+  padding:25px;
+  font-size: 12px;
+  font-weight:lighter;
 }
 
 table, td, th {
-    border: 1px solid #ddd;
-    text-align: left;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 tr:nth-child(even) {
@@ -27,55 +14,55 @@ tr:nth-child(even) {
 }
 
 table {
-    border-collapse: collapse;
-    width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 th, td {
-    padding: 5px;
+  padding: 5px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: bold;
-    margin: 2em 0px 15px 0px;
+  font-weight: bold;
+  margin: 2em 0px 15px 0px;
 }
 
 h1 {
-    color: #000;
-    font-size: 2em;
+  color: #000;
+  font-size: 2em;
 }
 
 h2 {
-    font-size: 2em;
+  font-size: 2em;
 }
 
 h3 {
-    font-size: 1.6em;
+  font-size: 1.6em;
 }
 
 h4 {
-    font-size: 1.3em;
+  font-size: 1.3em;
 }
 
 h5 {
-    font-size: 1em;
+  font-size: 1em;
 }
 
 h6 {
-    color: #777777;
-    background-color: inherit;
-    font-size: 1em;
+  color: #777777;
+  background-color: inherit;
+  font-size: 1em;
 }
 
 hr {
-    height: 0.2em;
-    border: 0;
-    color: #CCCCCC;
-    background-color: #CCCCCC;
+  height: 0.2em;
+  border: 0;
+  color: #CCCCCC;
+  background-color: #CCCCCC;
 }
 
 p, blockquote, ul, ol, dl, li {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 Contact GitHub API Training Shop Blog About

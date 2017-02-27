@@ -37,19 +37,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $status = intval($_POST['newActivity']);
     $newBreakVal = floatval($_POST['newBreakValues']);
 
-    if(isset($_POST['timeToUTC']) && ($arr = explode(', ', $imm))){ //create new
-      $timeToUTC = intval($_POST['timeToUTC']);
-      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeBegin', '$timeEnd', $filterID, '$activity', '$timeToUTC');";
+    if(isset($_POST['creatTimeZone']) && ($arr = explode(', ', $imm))){ //create new
+      $filterID = $arr[0];
+      $timeToUTC = intval($_POST['creatTimeZone']);
+      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $filterID, '$status', '$timeToUTC');";
       $conn->query($sql);
-    } else {//update old
+    } else { //update old
       if($timeFin != '0000-00-00 00:00:00'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       } else {
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='$timeFin', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       }
       $conn->query($sql);
-      echo mysqli_error($conn);
     }
+    echo mysqli_error($conn);
   } elseif (isset($_POST['delete'])) {
     $activeTab = $_POST['delete'];
     if(isset($_POST['index'])){
@@ -260,13 +261,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if(isset($_POST['modifyDate']) && substr($_POST['modifyDate'],0,strlen($calculator->indecesIM[$i])) === $calculator->indecesIM[$i]){
               echo "<tr>";
               echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
-              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){
+              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){//for non existing timestamps, indexIM consists of (userID, count) while count is just a number from calculator, to see which ones been pressed.
                 echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
                 for($i = -12; $i <= 12; $i++){
                   if($i == $timeToUTC){
-                    echo "<option name='ttz' value= $i selected>UTC " . sprintf("%+03d", $i) . "</option>";
+                    echo "<option name='ttz' value='$i' selected>UTC " . sprintf("%+03d", $i) . "</option>";
                   } else {
-                    echo "<option name='ttz' value= $i>UTC " . sprintf("%+03d", $i) . "</option>";
+                    echo "<option name='ttz' value='$i'>UTC " . sprintf("%+03d", $i) . "</option>";
                   }
                 }
                 echo "</select></td>";
@@ -360,11 +361,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </form>
 
 <script>
-var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d %H:%i");
-
 $(document).ready(function() {
+  var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+  myCalendar.setSkin("material");
+  myCalendar.setDateFormat("%Y-%m-%d %H:%i");
   // If cookie is set, scroll to the position saved in the cookie.
   if ( $.cookie("scroll") !== null ) {
     $(document).scrollTop( $.cookie("scroll") );
