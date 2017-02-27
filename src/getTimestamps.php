@@ -261,13 +261,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if(isset($_POST['modifyDate']) && substr($_POST['modifyDate'],0,strlen($calculator->indecesIM[$i])) === $calculator->indecesIM[$i]){
               echo "<tr>";
               echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
-              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){//for non existing timestamps, indexIM consists of (userID, count) while count is just a number from calculator, to see which ones been pressed.
+              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){ //for non existing timestamps, indexIM consists of (userID, count) while count is just a number from calculator, to see which ones been pressed.
+                $A = $B = $calculator->date[$i].'---';
                 echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
-                for($i = -12; $i <= 12; $i++){
-                  if($i == $timeToUTC){
-                    echo "<option name='ttz' value='$i' selected>UTC " . sprintf("%+03d", $i) . "</option>";
+                for($i_mon = -12; $i_mon <= 12; $i_mon++){
+                  if($i_mon == $timeToUTC){
+                    echo "<option name='ttz' value='$i_mon' selected>UTC " . sprintf("%+03d", $i_mon) . "</option>";
                   } else {
-                    echo "<option name='ttz' value='$i'>UTC " . sprintf("%+03d", $i) . "</option>";
+                    echo "<option name='ttz' value='$i_mon'>UTC " . sprintf("%+03d", $i_mon) . "</option>";
                   }
                 }
                 echo "</select></td>";
