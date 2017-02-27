@@ -328,7 +328,7 @@ $('form').preventDoubleSubmission();
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingCore">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE">
-              <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down"></i>
+              <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
@@ -384,7 +384,7 @@ $('form').preventDoubleSubmission();
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingTime">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME">
-              <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down"></i>
+              <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
@@ -396,7 +396,6 @@ $('form').preventDoubleSubmission();
                 <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-check-square-o"></i> <?php echo $lang['VACATION']; ?></a></li>
                 <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="getTravellingExpenses.php"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>
                 <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-                <hr>
                 <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="adminTodos.php"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['FOUNDERRORS']; ?></a></li>
               </ul>
             </div>
@@ -414,7 +413,7 @@ $('form').preventDoubleSubmission();
           <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingProject">
               <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT">
-                <?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down"></i>
+                <?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
               </a>
             </div>
             <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
@@ -444,7 +443,7 @@ $('form').preventDoubleSubmission();
           <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingReport">
               <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
-                <?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down"></i>
+                <?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down pull-right"></i>
               </a>
             </div>
             <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">

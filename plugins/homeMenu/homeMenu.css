@@ -37,7 +37,6 @@ i{
   100% { transform: rotate(360deg); }
 }
 
-
 @media (min-width: 768px){
   .affix-content .container {
     width: 98%;

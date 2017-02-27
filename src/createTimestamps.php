@@ -62,6 +62,22 @@ function test_Date($date){
   return $dt && $dt->format("Y-m-d H:i:s") === $date;
 }
 
+//$hours is a float
+function displayAsHoursMins($hour){
+  $hours = $hour;
+  $s = '';
+  if($hours < 0){
+    $s = '-';
+    $hours = $hours * -1;
+  }
+  if($hours >= 1){
+    $s .= intval($hours) . 'h ';
+    $hours = $hours - intval($hours);
+  }
+  $s .= intval($hours * 60) .'min';
+  return $s;
+}
+
 function redirect($url){
   if (!headers_sent()) {
     header('Location: '.$url);
