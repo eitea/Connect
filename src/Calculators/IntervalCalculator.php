@@ -29,10 +29,10 @@ class Interval_Calculator{
 
   //month like yyyy-mm-dd hh-mm-ss
   public function __construct($from, $to, $userid){
-    $this->from = substr($from, 0, 10).' 10:00:00';
-    $this->to = substr($to, 0, 10).' 15:00:00';
+    $this->from = substr($from, 0, 10).' 12:00:00';
+    $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = ceil(timeDiff_Hours($from, $to) / 24) + 1; //include the to date.
+    $this->days = (timeDiff_Hours($from, $to) / 24) +1; //include the to date.
     $this->calculateValues();
   }
 
@@ -61,7 +61,8 @@ class Interval_Calculator{
       if($result && $result->num_rows == 1){
         $row = $result->fetch_assoc();
         $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
-        if($oldMonth != $currentMonth){ //add overTimeLump if month changes
+        //add overTimeLump if month changes
+        if($oldMonth != $currentMonth){
           $this->overTimeLump += $row['overTimeLump'];
           $oldMonth = $currentMonth;
         }

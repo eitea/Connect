@@ -368,41 +368,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $absolvedHoursSUM += $difference - $calculator->lunchTime[$i];
             $differenceSUM += $theSaldo;
           } //endfor
+
           //correctionHours
           $accumulatedSaldo += $calculator->correctionHours;
-          $differenceSUM += $calculator->correctionHours;
           echo "<tr>";
-          echo "<td style='font-weight:bold;'>".$lang['CORRECTION'].": </td>";
+          echo "<td style='font-weight:bold;'>".$lang['CORRECTION'].":* </td>";
           echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
           echo "<td style='color:#9222cc'>" . sprintf('%+.2f', $calculator->correctionHours) . "</td>";
           echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
           echo "<td></td></tr>";
 
           //overTimeLump
-          $accumulatedSaldo += $calculator->overTimeLump;
-          $differenceSUM += $calculator->overTimeLump;
+          $accumulatedSaldo -= $calculator->overTimeLump;
           echo "<tr>";
-          echo "<td style='font-weight:bold;' colspan='2'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
+          echo "<td style='font-weight:bold;' colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
           echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
-          echo "<td style='color:#fc8542;'>" . sprintf('%+.2f', $calculator->overTimeLump) . "</td>";
+          echo "<td style='color:#fc8542;'>-" . sprintf('%.2f', $calculator->overTimeLump) . "</td>"; //its always negative. always.
           echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
           echo "<td></td></tr>";
 
           //summary
-          /*
-          echo "<tr style='font-weight:bold;'>";
-          echo "<td>Sum: </td>";
-          echo "<td></td><td></td>";
-          echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
-          echo "<td></td><td></td><td></td>";
-          echo "<td>".displayAsHoursMins($expectedHoursSUM)."</td>";
-          echo "<td>".displayAsHoursMins($absolvedHoursSUM)."</td>";
-          echo "<td>".displayAsHoursMins($differenceSUM)."</td>";
-          echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
-          echo "<td></td></tr>";
-          */
+          $differenceSUM += $calculator->correctionHours;
+          $differenceSUM -= $calculator->overTimeLump;
           echo "<tr>";
-          echo "<td style='font-weight:bold;'>Sum: </td>";
+          echo "<td style='font-weight:bold;'>Sum:* </td>";
           echo "<td></td><td></td>";
           echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
           echo "<td></td><td></td><td></td>";
@@ -412,17 +401,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
 
-          //get saldo from aall previous days, if its only one user, else it would take foreeever...
+          //get saldo from aall previous days, if its only one user, else it would take forever...
           if($filterID){
             $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
             $lunchbreakSUM += array_sum($calculator_P->lunchTime);
-            $expectedHoursSUM += array_sum($calculator_P->shouldTime);
+            $expectedHoursSUM += array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
+            if(substr($filterDateFrom,8,2) != '01') {$expectedHoursSUM += $calculator->overTimeLump;} //add overTimeLump back, so it wont get subtracted twice for the same month.
             $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
             $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
 
             $accumulatedSaldo += $differenceSUM;
             echo "<tr style='font-weight:bold;'>";
-            echo "<td colspan='2'>Inkl. vorheriges Saldo: </td>";
+            echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
             echo "<td></td>";
             echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
             echo "<td></td><td></td><td></td>";
@@ -435,6 +425,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           ?>
         </tbody>
       </table>
+      <small>*Angaben in Stunden</small>
       <script>
       var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
       myCalendar.setSkin("material");
