@@ -39,10 +39,10 @@ class LogCalculator{
 
       if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
         $j = getCurrentTimestamp();
+        $j = carryOverAdder_Hours($j, 24);
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
-      $j = carryOverAdder_Hours($j, 24);
 
       $this->vacationDays = ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
       while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {

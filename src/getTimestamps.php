@@ -13,12 +13,20 @@ require_once 'Calculators/IntervalCalculator.php';
 
 $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
 $filterDateTo = substr(getCurrentTimestamp(),0,10) .' 12:00:00';
+$filterID = 0;
+$filterStatus ='';
 $activeTab = 1;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterDayFrom']) && isset($_POST['filterDayTo'])){
     $filterDateFrom = $_POST['filterYearFrom'] .'-'.$_POST['filterMonthFrom'].'-'.$_POST['filterDayFrom'].' 12:00:00';
     $filterDateTo = $_POST['filterYearTo'] .'-'.$_POST['filterMonthTo'].'-'.$_POST['filterDayTo'].' 12:00:00';
+  }
+  if (!empty($_POST['filteredUserID'])) {
+    $activeTab = $filterID = $_POST['filteredUserID'];
+  }
+  if (isset($_POST['filterStatus'])) {
+    $filterStatus = $_POST['filterStatus'];
   }
 
   if(isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){
@@ -38,9 +46,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $newBreakVal = floatval($_POST['newBreakValues']);
 
     if(isset($_POST['creatTimeZone']) && ($arr = explode(', ', $imm))){ //create new
-      $filterID = $arr[0];
+      $creatUser = $arr[0];
       $timeToUTC = intval($_POST['creatTimeZone']);
-      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $filterID, '$status', '$timeToUTC');";
+      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $creatUser, '$status', '$timeToUTC');";
       $conn->query($sql);
     } else { //update old
       if($timeFin != '0000-00-00 00:00:00'){
@@ -68,8 +76,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!-- ############################### FILTER ################################### -->
 
 <form method="post">
-  <div class="container-fluid">
-    <div class="col-xs-4 text-center"> <!-- Date Interval FROM-->
+  <div class="row">
+    <div class="col-sm-4"> <!-- Date Interval FROM-->
       Von:
       <select name='filterYearFrom' style="width:100px" class="js-example-basic-single">
         <?php
@@ -104,7 +112,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         ?>
       </select>
     </div>
-    <div class="col-xs-4 text-center"> <!-- Date Interval TO -->
+    <div class="col-sm-4"> <!-- Date Interval TO -->
       Bis:
       <select name='filterYearTo' style="width:100px" class="js-example-basic-single">
         <?php
@@ -139,7 +147,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         ?>
       </select>
     </div>
-    <div class="col-xs-1">
+    <div class="col-sm-3 text-right">
+      <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
+        <?php
+        $query = "SELECT * FROM $userTable;";
+        $result = mysqli_query($conn, $query);
+        echo "<option name='filterUserID' value='0'>Alle</option>";
+        while($row = $result->fetch_assoc()){
+          $i = $row['id'];
+          if ($filterID == $i) {
+            echo "<option name='filterUserID' value='$i' selected>".$row['firstname'] . " " . $row['lastname']."</option>";
+          } else {
+            echo "<option name='filterUserID' value='$i' >".$row['firstname'] . " " . $row['lastname']."</option>";
+          }
+        }
+        ?>
+      </select>
+      <br><br>
+      <select name='filterStatus' style="width:100px" class="js-example-basic-single">
+        <option value="" >---</option>
+        <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang_activityToString[0]; ?></option>
+        <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang_activityToString[1]; ?></option>
+        <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang_activityToString[2]; ?></option>
+        <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang_activityToString[3]; ?></option>
+      </select>
+    </div>
+    <div class="col-sm-1">
       <button type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
     </div>
   </div>
@@ -149,17 +182,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   <ul class="nav nav-tabs">
     <?php
-    $result = $conn->query("SELECT id, firstname FROM $userTable");
+    if($filterID){
+      $filterUserID_query = " WHERE id = $filterID";
+    } else {
+      $filterUserID_query = "";
+    }
+
+    $result = $conn->query("SELECT id, firstname FROM $userTable $filterUserID_query");
     while($result && ($row = $result->fetch_assoc())){
       $x = $row['id'];
       $active = $activeTab == $x ? "class='active'" : '';
       echo "<li $active><a data-toggle='tab' href='#tab$x'>".$row['firstname']."</a></li>";
     }
+
+    if($filterID){ //display that users summary
+      echo '<li><a data-toggle="tab" href="#menu_summary">'.$lang['OVERVIEW'] .'</a></li>';
+    }
     ?>
   </ul>
+
   <div class="tab-content">
     <?php
-    $resultU = $conn->query("SELECT id, firstname FROM $userTable");
+    $resultU = $conn->query("SELECT id, firstname FROM $userTable $filterUserID_query");
     while($resultU && ($rowU = $resultU->fetch_assoc())):
       $x = $rowU['id'];
       $active = $activeTab == $x ? "in active" : '';
@@ -362,7 +406,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <br><br><hr><br>
       </div>
     </div>
-  <?php endwhile;?>
+
+  <?php endwhile; if($filterID): //we filter for one user: display his summary  ?>
+    <div id="menu_summary" class="tab-pane fade"><br>
+      <script>
+      function resizeIframe(obj) {
+        obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+      }
+      </script>
+      <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>
+    </div>
+  <?php endif; ?>
+
 </div>
 </form>
 

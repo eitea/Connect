@@ -17,14 +17,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if (!empty($_POST['filteredUserID'])) {
     $filterID = $_POST['filteredUserID'];
   }
+  if (isset($_POST['filterStatus'])) {
+    $filterStatus = $_POST['filterStatus'];
+  }
   if(!empty($_POST['filterYear'])){
     $filterDate = $_POST['filterYear'];
     if(!empty($_POST['filterMonth'])){
       $filterDate .= '-' . $_POST['filterMonth'];
     }
-  }
-  if (isset($_POST['filterStatus'])) {
-    $filterStatus = $_POST['filterStatus'];
   }
 }
 ?>

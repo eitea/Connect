@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
   <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
@@ -46,7 +47,6 @@
     $color = 'style=color:#00ba29';
   }
 
-
   $sql = "SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $curID AND endDate IS NULL";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
@@ -55,8 +55,16 @@
     die(mysqli_error($conn));
   }
   ?>
-    <h4> <?php echo $lang['HOURS_COMPLETE']; ?></h4>
+    <h4> <?php echo $lang['HOURS_COMPLETE']; ?> <div class="pull-right"><a data-toggle="collapse" href="#infoSummarycollapse" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-question-circle"></i></a></div></h4>
     <hr>
+
+    <div class="collapse" id="infoSummarycollapse">
+      <div class="well">
+        This is an overall summary of all hours, filters do not apply here. <br>
+         Sumamries display all hours this User has, starting from entrance date until now or, if defined, the date of exit.
+      </div>
+    </div>
+
     <div>
     <table class="table table-striped">
       <thead>
