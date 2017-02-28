@@ -22,14 +22,17 @@ class Interval_Calculator{
 
   public $lunchTime = array();
   public $shouldTime = array();
+  public $absolvedTime = array();
   public $activity = array();
+
+  public $beginDate = '';
 
   //month like yyyy-mm-dd hh-mm-ss
   public function __construct($from, $to, $userid){
-    $this->from = substr($from, 0, 10).' 12:00:00';
-    $this->to = substr($to, 0, 10).' 12:00:00';
+    $this->from = substr($from, 0, 10).' 10:00:00';
+    $this->to = substr($to, 0, 10).' 15:00:00';
     $this->id = $userid;
-    $this->days = intval(timeDiff_Hours($from, $to) / 24) + 1;
+    $this->days = ceil(timeDiff_Hours($from, $to) / 24) + 1; //include the to date.
     $this->calculateValues();
   }
 
@@ -40,7 +43,7 @@ class Interval_Calculator{
     require "connection.php";
     $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
     if($result && ($row = $result->fetch_assoc())){
-      $beginDate = $row['beginningDate'];
+      $this->beginDate = $beginDate = $row['beginningDate'];
       $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
     } else { //should never occur
       return "Invalid userID";
@@ -48,7 +51,7 @@ class Interval_Calculator{
 
     $count = 0;
     $oldMonth = 0;
-    for($j = 0; $j <= $this->days && $this->days > 0; $j++){ //for EVERY day of the month (excluding the last day of j of course)
+    for($j = 0; $j < $this->days && $this->days > 0; $j++){ //for each day of the month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
       $currentMonth = substr($i, 0, 7);
@@ -72,6 +75,7 @@ class Interval_Calculator{
         $row = $result->fetch_assoc();
         $this->start[] = $row['time'];
         $this->end[] = $row['timeEnd'];
+        $this->absolvedTime[] = timeDiff_Hours($row['time'], $row['timeEnd']);
         $this->activity[] = $row['status'];
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
@@ -79,6 +83,7 @@ class Interval_Calculator{
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = '-';
         $this->end[] = '-';
+        $his->absolvedTime[] = 0;
         $this->activity[] = '-1';
         $this->lunchTime[] = 0;
         $this->timeToUTC[] = 0;

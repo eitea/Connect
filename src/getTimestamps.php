@@ -176,7 +176,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </select>
     </div>
     <div class="col-sm-1">
-      <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
+      <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter" value="1">Filter</button>
     </div>
   </div>
   <br><br>
@@ -195,7 +195,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       $filterUserID_query = "";
     }
-
     $result = $conn->query("SELECT id, firstname FROM $userTable $filterUserID_query");
     while($result && ($row = $result->fetch_assoc())){
       $x = $row['id'];
@@ -203,7 +202,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //onclick sets value of filter button to keep tab selected when filtering again
       echo "<li $active><a data-toggle='tab' href='#tab$x' onclick='setFilter(\"$x\");' >".$row['firstname']."</a></li>";
     }
-
     if($filterID){ //display that users summary
       echo '<li><a data-toggle="tab" href="#menu_summary" >'.$lang['OVERVIEW'] .'</a></li>';
     }
@@ -384,23 +382,56 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $accumulatedSaldo += $calculator->overTimeLump;
           $differenceSUM += $calculator->overTimeLump;
           echo "<tr>";
-          echo "<td style='font-weight:bold;'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
-          echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
+          echo "<td style='font-weight:bold;' colspan='2'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
+          echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
           echo "<td style='color:#fc8542;'>" . sprintf('%+.2f', $calculator->overTimeLump) . "</td>";
           echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
           echo "<td></td></tr>";
 
           //summary
+          /*
           echo "<tr style='font-weight:bold;'>";
           echo "<td>Sum: </td>";
+          echo "<td></td><td></td>";
+          echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
+          echo "<td></td><td></td><td></td>";
+          echo "<td>".displayAsHoursMins($expectedHoursSUM)."</td>";
+          echo "<td>".displayAsHoursMins($absolvedHoursSUM)."</td>";
+          echo "<td>".displayAsHoursMins($differenceSUM)."</td>";
+          echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
+          echo "<td></td></tr>";
+          */
+          echo "<tr>";
+          echo "<td style='font-weight:bold;'>Sum: </td>";
           echo "<td></td><td></td>";
           echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
           echo "<td></td><td></td><td></td>";
           echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
           echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
-          echo "<td>".sprintf('%.2f',$differenceSUM)."</td>";
-          echo "<td>".sprintf('%.2f',$accumulatedSaldo)."</td>";
+          echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
+          echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
+
+          //get saldo from aall previous days, if its only one user, else it would take foreeever...
+          if($filterID){
+            $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
+            $lunchbreakSUM += array_sum($calculator_P->lunchTime);
+            $expectedHoursSUM += array_sum($calculator_P->shouldTime);
+            $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
+            $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
+
+            $accumulatedSaldo += $differenceSUM;
+            echo "<tr style='font-weight:bold;'>";
+            echo "<td colspan='2'>Inkl. vorheriges Saldo: </td>";
+            echo "<td></td>";
+            echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
+            echo "<td></td><td></td><td></td>";
+            echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
+            echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
+            echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
+            echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
+            echo "<td></td></tr>";
+          }
           ?>
         </tbody>
       </table>
