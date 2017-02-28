@@ -7,7 +7,7 @@
 </div>
 <?php
 
-//illegal lunchbreaks (happens to bookers only)
+//illegal lunchbreaks
 if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
   foreach($_POST['lunchbreakIndeces'] as $indexIM){
     $result = $conn->query("SELECT pauseAfterHours, hoursOfRest FROM $intervalTable WHERE userID = $uId AND endDate IS NULL");
@@ -76,13 +76,13 @@ endif;
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
 
 <form method="POST">
-  <?php
+  <?php //select all timestamps that do not have at least one complete break booking
   $sql = "SELECT indexIM, $logTable.userID, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id $intervalTable ON l1.userID = $intervalTable.userID
-  WHERE status = '0' endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
+  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end))";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
-    ?>
+  ?>
     <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
@@ -124,14 +124,13 @@ endif;
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
 
   <?php
-  $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.*
-  FROM $logTable
+  $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.* FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
   WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
-    ?>
+  ?>
     <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>:</h4>
     <div class="h4 text-right">
       <a role="button" data-toggle="collapse" href="#illegal_timestamp_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">

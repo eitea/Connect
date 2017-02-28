@@ -38,31 +38,31 @@ class LogCalculator{
       $j = $iRow['endDate'];
 
       if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
-        $j = carryOverAdder_Hours(getCurrentTimestamp(), 24);
+        $j = getCurrentTimestamp();
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
+      $j = carryOverAdder_Hours($j, 24);
 
       $this->vacationDays = ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
       while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {
         if($count % date('t', strtotime($i)) == 0){ //modulo the amount of days this month has.
           $this->overTimeAdditive += $iRow['overTimeLump'];
         }
-
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
+
         if(isHoliday($i)){
           $expectedHours = 0;
         }
-
         $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
         if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
           if($row['timeEnd'] == '0000-00-00 00:00:00'){
             //open timestamp lowers expected Hours according to how long user has been checked in
             $timeEnd = getCurrentTimestamp();
-            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours
+            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
               $this->expectedHours += $expectedHours;
             } else {
-              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //alter expected hours to match time he has been here already
+              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //else: reduce expected hours to match time he has been here already, so there's no minus he can't keep up to.
             }
           } else {
             $timeEnd = $row['timeEnd'];
