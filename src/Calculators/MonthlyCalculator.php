@@ -42,7 +42,7 @@ class Monthly_Calculator{
     }
 
     $count = 0;
-    while(substr($i,0, 10) != substr($j,0,10)) { //for EVERY day of the month (excluding the last day of j of course)
+    while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for EVERY day of the month (excluding the last day of j of course)
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
       //get the expectedHours from the matching interval
@@ -52,8 +52,8 @@ class Monthly_Calculator{
         $row = $result->fetch_assoc();
         $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
         $this->overTimeLump = $row['overTimeLump'];
-      } else {
-        die("No values available.");
+      } else { //the date doesnt have an interval, it goes out of the intervals bounds.
+        $this->shouldTime[] = 0;
       }
 
       $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time >= '$beginDate' AND time <= '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %'";
@@ -65,7 +65,7 @@ class Monthly_Calculator{
         $this->activity[] = $row['status'];
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
-        $this->lunchTime[$count] = $row['breakCredit'];
+        $this->lunchTime[] = $row['breakCredit'];
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = '-';
         $this->end[] = '-';

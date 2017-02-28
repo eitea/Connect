@@ -21,11 +21,7 @@ $travellingFile
 $sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 $conn->query($sql);
 
-$sql = "INSERT INTO $bookingTable (userID) VALUES (1);";
-$conn->query($sql);
-
-//insert vacationtable
-$sql = "INSERT INTO $vacationTable (userID) VALUES(1);";
+$sql = "INSERT INTO $intervalTable (userID) VALUES (1);";
 $conn->query($sql);
 
 //insert roletable

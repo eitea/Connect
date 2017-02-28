@@ -182,7 +182,6 @@ if(isset($_POST['create'])){
       }
     }
     echo mysqli_error($conn);
-    //check if entry date lies before/after today
     redirect('editUsers.php');
   } //end if accept
 } //end if post
