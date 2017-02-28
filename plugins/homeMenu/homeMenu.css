@@ -6,6 +6,15 @@
      border: 0;
  }
 
+ .nav.navbar-nav > ul, .sidebar-nav .navbar > ul {
+   float: none;
+   display: block;
+ }
+ .nav.navbar-nav > li, .sidebar-nav .navbar > li {
+   float: none;
+   display: block;
+ }
+
 .required-field {
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
@@ -78,14 +87,7 @@ i{
     margin-bottom:0;
     border:0;
   }
-  .sidebar-nav .navbar ul {
-    float: none;
-    display: block;
-  }
-  .sidebar-nav .navbar li {
-    float: none;
-    display: block;
-  }
+
   .sidebar-nav .navbar li a {
     padding-top: 12px;
     padding-bottom: 12px;

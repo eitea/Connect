@@ -18,6 +18,9 @@ $filterStatus ='';
 $activeTab = 1;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if(isset($_POST['filter'])){
+    $activeTab = intval($_POST['filter']);
+  }
   if(isset($_POST['filterDayFrom']) && isset($_POST['filterDayTo'])){
     $filterDateFrom = $_POST['filterYearFrom'] .'-'.$_POST['filterMonthFrom'].'-'.$_POST['filterDayFrom'].' 12:00:00';
     $filterDateTo = $_POST['filterYearTo'] .'-'.$_POST['filterMonthTo'].'-'.$_POST['filterDayTo'].' 12:00:00';
@@ -173,12 +176,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </select>
     </div>
     <div class="col-sm-1">
-      <button type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
+      <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter">Filter</button>
     </div>
   </div>
   <br><br>
 
   <!-- ############################### TABLE ################################### -->
+  <script>
+  function setFilter(id){
+    document.getElementById("myFilter").value = id;
+  }
+  </script>
 
   <ul class="nav nav-tabs">
     <?php
@@ -192,11 +200,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     while($result && ($row = $result->fetch_assoc())){
       $x = $row['id'];
       $active = $activeTab == $x ? "class='active'" : '';
-      echo "<li $active><a data-toggle='tab' href='#tab$x'>".$row['firstname']."</a></li>";
+      //onclick sets value of filter button to keep tab selected when filtering again
+      echo "<li $active><a data-toggle='tab' href='#tab$x' onclick='setFilter(\"$x\");' >".$row['firstname']."</a></li>";
     }
 
     if($filterID){ //display that users summary
-      echo '<li><a data-toggle="tab" href="#menu_summary">'.$lang['OVERVIEW'] .'</a></li>';
+      echo '<li><a data-toggle="tab" href="#menu_summary" >'.$lang['OVERVIEW'] .'</a></li>';
     }
     ?>
   </ul>
