@@ -15,18 +15,14 @@ $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
 $filterDateTo = substr(getCurrentTimestamp(),0,10) .' 12:00:00';
 $filterID = 0;
 $filterStatus ='';
-$activeTab = 1;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['filter'])){
-    $activeTab = intval($_POST['filter']);
-  }
   if(isset($_POST['filterDayFrom']) && isset($_POST['filterDayTo'])){
     $filterDateFrom = $_POST['filterYearFrom'] .'-'.$_POST['filterMonthFrom'].'-'.$_POST['filterDayFrom'].' 12:00:00';
     $filterDateTo = $_POST['filterYearTo'] .'-'.$_POST['filterMonthTo'].'-'.$_POST['filterDayTo'].' 12:00:00';
   }
   if (!empty($_POST['filteredUserID'])) {
-    $activeTab = $filterID = $_POST['filteredUserID'];
+    $filterID = $_POST['filteredUserID'];
   }
   if (isset($_POST['filterStatus'])) {
     $filterStatus = $_POST['filterStatus'];
@@ -35,11 +31,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){
     $imm = isset($_POST['modifyDate'])? $_POST['modifyDate'] : $_POST['saveChanges'];
     $result = $conn->query("SELECT userID FROM $logTable WHERE indexIM = '$imm'");
-    if($result && $row = $result->fetch_assoc()){
-      $activeTab = $row['userID'];
-    } elseif($arr = explode(', ', $imm)){
-      $activeTab = $arr[0];
-    }
   }
   if(isset($_POST['saveChanges'])) {
     $imm = $_POST['saveChanges'];
@@ -51,8 +42,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['creatTimeZone']) && ($arr = explode(', ', $imm))){ //create new
       $creatUser = $arr[0];
       $timeToUTC = intval($_POST['creatTimeZone']);
-      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $creatUser, '$status', '$timeToUTC');";
+      $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
+      if($timeFin != '0000-00-00 00:00:00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); }
+      $sql = "INSERT INTO $logTable (time, timeEnd, breakCredit, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', '$newBreakVal', $creatUser, '$status', '$timeToUTC');";
       $conn->query($sql);
+      $insertID = mysqli_insert_id($conn);
+      echo mysqli_error($conn);
+      //create break
+      if($newBreakVal != 0){
+        $timeStart = carryOverAdder_Hours($timeStart, 4);
+        $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
+        $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
+        echo mysqli_error($conn);
+      }
     } else { //update old
       if($timeFin != '0000-00-00 00:00:00'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
@@ -155,7 +157,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         $query = "SELECT * FROM $userTable;";
         $result = mysqli_query($conn, $query);
-        echo "<option name='filterUserID' value='0'>Alle</option>";
+        echo "<option name='filterUserID' value='0'>Benutzer ... </option>";
         while($row = $result->fetch_assoc()){
           $i = $row['id'];
           if ($filterID == $i) {
@@ -179,61 +181,44 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter" value="1">Filter</button>
     </div>
   </div>
-  <br><br>
 
   <!-- ############################### TABLE ################################### -->
-  <script>
-  function setFilter(id){
-    document.getElementById("myFilter").value = id;
-  }
-  </script>
 
   <ul class="nav nav-tabs">
     <?php
-    if($filterID){
-      $filterUserID_query = " WHERE id = $filterID";
-    } else {
-      $filterUserID_query = "";
-    }
-    $result = $conn->query("SELECT id, firstname FROM $userTable $filterUserID_query");
-    while($result && ($row = $result->fetch_assoc())){
-      $x = $row['id'];
-      $active = $activeTab == $x ? "class='active'" : '';
-      //onclick sets value of filter button to keep tab selected when filtering again
-      echo "<li $active><a data-toggle='tab' href='#tab$x' onclick='setFilter(\"$x\");' >".$row['firstname']."</a></li>";
-    }
-    if($filterID){ //display that users summary
-      echo '<li><a data-toggle="tab" href="#menu_summary" >'.$lang['OVERVIEW'] .'</a></li>';
-    }
-    ?>
+    if($filterID):
+      $result = $conn->query("SELECT id, firstname FROM $userTable WHERE id = $filterID");
+      if($result && ($row = $result->fetch_assoc())){
+        $x = $row['id'];
+        //onclick sets value of filter button to keep tab selected when filtering again
+        echo "<li class='active'><a data-toggle='tab' href='#userTab' >".$row['firstname']."</a></li>";
+        echo '<li><a data-toggle="tab" href="#menu_summary" >'.$lang['OVERVIEW'] .'</a></li>';
+      }
+      ?>
   </ul>
 
   <div class="tab-content">
-    <?php
-    $resultU = $conn->query("SELECT id, firstname FROM $userTable $filterUserID_query");
-    while($resultU && ($rowU = $resultU->fetch_assoc())):
-      $x = $rowU['id'];
-      $active = $activeTab == $x ? "in active" : '';
-      echo "<div id='tab$x' class='tab-pane fade $active'><br>";
-      $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
-      ?>
-      <table class="table table-hover table-condensed">
+    <div id='userTab' class='tab-pane fade in active'><br>
+      <section>
+      <div class="table-scrollable-container" >
+      <table class="table table-hover table-condensed table-scrollable">
         <thead>
-          <th><?php echo $lang['WEEKLY_DAY']; ?></th>
-          <th><?php echo $lang['DATE']; ?></th>
-          <th><?php echo $lang['BEGIN']; ?></th>
-          <th><?php echo $lang['BREAK']; ?></th>
-          <th><?php echo $lang['END']; ?></th>
-          <th style='width:40px'><small><?php echo $lang['LAST_BOOKING']; ?></small></th>
-          <th><?php echo $lang['ACTIVITY']; ?></th>
-          <th><?php echo $lang['SHOULD_TIME']; ?></th>
-          <th><?php echo $lang['IS_TIME']; ?></th>
-          <th><?php echo $lang['DIFFERENCE']; ?></th>
-          <th>Saldo</th>
-          <th width=100px;><?php echo $lang['EDIT']; ?></th>
+          <th><div><?php echo $lang['WEEKLY_DAY']; ?></div></th>
+          <th><div><?php echo $lang['DATE']; ?></div></th>
+          <th><div><?php echo $lang['BEGIN']; ?></div></th>
+          <th><div><?php echo $lang['BREAK']; ?></div></th>
+          <th><div><?php echo $lang['END']; ?></div></th>
+          <th><div style="text-align:center;top:-5px;"><small><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></small></div></th>
+          <th><div><?php echo $lang['ACTIVITY']; ?></div></th>
+          <th><div><?php echo $lang['SHOULD_TIME']; ?></div></th>
+          <th><div><?php echo $lang['IS_TIME']; ?></div></th>
+          <th><div><?php echo $lang['DIFFERENCE']; ?></div></th>
+          <th><div>Saldo</div></th>
+          <th width=100px;><div><?php echo $lang['EDIT']; ?></div></th>
         </thead>
         <tbody>
           <?php
+          $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
           $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $differenceSUM = $accumulatedSaldo = 0;
           for($i = 0; $i < $calculator->days; $i++){
             if($calculator->end[$i] == '0000-00-00 00:00:00'){
@@ -281,16 +266,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               }
             }
 
-            if($calculator->start[$i] != '-'){
-              $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
-            } else {
-              $A = $calculator->start[$i];
-            }
+            $A = $calculator->start[$i];
+            $B = $calculator->end[$i];
 
-            if($calculator->end[$i] != '-'){
+            if($calculator->start[$i]){
+              $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
+            }
+            if($calculator->end[$i] && $calculator->end[$i] != '0000-00-00 00:00:00'){
               $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
-            } else {
-              $B = $calculator->end[$i];
             }
 
             $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
@@ -309,21 +292,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
 
             //pressing edit on a button makes row editable, (scrollheight preserved via js at bottom of page)
-            if(isset($_POST['modifyDate']) && substr($_POST['modifyDate'],0,strlen($calculator->indecesIM[$i])) === $calculator->indecesIM[$i]){
+            if(isset($_POST['modifyDate']) && $_POST['modifyDate'] === $calculator->indecesIM[$i]){
               echo "<tr>";
               echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
-              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){ //for non existing timestamps, indexIM consists of (userID, count) while count is just a number from calculator, to see which ones been pressed.
-                $A = $B = $calculator->date[$i].'---';
+              if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){ //for non existing timestamps, indexIM consists of (userID, date)
+                $A = $B = $arr[1];
                 echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
-                for($i_mon = -12; $i_mon <= 12; $i_mon++){
-                  if($i_mon == $timeToUTC){
-                    echo "<option name='ttz' value='$i_mon' selected>UTC " . sprintf("%+03d", $i_mon) . "</option>";
+                for($i_utc = -12; $i_utc <= 12; $i_utc++){
+                  if($i_utc == $timeToUTC){
+                    echo "<option name='ttz' value='$i_utc' selected>UTC " . sprintf("%+03d", $i_utc) . "</option>";
                   } else {
-                    echo "<option name='ttz' value='$i_mon'>UTC " . sprintf("%+03d", $i_mon) . "</option>";
+                    echo "<option name='ttz' value='$i_utc'>UTC " . sprintf("%+03d", $i_utc) . "</option>";
                   }
                 }
                 echo "</select></td>";
-              } else {
+              } else { //existing timestamps cant have timeToUTC edited
                 echo '<td></td>';
               }
               echo "<td><input id='calendar' type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom' value='" . substr($A,0,-3) . "' /></td>";
@@ -401,44 +384,45 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
 
-          //get saldo from aall previous days, if its only one user, else it would take forever...
-          if($filterID){
-            $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
-            $lunchbreakSUM += array_sum($calculator_P->lunchTime);
-            $expectedHoursSUM += array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
-            if(substr($filterDateFrom,8,2) != '01') {$expectedHoursSUM += $calculator->overTimeLump;} //add overTimeLump back, so it wont get subtracted twice for the same month.
-            $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
-            $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
+          //get saldo from aall previous days
+          $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
+          $lunchbreakSUM += array_sum($calculator_P->lunchTime);
+          $expectedHoursSUM += array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
+          if(substr($filterDateFrom,8,2) != '01') {$expectedHoursSUM += $calculator->overTimeLump;} //add overTimeLump back, so it wont get subtracted twice for the same month.
+          $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
+          $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
 
-            $accumulatedSaldo += $differenceSUM;
-            echo "<tr style='font-weight:bold;'>";
-            echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
-            echo "<td></td>";
-            echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
-            echo "<td></td><td></td><td></td>";
-            echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
-            echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
-            echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
-            echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
-            echo "<td></td></tr>";
-          }
+          $accumulatedSaldo += $differenceSUM;
+          echo "<tr style='font-weight:bold;'>";
+          echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
+          echo "<td></td>";
+          echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
+          echo "<td></td><td></td><td></td>";
+          echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
+          echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
+          echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
+          echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
+          echo "<td></td></tr>";
           ?>
+          <tr><td colspan="12"><small>*Angaben in Stunden</small></td></tr>
         </tbody>
       </table>
-      <small>*Angaben in Stunden</small>
+    </div>
+  </section>
+
       <script>
       var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
       myCalendar.setSkin("material");
       myCalendar.setDateFormat("%Y-%m-%d %H:%i");
       </script>
+
       <div class="container text-right">
         <br>
         <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>">Delete</button>
-        <br><br><hr><br>
+        <br><br>
       </div>
     </div>
 
-  <?php endwhile; if($filterID): //we filter for one user: display his summary  ?>
     <div id="menu_summary" class="tab-pane fade"><br>
       <script>
       function resizeIframe(obj) {
@@ -447,8 +431,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </script>
       <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>
     </div>
-  <?php endif; ?>
 
+  <?php
+  else:
+  echo '<div class="alert alert-info">Select a User to Continue </div>';
+  endif;  //end if filterUserID
+  ?>
 </div>
 </form>
 

@@ -70,7 +70,7 @@ class Interval_Calculator{
         die("No values available.");
       }
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND time >= '$beginDate' AND time <= '$exitDate' AND time LIKE'". substr($i, 0, 10) ." %' ";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND time LIKE'". substr($i, 0, 10) ." %' ";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
         $row = $result->fetch_assoc();
@@ -82,13 +82,13 @@ class Interval_Calculator{
         $this->indecesIM[] = $row['indexIM'];
         $this->lunchTime[$count] = $row['breakCredit'];
       } else { //user wasnt here today = 0 absolved hours
-        $this->start[] = '-';
-        $this->end[] = '-';
+        $this->start[] = false;
+        $this->end[] = false;
         $his->absolvedTime[] = 0;
         $this->activity[] = '-1';
         $this->lunchTime[] = 0;
         $this->timeToUTC[] = 0;
-        $this->indecesIM[] = "$id, $count";
+        $this->indecesIM[] = $id.', '.$i;
       }
       //if today is a holiday, poot poot
       if(isHoliday($i)){

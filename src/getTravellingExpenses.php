@@ -26,7 +26,6 @@ if($result && ($row = $result->fetch_assoc())){
 }
 ?>
 
-
 <form method = "post">
   <div class="row">
     <div class="col-md-6">

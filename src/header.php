@@ -286,40 +286,36 @@ $('form').preventDoubleSubmission();
     ?>
 
     <!-- side menu -->
-    <div class="row affix-row">
-    <div class="col-sm-3 col-md-2 affix-sidebar">
+    <div class="affix-sidebar">
       <div class="sidebar-nav">
         <div class="navbar navbar-default" role="navigation">
+          <ul class="nav navbar-nav" id="sidenav01">
+            <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
 
-          <div class="navbar-collapse collapse sidebar-navbar-collapse">
-            <ul class="nav navbar-nav" id="sidenav01">
-              <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
+              <!-- User-Section: BASIC -->
+              <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
+              <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
+              <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
+              <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
 
-                <!-- User-Section: BASIC -->
-                <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
-                <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-                <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
-                <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
-
-                <?php if($showReadyPlan == 'TRUE'): ?>
-                  <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
-                <?php endif; ?>
-
-                <!-- User-Section: BOOKING -->
-                <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-                  <hr>
-                  <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-                <?php endif; ?>
-
-              <?php endif; //endif(canStamp)?>
-
-              <!-- User-Section: EDITING -->
-              <?php if($canEditTemplates == 'TRUE'):?>
-                <hr>
-                <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
+              <?php if($showReadyPlan == 'TRUE'): ?>
+                <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
               <?php endif; ?>
-            </ul>
-        </div>
+
+              <!-- User-Section: BOOKING -->
+              <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
+                <hr>
+                <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+              <?php endif; ?>
+
+            <?php endif; //endif(canStamp)?>
+
+            <!-- User-Section: EDITING -->
+            <?php if($canEditTemplates == 'TRUE'):?>
+              <hr>
+              <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
+            <?php endif; ?>
+          </ul>
       </div>
       <br>
       <div class="panel-group" id="sidebar-accordion">
@@ -489,5 +485,5 @@ $('form').preventDoubleSubmission();
   ?>
 
   <div id="bodyContent" style="display:none;" >
-    <div class="col-sm-9 col-md-10 affix-content">
-      <div class="container">
+    <div class="affix-content">
+      <div class="container-fluid">
