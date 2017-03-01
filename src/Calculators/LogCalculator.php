@@ -29,7 +29,7 @@ class LogCalculator{
 
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
 
-    $count = 0; //count the days for the overtimelump
+    $oldMonth = 0;
     while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
       $this->beginDate = $iRow['beginningDate'];
       $this->exitDate = $iRow['exitDate'];
@@ -43,11 +43,13 @@ class LogCalculator{
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
-
       $this->vacationDays = ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
+
       while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {
-        if($count % date('t', strtotime($i)) == 0){ //modulo the amount of days this month has.
+        $currentMonth = substr($i, 0, 7);
+        if($oldMonth != $currentMonth){ //whenever a month changes, add the overtime. using a counter is too volatile
           $this->overTimeAdditive += $iRow['overTimeLump'];
+          $oldMonth = $currentMonth;
         }
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
 
@@ -89,7 +91,6 @@ class LogCalculator{
         }
 
         $i = carryOverAdder_Hours($i, 24);
-        $count++;
       }
     } //end foreach interval
 
