@@ -286,178 +286,175 @@ $('form').preventDoubleSubmission();
     ?>
 
     <!-- side menu -->
-    <div class="affix-sidebar">
-      <div class="sidebar-nav">
-        <div class="navbar navbar-default" role="navigation">
-          <ul class="nav navbar-nav" id="sidenav01">
-            <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
+    <div class="affix-sidebar sidebar-nav">
+      <div class="navbar navbar-default" role="navigation">
+        <ul class="nav navbar-nav" id="sidenav01">
+          <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
 
-              <!-- User-Section: BASIC -->
-              <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
-              <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-              <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
-              <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
+            <!-- User-Section: BASIC -->
+            <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
+            <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
+            <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
 
-              <?php if($showReadyPlan == 'TRUE'): ?>
-                <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
-              <?php endif; ?>
-
-              <!-- User-Section: BOOKING -->
-              <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-                <hr>
-                <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-              <?php endif; ?>
-
-            <?php endif; //endif(canStamp)?>
-
-            <!-- User-Section: EDITING -->
-            <?php if($canEditTemplates == 'TRUE'):?>
-              <hr>
-              <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
+            <?php if($showReadyPlan == 'TRUE'): ?>
+              <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
             <?php endif; ?>
-          </ul>
+
+            <!-- User-Section: BOOKING -->
+            <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
+              <hr>
+              <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+            <?php endif; ?>
+
+          <?php endif; //endif(canStamp)?>
+
+          <!-- User-Section: EDITING -->
+          <?php if($canEditTemplates == 'TRUE'):?>
+            <hr>
+            <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
+          <?php endif; ?>
+        </ul>
       </div>
       <br>
       <div class="panel-group" id="sidebar-accordion">
         <!-- Section One: CORE -->
         <?php if($isCoreAdmin == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingCore">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE">
-              <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
-            </a>
-          </div>
-          <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-              <li>
-                <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
-                  <i class="fa fa-users"></i> <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
-                </a>
-                <div class="collapse" id="toggleUsers" style="height: 0px;">
-                  <ul class="nav nav-list">
-                    <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
-                    <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
-                    <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
-                  </ul>
-                </div>
-              </li>
-              <li>
-                <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
-                  <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
-                </a>
-                <div class="collapse" id="toggleSettings" style="height: 0px;">
-                  <ul class="nav nav-list">
-                    <li><a <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="editCompanies.php"><?php echo $lang['COMPANIES']; ?></a></li>
-                    <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
-                    <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                    <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                    <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
-                    <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                    <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
-                  </ul>
-                </div>
-              </li>
-              <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"> <i class="fa fa-database"></i> <span> DB Backup</span> </a></li>
-              <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"> <i class="fa fa-file-pdf-o"></i> <span>Report Designer</span> </a></li><?php endif; ?>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <br>
-        <?php
-        if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
-          echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "reportOptions.php" || $this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
-          echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
-          echo "<script>document.getElementById('adminOption_CORE').click();</script>";
-        }
-        ?>
-        <?php endif; ?>
-
-        <!-- Section Two: TIME -->
-        <?php if($isTimeAdmin == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingTime">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME">
-              <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
-            </a>
-          </div>
-          <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-history"></i> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
-                <li><a <?php if($this_page =='getTimestamps_select.php'){echo $setActiveLink;}?> href="getTimestamps_select.php"><i class="fa fa-pencil"></i> <span><?php echo $lang['TIMESTAMPS']; ?></span></a></li>
-                <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="bookAdjustments.php"><i class="fa fa-plus"></i> <?php echo $lang['CORRECTION']; ?></a></li>
-                <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-check-square-o"></i> <?php echo $lang['VACATION']; ?></a></li>
-                <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="getTravellingExpenses.php"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>
-                <li><a href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-                <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="adminTodos.php"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['FOUNDERRORS']; ?></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <br>
-        <?php
-        if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php"){
-          echo "<script>document.getElementById('adminOption_TIME').click();</script>";
-        }
-        ?>
-        <?php endif; ?>
-
-        <!-- Section Three: PROJECTS -->
-        <?php if($isProjectAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
-            <div class="panel-heading" role="tab" id="headingProject">
-              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT">
-                <?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+            <div class="panel-heading" role="tab" id="headingCore">
+              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE">
+                <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
               </a>
             </div>
-            <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
+            <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
               <div class="panel-body">
                 <ul class="nav navbar-nav">
-                  <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="getProjects.php"><i class="fa fa-history"></i>
-                    <span><?php echo $lang['PROJECT_BOOKINGS']; ?></span>
-                  </a></li>
-                  <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i>
-                    <span><?php echo $lang['CLIENTS']; ?></span>
-                  </a></li>
-                  <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="editProjects.php"><i class="fa fa-tags"></i>
-                    <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
-                  </a></li>
-                </ul>
+                  <li>
+                    <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
+                      <i class="fa fa-users"></i> <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleUsers" style="height: 0px;">
+                      <ul class="nav nav-list">
+                        <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
+                        <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
+                        <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li>
+                    <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
+                      <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleSettings" style="height: 0px;">
+                      <ul class="nav nav-list">
+                        <li><a <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="editCompanies.php"><?php echo $lang['COMPANIES']; ?></a></li>
+                        <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
+                        <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                        <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"> <i class="fa fa-database"></i> <span> DB Backup</span> </a></li>
+                  <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"> <i class="fa fa-file-pdf-o"></i> <span>Report Designer</span> </a></li><?php endif; ?>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-          <br>
-        <?php
-          if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
-            echo "<script>$('#adminOption_PROJECT').click();</script>";
-          }
-        ?>
-        <?php endif; ?>
+            <br>
+            <?php
+            if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
+              echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+            } elseif($this_page == "reportOptions.php" || $this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+              echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+            } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
+              echo "<script>document.getElementById('adminOption_CORE').click();</script>";
+            }
+            ?>
+          <?php endif; ?>
 
-        <?php if($isReportAdmin == 'TRUE'): ?>
-          <div class="panel panel-default panel-borderless">
-            <div class="panel-heading" role="tab" id="headingReport">
-              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
-                <?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down pull-right"></i>
-              </a>
-            </div>
-            <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
-              <div class="panel-body">
-                <ul class="nav navbar-nav">
-                  <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
-                </ul>
+          <!-- Section Two: TIME -->
+          <?php if($isTimeAdmin == 'TRUE'): ?>
+            <div class="panel panel-default panel-borderless">
+              <div class="panel-heading" role="tab" id="headingTime">
+                <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME">
+                  <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+                </a>
+              </div>
+              <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
+                <div class="panel-body">
+                  <ul class="nav navbar-nav">
+                    <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-history"></i> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
+                    <li><a <?php if($this_page =='getTimestamps_select.php'){echo $setActiveLink;}?> href="getTimestamps_select.php"><i class="fa fa-pencil"></i> <span><?php echo $lang['TIMESTAMPS']; ?></span></a></li>
+                    <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="bookAdjustments.php"><i class="fa fa-plus"></i> <?php echo $lang['CORRECTION']; ?></a></li>
+                    <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-check-square-o"></i> <?php echo $lang['VACATION']; ?></a></li>
+                    <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="getTravellingExpenses.php"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>
+                    <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="adminTodos.php"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['FOUNDERRORS']; ?></a></li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-          <br>
-        <?php endif; ?>
-      </div> <!-- /accordions -->
-    </div>
-  </div>
+            <br>
+            <?php
+            if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "allowVacations.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php"){
+              echo "<script>document.getElementById('adminOption_TIME').click();</script>";
+            }
+            ?>
+          <?php endif; ?>
+
+          <!-- Section Three: PROJECTS -->
+          <?php if($isProjectAdmin == 'TRUE'): ?>
+            <div class="panel panel-default panel-borderless">
+              <div class="panel-heading" role="tab" id="headingProject">
+                <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT">
+                  <?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+                </a>
+              </div>
+              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
+                <div class="panel-body">
+                  <ul class="nav navbar-nav">
+                    <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="getProjects.php"><i class="fa fa-history"></i>
+                      <span><?php echo $lang['PROJECT_BOOKINGS']; ?></span>
+                    </a></li>
+                    <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><i class="fa fa-briefcase"></i>
+                      <span><?php echo $lang['CLIENTS']; ?></span>
+                    </a></li>
+                    <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="editProjects.php"><i class="fa fa-tags"></i>
+                      <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
+                    </a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <br>
+            <?php
+            if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
+              echo "<script>$('#adminOption_PROJECT').click();</script>";
+            }
+            ?>
+          <?php endif; ?>
+
+          <?php if($isReportAdmin == 'TRUE'): ?>
+            <div class="panel panel-default panel-borderless">
+              <div class="panel-heading" role="tab" id="headingReport">
+                <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
+                  <?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down pull-right"></i>
+                </a>
+              </div>
+              <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
+                <div class="panel-body">
+                  <ul class="nav navbar-nav">
+                    <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <br>
+          <?php endif; ?>
+        </div> <!-- /accordions -->
+      </div>
 <!-- /side menu -->
 
   <?php

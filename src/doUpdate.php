@@ -484,6 +484,21 @@ if($row['version'] < 67){
   }
 }
 
+if($row['version'] < 68){
+  $result = $conn->query("SELECT indexIM, time FROM $logTable WHERE status = '0' AND DATE(time) < DATE('2016-12-12') AND breakCredit > 0 AND userID = 10");
+  while($result && ($row = $result->fetch_assoc())){
+    $indexIM = $row['indexIM'];
+    $A = substr($row['indexIM'],0,10) .' 10:00:00';
+    $B = substr($row['indexIM'],0,10) .' 10:30:00';
+    $conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM");
+    $conn->query("INSERT INTO $projectBookingTable(start, end, timestampID, infoText, bookingType) VALUES('$A', '$B', $indexIM, 'Lunchbreak recalculation', 'break')");
+    $conn->query("UPDATE $logTable SET breakCredit = '0.5' WHERE indexIM = $indexIM");
+    echo $indexIM;
+  }
+  echo "New Breakvalues for Intervals";
+}
+
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";

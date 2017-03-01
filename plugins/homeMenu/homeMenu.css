@@ -51,15 +51,20 @@ html,body{
 }
 .affix-content{
   background-color:white;
-  overflow: auto;
   padding-left:250px;
   width:100%;
+  overflow-x:auto;
+}
+.affix-content .container {
+  margin-left:5px;
 }
 .affix-sidebar{
   font-size:small;
   padding-left: 0;
   width: 250px;
   position:fixed;
+  max-height: 95%;
+  overflow-y: auto;
 }
  /* shrink sidenav if window gets smaller than that */
 @media (max-width: 724px){
@@ -89,9 +94,6 @@ html,body{
   border-radius:0;
   margin-bottom:0;
   border:0;
-}
-.affix-content .container {
-  margin-left:5px;
 }
 .affix-title{
   border-bottom: 1px solid #ecf0f1;
