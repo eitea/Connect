@@ -66,8 +66,8 @@ class Interval_Calculator{
           $this->overTimeLump += $row['overTimeLump'];
           $oldMonth = $currentMonth;
         }
-      } else {
-        die("No values available.");
+      } else { //if no interval found means i want everything to be 0.
+        $this->shouldTime[] = 0;
       }
 
       $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND time LIKE'". substr($i, 0, 10) ." %' ";

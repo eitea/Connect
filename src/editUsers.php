@@ -616,7 +616,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h4 class="modal-title">Do you really wish to delete <?php $firstname.' '.$lastname; ?> ?</h4>
+                    <h4 class="modal-title">Do you really wish to delete <?php echo $firstname.' '.$lastname; ?> ?</h4>
                   </div>
                   <div class="modal-body">
                     All Stamps and Bookings belonging to this User will be lost forever. Do you still wish to proceed?
