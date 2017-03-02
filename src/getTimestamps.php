@@ -217,7 +217,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <th><div><?php echo $lang['IS_TIME']; ?></div></th>
                 <th><div><?php echo $lang['DIFFERENCE']; ?></div></th>
                 <th><div>Saldo</div></th>
-                <th width="100px"><div>Option</div></th>
+                <th style="text-align:right;width:160px;"><div>Option</div></th>
               </thead>
               <tbody>
                 <?php
@@ -352,7 +352,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
                     echo '<td><button type="submit" name="modifyDate" class="btn btn-default" title="Edit" value="'.$calculator->indecesIM[$i].'"><i class="fa fa-pencil"></i></button>';
                     if($bookingResults && $bookingResults->num_rows > 0){
-                      echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button>';
+                      echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
                       $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
                     }
                     echo '<a></a>';
@@ -424,27 +424,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
         </section>
         <!-- Projectbooking Modall -->
-        <?php for($i = 0; $i < count($bookingResultsResults); $i++):?>
+        <?php
+         for($i = 0; $i < count($bookingResultsResults); $i++):
+           $bookingResult = $bookingResultsResults[$i];
+           $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
+        ?>
           <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-            <div class="modal-dialog modal-md" role="document">
+            <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
                   <h4 class="modal-title"><?php echo $row['start'] ?></h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
                   <table class="table table-hover">
                     <thead>
                       <th><?php echo $lang['CLIENT']; ?></th>
                       <th><?php echo $lang['PROJECT']; ?></th>
-                      <th>Datum</th>
+                      <th width="15%">Datum</th>
                       <th>Start</th>
                       <th><?php echo $lang['END']; ?></th>
                       <th>Info</th>
                     </thead>
                     <tbody>
                       <?php
-                      $bookingResult = $bookingResultsResults[$i];
-                      while($row = $bookingResult->fetch_assoc()){
+                      do {
                         echo '<tr>';
                         echo "<td>". $row['name'] ."</td>";
                         echo "<td>". $row['projectName'] ."</td>";
@@ -453,7 +456,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
                         echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
                         echo '</tr>';
-                      }
+                      } while($row = $bookingResult->fetch_assoc());
                       ?>
                     </tbody>
                   </table>
