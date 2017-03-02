@@ -70,13 +70,14 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
     } $content .="\n\n\n";
   }
 
+/*
   $events = $mysqli->query("SHOW EVENTS");
   while($events && ($row = $events->fetch_row())){
     $res = $mysqli->query("SHOW CREATE EVENT ".$row[0].'.'.$row[1]);
     $TableMLine = $res->fetch_row();
     $content .= "\n\n".$TableMLine[3].";\n\n";
   }
-
+*/
   $backup_name = $backup_name ? $backup_name : $name.".sql";
   header('Content-Type: application/octet-stream');
   header("Content-Transfer-Encoding: Binary");
