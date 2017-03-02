@@ -15,10 +15,11 @@ $mysqlUserName      = $username;
 $mysqlPassword      = $password;
 $mysqlHostName      = $servername;
 $DbName             = $dbName;
-$backup_name        = "$dbName.sql";
+$backup_name        = $dbName."_".date('dmY_Hi', time()).".sql";
 $tables             = array("mytable1","mytable2","mytable3"); //for specific tables
 
-Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,  $tables=false, $backup_name=false );
+
+Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,  $tables=false, $backup_name);
 
 function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=false){
   $mysqli = new mysqli($host,$user,$pass,$name);

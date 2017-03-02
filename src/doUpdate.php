@@ -493,9 +493,24 @@ if($row['version'] < 68){
     $conn->query("DELETE FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM");
     $conn->query("INSERT INTO $projectBookingTable(start, end, timestampID, infoText, bookingType) VALUES('$A', '$B', $indexIM, 'Lunchbreak recalculation', 'break')");
     $conn->query("UPDATE $logTable SET breakCredit = '0.5' WHERE indexIM = $indexIM");
-    echo $indexIM;
   }
-  echo "New Breakvalues for Intervals";
+  echo "<br> New Breakvalues for Intervals";
+}
+
+if($row['version'] < 69){
+  $sql = "ALTER TABLE $projectBookingTable ADD UNIQUE KEY double_submit (timestampID, start, end)";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added unique key for duplicate entries.";
+  }
+
+  $sql = "DELETE p1 FROM $projectBookingTable p1, $projectBookingTable p2 WHERE p1.id < p2.id AND p1.timestampID = p2.timestampID AND p1.start = p2.start AND p1.infoText = p2.infoText AND p1.end = p2.end";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Deleted all duplicates from projectbooking table.";
+  }
 }
 
 

@@ -127,7 +127,8 @@ $sql = "CREATE TABLE $projectBookingTable (
   ON DELETE CASCADE,
   FOREIGN KEY (timestampID) REFERENCES $logTable(indexIM)
   ON UPDATE CASCADE
-  ON DELETE CASCADE
+  ON DELETE CASCADE,
+  UNIQUE KEY double_submit (timestampID, start, end)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

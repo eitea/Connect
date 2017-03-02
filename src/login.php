@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 <head>
   <title>Login</title>
   <style>

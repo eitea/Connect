@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
@@ -454,6 +455,7 @@ $('form').preventDoubleSubmission();
             <br>
           <?php endif; ?>
         </div> <!-- /accordions -->
+        <br><br><br>
       </div>
 <!-- /side menu -->
 

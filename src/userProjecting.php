@@ -59,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project')";
           }
           $conn->query($sql);
-          echo mysqli_error($conn);
           $insertInfoText = $insertInternInfoText = '';
           $showUndoButton = TRUE;
         } else {
