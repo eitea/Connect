@@ -49,7 +49,7 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
         $content .= "\n(";
         for($j=0; $j<$fields_amount; $j++){
           $row[$j] = str_replace("\n","\\n", addslashes($row[$j]) );
-          if (!empty($row[$j])){
+          if ($row[$j] === "0" || $row[$j]){
             $content .= '"'.$row[$j].'"' ;
           } else {
             $content .= 'NULL';
@@ -78,6 +78,7 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
     $content .= "\n\n".$TableMLine[3].";\n\n";
   }
 */
+
   $backup_name = $backup_name ? $backup_name : $name.".sql";
   header('Content-Type: application/octet-stream');
   header("Content-Transfer-Encoding: Binary");
