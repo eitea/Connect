@@ -31,7 +31,7 @@ i{
   100% { transform: rotate(360deg); }
 }
 
-
+/*  HEADER AND CONTENT  */
 html,body{
   padding-top: 25px;
 }
@@ -51,11 +51,8 @@ html,body{
 }
 .affix-content{
   background-color:white;
-  padding-left:250px;
+  padding-left:255px;
   width:100%;
-}
-.affix-content .container {
-  margin-left:5px;
 }
 .affix-sidebar{
   font-size:small;
@@ -64,6 +61,8 @@ html,body{
   position:fixed;
   max-height: 100%;
   overflow-y: auto;
+  z-index: 20;
+  background-color: white;
 }
  /* shrink sidenav if window gets smaller than that */
 @media (max-width: 724px){

@@ -474,8 +474,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         myCalendar.setSkin("material");
         myCalendar.setDateFormat("%Y-%m-%d %H:%i");
         </script>
-
-        <div class="container text-right">
+        <br><br>
+        <div class="text-right">
           <br>
           <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>">Delete</button>
           <br><br>
@@ -488,7 +488,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
         }
         </script>
-        <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>
+        <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no'></iframe>
       </div>
 
       <?php
