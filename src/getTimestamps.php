@@ -488,7 +488,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
         }
         </script>
-        <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no'></iframe>
+        <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload="resizeIframe(this);"></iframe>
       </div>
 
       <?php
