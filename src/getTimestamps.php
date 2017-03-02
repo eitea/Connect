@@ -10,6 +10,7 @@
 
 <?php
 require_once 'Calculators/IntervalCalculator.php';
+$scrollPos = 0;
 
 $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
 $filterDateTo = substr(getCurrentTimestamp(),0,10) .' 12:00:00';
@@ -29,10 +30,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 
   if(isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){
+    $scrollPos = intval($_POST['scrollPos']);
     $imm = isset($_POST['modifyDate'])? $_POST['modifyDate'] : $_POST['saveChanges'];
     $result = $conn->query("SELECT userID FROM $logTable WHERE indexIM = '$imm'");
   }
   if(isset($_POST['saveChanges'])) {
+    $scrollPos = intval($_POST['scrollPos']);
     $imm = $_POST['saveChanges'];
     $timeStart = $_POST['timesFrom'] .':00';
     $timeFin = $_POST['timesTo'] .':00';
@@ -477,6 +480,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <br><br>
         <div class="text-right">
           <br>
+          <input id="scrollPos" type="text" name="scrollPos" value="<?php echo $scrollPos; ?>" style="display:none;" />
           <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>">Delete</button>
           <br><br>
         </div>
@@ -491,7 +495,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload="resizeIframe(this);"></iframe>
       </div>
 
-      <?php
+    <?php
     else:
       echo '<br><div class="alert alert-info">Select a User to Continue </div>';
     endif;  //end if filterUserID
@@ -500,75 +504,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </form>
 
 <script>
-$(document).ready(function() {
-  // If cookie is set, scroll to the position saved in the cookie.
-  if ( $.cookie("scroll") !== null ) {
-    $(document).scrollTop( $.cookie("scroll") );
+window.onload = function () {
+  if ($("#scrollPos").val() != 0 ) {
+    setTimeout(function(){
+      $(".table-scrollable-container").scrollTop($("#scrollPos").val());
+    }, 200);
   }
+}
+$(document).ready(function() {
   // When scrolling happens....
-  $(window).on("scroll", function() {
-    // Set a cookie that holds the scroll position.
-    $.cookie("scroll", $(document).scrollTop() );
+  $(".table-scrollable-container").on("scroll", function() {
+    $("#scrollPos").val($(".table-scrollable-container").scrollTop());
   });
 });
-
-/*!
-* jQuery Cookie Plugin v1.3
-* https://github.com/carhartl/jquery-cookie
-*
-* Copyright 2011, Klaus Hartl
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://www.opensource.org/licenses/mit-license.php
-* http://www.opensource.org/licenses/GPL-2.0
-*/
-(function ($, document, undefined) {
-  var pluses = /\+/g;
-  function raw(s) {
-    return s;
-  }
-  function decoded(s) {
-    return decodeURIComponent(s.replace(pluses, ' '));
-  }
-  var config = $.cookie = function (key, value, options) {
-    // write
-    if (value !== undefined) {
-      options = $.extend({}, config.defaults, options);
-      if (value === null) {
-        options.expires = -1;
-      }
-      if (typeof options.expires === 'number') {
-        var days = options.expires, t = options.expires = new Date();
-        t.setDate(t.getDate() + days);
-      }
-      value = config.json ? JSON.stringify(value) : String(value);
-      return (document.cookie = [
-        encodeURIComponent(key), '=', config.raw ? value : encodeURIComponent(value),
-        options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-        options.path    ? '; path=' + options.path : '',
-        options.domain  ? '; domain=' + options.domain : '',
-        options.secure  ? '; secure' : ''
-      ].join(''));
-    }
-    // read
-    var decode = config.raw ? raw : decoded;
-    var cookies = document.cookie.split('; ');
-    for (var i = 0, parts; (parts = cookies[i] && cookies[i].split('=')); i++) {
-      if (decode(parts.shift()) === key) {
-        var cookie = decode(parts.join('='));
-        return config.json ? JSON.parse(cookie) : cookie;
-      }
-    }
-    return null;
-  };
-  config.defaults = {};
-  $.removeCookie = function (key, options) {
-    if ($.cookie(key) !== null) {
-      $.cookie(key, null, options);
-      return true;
-    }
-    return false;
-  };
-})(jQuery, document);
 </script>
 
 <!-- /BODY -->
