@@ -38,8 +38,8 @@ class LogCalculator{
       $j = $iRow['endDate'];
 
       if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
-        $j = getCurrentTimestamp();
-        $j = carryOverAdder_Hours($j, 24);
+        $now = getCurrentTimestamp();
+        $j = carryOverAdder_Hours($now, 24);
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
@@ -60,7 +60,7 @@ class LogCalculator{
         if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
           if($row['timeEnd'] == '0000-00-00 00:00:00'){
             //open timestamp lowers expected Hours according to how long user has been checked in
-            $timeEnd = getCurrentTimestamp();
+            $timeEnd = $now;
             if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
               $this->expectedHours += $expectedHours;
             } else {
@@ -86,7 +86,7 @@ class LogCalculator{
             case 3:
             $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
           }
-        } else { //no log found for today
+        } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
           $this->expectedHours += $expectedHours;
         }
 
