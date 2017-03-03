@@ -35,7 +35,7 @@ class LogCalculator{
       $this->exitDate = $iRow['exitDate'];
 
       $i = $iRow['startDate'];
-      $j = $iRow['endDate'];
+      $now = $j = $iRow['endDate'];
 
       if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
         $now = getCurrentTimestamp();
