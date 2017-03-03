@@ -43,9 +43,9 @@ class LogCalculator{
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
-      $this->vacationDays = ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
+      $this->vacationDays += ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
 
-      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {
+      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
         $currentMonth = substr($i, 0, 7);
         if($oldMonth != $currentMonth){ //whenever a month changes, add the overtime. using a counter is too volatile
           $this->overTimeAdditive += $iRow['overTimeLump'];
@@ -124,7 +124,7 @@ class LogCalculator{
       return $a;
     }
     $date = new DateTime($a);
-    if($b<0){
+    if($b < 0){
       $b *= -1;
       $date->sub(new DateInterval("PT".$b."H"));
     } else {

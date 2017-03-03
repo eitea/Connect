@@ -1,9 +1,6 @@
 <?php include 'header.php'; ?>
 <?php enableToTime($userID); ?>
 
-<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
-<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
-
 <div class="page-header">
   <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
 </div>
@@ -227,6 +224,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
                 $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $differenceSUM = $accumulatedSaldo = 0;
                 for($i = 0; $i < $calculator->days; $i++){
+                  //filterStatus, let's just skip all those taht dont fit?
+                  if($filterStatus !== '' && $calculator->activity[$i] != $filterStatus) continue;
+
                   if($calculator->end[$i] == '0000-00-00 00:00:00'){
                     $endTime = getCurrentTimestamp();
                   } else {
@@ -273,12 +273,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   }
 
                   $A = $calculator->start[$i];
-                  $B = $calculator->end[$i];
+                  $B = $A; //trust me.
 
                   if($calculator->start[$i]){
                     $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
                   }
                   if($calculator->end[$i] && $calculator->end[$i] != '0000-00-00 00:00:00'){
+                    $B = $calculator->end[$i];
                     $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
                   }
 
@@ -321,9 +322,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     } else { //existing timestamps cant have timeToUTC edited
                       echo '<td></td>';
                     }
-                    echo "<td><input id='calendar' type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom' value='" . substr($A,0,-3) . "' /></td>";
+
+                    echo "<td><input id='calendar' type='datetime-local' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom' value='" . substr($A,0,10).'T'. substr($A,11,5) . "' /></td>";
                     echo "<td><div style='display:inline-block;text-align:center'><input type='number' step='any' class='form-control input-sm' name='newBreakValues' value='" . sprintf('%.2f', $calculator->lunchTime[$i]). "' style='width:70px' /></div></td>";
-                    echo "<td><input id='calendar2' type='text' class='form-control input-sm' maxlength='16' onkeydown='if (event.keyCode == 13) return false;' name='timesTo' value='" . substr($B,0,-3) . "' /></td>";
+                    echo "<td><input id='calendar2' type='datetime-local' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesTo' value='" . substr($B,0,10).'T'. substr($B,11,5) . "' /></td>";
                     echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
                     echo "<td><select name='newActivity' class='js-example-basic-single'>";
                     for($j = 0; $j < 4; $j++){
@@ -358,7 +360,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                       echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
                       $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
                     }
-                    echo '<a></a>';
                     if(!preg_match('/,\s/', $calculator->indecesIM[$i])){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/></td>';}
                     echo "</tr>";
                   }
@@ -426,12 +427,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </table>
           </div>
         </section>
+
         <!-- Projectbooking Modall -->
         <?php
-         for($i = 0; $i < count($bookingResultsResults); $i++):
-           $bookingResult = $bookingResultsResults[$i];
-           $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
-        ?>
+        for($i = 0; $i < count($bookingResultsResults); $i++):
+          $bookingResult = $bookingResultsResults[$i];
+          $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
+          ?>
           <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
@@ -441,6 +443,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
                   <table class="table table-hover">
                     <thead>
+                      <th></th>
                       <th><?php echo $lang['CLIENT']; ?></th>
                       <th><?php echo $lang['PROJECT']; ?></th>
                       <th width="15%">Datum</th>
@@ -451,7 +454,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <tbody>
                       <?php
                       do {
+                        $icon = "fa fa-bookmark";
+                        if($row['bookingType'] == 'break'){
+                          $icon = "fa fa-cutlery";
+                        } elseif($row['bookingType'] == 'drive'){
+                          $icon = "fa fa-car";
+                        }
                         echo '<tr>';
+                        echo "<td><i class='$icon'></i></td>";
                         echo "<td>". $row['name'] ."</td>";
                         echo "<td>". $row['projectName'] ."</td>";
                         echo "<td>". substr($row['start'], 0, 10) ."</td>";
@@ -471,12 +481,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div>
           </div>
         <?php endfor; ?>
-
-        <script>
-        var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-        myCalendar.setSkin("material");
-        myCalendar.setDateFormat("%Y-%m-%d %H:%i");
-        </script>
         <br><br>
         <div class="text-right">
           <br>

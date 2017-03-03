@@ -388,7 +388,6 @@ $('form').preventDoubleSubmission();
                 <div class="panel-body">
                   <ul class="nav navbar-nav">
                     <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-history"></i> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
-                    <li><a <?php if($this_page =='getTimestamps_select.php'){echo $setActiveLink;}?> href="getTimestamps_select.php"><i class="fa fa-pencil"></i> <span><?php echo $lang['TIMESTAMPS']; ?></span></a></li>
                     <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="bookAdjustments.php"><i class="fa fa-plus"></i> <?php echo $lang['CORRECTION']; ?></a></li>
                     <li><a <?php if($this_page =='allowVacations.php'){echo $setActiveLink;}?> href="allowVacations.php"><i class="fa fa-check-square-o"></i> <?php echo $lang['VACATION']; ?></a></li>
                     <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="getTravellingExpenses.php"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>

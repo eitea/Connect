@@ -49,7 +49,7 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
         $content .= "\n(";
         for($j=0; $j<$fields_amount; $j++){
           $row[$j] = str_replace("\n","\\n", addslashes($row[$j]) );
-          if ($row[$j] === "0" || $row[$j]){
+          if ($row[$j] || $row[$j] === "0"){
             $content .= '"'.$row[$j].'"' ;
           } else {
             $content .= 'NULL';

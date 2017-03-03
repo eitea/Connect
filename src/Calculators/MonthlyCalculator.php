@@ -19,7 +19,7 @@ class Monthly_Calculator{
   public $shouldTime = array();
   public $activity = array();
 
-//month like yyyy-mm-dd hh-mm-ss
+//ts should be like yyyy-mm-dd hh-mm-ss
   public function __construct($ts, $userid){
     $this->month = $ts;
     $this->id = $userid;
