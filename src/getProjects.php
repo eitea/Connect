@@ -375,9 +375,7 @@ function changeValue(cVal, id, val){
       </div>
     </div>
   </div>
-  <br>
-
-  <br>
+  <br><br>
 </div>
 
 <!----------------------------------------------------------------------------->
@@ -584,6 +582,9 @@ function showNewClients(selectID, company, client){
               if($row['bookingType'] != 'break'){ //if this is a break, do not display dis
                 echo "<td><select style='width:150px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
                 $sql = "SELECT * FROM $clientTable";
+                if($filterCompany){
+                  $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany";
+                }
                 $clientResult = $conn->query($sql);
                 while($clientRow = $clientResult->fetch_assoc()){
                   $selected = '';
