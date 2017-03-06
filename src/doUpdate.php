@@ -62,7 +62,6 @@ function move() {
 </script>
 
 <body>
-
   <div id="progressBar_grey">
     <div id="progress_text">0%</div>
     <div id="progress">.</div>
