@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $creatUser = $arr[0];
       $timeToUTC = intval($_POST['creatTimeZone']);
       $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
-      if($timeFin != '0001-01-01T00:00:00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
+      if($timeFin != '0001-01-01T01:00:00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
       $sql = "INSERT INTO $logTable (time, timeEnd, breakCredit, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', '$newBreakVal', $creatUser, '$status', '$timeToUTC');";
       $conn->query($sql);
       $insertID = mysqli_insert_id($conn);
@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
     } else { //update old
-      if($timeFin != '0001-01-01T00:00:00'){
+      if($timeFin != '0001-01-01T01:00:00'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       } else {
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
