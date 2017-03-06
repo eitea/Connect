@@ -76,11 +76,11 @@ class Interval_Calculator{
         $row = $result->fetch_assoc();
         $this->start[] = $row['time'];
         $this->end[] = $row['timeEnd'];
-        $this->absolvedTime[] = timeDiff_Hours($row['time'], $row['timeEnd']);
         $this->activity[] = $row['status'];
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
         $this->lunchTime[$count] = $row['breakCredit'];
+        $this->absolvedTime[] = $row['timeEnd'] == '0000-00-00 00:00:00' ? 0 : timeDiff_Hours($row['time'], $row['timeEnd']);
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = false;
         $this->end[] = false;
