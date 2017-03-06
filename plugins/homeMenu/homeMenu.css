@@ -34,6 +34,7 @@ i{
 /*  HEADER AND CONTENT  */
 html,body{
   padding-top: 25px;
+  font: 13px/1.4 Geneva, 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
 }
 .panel > .panel-heading a:link {
   color: #6f6f6f;
@@ -136,4 +137,15 @@ section {
 .required-field {
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
+}
+
+
+[type="datetime-local"] {
+  background:#fff url('../../images/calendar_2.png') 97% 50% no-repeat ;
+}
+[type="datetime-local"]::-webkit-inner-spin-button {
+  display: none;
+}
+[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
 }
