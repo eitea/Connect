@@ -38,8 +38,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeFin = $_POST['timesTo'] .':00';
     $status = intval($_POST['newActivity']);
     $newBreakVal = floatval($_POST['newBreakValues']);
-
-    echo $timeFin;
     if(isset($_POST['creatTimeZone']) && ($arr = explode(', ', $imm))){ //create new
       $creatUser = $arr[0];
       $timeToUTC = intval($_POST['creatTimeZone']);
