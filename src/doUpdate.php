@@ -5,7 +5,71 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+
+<style>/*  HEADER AND CONTENT  */
+html,body{
+  padding-top: 25px;
+  font: 13px/1.4 Geneva, 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+  text-align: center;
+  line-height:200%;
+}
+#progressBar_grey{
+  margin-left:10%;
+  width:80%;
+  background-color:#ddd;
+  border-radius:10px;
+}
+#progress{
+  width: 0%;
+  background-color: #ff9900;
+  color: #ff9900;
+  border-radius:10px;
+}
+#progress_text{
+  z-index:10;
+  background-color : transparent;
+  position: absolute;
+  left:50%;
+  color:white;
+}
+</style>
+
+<script>
+document.onreadystatechange = function () {
+  var state = document.readyState
+  if (state == 'complete') {
+    document.getElementById("content").style.display = "block";
+  } else {
+    move();
+  }
+}
+
+function move() {
+  var elem = document.getElementById("progress");
+  var elem_text = document.getElementById("progress_text");
+  var width = 10;
+  var id = setInterval(frame, 20); //call frame() every 20ms
+  function frame() {
+    if (width >= 100) {
+      clearInterval(id);
+    } else {
+      width++;
+      elem.style.width = width + '%';
+      elem_text.innerHTML = width * 1  + '%';
+    }
+  }
+}
+</script>
+
 <body>
+
+  <div id="progressBar_grey">
+    <div id="progress_text">0%</div>
+    <div id="progress">.</div>
+  </div>
+
+  <div id="content" style="display:none;">
+<br>
 <?php
 /*
 * To add a new Update: increase the version number in version_number.php. For more information see head of setup_inc.php
@@ -18,20 +82,6 @@ denyToCloud();
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
 $row = $result->fetch_assoc();
-
-if($row['version'] < 46){
-  $sql="CREATE TABLE $moduleTable (
-    enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "Created module enable/disable function";
-  }
-  $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
-  echo mysqli_error($conn);
-}
 
 if($row['version'] < 47){
   $sql = "CREATE TABLE $policyTable (
@@ -507,8 +557,8 @@ require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
 $conn->query($sql);
 header("refresh:6;url=home.php");
-die ('<br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>');
-
+die ('<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>');
 ?>
+</div>
 </body>
 </html>
