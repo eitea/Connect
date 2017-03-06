@@ -40,7 +40,7 @@
       $feedbackmail = "";
     }
     $feedbackConn = mysqli_connect($_SERVER['RDS_HOSTNAME'], $_SERVER['RDS_USERNAME'], $_SERVER['RDS_PASSWORD'], 'systematic', $_SERVER['RDS_PORT']);
-    $feedbackConn->query("INSERT INTO feedbacks (info, mail) VALUES('$feedbackText', '$feedbackmail')");
+    $feedbackConn->query("INSERT INTO feedbacks (info, email) VALUES('$feedbackText', '$feedbackmail')");
     echo mysqli_error($feedbackConn);
     $feedbackConn->close();
   }

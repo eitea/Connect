@@ -42,7 +42,6 @@ $conn->query($sql);
 
 //insert module en/disable
 $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
-$conn->query($sql);
 
 //insert password policy
 $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");

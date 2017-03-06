@@ -51,7 +51,7 @@ class Interval_Calculator{
 
     $count = 0;
     $oldMonth = 0;
-    for($j = 0; $j < $this->days && $this->days > 0; $j++){ //for each day of the month
+    for($j = 0; $j < $this->days; $j++){ //for each day of the month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
       $currentMonth = substr($i, 0, 7);

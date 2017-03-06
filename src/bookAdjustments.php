@@ -108,7 +108,7 @@ echo mysqli_error($conn);
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                   <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignLog" value="1"><?php echo $lang['ABSOLVED_HOURS']; ?> (+)</button></li>
-                  <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignLog" value="-1"><?php echo $lang['EXPECTED_HOURS']; ?> (-)</button></li>
+                  <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignLog" value="-1"><?php echo $lang['EXPECTED_HOURS']; ?> ( - )</button></li>
                 </ul>
               </div>
             </div>
@@ -179,8 +179,8 @@ echo mysqli_error($conn);
                     ( + / - )
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignVac" value="1">(+) <?php echo $lang['DAYS']; ?></button></li>
-                    <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignVac" value="-1">(-) <?php echo $lang['DAYS']; ?></button></li>
+                    <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignVac" value="1"> <?php echo $lang['DAYS'].' '.$lang['AVAILABLE']; ?> (+)</button></li>
+                    <li><button type="submit" class="btn-link" style="white-space: nowrap;" name="creatSignVac" value="-1"> <?php echo $lang['DAYS'].' '.$lang['CONSUMED']; ?> ( - )</button></li>
                   </ul>
                 </div>
               </div>

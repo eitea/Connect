@@ -7,9 +7,12 @@ if(isset($_POST["templateUpload"])) {
   } elseif ($_FILES["fileToUpload"]["type"] != "text/html") {
     echo "File must be .html";
   }
-
+  if(empty($_POST['uploadName'])){
+    $name = basename($_FILES["fileToUpload"]["name"], '.html');
+  } else {
+    $name = test_input($_POST['uploadName']);
+  }
   $fp = file_get_contents($_FILES['fileToUpload']['tmp_name'], 'rb');
-  $name = basename($_FILES["fileToUpload"]["name"], '.html');
   if($fp){
     include 'connection.php';
     $fp = $conn->real_escape_string($fp);
@@ -19,4 +22,11 @@ if(isset($_POST["templateUpload"])) {
 }
 
 header("Location: templateSelect.php");
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
 ?>
