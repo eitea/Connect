@@ -550,6 +550,15 @@ if($row['version'] < 69){
   }
 }
 
+if($row['version'] < 70){
+  $sql = "ALTER TABLE $userTable ADD COLUMN real_email VARCHAR(50)";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Added real email Adress to user.";
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

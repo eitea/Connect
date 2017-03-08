@@ -48,6 +48,15 @@ function isHoliday($ts){
   return($result && $result->num_rows>0);
 }
 
+/*
+function isHoliday($ts){
+  require "connection.php";
+  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%'";
+  $result = mysqli_query($conn, $sql);
+  return($result && $result->num_rows>0);
+}
+*/
+
 function test_input($data) {
   require "connection.php";
   $data = trim($data);

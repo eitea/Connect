@@ -492,7 +492,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
               <br><br>
               <!-- Interval table -->
-              <div class="container well">
+              <div class="container-fluid well">
                 <div class="row">
                   <div class="col-md-3">
                     <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
@@ -541,7 +541,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   </div>
                 </div>
               </div>
-              <div class="container well">
+              <div class="container-fluid well">
                 <div class="row">
                   <div class="col-md-4">
                     <?php echo $lang['VALID_PERIOD'].' ('.$lang['FROM'].' - '.$lang['TO'].')'; ?>:

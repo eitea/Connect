@@ -24,7 +24,8 @@ $sql = "CREATE TABLE $userTable (
   gender ENUM('female', 'male'),
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   kmMoney DECIMAL(4,2) DEFAULT 0.42,
-  emUndo DATETIME DEFAULT CURRENT_TIMESTAMP
+  emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
+  real_email VARCHAR(50)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -61,9 +62,13 @@ if (!$conn->query($sql)) {
 }
 
 $sql = "CREATE TABLE $holidayTable(
-  begin DATETIME,
-  end DATETIME,
-  name VARCHAR(60) NOT NULL
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  rule VARCHAR(100),
+  name VARCHAR(60),
+  countryID INT(6) UNSIGNED,
+  FOREIGN KEY (countryID) REFERENCES $travelCountryTable(id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

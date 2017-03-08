@@ -447,7 +447,6 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
               echo '<td>' . $rowBank['bankName'] . '</td>';
               if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
                 $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $_SESSION['unlock'], 0, $rowBank['iv2']);
-                echo "<br> Key: $keyValue <br>";
                 echo '<td>'.mc_decrypt($rowBank['iban'], $keyValue). '</td>';
                 echo '<td>'.mc_decrypt($rowBank['bic'], $keyValue). '</td>';
               } else { // **** it.

@@ -52,6 +52,8 @@
         <option value="ssl" <?php if($row['smtpSecure'] == 'ssl'){echo "selected";} ?>> SSL </option>
       </select>
     </div>
+  </div>
+  <div class="container">
     <br><br>
     <div class="checkbox col-md-4">
       Absender-Adresse

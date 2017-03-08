@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php enableToTime($userID); ?>
+
 <!-- BODY -->
 <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
 <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
@@ -106,62 +106,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query($sql);
         echo mysqli_error($conn);
       }
-    } elseif (isset($_POST['delete']) && isset($_POST['index'])) {
-      $index = $_POST["index"];
-      foreach ($index as $x) {
-        $sql = "DELETE FROM $logTable WHERE indexIM=$x;";
-        $conn->query($sql);
-        echo mysqli_error($conn);
-      }
-    } elseif (isset($_POST['create']) && !empty($_POST['creatFromTime']) && !empty($_POST['creatToTime']) && $_POST['creatFromTime'] != '0000-00-00 00:00') {
-      if($_POST['creatToTime'] == '0000-00-00 00:00' || timeDiff_Hours($_POST['creatFromTime'], $_POST['creatToTime']) > 0) {
-
-        $activity = $_POST['action'];
-        $timeIsLike = substr($_POST['creatFromTime'], 0, 10) ." %";
-        $timeToUTC = $_POST['creatTimeZone'];
-
-        $timeBegin = carryOverAdder_Hours($_POST['creatFromTime'] .':00', ($_POST['creatTimeZone']*-1)); //UTC
-
-        if($_POST['creatToTime'] != '0000-00-00 00:00'){
-          $timeEnd = carryOverAdder_Hours($_POST['creatToTime'] .':00', ($_POST['creatTimeZone']*-1)); //UTC
-        } else {
-          $timeEnd = '0000-00-00 00:00:00';
-        }
-
-        //gotta see if there already is a timestamp for that day
-        $sql = "SELECT * FROM $logTable WHERE userID = $filterID
-        AND status = '$activity'
-        AND time LIKE '$timeIsLike'";
-
-        $result = mysqli_query($conn, $sql);
-        if($result && $result->num_rows > 0){ //user already stamped in today
-          $row = $result->fetch_assoc();
-
-          $start = $row['timeEnd'];
-          $indexIM = $row['indexIM'];
-
-          $diff = timeDiff_Hours($start, $timeBegin); //beginning of new timestamp has to be later than the end of the existing timestamp and existing timestamp has to be be closed
-          if($start != '0000-00-00 00:00:00' && $diff > 0){
-            //create a break stamp only if its about status 0
-            if($activity == 0){
-              $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$start', '$timeBegin', $indexIM, 'Create auto-break', 'break')";
-              $conn->query($sql);
-              echo mysqli_error($conn);
-            }
-            //update breakCredit and new endTime
-            $sql = "UPDATE $logTable SET timeEnd = '$timeEnd', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
-            $conn->query($sql);
-            echo mysqli_error($conn);
-          } else {
-            echo "ERROR - Merging timestamps of same dates: time difference was less or equal 0. Check your times and see if existing timestamp has been closed.";
-          }
-        } else { //no existing timestamp yet - create a new stamp
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeBegin', '$timeEnd', $filterID, '$activity', '$timeToUTC');";
-          $conn->query($sql);
-        }
-      } else {
-        echo "Invalid Timestamps or no user selected";
-      }
     }
   }
   ?>
@@ -259,52 +203,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         </table>
 
-        <br>
-        <?php if($filterID != 0) : ?>
-          <div class="container-fluid">
-            <span class="blockInput">
-              <select name="action" class="js-example-basic-single">
-                <option name="act" value="0">Work</option>
-                <option name="act" value="1">Vacation</option>
-                <option name="act" value="2">Special Leave</option>
-                <option name="act" value="3">Sick</option>
-              </select>
-
-              <select name="creatTimeZone" class="js-example-basic-single" style=width:100px>
-                <?php
-                for($i = -12; $i <= 12; $i++){
-                  if($i == $timeToUTC){
-                    echo "<option name='ttz' value= $i selected>UTC " . sprintf("%+03d", $i) . "</option>";
-                  } else {
-                    echo "<option name='ttz' value= $i>UTC " . sprintf("%+03d", $i) . "</option>";
-                  }
-                }
-                ?>
-              </select>
-
-              <div class="col-xs-6 col-md-5">
-                <div class="input-group input-daterange">
-                  <span class="input-group-btn">
-                    <button class="btn btn-warning" type="submit" name="create"> + </button>
-                  </span>
-                  <input id="calendar" type="text" class="form-control datepick" value="" placeholder="Von" size='16' maxlength=16 name="creatFromTime">
-                  <span class="input-group-addon"> - </span>
-                  <input id="calendar2" type="text" class="form-control datepick" value="" placeholder="Bis" size='16' maxlength=16  name="creatToTime">
-                </div>
-              </div>
-              <script>
-              var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-              myCalendar.setSkin("material");
-              myCalendar.setDateFormat("%Y-%m-%d %H:%i");
-              </script>
-
-              <div class="text-right">
-                <button type="submit" class="btn btn-warning" name="delete"><?php echo $lang['DELETE']; ?></button>
-                <button  type="submit" class="btn btn-warning" name="saveChanges"> Save </button>
-              </div>
-            </div>
-          </span>
-
         </form>
 
 
@@ -318,8 +216,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>
       </div>
     </div>
-
-  <?php endif; ?>
 <?php else: ?>
   <div class="alert alert-info" role="alert"><strong><?php echo $lang['MANDATORY_SETTINGS']; ?>: </strong>Wähle Benutzer und Jahr um Informationen anzuzeigen.</div>
 <?php endif; ?>

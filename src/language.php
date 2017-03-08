@@ -186,6 +186,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REQUESTS'] = "Request";
 
   $lang['SAVE'] = 'Save';
+  $lang['SEND_ACCESS'] = 'Send Access';
   $lang['SETTINGS'] = 'Settings';
   $lang['SHOULD_TIME'] = 'Should';
   $lang['SICK_LEAVE'] = 'Sick Leave';
@@ -404,6 +405,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REQUESTS'] = "Anfragen";
 
   $lang['SAVE'] = 'Speichern';
+  $lang['SEND_ACCESS'] = 'Zugang Senden';
   $lang['SETTINGS'] = 'Einstellungen';
   $lang['SHOULD_TIME'] = 'Soll';
   $lang['SICK_LEAVE'] = 'Krankenstand';
