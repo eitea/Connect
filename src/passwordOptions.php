@@ -1,4 +1,4 @@
-<?php require 'header.php'; ?>
+<?php require 'header.php'; require_once 'utilities.php'; ?>
 <?php enableToCore($userID);?>
 
 <?php
@@ -35,7 +35,7 @@ if(isset($_POST['saveButton'])){
     if(test_input($password) != $password){
       $acceptMasterPassword = false;
     }
-    //check if old password matches
+    //check if old password matches, if old password exists
     $result = $conn->query("SELECT masterPassword FROM $configTable");
     $row = $result->fetch_assoc();
     if(crypt($passwordCurrent, $row['masterPassword']) != $row['masterPassword'] && !empty($row['masterPassword'])){ //skip this validation if pass in DB is NULL (not been initialized yet)
@@ -46,9 +46,33 @@ if(isset($_POST['saveButton'])){
     if(strcmp($password, $passwordConfirm) != 0 || !match_passwordpolicy($_POST['masterPass_new'], $output)){
       $acceptMasterPassword = false;
     }
-    //if all matched:
+    //if everything was okay:
     if($acceptMasterPassword){
-      //TODO: decrypt all that has been encrypted with old password, and RE-ENCRYPT that with the new password. Yes.
+      $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable");
+      while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
+        $curID = $rowBank['id'];
+        //decrypt all that has been encrypted with old password
+        $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $passwordCurrent, 0, $rowBank['iv2']);
+        $ibanVal = mc_decrypt($rowBank['iban'], $keyValue);
+        $bicVal = mc_decrypt($rowBank['bic'], $keyValue);
+
+        //encrypt with new password
+        $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
+        $keyValue = bin2hex($keyValue);
+
+        $ibanVal = mc_encrypt($ibanVal, $keyValue);
+        $bicVal = mc_encrypt($bicVal, $keyValue);
+
+        $ivValue = openssl_random_pseudo_bytes(8);
+        $ivValue = bin2hex($ivValue);
+
+        //this did not need an iv since keyValue was random anyway, but silly php thinks its smarter than me.
+        $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $password, 0, $ivValue);
+
+        $conn->query("UPDATE $clientDetailBankTable SET iban='$ibanVal', bic='$bicVal', iv='$keyValue', iv2='$ivValue' WHERE id = $curID");
+        echo mysqli_error($conn);
+      }
+      //save new passwordhash
       $password = password_hash($password, PASSWORD_BCRYPT);
       $conn->query("UPDATE $configTable SET masterPassword = '$password'");
     } else {
@@ -77,8 +101,10 @@ $row = $result->fetch_assoc();
     Mittel - Passwörter müssen mind. 1 Großbuchstaben und 1 Zahl enthalten <br>
     Stark - Passwörter müssen mind. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>
     <br>
-    Passwörter können ein Verfallsdatum bekommen (Erweitert - Aktiv), wodurch nach Ablauf der Zeit der Benutzer dazu aufgefordert wird sein Passwort zu ändern.
+    Passwörter können ein Verfallsdatum besitzen (Erweitert - Aktiv), wodurch nach Ablauf der Zeit der Benutzer dazu aufgefordert wird sein Passwort zu ändern.
     Die Aufforderung kann den Benutzer entweder Zwingen, oder ihm die Entscheidung überlassen.
+    <br>
+    Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
   </div>
 </div>
 
@@ -135,10 +161,8 @@ $row = $result->fetch_assoc();
 
   <br><hr><br>
 
-<?php if(!$masterPasswordResult || $masterPasswordResult->num_rows <= 0): ?>
   <div class="col-xs-12">
     <h4>Master Passwort Setzen</h4>
-    <small>Achtung: Das Passwort kann momentan nur einmal gesetzt werden. Wählen sie daher ein starkes Passwort! Dabei gilt grundsätzlich: Länge > Komplexität. </small>
   </div>
   <br><br><br>
   <div class="container">
@@ -165,7 +189,6 @@ $row = $result->fetch_assoc();
     <br><br><br>
   </div>
   <br><hr><br>
-<?php endif; ?>
 
   <div class="text-right">
     <button type="submit" class="btn btn-warning" name="saveButton">Speichern </button>
