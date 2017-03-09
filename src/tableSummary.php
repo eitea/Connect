@@ -1,30 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
-
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
-</head>
-<body>
   <?php
-  include 'connection.php';
-  include 'language.php';
-  include 'createTimestamps.php';
-
-  if(isset($_GET['userID'])){
-    $curID = test_input($_GET['userID']);
-  } else {
-    die();
-  }
-
-  include 'Calculators/LogCalculator.php';
+  require 'Calculators/LogCalculator.php';
   $logSums = new LogCalculator($curID);
 
   $breakCreditHours = $logSums->breakCreditHours;
@@ -35,7 +10,6 @@
   $sickHours = $logSums->sickHours;
   $overTimeAdditive = $logSums->overTimeAdditive;
   $correctionHours = $logSums->correctionHours;
-
   $availableVacationDays = $logSums->vacationDays;
 
   $beginDate = $logSums->beginDate;
@@ -47,10 +21,9 @@
     $color = 'style=color:#00ba29';
   }
 
-  $sql = "SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $curID AND endDate IS NULL";
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0){
-    $userRow = $result->fetch_assoc();
+  $result_Sum = $conn->query("SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $curID AND endDate IS NULL");
+  if($result_Sum && $result_Sum->num_rows > 0){
+    $userRow = $result_Sum->fetch_assoc();
   } else {
     die(mysqli_error($conn));
   }
@@ -60,8 +33,8 @@
 
     <div class="collapse" id="infoSummarycollapse">
       <div class="well">
-        This is an overall summary of all hours, filters do not apply here. <br>
-         Sumamries display all hours this User has, starting from entrance date until now or, if defined, the date of exit.
+        This is an overall summary of all hours this user has, filters do not apply here. <br>
+         Sumamries below display all hours this User has, starting from entrance date until now or, if defined, the date of exit.
       </div>
     </div>
 
@@ -134,5 +107,3 @@
       </tbody>
     </table>
   </div>
-</body>
-</html>

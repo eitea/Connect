@@ -490,12 +490,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
 
       <div id="menu_summary" class="tab-pane fade"><br>
-        <script>
-        function resizeIframe(obj) {
-          obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-        }
-        </script>
-        <iframe src="tableSummary.php?userID=<?php echo $filterID; ?>" style='width:100%; border:none;' scrolling='no' onload="resizeIframe(this);"></iframe>
+        <?php
+        $curID = $filterID;
+        include 'tableSummary.php';
+        ?>
       </div>
 
     <?php

@@ -148,14 +148,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $infoText = test_input($_POST['infoTextArea'][$i]);
         $newProjectID = test_input($_POST['projectIDs'][$i]);
 
-        $sql = "UPDATE $projectBookingTable SET
-        start='$timeStart', end='$timeFin',
-        infoText='$infoText',projectID = $newProjectID,
-        chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin'
-        WHERE id = $imm";
-
-        $conn->query($sql); //UPDATE projectBookingTable to NEW values
-        echo mysqli_error($conn);
+        if($newProjectID){
+          $sql = "UPDATE $projectBookingTable SET start='$timeStart', end='$timeFin', infoText='$infoText',projectID = $newProjectID,
+          chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $imm";
+          $conn->query($sql); //UPDATE projectBookingTable to NEW values
+          echo mysqli_error($conn);
+        } else {
+          echo '<div class="alert alert-danger fade in">';
+          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+          echo '<strong>Could not change entry: </strong>No Project selected.';
+          echo '</div>';
+        }
       } //end if booking has corresponding timestamp
       echo mysqli_error($conn);
     } //end FOR

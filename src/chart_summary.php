@@ -8,8 +8,8 @@
 <canvas id="analysisChart" width="600" height="600"></canvas>
 
 <script>
-var ctx = document.getElementById("analysisChart");
-var myRadarChart = new Chart(ctx, {
+var ctx_analysis = document.getElementById("analysisChart");
+var myRadarChart = new Chart(ctx_analysis, {
     type: 'radar',
     data: {
       labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
@@ -31,7 +31,7 @@ var myRadarChart = new Chart(ctx, {
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
                 'rgba(255, 159, 64, 1)'
-            ],            
+            ],
             borderWidth: 1
         }]
     },
