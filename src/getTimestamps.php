@@ -56,10 +56,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     } else { //update old
     echo 'End: '.$timeFin;
-      if($timeFin != '0001-01-01T00:00:00'){
-        $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
-      } else {
+      if($timeFin == '0001-01-01T00:00:00' || $timeFin == ':00'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
+      } else {
+        $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       }
       $conn->query($sql);
     }
