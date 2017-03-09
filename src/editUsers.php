@@ -301,6 +301,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({
+      container: 'body'
+    });
+});
+</script>
+
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
   //enable/disable modules
@@ -496,7 +504,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="row">
                   <div class="col-md-3">
                     <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
-                    <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"/>
+                    <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"
+                     data-toggle="popover" title="Important!" data-trigger="focus" data-content="This value will always be read on the beginning of each month, and will be counted for the complete following month."/>
                   </div>
                   <div class="col-md-3">
                     <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>
