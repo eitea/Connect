@@ -69,13 +69,17 @@ var myAnalysisChart = new Chart(ctx_analysis, {
   type: 'horizontalBar',
   options: {
     legend:{
-      display: true
+      display: false
+    },
+    title:{
+      display:true,
+      text: 'Durchschnittliche Stunden'
     }
   },
   data: {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [{
-      label: "Durschnittliche Stunden",
+      label: "Mittel",
       backgroundColor: [
         'rgba(255, 99, 132, 0.5)',
         'rgba(54, 162, 235, 0.5)',
@@ -111,6 +115,10 @@ var myStatisticChart = new Chart(ctx_statistic, {
   options: {
     legend:{
       display: false
+    },
+    title: {
+      display: true,
+      text: 'Heute'
     }
   }
 });
