@@ -2,6 +2,7 @@
 class Monthly_Calculator{
   public $days = 0;
   public $overTimeLump = 0;
+  public $correctionHours = 0;
 
   private $month = 0;
   private $id = 0;
@@ -82,6 +83,12 @@ class Monthly_Calculator{
       $count++;
     } //endwhile;
     $this->daysAsNumber[] = $count;
+
+    //correction Hours:
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType ='log' AND createdOn LIKE '".substr($this->month,0,7)."%'");
+    while($result && ($row = $result->fetch_assoc())){
+      $this->correctionHours += $row['hours'] * intval($row['addOrSub']);      
+    }
   }
 
 private function timeDiff_Hours($from, $to) {

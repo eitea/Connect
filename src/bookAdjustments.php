@@ -72,9 +72,8 @@ echo mysqli_error($conn);
 
 <div class="tab-content">
   <div id="log" class="tab-pane fade <?php if($activeTab == 'log'){echo 'in active';}?>">
-    <div class="container">
+    <div class="container-fluid">
       <form method="POST">
-
         <?php
           if(!$filterID):
             echo "<br><h3> </h3><br><br>";
@@ -145,7 +144,7 @@ echo mysqli_error($conn);
   </div>
   <div id="vac" class="tab-pane fade <?php if($activeTab == 'vac'){echo 'in active';}?>">
     <form method="POST">
-      <div class="container">
+      <div class="container-fluid">
         <form method="POST">
           <?php
             if(!$filterID):

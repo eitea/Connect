@@ -58,10 +58,17 @@ $currentTimeStamp = getCurrentTimestamp();
     <tbody>
       <?php
       $calculator = new Monthly_Calculator($currentTimeStamp, $userID);
-      $calculator->calculateValues();
+
+      if($calculator->correctionHours){
+        echo "<tr style='font-weight:bold;'>";
+        echo "<td>".$lang['CORRECTION']." </td>";
+        echo "<td>".$lang_monthToString[intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
+        echo "<td>" . sprintf('%+.2f', $calculator->correctionHours) . "</td>";
+        echo "</tr>";
+      }
 
       $absolvedHours = array();
-      $accumulatedSaldo = 0;
+      $accumulatedSaldo = $calculator->correctionHours;
       for($i = 0; $i < $calculator->days; $i++){
         if($calculator->end[$i] == '0000-00-00 00:00:00'){
           $endTime = getCurrentTimestamp();
