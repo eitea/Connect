@@ -71,10 +71,20 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
       //if a user did not check in at all, mark him as absent.
       if(empty($row['time'])){
         $row['status'] = '-1';
-        $time_Cell = '<td> - </td>';
-        $timeEnd_Cell = '<td> - </td>';
       } else {
         $time_Cell = '<td>'.substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']),11,5).'</td>';
+      }
+
+      //if a user did not >work< dont display times (no correct core times available)
+      if($row['status'] != 0){
+        $time_Cell = '<td> - </td>';
+        $timeEnd_Cell = '<td> - </td>';
+      }
+
+      if($diff > 10 && $diff != ' - '){ //user was checked in for over 10 hours
+        $diff_Cell = '<td style="color:red;">'.$diff.'</td>';
+      } else {
+        $diff_Cell = "<td>$diff</td>";
       }
 
       //SALDO calculation:
@@ -87,11 +97,6 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
         $saldo_Cell = "<td>$saldo</td>";
       }
 
-      if($diff > 10 && $diff != ' - '){ //user was checked in for over 10 hours
-        $diff_Cell = '<td style="color:red;">'.$diff.'</td>';
-      } else {
-        $diff_Cell = "<td>$diff</td>";
-      }
       $html_bookings .= '<td>'.$lang_activityToString[$row['status']].'</td>'."$time_Cell $timeEnd_Cell $diff_Cell $saldo_Cell</tr>";
     }
     $html_bookings .= "</table>";

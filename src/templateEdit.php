@@ -58,7 +58,7 @@ if($templateName == 'Main_Report'){
 </style>
 
 <form method="POST">
-  <div class="container">
+  <div class="container-fluid">
     <div class="col-xs-10">
       <input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $templateName; ?>" />
     </div>
@@ -67,7 +67,7 @@ if($templateName == 'Main_Report'){
     </div>
   </div>
   <br>
-  <div class="container">
+  <div class="container-fluid">
 
     <div class="col-sm-10" id="droppableDiv" style="max-width:780px;">
       <textarea id="firstPage" name="firstPage"><?php echo $templateContent; ?></textarea>
