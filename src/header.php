@@ -177,7 +177,7 @@ $(document).ready(function() {
         <div class="navbar-right" style="margin-right:10px">
           <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
             <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
-            <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-info"></i></a>
+            <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample"><i class="fa fa-info"></i></a>
             <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
             <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
           </div>
@@ -324,6 +324,7 @@ $(document).ready(function() {
                       </ul>
                     </div>
                   </li>
+                  <li><a <?php if($this_page =='teamConfig.php'){echo $setActiveLink;}?> href="teamConfig.php"><i class="fa fa-share-alt"></i>Teams</a></li>
                   <li>
                     <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
                       <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
@@ -352,7 +353,7 @@ $(document).ready(function() {
               echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
             } elseif($this_page == "reportOptions.php" || $this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
               echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-            } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php") {
+            } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php") {
               echo "<script>document.getElementById('adminOption_CORE').click();</script>";
             }
             ?>

@@ -1,5 +1,4 @@
 <?php
-
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
 $auditLogsTable = "auditLogs";
@@ -20,7 +19,7 @@ $correctionTable = "correctionData";
 $deactivatedUserTable = "DeactivatedUsers";
 $deactivatedUserDataTable = "DeactivatedUserData"; //bookingtable, vacationtable
 $deactivatedUserLogs = "DeactivatedUserLogData";
-$deactivatedUserUnLogs = "DeactivatedUserUnLogData";
+$deactivatedUserUnLogs = "DeactivatedUserUnLogData"; //deleted
 $deactivatedUserProjects = "DeactivatedUserProjectData";
 $deactivatedUserTravels = "DeactivatedUserTravelData";
 
@@ -34,7 +33,7 @@ $mailReportsTable = 'mailReports';
 $mailReportsRecipientsTable = 'mailRecipients';
 $moduleTable = "modules"; //module enable/disable options set by systematic admin
 
-$negative_logTable = "unlogs"; //absent table
+$negative_logTable = "unlogs"; //deleted
 
 $pdfTemplateTable = "templateData";
 $projectTable = "projectData"; //each customer can have projects
@@ -46,6 +45,8 @@ $userTable = "UserData"; //users
 $userRequests = "userRequestsData"; //user requests for vacation
 $roleTable = "roles"; //all roles (admin/canBook)
 
+$teamTable = 'teamData'; //users can be divided into teams
+$teamRelationshipTable = 'teamRelationshipData'; //team to users is a n:m relation
 $travelTable = "travelBookings";
 $travelCountryTable = "travelCountryData"; //for calculation of travel expenses
 

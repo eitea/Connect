@@ -65,6 +65,11 @@ html,body{
   z-index: 20;
   background-color: white;
 }
+
+.modal-body{
+  max-height:80vh;
+  overflow-y:auto;
+}
  /* shrink sidenav if window gets smaller than that */
 @media (max-width: 724px){
   .affix-sidebar{
@@ -78,7 +83,7 @@ html,body{
   padding-top: 12px;
   padding-bottom: 12px;
 }
-.sidebar-nav .navbar li a:hover {
+.sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
   background-color: #428bca;
   color: white;
 }

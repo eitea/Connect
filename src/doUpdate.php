@@ -525,7 +525,6 @@ if($row['version'] < 67){
 
   echo "<br> Removed a few interval-columns from usertable";
 
-
   $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN expectedHours";
   if (!$conn->query($sql)){
     echo mysqli_error($conn);
@@ -556,6 +555,38 @@ if($row['version'] < 70){
     echo mysqli_error($conn);
   } else {
     echo "<br> Added real email Adress to user.";
+  }
+}
+
+if($row['version'] < 71){
+  $sql = "CREATE TABLE $teamTable (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(60),
+    companyID INT(6) UNSIGNED,
+    FOREIGN KEY (companyID) REFERENCES $companyTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created table for teams.";
+  }
+
+  $sql = "CREATE TABLE $teamRelationshipTable (
+    teamID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    FOREIGN KEY (teamID) REFERENCES $teamTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (userID) REFERENCES $userTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br> Created relationship table for teams and users.";
   }
 }
 

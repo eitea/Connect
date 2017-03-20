@@ -40,7 +40,7 @@
   ?>
 
   <h4>SMTP Einstellungen</h4>
-  <div class="container">
+  <div class="container-fluid">
     <br>
     <div class="checkbox col-md-4">
       SMTP Security
@@ -53,7 +53,7 @@
       </select>
     </div>
   </div>
-  <div class="container">
+  <div class="container-fluid">
     <br><br>
     <div class="checkbox col-md-4">
       Absender-Adresse

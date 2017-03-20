@@ -132,7 +132,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
         <form method="post">
           <div class="modal-body">
             Select all users who's data should be included in your report. <br>Leave empty to include all. <br><br>
-            <div class="container checkbox">
+            <div class="container-fluid checkbox">
               <?php
               $users = explode(",", $row['userIDs']);
               $resultUser = $conn->query("SELECT id, firstname, lastname FROM $userTable");
@@ -186,7 +186,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
 
 <hr><h4 style="color:grey; font-weight:bold;"><?php echo $lang['PREVIEW']; ?>:</h4><hr>
 
-<div class="container text-center">
+<div class="container-fluid text-center">
   <?php  echo $templatePreview;  ?>
 </div>
 
