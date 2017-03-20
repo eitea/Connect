@@ -409,6 +409,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
                 $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
 
+                if($calculator_->correctionHours > 0){
+                  $absolvedHoursSUM += $calculator_->correctionHours;
+                } else {
+                  $expectedHoursSUM += $calculator_->correctionHours;
+                }
+
                 $accumulatedSaldo += $differenceSUM;
                 echo "<tr style='font-weight:bold;'>";
                 echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
