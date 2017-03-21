@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'header.php'; enableToCore($userID); ?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -6,6 +6,7 @@
 </div>
 
 <?php
+$teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
   $name = test_input($_POST['createTeam_name']);
   $conn->query("INSERT INTO $teamTable (name) VALUES('$name')");
@@ -21,7 +22,14 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
   $teamID = intval($arr[0]);
   $user = intval($arr[1]);
   $conn->query("DELETE FROM $teamRelationshipTable WHERE userID = $user AND teamID = $teamID");
+} elseif(isset($_POST['hire']) && !empty($_POST['userIDs'])){ //this submit comes from teamConfig_addMembers.php
+  $teamID = intval($_POST['hire']);
+  foreach($_POST['userIDs'] as $x){
+    $sql = "INSERT INTO $teamRelationshipTable (teamID, userID) VALUES ($teamID, $x)";
+    $conn->query($sql);
+  }
 }
+$activeTab = $teamID;
 echo mysqli_error($conn);
 ?>
 
@@ -41,7 +49,7 @@ echo mysqli_error($conn);
         <div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a></div>
         <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button></div>
       </div>
-      <div class="collapse" id="teamCollapse-<?php echo $teamID; ?>">
+      <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
         <div class="panel-body container-fluid">
           <?php
           $userResult = $conn->query("SELECT id, firstname, lastname FROM $userTable JOIN $teamRelationshipTable ON userID = id WHERE teamID = $teamID");
@@ -51,6 +59,7 @@ echo mysqli_error($conn);
           }
           echo mysqli_error($conn);
           ?>
+          <div class="col-md-12 text-right"><a class="btn btn-default" href="teamConfig_addMembers.php?tm=<?php echo $teamID; ?>">+</a></div>
         </div>
       </div>
     </div>
@@ -58,34 +67,33 @@ echo mysqli_error($conn);
   </form>
 </div>
 
-
 <form method="post">
-<div class="modal fade bookingModal-newTeam" tabindex="-1" role="dialog" aria-labelledby="newTeamModal">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">New Team</h4>
-      </div>
-      <div class="modal-body">
-        <label>Name</label>
-        <input type="text" class="form-control" name="createTeam_name" placeholder="Name" /><br>
-        <label>Benutzer</label>
-        <div class="container-fluid checkbox">
-          <?php
-          $result = $conn->query("SELECT id, firstname, lastname FROM $userTable");
-          while($result && ($row = $result->fetch_assoc())){
-            echo '<div class="col-xs-6"><input type="checkbox" name="createTeam_members[]" value="'.$row['id'].'" />'.$row['firstname'].' '.$row['lastname'].'</div>';
-          }
-          ?>
+  <div class="modal fade bookingModal-newTeam" tabindex="-1" role="dialog" aria-labelledby="newTeamModal">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">New Team</h4>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="createTeam" value="<?php echo $x; ?>"><?php echo $lang['ADD']; ?></button>
+        <div class="modal-body">
+          <label>Name</label>
+          <input type="text" class="form-control" name="createTeam_name" placeholder="Name" /><br>
+          <label>Benutzer</label>
+          <div class="container-fluid checkbox">
+            <?php
+            $result = $conn->query("SELECT id, firstname, lastname FROM $userTable");
+            while($result && ($row = $result->fetch_assoc())){
+              echo '<div class="col-xs-6"><input type="checkbox" name="createTeam_members[]" value="'.$row['id'].'" />'.$row['firstname'].' '.$row['lastname'].'</div>';
+            }
+            ?>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="createTeam" value="<?php echo $x; ?>"><?php echo $lang['ADD']; ?></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </form>
 
 <!-- /BODY -->

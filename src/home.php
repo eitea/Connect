@@ -40,7 +40,7 @@ $today = getCurrentTimestamp();
 $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $userID AND endDate IS NULL");
 $row = $result->fetch_assoc();
 $expected_today = floatval($row[strtolower(date('D', strtotime($today)))]);
-$result = $conn->query("SELECT time, timeEnd, breakCredit FROM $logTable WHERE userID = $userID AND time LIKE '".substr($today,0,10)." %'");
+$result = $conn->query("SELECT time, timeEnd, breakCredit FROM $logTable WHERE userID = $userID AND timeEnd ='0000-00-00 00:00:00'");
 $row = $result->fetch_assoc();
 $break_today = floatval($row['breakCredit']);
 if($row['timeEnd'] == '0000-00-00 00:00:00'){

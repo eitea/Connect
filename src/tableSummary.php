@@ -49,12 +49,12 @@
         echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['VACATION'].': </td><td>+'. number_format($vacationHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'. number_format($specialLeaveHours, 2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'. number_format($sickHours, 2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'].': </td><td>-'. $overTimeAdditive . '</td></tr>';
-        echo "<tr><td>".$lang['CORRECTION'].' '.$lang['HOURS'].': </td><td>'. sprintf('%+.2f', $correctionHours) . '</td></tr>';
-        echo "<tr><td style=font-weight:bold;>Sum: </td><td $color>". number_format($theBigSum, 2, '.', '').'</td></tr>';
+        echo '<tr><td>'.$lang['VACATION'] . ': </td><td> +' . number_format($vacationHours, 2, '.', '') . ' </td></tr>';
+        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($specialLeaveHours,2, '.', '').'</td></tr>';
+        echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($sickHours,2,'.','').'</td></tr>';
+        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . ': </td> <td> -' . $overTimeAdditive . ' </td></tr>';
+        echo "<tr><td>".$lang['CORRECTION'].' '.$lang['HOURS'].': </td><td>'.sprintf('%+.2f',$correctionHours).'</td></tr>';
+        echo "<tr><td style='font-weight:bold;'>Sum: </td><td $color>". number_format($theBigSum, 2, '.', ''). '</td></tr>';
         ?>
       </tbody>
     </table>
