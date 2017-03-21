@@ -5,7 +5,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <style>/*  HEADER AND CONTENT  */
 html,body{
   padding-top: 25px;
@@ -48,7 +47,7 @@ function move() {
   var elem = document.getElementById("progress");
   var elem_text = document.getElementById("progress_text");
   var width = 10;
-  var id = setInterval(frame, 20); //call frame() every 20ms
+  var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
   function frame() {
     if (width >= 100) {
       clearInterval(id);
@@ -587,6 +586,28 @@ if($row['version'] < 71){
     echo mysqli_error($conn);
   } else {
     echo "<br> Created relationship table for teams and users.";
+  }
+}
+
+if($row['version'] < 72){
+  $sql = "ALTER TABLE $userRequests MODIFY COLUMN toDate DATETIME";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br>Altert request table to match expansion";
+  }
+  $sql = "ALTER TABLE $userRequests ADD COLUMN requestType ENUM('vac', 'log', 'acc') DEFAULT 'vac'";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br>Expanded request type table";
+  }
+
+  $sql = "ALTER TABLE $configTable ADD COLUMN enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br>Added DB check for enabling self registration";
   }
 }
 

@@ -1,81 +1,28 @@
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
+<link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet">
 <head>
   <title>Login</title>
-  <style>
-  @font-face {
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Montserrat-Regular'), url(http://fonts.gstatic.com/s/montserrat/v7/zhcz-_WihjSQC0oHJ9TCYPk_vArhqVIZ0nv9q090hN8.woff2) format('woff2');
-  }
-  #footer {
-    clear: both;
-    position:fixed;
-    bottom:20%;
-    width:100%;
-    right;
-    padding-top:20px;
-    padding-bottom:20px;
-    text-align: right;
-    background-color: rgba(74, 70, 138, 0.37);
-    border-top:solid;
-    border-bottom:solid;
-  }
-  body{
-    color:white;
-    overflow:hidden;
-    background-image:url(../images/linz.jpg);
-    background-repeat: no-repeat;
-    background-origin: content-box;
-    background-attachment: fixed;
-    background-size:cover;
-  }
-  label{
-    color:white;
-    font-family:sans-serif;
-    font-size:10pt;
-    letter-spacing:1px;
-  }
-  input[name="cancelButton"]{
-    background-color:#ab325a;
-  }
-  input[name="login"]{
-    background-color:#51a33c;
-    margin-right:10%;
-  }
-  input[type=submit]{
-    border:none;
-    color:white;
-    width:100px;
-    padding:8px;
-    font-family:'Montserrat';
-    text-transform: uppercase;
-    font-weight: 400;
-    box-shadow: 0 3px 5px #282828;
-    font-size:8pt;
-    letter-spacing:1px;
-  }
-  input[type=text], input[type=password]{
-    margin-bottom:5px;
-    width:240px;
-    margin-right:10%;
-  }
-  </style>
 </head>
 
 <?php
+//TODO: put a brute-force stopper in here
+if(!empty($_POST['captcha'])){
+  die("");
+}
+
+require 'connection.php';
+require 'createTimestamps.php';
 include 'version_number.php';
 require 'validate.php'; denyToCloud();
+
 //check if this is the first time this app runs
 if(!file_exists('connection_config.php')){
   header("Location: setup_getInput.php");
 }
 $invalidLogin = "";
 if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
-  require 'connection.php';
-  require 'createTimestamps.php';
   $query = "SELECT * FROM  $userTable  WHERE email = '" . strip_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);
   if($result){
@@ -108,6 +55,10 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
     $invalidLogin = "Invalid Username/ Password!";
   }
 }
+
+$result = $conn->query("SELECT enableReg FROM $configTable");
+$rowConfigTable = $result->fetch_assoc();
+
 function strip_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
@@ -118,7 +69,6 @@ function strip_input($data) {
 ?>
 
 <body>
-
   <div id="footer">
     <form method="POST" action="login.php">
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus></input><br>
@@ -127,9 +77,10 @@ function strip_input($data) {
 
       <input type="submit" name="cancelButton" value="Cancel"> <input type="submit" name="login" value="Submit"><br>
 
-      <input type="text" name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
-      <input type="number" id="funZone" name="funZone" style="display:none" readonly>
+      <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
+      <input type="number" id="funZone" name="funZone" style="display:none" readonly><div class="robot-control"> <input type="text" name="captcha" value="" /></div>
     </form>
+    <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a href="selfregistration.php">Register</a>';} ?>
   </div>
 
   <script>
@@ -148,7 +99,7 @@ function strip_input($data) {
   </script>
 
   <div style="position: absolute; bottom: 5px;">
-    <a href=http://www.eitea.at target='_blank' style="color:white;text-decoration: none;">EI-TEA Partner GmbH - <?php echo $VERSION_TEXT; ?></a>
+    <a href=http://www.eitea.at target='_blank'>EI-TEA Partner GmbH - <?php echo $VERSION_TEXT; ?></a>
   </div>
 </body>
 </html>

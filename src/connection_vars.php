@@ -50,6 +50,6 @@ $teamRelationshipTable = 'teamRelationshipData'; //team to users is a n:m relati
 $travelTable = "travelBookings";
 $travelCountryTable = "travelCountryData"; //for calculation of travel expenses
 
-$intervalTable = "intervalData";
+$intervalTable = "intervalData"; //holy grail of grails
 
-$vacationTable = "vacationData"; //each users info on his vacation data
+$vacationTable = "vacationData"; //deleted

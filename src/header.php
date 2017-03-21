@@ -176,14 +176,14 @@ $(document).ready(function() {
         </ul>
         <div class="navbar-right" style="margin-right:10px">
           <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
-            <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
-            <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample"><i class="fa fa-info"></i></a>
-            <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-            <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
-          </div>
+          <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
+          <a class="btn navbar-btn" data-toggle="collapse" href="#collapseExample"><i class="fa fa-info"></i></a>
+          <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+          <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
     <!-- /navbar -->
     <div class="collapse" id="collapseExample">
       <div class="well">

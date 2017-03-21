@@ -6,35 +6,30 @@
 <h3>Register</h3>
 </div>
 
-  <?php
-  $accept = TRUE;
-  $firstname = $lastname = $email = "";
-  $firstnameErr = $lastnameErr = $emailErr = "";
+<?php
+$accept = TRUE;
+$firstname = $lastname = "";
 
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (empty($_POST["firstname"])) {
-      $firstnameErr = "*Name is required";
-      $accept = FALSE;
-    } else {
-      $firstname = test_input($_POST["firstname"]);
-    }
-
-    if (empty($_POST["lastname"])) {
-      $lastnameErr = "*Last name is required";
-      $accept = FALSE;
-    } else {
-      $lastname = test_input($_POST['lastname']);
-    }
-
-    if ($accept) {
-      redirect("register_optionals.php?gn=$firstname&sn=$lastname" );
-    }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST["firstname"])) {
+    $accept = FALSE;
+  } else {
+    $firstname = test_input($_POST["firstname"]);
   }
 
-  ?>
+  if (empty($_POST["lastname"])) {
+    $accept = FALSE;
+  } else {
+    $lastname = test_input($_POST['lastname']);
+  }
 
+  if ($accept) {
+    redirect("register_optionals.php?gn=$firstname&sn=$lastname" );
+  }
+}
+?>
 <form method="post">
-  <div class=container>
+<div class=container>
   <div class="col-md-8">
     <div class="row form-group">
       <div class="input-group">
@@ -53,7 +48,6 @@
     </div>
   </div>
 </div>
-
 </form>
 
 <!-- /BODY -->

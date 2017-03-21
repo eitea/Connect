@@ -175,8 +175,9 @@ $sql = "CREATE TABLE $configTable(
   bookingTimeBuffer INT(3) DEFAULT '5',
   cooldownTimer INT(3) DEFAULT '2',
   enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   masterPassword VARCHAR(100),
-  enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -185,13 +186,14 @@ if (!$conn->query($sql)) {
 $sql = "INSERT INTO $configTable (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
 $conn->query($sql);
 
-
+//status: 0 = open, 1 = declined, 2 = accepted
 $sql = "CREATE TABLE $userRequests(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   userID INT(6) UNSIGNED,
   fromDate DATETIME NOT NULL,
-  toDate DATETIME NOT NULL,
+  toDate DATETIME,
   status ENUM('0', '1', '2') DEFAULT '0',
+  requestType ENUM('vac', 'log', 'acc') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
   FOREIGN KEY (userID) REFERENCES $userTable(id)

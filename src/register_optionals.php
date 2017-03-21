@@ -188,27 +188,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $psw = password_hash($pass, PASSWORD_BCRYPT);
       $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email)
       VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients');";
-      $conn->query($sql);
-      $curID = mysqli_insert_id($conn);
-      echo mysqli_error($conn);
-      //create interval
-      $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
-      VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-      //create roletable
-      $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-      //add relationships
-      if(isset($_POST['company'])){
-        foreach($_POST['company'] as $cmp){
-          $sql = "INSERT INTO $companyToUserRelationshipTable (userID, companyID) VALUES($curID, $cmp)";
-          $conn->query($sql);
+      if($conn->query($sql)){
+        $curID = mysqli_insert_id($conn);
+        echo mysqli_error($conn);
+        //create interval
+        $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
+        VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
+        $conn->query($sql);
+        echo mysqli_error($conn);
+        //create roletable
+        $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
+        $conn->query($sql);
+        echo mysqli_error($conn);
+        //add relationships
+        if(isset($_POST['company'])){
+          foreach($_POST['company'] as $cmp){
+            $sql = "INSERT INTO $companyToUserRelationshipTable (userID, companyID) VALUES($curID, $cmp)";
+            $conn->query($sql);
+          }
         }
+        echo mysqli_error($conn);
+        redirect('editUsers.php');
       }
-      echo mysqli_error($conn);
-      redirect('editUsers.php');
     }
   }
 } //end if post

@@ -40,7 +40,12 @@
     } else {
       $status = 'FALSE';
     }
-    $sql = "UPDATE $configTable SET enableReadyCheck = '$status'";
+    if(isset($_POST['enableReg'])){
+      $regStatus = 'TRUE';
+    } else {
+      $regStatus = 'FALSE';
+    }
+    $sql = "UPDATE $configTable SET enableReadyCheck = '$status', enableReg = '$regStatus'";
     $conn->query($sql);
 
     redirect("advancedOptions.php");
@@ -56,8 +61,6 @@
   $result = $conn->query( "SELECT * FROM $piConnTable");
   $rowPiConnTable = $result->fetch_assoc();
   ?>
-
-
 
   <h4>GitHub</h4>
   <div class="container">
@@ -107,8 +110,19 @@
   </div>
   <br><hr><br>
 
+  <h4>Self Registration</h4>
+  <div class="container">
+    <br>
+    <div class="checkbox col-md-12">
+      <input <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableReg' value='TRUE'>
+      Allow Users to Register themselves
+    </div>
+    <br>
+  </div>
+  <br><hr><br>
+
   <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Save </button>
+    <button type="submit" class="btn btn-warning" name="saveButton">Save </button><br><br><br>
   </div>
 </form>
 
