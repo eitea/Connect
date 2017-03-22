@@ -122,7 +122,7 @@
   <br><hr><br>
 
   <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Save </button><br><br><br>
+    <button type="submit" class="btn btn-warning" name="saveButton">Save </button>
   </div>
 </form>
 

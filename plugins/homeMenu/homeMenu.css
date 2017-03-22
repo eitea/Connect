@@ -32,11 +32,10 @@ i{
 }
 
 /*  HEADER AND CONTENT  */
-body{
+html,body{
   padding-top: 25px;
   font: 13px/1.4 Geneva, 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
-  padding-bottom: 150px;
-  margin-bottom:150px;
+  margin-bottom:50px;
 }
 .panel > .panel-heading a:link {
   color: #6f6f6f;
