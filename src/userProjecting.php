@@ -137,7 +137,7 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
               } else {
-                $icon = "fa fa-send-o"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
+                $icon = "fa fa-star-o"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
               }
 
               echo "<tr>";
