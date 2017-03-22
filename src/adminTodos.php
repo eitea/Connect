@@ -58,7 +58,7 @@ if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
 }
 ?>
 
-<!--VACATION REQUESTS -------------------------------------------------------------------------->
+<!--GENERAL REQUESTS -------------------------------------------------------------------------->
 
 <?php
 $sql ="SELECT * FROM $userRequests WHERE status = '0'";

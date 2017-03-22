@@ -157,7 +157,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $conn->query($sql);
         }
       }
-      //send accessdata if user gets created
+      //create request
+      $conn->query("INSERT INTO $userRequests(userID, fromDate, status, requestType) VALUES($curID, UTC_TIMESTAMP, '0', 'acc')");
+
+      //send accessdata
       require_once "../plugins/phpMailer/class.phpmailer.php";
       require_once "../plugins/phpMailer/class.smtp.php";
       $mail = new PHPMailer();
