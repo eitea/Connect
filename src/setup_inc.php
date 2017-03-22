@@ -196,6 +196,7 @@ $sql = "CREATE TABLE $userRequests(
   requestType ENUM('vac', 'log', 'acc') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
+  requestID INT(10) DEFAULT 0,
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE

@@ -89,17 +89,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['okay_acc'])){ //okay it and redirect to edit user
     $requestID = $_POST['okay_acc'];
     $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
+    redirect("editUsers.php");
   } elseif(isset($_POST['nokay_acc'])){ //delete account
     $requestID = $_POST['nokay_acc'];
     $conn->query("DELETE FROM $userTable WHERE id = $requestID"); //FK dependency will delete all requests etc.
   }
   if(isset($_POST['okay_log'])){
-
+    $requestID = intval($_POST['okay_log']);
+    $result = $conn->query("SELECT * FROM $userRequests WHERE id = $requestID");
+    $row = $result->fetch_assoc();
+    $timeStart = $row['fromDate'];
+    $timeFin = $row['toDate'];
+    $indexIM = $row['requestID'];
+    $user = $row['userID'];
+    if($indexIM != 0){ // 0
+      $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
+    } else { //timestamp doesnt exist
+      $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, breakCredit, status) VALUES('$timeStart', '$timeFin', $user, 0, 0, '0')");
+    }
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_log'])){
-
+    $requestID = $_POST['nokay_log'];
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
+  echo mysqli_error($conn);
 }
-
 ?>
 
 <!--GENERAL REQUESTS -------------------------------------------------------------------------->
@@ -119,7 +135,7 @@ if($result && $result->num_rows > 0):
       <th class="text-center"><?php echo $lang['REPLY_TEXT']; ?></th>
       <tbody>
         <?php
-        $sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
+        $sql = "SELECT $userRequests.*, $userTable.firstname, $userTable.lastname FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
         $result = $conn->query($sql);
         if($result && $result->num_rows > 0){
           while($row = $result->fetch_assoc()){
@@ -135,13 +151,20 @@ if($result && $result->num_rows > 0):
               echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
               echo '<td>'. $row['requestText'].'</td>';
               echo '<td><div class="input-group">';
-              echo '<input type=text class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'log') {
-
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
+              echo '<td>'. $row['requestText'].'</td>';
+              echo '<td><div class="input-group">';
+              echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<span class="input-group-btn">';
+              echo '<button type="submit" class="btn btn-default" name="okay_log" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_log" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
+              echo '</span></div></td>';
             }
             echo '</tr>';
           }

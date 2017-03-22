@@ -32,7 +32,7 @@ function carryOverAdder_Minutes($a, $b) {
     return $a;
   }
   $date = new DateTime($a);
-  if($b<0){
+  if($b < 0){
     $b *= -1;
     $date->sub(new DateInterval("PT".$b."M"));
   } else {

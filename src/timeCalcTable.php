@@ -12,10 +12,66 @@
 <?php
 require 'Calculators/MonthlyCalculator.php';
 $currentTimeStamp = getCurrentTimestamp();
-if(isset($_POST['filterMonth'])){
+if(isset($_POST['newMonth'])){
   $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
 }
+if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty($_POST['request_end'])){
+  $arr = explode(' ', $_POST['request_date']); //0- indexIM, 1- date
+  $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
+  $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+  $requestText = test_input($_POST['request_text']);
+  if(timeDiff_Hours($startTime, $endTime) > 0){
+    $conn->query("INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', ".$arr[0].")");
+  } else {
+    echo '<div class="alert alert-danger fade in">';
+    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo '<strong>Could not create request: </strong>Invalid times.';
+    echo '</div>';
+  }
+}
+echo mysqli_error($conn);
 ?>
+
+<form method="post" id="form1">
+  <div class="row form-group">
+    <div class="col-xs-6">
+      <div class="input-group">
+        <input id="calendar" readonly type="text" class="form-control from" name="newMonth" value= <?php echo substr($currentTimeStamp,0,7); ?> >
+        <span class="input-group-btn">
+          <button class="btn btn-warning" type="submit">Filter</button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <!-- request collapse -->
+  <?php if(isset($_POST['aButton'])): ?>
+    <div class="well">
+      <div class="container-fluid">
+        <div class="col-md-3">
+          <label>ID</label>
+          <input id="request_date" type="text" class="form-control" name="request_date" readonly value="<?php echo test_input($_POST['aButton']); ?>"/>
+        </div>
+        <div class="col-md-2">
+          <label>Neuer Anfang</label>
+          <input type="time" name="request_start" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Neues Ende</label>
+          <input type="time" name="request_end" class="form-control" />
+        </div>
+        <div class="col-md-4">
+          <label>Infotext</label>
+          <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
+        </div>
+        <div class="col-md-1">
+          <label>Okay</label>
+          <button type="submit" class="btn btn-warning" name="request_submit"><?php echo $lang['REQUESTS']; ?></button>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+  <!-- /request collapse -->
+</form>
 <script>
 $("#calendar").datepicker({
   format: "yyyy-mm",
@@ -24,45 +80,6 @@ $("#calendar").datepicker({
 });
 </script>
 
-<form method=post>
-  <div class="row form-group">
-    <div class="col-xs-6">
-      <div class="input-group">
-        <input id="calendar" readonly type="text" class="form-control from" name="newMonth" value= <?php echo substr($currentTimeStamp,0,7); ?> >
-        <span class="input-group-btn">
-          <button class="btn btn-warning" type="submit" name='filterMonth'>Filter</button>
-        </span>
-      </div>
-    </div>
-  </div>
-  <!-- request collapse -->
-  <div class="collapse" id="requestLog_collapse">
-    <div class="well">
-      <div class="container-fluid">
-        <div class="col-md-2">
-          <label>ID</label>
-          <input id="request_date" type="text" class="form-control" name="request_date" readonly />
-        </div>
-        <div class="col-md-3">
-          <label>Neuer Anfang</label>
-          <input type="datetime-local" name="request_start" class="form-control" />
-        </div>
-        <div class="col-md-3">
-          <label>Neues Ende</label>
-          <input type="datetime-local" name="request_end" class="form-control" />
-        </div>
-        <div class="col-md-4">
-          <label>Infotext</label>
-          <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
-        </div>
-        <div class="col-md-12 text-right">
-          <br><br><button type="submit" class="btn btn-warning" name="request_submit"><?php echo $lang['REQUESTS']; ?></button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- /request collapse -->
-</form>
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
@@ -138,7 +155,7 @@ $("#calendar").datepicker({
         echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
-        echo "<td><a class='btn btn-default' data-toggle='collapse' href='#requestLog_collapse' onclick='$(\"#request_date\").val(\"".$calculator->indecesIM[$i]."\");'><i class='fa fa-pencil'></i></a></td>";
+        echo "<td><button type='submit' form='form1' class='btn btn-default' value='".$calculator->indecesIM[$i].' '.$calculator->date[$i]."' name='aButton' ><i class='fa fa-pencil'></i></button></td>";
         echo "</tr>";
       }
       ?>

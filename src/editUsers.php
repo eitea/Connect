@@ -618,11 +618,10 @@ $(document).ready(function(){
                 </div>
               </div>
               <br><br>
-            </form>
 
             <!-- Delete confirm modal -->
             <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-              <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-dialog modal-md" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title">Do you really wish to delete <?php echo $firstname.' '.$lastname; ?> ?</h4>
@@ -637,6 +636,8 @@ $(document).ready(function(){
                 </div>
               </div>
             </div>
+
+            </form>
             <!-- /CONTENT -->
           </div>
         </div>
