@@ -11,6 +11,11 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
     "sick" => "Sick",
     "ZA" => "Time Balance"
   );
+  $lang_requestToString = array(
+    "vac" => "Vacation",
+    "acc" => "New Account",
+    "log" => "Time Change"
+  );
   $lang_weeklyDayToString = array(
     "mon" => "Monday",
     "tue" => "Tuesday",
@@ -80,6 +85,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CHARGED'] = 'Charged';
   $lang['CHECK_IN'] = 'Check In';
   $lang['CHECK_OUT'] = 'Check Out';
+  $lang['CHECKLIST'] = 'Checklist';
   $lang['CLIENT'] = 'Client';
   $lang['CLIENTS'] = 'Clients';
   $lang['COMPANIES'] = 'Companies';
@@ -175,6 +181,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
   $lang['READY_STATUS'] = 'Ready Status';
+  $lang['REASON'] = 'Reason';
   $lang['RECALCULATE_VACATION'] = 'Recalculate Accumulated Vacation';
   $lang['RECIPIENTS'] = 'Recipients';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
@@ -242,6 +249,11 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
     "sick" => "Krank",
     "ZA" => "Zeitausgleich"
   );
+  $lang_requestToString = array(
+    "vac" => "Urlaub",
+    "acc" => "Neuer Account",
+    "log" => "Zeitänderung"
+  );
   $lang_weeklyDayToString = array(
     "mon" => "Montag",
     "tue" => "Dienstag",
@@ -297,6 +309,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CHARGED'] = 'Verrechnet';
   $lang['CHECK_IN'] = 'Einstempeln';
   $lang['CHECK_OUT'] = 'Ausstempeln';
+  $lang['CHECKLIST'] = 'Checkliste';
   $lang['CLIENT'] = 'Kunde';
   $lang['CLIENTS'] = 'Kunden';
   $lang['COMPANY'] = 'Mandant';
@@ -393,6 +406,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PROJECT_INFORMATION'] = 'Reports';
 
   $lang['READY_STATUS'] = 'Bereitschaftsstatus';
+  $lang['REASON'] = 'Grund';
   $lang['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
   $lang['RECIPIENTS'] = 'Empfänger';
   $lang['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';

@@ -68,16 +68,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<td>'. $row['requestText'].'</td>';
         echo '<td>'; ?>
           <div class="form-group">
-              <div class="input-group">
-                <input type=text class="form-control" name="answerText<?php echo $row['id']; ?>" placeholder="Reply... (Optional)" />
-                <span class="input-group-btn">
-                  <button type="submit" class="btn btn-default" name="okay" value="<?php echo $row['id']; ?>" > <img width=18px height=18px src="../images/okay.png"> </button>
-                  <button type="submit" class="btn btn-default" name="nokay" value="<?php echo $row['id']; ?>"> <img width=18px height=18px src="../images/not_okay.png"> </button>
-                </span>
-              </div><!-- /input-group -->
+            <div class="input-group">
+              <input type=text class="form-control" name="answerText<?php echo $row['id']; ?>" placeholder="Reply... (Optional)" />
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-default" name="okay" value="<?php echo $row['id']; ?>" > <img width=18px height=18px src="../images/okay.png"> </button>
+                <button type="submit" class="btn btn-default" name="nokay" value="<?php echo $row['id']; ?>"> <img width=18px height=18px src="../images/not_okay.png"> </button>
+              </span>
+            </div><!-- /input-group -->
           </div>
         <?php echo '</td>';
-
         echo '</tr>';
       }
     }

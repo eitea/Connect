@@ -594,13 +594,19 @@ if($row['version'] < 72){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
-    echo "<br>Altert request table to match expansion";
+    echo "<br>Alter request table to match expansion";
   }
   $sql = "ALTER TABLE $userRequests ADD COLUMN requestType ENUM('vac', 'log', 'acc') DEFAULT 'vac'";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } else {
     echo "<br>Expanded request type table";
+  }
+  $sql="ALTER TABLE $userRequests ADD COLUMN requestID INT(10) DEFAULT 0";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo "<br>Added volatile request ID to request Table";
   }
 
   $sql = "ALTER TABLE $configTable ADD COLUMN enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";

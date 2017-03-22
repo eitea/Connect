@@ -7,55 +7,99 @@
 </div>
 <?php
 
-//illegal lunchbreaks
-if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
-  foreach($_POST['lunchbreakIndeces'] as $indexIM){
-    $result = $conn->query("SELECT pauseAfterHours, hoursOfRest FROM $intervalTable WHERE userID = $uId AND endDate IS NULL");
-    if($result && ($row = $result->fetch_assoc())){
-      $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
-      $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
-      $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
-      $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM");
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  //illegal lunchbreaks
+  if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
+    foreach($_POST['lunchbreakIndeces'] as $indexIM){
+      $result = $conn->query("SELECT pauseAfterHours, hoursOfRest FROM $intervalTable WHERE userID = $uId AND endDate IS NULL");
+      if($result && ($row = $result->fetch_assoc())){
+        $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
+        $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
+        $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
+        $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM");
+        echo mysqli_error($conn);
+      }
+    }
+  }
+  //repair forgotten check outs
+  if(isset($_POST['autoCorrect']) && !empty($_POST['autoCorrects'])){
+    foreach($_POST['autoCorrects'] as $indexIM){
+      $result = $conn->query("SELECT $intervalTable.*, $logTable.time FROM $logTable, $intervalTable WHERE indexIM = $indexIM AND $logTable.userID = $intervalTable.userID AND endDate IS NULL");
+      $row = $result->fetch_assoc();
+      //date for query in projectbookingTable
+      $date = substr($row['time'],0,10);
+      //first, match expectedHours. if user has booking, overwrite this var
+      $adjustedTime = carryOverAdder_Hours($row['time'], floor($row[strtolower(date('D', strtotime($row['time'])))]));
+      $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row[strtolower(date('D', strtotime($row['time'])))] * 60) % 60));
+
+      //adjust to match expectedHours OR last projectbooking, if any of these even exist
+      $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
+      if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
+        $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
+        WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
+        $result = mysqli_query($conn, $sql);
+        if ($result && $result->num_rows > 0) { //does a booking exist?
+          $rowLastBooking = $result->fetch_assoc();
+          $adjustedTime = $rowLastBooking['end']; //adjust break later.
+        }
+      }
+      $conn->query("UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM = $indexIM");
       echo mysqli_error($conn);
     }
   }
-}
-
-//repair forgotten check outs
-if(isset($_POST['autoCorrect']) && !empty($_POST['autoCorrects'])){
-  foreach($_POST['autoCorrects'] as $indexIM){
-    $result = $conn->query("SELECT $intervalTable.*, $logTable.time FROM $logTable, $intervalTable WHERE indexIM = $indexIM AND $logTable.userID = $intervalTable.userID AND endDate IS NULL");
-    $row = $result->fetch_assoc();
-    //date for query in projectbookingTable
-    $date = substr($row['time'],0,10);
-    //first, match expectedHours. if user has booking, overwrite this var
-    $adjustedTime = carryOverAdder_Hours($row['time'], floor($row[strtolower(date('D', strtotime($row['time'])))]));
-    $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row[strtolower(date('D', strtotime($row['time'])))] * 60) % 60));
-
-    //adjust to match expectedHours OR last projectbooking, if any of these even exist
-    $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
-    if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
-      $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
-      WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
-      $result = mysqli_query($conn, $sql);
-      if ($result && $result->num_rows > 0) { //does a booking exist?
-        $rowLastBooking = $result->fetch_assoc();
-        $adjustedTime = $rowLastBooking['end']; //adjust break later.
-      }
+  //gemini
+  if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
+    foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
+      $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
+      $conn->query($sql);
+      echo mysqli_error($conn);
     }
-    $conn->query("UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM = $indexIM");
-    echo mysqli_error($conn);
+  }
+  //user Requests
+  if(isset($_POST['okay'])){
+    $requestID = $_POST['okay'];
+    $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
+    WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
+    if($result && ($row = $result->fetch_assoc())){
+      $i = $row['fromDate'];
+      $days = (timeDiff_Hours($i, $row['toDate'])/24) + 1; //days
+      for($j = 0; $j < $days; $j++){
+        $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
+        if($expected != 0){ //only insert if expectedHours != 0
+          $expectedHours = floor($expected);
+          $expectedMinutes = ($expected * 60) % 60;
+          $i2 = carryOverAdder_Hours($i, $expectedHours);
+          $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
+          $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', 0)";
+          $conn->query($sql);
+          echo mysqli_error($conn);
+        }
+        $i = carryOverAdder_Hours($i, 24);
+      }
+      $answerText = test_input($_POST['answerText'. $requestID]); //inputs are always set
+      $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+    } else {
+      echo $conn->error;
+    }
+  } elseif(isset($_POST['nokay'])){
+    $requestID = $_POST['nokay'];
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
+  }
+  if(isset($_POST['okay_acc'])){ //okay it and redirect to edit user
+    $requestID = $_POST['okay_acc'];
+    $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
+  } elseif(isset($_POST['nokay_acc'])){ //delete account
+    $requestID = $_POST['nokay_acc'];
+    $conn->query("DELETE FROM $userTable WHERE id = $requestID"); //FK dependency will delete all requests etc.
+  }
+  if(isset($_POST['okay_log'])){
+
+  } elseif(isset($_POST['nokay_log'])){
+
   }
 }
 
-//gemini
-if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
-  foreach(array_unique($_POST['geminiIndeces']) as $indexIM){
-    $sql = "DELETE FROM $logTable WHERE indexIM = $indexIM";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-  }
-}
 ?>
 
 <!--GENERAL REQUESTS -------------------------------------------------------------------------->
@@ -64,14 +108,50 @@ if(isset($_POST['deleteGemini']) && !empty($_POST['geminiIndeces'])){
 $sql ="SELECT * FROM $userRequests WHERE status = '0'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0):
-  ?>
-  <h4> <?php echo $lang['UNANSWERED_REQUESTS']; ?>: </h4>
-
-  <?php
-  echo $result->num_rows . " Urlaubsanfrage: ";
-  echo "<a href=allowVacations.php > Beantworten</a><br><hr><br>";
-endif;
+  echo '<h4>'.$lang['UNANSWERED_REQUESTS'].': </h4><br>';
 ?>
+  <form method="POST">
+    <table class="table table-hover">
+      <th>Request Type</th>
+      <th>Name</th>
+      <th><?php echo $lang['DATE']; ?></th>
+      <th><?php echo $lang['REASON']; ?></th>
+      <th class="text-center"><?php echo $lang['REPLY_TEXT']; ?></th>
+      <tbody>
+        <?php
+        $sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
+        $result = $conn->query($sql);
+        if($result && $result->num_rows > 0){
+          while($row = $result->fetch_assoc()){
+            echo '<tr>';
+            echo '<td>'. $lang_requestToString[$row['requestType']].'</td>';
+            echo '<td>'. $row['firstname']. ' ' .$row['lastname'] . '</td>';
+            if($row['requestType'] == 'acc'){
+              echo '<td>'. substr($row['fromDate'],0,10). '</td>';
+              echo '<td> --- </td>';
+              echo '<td class="text-center"><button type="submit" class="btn btn-default" name="okay_acc" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_acc" value="'.$row['userID'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button></td>';
+            } elseif($row['requestType'] == 'vac') {
+              echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
+              echo '<td>'. $row['requestText'].'</td>';
+              echo '<td><div class="input-group">';
+              echo '<input type=text class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<span class="input-group-btn">';
+              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
+              echo '</span></div></td>';
+            } elseif($row['requestType'] == 'log') {
+
+            }
+            echo '</tr>';
+          }
+        }
+        ?>
+     </tbody>
+    </table>
+  </form>
+<br><hr><br>
+<?php endif; ?>
 
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
 

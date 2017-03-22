@@ -12,15 +12,19 @@
 <?php
 require 'Calculators/MonthlyCalculator.php';
 $currentTimeStamp = getCurrentTimestamp();
+if(isset($_POST['filterMonth'])){
+  $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
+}
 ?>
+<script>
+$("#calendar").datepicker({
+  format: "yyyy-mm",
+  viewMode: "months",
+  minViewMode: "months"
+});
+</script>
 
 <form method=post>
-  <?php
-  if(isset($_POST['filterMonth'])){
-    $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
-  }
-  ?>
-
   <div class="row form-group">
     <div class="col-xs-6">
       <div class="input-group">
@@ -28,18 +32,36 @@ $currentTimeStamp = getCurrentTimestamp();
         <span class="input-group-btn">
           <button class="btn btn-warning" type="submit" name='filterMonth'>Filter</button>
         </span>
-      </div><!-- /input-group -->
-    </div><!-- /.col-lg-6 -->
+      </div>
+    </div>
   </div>
-
-  <script>
-  $("#calendar").datepicker({
-    format: "yyyy-mm",
-    viewMode: "months",
-    minViewMode: "months"
-  });
-  </script>
-
+  <!-- request collapse -->
+  <div class="collapse" id="requestLog_collapse">
+    <div class="well">
+      <div class="container-fluid">
+        <div class="col-md-2">
+          <label>ID</label>
+          <input id="request_date" type="text" class="form-control" name="request_date" readonly />
+        </div>
+        <div class="col-md-3">
+          <label>Neuer Anfang</label>
+          <input type="datetime-local" name="request_start" class="form-control" />
+        </div>
+        <div class="col-md-3">
+          <label>Neues Ende</label>
+          <input type="datetime-local" name="request_end" class="form-control" />
+        </div>
+        <div class="col-md-4">
+          <label>Infotext</label>
+          <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
+        </div>
+        <div class="col-md-12 text-right">
+          <br><br><button type="submit" class="btn btn-warning" name="request_submit"><?php echo $lang['REQUESTS']; ?></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /request collapse -->
 </form>
 <div class="table-responsive">
   <table class="table table-striped">
@@ -54,6 +76,7 @@ $currentTimeStamp = getCurrentTimestamp();
       <th><?php echo $lang['IS_TIME']?></th>
       <th><?php echo $lang['DIFFERENCE']?></th>
       <th>Saldo</th>
+      <th></th>
     </thead>
     <tbody>
       <?php
@@ -115,6 +138,7 @@ $currentTimeStamp = getCurrentTimestamp();
         echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
+        echo "<td><a class='btn btn-default' data-toggle='collapse' href='#requestLog_collapse' onclick='$(\"#request_date\").val(\"".$calculator->indecesIM[$i]."\");'><i class='fa fa-pencil'></i></a></td>";
         echo "</tr>";
       }
       ?>
