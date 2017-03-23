@@ -65,6 +65,7 @@ echo mysqli_error($conn);
 
 <br><br><br>
 
+<?php if($filterID): ?>
 <ul class="nav nav-tabs">
   <li <?php if($activeTab == 'log'){echo 'class="active"';}?>><a data-toggle="tab" href="#log"><?php echo $lang['HOURS']; ?></a></li>
   <li <?php if($activeTab == 'vac'){echo 'class="active"';}?>><a data-toggle="tab" href="#vac"><?php echo $lang['VACATION']; ?></a></li>
@@ -74,11 +75,7 @@ echo mysqli_error($conn);
   <div id="log" class="tab-pane fade <?php if($activeTab == 'log'){echo 'in active';}?>">
     <div class="container-fluid">
       <form method="POST">
-        <?php
-          if(!$filterID):
-            echo "<br><h3> </h3><br><br>";
-          else:
-             echo "<br><h3>$filterName - <small>".$lang['TIMES']."</small></h3><br><br>"; ?>
+        <?php echo "<br><h3>$filterName - <small>".$lang['TIMES']."</small></h3><br><br>"; ?>
 
           <input type="text" readonly style="display:none" name="filterUserID" value="<?php echo "$filterID, $filterName"; ?>" />
           <div class="row">
@@ -138,7 +135,6 @@ echo mysqli_error($conn);
             </tbody>
           </table>
           <br><br>
-        <?php endif; ?>
       </form>
     </div>
   </div>
@@ -146,11 +142,7 @@ echo mysqli_error($conn);
     <form method="POST">
       <div class="container-fluid">
         <form method="POST">
-          <?php
-            if(!$filterID):
-              echo "<br><h3> </h3><br><br>";
-            else:
-              echo "<br><h3>$filterName - <small>".$lang['VACATION']."</small></h3><br><br>"; ?>
+          <?php echo "<br><h3>$filterName - <small>".$lang['VACATION']."</small></h3><br><br>"; ?>
 
             <input type="text" readonly style="display:none" name="filterUserID" value="<?php echo "$filterID, $filterName"; ?>" />
             <div class="row">
@@ -212,17 +204,10 @@ echo mysqli_error($conn);
               </tbody>
             </table>
             <br><br>
-          <?php endif; ?>
         </form>
       </div>
     </form>
   </div>
 </div>
-
-<?php if(!$filterID): ?>
-<br><br><br><br><br><br>
-<br><br>
-<br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br>
 <?php endif; ?>
 <?php include 'footer.php'; ?>

@@ -2,17 +2,17 @@
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 <style>
-canvas{
+#statisticChart, #analysisChart{
   margin:50px 0px 50px 0px;
 }
 </style>
 
-<div class="container-fluid">
+<div class="container">
   <div class="col-md-6">
-    <canvas id="analysisChart" width="200" height="100"></canvas>
+    <canvas id="analysisChart" width="200" height="100" style="max-width:400px; max-height:200px;"></canvas>
   </div>
   <div class="col-md-6">
-    <canvas id="statisticChart" width="200" height="100"></canvas>
+    <canvas id="statisticChart" width="200" height="100" style="max-width:400px; max-height:200px;" ></canvas>
   </div>
 </div>
 
@@ -21,7 +21,7 @@ $curID = $userID;
 include 'tableSummary.php'; //this is how it goes
 
 $mean_mon = $mean_tue = $mean_wed = $mean_thu = $mean_fri = $mean_sat = $mean_sun = 0;
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = 5 AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_mon = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows); }
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 1 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_tue = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
@@ -64,63 +64,83 @@ $surplus_today = sprintf('%.2f', $surplus_today);
 ?>
 
 <script>
-var ctx_analysis = document.getElementById("analysisChart");
-var myAnalysisChart = new Chart(ctx_analysis, {
-  type: 'horizontalBar',
-  options: {
-    legend:{
-      display: false
+$(function(){
+  var ctx_analysis = document.getElementById("analysisChart");
+  var myAnalysisChart = new Chart(ctx_analysis, {
+    type: 'horizontalBar',
+    options: {
+      legend:{
+        display: false
+      },
+      title:{
+        display:true,
+        text: 'Durchschnittliche Stunden'
+      }
     },
-    title:{
-      display:true,
-      text: 'Durchschnittliche Stunden'
-    }
-  },
-  data: {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [{
-      label: "Mittel",
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.5)',
-        'rgba(54, 162, 235, 0.5)',
-        'rgba(255, 206, 86, 0.5)',
-        'rgba(75, 192, 192, 0.5)',
-        'rgba(153, 102, 255, 0.5)'
-      ],
-      data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
-    }
-  ]}
-});
+    data: {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      datasets: [{
+        label: "Mittel",
+        backgroundColor: [
+          'rgba(255, 99, 169, 0.5)',
+          'rgba(90, 163, 231, 0.5)',
+          'rgba(189, 209, 71, 0.5)',
+          'rgba(75, 192, 192, 0.5)',
+          'rgba(154, 125, 210, 0.5)'
+        ],
+        data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
+      }
+    ]}
+  });
 
-var ctx_statistic = document.getElementById("statisticChart");
-var myStatisticChart = new Chart(ctx_statistic, {
-  type: 'doughnut',
-  data: {
-    labels: [
-      "Absolviert",
-      "Pause",
-      "Erwartet",
-      "Überstunden"
-    ],
-    datasets: [{
-      data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],
-      backgroundColor: [
-        "#fba636",
-        "#75bdee",
-        "#828282",
-        "#7fcb51"
-      ]
-    }]
-  },
-  options: {
-    legend:{
-      display: false
+  var ctx_statistic = document.getElementById("statisticChart");
+  var myStatisticChart = new Chart(ctx_statistic, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        "Absolviert",
+        "Pause",
+        "Erwartet",
+        "Überstunden"
+      ],
+      datasets: [{
+        data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],
+        backgroundColor: [
+          "#fba636",
+          "#75bdee",
+          "#828282",
+          "#7fcb51"
+        ]
+      }]
     },
-    title: {
-      display: true,
-      text: 'Heute'
+    options: {
+      legend:{
+        display: false
+      },
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItems, data) {
+            return ' ' + data.labels[tooltipItems.index] +': ' + Math.round(data.datasets[0].data[tooltipItems.index]*100)/100 + 'h';
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: 'Heute'
+      }
     }
-  }
+  });
+  //increase values every 3 minutes, by 3 minutes
+  window.setInterval(function(){
+    if(myStatisticChart.data.datasets[0].data[2] > 0){
+      myStatisticChart.data.datasets[0].data[0] += 0.05; //0,05h = 3min
+      myStatisticChart.data.datasets[0].data[2] -= 0.05;
+    } else {
+      myStatisticChart.data.datasets[0].data[2] = 0;
+      myStatisticChart.data.datasets[0].data[3] += 0.05;
+    }
+    myStatisticChart.update(); //Calling update now animates the new positions
+  }, 180000);
 });
 </script>
 

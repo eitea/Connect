@@ -15,7 +15,6 @@
 
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
   <script src='../plugins/select2/js/select2.js'></script>
-
   <title>T-Time</title>
 </head>
 <script>
@@ -234,7 +233,6 @@ $(document).ready(function() {
       $row = $result->fetch_assoc();
       $cd = $row['cooldownTimer'];
     }
-
     //display checkin or checkout + disabled
     $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";
     $result = mysqli_query($conn, $query);
@@ -248,7 +246,7 @@ $(document).ready(function() {
         $disabled = 'disabled';
       }
       $buttonVal = $lang['CHECK_OUT'];
-      $checkInButton =  "<li><br><div class=container-fluid><form method=post><button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button></form></div><br></li>";
+      $checkInButton =  "<li><br><div class='container-fluid'><form method=post><button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button></form></div><br></li>";
       $showProjectBookingLink = TRUE;
     } else {
       $today = getCurrentTimestamp();
@@ -273,7 +271,6 @@ $(document).ready(function() {
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
           <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
-
             <!-- User-Section: BASIC -->
             <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
             <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
@@ -429,11 +426,18 @@ $(document).ready(function() {
                 <div class="panel-body">
                   <ul class="nav navbar-nav">
                     <li><a target="_blank" href="sendMailReport.php"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
+                    <li><a <?php if($this_page =='report_productivity.php'){echo $setActiveLink;}?> href="report_productivity.php"><i class="fa fa-bar-chart"></i><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
                   </ul>
                 </div>
               </div>
             </div>
             <br>
+            <?php
+            if($this_page == "report_productivity.php"){
+              echo "<script>$('#adminOption_REPORT').click();</script>";
+            }
+            ?>
+
           <?php endif; ?>
         </div> <!-- /accordions -->
         <br><br><br>

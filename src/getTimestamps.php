@@ -153,7 +153,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </select>
       <br><br>
     </div>
-    <div class="col-md-3 text-right">
+    <div class="col-md-3 text-right"> <!-- Filter User -->
       <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
         <?php
         $query = "SELECT * FROM $userTable;";
@@ -169,7 +169,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         ?>
       </select>
-      <br><br>
+      <br><br>              <!-- Filter Status -->
       <select name='filterStatus' style="width:100px" class="js-example-basic-single">
         <option value="" >---</option>
         <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang_activityToString[0]; ?></option>

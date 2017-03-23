@@ -39,7 +39,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 
 <form method="post">
-
   <div class=container-fluid>
     LDAP Configuration Settings: <br><br>
     <div class=form-group>
@@ -63,8 +62,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <button type="submit" class="btn btn-warning" name="ldapSubmit">Save</button><br>
     </div>
     <br><br><br>
-
-
   </form>
 
   <!-- /BODY -->

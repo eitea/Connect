@@ -103,12 +103,19 @@ $("#calendar").datepicker({
         echo "<tr style='font-weight:bold;'>";
         echo "<td>".$lang['CORRECTION']." </td>";
         echo "<td>".$lang_monthToString[intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
-        echo "<td>" . sprintf('%+.2f', $calculator->correctionHours) . "</td>";
+        echo "<td>".sprintf('%+.2f', $calculator->correctionHours)."</td><td></td>";
+        echo "</tr>";
+      }
+      if($calculator->overTimeLump){
+        echo "<tr style='font-weight:bold;'>";
+        echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
+        echo "<td>-</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
+        echo "<td> -".$calculator->overTimeLump."</td><td></td>";
         echo "</tr>";
       }
 
       $absolvedHours = array();
-      $accumulatedSaldo = $calculator->correctionHours;
+      $accumulatedSaldo = $calculator->correctionHours - $calculator->overTimeLump;
       for($i = 0; $i < $calculator->days; $i++){
         if($calculator->end[$i] == '0000-00-00 00:00:00'){
           $endTime = getCurrentTimestamp();

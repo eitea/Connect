@@ -176,6 +176,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PREVIEW'] = 'Preview';
   $lang['PRODUCTIVE'] = 'Productive';
   $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
+  $lang['PRODUCTIVITY'] = 'Productivity';
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -401,6 +402,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PREVIEW'] = 'Vorschau';
   $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
+  $lang['PRODUCTIVITY'] = 'Produktivität';
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';
