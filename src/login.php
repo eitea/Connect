@@ -56,8 +56,12 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
   }
 }
 
+$rowConfigTable['enableReg'] = FALSE;
 $result = $conn->query("SELECT enableReg FROM $configTable");
-$rowConfigTable = $result->fetch_assoc();
+if($result && $result->num_rows > 0){
+  $rowConfigTable = $result->fetch_assoc();
+}
+
 
 function strip_input($data) {
   $data = trim($data);
