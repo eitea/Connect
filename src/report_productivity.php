@@ -56,6 +56,11 @@ $("#calendar").datepicker({
   viewMode: "days",
   minViewMode: "days"
 });
+$("#calendar2").datepicker({
+  format: "yyyy-mm-dd",
+  viewMode: "days",
+  minViewMode: "days"
+});
 </script>
 <br><br>
 
