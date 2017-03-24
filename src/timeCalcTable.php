@@ -2,9 +2,6 @@
 <?php enableToStamps($userID);?>
 <!-- BODY -->
 
-<link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
-<script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
-
 <div class="page-header">
   <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
 </div>

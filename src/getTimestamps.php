@@ -166,7 +166,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               <tbody>
                 <?php
                 $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
-                $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $differenceSUM = $accumulatedSaldo = 0;
+                $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $accumulatedSaldo = 0;
                 for($i = 0; $i < $calculator->days; $i++){
                   //filterStatus, let's just skip all those taht dont fit?
                   if($filterStatus !== '' && $calculator->activity[$i] != $filterStatus) continue;
@@ -311,66 +311,71 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   $lunchbreakSUM += $calculator->lunchTime[$i];
                   $expectedHoursSUM += $calculator->shouldTime[$i];
                   $absolvedHoursSUM += $difference - $calculator->lunchTime[$i];
-                  $differenceSUM += $theSaldo;
                 } //endfor
+
+                //partial sum
+                echo '<tr class="blank_row"><td colspan="12"></td><tr>';
+                echo "<tr style='font-weight:bold;'>";
+                echo "<td colspan='2'>Zwischensumme:* </td>";
+                echo "<td></td>";
+                echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
+                echo "<td></td><td></td><td></td>";
+                echo "<td>".displayAsHoursMins($expectedHoursSUM)."</td>";
+                echo "<td>".displayAsHoursMins($absolvedHoursSUM)."</td>";
+                echo "<td> = </td>";
+                echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
+                echo "<td></td></tr>";
 
                 //correctionHours
                 $accumulatedSaldo += $calculator->correctionHours;
                 echo "<tr>";
-                echo "<td style='font-weight:bold;'>".$lang['CORRECTION'].":* </td>";
+                echo "<td>".$lang['CORRECTION'].":* </td>";
                 echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
-                echo "<td style='color:#9222cc'>" . sprintf('%+.2f', $calculator->correctionHours) . "</td>";
-                echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
+                echo "<td style='color:#9222cc'>" . displayAsHoursMins($calculator->correctionHours) . "</td>";
+                echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
                 echo "<td></td></tr>";
 
                 //overTimeLump
                 $accumulatedSaldo -= $calculator->overTimeLump;
                 echo "<tr>";
-                echo "<td style='font-weight:bold;' colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
+                echo "<td colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
                 echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
-                echo "<td style='color:#fc8542;'>-" . sprintf('%.2f', $calculator->overTimeLump) . "</td>"; //its always negative. always.
-                echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
-                echo "<td></td></tr>";
-
-                //summary
-                $differenceSUM += $calculator->correctionHours;
-                $differenceSUM -= $calculator->overTimeLump;
-                echo "<tr>";
-                echo "<td style='font-weight:bold;'>".$lang['SUM'].":* </td>";
-                echo "<td></td><td></td>";
-                echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
-                echo "<td></td><td></td><td></td>";
-                echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
-                echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
-                echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
-                echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
+                echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($calculator->overTimeLump) . "</td>"; //its always negative. always.
+                echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
                 echo "<td></td></tr>";
 
                 //get saldo from aall the previous days
-                $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
+                $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -48), $x);
+
+                $p_shouldTime = array_sum($calculator_P->shouldTime) + $calculator_P->overTimeLump;
+                $p_isTime = array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) + $calculator_P->correctionHours;
+                $accumulatedSaldo += $p_isTime - $p_shouldTime;
+
+                echo "<tr style='color:#626262;'>";
+                echo "<td colspan='2'>Vorheriges Saldo:* </td>";
+                echo "<td></td>";
+                echo "<td>".displayAsHoursMins(array_sum($calculator_P->lunchTime))."</td>";
+                echo "<td></td><td></td><td></td>";
+                echo "<td>".displayAsHoursMins($p_shouldTime)."</td>";
+                echo "<td>".displayAsHoursMins($p_isTime)."</td>";
+                echo "<td>".displayAsHoursMins($p_isTime - $p_shouldTime)."</td>";
+                echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
+                echo "<td></td></tr>";
 
                 $lunchbreakSUM += array_sum($calculator_P->lunchTime);
-                $expectedHoursSUM += array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
-                if(substr($filterDateFrom,8,2) != '01') {$expectedHoursSUM += $calculator->overTimeLump;} //add overTimeLump back, so it wont get subtracted twice for the same month.
-                $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
-                $differenceSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) - array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
+                $expectedHoursSUM += $p_shouldTime;
+                $absolvedHoursSUM += $p_isTime;
 
-                if($calculator_P->correctionHours > 0){
-                  $absolvedHoursSUM += $calculator_P->correctionHours;
-                } else {
-                  $expectedHoursSUM += $calculator_P->correctionHours;
-                }
-
-                $accumulatedSaldo += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) - array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
+                echo '<tr class="blank_row"><td colspan="12"></td><tr>';
                 echo "<tr style='font-weight:bold;'>";
-                echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
+                echo "<td colspan='2'>Summe:* </td>";
                 echo "<td></td>";
-                echo "<td>".sprintf('%.2f',$lunchbreakSUM)."</td>";
+                echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
                 echo "<td></td><td></td><td></td>";
-                echo "<td>".sprintf('%.2f',$expectedHoursSUM)."</td>";
-                echo "<td>".sprintf('%.2f',$absolvedHoursSUM)."</td>";
-                echo "<td>".sprintf('%+.2f',$differenceSUM)."</td>";
-                echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
+                echo "<td>".displayAsHoursMins($expectedHoursSUM)."</td>";
+                echo "<td>".displayAsHoursMins($absolvedHoursSUM)."</td>";
+                echo "<td> = </td>";
+                echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
                 echo "<td></td></tr>";
                 ?>
                 <tr><td colspan="12"><small>*Angaben in Stunden</small></td></tr>

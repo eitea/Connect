@@ -32,8 +32,8 @@ class Interval_Calculator{
     $this->from = substr($from, 0, 10).' 12:00:00';
     $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = (timeDiff_Hours($from, $to) / 24) +1; //include the to date.
-    if($this->days > 0){
+    $this->days = (timeDiff_Hours($from, $to) / 24)+1;
+    if($this->days > 1){
       $this->calculateValues();
     }
   }

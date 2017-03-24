@@ -83,7 +83,7 @@ function displayAsHoursMins($hour){
     $s .= intval($hours) . 'h ';
     $hours = $hours - intval($hours);
   }
-  $s .= intval($hours * 60) .'min';
+  $s .= round($hours * 60) .'min';
   return $s;
 }
 

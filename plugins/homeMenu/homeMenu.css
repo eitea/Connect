@@ -31,6 +31,11 @@ i{
   100% { transform: rotate(360deg); }
 }
 
+.blank_row {
+    height: 2px !important; /* Overwrite any previous rules */
+    background-color: #FFFFFF;
+}
+
 /*  HEADER AND CONTENT  */
 html,body{
   padding-top: 25px;

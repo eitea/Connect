@@ -1,6 +1,4 @@
 <?php include 'header.php'; ?>
-<link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
-<script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 
@@ -9,9 +7,12 @@
 </div>
 
 <?php
-$currentTimeStamp = carryOverAdder_Hours(getCurrentTimestamp(), -24);
-if(isset($_POST['newMonth'])){
-  $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
+$filter_begin = $filter_end = carryOverAdder_Hours(getCurrentTimestamp(), -24);
+if(isset($_POST['filterMonth_from'])){
+  $filter_begin = $_POST['filterMonth_from']. '-01 05:00:00';
+}
+if(isset($_POST['filterMonth_to'])){
+  $filter_end = $_POST['filterMonth_to']. '-01 05:00:00';
 }
 
 $filterIDs = $filterID = 0;
@@ -24,9 +25,9 @@ if(!empty($_POST['filterUserID'])){
   <div class="container-fluid form-group">
     <div class="col-xs-6">
       <div class="input-group">
-        <input id="calendar" type="text" class="form-control from" name="filterMonth_from" value=<?php echo substr($currentTimeStamp,0,10); ?> >
+        <input id="calendar" type="text" class="form-control from" name="filterMonth_from" value=<?php echo substr($filter_begin,0,10); ?> >
         <span class="input-group-addon"> - </span>
-        <input id="calendar2" type="text" class="form-control"  name="filterMonth_to" value="<?php echo substr($currentTimeStamp,0,10); ?>">
+        <input id="calendar2" type="text" class="form-control"  name="filterMonth_to" value="<?php echo substr($filter_end,0,10); ?>">
       </div>
     </div>
     <div class="col-sm-3">
@@ -65,47 +66,95 @@ $("#calendar2").datepicker({
 <br><br>
 
 <div class="container-fluid">
-  <canvas id="analysisChart" width="200" height="100" style="max-width:600px; max-height:300px;"></canvas>
+  <canvas id="analysisChart" width="1000" height="100"></canvas>
 </div>
 
-<?php if($filterIDs):
-$result = $conn->query("SELECT * FROM $logTable WHERE userID = $filterID && timeEnd != '0000-00-00 00:00:00'");
+<?php if($filterIDs): //userID canBook
+$full = $break = $productive = $nonproductive = $drive = 0;
+$result_log = $conn->query("SELECT * FROM $logTable WHERE userID = $filterID AND status = '0' AND timeEnd != '0000-00-00 00:00:00' AND DATE('$filter_begin') <= DATE(time) AND Date(time) <= DATE('$filter_end')");
+while($result_log && ($row_log = $result_log->fetch_assoc())){
+  $full += timeDiff_Hours($row_log['time'], $row_log['timeEnd']);
+  $result_proj = $conn->query("SELECT start, end, bookingType, status FROM $projectBookingTable LEFT JOIN $projectTable ON projectID = $projectTable.id
+                                WHERE timestampID =".$row_log['indexIM']." AND start != '0000-00-00 00:00:00' AND end != '0000-00-00 00:00:00'");
+  while($result_proj && ($row_proj = $result_proj->fetch_assoc())){
+    if($row_proj['bookingType'] == 'project'){
+      if(!empty($row_proj['status'])){
+        $productive += timeDiff_Hours($row_proj['start'], $row_proj['end']);
+      } else {
+        $nonproductive += timeDiff_Hours($row_proj['start'], $row_proj['end']);
+      }
+    } elseif($row_proj['bookingType'] == 'drive') { //drive
+      $drive += timeDiff_Hours($row_proj['start'], $row_proj['end']);
+    } else {
+      $break += timeDiff_Hours($row_proj['start'], $row_proj['end']);
+    }
+  }
+}
+//normalize numbers
+echo 'Full: ' . $full;
+echo '<br> Productive: '. $productive;
+echo '<br> Not Productive: '. $nonproductive;
+echo '<br> Breaks: ' . $break;
+echo '<br> Drives: '. $drive;
+
+if(($productive + $nonproductive + $break + $drive) > $full){
+$full = $productive + $nonproductive + $break + $drive;
+}
+
+$break = floor(($break / $full) * 100);
+$productive = $productive / $full * 100;
+$drive = floor($drive / $full * 100);
+$nonproductive = 100 - $productive - $break - $drive;
 
 ?>
 <script>
 $(function(){
-  var ctx_analysis = document.getElementById("analysisChart");
-  var myAnalysisChart = new Chart(ctx_analysis, {
+var ctx = document.getElementById("analysisChart");
+var myChart = new Chart(ctx, {
     type: 'horizontalBar',
+    data: {
+      labels: ["Person"],
+      datasets: [{
+        label: ["Produktiv"],
+        data: [<?php echo $productive; ?>],
+        backgroundColor: "#78cad9"
+      }, {
+        label: ["Nicht Produktiv"],
+        data: [<?php echo $nonproductive; ?>],
+        backgroundColor: "#af9acb"
+      }, {
+        label: ["Pausen"],
+        data: [<?php echo $break; ?>],
+        backgroundColor: "#acc46c"
+      }, {
+        label: ["Fahrzeiten"],
+        data: [<?php echo $drive; ?>],
+        backgroundColor: "#ffb73d"
+      }]
+    },
     options: {
       scales:{
         xAxes: [{
           stacked: true
+        }],
+        yAxes: [{
+          stacked: true
         }]
-      }
-      legend:{
-        display: false
       },
-      title:{
-        display:true,
-        text: 'Durchschnittliche Stunden'
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            return ' ' + data.datasets[tooltipItem.datasetIndex].label[0] +': ' + Math.round(data.datasets[tooltipItem.datasetIndex].data[0]*100)/100 + '%';
+          }
+        }
+      },
+      legend: {
+        display: false
       }
-    },
-    data: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [{
-        label: "Mittel",
-        backgroundColor: [
-          'rgba(255, 99, 169, 0.5)',
-          'rgba(90, 163, 231, 0.5)',
-          'rgba(189, 209, 71, 0.5)',
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(154, 125, 210, 0.5)'
-        ],
-        data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
-      }
-    ]}
-  });
+    }
+});
+
+//---
 });
 </script>
 <?php endif; ?>
