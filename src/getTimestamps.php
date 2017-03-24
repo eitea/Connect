@@ -1,5 +1,4 @@
-<?php include 'header.php'; ?>
-<?php enableToTime($userID); ?>
+<?php include 'header.php'; enableToTime($userID); ?>
 
 <div class="page-header">
   <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
@@ -10,14 +9,14 @@ require_once 'Calculators/IntervalCalculator.php';
 $scrollPos = 0;
 
 $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
-$filterDateTo = substr(getCurrentTimestamp(),0,10) .' 12:00:00';
+$filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom)); // t returns the number of days in the month
 $filterID = 0;
 $filterStatus ='';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['filterDayFrom']) && isset($_POST['filterDayTo'])){
-    $filterDateFrom = $_POST['filterYearFrom'] .'-'.$_POST['filterMonthFrom'].'-'.$_POST['filterDayFrom'].' 12:00:00';
-    $filterDateTo = $_POST['filterYearTo'] .'-'.$_POST['filterMonthTo'].'-'.$_POST['filterDayTo'].' 12:00:00';
+  if(!empty($_POST['filterDateFrom']) && !empty($_POST['filterDateTo']) && strlen($_POST['filterDateFrom']) == 7 && strlen($_POST['filterDateTo']) == 7){
+    $filterDateFrom = $_POST['filterDateFrom'] .'-01 12:00:00';
+    $filterDateTo = date('Y-m-t H:i:s', strtotime($_POST['filterDateTo']));
   }
   if (!empty($_POST['filteredUserID'])) {
     $filterID = $_POST['filteredUserID'];
@@ -81,77 +80,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <form method="post">
   <div class="row">
-    <div class="col-md-4"> <!-- Date Interval FROM-->
-      Von:
-      <select name='filterYearFrom' style="width:100px" class="js-example-basic-single">
-        <?php
-        for($i = substr($filterDateFrom,0,4)-4; $i < substr($filterDateFrom,0,4)+4; $i++){
-          $selected = ($i == substr($filterDateFrom,0,4))?'selected':'';
-          echo "<option $selected value=$i>$i</option>";
-        }
-        ?>
-      </select>
-      <select name='filterMonthFrom' style="width:100px" class="js-example-basic-single">
-        <?php
-        for($i = 1; $i < 13; $i++) {
-          $selected= '';
-          if ($i == substr($filterDateFrom,5,2)) {
-            $selected = 'selected';
-          }
-          $dateObj = DateTime::createFromFormat('!m', $i);
-          $option = $dateObj->format('F');
-          echo "<option $selected name=filterUserID value=".sprintf("%02d",$i).">$option</option>";
-        }
-        ?>
-      </select>
-      <select name="filterDayFrom" style='width:50px' class="js-example-basic-single">
-        <?php
-        for($i = 1; $i < 32; $i++){
-          $selected= '';
-          if ($i == intval(substr($filterDateFrom,8,2))) {
-            $selected = 'selected';
-          }
-          echo "<option $selected value=".sprintf("%02d",$i).">$i</option>";
-        }
-        ?>
-      </select>
-      <br><br>
-    </div>
-    <div class="col-md-4"> <!-- Date Interval TO -->
-      Bis:
-      <select name='filterYearTo' style="width:100px" class="js-example-basic-single">
-        <?php
-        for($i = substr($filterDateTo,0,4)-4; $i < substr($filterDateTo,0,4)+4; $i++){
-          $selected = ($i == substr($filterDateTo,0,4))?'selected':'';
-          echo "<option $selected value=$i>$i</option>";
-        }
-        ?>
-      </select>
-      <select name='filterMonthTo' style="width:100px" class="js-example-basic-single">
-        <?php
-        for($i = 1; $i < 13; $i++) {
-          $selected= '';
-          if ($i == substr($filterDateTo,5,2)) {
-            $selected = 'selected';
-          }
-          $dateObj = DateTime::createFromFormat('!m', $i);
-          $option = $dateObj->format('F');
-          echo "<option $selected name=filterUserID value=".sprintf("%02d",$i).">$option</option>";
-        }
-        ?>
-      </select>
-      <select name="filterDayTo" id="filterDayTo" style='width:50px' class="js-example-basic-single">
-        <?php
-        for($i = 1; $i < 32; $i++){
-          $selected= '';
-          if ($i == intval(substr($filterDateTo,8,2))) {
-            $selected = 'selected';
-          }
-          echo "<option $selected value=".sprintf("%02d",$i).">$i</option>";
-        }
-        ?>
-      </select>
-      <br><br>
+    <div class="col-md-4"> <!-- Date Interval-->
+      <div class="input-group">
+        <input id="calendar" type="text" maxlength="7" class="form-control from" name="filterDateFrom" value=<?php echo substr($filterDateFrom,0,7); ?> >
+        <span class="input-group-addon"> - </span>
+        <input id="calendar2" type="text" maxlength="7" class="form-control"  name="filterDateTo" value="<?php echo substr($filterDateTo,0,7); ?>">
+      </div>
     </div>
     <div class="col-md-3 text-right"> <!-- Filter User -->
       <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
@@ -169,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         ?>
       </select>
-      <br><br>              <!-- Filter Status -->
+      <br><br><!-- Filter Status -->
       <select name='filterStatus' style="width:100px" class="js-example-basic-single">
         <option value="" >---</option>
         <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang_activityToString[0]; ?></option>
@@ -182,7 +116,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter" value="1">Filter</button>
     </div>
   </div>
-
+  <script>
+  $("#calendar").datepicker({
+    format: "yyyy-mm",
+    viewMode: "months",
+    minViewMode: "months"
+  });
+  $("#calendar2").datepicker({
+    format: "yyyy-mm",
+    viewMode: "months",
+    minViewMode: "months"
+  });
+  </script>
   <!-- ############################### TABLE ################################### -->
 
   <ul class="nav nav-tabs">
@@ -401,13 +346,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo "<td>".sprintf('%+.2f',$accumulatedSaldo)."</td>";
                 echo "<td></td></tr>";
 
-                //get saldo from aall previous days
+                //get saldo from aall the previous days
                 $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -24), $x);
+
                 $lunchbreakSUM += array_sum($calculator_P->lunchTime);
                 $expectedHoursSUM += array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
                 if(substr($filterDateFrom,8,2) != '01') {$expectedHoursSUM += $calculator->overTimeLump;} //add overTimeLump back, so it wont get subtracted twice for the same month.
                 $absolvedHoursSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime);
-                $differenceSUM += $absolvedHoursSUM - $expectedHoursSUM;
+                $differenceSUM += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) - array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
 
                 if($calculator_P->correctionHours > 0){
                   $absolvedHoursSUM += $calculator_P->correctionHours;
@@ -415,7 +361,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   $expectedHoursSUM += $calculator_P->correctionHours;
                 }
 
-                $accumulatedSaldo += $differenceSUM;
+                $accumulatedSaldo += array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) - array_sum($calculator_P->shouldTime) - $calculator_P->overTimeLump;
                 echo "<tr style='font-weight:bold;'>";
                 echo "<td colspan='2'>Inkl. vorheriges Saldo:* </td>";
                 echo "<td></td>";

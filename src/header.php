@@ -15,6 +15,9 @@
 
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
   <script src='../plugins/select2/js/select2.js'></script>
+
+  <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
+  <script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
   <title>T-Time</title>
 </head>
 <script>
