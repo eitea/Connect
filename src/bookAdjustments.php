@@ -47,20 +47,17 @@ echo mysqli_error($conn);
 
 
 <form method="POST">
-  <div class="dropdown">
-    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-      <?php if($filterName) echo $filterName; else echo $lang['USERS']; ?>
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-      <?php
-      $result = mysqli_query($conn, "SELECT id, firstname, lastname FROM $userTable;");
-      while($row = $result->fetch_assoc()){
-        echo "<li><button type='submit' class='btn btn-link' name='filterUserID' value='".$row['id'].', '.$row['firstname']. " " .$row['lastname']."' >".$row['firstname'] . " " . $row['lastname']."</button></li>";
-      }
-      ?>
-    </ul>
-  </div>
+  <select name='filterUserID' style="width:200px" class="js-example-basic-single">
+    <?php
+    $result = mysqli_query($conn, "SELECT id, firstname, lastname FROM $userTable");
+    echo "<option name='filterUserID' value='0'>Benutzer ... </option>";
+    while($row = $result->fetch_assoc()){
+      $i = $row['id'];
+      echo "<option name='filterUserID' value='".$row['id'].', '.$row['firstname']. " " .$row['lastname']."' >".$row['firstname'] . " " . $row['lastname']."</option>";
+    }
+    ?>
+  </select>
+    <button type="submit" class="btn btn-warning btn-sm">Select</button>
 </form>
 
 <br><br><br>
@@ -157,7 +154,7 @@ echo mysqli_error($conn);
               </div>
               <div class="col-xs-3">
                 <label><?php echo $lang['AFFECTED_MONTH']; ?></label>
-                <input id="calendar" type="month" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
+                <input id="calendar2" type="month" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
               </div>
               <div class="col-xs-2">
                 <label><?php echo $lang['DAYS']; ?></label>
@@ -176,6 +173,18 @@ echo mysqli_error($conn);
                 </div>
               </div>
             </div>
+            <script>
+            $("#calendar").datepicker({
+              format: "yyyy-mm",
+              viewMode: "months",
+              minViewMode: "months"
+            });
+            $("#calendar2").datepicker({
+              format: "yyyy-mm",
+              viewMode: "months",
+              minViewMode: "months"
+            });
+            </script>
             <br><br><br>
 
             <table class="table table-hover">

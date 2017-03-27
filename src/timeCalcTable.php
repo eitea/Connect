@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
+  <h3><?php echo $lang['MONTHLY_REPORT']; ?></h3>
 </div>
 
 <?php
@@ -103,7 +103,7 @@ $("#calendar").datepicker({
         echo "<td>".sprintf('%+.2f', $calculator->correctionHours)."</td><td></td>";
         echo "</tr>";
       }
-      if($calculator->overTimeLump){
+      if($calculator->overTimeLump > 0){
         echo "<tr style='font-weight:bold;'>";
         echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
         echo "<td>-</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
