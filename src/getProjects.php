@@ -63,6 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($result && $result->num_rows>0){
       $row = $result->fetch_assoc();
       $indexIM = $row['indexIM']; //this value mustnt change
+      $timeToUTC = $row['timeToUTC'];
 
       $startDate = $filterDate." ".$_POST['start'];
       $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
