@@ -7,7 +7,7 @@
 </div>
 
 <?php
-require 'Calculators/MonthlyCalculator.php';
+require 'Calculators/IntervalCalculator.php';
 $currentTimeStamp = getCurrentTimestamp();
 if(isset($_POST['newMonth'])){
   $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
@@ -94,7 +94,8 @@ $("#calendar").datepicker({
     </thead>
     <tbody>
       <?php
-      $calculator = new Monthly_Calculator($currentTimeStamp, $userID);
+      $now = substr(getCurrentTimestamp(),0,7). '-01 05:00:00';
+      $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
 
       if($calculator->correctionHours){
         echo "<tr style='font-weight:bold;'>";
@@ -103,15 +104,6 @@ $("#calendar").datepicker({
         echo "<td>".sprintf('%+.2f', $calculator->correctionHours)."</td><td></td>";
         echo "</tr>";
       }
-      /*
-      if($calculator->overTimeLump > 0){
-        echo "<tr style='font-weight:bold;'>";
-        echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
-        echo "<td>-</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
-        echo "<td> -".$calculator->overTimeLump."</td><td></td>";
-        echo "</tr>";
-      }
-      */
 
       $absolvedHours = array();
       $accumulatedSaldo = $calculator->correctionHours;
@@ -125,12 +117,12 @@ $("#calendar").datepicker({
         $difference = timeDiff_Hours($calculator->start[$i], $endTime );
         $absolvedHours[] = $difference - $calculator->lunchTime[$i];
 
-        if($calculator->start[$i] != '-'){
+        if($calculator->start[$i]){
           $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
         } else {
           $A = $calculator->start[$i];
         }
-        if($calculator->end[$i] != '-'){
+        if($calculator->end[$i]){
           $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
         } else {
           $B = $calculator->end[$i];
@@ -162,6 +154,23 @@ $("#calendar").datepicker({
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
         echo "<td><button type='submit' form='form1' class='btn btn-default' value='".$calculator->indecesIM[$i].' '.$calculator->date[$i]."' name='aButton' ><i class='fa fa-pencil'></i></button></td>";
+        echo "</tr>";
+      }
+
+      if($calculator->overTimeLump > 0){
+        $accumulatedSaldo -= $calculator->overTimeLump;
+        if($accumulatedSaldo < 0){
+          $accumulatedSaldo += $calculator->overTimeLump;
+          if($accumulatedSaldo > 0){
+            $calculator->overTimeLump -= $accumulatedSaldo;
+            $accumulatedSaldo = 0;
+          }
+        }
+        echo "<tr style='font-weight:bold;'>";
+        echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
+        echo "<td>-</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td>";
+        echo "<td style='color:red'> -".displayAsHoursMins($calculator->overTimeLump)."</td>";
+        echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td><td></td>";
         echo "</tr>";
       }
       ?>

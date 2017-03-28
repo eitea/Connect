@@ -52,11 +52,9 @@ class Interval_Calculator{
     }
 
     $count = 0;
-    $oldMonth = 0;
     for($j = 0; $j < $this->days; $j++){ //for each day of the month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
-      $currentMonth = substr($i, 0, 7);
       //get the expectedHours from the matching interval
       $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ( (DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)) )";
       $result = $conn->query($sql);
@@ -64,9 +62,8 @@ class Interval_Calculator{
         $row = $result->fetch_assoc();
         $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
         //add overTimeLump if month changes
-        if($oldMonth != $currentMonth){
+        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
           $this->overTimeLump += $row['overTimeLump'];
-          $oldMonth = $currentMonth;
         }
       } else { //if no interval found means i want everything to be 0.
         $this->shouldTime[] = 0;
