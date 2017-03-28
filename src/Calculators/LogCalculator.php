@@ -1,4 +1,7 @@
 <?php
+/*
+* This Badass calculates everything. Yep.
+*/
 class LogCalculator{
   public $overTimeAdditive = 0;
   public $vacationDays = 0; //can be understood as 'still available vacation days' (considers already used vacation)
@@ -28,8 +31,6 @@ class LogCalculator{
     $curID = $this->id;
 
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
-
-    $oldMonth = 0;
     while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
       $this->beginDate = $iRow['beginningDate'];
       $this->exitDate = $iRow['exitDate'];
@@ -46,10 +47,9 @@ class LogCalculator{
       $this->vacationDays += ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
 
       while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
-        $currentMonth = substr($i, 0, 7);
-        if($oldMonth != $currentMonth){ //whenever a month changes, add the overtime. using a counter is too volatile
+
+        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
           $this->overTimeAdditive += $iRow['overTimeLump'];
-          $oldMonth = $currentMonth;
         }
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
 

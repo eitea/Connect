@@ -30,6 +30,19 @@ document.onreadystatechange = function () {
 }
 $(document).ready(function() {
   $(".js-example-basic-single").select2();
+
+  if ($('#seconds').length) { //something like a if(exists(..))
+    var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
+
+    function pad(val) {
+      return val > 9 ? val : "0" + val;
+    }
+    window.setInterval(function(){
+      document.getElementById("seconds").innerHTML = pad(++sec % 60);
+      document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
+      document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
+    }, 1000);
+  }
 });
 </script>
 
@@ -241,15 +254,18 @@ $(document).ready(function() {
     $result = mysqli_query($conn, $query);
     if ($result && $result->num_rows > 0) { //open timestamps must be closed
       $row = $result->fetch_assoc();
-      $now = getCurrentTimestamp();
+      $diff = timeDiff_Hours($row['time'],getCurrentTimestamp());
       $indexIM = $row['indexIM'];
-      if(timeDiff_Hours($row['time'],$now) > $cd/60){ //he has waited long enough to stamp out
+      if($diff > $cd/60){ //he has waited long enough to stamp out
         $disabled = '';
       } else {
         $disabled = 'disabled';
       }
       $buttonVal = $lang['CHECK_OUT'];
-      $checkInButton =  "<li><br><div class='container-fluid'><form method=post><button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button></form></div><br></li>";
+      $checkInButton =  "<li><br><div class='container-fluid'>
+      <div><form method='post'><button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>&nbsp
+       <span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>
+      </div></form></div><br></li>";
       $showProjectBookingLink = TRUE;
     } else {
       $today = getCurrentTimestamp();
@@ -265,7 +281,7 @@ $(document).ready(function() {
         $disabled = 'disabled';
       }
       $buttonVal = $lang['CHECK_IN'];
-      $checkInButton = "<li><br><div class=container-fluid><form method=post><button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button></form></div><br></li>";
+      $checkInButton = "<li><br><div class='container-fluid'><form method='post'><button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button></form></div><br></li>";
     }
     ?>
 

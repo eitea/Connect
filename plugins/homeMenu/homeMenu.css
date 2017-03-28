@@ -76,15 +76,6 @@ html,body{
   max-height:80vh;
   overflow-y:auto;
 }
- /* shrink sidenav if window gets smaller than that */
-@media (max-width: 724px){
-  .affix-sidebar{
-    width: 150px;
-  }
-  .affix-content{
-    padding-left:150px;
-  }
-}
 .sidebar-nav .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;

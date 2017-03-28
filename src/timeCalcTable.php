@@ -103,6 +103,7 @@ $("#calendar").datepicker({
         echo "<td>".sprintf('%+.2f', $calculator->correctionHours)."</td><td></td>";
         echo "</tr>";
       }
+      /*
       if($calculator->overTimeLump > 0){
         echo "<tr style='font-weight:bold;'>";
         echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
@@ -110,9 +111,10 @@ $("#calendar").datepicker({
         echo "<td> -".$calculator->overTimeLump."</td><td></td>";
         echo "</tr>";
       }
+      */
 
       $absolvedHours = array();
-      $accumulatedSaldo = $calculator->correctionHours - $calculator->overTimeLump;
+      $accumulatedSaldo = $calculator->correctionHours;
       for($i = 0; $i < $calculator->days; $i++){
         if($calculator->end[$i] == '0000-00-00 00:00:00'){
           $endTime = getCurrentTimestamp();

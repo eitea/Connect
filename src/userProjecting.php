@@ -13,6 +13,7 @@ if ($result && $result->num_rows > 0) {
   $start = substr(carryOverAdder_Hours($row['time'], $timeToUTC), 11, 19);
   $date = substr($row['time'], 0, 10);
   $indexIM = $row['indexIM']; //this value must not change
+  $timeToUTC = $row['timeToUTC']; //just in case.
 } else {
   redirect("home.php");
 }

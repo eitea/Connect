@@ -62,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows>0){
       $row = $result->fetch_assoc();
-      $indexIM = $row['indexIM']; //this value mustnt change
+      $indexIM = $row['indexIM'];
       $timeToUTC = $row['timeToUTC'];
 
       $startDate = $filterDate." ".$_POST['start'];
