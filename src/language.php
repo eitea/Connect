@@ -69,6 +69,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ASSIGNED'] = 'Assigned';
   $lang['AUTOREDIRECT'] = 'Click here if not redirected automatically: ';
   $lang['AVAILABLE'] = 'Available';
+  $lang['AVERAGE'] = 'Average';
 
   $lang['BEGIN'] = 'Begin';
   $lang['BILLING'] = 'Billing';
@@ -212,6 +213,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['TIMETABLE'] = 'Timetable';
   $lang['TIMESTAMPS'] = 'Timestamps';
   $lang['TO'] = 'To';
+  $lang['TODAY'] = 'Today';
   $lang['TRAVEL_FORM'] = 'Traveling Expenses';
 
   $lang['UNDO'] ='Undo';
@@ -294,6 +296,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ASSIGNED'] = 'Zugewiesene';
   $lang['AUTOREDIRECT'] = 'Klicken Sie hier, wenn Sie nicht automatisch weitergeleitet werden: ';
   $lang['AVAILABLE'] = 'Verfügbar';
+  $lang['AVERAGE'] = 'Durschnitt';
 
   $lang['BEGIN'] = 'Anfang';
   $lang['BILLING'] = 'Abrechnung';
@@ -439,6 +442,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['TIMETABLE'] = 'Stundenplan';
   $lang['TIMESTAMPS'] = 'Zeitstempel';
   $lang['TO'] = 'Bis';
+  $lang['TODAY'] = 'Heute';
   $lang['TRAVEL_FORM'] = 'Reisekosten';
 
   $lang['UNDO'] = 'Rückgängig';

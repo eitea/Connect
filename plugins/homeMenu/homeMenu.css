@@ -48,6 +48,7 @@ html,body{
 .panel-borderless {
   border: 0;
 }
+
 .nav.navbar-nav > ul, .sidebar-nav .navbar > ul {
   float: none;
   display: block;

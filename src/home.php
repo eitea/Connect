@@ -74,7 +74,7 @@ $(function(){
       },
       title:{
         display:true,
-        text: 'Durchschnittliche Stunden'
+        text: '<?php echo $lang['AVERAGE'].' '. $lang['HOURS']; ?>'
       }
     },
     data: {
@@ -126,7 +126,7 @@ $(function(){
       },
       title: {
         display: true,
-        text: 'Heute'
+        text: '<?php echo $lang['TODAY']; ?>'
       }
     }
   });

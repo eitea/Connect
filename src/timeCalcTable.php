@@ -8,7 +8,7 @@
 
 <?php
 require 'Calculators/IntervalCalculator.php';
-$currentTimeStamp = getCurrentTimestamp();
+$currentTimeStamp = substr(getCurrentTimestamp(),0,7);
 if(isset($_POST['newMonth'])){
   $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
 }
@@ -94,7 +94,7 @@ $("#calendar").datepicker({
     </thead>
     <tbody>
       <?php
-      $now = substr(getCurrentTimestamp(),0,7). '-01 05:00:00';
+      $now = $currentTimeStamp;
       $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
 
       if($calculator->correctionHours){
