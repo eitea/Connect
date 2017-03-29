@@ -159,19 +159,19 @@ endforeach; ?>
         datasets: [{
           label: ["Produktiv"],
           data: [<?php echo $productives; ?>],
-          backgroundColor: "rgba(120, 202, 217, 0.5)"
+          backgroundColor: "rgba(255, 153, 0, 0.5)"
         }, {
           label: ["Nicht Produktiv"],
           data: [<?php echo $nonproductives; ?>],
-          backgroundColor: "rgba(175, 154, 203, 0.5)"
+          backgroundColor: "rgba(149, 149, 149, 0.5)"
         }, {
           label: ["Pausen"],
           data: [<?php echo $breaks; ?>],
-          backgroundColor: "rgba(172, 196, 108, 0.5)"
+          backgroundColor: "rgba(48, 122, 219, 0.5)"
         }, {
           label: ["Fahrzeiten"],
           data: [<?php echo $drives; ?>],
-          backgroundColor: "rgba(255, 183, 61, 0.5)"
+          backgroundColor: "rgba(172, 196, 108, 0.5)"
         }]
       },
       options: {

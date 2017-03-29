@@ -18,7 +18,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
   $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
   $requestText = test_input($_POST['request_text']);
   if(timeDiff_Hours($startTime, $endTime) > 0){
-    $conn->query("INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', ".$arr[0].")");
+    $conn->query("INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."' )");
   } else {
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

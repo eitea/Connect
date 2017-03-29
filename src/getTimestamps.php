@@ -303,6 +303,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     if($bookingResults && $bookingResults->num_rows > 0){
                       echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
                       $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
+                      $bookingResultsResults['timeToUTC'][] = $calculator->timeToUTC[$i];
                     }
                     if(!preg_match('/,\s/', $calculator->indecesIM[$i])){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/></td>';}
                     echo "</tr>";
@@ -386,8 +387,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         <!-- Projectbooking Modall -->
         <?php
-        for($i = 0; $i < count($bookingResultsResults); $i++):
+        for($i = 0; $i < count($bookingResultsResults)-1; $i++): //timeToUTC takes up 1 count too much
           $bookingResult = $bookingResultsResults[$i];
+          $timeToUTC = $bookingResultsResults['timeToUTC'][$i];
           $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
           ?>
           <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -421,7 +423,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         echo "<td>". $row['name'] ."</td>";
                         echo "<td>". $row['projectName'] ."</td>";
                         echo "<td>". substr($row['start'], 0, 10) ."</td>";
-                        echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
+                        echo "<td>". substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5) ."</td>";
                         echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
                         echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
                         echo '</tr>';
