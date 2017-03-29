@@ -174,7 +174,7 @@ $sql = "CREATE TABLE $configTable(
   enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   masterPassword VARCHAR(100),
-  enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
