@@ -63,12 +63,9 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $holidayTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  rule VARCHAR(100),
-  name VARCHAR(60),
-  countryID INT(6) UNSIGNED,
-  FOREIGN KEY (countryID) REFERENCES $travelCountryTable(id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
+  begin DATETIME,
+  end DATETIME,
+  name VARCHAR(60) NOT NULL
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
