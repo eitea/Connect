@@ -52,7 +52,6 @@ class LogCalculator{
           $this->overTimeAdditive += $iRow['overTimeLump'];
         }
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
-
         if(isHoliday($i)){
           $expectedHours = 0;
         }
@@ -104,16 +103,19 @@ class LogCalculator{
       }
     }
 
-    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours - $this->overTimeAdditive + $this->correctionHours;
+    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
 
     //sooo.. apparently the overtimelump cannot make our saldo negative
-    if($this->saldo < 0){
-      $this->saldo += $this->overTimeAdditive;
-      if($this->saldo > 0){
-        $this->overTimeAdditive = $this->saldo;
-        $this->saldo = 0;
-      }
-    }
+    if($this->overTimeAdditive < $this->saldo){
+       $this->saldo -= $this->overTimeAdditive;
+     } else {
+       if($this->saldo < 0){ //negative saldo
+         $this->overTimeAdditive = 0;
+       } else { //too little saldo
+         $this->overTimeAdditive -= $this->saldo;
+         $this->saldo = 0;
+       }
+     }
   }
 
   private function timeDiff_Hours($from, $to) {

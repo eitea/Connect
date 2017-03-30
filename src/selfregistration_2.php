@@ -197,7 +197,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$real_email', '$errorInfo')");
 
       echo mysqli_error($conn);
-      //redirect('editUsers.php');
+      redirect('login.php');
     }
   }
 }

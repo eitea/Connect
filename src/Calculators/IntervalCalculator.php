@@ -83,7 +83,7 @@ class Interval_Calculator{
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = false;
         $this->end[] = false;
-        $his->absolvedTime[] = 0;
+        $this->absolvedTime[] = 0;
         $this->activity[] = '-1';
         $this->lunchTime[] = 0;
         $this->timeToUTC[] = 0;
@@ -122,7 +122,7 @@ class Interval_Calculator{
       $date->sub(new DateInterval("PT".$b."H"));
     } else {
       $date->add(new DateInterval("PT".$b."H"));
-  }
+    }
     return $date->format('Y-m-d H:i:s');
   }
 

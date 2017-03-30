@@ -444,20 +444,22 @@ function showNewClients(selectID, company, client){
         <br><br>
         <div class="alert alert-info" role="alert"><strong>Editing Disabled - </strong>You can only edit entries on 'not charged' option.</div>
       <?php endif; ?>
-
-      <table class="table table-striped table-condensed">
+  <section>
+    <div class="table-scrollable-container" >
+      <table class="table table-striped table-condensed table-scrollable">
         <thead>
           <tr>
             <th></th>
-            <th><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></th>
-            <th>Infotext</th>
-            <th><?php echo $lang['DATE']; ?></th>
-            <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
-            <th><?php echo $lang['MINUTES']; ?></th>
-            <th>0.25h</th>
-            <th><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?> <br> <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></th>
-            <th>Intern</th>
-            <th>Detail</th>
+            <th><div><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></div></th>
+            <th><div>Infotext</div></th>
+            <th><div><?php echo $lang['DATE']; ?></div></th>
+            <th><div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
+            <th><div><?php echo $lang['MINUTES']; ?></div></th>
+            <th>0.25h<div>0.25h</div></th>
+            <th>1234567890<div><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
+              <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
+            <th><div>Intern</div></th>
+            <th><div>Detail</div></th>
           </tr>
         </thead>
         <?php
@@ -709,6 +711,8 @@ function showNewClients(selectID, company, client){
         echo "</tr>";
         ?>
       </table>
+    </div>
+  </section>
       <script>
       $(function () {
         $('[data-toggle="popover"]').popover()

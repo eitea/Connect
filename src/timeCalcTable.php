@@ -8,7 +8,7 @@
 
 <?php
 require 'Calculators/IntervalCalculator.php';
-$currentTimeStamp = substr(getCurrentTimestamp(),0,7);
+$currentTimeStamp = substr(getCurrentTimestamp(),0,7). '-01 05:00:00';
 if(isset($_POST['newMonth'])){
   $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
 }

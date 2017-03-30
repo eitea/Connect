@@ -46,7 +46,7 @@ $(document).ready(function() {
 });
 </script>
 
-<body class="is-table-row">
+<body id="body_container" class="is-table-row">
   <div id="loader"></div>
 
   <?php

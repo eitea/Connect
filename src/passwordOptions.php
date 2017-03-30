@@ -111,7 +111,7 @@ $row = $result->fetch_assoc();
 <form method="POST">
   <h4>Allgemein</h4>
   <br><br>
-  <div class="container">
+  <div class="container-fluid">
     <div class="col-md-4">
       Minimale Passwortlänge:
     </div>
@@ -140,7 +140,7 @@ $row = $result->fetch_assoc();
     <input type="checkbox" value="person" name="enableTimechange"  <?php if($row['expiration'] == 'TRUE'){echo 'checked';} ?> /> Aktiv
   </div>
   <br><br><br>
-  <div class="container">
+  <div class="container-fluid">
     <div class="col-md-4">
       Änderung nach Monaten:
     </div>
@@ -165,7 +165,7 @@ $row = $result->fetch_assoc();
     <h4>Master Passwort Setzen</h4>
   </div>
   <br><br><br>
-  <div class="container">
+  <div class="container-fluid">
     <div class="col-md-4">
       Aktuelles Passwort:
     </div>

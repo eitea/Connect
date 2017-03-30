@@ -146,21 +146,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     <div class="tab-content">
       <div id='userTab' class='tab-pane fade in active'><br>
-        <section>
-          <div class="table-scrollable-container" >
-            <table class="table table-hover table-condensed table-scrollable">
+            <table class="table table-hover table-condensed">
               <thead>
-                <th><div><?php echo $lang['WEEKLY_DAY']; ?></div></th>
-                <th><div><?php echo $lang['DATE']; ?></div></th>
-                <th><?php echo $lang['BEGIN']; ?><div><?php echo $lang['BEGIN']; ?></div></th>
-                <th><div><?php echo $lang['BREAK']; ?></div></th>
-                <th><?php echo $lang['END']; ?><div><?php echo $lang['END']; ?></div></th>
-                <th width="60px"><div style="top:-5px;font-size:10px;"><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></div></th>
-                <th><div><?php echo $lang['ACTIVITY']; ?></div></th>
-                <th><div><?php echo $lang['SHOULD_TIME']; ?></div></th>
-                <th><div><?php echo $lang['IS_TIME']; ?></div></th>
-                <th><div><?php echo $lang['DIFFERENCE']; ?></div></th>
-                <th><div>Saldo</div></th>
+                <th><?php echo $lang['WEEKLY_DAY']; ?></th>
+                <th><?php echo $lang['DATE']; ?></th>
+                <th><?php echo $lang['BEGIN']; ?></th>
+                <th><?php echo $lang['BREAK']; ?></th>
+                <th><?php echo $lang['END']; ?></th>
+                <th width="60px"><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></th>
+                <th><?php echo $lang['ACTIVITY']; ?></th>
+                <th><?php echo $lang['SHOULD_TIME']; ?></th>
+                <th><?php echo $lang['IS_TIME']; ?></th>
+                <th><?php echo $lang['DIFFERENCE']; ?></th>
+                <th>Saldo</th>
                 <th style="text-align:right;width:160px;"><div>Option</div></th>
               </thead>
               <tbody>
@@ -382,8 +380,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <tr><td colspan="12"><small>*Angaben in Stunden</small></td></tr>
               </tbody>
             </table>
-          </div>
-        </section>
 
         <!-- Projectbooking Modall -->
         <?php
@@ -443,8 +439,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="text-right">
           <br>
           <input id="scrollPos" type="text" name="scrollPos" value="<?php echo $scrollPos; ?>" style="display:none;" />
-          <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>">Delete</button>
-          <br><br>
+          <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>"><?php echo $lang['DELETE']; ?></button>
         </div>
       </div>
 
@@ -465,17 +460,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <script>
 window.onload = function () {
-  if ($("#scrollPos").val() != 0 ) {
+  var value = $("#scrollPos").val();
+  if (value != 0 ) {
     setTimeout(function(){
-      $(".table-scrollable-container").scrollTop($("#scrollPos").val());
+    window.scrollTo(0, value);
     }, 200);
   }
 }
 $(document).ready(function() {
   // When scrolling happens....
-  $(".table-scrollable-container").on("scroll", function() {
-    $("#scrollPos").val($(".table-scrollable-container").scrollTop());
-  });
+  window.onscroll = function (e) {
+    $("#scrollPos").val($("#body_container").scrollTop());
+  }
 });
 </script>
 
