@@ -456,7 +456,7 @@ function showNewClients(selectID, company, client){
             <th><div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
             <th><div><?php echo $lang['MINUTES']; ?></div></th>
             <th>0.25h<div>0.25h</div></th>
-            <th>1234567890<div><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
+            <th>1234567890<div style="top:-15px;"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
               <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
             <th><div>Intern</div></th>
             <th><div>Detail</div></th>
