@@ -171,13 +171,13 @@ $(document).ready(function() {
   ?>
 
   <!-- navbar -->
-  <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
+  <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
-      <div class="navbar-header">
+      <div class="navbar-header hidden-xs">
         <a class="navbar-brand" href="home.php">T-Time</a>
       </div>
       <div>
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav hidden-xs">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-language" ></i> <span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -191,7 +191,7 @@ $(document).ready(function() {
         </ul>
         <div class="navbar-right" style="margin-right:10px">
           <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
-          <p class="navbar-text"><?php echo $_SESSION['firstname']; ?></p>
+          <span class="navbar-text"><?php echo $_SESSION['firstname']; ?></span>
           <a class="btn navbar-btn" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
           <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -286,7 +286,8 @@ $(document).ready(function() {
     ?>
 
     <!-- side menu -->
-    <div class="affix-sidebar sidebar-nav">
+    <div class="affix-sidebar sidebar-nav hidden-scrollbar">
+      <div class="inner">
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
           <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
@@ -462,6 +463,7 @@ $(document).ready(function() {
         </div> <!-- /accordions -->
         <br><br><br>
       </div>
+    </div>
 <!-- /side menu -->
 
   <?php

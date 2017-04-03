@@ -1,46 +1,9 @@
-
-i{
-  margin-right:5px;
-  margin-left:5px;
-}
-
-#loader {
-  position: absolute;
-  left: 55%;
-  top: 50%;
-  z-index: 1;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #ff9b26;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.blank_row {
-    height: 2px !important; /* Overwrite any previous rules */
-    background-color: #FFFFFF;
-}
-
 /*  HEADER AND CONTENT  */
-html,body{
-  padding-top: 25px;
+body{
+  padding-top: 50px;
   font: 13px/1.4 Geneva, 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
   margin-bottom:50px;
+  overflow-x: hidden;
 }
 .panel > .panel-heading a:link {
   color: #6f6f6f;
@@ -108,14 +71,55 @@ html,body{
   padding: 0;
 }
 
+/* LOADER */
+#loader {
+  position: absolute;
+  left: 55%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #ff9b26;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
 
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* hidden scrollbar */
+.hidden-scrollbar {
+  overflow:hidden;
+  text-align:justify;
+}
+.hidden-scrollbar .inner {
+  height:99vh;
+  overflow:auto;
+  margin:0px -300px 20px 0px;
+  padding-right:300px;
+}
+
+/* Scrollable table with fixed header */
 section {
   position: relative;
   padding-top: 37px;
 }
 .table-scrollable-container{
   overflow-y: auto;
-  height:50vh;
+  min-height:10vh; /* i dont know why this works and at this point i am too afraid to ask */
+  max-height:50vh;
 }
 .table-scrollable th{
   height: 0;
@@ -137,12 +141,22 @@ section {
 }
 
 
+/* helpings */
+i{
+  margin-right:5px;
+  margin-left:5px;
+}
+
+.blank_row {
+    height: 2px !important;
+    background-color: #FFFFFF;
+}
 .required-field {
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
 }
 
-
+/* html calendar date-picker */
 [type="datetime-local"] {
   background:#fff url('../../images/calendar_2.png') 97% 50% no-repeat ;
 }

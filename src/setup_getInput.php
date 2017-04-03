@@ -145,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
-            <input type='text' class="form-control" name='localPart' placeholder='name'  style=width:400px >
+            <input type='text' class="form-control" name='localPart' placeholder='name' >
             <span class="input-group-addon text-warning">
               @
             </span>

@@ -1,6 +1,5 @@
 </div>
 </div>
-</div>
 </body>
 
 <?php if(isset($_SERVER['RDS_HOSTNAME'])): ?>
