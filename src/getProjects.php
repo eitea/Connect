@@ -633,8 +633,8 @@ function showNewClients(selectID, company, client){
               $csv_Add[] = str_replace(array("\r", "\n",";"), ' ', $row['infoText']);
               $csv_Add[] = substr($A,0,10);
               $csv_Add[] = substr($B,0,10);
-              $csv_Add[] = substr($row['start'],11,6);
-              $csv_Add[] = substr($row['end'],11,6);
+              $csv_Add[] = substr($A,11,6);
+              $csv_Add[] = substr($B,11,6);
               $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
               $csv_Add[] = $t;
               $csv_Add[] = $row['hours'];
