@@ -617,6 +617,15 @@ if($row['version'] < 72){
   }
 }
 
+if($row['version'] < 73){
+  $sql = "DELETE FROM $userRequests WHERE requestType = 'log'";
+  if($conn->query($sql)){
+    echo '<br> Removed possible wrong log-requests';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
