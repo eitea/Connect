@@ -99,7 +99,8 @@ class Interval_Calculator{
     $this->daysAsNumber[] = $count;
 
     //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE('$fromDate') <= DATE(createdOn) AND DATE('$i') > DATE(createdOn)");
+    $i = carryOverAdder_Hours($i, -24);
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND (YEAR(createdOn) BETWEEN YEAR('$fromDate') AND YEAR('$i')) AND (MONTH(createdOn) BETWEEN MONTH('$fromDate') AND MONTH('$i'))");
     while($result && ($row = $result->fetch_assoc())){
       $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
     }

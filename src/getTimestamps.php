@@ -346,7 +346,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 //get saldo from aall the previous days
                 $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -48), $x);
-
                 $p_shouldTime = array_sum($calculator_P->shouldTime) + $calculator_P->overTimeLump;
                 $p_isTime = array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) + $calculator_P->correctionHours;
                 $accumulatedSaldo += $p_isTime - $p_shouldTime;
