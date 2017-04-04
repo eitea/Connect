@@ -40,9 +40,9 @@ body{
   max-height:80vh;
   overflow-y:auto;
 }
-.sidebar-nav .navbar li a {
-  padding-top: 12px;
-  padding-bottom: 12px;
+.sidebar-nav .navbar li a,  .navbar-nav > li > a{
+  padding-top: 4px;
+  padding-bottom: 10px;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
   background-color: #428bca;
