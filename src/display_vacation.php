@@ -89,11 +89,10 @@ if(isset($_POST['newMonth'])){
           } elseif($iRow['exitDate'] != '0000-00-00 00:00:00'){ //current interval and he HAS an exitDate, calculate until the exitDate.
             $j = $iRow['exitDate'];
           }
-          $dayDiff = timeDiff_Hours($i, $j) / 24;
+          $dayDiff = intval(timeDiff_Hours($i, $j) / 24);
           $gatheredDays += round(($iRow['vacPerYear']/365) * $dayDiff, 2); //accumulated vacation
           $i = substr($i, 0, 10);
           $j = substr($j, 0, 10);
-          $dayDiff = round($dayDiff, 2);
           echo "<li>From $i - Until $j  ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays days</li></ul></li>";
 
           $i = $iRow['endDate'];
@@ -123,19 +122,17 @@ if(isset($_POST['newMonth'])){
         $i = $iRow['startDate'];
         $now = $j = $iRow['endDate'];
         if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
-          $now = getCurrentTimestamp();
-          $j = carryOverAdder_Hours($now, 24);
+          $j = getCurrentTimestamp();
+
         } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
           $j = $iRow['exitDate'];
         }
-        $gatheredDays += ($vac/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
+        $gatheredDays += ($vac/365) * (timeDiff_Hours($i, $j) / 24 + 1); //accumulated vacation
       }
-      $dayDiff = timeDiff_Hours($i, $j) / 24;
+      $dayDiff = intval(timeDiff_Hours($i, $j) / 24)+1;
 
-      $gatheredDays += ($vac/365) * $dayDiff; //accumulated vacation
       $i = substr($i, 0, 10);
       $j = substr($j, 0, 10);
-      $dayDiff = round($dayDiff, 2);
       $gatheredDays = round($gatheredDays, 2);
       echo "<li>From $i - Until $j  ($dayDiff days difference)<ul><li> $vac / 365 * $dayDiff = $gatheredDays days</li></ul></li>";
       ?>
