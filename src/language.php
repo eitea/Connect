@@ -91,6 +91,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CLIENTS'] = 'Clients';
   $lang['COMPANIES'] = 'Companies';
   $lang['COMPANY'] = 'Company';
+  $lang['COMPLETE'] = 'Complete';
   $lang['CONSUMED'] = 'Consumed';
   $lang['CORE_TIME'] = 'Core Time';
   $lang['CORRECTION'] = 'Correction';
@@ -318,6 +319,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CLIENTS'] = 'Kunden';
   $lang['COMPANY'] = 'Mandant';
   $lang['COMPANIES'] = 'Mandanten';
+  $lang['COMPLETE'] = 'Komplett';
   $lang['CONSUMED'] = 'Konsumiert';
   $lang['CORE_TIME'] = 'Kernzeit';
   $lang['CORRECTION'] = 'Korrektur';

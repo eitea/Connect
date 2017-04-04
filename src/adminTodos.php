@@ -56,7 +56,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   //user Requests
-  if(isset($_POST['okay'])){
+  if(isset($_POST['okay'])){ //vacation
     $requestID = $_POST['okay'];
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
@@ -86,6 +86,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
+  //account
   if(isset($_POST['okay_acc'])){ //okay it and redirect to edit user
     $requestID = $_POST['okay_acc'];
     $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
@@ -94,6 +95,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $requestID = $_POST['nokay_acc'];
     $conn->query("DELETE FROM $userTable WHERE id = $requestID"); //FK dependency will delete all requests etc.
   }
+  //log
   if(isset($_POST['okay_log'])){
     $requestID = intval($_POST['okay_log']);
     $result = $conn->query("SELECT * FROM $userRequests WHERE id = $requestID");
@@ -104,8 +106,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $user = $row['userID'];
     if($indexIM != 0){ // 0
       $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
+      echo 'INSERTED ' . mysqli_error($conn);
     } else { //timestamp doesnt exist
       $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, breakCredit, status) VALUES('$timeStart', '$timeFin', $user, 0, 0, '0')");
+      echo 'INSERTED ' . mysqli_error($conn);
     }
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");

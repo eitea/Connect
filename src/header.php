@@ -391,6 +391,7 @@ $(document).ready(function() {
                     <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="getTimestamps.php"><i class="fa fa-history"></i> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
                     <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="bookAdjustments.php"><i class="fa fa-plus"></i> <?php echo $lang['CORRECTION']; ?></a></li>
                     <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="getTravellingExpenses.php"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>
+                    <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="display_vacation.php"><i class="fa fa-suitcase"></i> <?php echo $lang['VACATION']; ?></a></li>
                     <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="adminTodos.php"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['CHECKLIST']; ?></a></li>
                   </ul>
                 </div>
@@ -398,7 +399,7 @@ $(document).ready(function() {
             </div>
             <br>
             <?php
-            if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php"){
+            if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php'){
               echo "<script>document.getElementById('adminOption_TIME').click();</script>";
             }
             ?>

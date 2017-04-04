@@ -113,6 +113,7 @@ echo mysqli_error($conn);
               <th>Name</th>
               <th><?php echo $lang['CORRECTION'] .' '. $lang['DATE']; ?> (UTC)</th>
               <th><?php echo $lang['ADJUSTMENTS'].' '. $lang['HOURS']; ?></th>
+              <th><?php echo $lang['AFFECTED_MONTH']; ?></th>
               <th>Info</th>
             </thead>
             <tbody>
@@ -125,6 +126,7 @@ echo mysqli_error($conn);
                 echo '<td>'.$row['firstname'].'</td>';
                 echo '<td>'.substr($row['cOnDate'],0,16).'</td>';
                 echo '<td>'.sprintf("%+.2f",$hours).'</td>';
+                echo '<td>'.substr($row['createdOn'],0,7).'</td>';
                 echo '<td>'.$row['infoText'].'</td>';
                 echo '</tr>';
               }
@@ -140,7 +142,6 @@ echo mysqli_error($conn);
       <div class="container-fluid">
         <form method="POST">
           <?php echo "<br><h3>$filterName - <small>".$lang['VACATION']."</small></h3><br><br>"; ?>
-
             <input type="text" readonly style="display:none" name="filterUserID" value="<?php echo "$filterID, $filterName"; ?>" />
             <div class="row">
               <div class="col-xs-5">

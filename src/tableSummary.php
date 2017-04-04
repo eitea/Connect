@@ -4,7 +4,7 @@
 
   $breakCreditHours = $logSums->breakCreditHours;
   $absolvedHours = $logSums->absolvedHours;
-  $expectedHours = $logSums->expectedHours;
+  $expectedHours = $logSums->expectedHours - $logSums->vacationHours;
   $vacationHours = $logSums->vacationHours;
   $specialLeaveHours = $logSums->specialLeaveHours;
   $sickHours = $logSums->sickHours;
@@ -49,7 +49,6 @@
         echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['VACATION'] . ': </td><td> +' . number_format($vacationHours, 2, '.', '') . ' </td></tr>';
         echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($specialLeaveHours,2, '.', '').'</td></tr>';
         echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($sickHours,2,'.','').'</td></tr>';
         echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . ': </td> <td> -' . number_format($overTimeAdditive,2,'.','') . ' </td></tr>';
@@ -135,7 +134,7 @@
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td>'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</td><td>'. sprintf('%.2f', $availableVacationDays) .'</td></tr>';
+        echo '<tr><td><a href="display_vacation.php?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $availableVacationDays) .'</td></tr>';
         echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>
