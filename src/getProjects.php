@@ -538,7 +538,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <th>Kunde und Pro<div><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></div></th>
           <th>Info <div>Infotext</div></th>
           <th>Date<div><?php echo $lang['DATE']; ?></div></th>
-          <th>Datum Verrech<div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
+          <th>Datum Verrechnt <div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
           <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
           <th>1234567890<div style="top:-15px;"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
             <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
