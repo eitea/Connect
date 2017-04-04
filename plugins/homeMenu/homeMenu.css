@@ -41,8 +41,8 @@ body{
   overflow-y:auto;
 }
 .sidebar-nav .navbar li a,  .navbar-nav > li > a{
-  padding-top: 4px;
-  padding-bottom: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
   background-color: #428bca;
