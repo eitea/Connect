@@ -109,6 +109,7 @@ if(isset($_POST['newMonth'])){
   <div class="col-sm-6 pull-left">
     <h4> Saldo <?php echo $lang_monthToString[intval(substr($currentMonth,5,2))]; ?> </h4>
     <ul>
+      <li><?php echo $lang['USED_DAYS'].": $usedDays ". $lang['DAYS']; ?></li>
       <li><?php echo round($gatheredDays - $usedDays + $correctionDays) .' '. $lang['DAYS'] . ' (' . sprintf('%+d ', $correctionDays) . $lang['DAYS'] . ' ' . $lang['CORRECTION'].')'; ?></li>
     </ul>
   </div>
