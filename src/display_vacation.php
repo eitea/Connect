@@ -90,12 +90,18 @@ if(isset($_POST['newMonth'])){
             $j = $iRow['exitDate'];
           }
           $dayDiff = intval(timeDiff_Hours($i, $j) / 24);
-          $gatheredDays += round(($iRow['vacPerYear']/365) * $dayDiff, 2); //accumulated vacation
+          $gatheredDays += ($iRow['vacPerYear']/365) * $dayDiff; //accumulated vacation
           $i = substr($i, 0, 10);
           $j = substr($j, 0, 10);
+          $gatheredDays = round($gatheredDays);
           echo "<li>From $i - Until $j  ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays days</li></ul></li>";
-
           $i = $iRow['endDate'];
+        }
+
+        $correctionDays = 0;
+        $result = $conn->query("SELECT hours, addOrSub FROM $correctionTable WHERE userID = $curID AND cType = 'vac' AND createdOn LIKE '$currentMonth%'");
+        while($result && ($row = $result->fetch_assoc())){
+          $correctionDays += intval($row['hours']) * intval($row['addOrSub']);
         }
         ?>
     </ul>
@@ -103,7 +109,7 @@ if(isset($_POST['newMonth'])){
   <div class="col-sm-6 pull-left">
     <h4> Saldo <?php echo $lang_monthToString[intval(substr($currentMonth,5,2))]; ?> </h4>
     <ul>
-      <li><?php echo ($gatheredDays - $usedDays) .' '. $lang['DAYS']; ?></li>
+      <li><?php echo round($gatheredDays - $usedDays + $correctionDays) .' '. $lang['DAYS'] . ' (' . sprintf('%+d ', $correctionDays) . $lang['DAYS'] . ' ' . $lang['CORRECTION'].')'; ?></li>
     </ul>
   </div>
 </div>
@@ -133,7 +139,7 @@ if(isset($_POST['newMonth'])){
 
       $i = substr($i, 0, 10);
       $j = substr($j, 0, 10);
-      $gatheredDays = round($gatheredDays, 2);
+      $gatheredDays = round($gatheredDays);
       echo "<li>From $i - Until $j  ($dayDiff days difference)<ul><li> $vac / 365 * $dayDiff = $gatheredDays days</li></ul></li>";
       ?>
     </ul>
@@ -148,8 +154,13 @@ if(isset($_POST['newMonth'])){
         $usedDays = $row['usedDays'];
         echo "<li>".$lang['USED_DAYS'].": $usedDays ". $lang['DAYS'] ."</li>";
       }
+      $correctionDays = 0;
+      $result = $conn->query("SELECT hours, addOrSub FROM $correctionTable WHERE userID = $curID AND cType = 'vac'");
+      while($result && ($row = $result->fetch_assoc())){
+        $correctionDays += intval($row['hours']) * intval($row['addOrSub']);
+      }
       ?>
-      <li><?php echo round($gatheredDays - $usedDays,2) .' '. $lang['DAYS']; ?></li>
+      <li><?php echo round($gatheredDays - $usedDays + $correctionDays) .' '. $lang['DAYS'] . ' (' . sprintf('%+d ', $correctionDays) . $lang['DAYS'] . ' ' . $lang['CORRECTION'].')'; ?></li>
     </ul>
   </div>
 </div>
