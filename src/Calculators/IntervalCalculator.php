@@ -32,7 +32,7 @@ class Interval_Calculator{
     $this->from = substr($from, 0, 10).' 12:00:00';
     $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = (timeDiff_Hours($from, $to) / 24)+1;
+    $this->days = (timeDiff_Hours($from, $to) / 24)+1; //24h covers up 2 days
     if($this->days > 1){
       $this->calculateValues();
     }
@@ -99,7 +99,7 @@ class Interval_Calculator{
     $this->daysAsNumber[] = $count;
 
     //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE('$fromDate') <= DATE(createdOn) AND DATE('$i') >= DATE(createdOn)");
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE('$fromDate') <= DATE(createdOn) AND DATE('$i') > DATE(createdOn)");
     while($result && ($row = $result->fetch_assoc())){
       $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
     }
