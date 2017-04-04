@@ -72,7 +72,7 @@ if(isset($_POST['newMonth'])){
 
 <div class="row">
   <div class="col-sm-6 pull-right">
-    <h4><?php echo $lang['ACCUMULATED_DAYS']; ?></h4>
+    <h5><?php echo $lang['ACCUMULATED_DAYS']; ?></h5>
     <ul>
       <?php
       //t returns the number of days in the month of a given date
@@ -113,7 +113,7 @@ if(isset($_POST['newMonth'])){
 
 <div class="row">
   <div class="col-sm-6 pull-right">
-    <h4><?php echo $lang['ACCUMULATED_DAYS']; ?></h4>
+    <h5><?php echo $lang['ACCUMULATED_DAYS']; ?></h5>
     <ul>
       <?php
       $gatheredDays = 0;
