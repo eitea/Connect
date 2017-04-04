@@ -115,7 +115,7 @@ if(isset($_POST['newMonth'])){
     <h5><?php echo $lang['ACCUMULATED_DAYS']; ?></h5>
     <ul>
       <?php
-      $gatheredDays = 0;
+      $gatheredDays = $vac = 0;
       $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
       while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
         $vac = intval($iRow['vacPerYear']);

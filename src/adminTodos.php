@@ -34,13 +34,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       //adjust to match expectedHours OR last projectbooking, if any of these even exist
       $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
-      if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){ //match last projectbooking
+      if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){
         $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
         WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
         $result = mysqli_query($conn, $sql);
         if ($result && $result->num_rows > 0) { //does a booking exist?
           $rowLastBooking = $result->fetch_assoc();
-          $adjustedTime = $rowLastBooking['end']; //adjust break later.
+          $adjustedTime = $rowLastBooking['end'];
         }
       }
       $conn->query("UPDATE $logTable SET timeEnd = '$adjustedTime' WHERE indexIM = $indexIM");
@@ -87,11 +87,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //account
-  if(isset($_POST['okay_acc'])){ //okay it and redirect to edit user
+  if(isset($_POST['okay_acc'])){
     $requestID = $_POST['okay_acc'];
     $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
     redirect("editUsers.php");
-  } elseif(isset($_POST['nokay_acc'])){ //delete account
+  } elseif(isset($_POST['nokay_acc'])){
     $requestID = $_POST['nokay_acc'];
     $conn->query("DELETE FROM $userTable WHERE id = $requestID"); //FK dependency will delete all requests etc.
   }
@@ -104,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeFin = $row['toDate'];
     $indexIM = $row['requestID'];
     $user = $row['userID'];
-    if($indexIM != 0){ // 0
+    if($indexIM != 0){
       $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
     } else { //timestamp doesnt exist
       $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, breakCredit, status) VALUES('$timeStart', '$timeFin', $user, 0, 0, '0')");
