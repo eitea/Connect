@@ -106,10 +106,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $user = $row['userID'];
     if($indexIM != 0){ // 0
       $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
-      echo 'INSERTED ' . mysqli_error($conn);
     } else { //timestamp doesnt exist
       $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, breakCredit, status) VALUES('$timeStart', '$timeFin', $user, 0, 0, '0')");
-      echo 'INSERTED ' . mysqli_error($conn);
     }
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");

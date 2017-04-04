@@ -87,7 +87,7 @@ class Interval_Calculator{
         $this->activity[] = '-1';
         $this->lunchTime[] = 0;
         $this->timeToUTC[] = 0;
-        $this->indecesIM[] = $id.', '.$i;
+        $this->indecesIM[] = 0;
       }
       //if today is a holiday, poot poot
       if(isHoliday($i)){

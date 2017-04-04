@@ -25,20 +25,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterStatus = $_POST['filterStatus'];
   }
 
-  if(isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){
+  if(isset($_POST['modifyDate_0']) ||isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){ //scrolling
     $scrollPos = intval($_POST['scrollPos']);
-    $imm = isset($_POST['modifyDate'])? $_POST['modifyDate'] : $_POST['saveChanges'];
-    $result = $conn->query("SELECT userID FROM $logTable WHERE indexIM = '$imm'");
   }
   if(isset($_POST['saveChanges'])) {
-    $scrollPos = intval($_POST['scrollPos']);
     $imm = $_POST['saveChanges'];
     $timeStart = $_POST['timesFrom'] .':00';
     $timeFin = $_POST['timesTo'] .':00';
     $status = intval($_POST['newActivity']);
     $newBreakVal = floatval($_POST['newBreakValues']);
-    if(isset($_POST['creatTimeZone']) && ($arr = explode(', ', $imm))){ //create new
-      $creatUser = $arr[0];
+    if($imm == 0){ //create new
+      $creatUser = $filterID;
       $timeToUTC = intval($_POST['creatTimeZone']);
       $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
       if($timeFin != '0001-01-01T00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
@@ -247,11 +244,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $neutralStyle = "style=color:#c7c6c6;";
                   }
                   //pressing edit on a button makes row editable, (scrollheight preserved via js at bottom of page)
-                  if(isset($_POST['modifyDate']) && $_POST['modifyDate'] === $calculator->indecesIM[$i]){
+                  if((isset($_POST['modifyDate']) && $_POST['modifyDate'] == $calculator->indecesIM[$i]) || (isset($_POST['modifyDate_0']) && $_POST['modifyDate_0'] == $calculator->date[$i])){
                     echo "<tr>";
                     echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
-                    if(($arr = explode(', ', $_POST['modifyDate'])) && count($arr) > 1){ //for non existing timestamps, indexIM consists of (userID, date)
-                      $A = $B = $arr[1];
+                    if(!empty($_POST['modifyDate_0'])){ //for non existing timestamps, indexIM consists of (userID, date)
+                      $A = $B = $_POST['modifyDate_0'].' 00:00:00';
                       echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
                       for($i_utc = -12; $i_utc <= 12; $i_utc++){
                         if($i_utc == $timeToUTC){
@@ -297,13 +294,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
                     echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
                     echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
-                    echo '<td><button type="submit" name="modifyDate" class="btn btn-default" title="Edit" value="'.$calculator->indecesIM[$i].'"><i class="fa fa-pencil"></i></button>';
+                    if($calculator->indecesIM[$i] != 0){
+                      echo '<td><button type="submit" name="modifyDate" class="btn btn-default" title="Edit" value="'.$calculator->indecesIM[$i].'"><i class="fa fa-pencil"></i></button>';
+                    } else {
+                      echo '<td><button type="submit" name="modifyDate_0" class="btn btn-default" title="Edit" value="'.$calculator->date[$i].'"><i class="fa fa-pencil"></i></button>';
+                    }
                     if($bookingResults && $bookingResults->num_rows > 0){
                       echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
                       $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
                       $bookingResultsResults['timeToUTC'][] = $calculator->timeToUTC[$i];
                     }
-                    if(!preg_match('/,\s/', $calculator->indecesIM[$i])){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/></td>';}
+                    if($calculator->indecesIM[$i] != 0){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/></td>';}
                     echo "</tr>";
                   }
 
