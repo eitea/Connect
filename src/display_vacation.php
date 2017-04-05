@@ -108,7 +108,7 @@ if(!$result || $result->num_rows <= 0){
         }
 
         $correctionDays = 0;
-        $result = $conn->query("SELECT hours, addOrSub FROM $correctionTable WHERE userID = $curID AND cType = 'vac' AND createdOn LIKE '$currentDate%'");
+        $result = $conn->query("SELECT hours, addOrSub FROM $correctionTable WHERE userID = $curID AND cType = 'vac' AND DATE(createdOn) <= DATE('$currentDate')");
         while($result && ($row = $result->fetch_assoc())){
           $correctionDays += intval($row['hours']) * intval($row['addOrSub']);
         }
