@@ -103,7 +103,7 @@ if(!$result || $result->num_rows <= 0){
           $i = substr($i, 0, 10);
           $j = substr($j, 0, 10);
           $gatheredDays = round($gatheredDays);
-          echo "<li>From $i - Until $j  ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays ".$lang['DAYS']."</li></ul></li>";
+          echo "<li>From $i - Until $j ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays ".$lang['DAYS']."</li></ul></li>";
           $i = $iRow['endDate'];
         }
 

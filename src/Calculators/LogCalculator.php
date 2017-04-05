@@ -41,10 +41,12 @@ class LogCalculator{
       } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
         $j = $iRow['exitDate'];
       }
-      $this->vacationDays += ($iRow['vacPerYear']/365) * (timeDiff_Hours($i, $j) / 24); //accumulated vacation
+
+      $diff = timeDiff_Hours($i, $j);
+      if($diff > 0){
+      $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
 
       while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
-
         if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
           $this->overTimeAdditive += $iRow['overTimeLump'];
         }
@@ -113,6 +115,8 @@ class LogCalculator{
          $this->saldo = 0;
        }
      }
+            
+   } //end if($diff > 0);
   }
 
   private function timeDiff_Hours($from, $to) {

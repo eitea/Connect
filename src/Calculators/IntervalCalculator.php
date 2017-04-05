@@ -115,7 +115,7 @@ class Interval_Calculator{
       return $a;
     }
     $date = new DateTime($a);
-    if($b<0){
+    if($b < 0){
       $b *= -1;
       $date->sub(new DateInterval("PT".$b."H"));
     } else {
