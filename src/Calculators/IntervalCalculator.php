@@ -1,7 +1,4 @@
 <?php
-/*
-* This Calculator is the same as the monthly calculator, it only accepts an interval instead.
-*/
 class Interval_Calculator{
   public $days = 0;
   public $overTimeLump = 0;
@@ -100,7 +97,7 @@ class Interval_Calculator{
 
     //correction Hours:
     $i = carryOverAdder_Hours($i, -24);
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND (YEAR(createdOn) BETWEEN YEAR('$fromDate') AND YEAR('$i')) AND (MONTH(createdOn) BETWEEN MONTH('$fromDate') AND MONTH('$i'))");
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE('".substr($fromDate,0,7)."-01') <= DATE(createdOn) AND DATE('$i') > DATE(createdOn)");
     while($result && ($row = $result->fetch_assoc())){
       $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
     }

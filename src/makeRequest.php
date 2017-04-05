@@ -73,7 +73,7 @@
   </script>
 
 <?php
-$sql = "SELECT * FROM $userRequests WHERE userID = $userID";
+$sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType = 'vac'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>
 
@@ -91,6 +91,9 @@ if($result && $result->num_rows > 0): ?>
         <tbody>
           <?php
             while($row = $result->fetch_assoc()){
+              if(timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
+                continue;
+              }
               $style = "";
               if($row['status'] == 0) {
                 $style="";

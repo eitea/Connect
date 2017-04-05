@@ -1,7 +1,4 @@
 <?php
-/*
-* This Badass calculates everything. Yep.
-*/
 class LogCalculator{
   public $overTimeAdditive = 0;
   public $vacationDays = 0; //can be understood as 'still available vacation days' (considers already used vacation)
