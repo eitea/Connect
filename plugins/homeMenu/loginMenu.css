@@ -14,12 +14,13 @@ body{
 #footer {
   clear: both;
   position:fixed;
+  left:0px;
   bottom:20%;
   right;
   padding:20px 10% 20px 0px;
   width:90%;
   text-align: right;
-  background-color: rgba(74, 70, 138, 0.37);
+  background-color: rgba(74, 70, 138, 0.35);
   border-top:solid;
   border-bottom:solid;
 }

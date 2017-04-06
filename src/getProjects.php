@@ -6,10 +6,45 @@
 .popover{
   max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
+#project_filters{
+  position:fixed;
+  background:white;
+  height:400px;
+  width:90%;
+}
+#project_body{
+  padding-top:350px;
+  padding-bottom:200px;
+}
+#project_footer{
+  position:fixed;
+  background:white;
+  width:100%;
+  bottom:0;
+  padding-bottom:5px;
+}
+.seperated_header{
+  padding-top: 37px;
+}
+.seperated_header th{
+  height: 0;
+  line-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  color: transparent;
+  border: none;
+  white-space: nowrap;
+}
+.seperated_header th div{
+  position: fixed;
+  background: transparent;
+  color: black;
+  padding: 9px 25px;
+  top:400px;
+  margin-left: -25px;
+  line-height: normal;
+}
 </style>
-<div class="page-header">
-  <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
-</div>
 
 <?php
 $filterDate = substr(getCurrentTimestamp(),0,10); //granularity: day
@@ -55,6 +90,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!isset($_POST['filterAddDrives'])){
     $filterAddDrives = "";
   }
+
+  if(!empty($_POST['set_all_filters'])){
+    $arr = explode(',', $_POST['set_all_filters']);
+      $filterDate = $arr[0];
+      $filterCompany = $arr[1];
+      $filterClient = $arr[2];
+      $filterProject = $arr[3];
+      $filterUserID = $arr[4];
+      $filterAddBreaks = $arr[5];
+      $filterAddDrives = $arr[6];
+      $booked = $arr[7];
+    }
+    // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
 
   if(!empty($_POST['editing_save'])){ //comes from the modal
     $x = $_POST['editing_save'];
@@ -116,14 +164,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(isset($_POST['editingIndeces'])) {
       //update free of charge
-      if(isset($_POST['noCheckCheckingIndeces']) && $_POST['filterBooked'] == 1){
+      if(isset($_POST['noCheckCheckingIndeces'])){
         foreach ($_POST["noCheckCheckingIndeces"] as $e) {
           $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
           $conn->query($sql);
         }
       }
       //charged
-      if(isset($_POST['checkingIndeces']) && $_POST['filterBooked'] == 1){
+      if(isset($_POST['checkingIndeces'])){
         foreach ($_POST["checkingIndeces"] as $e) {
           $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
           $conn->query($sql);
@@ -258,10 +306,13 @@ function changeValue(cVal, id, val){
 </script>
 
 
-<form method='post'>
   <!-- ####################-FILTERS-######################################## -->
-  <div class="row">
-    <div class="col-md-3">
+  <form method='post'>
+  <div id="project_filters" class="row">
+    <div class="page-header">
+      <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
+    </div>
+    <div class="col-xs-3">
       <!-- SELECT COMPANY -->
       <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
         <option value="0">Select Company...</option>
@@ -313,7 +364,7 @@ function changeValue(cVal, id, val){
 
     <!-- SELECTS DATE -->
     <div id="dateDiv" class="invisible">
-      <div class="col-md-3">
+      <div class="col-xs-3">
         <div class="form-group">
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
@@ -360,7 +411,7 @@ function changeValue(cVal, id, val){
 
     <!-- SELECTS CLIENT AND PROJECT -->
     <div id="projectAndClientDiv" class="invisible">
-      <div class="col-md-3">
+      <div class="col-xs-3">
         <div class="form-group">
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
         </div>
@@ -376,7 +427,7 @@ function changeValue(cVal, id, val){
     </div>
 
     <!-- SELECTS CHARGED -->
-    <div class="col-md-3">
+    <div class="col-xs-3">
       <div class="form-group">
         <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
       </div>
@@ -391,9 +442,8 @@ function changeValue(cVal, id, val){
     </div>
   </div>
   <br><br>
-
+</form>
 <!----------------------------------------------------------------------------->
-
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //build your query depending on filter options
@@ -528,21 +578,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   };
   </script>
 <?php endif; ?>
+
 <?php if($result && $result->num_rows > 0): ?>
-  <div class="container-fluid">
-  <section>
-    <div class="table-scrollable-container" >
-      <table class="table table-striped table-condensed table-scrollable">
-        <thead>
-          <th><div><?php echo $lang['DELETE']; ?></div></th>
-          <th>Kunde und Pro<div><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></div></th>
-          <th>Info <div>Infotext</div></th>
-          <th>Date<div><?php echo $lang['DATE']; ?></div></th>
-          <th>Datum Verrechnt <div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
-          <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
-          <th>1234567890<div style="top:-15px;"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
-            <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
+<div id="project_body">
+  <form id="project_table" method="post">
+    <?php echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />"; ?>
+    <table class="table table-striped table-condensed seperated_header">
+      <thead>
+        <th><div><?php echo $lang['DELETE']; ?></div></th>
+        <th>Kunde und Pro<div><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></div></th>
+        <th>Info <div>Infotext</div></th>
+        <th>Date<div><?php echo $lang['DATE']; ?></div></th>
+        <th>Datum Verrechnt <div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
+        <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
+        <th>1234567890<div style="margin-top:-10px"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
+          <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
           <th>Detail<div>Detail</div></th>
+          <th></th>
         </thead>
         <?php
         $csv = new Csv();
@@ -617,8 +669,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Person - Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
           if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
           echo "</td>";
+          echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //since we dont know what has been edited: save all.
           echo "</tr>";
-          echo '<input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '">'; //since we dont know what has been edited: save all.
 
           $csv->addLine($csv_Add);
           $sum_min += timeDiff_Hours($row['start'], $row['end']);
@@ -630,10 +682,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
         echo "</tr>";
         ?>
-      </table>
-    </div>
-  </section>
-
+    </table>
+  </form>
+</div>
   <script>
   $(function () {
     $('[data-toggle="popover"]').popover()
@@ -644,7 +695,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <?php
   while($row = $editingResult->fetch_assoc()):
     $x = $row['projectBookingID'];
-  ?>
+?>
+<form method="post">
     <div class="modal fade editingModal-<?php echo $x ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -653,6 +705,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
           <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
             <?php
+            echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
             if($row['bookingType'] != 'break'){ //if this is a break, do not display client/project selection
               echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
               $sql = "SELECT * FROM $clientTable";
@@ -724,20 +777,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </div>
     </div>
+  </form>
   <?php endwhile;?>
 
-
+<div id="project_footer">
   <br><!-- BUTTONS --><br>
   <?php
   $diabled = 'disabled';
   if($filterUserID != 0 && !empty($_POST['filterDay']) && !empty($_POST['filterMonth'])&& !empty($_POST['filterYear'])){ $diabled = ''; }
   ?>
-  <button type='submit' class="btn btn-warning" name='saveChanges'><?php echo $lang['SAVE']; ?></button>
+  <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
   <button class="btn btn-default" <?php echo $diabled; ?> data-toggle="collapse" href="#add_bookings_collapse" title="Specify day and user to add bookings"><?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?></button>
 
   <br><br>
 
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
+<form method="POST">
   <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
     <div class="well">
       <div class="container-fluid">
@@ -753,6 +808,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="row">
         <div id="mySelections" class="col-xs-9"><br>
           <?php
+          echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
           $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
           $result = mysqli_query($conn, $query);
           if($result->num_rows == 1):
@@ -793,15 +849,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </div>
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-xs-8">
           <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
         </div>
-        <div class="col-md-4">
+        <div class="col-xs-4">
           <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-xs-6">
           <div class="input-group">
             <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
             <span class="input-group-addon"> - </span>
@@ -814,33 +870,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
   </div>
-  <!-- END ADD-BOOKING FIELD -->
 </form>
-</div>
-<div class="row" style="padding-left:15px;">
-  <div class="col-xs-3">
-    <form action="csvDownload.php" method="post" target='_blank'>
-      <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-    </form>
-  </div>
-  <div class="col-xs-3">
-    <form action="pdfDownload.php" method="post" target='_blank'>
-      <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
-      <div class="dropup">
-        <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Download as PDF
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-          <?php
-          $result = $conn->query("SELECT * FROM $pdfTemplateTable");
-          while($result && ($row = $result->fetch_assoc())){
-            echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
-          }
-          ?>
-        </ul>
-      </div>
-    </form>
+<!-- END ADD-BOOKING FIELD -->
+  <div class="row" style="padding-left:15px;">
+    <div class="col-xs-3">
+      <form action="csvDownload.php" method="post" target='_blank'>
+        <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
+      </form>
+    </div>
+    <div class="col-xs-3">
+      <form action="pdfDownload.php" method="post" target='_blank'>
+        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
+        <div class="dropup">
+          <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download as PDF
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <?php
+            $result = $conn->query("SELECT * FROM $pdfTemplateTable");
+            while($result && ($row = $result->fetch_assoc())){
+              echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
+            }
+            ?>
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 <?php endif; //end if($result && $result->num_rows > 0) ?>

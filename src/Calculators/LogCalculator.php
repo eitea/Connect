@@ -89,21 +89,20 @@ class LogCalculator{
           }
 
           $i = carryOverAdder_Hours($i, 24);
-        }
+        }//end foreach day in intveral
       } //end if($diff > 0);
-
-      //correction Hours:
-      $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND createdOn");
-      while($result && ($row = $result->fetch_assoc())){
-        if($row['cType'] == 'log'){
-          $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
-        } elseif($row['cType'] == 'vac'){
-          $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
-        }
-      }
     } //end foreach interval
 
-
+    
+    //correction Hours:
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE(createdOn) >= DATE('".$this->beginDate."')");
+    while($result && ($row = $result->fetch_assoc())){
+      if($row['cType'] == 'log'){
+        $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
+      } elseif($row['cType'] == 'vac'){
+        $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
+      }
+    }
 
     $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
 

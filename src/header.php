@@ -44,6 +44,18 @@ $(document).ready(function() {
     }, 1000);
   }
 });
+
+$(document).ready(function () {
+  $('[data-toggle=offcanvas]').click(function () {
+    if ($('.sidebar-offcanvas').css('background-color') == 'rgb(255, 255, 255)') {
+      $('.list-group-item').attr('tabindex', '-1');
+    } else {
+      $('.list-group-item').attr('tabindex', '');
+    }
+    $('.row-offcanvas').toggleClass('active');
+  });
+});
+
 </script>
 
 <body id="body_container" class="is-table-row">
@@ -190,6 +202,7 @@ $(document).ready(function() {
           </li>
         </ul>
         <div class="navbar-right" style="margin-right:10px">
+          <a class="btn navbar-btn hidden-md hidden-lg hidden-sm" data-toggle="offcanvas"><i class="fa fa-bars"></i></a>
           <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
           <span class="navbar-text"><?php echo $_SESSION['firstname']; ?></span>
           <a class="btn navbar-btn" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
@@ -221,7 +234,6 @@ $(document).ready(function() {
             <div class="modal-body">
               <?php echo $lang['NEW_PASSWORD']?>: <br>
               <input type="password" class="form-control" name="password" ><br>
-
               <?php echo $lang['NEW_PASSWORD_CONFIRM']?>: <br>
               <input type="password" class="form-control" name="passwordConfirm" ><br><br>
             </div>
@@ -297,7 +309,7 @@ $(document).ready(function() {
             <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
             <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
             <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
-
+            
             <?php if($showReadyPlan == 'TRUE'): ?>
               <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
             <?php endif; ?>
