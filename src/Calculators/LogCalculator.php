@@ -43,64 +43,67 @@ class LogCalculator{
       }
 
       $diff = timeDiff_Hours($i, $j);
-      if($diff > 0){
-      $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
+      if($diff > 0){ //in case for future dates
+        $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
 
-      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
-        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
-          $this->overTimeAdditive += $iRow['overTimeLump'];
-        }
-        $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
-        if(isHoliday($i)){
-          $expectedHours = 0;
-        }
-        $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
-        if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
-          if($row['timeEnd'] == '0000-00-00 00:00:00'){
-            //open timestamp lowers expected Hours according to how long user has been checked in
-            $timeEnd = $now;
-            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
-              $this->expectedHours += $expectedHours;
+        while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
+          if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
+            $this->overTimeAdditive += $iRow['overTimeLump'];
+          }
+          $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
+          if(isHoliday($i)){
+            $expectedHours = 0;
+          }
+          $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
+          if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
+            if($row['timeEnd'] == '0000-00-00 00:00:00'){
+              //open timestamp lowers expected Hours according to how long user has been checked in
+              $timeEnd = $now;
+              if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
+                $this->expectedHours += $expectedHours;
+              } else {
+                $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //else: reduce expected hours to match time he has been here already, so there's no minus he can't keep up to.
+              }
             } else {
-              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //else: reduce expected hours to match time he has been here already, so there's no minus he can't keep up to.
+              $timeEnd = $row['timeEnd'];
+              $this->expectedHours += $expectedHours;
             }
-          } else {
-            $timeEnd = $row['timeEnd'];
+
+            switch($row['status']){
+              case 0:
+              $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
+              $this->breakCreditHours += $row['breakCredit'];
+              break;
+              case 1:
+              $this->vacationHours += timeDiff_Hours($row['time'], $timeEnd);
+              $this->vacationDays--;
+              break;
+              case 2:
+              $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
+              break;
+              case 3:
+              $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
+            }
+          } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
             $this->expectedHours += $expectedHours;
           }
 
-          switch($row['status']){
-            case 0:
-            $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
-            $this->breakCreditHours += $row['breakCredit'];
-            break;
-            case 1:
-            $this->vacationHours += timeDiff_Hours($row['time'], $timeEnd);
-            $this->vacationDays--;
-            break;
-            case 2:
-            $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
-            break;
-            case 3:
-            $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
-          }
-        } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
-          $this->expectedHours += $expectedHours;
+          $i = carryOverAdder_Hours($i, 24);
         }
+      } //end if($diff > 0);
 
-        $i = carryOverAdder_Hours($i, 24);
+      //correction Hours:
+      $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND createdOn");
+      while($result && ($row = $result->fetch_assoc())){
+        if($row['cType'] == 'log'){
+          $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
+        } elseif($row['cType'] == 'vac'){
+          $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
+        }
       }
     } //end foreach interval
 
-    //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID");
-    while($result && ($row = $result->fetch_assoc())){
-      if($row['cType'] =='log'){
-        $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
-      } elseif($row['cType'] == 'vac'){
-        $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
-      }
-    }
+
 
     $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
 
@@ -115,8 +118,6 @@ class LogCalculator{
          $this->saldo = 0;
        }
      }
-            
-   } //end if($diff > 0);
   }
 
   private function timeDiff_Hours($from, $to) {

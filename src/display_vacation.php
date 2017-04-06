@@ -87,10 +87,10 @@ if(!$result || $result->num_rows <= 0){
       <?php
       //t returns the number of days in the month of a given date
       $gatheredDays = 0;
-      $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id
+      $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id
         WHERE userID = $curID AND (DATE(endDate) <= DATE('$currentDate') OR endDate IS NULL)"); //select all intervals until this date
         while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
-          $i = substr($iRow['beginningDate'],0,10).' 05:00:00';
+          $i = substr($iRow['startDate'],0,10).' 05:00:00';
           if(!empty($iRow['endDate'])){ //current interval has endDate
             $j = $iRow['endDate'];
           } elseif($iRow['exitDate'] == '0000-00-00 00:00:00'){ //current interval and he HAS an exitDate, calculate until the exitDate.
@@ -104,7 +104,6 @@ if(!$result || $result->num_rows <= 0){
           $j = substr($j, 0, 10);
           $gatheredDays = round($gatheredDays);
           echo "<li>From $i - Until $j ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays ".$lang['DAYS']."</li></ul></li>";
-          $i = $iRow['endDate'];
         }
 
         $correctionDays = 0;
