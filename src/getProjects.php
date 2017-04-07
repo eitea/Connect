@@ -6,10 +6,14 @@
 .popover{
   max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
+.custom{
+  width:20%;
+  padding:0;
+}
 #project_filters{
   position:fixed;
   background:white;
-  height:400px;
+  padding-bottom:40px;
   width:90%;
 }
 #project_body{
@@ -312,7 +316,7 @@ function changeValue(cVal, id, val){
     <div class="page-header">
       <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
     </div>
-    <div class="col-xs-3">
+    <div class="col-xs-3 custom">
       <!-- SELECT COMPANY -->
       <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
         <option value="0">Select Company...</option>
@@ -364,7 +368,7 @@ function changeValue(cVal, id, val){
 
     <!-- SELECTS DATE -->
     <div id="dateDiv" class="invisible">
-      <div class="col-xs-3">
+      <div class="col-xs-3 custom">
         <div class="form-group">
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
         </div>
@@ -411,7 +415,7 @@ function changeValue(cVal, id, val){
 
     <!-- SELECTS CLIENT AND PROJECT -->
     <div id="projectAndClientDiv" class="invisible">
-      <div class="col-xs-3">
+      <div class="col-xs-3 custom">
         <div class="form-group">
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
         </div>
@@ -427,7 +431,7 @@ function changeValue(cVal, id, val){
     </div>
 
     <!-- SELECTS CHARGED -->
-    <div class="col-xs-3">
+    <div class="col-xs-3 custom">
       <div class="form-group">
         <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
       </div>
@@ -781,14 +785,41 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <?php endwhile;?>
 
 <div id="project_footer">
-  <br><!-- BUTTONS --><br>
-  <?php
-  $diabled = 'disabled';
-  if($filterUserID != 0 && !empty($_POST['filterDay']) && !empty($_POST['filterMonth'])&& !empty($_POST['filterYear'])){ $diabled = ''; }
-  ?>
-  <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
-  <button class="btn btn-default" <?php echo $diabled; ?> data-toggle="collapse" href="#add_bookings_collapse" title="Specify day and user to add bookings"><?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?></button>
-
+  <br><!-- BUTTONS -->
+  <div class="row">
+    <?php
+    $diabled = 'disabled';
+    if($filterUserID != 0 && !empty($_POST['filterDay']) && !empty($_POST['filterMonth'])&& !empty($_POST['filterYear'])){ $diabled = ''; }
+    ?>
+    <div class="col-xs-6">
+      <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
+      <button class="btn btn-default" <?php echo $diabled; ?> data-toggle="collapse" href="#add_bookings_collapse" title="Specify day and user to add bookings"><?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?></button>
+    </div>
+    <div class="col-xs-2">
+      <form action="csvDownload.php" method="post" target='_blank'>
+        <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
+      </form>
+    </div>
+    <div class="col-xs-2">
+      <form action="pdfDownload.php" method="post" target='_blank'>
+        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
+        <div class="dropup">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download as PDF
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <?php
+            $result = $conn->query("SELECT * FROM $pdfTemplateTable");
+            while($result && ($row = $result->fetch_assoc())){
+              echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
+            }
+            ?>
+          </ul>
+        </div>
+      </form>
+    </div>
+  </div>
   <br><br>
 
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
@@ -872,32 +903,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </div>
 </form>
 <!-- END ADD-BOOKING FIELD -->
-  <div class="row" style="padding-left:15px;">
-    <div class="col-xs-3">
-      <form action="csvDownload.php" method="post" target='_blank'>
-        <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-      </form>
-    </div>
-    <div class="col-xs-3">
-      <form action="pdfDownload.php" method="post" target='_blank'>
-        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
-        <div class="dropup">
-          <button class="btn btn-default btn-block dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Download as PDF
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-            <?php
-            $result = $conn->query("SELECT * FROM $pdfTemplateTable");
-            while($result && ($row = $result->fetch_assoc())){
-              echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
-            }
-            ?>
-          </ul>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 <?php endif; //end if($result && $result->num_rows > 0) ?>
 

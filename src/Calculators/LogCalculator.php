@@ -93,9 +93,9 @@ class LogCalculator{
       } //end if($diff > 0);
     } //end foreach interval
 
-    
+
     //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE(createdOn) >= DATE('".$this->beginDate."')");
+    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE(createdOn) >= DATE('".substr($this->beginDate,0,7)."-01')");
     while($result && ($row = $result->fetch_assoc())){
       if($row['cType'] == 'log'){
         $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
