@@ -8,7 +8,7 @@
 
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
-  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
+<link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -44,18 +44,6 @@ $(document).ready(function() {
     }, 1000);
   }
 });
-
-$(document).ready(function () {
-  $('[data-toggle=offcanvas]').click(function () {
-    if ($('.sidebar-offcanvas').css('background-color') == 'rgb(255, 255, 255)') {
-      $('.list-group-item').attr('tabindex', '-1');
-    } else {
-      $('.list-group-item').attr('tabindex', '');
-    }
-    $('.row-offcanvas').toggleClass('active');
-  });
-});
-
 </script>
 
 <body id="body_container" class="is-table-row">
@@ -376,7 +364,6 @@ $(document).ready(function () {
                 </div>
               </div>
             </div>
-            <br>
             <?php
             if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
               echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -408,7 +395,6 @@ $(document).ready(function () {
                 </div>
               </div>
             </div>
-            <br>
             <?php
             if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php'){
               echo "<script>document.getElementById('adminOption_TIME').click();</script>";
@@ -440,7 +426,6 @@ $(document).ready(function () {
                 </div>
               </div>
             </div>
-            <br>
             <?php
             if($this_page == "getProjects.php" || $this_page == "editCustomers.php" || $this_page == "editProjects.php"){
               echo "<script>$('#adminOption_PROJECT').click();</script>";

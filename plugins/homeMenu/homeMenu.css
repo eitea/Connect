@@ -11,7 +11,9 @@ body{
 .panel-borderless {
   border: 0;
 }
-
+.panel-group .panel-borderless{
+  padding-top:5px;
+}
 .nav.navbar-nav > ul, .sidebar-nav .navbar > ul {
   float: none;
   display: block;
@@ -77,6 +79,9 @@ body{
    .affix-content{
      padding-left:0px;
    }
+   .sidebar-nav .navbar li a > .caret {
+     margin-top: 0px;
+   }
  }
 @media screen and (min-width:768px) {
    #sidemenu{
@@ -84,6 +89,22 @@ body{
      height: 100% !important;
    }
  }
+
+@media screen and (max-height:600px){
+  .sidebar-nav .navbar li a,  .navbar-nav > li > a, .nav .nav-list >li >a{
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  hr{
+    display:none;
+  }
+  .panel-group .panel-borderless{
+    padding-top:0px;
+  }
+  .panel-group .panel-borderless .panel-heading{
+    padding:1px 0px 1px 20px;
+  }
+}
 
 /* LOADER */
 #loader {
