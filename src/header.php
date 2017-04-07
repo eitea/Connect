@@ -8,7 +8,7 @@
 
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -202,7 +202,7 @@ $(document).ready(function () {
           </li>
         </ul>
         <div class="navbar-right" style="margin-right:10px">
-          <a class="btn navbar-btn hidden-md hidden-lg hidden-sm" data-toggle="offcanvas"><i class="fa fa-bars"></i></a>
+          <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
           <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
           <span class="navbar-text"><?php echo $_SESSION['firstname']; ?></span>
           <a class="btn navbar-btn" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
@@ -298,7 +298,7 @@ $(document).ready(function () {
     ?>
 
     <!-- side menu -->
-    <div class="affix-sidebar sidebar-nav hidden-scrollbar">
+    <div id="sidemenu" class="affix-sidebar sidebar-nav hidden-scrollbar">
       <div class="inner">
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
@@ -309,7 +309,7 @@ $(document).ready(function () {
             <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
             <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
             <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
-            
+
             <?php if($showReadyPlan == 'TRUE'): ?>
               <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="readyPlan.php"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
             <?php endif; ?>
@@ -319,7 +319,6 @@ $(document).ready(function () {
               <hr>
               <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
             <?php endif; ?>
-
           <?php endif; //endif(canStamp)?>
 
           <!-- User-Section: EDITING -->
