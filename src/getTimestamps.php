@@ -156,7 +156,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <th><?php echo $lang['IS_TIME']; ?></th>
                 <th><?php echo $lang['DIFFERENCE']; ?></th>
                 <th>Saldo</th>
-                <th style="text-align:right;width:160px;"><div>Option</div></th>
+                <th style="text-align:right;"><div>Option</div></th>
               </thead>
               <tbody>
                 <?php

@@ -8,7 +8,7 @@
 
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
-<link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
