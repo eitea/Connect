@@ -56,6 +56,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
   $lang['ADD'] = 'Add';
+  $lang['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
   $lang['ADJUSTMENTS'] = 'Adjustments';
   $lang['ADMIN_DELETE'] = 'Please do not delete the Admin';
   $lang['ADMIN_CORE_OPTIONS'] = 'System Options';
@@ -97,6 +98,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CORRECTION'] = 'Correction';
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
+  $lang['DATA'] = 'Data';
   $lang['DATE'] = 'Date';
   $lang['DAYS'] = 'Days';
   $lang['DEACTIVATE'] = 'Deactivate';
@@ -284,6 +286,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
   $lang['ADD'] = 'Hinzufügen';
+  $lang['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
   $lang['ADJUSTMENTS'] = 'Anpassungen';
   $lang['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
   $lang['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';

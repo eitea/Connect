@@ -1,5 +1,5 @@
 
-<?php include 'header.php'; ?>
+<?php include 'header.php'; enableToReport($userID);?>
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 
@@ -86,6 +86,7 @@ foreach($arr_IDs as $i): //i canBook
     $break = $row_log['breakCredit'];
     $result_proj = $conn->query("SELECT start, end, bookingType, status FROM $projectBookingTable LEFT JOIN $projectTable ON projectID = $projectTable.id
                                  WHERE bookingType != 'break' AND timestampID =".$row_log['indexIM']." AND start != '0000-00-00 00:00:00' AND end != '0000-00-00 00:00:00'");
+    echo mysqli_error($conn);
     while($result_proj && ($row_proj = $result_proj->fetch_assoc())){
       if($row_proj['bookingType'] == 'project'){
         if(!empty($row_proj['status'])){

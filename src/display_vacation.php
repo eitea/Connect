@@ -99,13 +99,11 @@ if(!$result || $result->num_rows <= 0){
             $j = $iRow['exitDate'];
           }
           $dayDiff = intval(timeDiff_Hours($i, $j) / 24);
-          $gatheredDays += ($iRow['vacPerYear']/365) * $dayDiff; //accumulated vacation
+          $gatheredDays += round($iRow['vacPerYear']/365 * $dayDiff); //accumulated vacation
           $i = substr($i, 0, 10);
           $j = substr($j, 0, 10);
-          $gatheredDays = round($gatheredDays);
-          echo "<li>From $i - Until $j ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = $gatheredDays ".$lang['DAYS']."</li></ul></li>";
+          echo "<li>From $i - Until $j ($dayDiff days difference)<ul><li>".$iRow['vacPerYear']." / 365 * $dayDiff = ".round($iRow['vacPerYear']/365 * $dayDiff)." ".$lang['DAYS']."</li></ul></li>";
         }
-
         $correctionDays = 0;
         $result = $conn->query("SELECT hours, addOrSub FROM $correctionTable WHERE userID = $curID AND cType = 'vac' AND DATE(createdOn) <= DATE('$currentDate')");
         while($result && ($row = $result->fetch_assoc())){

@@ -14,19 +14,15 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $result = $conn->query("SELECT companyID FROM $clientTable WHERE id = $filterClient");
   $row = $result->fetch_assoc();
   $filterCompany = $row['companyID'];
-
 } else {
   $filterClient = 0;
 }
-
 if(isset($_POST['filterCompany'])){
   $filterCompany = $_POST['filterCompany'];
 }
-
 if(isset($_POST['filterClient'])){
   $filterClient = $_POST['filterClient'];
 }
-
 if(isset($_POST['add']) && !empty($_POST['name']) && $filterClient != 0){
   $name = test_input($_POST['name']);
   if(isset($_POST['status'])){
@@ -40,8 +36,7 @@ if(isset($_POST['add']) && !empty($_POST['name']) && $filterClient != 0){
   $sql="INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice')";
   $conn->query($sql);
 }
-
-if (isset($_POST['delete']) && isset($_POST['index'])) {
+if(isset($_POST['delete']) && isset($_POST['index'])) {
   $index = $_POST["index"];
   foreach ($index as $x) {
     $sql = "DELETE FROM $projectTable WHERE id = $x;";
@@ -50,7 +45,6 @@ if (isset($_POST['delete']) && isset($_POST['index'])) {
     }
   }
 }
-
 if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   if(empty($_POST['statii'])){
     $_POST['statii'] = array();
@@ -67,6 +61,12 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
     $sql = "UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status' WHERE id = $projectID";
     $conn->query($sql);
     echo mysqli_error($conn);
+
+    //checkboxes are not set at all if they're not checked. so we gotta remove this!!
+    if(isset($_POST['addField_1_'.$projectID])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
+    if(isset($_POST['addField_2_'.$projectID])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
+    if(isset($_POST['addField_3_'.$projectID])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
+    $conn->query("UPDATE $projectTable SET field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
   }
 }
 ?>
@@ -125,21 +125,45 @@ function showClients(company, client){
         <th><?php echo $lang['DELETE']; ?></th>
         <th>Name</th>
         <th><?php echo $lang['PRODUCTIVE']; ?></th>
+        <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
         <th><?php echo $lang['HOURS']; ?></th>
         <th><?php echo $lang['HOURLY_RATE']; ?></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       <?php
-      $sql = "SELECT * FROM $projectTable WHERE clientID = $filterClient";
-      $result = $conn->query($sql);
-
+      $result = $conn->query("SELECT * FROM $projectTable WHERE clientID = $filterClient");
       echo mysqli_error($conn);
       while($row = $result->fetch_assoc()){
         echo '<tr>';
-        echo '<td><input type=checkbox name=index[] value='. $row['id'].'> </td>';
+        echo '<td><input type="checkbox" name="index[]" value='. $row['id'].'> </td>';
         echo '<td>'. $row['name'] .'</td>';
         echo '<td><div class="checkbox text-center"><input type="checkbox" name="statii[]" '. $row['status'] .' value="'.$row['id'].'"> <i class="fa fa-tags"></i></div></td>';
+        echo '<td><small>';
+        $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $filterCompany ORDER BY id ASC");
+        if($resF->num_rows > 0){
+          $rowF = $resF->fetch_assoc();
+          if($rowF['isActive'] == 'TRUE'){
+            $checked = $row['field_1'] == 'TRUE' ? 'checked': '';
+            echo '<input type="checkbox" '.$checked.' name="addField_1_'.$row['id'].'"/>'. $rowF['name'];
+          }
+        }
+        if($resF->num_rows > 1){
+          $rowF = $resF->fetch_assoc();
+          if($rowF['isActive'] == 'TRUE'){
+            $checked = $row['field_2'] == 'TRUE' ? 'checked': '';
+            echo '<br><input type="checkbox" '.$checked.' name="addField_2_'.$row['id'].'" />'. $rowF['name'];
+          }
+        }
+        if($resF->num_rows > 2){
+          $rowF = $resF->fetch_assoc();
+          if($rowF['isActive'] == 'TRUE'){
+            $checked = $row['field_3'] == 'TRUE' ? 'checked': '';
+            echo '<br><input type="checkbox" '.$checked.' name="addField_3_'.$row['id'].'" />'. $rowF['name'];;
+          }
+        }
+        echo '</small></td>';
         echo '<td><input type="number" class="form-control" step="any" name="boughtHours[]" value="'. $row['hours'] .'"></td>';
         echo '<td><input type="number" class="form-control" step="any" name="pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
         echo '<td><input type="text" class="hidden" name="projectIndeces[]" value="'.$row['id'].'"></td>';
@@ -190,6 +214,6 @@ function showClients(company, client){
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
   </script>
 
-  </form>
-  <!-- /BODY -->
-  <?php include 'footer.php'; ?>
+</form>
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

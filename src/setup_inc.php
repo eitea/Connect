@@ -584,4 +584,36 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE $companyExtraFieldsTable (
+    id INT(6) UNSIGNED PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    name VARCHAR(25) NOT NULL,
+    isActive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isRequired ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isForAllProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    description VARCHAR(50),
+    FOREIGN KEY (companyID) REFERENCES $companyTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $fieldToProjectRelationshipTable (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    active ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    fieldID INT(6) UNSIGNED,
+    projectID INT(6) UNSIGNED,
+    FOREIGN KEY (fieldID) REFERENCES $companyExtraFieldsTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (projectID) REFERENCES $projectTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
 ?>

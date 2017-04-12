@@ -10,9 +10,10 @@ $clientTable = "clientData"; //customers
 $clientDetailTable = "clientInfoData";
 $clientDetailNotesTable = "clientInfoNotes";
 $clientDetailBankTable = "clientInfoBank";
-$companyToUserRelationshipTable = "companyToClientRelationshipData"; //which user works for which companies (N:N)
-$companyDefaultProjectTable = "companyDefaultProjects";
 $companyTable = "companyData";
+$companyExtraFieldsTable = "additionalFields";
+$companyToUserRelationshipTable = "relationship_company_client"; //which user works for which companies (N:N)
+$companyDefaultProjectTable = "companyDefaultProjects";
 $correctionTable = "correctionData";
 
 //deactivated users disappear from the program like deleted ones, but keeps their data.

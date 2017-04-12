@@ -171,7 +171,6 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
     </div>
   </div>
 
-
   <script>
   function showClients(str) {
     if (str != "") {
@@ -198,7 +197,7 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   }
 
   function showProjects(str) {
-    if (str != "") {
+    if (str != "") { //this little piece of sh** won't accept 0 either, btw.
       if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest();
@@ -209,11 +208,27 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
       xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
           document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+          showProjectfields(0, str);
         }
       };
       xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?q="+str+"&p=0",true);
       xmlhttp.send();
     }
+  }
+
+  function showProjectfields(str, str2){
+    if (window.XMLHttpRequest) {
+      xmlhttp = new XMLHttpRequest();
+    } else {
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        document.getElementById("project_fields").innerHTML = xmlhttp.responseText;
+      }
+    };
+    xmlhttp.open("GET","ajaxQuery/AJAX_getProjectFields.php?q="+str+"&p="+str2,true);
+    xmlhttp.send();
   }
 
   function hideMyDiv(o){
@@ -276,12 +291,12 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
           ?>
         </select>
 
-        <select id="clientHint" style='width:200px' class="js-example-basic-single" name="client" onchange="showProjects(this.value)">
+        <select id="clientHint" style='width:200px' class="js-example-basic-single" name="client" onchange="showProjects(this.value);">
         </select>
 
       <?php endif; ?>
 
-      <select id="txtHint" style='width:200px' class="js-example-basic-single" name="project">
+      <select id="txtHint" style='width:200px' class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
       </select>
     </div>
   </div>
@@ -295,6 +310,9 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
       <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
     </div>
   </div>
+
+  <div id="project_fields" class="row">
+  </div><br>
 
   <div class="row">
     <div class="col-md-6">

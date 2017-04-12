@@ -626,6 +626,52 @@ if($row['version'] < 73){
   }
 }
 
+if($row['version'] < 74){
+  $conn->query("ALTER TABLE $logTable ADD COLUMN extra_1 VARCHAR(200) NULL DEFAULT NULL");
+  $conn->query("ALTER TABLE $logTable ADD COLUMN extra_2 VARCHAR(200) NULL DEFAULT NULL");
+  $sql = "ALTER TABLE $logTable ADD COLUMN extra_3 VARCHAR(200) NULL DEFAULT NULL";
+  if($conn->query($sql)){
+    echo '<br> Added three optional booking fields to logs';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+//through my mapping from companyID to extraField ID, this is possible
+  $conn->query("ALTER TABLE $projectTable ADD COLUMN field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("ALTER TABLE $projectTable ADD COLUMN field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $sql = "ALTER TABLE $projectTable ADD COLUMN field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo '<br> Added three additional fields to projects';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE $companyExtraFieldsTable (
+    id INT(6) UNSIGNED PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    name VARCHAR(25) NOT NULL,
+    isActive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isRequired ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isForAllProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    description VARCHAR(50),
+    FOREIGN KEY (companyID) REFERENCES $companyTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table to save additional fields to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "RENAME TABLE companyToClientRelationshipData TO $companyToUserRelationshipTable";
+  if($conn->query($sql)){
+    echo '<br> Quick table rename';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

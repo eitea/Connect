@@ -165,6 +165,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       <ul class="dropdown-menu">
                         <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Neues Standardprojekt</a></li>
                         <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Benutzer einstellen</a></li>
+                        <li><a href="editCompanies_fields.php?cmp=<?php echo $x; ?>">Weitere Projektfelder</a></li>
                         <li role="separator" class="divider"></li>
                         <li><button type="button" class="btn btn-link text-warning" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
                       </ul>
@@ -198,7 +199,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           </div>
         </div>
       </div>
-    <?php endwhile; endif; ?>
+    <?php endwhile; endif;?>
   </div>
 
 

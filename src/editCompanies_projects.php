@@ -99,3 +99,5 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
     </div>
   </form>
 </div>
+
+<?php include 'footer.php'; ?>
