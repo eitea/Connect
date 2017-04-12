@@ -18,9 +18,13 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
   $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
   $hours = floatval(test_input($_POST['hours']));
 
-  $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours) VALUES($x, '$name', '$status', '$hourlyPrice', '$hours')";
+  if(isset($_POST['createField_1'])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
+  if(isset($_POST['createField_2'])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
+  if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
+
+  $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours, field_1, field_2, field_3) VALUES($x, '$name', '$status', '$hourlyPrice', '$hours', '$field_1', '$field_2', '$field_3')";
   if($conn->query($sql)){ //add default project to all clients with the company. pow.;
-    $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) SELECT id,'$name', '$status', '$hours', '$hourlyPrice' FROM $clientTable WHERE companyID = $x";
+    $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) SELECT id,'$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3' FROM $clientTable WHERE companyID = $x";
     if($conn->query($sql)){
       echo '<div class="alert alert-success fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -88,8 +92,38 @@ if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
           </div>
         </div>
         <br>
-        <div style="margin-left:25px">
-          <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
+        <div class="row">
+          <div class="col-md-6" style="padding-left:50px;">
+            <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
+          </div>
+          <div class="col-md-6" style="padding-left:50px;">
+            <div class="checkbox">
+              <?php
+              $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $x ORDER BY id ASC");
+              if($resF->num_rows > 0){
+                $rowF = $resF->fetch_assoc();
+                if($rowF['isActive'] == 'TRUE'){
+                  $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                  echo '<input type="checkbox" '.$checked.' name="createField_1"/>'. $rowF['name'];
+                }
+              }
+              if($resF->num_rows > 1){
+                $rowF = $resF->fetch_assoc();
+                if($rowF['isActive'] == 'TRUE'){
+                  $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                  echo '<br><input type="checkbox" '.$checked.' name="createField_2" />'. $rowF['name'];
+                }
+              }
+              if($resF->num_rows > 2){
+                $rowF = $resF->fetch_assoc();
+                if($rowF['isActive'] == 'TRUE'){
+                  $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                  echo '<br><input type="checkbox" '.$checked.' name="createField_3" />'. $rowF['name'];
+                }
+              }
+              ?>
+            </div>
+          </div>
         </div>
         <br>
         <div class="text-right">

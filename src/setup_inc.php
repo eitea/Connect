@@ -103,6 +103,9 @@ $sql = "CREATE TABLE $projectTable(
   hours DECIMAL(5,2),
   status VARCHAR(30),
   hourlyPrice DECIMAL(4,2) DEFAULT 0,
+  field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   FOREIGN KEY (clientID) REFERENCES $clientTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
@@ -124,6 +127,9 @@ $sql = "CREATE TABLE $projectBookingTable (
   internInfo VARCHAR(500),
   booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   bookingType ENUM('project', 'break', 'drive'),
+  extra_1 VARCHAR(200) NULL DEFAULT NULL,
+  extra_2 VARCHAR(200) NULL DEFAULT NULL,
+  extra_3 VARCHAR(200) NULL DEFAULT NULL,
   FOREIGN KEY (projectID) REFERENCES $projectTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE,
@@ -600,20 +606,5 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE $fieldToProjectRelationshipTable (
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    active ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    fieldID INT(6) UNSIGNED,
-    projectID INT(6) UNSIGNED,
-    FOREIGN KEY (fieldID) REFERENCES $companyExtraFieldsTable(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE,
-    FOREIGN KEY (projectID) REFERENCES $projectTable(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
 
 ?>

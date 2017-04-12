@@ -500,6 +500,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   $sql="SELECT $projectTable.id AS projectID,
   $clientTable.id AS clientID,
+  $companyTable.id AS companyID,
   $clientTable.name AS clientName,
   $projectTable.name AS projectName,
   $projectBookingTable.*,
@@ -666,12 +667,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
           $detailInfo = $row['firstname']." ".$row['lastname'] .' || '. $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
           $interninfo = $row['internInfo'];
+          $optionalinfo = '';
+          $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
+          if($extraFldRes && $extraFldRes->num_rows > 0){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; }
+          }
+          if($extraFldRes && $extraFldRes->num_rows > 1){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; }
+          }
+          if($extraFldRes && $extraFldRes->num_rows > 2){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
+          }
           echo "<td>";
           if($row['booked'] == 'FALSE'){
             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
           }
           echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Person - Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
           if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+          if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
           echo "</td>";
           echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //since we dont know what has been edited: save all.
           echo "</tr>";
@@ -691,7 +707,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </div>
   <script>
   $(function () {
-    $('[data-toggle="popover"]').popover()
+    $('[data-toggle="popover"]').popover({html : true});
   })
   </script>
 

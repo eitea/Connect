@@ -627,9 +627,9 @@ if($row['version'] < 73){
 }
 
 if($row['version'] < 74){
-  $conn->query("ALTER TABLE $logTable ADD COLUMN extra_1 VARCHAR(200) NULL DEFAULT NULL");
-  $conn->query("ALTER TABLE $logTable ADD COLUMN extra_2 VARCHAR(200) NULL DEFAULT NULL");
-  $sql = "ALTER TABLE $logTable ADD COLUMN extra_3 VARCHAR(200) NULL DEFAULT NULL";
+  $conn->query("ALTER TABLE $projectBookingTable ADD COLUMN extra_1 VARCHAR(200) NULL DEFAULT NULL");
+  $conn->query("ALTER TABLE $projectBookingTable ADD COLUMN extra_2 VARCHAR(200) NULL DEFAULT NULL");
+  $sql = "ALTER TABLE $projectBookingTable ADD COLUMN extra_3 VARCHAR(200) NULL DEFAULT NULL";
   if($conn->query($sql)){
     echo '<br> Added three optional booking fields to logs';
   } else {
@@ -642,6 +642,15 @@ if($row['version'] < 74){
   $sql = "ALTER TABLE $projectTable ADD COLUMN field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if($conn->query($sql)){
     echo '<br> Added three additional fields to projects';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $conn->query("ALTER TABLE $companyDefaultProjectTable ADD COLUMN field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("ALTER TABLE $companyDefaultProjectTable ADD COLUMN field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $sql = "ALTER TABLE $companyDefaultProjectTable ADD COLUMN field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo '<br> Added three additional fields to default projects';
   } else {
     echo mysqli_error($conn);
   }

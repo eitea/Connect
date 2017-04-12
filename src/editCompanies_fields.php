@@ -7,10 +7,12 @@
 </div>
 
 <?php
-/* -howDoesThisMagicWordCommentBeforeIforgetHowItWorks-
+/* -the howDoesThisMagicWorkBeforeIforgetHowItWorks comment-
 * each company can define up to three fields, all with reserved IDs, meaning ID no. 2 will always have id 4,5,6 assigned to in other table (where fields are stored)
-* this way, we ALWAYS know which project CAN have which fields assigned to.
+* this way, we ALWAYS know which project CAN have which fields assigned to, it is a 1:3 mapping
 * if a company field is activated, only then can the corresponding field variable in projects table be set to true also (double acitvation!)
+* user enters additional info to projectbookingdata directly, whereas the corresponding field in projectTable says if it is active or not (cannot be active if deactivated on companyExtrafieldsTable)
+* This is possible by our unique id to id mapping.
 */
 $cmpID = intval($_GET['cmp']);
 //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
@@ -92,8 +94,6 @@ if(isset($_POST['save'])){
     } elseif($forall_old == 'TRUE' && $forall == 'FALSE'){
       $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_3 = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
     }
-
-
   }
 }
 echo mysqli_error($conn);

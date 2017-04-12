@@ -52,6 +52,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
 
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
+  $lang['ACTIVE'] = 'Active';
   $lang['ACCUMULATED'] = 'Accumulated';
   $lang['ACCUMULATED_HOURS'] = 'Accumulated Hours';
   $lang['ACCUMULATED_DAYS'] = 'Accumulated Days';
@@ -127,6 +128,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['FUNCTIONS'] = 'Functions';
   $lang['FROM'] ='From';
   $lang['FORMS'] ='Forms';
+  $lang['FOR_ALL_PROJECTS'] = 'For All Projects';
   $lang['FOUNDERRORS'] = 'Found Errors';
 
   $lang['GREETING_MORNING'] = 'Good Morning';
@@ -135,6 +137,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['GREETING_EVENING'] = 'Good Evening';
   $lang['GENDER'] = 'Gender';
 
+  $lang['HEADLINE'] = 'Headline';
   $lang['HOLIDAYS'] = 'Holidays';
   $lang['HOURLY_RATE'] = 'Hourly Rate';
   $lang['HOURS'] = 'Hours';
@@ -196,6 +199,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REPLY_TEXT'] = 'Answer';
   $lang['REPORTS'] = 'Reports';
   $lang['REQUESTS'] = "Request";
+  $lang['REQUIRED_FIELD'] = 'Required Field';
 
   $lang['SAVE'] = 'Save';
   $lang['SEND_ACCESS'] = 'Send Access';
@@ -285,6 +289,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['ACCUMULATED'] = 'Akkumuliert';
   $lang['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
   $lang['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
+  $lang['ACTIVE'] = 'Aktiv';
   $lang['ADD'] = 'Hinzufügen';
   $lang['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
   $lang['ADJUSTMENTS'] = 'Anpassungen';
@@ -357,6 +362,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['FUNCTIONS'] = 'Funktionen';
   $lang['FROM'] ='Von';
   $lang['FORMS'] ='Formulare';
+  $lang['FOR_ALL_PROJECTS'] = 'Für Alle Projekte';
   $lang['FOUNDERRORS'] = 'Gefundene Fehler';
 
   $lang['GENDER'] = 'Gender';
@@ -365,6 +371,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['GREETING_AFTERNOON'] = 'Hallo';
   $lang['GREETING_EVENING'] = 'Guten Abend';
 
+  $lang['HEADLINE'] = 'Überschrift';
   $lang['HOLIDAYS'] = 'Feiertage';
   $lang['HOURLY_RATE'] = 'Stundenrate';
   $lang['HOURS'] = 'Stunden';
@@ -427,6 +434,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REPLY_TEXT'] = 'Antwort';
   $lang['REPORTS'] = 'Berichte';
   $lang['REQUESTS'] = "Anfragen";
+  $lang['REQUIRED_FIELD'] = 'Pflichtfeld';
 
   $lang['SAVE'] = 'Speichern';
   $lang['SEND_ACCESS'] = 'Zugang Senden';

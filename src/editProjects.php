@@ -32,9 +32,11 @@ if(isset($_POST['add']) && !empty($_POST['name']) && $filterClient != 0){
   }
   $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
   $hours = floatval(test_input($_POST['hours']));
+  if(isset($_POST['createField_1'])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
+  if(isset($_POST['createField_2'])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
+  if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
 
-  $sql="INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice')";
-  $conn->query($sql);
+  $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
 }
 if(isset($_POST['delete']) && isset($_POST['index'])) {
   $index = $_POST["index"];
@@ -82,7 +84,6 @@ function showClients(company, client){
     },
     error : function(resp){}
   });
-
   showProjects(client, 0);
 };
 </script>
@@ -173,11 +174,13 @@ function showClients(company, client){
     </tbody>
   </table>
   <br>
-  <div class="row">
+  <div class="container-fluid">
     <div class="col-md-4">
+      <?php if($filterClient): ?>
       <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#newProjectDrop" aria-expanded="false" aria-controls="collapseExample">
         New Project <i class="fa fa-caret-down"></i>
       </button>
+    <?php endif; ?>
     </div>
     <div class="text-right">
       <button type="submit" class="btn btn-danger" name='delete'>Delete</button>
@@ -186,34 +189,63 @@ function showClients(company, client){
   </div>
 
   <br><br>
+  <?php if($filterClient): ?>
   <div class="collapse col-md-5 well" id="newProjectDrop">
-    <form method="post">
-      <br>
-      <input type=text class="form-control" name='name' placeholder='Name'>
-      <br>
-      <div class="row">
-        <div class="col-md-6">
-          <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
-        </div>
-        <div class="col-md-6">
-          <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
-        </div>
+    <br>
+    <input type=text class="form-control" name='name' placeholder='Name'>
+    <br>
+    <div class="row">
+      <div class="col-md-6">
+        <input type=number class="form-control" name='hours' placeholder='Hours' step="any">
       </div>
-      <br>
-      <div style="margin-left:25px">
+      <div class="col-md-6">
+        <input type=number class="form-control" name='hourlyPrice' placeholder='Price per Hour' step="any">
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-6" style="padding-left:50px;">
         <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
       </div>
-      <br>
-      <div class="text-right">
-        <button type=submit class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
+      <div class="col-md-6" style="padding-left:50px;">
+        <div class="checkbox">
+          <?php
+          $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $filterCompany ORDER BY id ASC");
+          if($resF->num_rows > 0){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+              $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+              echo '<input type="checkbox" '.$checked.' name="createField_1"/>'. $rowF['name'];
+            }
+          }
+          if($resF->num_rows > 1){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+              $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+              echo '<br><input type="checkbox" '.$checked.' name="createField_2" />'. $rowF['name'];
+            }
+          }
+          if($resF->num_rows > 2){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+              $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+              echo '<br><input type="checkbox" '.$checked.' name="createField_3" />'. $rowF['name'];
+            }
+          }
+          ?>
+        </div>
       </div>
-    </form>
+    </div>
+    <br>
+    <div class="text-right">
+      <button type=submit class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
+    </div>
   </div>
+<?php endif;?>
 
   <script>
   showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
   </script>
-
 </form>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

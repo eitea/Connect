@@ -54,14 +54,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
         if(isset($_POST['project'])){
           $projectID = test_input($_POST['project']);
-          if(isset($_POST['addDrive'])){ //add as driving time
-            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive')";
-          } else { //normal booking
-            $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project')";
+          $accept = 'TRUE';
+          if(isset($_POST['required_1'])){
+            $field_1 = "'".test_input($_POST['required_1'])."'";
+            if(empty($field_1)){ echo "EEEE MACARENA"; $accept = FALSE; }
+          } elseif(!empty($_POST['optional_1'])){
+            $field_1 = "'".test_input($_POST['optional_1'])."'";
+          } else {
+            $field_1 = 'NULL';
           }
-          $conn->query($sql);
-          $insertInfoText = $insertInternInfoText = '';
-          $showUndoButton = TRUE;
+          if(isset($_POST['required_2'])){
+            $field_2 = "'".test_input($_POST['required_2'])."'";
+            if(empty($field_2)){ $accept = FALSE; }
+          } elseif(!empty($_POST['optional_2'])){
+            $field_2 = "'".test_input($_POST['optional_2'])."'";
+          } else {
+            $field_2 = 'NULL';
+          }
+          if(isset($_POST['required_3'])){
+            $field_3 = "'".test_input($_POST['required_3'])."'";
+            if(empty($field_3)){ $accept = FALSE; }
+          } elseif(!empty($_POST['optional_3'])){
+            $field_3 = "'".test_input($_POST['optional_3'])."'";
+          } else {
+            $field_3 = 'NULL';
+          }
+          if($accept){
+            if(isset($_POST['addDrive'])){ //add as driving time
+              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
+            } else { //normal booking
+              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
+            }
+            $conn->query($sql);
+            $insertInfoText = $insertInternInfoText = '';
+            $showUndoButton = TRUE;
+          } else {
+            echo '<div class="alert alert-danger fade in">';
+            echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Could not create entry: </strong>Required field may not be empty (orange highlighted).';
+            echo '</div>';
+          }
         } else {
           echo '<div class="alert alert-danger fade in">';
           echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

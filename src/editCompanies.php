@@ -132,7 +132,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
               <br><br>
               <p> <?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>: </p>
-              <table class="table table-hover table-condensed" >
+              <table class="table table-hover" >
                 <tr>
                   <th>Option</th>
                   <th>Name</th>
@@ -153,33 +153,57 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                   ?>
                 </tbody>
               </table>
+
               <br><br>
+              <p><?php echo $lang['ADDITIONAL_FIELDS']; ?>: </p>
+              <table class="table table-hover" >
+                <thead>
+                  <th><?php echo $lang['ACTIVE']; ?></th>
+                  <th><?php echo $lang['HEADLINE']; ?></th>
+                  <th><?php echo $lang['REQUIRED_FIELD']; ?></th>
+                  <th><?php echo $lang['FOR_ALL_PROJECTS']; ?></th>
+                  <th><?php echo $lang['DESCRIPTION']; ?></th>
+                </thead>
+                <tbody>
+                  <?php
+                  $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $x");
+                  while ($fieldResult && ($fieldRow = $fieldResult->fetch_assoc())) {
+                    echo '<tr>';
+                    echo '<td>'.$fieldRow['isActive'].'</td>';
+                    echo '<td>'.$fieldRow['name'].'</td>';
+                    echo '<td>'.$fieldRow['isRequired'].'</td>';
+                    echo '<td>'.$fieldRow['isForAllProjects'].'</td>';
+                    echo '<td>'.$fieldRow['description'].'</td>';
+                    echo '</tr>';
+                  }
+                  ?>
+                </tbody>
+              </table>
 
+              <br><br>
               <div class="container-fluid text-right">
-                  <div class="btn-group" role="group">
-                    <div class="dropup">
-                      <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Option
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Neues Standardprojekt</a></li>
-                        <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Benutzer einstellen</a></li>
-                        <li><a href="editCompanies_fields.php?cmp=<?php echo $x; ?>">Weitere Projektfelder</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><button type="button" class="btn btn-link text-warning" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
-                      </ul>
-                    </div>
+                <div class="btn-group" role="group">
+                  <div class="dropup">
+                    <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Option
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Neues Standardprojekt</a></li>
+                      <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Benutzer einstellen</a></li>
+                      <li><a href="editCompanies_fields.php?cmp=<?php echo $x; ?>">Weitere Projektfelder</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><button type="button" class="btn btn-link text-warning" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
+                    </ul>
                   </div>
-
-                  <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
                 </div>
+                <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
+              </div>
 
               <!-- Small modal -->
               <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
                 <div class="modal-dialog modal-sm" role="document">
                   <div class="modal-content">
-
                     <div class="modal-header">
                       <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
                     </div>
@@ -193,7 +217,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                   </div>
                 </div>
               </div>
-
               <!-- #########  /CONTENT ######## -->
             </form>
           </div>

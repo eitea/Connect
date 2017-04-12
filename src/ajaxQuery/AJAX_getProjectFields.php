@@ -23,14 +23,27 @@ AND $projectTable.id = $q";
 
 $result = mysqli_query($conn,$sql);
 while($result && ($row = $result->fetch_assoc())) { //this should probably return 3 rows.
+
   if($row['field_1'] == 'TRUE' && $row['id'] == ($row['companyID'] * 3 - 2)){
-    echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_1" placeholder="'.$row['description'].'" /></div>';
+    if($row['isRequired'] == 'TRUE'){
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control required-field" name="required_1" placeholder="'.$row['description'].'" /></div>';
+    } else {
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_1" placeholder="'.$row['description'].'" /></div>';
+    }
   }
   if($row['field_2'] == 'TRUE' && $row['id'] == ($row['companyID'] * 3 - 1)){
-    echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_2" placeholder="'.$row['description'].'" /></div>';
+    if($row['isRequired'] == 'TRUE'){
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control required-field" name="required_2" placeholder="'.$row['description'].'" /></div>';
+    } else {
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_2" placeholder="'.$row['description'].'" /></div>';
+    }
   }
   if($row['field_3'] == 'TRUE' && $row['id'] == ($row['companyID'] * 3)){
-    echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_3" placeholder="'.$row['description'].'" /></div>';
+    if($row['isRequired'] == 'TRUE'){
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control required-field" name="required_3" placeholder="'.$row['description'].'" /></div>';
+    } else {
+      echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control" name="optional_3" placeholder="'.$row['description'].'" /></div>';
+    }
   }
 }
 ?>
