@@ -165,6 +165,9 @@ $sql = "CREATE TABLE $companyDefaultProjectTable (
   hours INT(3),
   status VARCHAR(30),
   hourlyPrice DECIMAL(4,2) DEFAULT 0,
+  field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   FOREIGN KEY (companyID) REFERENCES $companyTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE

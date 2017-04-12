@@ -15,7 +15,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $type = test_input($_POST['compaType']);
     $conn->query("INSERT INTO $companyTable (name, companyType) VALUES('$compaName', '$type')");
     echo mysqli_error($conn);
-  } else {
+  } elseif(isset($_POST['compaCreate'])) {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
     echo '<strong>Cannot create new instance: </strong>Name or Type were not well defined.</div>';

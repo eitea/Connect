@@ -175,6 +175,21 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
                 $icon = "fa fa-star-o"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
               }
 
+              $interninfo = $row['internInfo'];
+              $optionalinfo = '';
+              $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
+              if($extraFldRes && $extraFldRes->num_rows > 0){
+                $extraFldRow = $extraFldRes->fetch_assoc();
+                if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; }
+              }
+              if($extraFldRes && $extraFldRes->num_rows > 1){
+                $extraFldRow = $extraFldRes->fetch_assoc();
+                if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; }
+              }
+              if($extraFldRes && $extraFldRes->num_rows > 2){
+                $extraFldRow = $extraFldRes->fetch_assoc();
+                if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
+              }
               echo "<tr>";
               echo "<td><i class='$icon'></i></td>";
               echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
@@ -182,7 +197,10 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
               echo "<td>". $row['name'] ."</td>";
               echo "<td>". $row['projectName'] ."</td>";
               echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
-              echo "<td style='text-align:left'>". $row['internInfo'] ."</td>";
+              echo "<td style='text-align:left'>";
+              if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+              if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+              echo '</td>';
               echo "</tr>";
 
               $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
@@ -206,6 +224,9 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   </div>
 
   <script>
+  $(function () {
+    $('[data-toggle="popover"]').popover({html : true});
+  });
   function showClients(str) {
     if (str != "") {
       if (window.XMLHttpRequest) {
