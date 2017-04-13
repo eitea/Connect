@@ -139,6 +139,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['GENDER'] = 'Gender';
 
   $lang['HEADLINE'] = 'Headline';
+  $lang['HIRE_USER'] = 'Hire User';
   $lang['HOLIDAYS'] = 'Holidays';
   $lang['HOURLY_RATE'] = 'Hourly Rate';
   $lang['HOURS'] = 'Hours';
@@ -376,6 +377,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['GREETING_EVENING'] = 'Guten Abend';
 
   $lang['HEADLINE'] = 'Überschrift';
+  $lang['HIRE_USER'] = 'Benutzer Einstellen';
   $lang['HOLIDAYS'] = 'Feiertage';
   $lang['HOURLY_RATE'] = 'Stundenrate';
   $lang['HOURS'] = 'Stunden';

@@ -3,36 +3,71 @@
 <!-- BODY -->
 
 <?php
-if(empty($_GET['cmp'])){die("Invalid Access");}
-$x = $cmpID = intval($_GET['cmp']);
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){die("Invalid Access");}
+$cmpID = intval($_GET['cmp']);
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){ //a long lost remain of what used to be here... (a lazy developer says never change a running system)
-  if(isset($_POST['deleteCompany'.$x]) && $x != 1){
-    $sql = "DELETE FROM $companyTable WHERE id=$x;";
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+  if(isset($_POST['deleteCompany']) && $cmpID != 1){
+    $sql = "DELETE FROM $companyTable WHERE id = $cmpID;";
     $conn->query($sql);
     echo mysqli_error($conn);
-  } elseif(isset($_POST['deleteCompany'.$x]) && $x == 1){
+  } elseif(isset($_POST['deleteCompany']) && $cmpID == 1){
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
     echo '<strong>Error: </strong>Cannot delete first Company.';
     echo '</div>';
   }
-  if(isset($_POST['deleteSelection'.$x])){
-    if(isset($_POST['indexProject'.$x])){
-      foreach ($_POST['indexProject'.$x] as $i) {
+
+  if(isset($_POST['deleteSelection'])){
+    if(isset($_POST['indexProject'])){
+      foreach ($_POST['indexProject'] as $i) {
         $sql = "DELETE FROM $companyDefaultProjectTable WHERE id = $i";
         $conn->query($sql);
       }
     }
-    if(isset($_POST['indexUser'.$x])){
-      foreach ($_POST['indexUser'.$x] as $i) {
-        $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $i AND companyID = $x";
+    if(isset($_POST['indexUser'])){
+      foreach ($_POST['indexUser'] as $i) {
+        $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $i AND companyID = $cmpID";
         $conn->query($sql);
       }
     }
   }
 
+  if(isset($_POST['hire']) && isset($_POST['hiring_userIDs'])){
+    foreach($_POST['hiring_userIDs'] as $i){
+      $sql = "INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES ($cmpID, $i)";
+      $conn->query($sql);
+    }
+  }
 
+  if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
+    $name = test_input($_POST['name']);
+    if(isset($_POST['status'])){
+      $status = "checked";
+    } else {
+      $status = "";
+    }
+    $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
+    $hours = floatval(test_input($_POST['hours']));
+
+    if(isset($_POST['createField_1'])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
+    if(isset($_POST['createField_2'])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
+    if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
+
+    $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours, field_1, field_2, field_3) VALUES($cmpID, '$name', '$status', '$hourlyPrice', '$hours', '$field_1', '$field_2', '$field_3')";
+    if($conn->query($sql)){ //add default project to all clients with the company. pow.;
+      $sql = "INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) SELECT id,'$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3' FROM $clientTable WHERE companyID = $cmpID";
+      if($conn->query($sql)){
+        echo '<div class="alert alert-success fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>O.K.: </strong>' .$lang['OK_CREATE'];
+        echo '</div>';
+      } else {
+        echo mysqli_error($conn);
+      }
+    }
+    echo mysqli_error($conn);
+  }
 
 }
 ?>
@@ -40,7 +75,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){ //a long lost remain of what used to b
 <?php
 $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
-  $x = $row['id'];
 ?>
   <div class="page-header">
     <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?></h3>
@@ -61,14 +95,14 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       </thead>
       <tbody>
         <?php
-        $query = "SELECT * FROM $companyDefaultProjectTable WHERE companyID = $x";
+        $query = "SELECT * FROM $companyDefaultProjectTable WHERE companyID = $cmpID";
         $projectResult = mysqli_query($conn, $query);
         if ($projectResult && $projectResult->num_rows > 0) {
           while ($projectRow = $projectResult->fetch_assoc()) {
             $i = $projectRow['id'];
 
             $projectRowStatus = (!empty($projectRow['status']))? $lang['PRODUCTIVE']:'';
-            echo "<tr><td><input type='checkbox' name='indexProject".$x."[]' value='$i'></td>";
+            echo "<tr><td><input type='checkbox' name='indexProject[]' value='$i'></td>";
             echo "<td>".$projectRow['name']."</td>";
             echo "<td> $projectRowStatus </td>";
             echo "<td>".$projectRow['hours']."</td>";
@@ -89,12 +123,12 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         <?php
         $query = "SELECT DISTINCT * FROM $userTable
         INNER JOIN $companyToUserRelationshipTable ON $userTable.id = $companyToUserRelationshipTable.userID
-        WHERE $companyToUserRelationshipTable.companyID = $x";
+        WHERE $companyToUserRelationshipTable.companyID = $cmpID";
         $usersResult = mysqli_query($conn, $query);
         if ($usersResult && $usersResult->num_rows > 0) {
           while ($usersRow = $usersResult->fetch_assoc()) {
             $i = $usersRow['id'];
-            echo "<tr><td><input type='checkbox' name='indexUser".$x."[]' value= $i></td>";
+            echo "<tr><td><input type='checkbox' name='indexUser[]' value= $i></td>";
             echo "<td>".$usersRow['firstname']." ".$usersRow['lastname']."</td></tr>";
           }
         }
@@ -113,7 +147,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       </thead>
       <tbody>
         <?php
-        $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $x");
+        $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID");
         while ($fieldResult && ($fieldRow = $fieldResult->fetch_assoc())) {
           echo '<tr>';
           echo '<td>'.$fieldRow['isActive'].'</td>';
@@ -126,7 +160,6 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         ?>
       </tbody>
     </table>
-
     <br><br>
     <div class="container-fluid text-right">
       <div class="btn-group" role="group">
@@ -136,19 +169,19 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="editCompanies_projects.php?cmp=<?php echo $x; ?>">Neues Standardprojekt</a></li>
-            <li><a href="editCompanies_users.php?cmp=<?php echo $x; ?>">Benutzer einstellen</a></li>
-            <li><a href="editCompanies_fields.php?cmp=<?php echo $x; ?>">Weitere Projektfelder</a></li>
+            <li><a href="#" data-toggle="modal" data-target=".cmp-new-project-modal">Neues Standardprojekt</a></li>
+            <li><a href="#" data-toggle="modal" data-target=".cmp-hire-users-modal"><?php echo $lang['HIRE_USER']; ?></a></li>
+            <li><a href="editCompanies_fields.php?cmp=<?php echo $cmpID; ?>">Weitere Projektfelder</a></li>
             <li role="separator" class="divider"></li>
-            <li><button type="button" class="btn btn-link text-warning" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
+            <li><button type="button" class="btn btn-link" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
           </ul>
         </div>
       </div>
-      <button type="submit" class="btn btn-danger" name="deleteSelection<?php echo $x; ?>">Auswahl Löschen</button>
+      <button type="submit" class="btn btn-danger" name="deleteSelection">Auswahl Löschen</button>
     </div>
 
-    <!-- Small modal -->
-    <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <!-- Delete confirm modal -->
+    <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
       <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -159,7 +192,103 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
-            <button type="submit" name='deleteCompany<?php echo $x; ?>' class="btn btn-primary">Yes, delete it.</button>
+            <button type="submit" name='deleteCompany' class="btn btn-primary">Yes, delete it.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- hire users modal -->
+    <div class="modal fade cmp-hire-users-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><?php echo $lang['HIRE_USER']; ?></h4>
+          </div>
+          <div class="modal-body">
+            <table class="table table-hover">
+              <thead>
+                <th>Select</th>
+                <th>Name</th>
+              </thead>
+              <tbody>
+                <?php
+                $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $cmpID)";
+                $result = mysqli_query($conn, $sql);
+                if ($result && $result->num_rows > 0) {
+                  while ($row = $result->fetch_assoc()) {
+                    echo '<tr>';
+                    echo '<td><input type="checkbox" name="hiring_userIDs[]" value="'.$row['id'].'" ></td>';
+                    echo '<td>'.$row['firstname'].' '. $row['lastname'] .'</td>';
+                    echo '</tr>';
+                  }
+                }
+                 ?>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name="hire"><?php echo $lang['HIRE_USER']; ?></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- new project modal -->
+    <div class="modal fade cmp-new-project-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><?php echo $lang['DEFAULT'] .' '.$lang['PROJECT']; ?></h4>
+          </div>
+          <div class="modal-body">
+            <input type="text" class="form-control" name="name" placeholder="Name">
+            <br>
+            <div class="row">
+              <div class="col-md-6">
+                <input type="number" step="any" class="form-control" name="hours" placeholder="Hours">
+              </div>
+              <div class="col-md-6">
+                <input type="number" step="any" class="form-control" name="hourlyPrice" placeholder="Price/Hour">
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-md-6" style="padding-left:50px;">
+                <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
+              </div>
+              <div class="col-md-6" style="padding-left:50px;">
+                <div class="checkbox">
+                  <?php
+                  $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID ORDER BY id ASC");
+                  if($resF->num_rows > 0){
+                    $rowF = $resF->fetch_assoc();
+                    if($rowF['isActive'] == 'TRUE'){
+                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                      echo '<input type="checkbox" '.$checked.' name="createField_1"/>'. $rowF['name'];
+                    }
+                  }
+                  if($resF->num_rows > 1){
+                    $rowF = $resF->fetch_assoc();
+                    if($rowF['isActive'] == 'TRUE'){
+                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                      echo '<br><input type="checkbox" '.$checked.' name="createField_2" />'. $rowF['name'];
+                    }
+                  }
+                  if($resF->num_rows > 2){
+                    $rowF = $resF->fetch_assoc();
+                    if($rowF['isActive'] == 'TRUE'){
+                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                      echo '<br><input type="checkbox" '.$checked.' name="createField_3" />'. $rowF['name'];
+                    }
+                  }
+                  ?>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type=submit class="btn btn-warning" name='createNewProject'> <?php echo $lang['ADD']; ?> </button>
           </div>
         </div>
       </div>

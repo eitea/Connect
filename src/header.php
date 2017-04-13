@@ -392,7 +392,7 @@ $(document).ready(function() {
               echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
             } elseif($this_page == "reportOptions.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
               echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-            } elseif($this_page == "editCompanies.php"){
+            } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
               echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
             } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php") {
               echo "<script>document.getElementById('adminOption_CORE').click();</script>";
