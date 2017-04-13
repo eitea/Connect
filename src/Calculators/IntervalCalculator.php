@@ -91,6 +91,13 @@ class Interval_Calculator{
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
+      //special leave treated same as holiday
+      if($this->activity[$count] == '2'){
+        $this->shouldTime[$count] = 0;
+        $this->absolvedTime[$count] = 0;
+        $this->end[$count] = $row['time'];
+      }
+
       $i = carryOverAdder_Hours($i, 24);
       $count++;
     } //endwhile;

@@ -41,13 +41,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $sql = "INSERT INTO $logTable (time, timeEnd, breakCredit, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', '$newBreakVal', $creatUser, '$status', '$timeToUTC');";
       $conn->query($sql);
       $insertID = mysqli_insert_id($conn);
-      echo mysqli_error($conn);
       //create break
       if($newBreakVal != 0){
         $timeStart = carryOverAdder_Hours($timeStart, 4);
         $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
         $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
-        echo mysqli_error($conn);
+      }
+      if(!mysqli_error($conn)){
+        echo '<div class="alert alert-success fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
+        echo '</div>';
       }
     } else { //update old
       if($timeFin == '0001-01-01T00:00:00' || $timeFin == ':00'){
@@ -55,9 +59,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       } else {
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       }
-      $conn->query($sql);
+      if($conn->query($sql)){
+        echo '<div class="alert alert-success fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
+        echo '</div>';
+      } else {
+        echo mysqli_error($conn);
+      }
     }
-    echo mysqli_error($conn);
   } elseif (isset($_POST['delete'])) {
     $activeTab = $_POST['delete'];
     if(isset($_POST['index'])){

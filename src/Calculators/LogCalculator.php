@@ -79,7 +79,7 @@ class LogCalculator{
               $this->vacationDays--;
               break;
               case 2:
-              $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
+              $this->specialLeaveHours += $expectedHours;
               break;
               case 3:
               $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);

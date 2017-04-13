@@ -105,6 +105,12 @@ $(document).ready(function() {
     $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 WHERE EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   }
+
+  $result = $conn->query("SELECT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID");
+  $available_companies = array();
+  while($result && ($row= $result->fetch_assoc())){
+    $available_companies[] = $row['companyID'];
+  }
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       if(test_input($_POST['password']) != $_POST['password']){
@@ -337,8 +343,25 @@ $(document).ready(function() {
                     <div class="collapse" id="toggleUsers" style="height: 0px;">
                       <ul class="nav nav-list">
                         <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
+                        <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="admin_saldoview.php"><?php echo $lang['USERS']; ?> Saldo</a></li>
                         <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
                         <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li>
+                    <a id="coreCompanyToggle" <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
+                      <i class="fa fa-building-o"></i> <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleCompany" style="height: 0px;">
+                      <ul class="nav nav-list">
+                        <?php
+                        $result = $conn->query("SELECT * FROM $companyTable");
+                        while($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)){
+                          echo "<li><a href='editCompanies.php?cmp=".$row['id']."'>".$row['name']."</a></li>";
+                        }
+                        ?>
+                        <li><a <?php if($this_page =='new_Companies.php'){echo $setActiveLink;}?> href="new_Companies.php"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
                       </ul>
                     </div>
                   </li>
@@ -349,7 +372,6 @@ $(document).ready(function() {
                     </a>
                     <div class="collapse" id="toggleSettings" style="height: 0px;">
                       <ul class="nav nav-list">
-                        <li><a <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="editCompanies.php"><?php echo $lang['COMPANIES']; ?></a></li>
                         <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
                         <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
@@ -366,10 +388,12 @@ $(document).ready(function() {
               </div>
             </div>
             <?php
-            if($this_page == "editUsers.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
+            if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
               echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-            } elseif($this_page == "reportOptions.php" || $this_page == "editCompanies.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+            } elseif($this_page == "reportOptions.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
               echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+            } elseif($this_page == "editCompanies.php"){
+              echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
             } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php") {
               echo "<script>document.getElementById('adminOption_CORE').click();</script>";
             }

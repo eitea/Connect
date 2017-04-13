@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php enableToCore($userID); require 'Calculators/LogCalculator.php'; ?>
+<?php enableToCore($userID);?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -308,15 +308,6 @@ $(document).ready(function(){
     });
 });
 </script>
-
-<div class="container-fluid">
-  <strong>
-  <div class="col-md-4">Name</div>
-  <div class="col-md-2">Saldo (h)</div>
-  <div class="col-md-4"><?php echo $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']; ?></div>
-  <div class="col-md-2 text-right"><?php echo $lang['DEACTIVATE']; ?></div>
-  </strong>
-</div>
 <br>
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
@@ -369,22 +360,18 @@ $(document).ready(function(){
       $canEditTemplates = $row['canEditTemplates'];
 
       $eOut = "$firstname $lastname";
-
-      $calc = new LogCalculator($x);
       ?>
 
       <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="heading<?php echo $x; ?>">
           <h4 class="panel-title">
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>">
                   <?php echo $eOut; ?>
                 </a>
               </div>
-              <div class="col-md-2"><small><?php echo displayAsHoursMins($calc->saldo); ?>h</small></div>
-              <div class="col-md-2"><small><?php echo sprintf('%+d', $calc->vacationDays); ?></small></div>
-              <div class="col-md-4 text-right">
+              <div class="col-md-6 text-right">
                 <form method="post">
                   <button type='submit' value="<?php echo $x; ?>" name='deactivate' style="background:none; border:none;" title="<?php echo $lang['DEACTIVATE']; ?>">
                     <small><?php echo $lang['DEACTIVATE']; ?></small>

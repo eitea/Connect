@@ -14,9 +14,11 @@ body{
 .panel-group .panel-borderless{
   padding-top:5px;
 }
-
 .navbar-nav {
   margin: 0;
+}
+ul.nav.navbar-nav .nav.nav-list {
+    padding-left: 25px;
 }
 /* whitespaces do matter. */
 .panel-body .nav.navbar-nav {
@@ -83,22 +85,22 @@ body{
   }
 }
 @media screen and (max-width:768px) {
-   #sidemenu{
-     display: none;
-   }
-   .affix-content{
-     padding-left:0px;
-   }
-   .sidebar-nav .navbar li a > .caret {
-     margin-top: 0px;
-   }
- }
+  #sidemenu{
+    display: none;
+  }
+  .affix-content{
+    padding-left:0px;
+  }
+  .sidebar-nav .navbar li a > .caret {
+    margin-top: 0px;
+  }
+}
 @media screen and (min-width:768px) {
-   #sidemenu{
-     display: block;
-     height: 100% !important;
-   }
- }
+  #sidemenu{
+    display: block;
+    height: 100% !important;
+  }
+}
 @media screen and (max-height:600px){
   .sidebar-nav .navbar li a,  .navbar-nav > li > a, .nav .nav-list >li >a{
     padding-top: 0px;
@@ -184,7 +186,6 @@ section {
   line-height: normal;
 }
 
-
 /* helpings */
 i{
   margin-right:5px;
@@ -192,8 +193,8 @@ i{
 }
 
 .blank_row {
-    height: 2px !important;
-    background-color: #FFFFFF;
+  height: 2px !important;
+  background-color: #FFFFFF;
 }
 .required-field {
   border: 1px solid #fbc871;

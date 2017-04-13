@@ -97,6 +97,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CONSUMED'] = 'Consumed';
   $lang['CORE_TIME'] = 'Core Time';
   $lang['CORRECTION'] = 'Correction';
+  $lang['CREATE_NEW_COMPANY'] = 'Create New Company';
 
   $lang['DAILY_USER_PROJECT'] = 'Daily User Project';
   $lang['DATA'] = 'Data';
@@ -173,6 +174,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
 
+  $lang['OK_CREATE'] = 'New entry was successfully created.';
+  $lang['OK_SAVE'] = 'Changes were successfully saved.';
   $lang['OPTIONS'] = 'Options';
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
@@ -331,6 +334,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['CONSUMED'] = 'Konsumiert';
   $lang['CORE_TIME'] = 'Kernzeit';
   $lang['CORRECTION'] = 'Korrektur';
+  $lang['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
 
   $lang['DAILY_USER_PROJECT'] = 'Tagesbericht';
   $lang['DATE'] = 'Datum';
@@ -407,6 +411,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['NOT_CHARGEABLE'] = 'Erlassen';
   $lang['NUMBER'] = 'Nummer';
 
+  $lang['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
+  $lang['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
   $lang['OPTIONS'] = 'Optionen';
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
