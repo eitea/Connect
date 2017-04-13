@@ -82,10 +82,10 @@ $(function(){
       datasets: [{
         label: "Mittel",
         backgroundColor: [
-          'rgba(255, 99, 169, 0.5)',
-          'rgba(90, 163, 231, 0.5)',
+          'rgba(251, 231, 54, 0.5)',
           'rgba(189, 209, 71, 0.5)',
           'rgba(75, 192, 192, 0.5)',
+          'rgba(90, 163, 231, 0.5)',
           'rgba(154, 125, 210, 0.5)'
         ],
         data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
@@ -115,7 +115,8 @@ $(function(){
     },
     options: {
       legend:{
-        display: false
+        display: true,
+        position: 'right'
       },
       tooltips: {
         callbacks: {

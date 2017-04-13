@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $accept = 'TRUE';
           if(isset($_POST['required_1'])){
             $field_1 = "'".test_input($_POST['required_1'])."'";
-            if(empty($field_1)){ echo "EEEE MACARENA"; $accept = FALSE; }
+            if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
           } elseif(!empty($_POST['optional_1'])){
             $field_1 = "'".test_input($_POST['optional_1'])."'";
           } else {
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
           if(isset($_POST['required_2'])){
             $field_2 = "'".test_input($_POST['required_2'])."'";
-            if(empty($field_2)){ $accept = FALSE; }
+            if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
           } elseif(!empty($_POST['optional_2'])){
             $field_2 = "'".test_input($_POST['optional_2'])."'";
           } else {
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
           if(isset($_POST['required_3'])){
             $field_3 = "'".test_input($_POST['required_3'])."'";
-            if(empty($field_3)){ $accept = FALSE; }
+            if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
           } elseif(!empty($_POST['optional_3'])){
             $field_3 = "'".test_input($_POST['optional_3'])."'";
           } else {
@@ -128,6 +128,7 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   $showEmergencyUndoButton = TRUE;
 }
 ?>
+
 
 <form method="post">
   <?php if($showUndoButton): ?>
@@ -383,6 +384,5 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   </div>
   <div class="robot-control"> <input type="text" name="captcha" value="" /></div>
 </form>
-
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

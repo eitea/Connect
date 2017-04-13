@@ -24,7 +24,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if (isset($_POST['filterStatus'])) {
     $filterStatus = $_POST['filterStatus'];
   }
-
   if(isset($_POST['modifyDate_0']) ||isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){ //scrolling
     $scrollPos = intval($_POST['scrollPos']);
   }

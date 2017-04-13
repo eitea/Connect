@@ -77,6 +77,11 @@ body{
   display: block;
 }
 
+@media screen and (max-width:1400px){
+  body{
+    overflow-x: auto;
+  }
+}
 @media screen and (max-width:768px) {
    #sidemenu{
      display: none;
@@ -94,7 +99,6 @@ body{
      height: 100% !important;
    }
  }
-
 @media screen and (max-height:600px){
   .sidebar-nav .navbar li a,  .navbar-nav > li > a, .nav .nav-list >li >a{
     padding-top: 0px;
