@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
   <script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
-  <title>T-Time</title>
+  <title>Connect</title>
 </head>
 <script>
 document.onreadystatechange = function () {
@@ -181,7 +181,7 @@ $(document).ready(function() {
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header hidden-xs">
-        <a class="navbar-brand" href="home.php">T-Time</a>
+        <a class="navbar-brand" href="home.php">Connect</a>
       </div>
       <div>
         <ul class="nav navbar-nav hidden-xs">
