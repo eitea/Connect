@@ -326,7 +326,7 @@ function changeValue(cVal, id, val){
       <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
         <option value="0">Select Company...</option>
         <?php
-        $sql = "SELECT * FROM $companyTable";
+        $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
         if($result && $result->num_rows > 0) {
           $row = $result->fetch_assoc();
@@ -345,7 +345,7 @@ function changeValue(cVal, id, val){
       <!-- SELECT USER -->
       <select id="filterUserID" name="filterUserID" class="js-example-basic-single" style='width:200px' onchange='showFilters("dateDiv");'>
         <?php
-        $query = "SELECT * FROM $userTable;";
+        $query = "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");";
         $result = mysqli_query($conn, $query);
         echo "<option name=filterUserID value=0>User...</option>";
         while($row = $result->fetch_assoc()){
@@ -508,6 +508,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $companyTable.id AS companyID,
   $clientTable.name AS clientName,
   $projectTable.name AS projectName,
+  $userTable.id AS userID,
   $projectBookingTable.*,
   $projectBookingTable.id AS projectBookingID,
   $logTable.timeToUTC,
@@ -618,6 +619,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $numRows = $result->num_rows;
         for($i = 0; $i < $numRows; $i++) {
           $row = $result->fetch_assoc();
+          //have to make sure admin can only see what is available to him
+          if(($row['companyID'] && !in_array($row['companyID'], $available_companies)) || ($row['userID'] && !in_array($row['userID'], $available_users))){
+            continue;
+          }
           $x = $row['projectBookingID'];
           $timeDiff = timeDiff_Hours($row['start'], $row['end']);
 

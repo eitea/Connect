@@ -52,7 +52,7 @@ if($result && ($row = $result->fetch_assoc())){
       <select name="filterUserID" class="js-example-basic-single">
         <option value=0>Benutzer... </option>
         <?php
-        $result = $conn->query("SELECT firstname, lastname,id FROM $userTable");
+        $result = $conn->query("SELECT firstname, lastname,id FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
         while($result && ($row = $result->fetch_assoc())){
           $selected = '';
           if ($row['id'] == $filterUserID) {

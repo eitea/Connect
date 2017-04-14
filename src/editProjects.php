@@ -95,7 +95,7 @@ function showClients(company, client){
       <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0);' class="js-example-basic-single">
         <option value="0">Select Company...</option>
         <?php
-        $sql = "SELECT * FROM $companyTable";
+        $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
         if($result && $result->num_rows > 0) {
           $row = $result->fetch_assoc();

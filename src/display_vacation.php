@@ -31,8 +31,9 @@ if(!$result || $result->num_rows <= 0){
     <?php if($display_all): ?>
     <div class="col-xs-3">
       <select id="filterUserID" name="filterUserID" class="js-example-basic-single btn-block">
+        <option value='0'>Benutzer ... </option>
         <?php
-        $result = mysqli_query($conn, "SELECT * FROM $userTable;");
+        $result = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");");
         while($row = $result->fetch_assoc()){
           $i = $row['id'];
           if ($curID == $i) {

@@ -54,8 +54,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <select name="filterCompany" class="js-example-basic-single" style="width:200px">
     <option value=0><?php echo $lang['COMPANY']; ?> ... </option>
     <?php
-    $filterCompanyQuery = "";
-    $query = "SELECT * FROM $companyTable";
+    $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
     $result = mysqli_query($conn, $query);
     if ($result && $result->num_rows > 0) {
       while ($row = $result->fetch_assoc()) {
@@ -63,7 +62,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $checked = "";
         if($filterCompanyID == $i){
           $checked = "selected";
-          $filterCompanyQuery = "WHERE companyID = ".$i;
         } elseif(isset($_POST['selectCompany']) && $_POST['selectCompany'] == $row['id']){
           $checked = "selected";
         }
@@ -75,7 +73,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   &nbsp <button type="submit" class="btn btn-warning btn-sm" name='filter'> Filter</button>
 
   <br><br>
-  <?php $query = "SELECT * FROM $clientTable $filterCompanyQuery ORDER BY name ASC";
+  <?php $query = "SELECT * FROM $clientTable WHERE companyID = $filterCompanyID AND companyID IN (".implode(', ', $available_companies).")  ORDER BY name ASC";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0):
   ?>
@@ -103,8 +101,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo "<td>" .$row['name'] ."</td>";
           echo "<td>" .$row['clientNumber']."</td>";
           echo '<td>';
-          echo "<a class='btn btn-default' title='Edit' href='editProjects.php?custID=$i'><i class='fa fa-pencil'></i></a> ";
-          echo "<a class='btn btn-default' title='Detail' href='editCustomer_detail.php?custID=$i'><i class='fa fa-search'></i></a> ";
+          echo "<a class='btn btn-default' title='Edit' href='editProjects.php?custID=$i'><i class='fa fa-pencil'></i><small> ".$lang['PROJECT']."</small></a>";
+          echo " <a class='btn btn-default' title='Detail' href='editCustomer_detail.php?custID=$i'><i class='fa fa-search'></i> <small> Detail</small></a> ";
           echo '</td>';
           echo '</tr>';
         }
@@ -112,7 +110,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       </tbody>
     </table>
     <br><br>
-  <?php else: ?>
+  <?php elseif($filterCompanyID): ?>
     <div class="alert alert-info" role="alert">
       <strong>No Clients yet: </strong> Please create a client first, so you can start assigning projects.<br>
       Clients can only be assigned to one company each. <br>

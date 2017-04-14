@@ -38,7 +38,7 @@ if(!empty($_POST['filterUserIDs']) && !empty($_POST['addUserID'])){
     <div class="col-sm-3">
       <select name='filterUserID' style="width:200px" class="js-example-basic-single btn-block">
         <?php
-        $result = mysqli_query($conn, "SELECT $userTable.* FROM $userTable, $roleTable WHERE userID = id AND canBook = 'TRUE';");
+        $result = mysqli_query($conn, "SELECT $userTable.* FROM $userTable, $roleTable WHERE userID = id AND canBook = 'TRUE' AND id IN (".implode(', ', $available_users).");");
         echo "<option name='filterUserID' value='0'>Benutzer ... </option>";
         while($row = $result->fetch_assoc()){
           $i = $row['id'];

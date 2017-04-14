@@ -49,7 +49,7 @@ echo mysqli_error($conn);
 <form method="POST">
   <select name='filterUserID' style="width:200px" class="js-example-basic-single">
     <?php
-    $result = mysqli_query($conn, "SELECT id, firstname, lastname FROM $userTable");
+    $result = mysqli_query($conn, "SELECT id, firstname, lastname FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
     echo "<option name='filterUserID' value='0'>Benutzer ... </option>";
     while($row = $result->fetch_assoc()){
       $i = $row['id'];

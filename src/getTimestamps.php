@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-md-3 text-right"> <!-- Filter User -->
       <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
         <?php
-        $query = "SELECT * FROM $userTable;";
+        $query = "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");";
         $result = mysqli_query($conn, $query);
         echo "<option name='filterUserID' value='0'>Benutzer ... </option>";
         while($row = $result->fetch_assoc()){

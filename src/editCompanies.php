@@ -69,6 +69,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     echo mysqli_error($conn);
   }
 
+  $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); //selects up to three rows (or at least it should)
+  if(isset($_POST['save_additional_fields'])){
+    for($i = 1; $i < 4; $i++){
+      //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
+      $id_save = $cmpID * 3 - 3 + $i;
+      if(!empty($_POST['name_'.$i]) && !empty($_POST['description_'.$i])){
+        $name = test_input($_POST['name_'.$i]);
+        $description = test_input($_POST['description_'.$i]);
+        $active = !empty($_POST['active_'.$i]) ? 'TRUE' : 'FALSE';
+        $required = !empty($_POST['required_'.$i]) ? 'TRUE' : 'FALSE';
+        $forall = !empty($_POST['forall_'.$i]) ? 'TRUE' : 'FALSE';
+
+        if($active == 'FALSE'){
+          $forall = 'FALSE';
+        }
+        if($result->num_rows > ($i -1)){ //first row
+          $row = $result->fetch_assoc();
+          $forall_old = $row['isForAllProjects'];
+          $conn->query("UPDATE $companyExtraFieldsTable SET name='$name', isActive = '$active' , isRequired = '$required', isForAllProjects = '$forall', description = '$description' WHERE id = $id_save");
+        } else {
+          $forall_old = 'FALSE';
+          $conn->query("INSERT INTO $companyExtraFieldsTable (id, companyID, name, isActive, isRequired, isForAllProjects, description) VALUES ($id_save, $cmpID, '$name', '$active', '$required', '$forall', '$description')");
+        }
+
+        if($forall_old == 'FALSE' && $forall == 'TRUE'){
+          $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'TRUE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
+        } elseif($forall_old == 'TRUE' && $forall == 'FALSE'){
+          $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
+        }
+      }
+    }
+  }
 }
 ?>
 
@@ -170,8 +202,8 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" data-toggle="modal" data-target=".cmp-new-project-modal">Neues Standardprojekt</a></li>
-            <li><a href="#" data-toggle="modal" data-target=".cmp-hire-users-modal"><?php echo $lang['HIRE_USER']; ?></a></li>
-            <li><a href="editCompanies_fields.php?cmp=<?php echo $cmpID; ?>">Weitere Projektfelder</a></li>
+            <li><a href="#" data-toggle="modal" data-target=".cmp-hire-users-modal" ><?php echo $lang['HIRE_USER']; ?></a></li>
+            <li><a href="#" data-toggle="modal" data-target=".cmp-additional-fields"><?php echo $lang['ADDITIONAL_FIELDS']; ?></a></li>
             <li role="separator" class="divider"></li>
             <li><button type="button" class="btn btn-link" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
           </ul>
@@ -197,7 +229,9 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         </div>
       </div>
     </div>
+  </form>
     <!-- hire users modal -->
+  <form method="POST">
     <div class="modal fade cmp-hire-users-modal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
@@ -233,7 +267,9 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         </div>
       </div>
     </div>
+  </form>
     <!-- new project modal -->
+  <form  method="POST">
     <div class="modal fade cmp-new-project-modal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
@@ -289,6 +325,58 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button type=submit class="btn btn-warning" name='createNewProject'> <?php echo $lang['ADD']; ?> </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+    <!-- edit projectfields modal -->
+  <form method="POST">
+    <div class="modal fade cmp-additional-fields" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><?php echo $lang['ADDITIONAL_FIELDS']; ?></h4>
+          </div>
+          <div class="modal-body">
+            <table class="table table-hover">
+              <thead>
+                <th>Aktiv</th>
+                <th width="200px">Überschrift</th>
+                <th>Pflichtfeld</th>
+                <th width="150px">Für Alle Projekte</th>
+                <th>Beschreibung</th>
+              </thead>
+              <tbody>
+                <?php
+                $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID");
+                for($i = 1; $i < 4; $i++){
+                  echo '<tr>';
+                  if($result->num_rows > ($i-1)){
+                    $row = $result->fetch_assoc();
+                    $active = $row['isActive'] == 'TRUE' ? 'checked' : '';
+                    $name = $row['name'];
+                    $required = $row['isRequired'] == 'TRUE' ? 'checked' : '';
+                    $forAllProjects = $row['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                    $description = $row['description'];
+                  } else {
+                    $row = $active = $name = $required = $forAllProjects = $description = '';
+                  }
+                  echo "<td><input type='checkbox' name='active_$i' $active /></td>";
+                  echo "<td><input type='text' class='form-control' name='name_$i' maxlength='15' placeholder='max. 15 Zeichen' value='$name' /></td>";
+                  echo "<td><input type='checkbox' name='required_$i' $required /></td>";
+                  echo "<td><input type='checkbox' name='forall_$i' $forAllProjects /></td>";
+                  echo "<td><input type='text' class='form-control' name='description_$i' maxlength='50' placeholder='max. 50 Zeichen' value='$description' /></td>";
+                  echo '</tr>';
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" name="save_additional_fields" class="btn btn-warning" value="<?php echo $cmpID; ?>"><?php echo $lang['SAVE']; ?></button>
           </div>
         </div>
       </div>

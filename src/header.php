@@ -106,11 +106,17 @@ $(document).ready(function() {
     if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   }
 
-  $result = $conn->query("SELECT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID");
+  $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
   $available_companies = array();
   while($result && ($row= $result->fetch_assoc())){
     $available_companies[] = $row['companyID'];
   }
+  $result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(".implode(', ', $available_companies).") OR $userID = 1");
+  $available_users = array();
+  while($result && ($row = $result->fetch_assoc())){
+    $available_users[] = $row['userID'];
+  }
+
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
       if(test_input($_POST['password']) != $_POST['password']){
@@ -357,8 +363,10 @@ $(document).ready(function() {
                       <ul class="nav nav-list">
                         <?php
                         $result = $conn->query("SELECT * FROM $companyTable");
-                        while($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)){
-                          echo "<li><a href='editCompanies.php?cmp=".$row['id']."'>".$row['name']."</a></li>";
+                        while($result && ($row = $result->fetch_assoc())){
+                          if(in_array($row['id'], $available_companies)){
+                            echo "<li><a href='editCompanies.php?cmp=".$row['id']."'>".$row['name']."</a></li>";
+                          }
                         }
                         ?>
                         <li><a <?php if($this_page =='new_Companies.php'){echo $setActiveLink;}?> href="new_Companies.php"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
