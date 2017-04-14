@@ -86,7 +86,6 @@ foreach($arr_IDs as $i): //i canBook
     $break = $row_log['breakCredit'];
     $result_proj = $conn->query("SELECT start, end, bookingType, status FROM $projectBookingTable LEFT JOIN $projectTable ON projectID = $projectTable.id
                                  WHERE bookingType != 'break' AND timestampID =".$row_log['indexIM']." AND start != '0000-00-00 00:00:00' AND end != '0000-00-00 00:00:00'");
-    echo mysqli_error($conn);
     while($result_proj && ($row_proj = $result_proj->fetch_assoc())){
       if($row_proj['bookingType'] == 'project'){
         if(!empty($row_proj['status'])){
@@ -99,6 +98,7 @@ foreach($arr_IDs as $i): //i canBook
       }
     }
   }
+  echo mysqli_error($conn);
   $height += 50;
   //normalize numbers
   /*
@@ -128,7 +128,8 @@ foreach($arr_IDs as $i): //i canBook
   $drives .= $drive.', ';
   $nonproductives .= $nonproductive.', ';
 
-endforeach; ?>
+endforeach;
+?>
 
   <div class="container-fluid">
     <canvas id="analysisChart" width="1000" height="<?php echo $height; ?>"></canvas>

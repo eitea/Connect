@@ -71,18 +71,22 @@ $(document).ready(function() {
   if($this_page != "editCustomer_detail.php"){
     unset($_SESSION['unlock']);
   }
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0){
-    $row = $result->fetch_assoc();
-    $isCoreAdmin = $row['isCoreAdmin'];
-    $isTimeAdmin = $row['isTimeAdmin'];
-    $isProjectAdmin = $row['isProjectAdmin'];
-    $isReportAdmin = $row['isReportAdmin'];
+  if($userID == 1){
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $canBook = $canStamp  = $canEditTemplates = 'TRUE';
+  } else {
+    $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
+    $result = $conn->query($sql);
+    if($result && $result->num_rows > 0){
+      $row = $result->fetch_assoc();
+      $isCoreAdmin = $row['isCoreAdmin'];
+      $isTimeAdmin = $row['isTimeAdmin'];
+      $isProjectAdmin = $row['isProjectAdmin'];
+      $isReportAdmin = $row['isReportAdmin'];
 
-    $canBook = $row['canBook'];
-    $canStamp = $row['canStamp'];
-    $canEditTemplates = $row['canEditTemplates'];
+      $canBook = $row['canBook'];
+      $canStamp = $row['canStamp'];
+      $canEditTemplates = $row['canEditTemplates'];
+    }
   }
 
   $result = $conn->query("SELECT lastPswChange FROM $userTable WHERE id = $userID");
