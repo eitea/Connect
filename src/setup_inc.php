@@ -609,5 +609,14 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE $taskTable(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
+    runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    description VARCHAR(200)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
 ?>

@@ -50,6 +50,15 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
     "4" => "Adjustment"
   );
 
+  $lang_scheduleToString = array(
+    '-1' => 'Inactive',
+    '0' => 'Once',
+    '1' => 'Daily',
+    '2' => 'Weekly',
+    '3' => 'Monthly',
+    '4' => 'Yearly'
+  );
+
   $lang['ABSOLVED_HOURS'] = 'Absolved Hours';
   $lang['ACTIVITY'] = 'Activity';
   $lang['ACTIVE'] = 'Active';
@@ -215,6 +224,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['SPECIAL_LEAVE_RET'] = 'Return from Leave';
   $lang['SUM'] = 'Sum';
 
+  $lang['TASK_SCHEDULER'] = 'Task Scheduler';
   $lang['TAKE_BREAK_AFTER'] = 'Take a break after Hours';
   $lang['TAXES'] = 'Taxes';
   $lang['TEMPLATES'] = 'Templates';
@@ -285,6 +295,14 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
     "2" => "Sonderurlaub",
     "3" => "Krankenstand",
     "4" => "Korrektur"
+  );
+  $lang_scheduleToString = array(
+    '-1' => 'Inaktiv',
+    '0' => 'Einmalig',
+    '1' => 'Täglich',
+    '2' => 'Wöchentlich',
+    '3' => 'Monatlich',
+    '4' => 'Jährlich'
   );
   $lang_vacationRequestStatus = array("Offen", "Abgelehnt", "Bewilligt");
   $lang_monthToString = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
@@ -455,6 +473,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
   $lang['SUM'] ='Summe';
 
+  $lang['TASK_SCHEDULER'] = 'Taskplaner';
   $lang['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
   $lang['TAXES'] = 'Steuern';
   $lang['TEMPLATES'] = 'Vorlagen';

@@ -46,6 +46,7 @@ $userTable = "UserData"; //users
 $userRequests = "userRequestsData"; //user requests for vacation
 $roleTable = "roles"; //all roles (admin/canBook)
 
+$taskTable ='taskData';
 $teamTable = 'teamData'; //users can be divided into teams
 $teamRelationshipTable = 'teamRelationshipData'; //team to users is a n:m relation
 $travelTable = "travelBookings";

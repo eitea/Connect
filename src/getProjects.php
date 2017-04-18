@@ -324,20 +324,22 @@ function changeValue(cVal, id, val){
     <div class="col-xs-3 custom">
       <!-- SELECT COMPANY -->
       <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
-        <option value="0">Select Company...</option>
         <?php
         $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
-        if($result && $result->num_rows > 0) {
-          $row = $result->fetch_assoc();
-          do {
-            $checked = '';
-            if($filterCompany == $row['id']) {
-              $checked = 'selected';
-            }
-            echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
-
-          } while($row = $result->fetch_assoc());
+        if($result && $result->num_rows > 1) {
+          echo '<option value="0">Select Company...</option>';
+        }
+        while($result && ($row = $result->fetch_assoc())){
+          $checked = '';
+          if($filterCompany == $row['id']) {
+            $checked = 'selected';
+          }
+          echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
+        }
+        if($result && $result->num_rows == 1) {
+          $filterCompany = $available_companies[0]; //easy peasy
+          echo '<option value="0">- Empty -</option>';
         }
         ?>
       </select>
@@ -347,7 +349,9 @@ function changeValue(cVal, id, val){
         <?php
         $query = "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");";
         $result = mysqli_query($conn, $query);
-        echo "<option name=filterUserID value=0>User...</option>";
+        if($result && $result->num_rows > 1) {
+          echo "<option name=filterUserID value=0>User...</option>";
+        }
         while($row = $result->fetch_assoc()){
           $i = $row['id'];
           if ($filterUserID == $i) {
@@ -355,6 +359,10 @@ function changeValue(cVal, id, val){
           } else {
             echo "<option value=$i>".$row['firstname'] . " " . $row['lastname']."</option>";
           }
+        }
+        if($result && $result->num_rows == 1) {
+          $filterUserID = $available_users[0]; //lemon squeezy
+          echo '<option value="0">- Empty -</option>';
         }
         ?>
       </select>

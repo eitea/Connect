@@ -1,5 +1,5 @@
 <?php
-//schedule all tasks (this page will be called every minute)
+//schedule all tasks (this page designed to be called about every minute)
 include 'connection.php';
 
 /*
