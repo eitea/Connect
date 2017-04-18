@@ -1,3 +1,12 @@
+<?php
+//check if this is the first time this app runs
+if(!file_exists('connection_config.php')){
+  header("Location: setup_getInput.php");
+} else {
+  session_start();
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
@@ -17,10 +26,6 @@ require 'createTimestamps.php';
 include 'version_number.php';
 require 'validate.php'; denyToCloud();
 
-//check if this is the first time this app runs
-if(!file_exists('connection_config.php')){
-  header("Location: setup_getInput.php");
-}
 $invalidLogin = "";
 if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . strip_input($_POST['loginName']) . "' ";
@@ -29,8 +34,6 @@ if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['
     $row = $result->fetch_assoc();
   }
   if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
-    session_destroy();
-    session_start();
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];
