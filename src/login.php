@@ -5,18 +5,8 @@ if(!file_exists('connection_config.php')){
 } else {
   session_start();
 }
-?>
 
-<!DOCTYPE html>
-<html>
-<meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
-<link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet">
-<head>
-  <title>Login</title>
-</head>
-
-<?php
-//TODO: put a brute-force stopper in here
+//TODO: put a brute-force stopper somewhere in here too
 if(!empty($_POST['captcha'])){
   die("");
 }
@@ -65,7 +55,6 @@ if($result && $result->num_rows > 0){
   $rowConfigTable = $result->fetch_assoc();
 }
 
-
 function strip_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
@@ -74,6 +63,14 @@ function strip_input($data) {
   return $data;
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
+<link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet">
+<head>
+  <title>Login</title>
+</head>
 
 <body>
   <div id="footer">

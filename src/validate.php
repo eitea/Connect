@@ -72,7 +72,7 @@ function enableToReport($userID){
 }
 
 function denyToCloud(){
-  if(isset($_SESSION['dbConnect']) || isset($_SERVER['RDS_HOSTNAME']) || isset($_SERVER['RDS_PORT'])){
+  if(isset($_SERVER['RDS_HOSTNAME']) || isset($_SERVER['RDS_PORT'])){
     die("Restricted Access. <a href='logout.php'> Exit</a>");
   }
 }
