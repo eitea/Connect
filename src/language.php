@@ -178,6 +178,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['OK_CREATE'] = 'New entry was successfully created.';
   $lang['OK_SAVE'] = 'Changes were successfully saved.';
   $lang['OPTIONS'] = 'Options';
+  $lang['OPEN'] = 'Open';
   $lang['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
   $lang['OVERVIEW'] = 'Overview';
 
@@ -416,6 +417,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
   $lang['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
   $lang['OPTIONS'] = 'Optionen';
+  $lang['OPEN'] = 'Offen';
   $lang['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
   $lang['OVERVIEW'] = 'Übersicht';
 
