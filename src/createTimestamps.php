@@ -1,4 +1,3 @@
-
 <?php
 //$to - $from in Hours.
 function timeDiff_Hours($from, $to) {

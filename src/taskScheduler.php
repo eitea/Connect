@@ -7,9 +7,9 @@
 if(isset($_POST['save_tasks'])){
   if(!empty($_POST['mail_runtime']) && test_date($_POST['mail_runtime'])){
     $pattern = intval($_POST['mail_repeat']);
-    $runtime = test_input($_POST['mail_runtime']);
-    $conn->query("DELETE FROM $taskTable WHERE id = 1");
-    $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, description) VALUES (1, '$pattern', '$runtime', 'Mailing schedule')");
+    $runtime = carryOverAdder_Hours($_POST['mail_runtime'], $timeToUTC * -1); //UTC
+    $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (1, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Mailing schedule', 'sendMailReport.php')
+                ON DUPLICATE KEY UPDATE repeatPattern = '$pattern', runtime = '$runtime'");
     if(!mysqli_error($conn)){
       echo '<div class="alert alert-success fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_SAVE'].'</div>';

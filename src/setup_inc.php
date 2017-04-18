@@ -613,7 +613,9 @@ $sql = "CREATE TABLE $policyTable (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
     runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    description VARCHAR(200)
+    description VARCHAR(200),
+    lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    callee VARCHAR(50) NOT NULL
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

@@ -38,11 +38,11 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();
       if($row['version'] < $VERSION_NUMBER){
-        header("refresh:3;url=doUpdate.php");
+        redirect("doUpdate.php");
         die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="doUpdate.php">update</a>');
       }
     }
-    header('Location: home.php');
+    redirect('home.php');
   } else {
     $invalidLogin = "Invalid Username/ Password!";
   }
