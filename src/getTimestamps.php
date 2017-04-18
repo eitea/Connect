@@ -36,12 +36,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($imm == 0){ //create new
       $creatUser = $filterID;
       $timeToUTC = intval($_POST['creatTimeZone']);
+      if($_POST['is_open']){
+        $timeFin = '0000-00-00 00:00:00';
+      } else {
+        if($timeFin != '0001-01-01T00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
+      }
       $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
-      if($timeFin != '0001-01-01T00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
       $sql = "INSERT INTO $logTable (time, timeEnd, breakCredit, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', '$newBreakVal', $creatUser, '$status', '$timeToUTC');";
       $conn->query($sql);
       $insertID = mysqli_insert_id($conn);
-      //create break
+      //create break for new timestamp
       if($newBreakVal != 0){
         $timeStart = carryOverAdder_Hours($timeStart, 4);
         $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
@@ -54,13 +58,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</div>';
       }
     } else { //update old
-      if($timeFin == '0001-01-01T00:00:00' || $timeFin == ':00'){
+      if($timeFin == '0001-01-01T00:00:00' || $timeFin == ':00' || $_POST['is_open']){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       } else {
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       }
       if($conn->query($sql)){
-        echo '<div class="alert alert-success fade in">';
+        echo '<div class="alert alert-success alert-over fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
         echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
         echo '</div>';
@@ -78,7 +82,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     }
   }
-
 } //endif post
 ?>
 
@@ -247,7 +250,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               WHERE timestampID = '".$calculator->indecesIM[$i]."' ORDER BY end ASC");
               echo mysqli_error($conn);
 
-
               $neutralStyle = '';
               if($calculator->shouldTime[$i] == 0 && $difference == 0){
                 $neutralStyle = "style=color:#c7c6c6;";
@@ -256,7 +258,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               if((isset($_POST['modifyDate']) && $_POST['modifyDate'] == $calculator->indecesIM[$i]) || (isset($_POST['modifyDate_0']) && $_POST['modifyDate_0'] == $calculator->date[$i])){
                 echo "<tr>";
                 echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
-                if(!empty($_POST['modifyDate_0'])){ //for non existing timestamps, indexIM consists of (userID, date)
+                if(!empty($_POST['modifyDate_0'])){ //for non existing timestamps, different submission buttlon
                   $A = $B = $_POST['modifyDate_0'].' 00:00:00';
                   echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
                   for($i_utc = -12; $i_utc <= 12; $i_utc++){
@@ -270,10 +272,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else { //existing timestamps cant have timeToUTC edited
                   echo '<td></td>';
                 }
-
                 echo "<td><input id='calendar' type='datetime-local' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesFrom' value='" . substr($A,0,10).'T'. substr($A,11,5) . "' /></td>";
                 echo "<td><div style='display:inline-block;text-align:center'><input type='number' step='any' class='form-control input-sm' name='newBreakValues' value='" . sprintf('%.2f', $calculator->lunchTime[$i]). "' style='width:70px' /></div></td>";
-                echo "<td><input id='calendar2' type='datetime-local' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesTo' value='" . substr($B,0,10).'T'. substr($B,11,5) . "' /></td>";
+                echo '<td><div class="input-group"><span class="input-group-addon"><input type="radio" name="is_open" value="0" checked /></span>';
+                echo "<input id='calendar2' type='datetime-local' class='form-control input-sm' onkeydown='if (event.keyCode == 13) return false;' name='timesTo' value='" . substr($B,0,10).'T'. substr($B,11,5) . "' />";
+                echo '</div><div style="margin-top:5px;"><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><span style="margin-left:20px;"> '. $lang['OPEN'] .'</span></div></td>';
                 echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
                 echo "<td><select name='newActivity' class='js-example-basic-single'>";
                 for($j = 0; $j < 4; $j++){
