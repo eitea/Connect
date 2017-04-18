@@ -5,7 +5,6 @@ if(empty($_SESSION['userid'])){
 }
 $userID = $_SESSION['userid'];
 require_once 'validate.php';
-denyToCloud();
 enableToCore($userID);
 
 require 'connection_config.php';

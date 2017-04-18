@@ -14,16 +14,15 @@ if(!empty($_POST['captcha'])){
 require 'connection.php';
 require 'createTimestamps.php';
 include 'version_number.php';
-require 'validate.php'; denyToCloud();
 
 $invalidLogin = "";
-if (!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
+if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . strip_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);
   if($result){
     $row = $result->fetch_assoc();
   }
-  if (crypt($_POST['password'], $row['psw']) == $row['psw']) {
+  if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];

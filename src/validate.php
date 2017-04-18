@@ -70,10 +70,4 @@ function enableToReport($userID){
     die('Access denied. <a href="logout.php"> return</a>');
   }
 }
-
-function denyToCloud(){
-  if(isset($_SERVER['RDS_HOSTNAME']) || isset($_SERVER['RDS_PORT'])){
-    die("Restricted Access. <a href='logout.php'> Exit</a>");
-  }
-}
 ?>

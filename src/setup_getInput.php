@@ -18,7 +18,6 @@ $(document).ready(function() {
 </script>
 
 <?php
-require_once "validate.php"; denyToCloud();
 function redirect($url){
   if (!headers_sent()) {
     header('Location: '.$url);

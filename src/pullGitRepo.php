@@ -1,6 +1,6 @@
 
 <?php include 'header.php'; ?>
-<?php enableToCore($userID); denyToCloud();?>
+<?php enableToCore($userID);?>
 <!-- BODY -->
 
 <div class="page-header">

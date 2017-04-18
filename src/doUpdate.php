@@ -75,7 +75,6 @@ function move() {
 require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
-denyToCloud();
 
 $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
