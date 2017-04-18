@@ -375,6 +375,7 @@ $(document).ready(function() {
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                        <li><a <?php if($this_page == 'taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                       </ul>
                     </div>
@@ -388,7 +389,7 @@ $(document).ready(function() {
           <?php
           if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
             echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "reportOptions.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+          } elseif($this_page == "reportOptions.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
