@@ -152,13 +152,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
       if(!mysqli_error($conn)){
-        echo '<div class="alert alert-success fade in">';
+        echo '<div class="alert alert-success alert-over fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
+        echo $lang['OK_SAVE'];
         echo '</div>';
       }
     } else {
-      echo '<div class="alert alert-danger fade in">';
+      echo '<div class="alert alert-danger alert-over fade in">';
       echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
       echo '<strong>Could not change entry: </strong>Input was not correct.';
       echo '</div>';
