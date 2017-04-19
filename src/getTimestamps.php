@@ -29,8 +29,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['saveChanges'])) {
     $imm = $_POST['saveChanges'];
-    $timeStart = $_POST['timesFrom'] .':00';
-    $timeFin = $_POST['timesTo'] .':00';
+    $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
+    $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
     $status = intval($_POST['newActivity']);
     $newBreakVal = floatval($_POST['newBreakValues']);
     if($imm == 0){ //create new
@@ -39,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($_POST['is_open']){
         $timeFin = '0000-00-00 00:00:00';
       } else {
-        if($timeFin != '0001-01-01T00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
+        if($timeFin != '0001-01-01 00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
       }
       $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
       $sql = "INSERT INTO $logTable (time, timeEnd, breakCredit, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', '$newBreakVal', $creatUser, '$status', '$timeToUTC');";
@@ -58,13 +58,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</div>';
       }
     } else { //update old
-      if($timeFin == '0001-01-01T00:00:00' || $timeFin == ':00' || $_POST['is_open']){
+      if($timeFin == '0001-01-01 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       } else {
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), breakCredit = '$newBreakVal', status='$status' WHERE indexIM = $imm";
       }
       if($conn->query($sql)){
-        echo '<div class="alert alert-success alert-over fade in">';
+        echo '<div class="alert alert-success fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
         echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
         echo '</div>';
