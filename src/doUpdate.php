@@ -696,6 +696,16 @@ if($row['version'] < 75){
   }
 }
 
+if($row['version'] < 76){
+  $sql = "ALTER TABLE $companyDefaultProjectTable ADD UNIQUE KEY name_company (name, companyID)";
+  if($conn->query($sql)){
+    echo '<br> Added unqiue constraint';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  echo '<br> Table cleanup';
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

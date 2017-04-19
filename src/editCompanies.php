@@ -69,6 +69,42 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     echo mysqli_error($conn);
   }
 
+if(isset($_POST['save_defaultProjects']) && isset($_POST['default_projectNames'])){
+	if(empty($_POST['default_statii'])){
+		$_POST['default_statii'] = array();
+	}
+	for($i = 0; $i < count($_POST['default_projectNames']); $i++){
+    $projectName = test_input($_POST['default_projectNames'][$i]);
+    $defaultID = intval($_POST['default_projectIDs'][$i]);
+    $hours = floatval(test_input($_POST['default_boughtHours'][$i]));
+    $hourlyPrice = floatval(test_input($_POST['default_pricedHours'][$i]));
+    if(in_array($defaultID, $_POST['default_statii'])){
+      $status = "checked";
+    } else {
+      $status = "";
+    }
+    //checkboxes are not set at all if they're not checked
+    if(isset($_POST['default_addField_1_'.$defaultID])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
+    if(isset($_POST['default_addField_2_'.$defaultID])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
+    if(isset($_POST['default_addField_3_'.$defaultID])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
+
+    $sql = "UPDATE $companyDefaultProjectTable SET hours = '$hours', status = '$status', hourlyPrice = '$hourlyPrice', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $defaultID";
+    $conn->query($sql);
+
+    $sql = "UPDATE $projectTable SET hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3'
+    WHERE name= '$projectName' AND clientID IN (SELECT id FROM $clientTable WHERE companyID = $cmpID)";
+    $conn->query($sql);
+  }
+  if(!mysqli_error($conn)){
+    echo '<div class="alert alert-success fade in">';
+    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo $lang['OK_SAVE'];
+    echo '</div>';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
   $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); //selects up to three rows (or at least it should)
   if(isset($_POST['save_additional_fields'])){
     for($i = 1; $i < 4; $i++){
@@ -107,23 +143,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php
 $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
-?>
+  ?>
+
   <div class="page-header">
     <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?></h3>
   </div>
 
   <br>
   <form method="POST">
-    <p><?php echo $lang['DEFAULT'] . " " . $lang['PROJECT']; ?>: </p>
-    <table class="table table-hover table-condensed">
+    <div class="container-fluid">
+      <div class="row"><h4><?php echo $lang['DEFAULT'] . " " . $lang['PROJECT']; ?></h4></div>
+      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-new-project-modal"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+    </div>
+    <table class="table table-hover">
       <thead>
-        <tr>
-          <th>Option</th>
-          <th>Name</th>
-          <th>Status</th>
-          <th><?php echo $lang['HOURS']; ?></th>
-          <th><?php echo $lang['HOURLY_RATE']; ?></th>
-        </tr>
+        <th><?php echo $lang['DELETE']; ?></th>
+        <th>Name</th>
+        <th>Status</th>
+        <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
+        <th><?php echo $lang['HOURS']; ?></th>
+        <th><?php echo $lang['HOURLY_RATE']; ?></th>
       </thead>
       <tbody>
         <?php
@@ -132,11 +171,15 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         if ($projectResult && $projectResult->num_rows > 0) {
           while ($projectRow = $projectResult->fetch_assoc()) {
             $i = $projectRow['id'];
-
             $projectRowStatus = (!empty($projectRow['status']))? $lang['PRODUCTIVE']:'';
             echo "<tr><td><input type='checkbox' name='indexProject[]' value='$i'></td>";
             echo "<td>".$projectRow['name']."</td>";
             echo "<td> $projectRowStatus </td>";
+            echo '<td>';
+            $j = 1;
+            $extraResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID AND isActive = 'TRUE' ORDER BY id ASC");
+            while($extraResult && ($extraRow = $extraResult->fetch_assoc())){ if($projectRow['field_'.$j] == 'TRUE'){echo $extraRow['name'] .'<br>';} $j++; }
+            echo '</td>';
             echo "<td>".$projectRow['hours']."</td>";
             echo "<td>".$projectRow['hourlyPrice']."</td></tr>";
           }
@@ -145,12 +188,15 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       </tbody>
     </table>
     <br><br>
-    <p> <?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>: </p>
-    <table class="table table-hover" >
-      <tr>
-        <th>Option</th>
+    <div class="container-fluid">
+      <div class="row"><h4><?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?></h4></div>
+      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-hire-users-modal" ><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+    </div>
+    <table class="table table-hover">
+      <thead>
+        <th><?php echo $lang['DELETE']; ?></th>
         <th>Name</th>
-      </tr>
+      </thead>
       <tbody>
         <?php
         $query = "SELECT DISTINCT * FROM $userTable
@@ -168,8 +214,11 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       </tbody>
     </table>
     <br><br>
-    <p><?php echo $lang['ADDITIONAL_FIELDS']; ?>: </p>
-    <table class="table table-hover" >
+    <div class="container-fluid">
+      <div class="row"><h4><?php echo $lang['ADDITIONAL_FIELDS']; ?></h4></div>
+      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-additional-fields"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+    </div>
+    <table class="table table-hover">
       <thead>
         <th><?php echo $lang['ACTIVE']; ?></th>
         <th><?php echo $lang['HEADLINE']; ?></th>
@@ -192,197 +241,243 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         ?>
       </tbody>
     </table>
+
     <br><br>
     <div class="container-fluid text-right">
-      <div class="btn-group" role="group">
-        <div class="dropup">
-          <button class="btn btn-warning dropdown-toggle" id="dropOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Option
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#" data-toggle="modal" data-target=".cmp-new-project-modal">Neues Standardprojekt</a></li>
-            <li><a href="#" data-toggle="modal" data-target=".cmp-hire-users-modal" ><?php echo $lang['HIRE_USER']; ?></a></li>
-            <li><a href="#" data-toggle="modal" data-target=".cmp-additional-fields"><?php echo $lang['ADDITIONAL_FIELDS']; ?></a></li>
-            <li role="separator" class="divider"></li>
-            <li><button type="button" class="btn btn-link" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?></button></li>
-          </ul>
-        </div>
+      <button type="submit" class="btn btn-warning" name="deleteSelection">Auswahl Löschen</button>
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?>
       </div>
-      <button type="submit" class="btn btn-danger" name="deleteSelection">Auswahl Löschen</button>
-    </div>
 
-    <!-- Delete confirm modal -->
-    <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-      <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
-          </div>
-          <div class="modal-body">
-            All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
-            <button type="submit" name='deleteCompany' class="btn btn-primary">Yes, delete it.</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-    <!-- hire users modal -->
-  <form method="POST">
-    <div class="modal fade cmp-hire-users-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><?php echo $lang['HIRE_USER']; ?></h4>
-          </div>
-          <div class="modal-body">
-            <table class="table table-hover">
-              <thead>
-                <th>Select</th>
-                <th>Name</th>
-              </thead>
-              <tbody>
-                <?php
-                $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $cmpID)";
-                $result = mysqli_query($conn, $sql);
-                if ($result && $result->num_rows > 0) {
-                  while ($row = $result->fetch_assoc()) {
-                    echo '<tr>';
-                    echo '<td><input type="checkbox" name="hiring_userIDs[]" value="'.$row['id'].'" ></td>';
-                    echo '<td>'.$row['firstname'].' '. $row['lastname'] .'</td>';
-                    echo '</tr>';
-                  }
-                }
-                 ?>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-warning" name="hire"><?php echo $lang['HIRE_USER']; ?></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-    <!-- new project modal -->
-  <form  method="POST">
-    <div class="modal fade cmp-new-project-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><?php echo $lang['DEFAULT'] .' '.$lang['PROJECT']; ?></h4>
-          </div>
-          <div class="modal-body">
-            <input type="text" class="form-control" name="name" placeholder="Name">
-            <br>
-            <div class="row">
-              <div class="col-md-6">
-                <input type="number" step="any" class="form-control" name="hours" placeholder="Hours">
-              </div>
-              <div class="col-md-6">
-                <input type="number" step="any" class="form-control" name="hourlyPrice" placeholder="Price/Hour">
-              </div>
+      <!-- Delete confirm modal -->
+      <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
             </div>
-            <br>
-            <div class="row">
-              <div class="col-md-6" style="padding-left:50px;">
-                <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
-              </div>
-              <div class="col-md-6" style="padding-left:50px;">
-                <div class="checkbox">
+            <div class="modal-body">
+              All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
+              <button type="submit" name='deleteCompany' class="btn btn-warning">Yes, delete it.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- hire users modal -->
+    <form method="POST">
+      <div class="modal fade cmp-hire-users-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo $lang['HIRE_USER']; ?></h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+                <thead>
+                  <th>Select</th>
+                  <th>Name</th>
+                </thead>
+                <tbody>
                   <?php
-                  $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID ORDER BY id ASC");
-                  if($resF->num_rows > 0){
-                    $rowF = $resF->fetch_assoc();
-                    if($rowF['isActive'] == 'TRUE'){
-                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
-                      echo '<input type="checkbox" '.$checked.' name="createField_1"/>'. $rowF['name'];
-                    }
-                  }
-                  if($resF->num_rows > 1){
-                    $rowF = $resF->fetch_assoc();
-                    if($rowF['isActive'] == 'TRUE'){
-                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
-                      echo '<br><input type="checkbox" '.$checked.' name="createField_2" />'. $rowF['name'];
-                    }
-                  }
-                  if($resF->num_rows > 2){
-                    $rowF = $resF->fetch_assoc();
-                    if($rowF['isActive'] == 'TRUE'){
-                      $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
-                      echo '<br><input type="checkbox" '.$checked.' name="createField_3" />'. $rowF['name'];
+                  $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $cmpID)";
+                  $result = mysqli_query($conn, $sql);
+                  if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                      echo '<tr>';
+                      echo '<td><input type="checkbox" name="hiring_userIDs[]" value="'.$row['id'].'" ></td>';
+                      echo '<td>'.$row['firstname'].' '. $row['lastname'] .'</td>';
+                      echo '</tr>';
                     }
                   }
                   ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning" name="hire"><?php echo $lang['HIRE_USER']; ?></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- edit default projects modal -->
+    <form  method="POST">
+      <div class="modal fade cmp-new-project-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo $lang['DEFAULT'] .' '.$lang['PROJECT']; ?></h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+                <thead>
+                  <th>Name</th>
+                  <th><?php echo $lang['PRODUCTIVE']; ?></th>
+                  <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
+                  <th><?php echo $lang['HOURS']; ?></th>
+                  <th><?php echo $lang['HOURLY_RATE']; ?></th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <?php
+                  $result = $conn->query("SELECT * FROM $companyDefaultProjectTable WHERE companyID = $cmpID");
+                  echo mysqli_error($conn);
+                  while($row = $result->fetch_assoc()){
+                    echo '<tr>';
+                    echo '<td>'. $row['name'] .'</td>';
+                    echo '<td><div class="checkbox text-center"><input type="checkbox" name="default_statii[]" '. $row['status'] .' value="'.$row['id'].'"> <i class="fa fa-tags"></i></div></td>';
+                    echo '<td><small>';
+                    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID ORDER BY id ASC");
+                    if($resF->num_rows > 0){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $row['field_1'] == 'TRUE' ? 'checked': '';
+                        echo '<input type="checkbox" '.$checked.' name="default_addField_1_'.$row['id'].'"/>'. $rowF['name'];
+                      }
+                    }
+                    if($resF->num_rows > 1){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $row['field_2'] == 'TRUE' ? 'checked': '';
+                        echo '<br><input type="checkbox" '.$checked.' name="default_addField_2_'.$row['id'].'" />'. $rowF['name'];
+                      }
+                    }
+                    if($resF->num_rows > 2){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $row['field_3'] == 'TRUE' ? 'checked': '';
+                        echo '<br><input type="checkbox" '.$checked.' name="default_addField_3_'.$row['id'].'" />'. $rowF['name'];;
+                      }
+                    }
+                    echo '</small></td>';
+                    echo '<td><input type="number" class="form-control" step="any" name="default_boughtHours[]" value="'. $row['hours'] .'"></td>';
+                    echo '<td><input type="number" class="form-control" step="any" name="default_pricedHours[]" value="'. $row['hourlyPrice'] .'"></td>';
+                    echo '<td><input type="text" class="hidden" name="default_projectNames[]" value="'.$row['name'].'"><input type="text" class="hidden" name="default_projectIDs[]" value="'.$row['id'].'"></td>';
+                    echo '</tr>';
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type=submit class="btn btn-warning" name='save_defaultProjects'> <?php echo $lang['SAVE']; ?> </button>
+            </div>
+
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
+            </div>
+            <div class="modal-body">
+              <input type="text" class="form-control" name="name" placeholder="Name">
+              <br>
+              <div class="row">
+                <div class="col-md-6">
+                  <input type="number" step="any" class="form-control" name="hours" placeholder="Hours">
+                </div>
+                <div class="col-md-6">
+                  <input type="number" step="any" class="form-control" name="hourlyPrice" placeholder="Price/Hour">
+                </div>
+              </div>
+              <br>
+              <div class="row">
+                <div class="col-md-6" style="padding-left:50px;">
+                  <div class="checkbox"><input type="checkbox" name="status" value="checked"> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?></div>
+                </div>
+                <div class="col-md-6" style="padding-left:50px;">
+                  <div class="checkbox">
+                    <?php
+                    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID ORDER BY id ASC");
+                    if($resF->num_rows > 0){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                        echo '<input type="checkbox" '.$checked.' name="createField_1"/>'. $rowF['name'];
+                      }
+                    }
+                    if($resF->num_rows > 1){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                        echo '<br><input type="checkbox" '.$checked.' name="createField_2" />'. $rowF['name'];
+                      }
+                    }
+                    if($resF->num_rows > 2){
+                      $rowF = $resF->fetch_assoc();
+                      if($rowF['isActive'] == 'TRUE'){
+                        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked': '';
+                        echo '<br><input type="checkbox" '.$checked.' name="createField_3" />'. $rowF['name'];
+                      }
+                    }
+                    ?>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type=submit class="btn btn-warning" name='createNewProject'> <?php echo $lang['ADD']; ?> </button>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning" name='createNewProject'> <?php echo $lang['ADD']; ?> </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
 
     <!-- edit projectfields modal -->
-  <form method="POST">
-    <div class="modal fade cmp-additional-fields" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><?php echo $lang['ADDITIONAL_FIELDS']; ?></h4>
-          </div>
-          <div class="modal-body">
-            <table class="table table-hover">
-              <thead>
-                <th>Aktiv</th>
-                <th width="200px">Überschrift</th>
-                <th>Pflichtfeld</th>
-                <th width="150px">Für Alle Projekte</th>
-                <th>Beschreibung</th>
-              </thead>
-              <tbody>
-                <?php
-                $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID");
-                for($i = 1; $i < 4; $i++){
-                  echo '<tr>';
-                  if($result->num_rows > ($i-1)){
-                    $row = $result->fetch_assoc();
-                    $active = $row['isActive'] == 'TRUE' ? 'checked' : '';
-                    $name = $row['name'];
-                    $required = $row['isRequired'] == 'TRUE' ? 'checked' : '';
-                    $forAllProjects = $row['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-                    $description = $row['description'];
-                  } else {
-                    $row = $active = $name = $required = $forAllProjects = $description = '';
+    <form method="POST">
+      <div class="modal fade cmp-additional-fields" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo $lang['ADDITIONAL_FIELDS']; ?></h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+                <thead>
+                  <th>Aktiv</th>
+                  <th width="200px">Überschrift</th>
+                  <th>Pflichtfeld</th>
+                  <th width="150px">Für Alle Projekte</th>
+                  <th>Beschreibung</th>
+                </thead>
+                <tbody>
+                  <?php
+                  $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID");
+                  for($i = 1; $i < 4; $i++){
+                    echo '<tr>';
+                    if($result->num_rows > ($i-1)){
+                      $row = $result->fetch_assoc();
+                      $active = $row['isActive'] == 'TRUE' ? 'checked' : '';
+                      $name = $row['name'];
+                      $required = $row['isRequired'] == 'TRUE' ? 'checked' : '';
+                      $forAllProjects = $row['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                      $description = $row['description'];
+                    } else {
+                      $row = $active = $name = $required = $forAllProjects = $description = '';
+                    }
+                    echo "<td><input type='checkbox' name='active_$i' $active /></td>";
+                    echo "<td><input type='text' class='form-control' name='name_$i' maxlength='15' placeholder='max. 15 Zeichen' value='$name' /></td>";
+                    echo "<td><input type='checkbox' name='required_$i' $required /></td>";
+                    echo "<td><input type='checkbox' name='forall_$i' $forAllProjects /></td>";
+                    echo "<td><input type='text' class='form-control' name='description_$i' maxlength='50' placeholder='max. 50 Zeichen' value='$description' /></td>";
+                    echo '</tr>';
                   }
-                  echo "<td><input type='checkbox' name='active_$i' $active /></td>";
-                  echo "<td><input type='text' class='form-control' name='name_$i' maxlength='15' placeholder='max. 15 Zeichen' value='$name' /></td>";
-                  echo "<td><input type='checkbox' name='required_$i' $required /></td>";
-                  echo "<td><input type='checkbox' name='forall_$i' $forAllProjects /></td>";
-                  echo "<td><input type='text' class='form-control' name='description_$i' maxlength='50' placeholder='max. 50 Zeichen' value='$description' /></td>";
-                  echo '</tr>';
-                }
-                ?>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" name="save_additional_fields" class="btn btn-warning" value="<?php echo $cmpID; ?>"><?php echo $lang['SAVE']; ?></button>
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" name="save_additional_fields" class="btn btn-warning" value="<?php echo $cmpID; ?>"><?php echo $lang['SAVE']; ?></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </form>
-<?php endif;?>
+    </form>
+  <?php endif;?>
 
-<!-- /BODY -->
-<?php include 'footer.php'; ?>
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

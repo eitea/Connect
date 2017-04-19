@@ -170,7 +170,8 @@ $sql = "CREATE TABLE $companyDefaultProjectTable (
   field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   FOREIGN KEY (companyID) REFERENCES $companyTable(id)
   ON UPDATE CASCADE
-  ON DELETE CASCADE
+  ON DELETE CASCADE,
+  UNIQUE KEY name_company (name, companyID)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
