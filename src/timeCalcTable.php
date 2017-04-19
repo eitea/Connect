@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'header.php';?>
 <?php enableToStamps($userID);?>
 <!-- BODY -->
 
@@ -26,7 +26,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
     echo '</div>';
   }
 }
-echo mysqli_error($conn);
 ?>
 
 <form method="post" id="form1">

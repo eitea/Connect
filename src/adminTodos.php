@@ -11,14 +11,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
-      $result = $conn->query("SELECT pauseAfterHours, hoursOfRest FROM $intervalTable WHERE userID = $uId AND endDate IS NULL");
+      $result = $conn->query("SELECT time, pauseAfterHours, hoursOfRest FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
       if($result && ($row = $result->fetch_assoc())){
         $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
         $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
         $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
-        $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM");
-        echo mysqli_error($conn);
       }
+      //just... just recalculate all lunchbreaks
+      $conn->query("UPDATE $logTable l1, (SELECT (SUM(TIMESTAMPDIFF(MINUTE, start, end))/60) as mySum FROM $projectBookingTable WHERE timestampID = $indexIM) p1 SET l1.breakCredit = p1.mySum WHERE l1.indexIM = $indexIM");
+      echo mysqli_error($conn);
     }
   }
   //repair forgotten check outs
@@ -182,8 +183,9 @@ if($result && $result->num_rows > 0):
 
 <form method="POST">
   <?php //select all timestamps that do not have at least one complete break booking
-  $sql = "SELECT indexIM, $logTable.userID, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id $intervalTable ON l1.userID = $intervalTable.userID
-  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
+  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID INNER JOIN $roleTable ON $userTable.id = $roleTable.userID
+  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND canBook = 'FALSE' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
   AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end))";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
@@ -197,7 +199,8 @@ if($result && $result->num_rows > 0):
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
         Für die gelisteten Zeitstempel wurde keine Mittagspause gefunden.<br>
-        Die Autokorrektur trägt eine vollständige Mittagspause nach (Diese Pause wird dazugerechnet).
+        Die Autokorrektur trägt eine vollständige Mittagspause nach (Diese Pause wird dazugerechnet). <br>
+        Hier werden nur Benutzer angezeigt, die ihre Pause nicht selbst buchen können.
       </div>
     </div>
 
@@ -224,7 +227,7 @@ if($result && $result->num_rows > 0):
     <br>
     <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Autocorrect</button>
     <br><hr><br>
-  <?php echo mysqli_error($conn); endif;?>
+  <?php endif; echo mysqli_error($conn);?>
 
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
 
