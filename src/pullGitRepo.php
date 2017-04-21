@@ -1,4 +1,3 @@
-
 <?php include 'header.php'; ?>
 <?php enableToCore($userID);?>
 <!-- BODY -->

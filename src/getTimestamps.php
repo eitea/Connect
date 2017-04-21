@@ -18,16 +18,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterDateFrom = $_POST['filterDateFrom'] .'-01 12:00:00';
     $filterDateTo = date('Y-m-t H:i:s', strtotime($_POST['filterDateTo']));
   }
-  if (!empty($_POST['filteredUserID'])) {
+  if(!empty($_POST['filteredUserID'])){
     $filterID = $_POST['filteredUserID'];
   }
-  if (isset($_POST['filterStatus'])) {
+  if(isset($_POST['filterStatus'])){
     $filterStatus = $_POST['filterStatus'];
   }
   if(isset($_POST['modifyDate_0']) ||isset($_POST['modifyDate']) || isset($_POST['saveChanges'])){ //scrolling
     $scrollPos = intval($_POST['scrollPos']);
   }
-  if(isset($_POST['saveChanges'])) {
+  if(isset($_POST['saveChanges'])){
     $imm = $_POST['saveChanges'];
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';

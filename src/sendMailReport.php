@@ -1,11 +1,9 @@
-
 <?php require_once "../plugins/phpMailer/class.phpmailer.php"; ?>
 <?php require_once "../plugins/phpMailer/class.smtp.php"; ?>
 <?php require_once "connection.php"; require_once "createTimestamps.php"; ?>
 <?php require_once "../plugins/cssToInlineStyles/autoload.php"; ?>
 <?php require_once 'utilities.php'; ?>
 <?php require_once "Calculators/LogCalculator.php"; ?>
-
 <?php
 //for css
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;

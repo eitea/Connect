@@ -703,7 +703,6 @@ if($row['version'] < 76){
   } else {
     echo mysqli_error($conn);
   }
-
   echo '<br> Table cleanup';
 }
 
@@ -711,9 +710,16 @@ if($row['version'] < 76){
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
 $conn->query($sql);
-header("refresh:6;url=home.php");
-die ('<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>');
+echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
 ?>
+<script type="text/javascript">
+  window.setInterval(function(){
+    window.location.href="home.php";
+  }, 6000);
+</script>
+<noscript>
+<meta http-equiv="refresh" content="0;url='.$url.'" />';
+</noscript>
 </div>
 </body>
 </html>

@@ -1,4 +1,3 @@
-
 <?php include 'header.php'; enableToTime($userID); ?>
 <div class="page-header">
   <h3><?php echo $lang['ADJUSTMENTS']; ?></h3>

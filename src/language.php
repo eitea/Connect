@@ -246,6 +246,9 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['USERS'] = 'Users';
   $lang['USER_INACTIVE'] = 'Deactivated Users';
   $lang['USER_MODULES'] = 'User Modules';
+  $lang['USER_PROJECTING_INFO'] = 'Entries cannot be accepted if made into the future (only past times are possible).
+  Lunchbreak has to be consumed as a whole, or else it cannot be counted.
+  Time gaps between breaks and bookings, may not be longer than 2 Minutes.';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';

@@ -1,4 +1,3 @@
-
 <?php include 'header.php'; enableToReport($userID);?>
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
