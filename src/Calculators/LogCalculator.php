@@ -107,16 +107,15 @@ class LogCalculator{
     $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
 
     //sooo.. apparently the overtimelump cannot make our saldo negative
-    if($this->overTimeAdditive < $this->saldo){
-       $this->saldo -= $this->overTimeAdditive;
-     } else {
-       if($this->saldo < 0){ //negative saldo
-         $this->overTimeAdditive = 0;
-       } else { //too little saldo
-         $this->overTimeAdditive -= $this->saldo;
-         $this->saldo = 0;
-       }
-     }
+    if($this->saldo > 0){ //is the overtimelump subtractable?
+      $this->saldo -= $this->overTimeAdditive;
+      if($this->saldo < 0){ //too little saldo
+        $this->overTimeAdditive = ($this->saldo + $this->overTimeAdditive);
+        $this->saldo = 0;
+      }
+    } else {
+      $this->overTimeAdditive = 0;
+    }
   }
 
   private function timeDiff_Hours($from, $to) {
