@@ -706,6 +706,17 @@ if($row['version'] < 76){
   echo '<br> Table cleanup';
 }
 
+if($row['version'] < 77){
+  $conn->query("DELETE p1 FROM projectData p1, projectData p2 WHERE p1.clientID = p2. clientID AND p1.name = p2.name AND p1.id > p2.id");
+
+  $sql = "ALTER TABLE projectData ADD UNIQUE KEY name_client (name, clientID)";
+  if($conn->query($sql)){
+    echo '<br> Added unqiue constraint';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
