@@ -42,8 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInfoText = test_input($_POST['infoText']);
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
-    if(timeDiff_Hours($startDate, $endDate) > 0){
+    if(timeDiff_Hours($startDate, $endDate) > 0 && timeDiff_Hours($endDate, getCurrentTimestamp()) > 0){
       if(isset($_POST['addBreak'])){ //break
+        $startDate = substr($startDate, 0, 17). rand(10,59);
+        $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
@@ -106,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Could not create entry: </strong>Times were not valid.';
+      echo '<strong>Could not create entry: </strong>Entered times were invalid, click the infobutton for more detail.';
       echo '</div>';
     }
   } elseif(isset($_POST['add'])) {
@@ -131,12 +133,20 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
 
 
 <form method="post">
-  <?php if($showUndoButton): ?>
-    <div style='text-align:right;'><button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button></div>
-  <?php elseif($showEmergencyUndoButton): ?>
-    <div style='text-align:right;'><button type='submit' class="btn btn-danger" name='undo' value='emergency' title='Emergency Undo. Can only be pressed every 2 Hours'>Undo</button></div>
-  <?php endif; ?>
-
+  <div style='text-align:right;'>
+    <?php if($showUndoButton): ?>
+      <button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button>
+    <?php elseif($showEmergencyUndoButton): ?>
+      <button type='submit' class="btn btn-danger" name='undo' value='emergency' title='Emergency Undo. Can only be pressed every 2 Hours'>Undo</button>
+    <?php endif; ?>
+    <button type='button' class="btn btn-default" style="border:0;background:0;" data-toggle="collapse" href="#userProjecting_info" aria-expanded="false"><i class="fa fa-question-circle-o fa-2x"></i></button>
+  </div>
+  <br>
+  <div class="collapse" id="userProjecting_info">
+    <div class="well">
+      <?php echo $lang['USER_PROJECTING_INFO']; ?>
+    </div>
+  </div>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-hover table-striped">
@@ -159,23 +169,21 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
           OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
 
           $result = mysqli_query($conn, $sql);
-          if ($result && $result->num_rows > 0) {
+          if($result && $result->num_rows > 0){
             $numRows = $result->num_rows;
             if(isset($_POST['undo'])){
               $numRows--;
             }
 
-            for ($i=0; $i<$numRows; $i++) {
+            for($i=0; $i<$numRows; $i++){
               $row = $result->fetch_assoc();
-
               if($row['bookingType'] == 'break'){
                 $icon = "fa fa-cutlery";
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
               } else {
-                $icon = "fa fa-star-o"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
+                $icon = "fa fa-bookmark"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
               }
-
               $interninfo = $row['internInfo'];
               $optionalinfo = '';
               $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
@@ -300,12 +308,12 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
 
   <div class="container-fluid">
     <div class="checkbox">
-      <div class="col-sm-2">
-        <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
-      </div>
       <div class="col-sm-3">
         <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
       </div>
+    </div>
+    <div id="hide_break">
+
     </div>
   </div>
 

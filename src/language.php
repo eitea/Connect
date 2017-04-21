@@ -246,9 +246,10 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['USERS'] = 'Users';
   $lang['USER_INACTIVE'] = 'Deactivated Users';
   $lang['USER_MODULES'] = 'User Modules';
-  $lang['USER_PROJECTING_INFO'] = 'Entries cannot be accepted if made into the future (only past times are possible).
-  Lunchbreak has to be consumed as a whole, or else it cannot be counted.
-  Time gaps between breaks and bookings, may not be longer than 2 Minutes.';
+  $lang['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter a valid time and fill out the infobox.
+  Entries with future or negative dates are not valid. Breaks have to be checked out.
+  Lunchbreaks have to be consumed as a whole, otherwise a complete one will be added additionally afterwards.
+  Time gaps between breaks and bookings may not be longer than 2 Minutes.';
 
   $lang['VACATION'] = 'Vacation';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
@@ -498,6 +499,10 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['USERS'] = 'Benutzer';
   $lang['USER_INACTIVE'] = 'Deaktivierte Benutzer';
   $lang['USER_MODULES'] = 'Benutzer Module';
+  $lang['USER_PROJECTING_INFO'] = 'Um einen Eintrag zu erstellen muss zuerst ein Projekt selektiert werden, eine gültige Uhrzeiten eingegeben und die Infoboxen ausgefüllt werden.
+  Einträge mit zukünftigen oder negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.
+  Die Mittagspause muss am Stück konsumiert werden, sonst muss im Anschluss eine vollständige Pause hinzugefügt werden.
+  Zwischen Pausen und Buchungen dürfen nicht mehr als 2 Minuten Unterschied liegen, sonst wird ein Nachtrag verlangt.';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';

@@ -46,7 +46,7 @@ function checkOut($userID) {
   $row = $result->fetch_assoc();
   if($row['canBook'] == 'FALSE'){
     //check if user was here for over 6h
-    $sql = "SELECT hoursOfRest, pauseAfterHours FROM $intervaltable
+    $sql = "SELECT hoursOfRest, pauseAfterHours FROM $intervalTable
     WHERE userID = $userID AND endDate IS NULL
     AND TIMESTAMPDIFF(MINUTE, '$start', UTC_TIMESTAMP) > (pauseAfterHours * 60)
     AND hoursOfRest > 0";
