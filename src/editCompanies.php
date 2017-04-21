@@ -282,7 +282,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
                 </thead>
                 <tbody>
                   <?php
-                  $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $cmpID)";
+                  $sql = "SELECT * FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID = $cmpID) ORDER BY lastname ASC";
                   $result = mysqli_query($conn, $sql);
                   if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {

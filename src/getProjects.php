@@ -735,7 +735,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $x = $row['projectBookingID'];
 ?>
 <form method="post">
-    <div class="modal fade editingModal-<?php echo $x ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -746,9 +746,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
             if($row['bookingType'] != 'break'){ //if this is a break, do not display client/project selection
               echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
-              $sql = "SELECT * FROM $clientTable";
+              $sql = "SELECT * FROM $clientTable ORDER BY NAME ASC";
               if($filterCompany){
-                $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany";
+                $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
               }
               $clientResult = $conn->query($sql);
               while($clientRow = $clientResult->fetch_assoc()){
@@ -759,7 +759,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
               }
               echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
-              $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'];
+              $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
               $clientResult = $conn->query($sql);
               while($clientRow = $clientResult->fetch_assoc()){
                 $selected = '';
