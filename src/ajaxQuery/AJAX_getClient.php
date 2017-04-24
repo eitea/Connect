@@ -1,7 +1,7 @@
 
 <?php
 require "../connection.php";
-$q = intval($_GET['company']);
+$cmpID = intval($_GET['company']);
 
 if(isset($_GET['p'])){
   $p = intval($_GET['p']);
@@ -9,8 +9,7 @@ if(isset($_GET['p'])){
   $p = 0;
 }
 echo "<option name='act' value=0 >Select Client</option>";
-$query = "SELECT * FROM $clientTable WHERE companyID = $q";
-$result = mysqli_query($conn, $query);
+$result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID");
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $clientID = $row['id'];

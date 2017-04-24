@@ -70,4 +70,13 @@ function enableToReport($userID){
     die('Access denied. <a href="logout.php"> return</a>');
   }
 }
+
+function enableToERP($userID){
+  require 'connection.php';
+  $sql = "SELECT isERPAdmin FROM $roleTable WHERE userID = $userID AND isERPAdmin = 'TRUE'";
+  $result = $conn->query($sql);
+  if($userID != 1 && (!$result || $result->num_rows <= 0)){
+    die('Access denied. <a href="logout.php"> return</a>');
+  }
+}
 ?>

@@ -13,7 +13,7 @@ if(isset($_POST['prevTemplate'])){
 }
 if(isset($_POST['removeTemplate'])){
   $tempelID = $_POST['removeTemplate'];
-  $conn->query("DELETE FROM $pdfTemplateTable WHERE id = $tempelID AND name != 'Main_Report'");
+  $conn->query("DELETE FROM $pdfTemplateTable WHERE id = $tempelID AND name NOT LIKE 'Main_%'");
 }
 
 if(isset($_POST['addRecipient'])){
@@ -99,7 +99,7 @@ if(isset($_POST['modifyUserIDs'])){
   echo $conn->error;
 }
 $result = $conn->query("SELECT * FROM $pdfTemplateTable"); //CARE: changes to this query must also be applied to above query!
-while($result && ($row = $result->fetch_assoc())):  //create a modal for every table above. So we don't mess it up.
+while($result && ($row = $result->fetch_assoc())):  //create a modal for every table above. So don't mess it up.
   ?>
   <!-- Modal: DELETE USERS -->
   <div class="modal fade" id="deleteUserModal<?php echo $row['id']; ?>" tabindex="-1" role="dialog">

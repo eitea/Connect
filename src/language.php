@@ -176,6 +176,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['MONTHLY_REPORT'] ='Monthly Report';
 
   $lang['NEW_CLIENT_CREATE'] = 'Create a new Client';
+  $lang['NEW_OFFER'] = 'New Offer';
   $lang['NEW_PASSWORD'] = 'New Password';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
   $lang['NEW_TEMPLATE'] = 'New Template';
@@ -184,6 +185,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['NOT_CHARGEABLE'] = 'Don`t charge';
   $lang['NUMBER'] = 'Number';
 
+  $lang['OFFER'] = 'Offer';
   $lang['OK_CREATE'] = 'New entry was successfully created.';
   $lang['OK_SAVE'] = 'Changes were successfully saved.';
   $lang['OPTIONS'] = 'Options';
@@ -198,6 +200,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PRODUCTIVE'] = 'Productive';
   $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
   $lang['PRODUCTIVITY'] = 'Productivity';
+  $lang['PRODUCTS'] = 'Products';
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -212,6 +215,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REMOVE_USER'] = 'Remove User';
   $lang['REPLY_TEXT'] = 'Answer';
   $lang['REPORTS'] = 'Reports';
+  $lang['RETURN'] = 'Return';
   $lang['REQUESTS'] = "Request";
   $lang['REQUIRED_FIELD'] = 'Required Field';
 
@@ -428,6 +432,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['MONTHLY_REPORT'] ='Monatsbericht';
 
   $lang['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
+  $lang['NEW_OFFER'] = 'Neues Angebot';
   $lang['NEW_PASSWORD'] = 'Neues Passwort';
   $lang['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
   $lang['NEW_TEMPLATE'] = 'Neue Vorlage';
@@ -436,6 +441,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['NOT_CHARGEABLE'] = 'Erlassen';
   $lang['NUMBER'] = 'Nummer';
 
+  $lang['OFFER'] = 'Angebot';
   $lang['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
   $lang['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
   $lang['OPTIONS'] = 'Optionen';
@@ -450,6 +456,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
   $lang['PRODUCTIVITY'] = 'Produktivität';
+  $lang['PRODUCTS'] = 'Produkte';
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';
@@ -465,6 +472,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['REMOVE_USER'] = 'Benutzer Entfernen';
   $lang['REPLY_TEXT'] = 'Antwort';
   $lang['REPORTS'] = 'Berichte';
+  $lang['RETURN'] = 'Zurück';
   $lang['REQUESTS'] = "Anfragen";
   $lang['REQUIRED_FIELD'] = 'Pflichtfeld';
 
@@ -499,10 +507,10 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['USERS'] = 'Benutzer';
   $lang['USER_INACTIVE'] = 'Deaktivierte Benutzer';
   $lang['USER_MODULES'] = 'Benutzer Module';
-  $lang['USER_PROJECTING_INFO'] = 'Um einen Eintrag zu erstellen muss zuerst ein Projekt selektiert werden, eine gültige Uhrzeiten eingegeben und die Infoboxen ausgefüllt werden.
+  $lang['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
   Einträge mit zukünftigen oder negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.
-  Die Mittagspause muss am Stück konsumiert werden, sonst muss im Anschluss eine vollständige Pause hinzugefügt werden.
-  Zwischen Pausen und Buchungen dürfen nicht mehr als 2 Minuten Unterschied liegen, sonst wird ein Nachtrag verlangt.';
+  Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein Zeitunterschied von mehr als 2 Minuten muss ein Nachtrag gemacht werden.
+  Eine Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.';
 
   $lang['VACATION'] = 'Urlaub';
   $lang['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';

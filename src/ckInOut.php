@@ -56,27 +56,26 @@ function checkOut($userID) {
       $minutesOfRest = $row['hoursOfRest'] * 60;
       //check if he didnt fullfill the lunchbreak. Note: He did not fulfill the lunchbreak if there is no COMPLETE 0,5h break booking.
       $result2 = $conn->query("SELECT $projectBookingTable.id FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM AND TIMESTAMPDIFF(MINUTE, start, end) >= $minutesOfRest ");
-        if(!$result2 || $result2->num_rows <= 0){
+      if(!$result2 || $result2->num_rows <= 0){
           //Add pauseAfterHours to start, and add complete hoursOfRest to that
           $start = carryOverAdder_Minutes($start, $row['pauseAfterHours']*60);
           $end = carryOverAdder_Minutes($start, $minutesOfRest);
           //create the lunchbreak booking
           $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$start', '$end', $indexIM, 'Lunchbreak for $userID', 'break')";
-          $conn->query($sql);
-          echo mysqli_error($conn);
-
-          //update timestamp
-          $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
           if($conn->query($sql)){
-            echo "Unconsumed Lunchbreak detected.";
+            //update timestamp
+            $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
+            if($conn->query($sql)){
+              return "Unconsumed Lunchbreak detected.";
+            } else {
+              return mysqli_error($conn);
+            }
           } else {
-            echo mysqli_error($conn);
+            return mysqli_error($conn);
           }
         }
       }
-    } else {
-      //or all was good, & he did nuttin wong.
-      echo mysqli_error($conn);
     }
+    return mysqli_error($conn);
   }
 ?>

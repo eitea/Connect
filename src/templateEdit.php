@@ -63,16 +63,14 @@ if($templateName == 'Main_Report'){
       <input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $templateName; ?>" />
     </div>
     <div class="col-xs-2 text-right">
-      <a href='templateSelect.php' class='btn btn-info btn-block'>Return <i class='fa fa-arrow-right'></i></a>
+      <a href='templateSelect.php' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a>
     </div>
   </div>
   <br>
   <div class="container-fluid">
-
     <div class="col-sm-10" id="droppableDiv" style="max-width:780px;">
       <textarea id="firstPage" name="firstPage"><?php echo $templateContent; ?></textarea>
     </div>
-
     <div class="col-sm-2">
       <br><br>Click to Insert: <br><br>
       <button type="button" class="draggable" value='[BOOKINGS]' onclick="addText(this);"><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
@@ -95,7 +93,6 @@ tinymce.init({
   relative_urls: false,
   content_css: '../plugins/homeMenu/template.css'
 });
-
 
 function addText(o) {
     var inText = o.value;

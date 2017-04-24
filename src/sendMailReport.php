@@ -21,7 +21,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail->IsSMTP();
 
   $reportID = $rowContent['id'];
-  $content = getFilledOutTemplate($reportID);
+  $content = getFilledOutTemplate($reportID); //utilities.php
 
   //convert to inline css style
   $content = $cssToInlineStyles->convert($content, $css);
@@ -62,7 +62,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail->isHTML(true);                       // Set email format to HTML
   $mail->Subject = $rowContent['name'];
   $mail->Body    = $content;
-  $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
+  $mail->AltBody = "If you can read this, your e-mail provider does not support HTML." . $content;
   $errorInfo = "";
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;

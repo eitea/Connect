@@ -8,7 +8,7 @@
 <?php
 $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
 $result = mysqli_query($conn, $sql);
-if ($result && $result->num_rows > 0) {
+if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
   $start = substr(carryOverAdder_Hours($row['time'], $timeToUTC), 11, 19);
   $date = substr($row['time'], 0, 10);

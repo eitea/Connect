@@ -18,7 +18,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
       }
       //just... just recalculate all lunchbreaks
-      $conn->query("UPDATE $logTable l1, (SELECT (SUM(TIMESTAMPDIFF(MINUTE, start, end))/60) as mySum FROM $projectBookingTable WHERE timestampID = $indexIM) p1 SET l1.breakCredit = p1.mySum WHERE l1.indexIM = $indexIM");
+      $conn->query("UPDATE $logTable l1, (SELECT (SUM(TIMESTAMPDIFF(MINUTE, start, end))/60) as mySum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break') p1 SET l1.breakCredit = p1.mySum WHERE l1.indexIM = $indexIM");
       echo mysqli_error($conn);
     }
   }

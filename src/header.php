@@ -6,7 +6,7 @@ if(empty($_SESSION['userid'])){
 
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-$isCoreAdmin = $isTimeAdmin = $isProjectAdmin = FALSE;
+$isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isERPAdmin = FALSE;
 $canBook = $canStamp = FALSE;
 $this_page = basename($_SERVER['PHP_SELF']);
 $setActiveLink = 'style="color:#ed9c21;"';
@@ -20,7 +20,7 @@ if($this_page != "editCustomer_detail.php"){
   unset($_SESSION['unlock']);
 }
 if($userID == 1){
-  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $canBook = $canStamp  = $canEditTemplates = 'TRUE';
+  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $canBook = $canStamp  = $canEditTemplates = 'TRUE';
 } else {
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
   $result = $conn->query($sql);
@@ -30,7 +30,7 @@ if($userID == 1){
     $isTimeAdmin = $row['isTimeAdmin'];
     $isProjectAdmin = $row['isProjectAdmin'];
     $isReportAdmin = $row['isReportAdmin'];
-
+    $isERPAdmin = $row['isERPAdmin'];
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
@@ -68,9 +68,9 @@ $available_users = array('-1');
 while($result && ($row = $result->fetch_assoc())){
   $available_users[] = $row['userID'];
 }
-$validation_output = '';
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
+$validation_output = $error_output = '';
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+  if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){
     if(test_input($_POST['password']) != $_POST['password']){
       die("Malicious Code Injection Detected, please do not use any HTML, SQL or Javascript specific characters.");
     }
@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
       $validation_output .= "<strong>Failed! </strong>Passwords did not match or were invalid. $output".'</div>';
     }
-  } elseif (isset($_POST['savePIN'])) {
+  } elseif(isset($_POST['savePIN'])){
     if(is_numeric($_POST['pinCode']) && !empty($_POST['pinCode'])){
       $sql = "UPDATE $userTable SET terminalPin = '".$_POST['pinCode']."' WHERE id = '$userID';";
       $conn->query($sql);
@@ -104,18 +104,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn'])) {
       checkIn($userID);
     } elseif (isset($_POST['stampOut'])) {
-      checkOut($userID);
+      $error_output = checkOut($userID);
     }
   } elseif(isset($_POST["GERMAN"])){
     $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
     $conn->query($sql);
     $_SESSION['language'] = 'GER';
+    $validation_output = mysqli_error($conn);
   } elseif(isset($_POST['ENGLISH'])){
     $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = 1";
     $conn->query($sql);
     $_SESSION['language'] = 'ENG';
+    $validation_output = mysqli_error($conn);
   }
-  $validation_output = mysqli_error($conn);
 }
 
 require "language.php";
@@ -171,7 +172,6 @@ $(document).ready(function() {
 </script>
 
 <body id="body_container" class="is-table-row">
-  <span><?php echo $validation_output; ?></span>
   <div id="loader"></div>
 
   <!-- navbar -->
@@ -455,7 +455,7 @@ $(document).ready(function() {
           }
           ?>
         <?php endif; ?>
-
+        <!-- Section Four: REPORTS -->
         <?php if($isReportAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
             <div class="panel-heading" role="tab" id="headingReport">
@@ -472,14 +472,39 @@ $(document).ready(function() {
               </div>
             </div>
           </div>
-          <br>
           <?php
           if($this_page == "report_productivity.php"){
             echo "<script>$('#adminOption_REPORT').click();</script>";
           }
-          ?>
 
+          endif;
+          ?>
+          <!-- Section Five: ERP -->
+          <?php
+          if($isReportAdmin == 'TRUE'):
+          ?>
+          <div class="panel panel-default panel-borderless">
+            <div class="panel-heading" role="tab" id="headingERP">
+              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">
+                ERP<i class="fa fa-caret-down pull-right"></i>
+              </a>
+            </div>
+            <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
+              <div class="panel-body">
+                <ul class="nav navbar-nav">
+                  <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFER']; ?></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <br>
+          <?php
+          if($this_page == "offer_proposals.php"){
+            echo "<script>$('#adminOption_ERP').click();</script>";
+          }
+          ?>
         <?php endif; ?>
+        <br>
       </div> <!-- /accordions -->
       <br><br><br>
     </div>
@@ -513,3 +538,5 @@ $(document).ready(function() {
   <div id="bodyContent" style="display:none;" >
     <div class="affix-content">
       <div class="container-fluid">
+        <span><?php echo $validation_output; ?></span>
+        <span><?php echo $error_output; ?></span>

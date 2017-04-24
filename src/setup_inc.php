@@ -75,7 +75,8 @@ if (!$conn->query($sql)) {
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
-  companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-'
+  companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-',
+  logo VARCHAR(20)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -244,6 +245,7 @@ $sql = "CREATE TABLE $roleTable(
   isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
   canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
   canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -621,5 +623,35 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
+
+  $sql = "CREATE TABLE proposals (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_number VARCHAR(10) NOT NULL,
+    clientID INT(6) UNSIGNED,
+    status ENUM('0', '1', '2'),
+    FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE products(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    proposalID INT(6) UNSIQNED,
+    name VARCHAR(50),
+    description VARCHAR(300),
+    price DECIMAL(10,2),
+    quantity DECIMAL(8,2),
+    FOREIGN KEY (proposalID) REFERENCES proposals(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+
 
 ?>

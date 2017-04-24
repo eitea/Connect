@@ -731,6 +731,55 @@ if($row['version'] < 77){
   }
 }
 
+if($row['version'] < 78){
+  $sql = "CREATE TABLE proposals (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_number VARCHAR(10) NOT NULL,
+    clientID INT(6) UNSIGNED,
+    status ENUM('0', '1', '2'),
+    FOREIGN KEY (clientID) REFERENCES $clientTable(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table for proposals)';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "CREATE TABLE products(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    proposalID INT(6) UNSIQNED,
+    name VARCHAR(50),
+    description VARCHAR(300),
+    price DECIMAL(10,2),
+    quantity DECIMAL(8,2),
+    FOREIGN KEY (proposalID) REFERENCES proposals(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table for products';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE $companyTable ADD COLUMN logo VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Added logo to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE $roleTable ADD COLUMN isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo '<br> Added ERP Admin';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+}
+
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
