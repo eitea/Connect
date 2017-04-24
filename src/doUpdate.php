@@ -736,7 +736,7 @@ if($row['version'] < 78){
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_number VARCHAR(10) NOT NULL,
     clientID INT(6) UNSIGNED,
-    status ENUM('0', '1', '2'),
+    status ENUM('0', '1', '2') DEFAULT '0',
     FOREIGN KEY (clientID) REFERENCES $clientTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -748,7 +748,7 @@ if($row['version'] < 78){
   }
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    proposalID INT(6) UNSIQNED,
+    proposalID INT(6) UNSIGNED,
     name VARCHAR(50),
     description VARCHAR(300),
     price DECIMAL(10,2),

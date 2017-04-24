@@ -197,6 +197,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PAYMENT'] = 'Payment';
   $lang['PDF_TEMPLATES'] = 'Pdf Templates';
   $lang['PREVIEW'] = 'Preview';
+  $lang['PRICE_STK'] = 'Unit Price';
   $lang['PRODUCTIVE'] = 'Productive';
   $lang['PRODUCTIVE_FALSE'] = 'Unproductive';
   $lang['PRODUCTIVITY'] = 'Productivity';
@@ -204,6 +205,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PROJECT'] = 'Project';
   $lang['PROJECT_BOOKINGS'] = 'Projectbookings';
   $lang['PROJECT_INFORMATION'] = 'Reports';
+
+  $lang['QUANTITY'] = 'Quantity';
 
   $lang['READY_STATUS'] = 'Ready Status';
   $lang['REASON'] = 'Reason';
@@ -453,6 +456,7 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PAYMENT'] = 'Zahlung';
   $lang['PDF_TEMPLATES'] = 'Pdf Vorlagen';
   $lang['PREVIEW'] = 'Vorschau';
+  $lang['PRICE_STK'] = 'Stückpreis';
   $lang['PRODUCTIVE'] = 'Produktiv';
   $lang['PRODUCTIVE_FALSE'] = 'Nicht Produktiv';
   $lang['PRODUCTIVITY'] = 'Produktivität';
@@ -460,6 +464,8 @@ if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
   $lang['PROJECT'] = 'Projekt';
   $lang['PROJECT_BOOKINGS'] = 'Projektbuchungen';
   $lang['PROJECT_INFORMATION'] = 'Reports';
+
+  $lang['QUANTITY'] = 'Quantität';
 
   $lang['READY_STATUS'] = 'Bereitschaftsstatus';
   $lang['REASON'] = 'Grund';
