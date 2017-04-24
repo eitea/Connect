@@ -6,13 +6,13 @@ function timeDiff_Hours($from, $to) {
   return $timeEnd - $timeBegin;
 }
 
-function getCurrentTimestamp() {
+function getCurrentTimestamp(){
   ini_set('date.timezone', 'UTC');
   $t = localtime(time(), true);
   return ($t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]) . " " . sprintf("%02d", $t["tm_hour"]) . ":" . sprintf("%02d", $t["tm_min"]) . ":" . sprintf("%02d", $t["tm_sec"]));
 }
 
-function carryOverAdder_Hours($a, $b) {
+function carryOverAdder_Hours($a, $b){
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }
@@ -26,7 +26,7 @@ function carryOverAdder_Hours($a, $b) {
   return $date->format('Y-m-d H:i:s');
 }
 
-function carryOverAdder_Minutes($a, $b) {
+function carryOverAdder_Minutes($a, $b){
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }
@@ -72,7 +72,7 @@ function test_Date($date){
 
 //$hours is a float
 function displayAsHoursMins($hour){
-  $hours = $hour;
+  $hours = round($hour, 2); //i know params are passed by value if not specified otherwise, but still.. I got trust issues with this language
   $s = '';
   if($hours < 0){
     $s = '-';
