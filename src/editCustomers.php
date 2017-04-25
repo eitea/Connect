@@ -52,11 +52,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <br>
 <form method="post">
   <select name="filterCompany" class="js-example-basic-single" style="width:200px">
-    <option value=0><?php echo $lang['COMPANY']; ?> ... </option>
     <?php
     $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
     $result = mysqli_query($conn, $query);
     if ($result && $result->num_rows > 0) {
+      if($result && $result->num_rows > 1) {
+        echo '<option value="0">'.$lang['COMPANY'].'...</option>';
+      }
       while ($row = $result->fetch_assoc()) {
         $i = $row['id'];
         $checked = "";
