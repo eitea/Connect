@@ -209,7 +209,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } //end if isset charged
   }
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     //get the timestamp. if it doesnt exist -> display a biiiig fat error
     $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
     $result = mysqli_query($conn, $sql);
@@ -338,7 +338,7 @@ function changeValue(cVal, id, val){
           echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
         }
         if($result && $result->num_rows == 1) {
-          $filterCompany = $available_companies[0]; //easy peasy
+          $filterCompany = $available_companies[1]; //easy peasy
           echo '<option value="0">- Empty -</option>';
         }
         ?>

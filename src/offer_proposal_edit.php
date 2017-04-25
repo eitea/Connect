@@ -25,7 +25,7 @@ if($proposalID){
       <?php echo $lang['CLIENT']; ?>:
     </div>
     <div class="col-md-10">
-      <select style='width:200px' name="filterCompany" class="js-example-basic-single" onchange="showClients(this.value)">
+      <select style='width:200px' name="filterCompany" class="js-example-basic-single" onchange="showClients(this.value);">
         <?php
         $sql = "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
@@ -43,7 +43,9 @@ if($proposalID){
         }
         ?>
       </select>
-      <select id="clientHint" style='width:200px' class="js-example-basic-single" name="filterClient">
+      <select id="clientHint" style='width:200px' class="js-example-basic-single" name="filterClient" onchange="showProposals(this.value);">
+      </select>
+      <select id="proposalHint" style='width:200px' class="js-example-basic-single" name="filterProposal">
       </select>
     </div>
   </div>
@@ -52,6 +54,8 @@ if($proposalID){
       <?php echo $lang['PRODUCTS']; ?>:
     </div>
   </div>
+
+  <br><br>
   <table class="table">
     <thead>
       <th><?php echo $lang['DELETE']; ?></th>
@@ -75,25 +79,57 @@ if($proposalID){
       ?>
     </tbody>
   </table>
+
+  <br><hr><br>
+  <div class="container-fluid">
+    <div class="col-md-4">
+      <input type="text" class="form-control" name="add_product_name" placeholder="New Product Name"/>
+    </div>
+    <div class="col-md-2">
+      <input type="number" class="form-control" name="add_product_quantity" placeholder="Quantity" />
+    </div>
+    <div class="col-md-2">
+      <input type="number" step="any" class="form-control" name="add_product_price" placeholder="Price" />
+    </div>
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-warning" name="add_product">+</button>
+    </div>
+  </div>
 </form>
 
 
 <script>
-function showClients(cmpID, clientID) {
+function showClients(cmpID, clientID){
   if (cmpID != "") {
-    if (window.XMLHttpRequest) {
+    if(window.XMLHttpRequest){
       // code for IE7+, Firefox, Chrome, Opera, Safari
       xmlhttp = new XMLHttpRequest();
     } else {
       // code for IE6, IE5
       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
-    xmlhttp.onreadystatechange = function() {
+    xmlhttp.onreadystatechange = function(){
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         document.getElementById("clientHint").innerHTML = xmlhttp.responseText;
       }
     };
     xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?company="+cmpID+"&p="+clientID,true);
+    xmlhttp.send();
+  }
+}
+function showProposals(clientID, proposalID){
+  if(clientID != ""){
+    if(window.XMLHttpRequest){
+      xmlhttp = new XMLHttpRequest();//IE7+, Firefox, Chrome, Opera, Safari
+    } else {
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");//IE6, IE5
+    }
+    xmlhttp.onreadystatechange = function(){
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        document.getElementById("proposalHint").innerHTML = xmlhttp.responseText;
+      }
+    };
+    xmlhttp.open("GET","ajaxQuery/AJAX_getProposals.php?client="+clientID+"&p="+proposalID,true);
     xmlhttp.send();
   }
 }
