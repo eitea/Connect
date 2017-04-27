@@ -168,7 +168,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
     <br><br><br>
   </div>
   <div class="cotnainer collapse well col-md-8" id="importTemplate">
-    <form action="templateUpload.php" method="post" enctype="multipart/form-data">
+    <form action="upload_template.php" method="post" enctype="multipart/form-data">
       <div class="col-md-6">
         <input type="file" name="fileToUpload" id="fileToUpload" />
       </div>

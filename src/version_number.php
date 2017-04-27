@@ -1,4 +1,4 @@
 <?php
-$VERSION_NUMBER=78; //incrementing this number triggers update process at login
-$VERSION_TEXT='A5.78.032017';
+$VERSION_NUMBER=79; //incrementing this number triggers update process at login
+$VERSION_TEXT='B0.79.032017';
 ?>

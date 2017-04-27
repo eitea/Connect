@@ -59,7 +59,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
     echo mysqli_error($conn);
     while($result && ($row = $result->fetch_assoc())){
       $html_bookings .= "<tr><td>".$row['firstname'].' '.$row['lastname']."</td>";
-       //did he check out?
+      //did he check out?
       if(!empty($row['timeEnd']) && $row['timeEnd'] != '0000-00-00 00:00:00'){
         $timeEnd_Cell = '<td>'.substr(carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']),11,5).'</td>';
         $diff = displayAsHoursMins(timeDiff_Hours($row['time'], $row['timeEnd']));
@@ -97,7 +97,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
         $saldo_Cell = "<td>$saldo</td>";
       }
 
-      $html_bookings .= '<td>'.$lang_activityToString[$row['status']].'</td>'."$time_Cell $timeEnd_Cell $diff_Cell $saldo_Cell</tr>";
+      $html_bookings .= '<td>'.$lang['ACTIVITY_TOSTRING'][$row['status']].'</td>'."$time_Cell $timeEnd_Cell $diff_Cell $saldo_Cell</tr>";
     }
     $html_bookings .= "</table>";
     //replace
@@ -165,4 +165,101 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
     $html = str_replace("[BOOKINGS]", $html_bookings, $html);
   }
   return $html;
+}
+
+
+function uploadFile ($file_field = null, $check_image = true, $random_name = false) {
+  //Config
+  $path = '../images/ups/'; //with trailing slash
+  $max_size = 500000; //in bytes
+  //Set default file extension whitelist
+  $whitelist_ext = array('jpeg','jpg','png','gif');
+  //Set default file type whitelist
+  $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png','image/gif');
+
+  //Validation
+  $out = array('error'=>null);
+
+  //Make sure that there is a file
+  if((!empty($_FILES[$file_field])) && ($_FILES[$file_field]['error'] == 0)) {
+
+    // Get filename
+    $file_info = pathinfo($_FILES[$file_field]['name']);
+    $name = $file_info['filename'];
+    $ext = strtolower($file_info['extension']);
+
+    //Check file has the right extension
+    if (!in_array($ext, $whitelist_ext)) {
+      $out['error'][] = "Invalid file Extension";
+    }
+
+    //Check that the file is of the right type
+    if (!in_array($_FILES[$file_field]["type"], $whitelist_type)) {
+      $out['error'][] = "Invalid file Type";
+    }
+
+    //Check that the file is not too big
+    if ($_FILES[$file_field]["size"] > $max_size) {
+      $out['error'][] = "File is too big";
+    }
+
+    //If $check image is set as true
+    if ($check_image) {
+      if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
+        $out['error'][] = "Uploaded file is not a valid image";
+      }
+    }
+
+    if (count($out['error'])>0) {
+      return $out;
+    }
+
+    //Create full filename including path
+    if ($random_name) {
+      // Generate random filename
+      $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $tmp = '';
+      for ($i = 0; $i < 10; $i++) {
+        $tmp .= $characters[rand(0, strlen($characters) - 1)];
+      }
+      $newname = $tmp.'.'.$ext;
+    } else {
+      $newname = $name.'.'.$ext;
+    }
+
+    //Check if file already exists on server
+    if (file_exists($path.$newname)) {
+      $out['error'][] = "A file with this name already exists";
+    }
+
+    if (count($out['error'])>0) {
+      //The file has not correctly validated
+      return $out;
+    }
+
+    if (move_uploaded_file($_FILES[$file_field]['tmp_name'], $path.$newname)) {
+      //Success
+      return $path.$newname;
+    } else {
+      $out['error'][] = "Server Error!";
+    }
+
+  } else {
+    $out['error'][] = "No file uploaded";
+    return $out;
+  }
+}
+
+
+if (isset($_POST['submit'])) {
+  $file = uploadFile('file', true, true);
+  if (is_array($file['error'])) {
+    $message = '';
+    foreach ($file['error'] as $msg) {
+      $message .= '<p>'.$msg.'</p>';
+    }
+  } else {
+    $message = "File uploaded successfully".$newname;
+  }
+  echo $message;
 }

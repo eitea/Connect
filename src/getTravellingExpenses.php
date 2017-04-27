@@ -44,7 +44,7 @@ if($result && ($row = $result->fetch_assoc())){
           if ($i == substr($filterMonth,5,2)) {
             $selected = 'selected';
           }
-          $option = $lang_monthToString[$i];
+          $option = $lang['MONTH_TOSTRING'][$i];
           echo "<option $selected value=".sprintf("%02d",$i).">$option</option>";
         }
         ?>

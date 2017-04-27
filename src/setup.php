@@ -1,6 +1,17 @@
+<link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+<script>
+document.onreadystatechange = function () {
+  var state = document.readyState
+  if (state == 'complete') {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("bodyContent").style.display = "block";
+  }
+}
+</script>
+<body id="body_container" class="is-table-row">
+<div id="loader"></div>
+<div id="bodyContent" style="display:none;" >
 <?php
-//this page will only be called on the setup for persons with private hosting (open source version)
-
 require 'connection_config.php';
 
 $conn = new mysqli($servername, $username, $password);
@@ -70,4 +81,7 @@ $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
 exec($command, $output, $returnValue);
 
 //------------------------------------------------------------------------------
-die ('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="login.php">Next</a>');
+echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="login.php">Next</a>';
+?>
+</div>
+</body>

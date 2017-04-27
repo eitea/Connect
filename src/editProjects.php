@@ -98,6 +98,11 @@ function showClients(company, client){
         $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
         if($result && $result->num_rows > 0) {
+          if($result && $result->num_rows > 1) {
+            echo '<option value="0">'.$lang['COMPANY'].'...</option>';
+          } else {
+            $filterCompany = $available_companies[1];
+          }
           $row = $result->fetch_assoc();
           do {
             $checked = '';

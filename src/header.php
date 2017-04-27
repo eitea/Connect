@@ -59,7 +59,7 @@ if($isTimeAdmin){
 }
 
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
-$available_companies = array('-1');
+$available_companies = array('-1'); //care
 while($result && ($row= $result->fetch_assoc())){
   $available_companies[] = $row['companyID'];
 }
@@ -77,7 +77,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $password = $_POST['password'];
     $passwordConfirm = $_POST['passwordConfirm'];
     $output = '';
-    if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)) {
+    if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
       $psw = password_hash($password, PASSWORD_BCRYPT);
       $sql = "UPDATE $userTable SET psw = '$psw', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';";
       $conn->query($sql);
@@ -101,9 +101,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
     $validation_output .= '<strong>Checkin/out recognized: </strong> Refresh in a few minutes.</div>';
 
-    if (isset($_POST['stampIn'])) {
+    if(isset($_POST['stampIn'])){
       checkIn($userID);
-    } elseif (isset($_POST['stampOut'])) {
+    } elseif(isset($_POST['stampOut'])){
       $error_output = checkOut($userID);
     }
   } elseif(isset($_POST["GERMAN"])){
@@ -493,13 +493,14 @@ $(document).ready(function() {
               <div class="panel-body">
                 <ul class="nav navbar-nav">
                   <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFER']; ?></span></a></li>
+                  <li><a <?php if($this_page =='offer_proposal_edit.php'){echo $setActiveLink;}?> href="offer_proposal_edit.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_OFFER']; ?></span></a></li>
                 </ul>
               </div>
             </div>
           </div>
           <br>
           <?php
-          if($this_page == "offer_proposals.php"){
+          if($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php"){
             echo "<script>$('#adminOption_ERP').click();</script>";
           }
           ?>

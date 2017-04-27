@@ -115,10 +115,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <br><br><!-- Filter Status -->
       <select name='filterStatus' style="width:100px" class="js-example-basic-single">
         <option value="" >---</option>
-        <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang_activityToString[0]; ?></option>
-        <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang_activityToString[1]; ?></option>
-        <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang_activityToString[2]; ?></option>
-        <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang_activityToString[3]; ?></option>
+        <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][0]; ?></option>
+        <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][1]; ?></option>
+        <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][2]; ?></option>
+        <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][3]; ?></option>
       </select>
     </div>
     <div class="col-sm-1">
@@ -179,11 +179,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               if($filterStatus !== '' && $calculator->activity[$i] != $filterStatus) continue;
 
               if($calculator->end[$i] == '0000-00-00 00:00:00'){
-                $endTime = getCurrentTimestamp();
-              } else {
-                $endTime = $calculator->end[$i];
+                $calculator->absolvedTime[$i] = timeDiff_Hours($calculator->start[$i], getCurrentTimestamp());
               }
-              $difference = timeDiff_Hours($calculator->start[$i], $endTime );
 
               $style = "";
               $tinyEndTime = '-';
@@ -204,7 +201,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   $config2 = $result->fetch_assoc();
 
                   $bookingTimeDifference = timeDiff_Hours($config2['end'], $calculator->end[$i]) * 60;
-
                   if($bookingTimeDifference <= $config['bookingTimeBuffer']){
                     $style = "color:#6fcf2c"; //green
                   }
@@ -234,9 +230,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $B = $calculator->end[$i];
               }
 
-              $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+              $accumulatedSaldo += $calculator->absolvedTime[$i] - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
 
-              $theSaldo = round($difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i], 2);
+              $theSaldo = round($calculator->absolvedTime[$i] - $calculator->shouldTime[$i] - $calculator->lunchTime[$i], 2);
               $saldoStyle = '';
               if($theSaldo < 0){
                 $saldoStyle = 'style=color:#fc8542;'; //red
@@ -251,13 +247,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               echo mysqli_error($conn);
 
               $neutralStyle = '';
-              if($calculator->shouldTime[$i] == 0 && $difference == 0){
+              if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
                 $neutralStyle = "style=color:#c7c6c6;";
               }
               //pressing edit on a button makes row editable, (scrollheight preserved via js at bottom of page)
               if((isset($_POST['modifyDate']) && $_POST['modifyDate'] == $calculator->indecesIM[$i]) || (isset($_POST['modifyDate_0']) && $_POST['modifyDate_0'] == $calculator->date[$i])){
                 echo "<tr>";
-                echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
+                echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
                 if(!empty($_POST['modifyDate_0'])){ //for non existing timestamps, different submission buttlon
                   $A = $B = $_POST['modifyDate_0'].' 00:00:00';
                   echo '<td><select name="creatTimeZone" class="js-example-basic-single" style=width:90px>';
@@ -281,29 +277,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo "<td><select name='newActivity' class='js-example-basic-single'>";
                 for($j = 0; $j < 4; $j++){
                   if($calculator->activity[$i] == $j){
-                    echo "<option value='$j' selected>". $lang_activityToString[$j] ."</option>";
+                    echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                   } else {
-                    echo "<option value='$j'>". $lang_activityToString[$j] ."</option>";
+                    echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                   }
                 }
                 echo "</select></td>";
                 echo "<td>" . $calculator->shouldTime[$i] . "</td>";
-                echo "<td>" . sprintf('%.2f', $difference - $calculator->lunchTime[$i]) . "</td>";
+                echo "<td>" . sprintf('%.2f', $calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
                 echo "<td $saldoStyle>" . sprintf('%+.2f', $theSaldo) . "</td>";
                 echo "<td>" . sprintf('%+.2f', $accumulatedSaldo) . "</td>";
                 echo '<td><button type="submit" name="saveChanges" class="btn btn-warning" title="Edit" value="'.$calculator->indecesIM[$i].'"><i class="fa fa-floppy-o"></i></button></td>';
                 echo "</tr>";
               } else {
                 echo "<tr $neutralStyle>";
-                echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
+                echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
                 echo "<td>" . $calculator->date[$i] . "</td>";
                 echo "<td>" . substr($A,11,5) . "</td>";
                 echo "<td><small>" . displayAsHoursMins($calculator->lunchTime[$i]) . "</small></td>";
                 echo "<td>" . substr($B,11,5) . "</td>";
                 echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
-                echo "<td>" . $lang_activityToString[$calculator->activity[$i]]. "</td>";
+                echo "<td>" . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]]. "</td>";
                 echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
-                echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
+                echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
                 echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
                 echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
                 if($calculator->indecesIM[$i] != 0){
@@ -322,7 +318,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
               $lunchbreakSUM += $calculator->lunchTime[$i];
               $expectedHoursSUM += $calculator->shouldTime[$i];
-              $absolvedHoursSUM += $difference - $calculator->lunchTime[$i];
+              $absolvedHoursSUM += $calculator->absolvedTime[$i] - $calculator->lunchTime[$i];
             } //endfor
 
             //partial sum
@@ -339,41 +335,70 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "<td></td></tr>";
 
             //correctionHours
-            $accumulatedSaldo += $calculator->correctionHours;
+            $current_corrections = array_sum($calculator->monthly_correctionHours);
+            $accumulatedSaldo += $current_corrections;
             echo "<tr>";
             echo "<td>".$lang['CORRECTION'].":* </td>";
             echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
-            echo "<td style='color:#9222cc'>" . displayAsHoursMins($calculator->correctionHours) . "</td>";
+            echo "<td style='color:#9222cc'>" . displayAsHoursMins($current_corrections) . "</td>";
             echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
             echo "<td></td></tr>";
 
-            //overTimeLump
-            $accumulatedSaldo -= $calculator->overTimeLump;
-            echo "<tr>";
-            echo "<td colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
-            echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
-            echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($calculator->overTimeLump) . "</td>"; //its always negative. always.
-            echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
-            echo "<td></td></tr>";
-
-            //get saldo from all previous days
+            //get all the previous days
             $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -48), $x);
-            $p_shouldTime = array_sum($calculator_P->shouldTime) + $calculator_P->overTimeLump;
-            $p_isTime = array_sum($calculator_P->absolvedTime) - array_sum($calculator_P->lunchTime) + $calculator_P->correctionHours;
-            $accumulatedSaldo += $p_isTime - $p_shouldTime;
+            $saldo_from_zero = $overTimeLump = 0;
+            for($i = 0; $i < count($calculator_P->monthly_saldo); $i++){
+              $saldo_from_zero += $calculator_P->monthly_saldo[$i] + $calculator_P->monthly_correctionHours[$i];
+              if($saldo_from_zero > 0){
+                if($saldo_from_zero < $calculator_P->overTimeLump_single[$i]){
+                  $overTimeLump += $saldo_from_zero;
+                  $saldo_from_zero = 0;
+                } else {
+                  $overTimeLump += $calculator_P->overTimeLump_single[$i];
+                  $saldo_from_zero -= $calculator_P->overTimeLump_single[$i];
+                }
+              }
+            }
+
+            $p_lunchTime = array_sum($calculator_P->lunchTime);
+            $p_shouldTime = array_sum($calculator_P->shouldTime);
+            $p_isTime = array_sum($calculator_P->absolvedTime) - $p_lunchTime;
+            $accumulatedSaldo += $saldo_from_zero;
 
             echo "<tr style='color:#626262;'>";
             echo "<td colspan='2'>Vorheriges Saldo:* </td>";
             echo "<td></td>";
-            echo "<td>".displayAsHoursMins(array_sum($calculator_P->lunchTime))."</td>";
+            echo "<td>".displayAsHoursMins($p_lunchTime)."</td>";
             echo "<td></td><td></td><td></td>";
             echo "<td>".displayAsHoursMins($p_shouldTime)."</td>";
             echo "<td>".displayAsHoursMins($p_isTime)."</td>";
-            echo "<td>".displayAsHoursMins($p_isTime - $p_shouldTime)."</td>";
+            echo "<td>".displayAsHoursMins($saldo_from_zero)."</td>";
             echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
             echo "<td></td></tr>";
 
-            $lunchbreakSUM += array_sum($calculator_P->lunchTime);
+            //add values from current interval
+            $overTimeLump = 0;
+            for($i = 0; $i < count($calculator->monthly_saldo); $i++){
+              if($accumulatedSaldo > 0){
+                if($accumulatedSaldo < $calculator->overTimeLump_single[$i]){
+                  $overTimeLump += $accumulatedSaldo;
+                  $accumulatedSaldo = 0;
+                } else {
+                  $overTimeLump += $calculator->overTimeLump_single[$i];
+                  $accumulatedSaldo -= $calculator->overTimeLump_single[$i];
+                }
+              }
+            }
+
+            //overTimeLump
+            echo "<tr>";
+            echo "<td colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
+            echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
+            echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($overTimeLump) . "</td>"; //its always negative. always.
+            echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
+            echo "<td></td></tr>";
+
+            $lunchbreakSUM += $p_lunchTime;
             $expectedHoursSUM += $p_shouldTime;
             $absolvedHoursSUM += $p_isTime;
 

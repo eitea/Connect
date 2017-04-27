@@ -11,15 +11,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
-      $result = $conn->query("SELECT time, pauseAfterHours, hoursOfRest FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
+      $result = $conn->query("SELECT hoursOfRest FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
       if($result && ($row = $result->fetch_assoc())){
-        $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
-        $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
-        $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
+        $conn->query("UPDATE $logTable SET breakCredit = (breakCredit +" .$row['hoursOfRest'].") WHERE indexIM = $indexIM"); //add a complete additional break.
+        echo mysqli_error($conn);
       }
-      //just... just recalculate all lunchbreaks
-      $conn->query("UPDATE $logTable l1, (SELECT (SUM(TIMESTAMPDIFF(MINUTE, start, end))/60) as mySum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break') p1 SET l1.breakCredit = p1.mySum WHERE l1.indexIM = $indexIM");
-      echo mysqli_error($conn);
     }
   }
   //repair forgotten check outs
@@ -143,7 +139,7 @@ if($result && $result->num_rows > 0):
         if($result && $result->num_rows > 0){
           while($row = $result->fetch_assoc()){
             echo '<tr>';
-            echo '<td>'. $lang_requestToString[$row['requestType']].'</td>';
+            echo '<td>'. $lang['REQUEST_TOSTRING'][$row['requestType']].'</td>';
             echo '<td>'. $row['firstname']. ' ' .$row['lastname'] . '</td>';
             if($row['requestType'] == 'acc'){
               echo '<td>'. substr($row['fromDate'],0,10). '</td>';
@@ -182,12 +178,15 @@ if($result && $result->num_rows > 0):
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
 
 <form method="POST">
-  <?php //select all timestamps that do not have at least one complete break booking
+  <?php //select all timestamps that do not have enough break
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
-  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID INNER JOIN $roleTable ON $userTable.id = $roleTable.userID
-  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND canBook = 'FALSE' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60)
-  AND !EXISTS(SELECT id FROM $projectBookingTable WHERE timestampID = l1.indexIM AND bookingType = 'break' AND (hoursOfRest * 60 DIV 1) <= TIMESTAMPDIFF(MINUTE, start, end))";
+  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
+  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND breakCredit < hoursOfRest";
   $result = $conn->query($sql);
+  /* Please note: cannot check for complete project bookings anymore, since correcting them would have to insert another complete booking.
+  selecting overlapping times is too much effort atm. breakCredit and bookings are two seperate units. breakCredit shoud always be more or equal all break bookings.
+  corrections and editings will affect breakCredit value only.
+  */
   if($result && $result->num_rows > 0):
   ?>
     <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
@@ -264,7 +263,7 @@ if($result && $result->num_rows > 0):
         while($row = $result->fetch_assoc()){
           echo '<tr>';
           echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
-          echo '<td>'. $lang_activityToString[$row['status']] .'</td>';
+          echo '<td>'. $lang['ACTIVITY_TOSTRING'][$row['status']] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. $row['breakCredit'].'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']) - $row['breakCredit'], 2, '.', '') .'</td>';
@@ -325,13 +324,13 @@ if($result && $result->num_rows > 0):
 
           echo '<td><div class="checkbox">';
           echo '<input type=checkbox name="geminiIndeces[]" value="'.$row['indexIM'].'" />';
-          echo $lang_activityToString[$row['status']] .' - '.$row['indexIM']. ' - ';
+          echo $lang['ACTIVITY_TOSTRING'][$row['status']] .' - '.$row['indexIM']. ' - ';
           echo carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']);
           echo '</div></td>';
 
           echo '<td><div class="checkbox">';
           echo '<input type=checkbox name="geminiIndeces[]" value="'.$row2['indexIM'].'" />';
-          echo $lang_activityToString[$row2['status']] .' - '.$row2['indexIM']. ' - ';
+          echo $lang['ACTIVITY_TOSTRING'][$row2['status']] .' - '.$row2['indexIM']. ' - ';
           echo carryOverAdder_Hours($row2['time'], $row2['timeToUTC']) .' - '. carryOverAdder_Hours($row2['timeEnd'], $row2['timeToUTC']);
           echo '</div></td>';
           echo '</tr>';

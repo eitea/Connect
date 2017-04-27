@@ -76,7 +76,12 @@ $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
   companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-',
-  logo VARCHAR(20)
+  logo VARCHAR(20),
+  address VARCHAR(100),
+  phone VARCHAR(100),
+  mail VARCHAR(100),
+  homepage VARCHAR(100),
+  erpText TEXT
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
@@ -624,7 +629,7 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE proposals (
+  $sql = "CREATE TABLE proposals(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_number VARCHAR(10) NOT NULL,
     clientID INT(6) UNSIGNED,
@@ -641,7 +646,7 @@ $sql = "CREATE TABLE $policyTable (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     proposalID INT(6) UNSIQNED,
     name VARCHAR(50),
-    description VARCHAR(300),
+    description VARCHAR(600),
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)

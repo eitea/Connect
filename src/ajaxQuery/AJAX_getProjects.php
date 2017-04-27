@@ -1,10 +1,9 @@
 <?php
-
 require "../connection.php";
-$q = intval($_GET['q']);
+$q = intval($_GET['clientID']);
 
-if(isset($_GET['p'])){
-  $p = intval($_GET['p']);
+if(isset($_GET['projectID'])){
+  $p = intval($_GET['projectID']);
 } else {
   $p = 0;
 }
@@ -16,7 +15,7 @@ if($result && $result->num_rows >0){
     if($p != 0 && $p == $row['id']){
       $selected = "selected";
     }
-      echo "<option $selected name='prj' value='".$row['id']."'>". $row['name']."</option>";
+    echo "<option $selected name='prj' value='".$row['id']."'>". $row['name']."</option>";
   }
 }
 ?>

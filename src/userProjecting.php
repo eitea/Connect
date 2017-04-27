@@ -24,12 +24,22 @@ if($result && $result->num_rows > 0){
 </div>
 
 <?php
+$setCompany = $setClient = $setProject = 0;
 $showUndoButton = $showEmergencyUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all Operations.");
+  }
+  if(isset($_POST['filterCompany'])){
+    $setCompany = intval($_POST['filterCompany']);
+  }
+  if(isset($_POST['filterClient'])){
+    $setClient = intval($_POST['filterClient']);
+  }
+  if(isset($_POST['filterProject'])){
+    $setProject = intval($_POST['filterProject']);
   }
 
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
@@ -42,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInfoText = test_input($_POST['infoText']);
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
-    if(timeDiff_Hours($startDate, $endDate) > 0 && timeDiff_Hours($endDate, getCurrentTimestamp()) > 0){
+    if(timeDiff_Hours($startDate, $endDate) > 0){
       if(isset($_POST['addBreak'])){ //break
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
@@ -54,8 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
       } else {
-        if(isset($_POST['project'])){
-          $projectID = test_input($_POST['project']);
+        if(isset($_POST['filterProject'])){
+          $projectID = test_input($_POST['filterProject']);
           $accept = 'TRUE';
           if(isset($_POST['required_1'])){
             $field_1 = "'".test_input($_POST['required_1'])."'";
@@ -84,10 +94,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           if($accept){
             if(isset($_POST['addDrive'])){ //add as driving time
               $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
-                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
+              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
             } else { //normal booking
               $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
-                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
+              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
             }
             $conn->query($sql);
             $insertInfoText = $insertInternInfoText = '';
@@ -151,13 +161,13 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
     <div class="col-md-12">
       <table class="table table-hover table-striped">
         <thead>
-            <th></th>
-            <th>Start</th>
-            <th><?php echo $lang['END']; ?></th>
-            <th><?php echo $lang['CLIENT']; ?></th>
-            <th><?php echo $lang['PROJECT']; ?></th>
-            <th>Info</th>
-            <th>Intern</th>
+          <th></th>
+          <th>Start</th>
+          <th><?php echo $lang['END']; ?></th>
+          <th><?php echo $lang['CLIENT']; ?></th>
+          <th><?php echo $lang['PROJECT']; ?></th>
+          <th>Info</th>
+          <th>Intern</th>
         </thead>
         <tbody>
           <?php
@@ -232,78 +242,6 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
     </div>
   </div>
 
-  <script>
-  $(function () {
-    $('[data-toggle="popover"]').popover({html : true});
-  });
-  function showClients(str) {
-    if (str != "") {
-      if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-      } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          document.getElementById("clientHint").innerHTML = xmlhttp.responseText;
-          showProjects(xmlhttp.responseText);
-        }
-      };
-      xmlhttp.open("GET","ajaxQuery/AJAX_getClient.php?company="+str+"&p=0",true);
-      xmlhttp.send();
-    }
-  }
-  function textAreaAdjust(o) {
-    o.style.height = "90px";
-    o.style.height = (o.scrollHeight)+"px";
-  }
-
-  function showProjects(str) {
-    if (str != "") { //this little piece of sh** won't accept 0 either, btw.
-      if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-      } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-          showProjectfields(0, str);
-        }
-      };
-      xmlhttp.open("GET","ajaxQuery/AJAX_getProjects.php?q="+str+"&p=0",true);
-      xmlhttp.send();
-    }
-  }
-
-  function showProjectfields(str, str2){
-    if (window.XMLHttpRequest) {
-      xmlhttp = new XMLHttpRequest();
-    } else {
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("project_fields").innerHTML = xmlhttp.responseText;
-      }
-    };
-    xmlhttp.open("GET","ajaxQuery/AJAX_getProjectFields.php?q="+str+"&p="+str2,true);
-    xmlhttp.send();
-  }
-
-  function hideMyDiv(o){
-    if(o.checked){
-      document.getElementById('mySelections').style.display='none';
-    } else {
-      document.getElementById('mySelections').style.display='inline';
-    }
-  }
-  </script>
-
   <br><br><br>
 
   <div class="container-fluid">
@@ -312,55 +250,52 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
         <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
       </div>
     </div>
-    <div id="hide_break">
-
-    </div>
+    <div id="hide_break"></div>
   </div>
 
   <!-- SELECTS -->
   <div class="row">
     <div id=mySelections class="col-xs-9"><br>
-      <?php
-      $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
-      $result = mysqli_query($conn, $query);
-      if($result->num_rows == 1):
-
-        $row = $result->fetch_assoc();
-        $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
-        $result = mysqli_query($conn, $query);
-        if ($result && $result->num_rows > 0) {
-          echo '<select style="width:200px" class="js-example-basic-single" id="clientHint" name="client" onchange="showProjects(this.value)">';
-          echo "<option name='act' value=0>Firma...</option>";
-          while ($row = $result->fetch_assoc()) {
-            $cmpnyID = $row['id'];
-            $cmpnyName = $row['name'];
-            echo "<option name='act' value=$cmpnyID>$cmpnyName</option>";
-          }
-        }
-        echo '</select>';
-      else:
-        ?>
-        <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value)">
-          <option name=cmp value=0>Firma...</option>
+      <?php if(count($available_companies) > 2): ?>
+        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0);">
           <?php
-          $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID) ";
+          $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
           $result = mysqli_query($conn, $query);
-          if ($result && $result->num_rows > 0) {
+          if($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
               $cmpnyID = $row['id'];
               $cmpnyName = $row['name'];
-              echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
+              if($cmpnyID == $setCompany){
+                echo "<option selected name='cmp' value='$cmpnyID'>$cmpnyName</option>";
+              } else {
+                echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
+              }
             }
           }
           ?>
         </select>
-
-        <select id="clientHint" style='width:200px' class="js-example-basic-single" name="client" onchange="showProjects(this.value);">
-        </select>
-
-      <?php endif; ?>
-
-      <select id="txtHint" style='width:200px' class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
+      <?php
+      else:
+        $setCompany = $available_companies[1];
+      endif;
+      $query = "SELECT * FROM $clientTable WHERE companyID=".$available_companies[1];
+      $result = mysqli_query($conn, $query);
+      if ($result && $result->num_rows > 0) {
+        echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0);">';
+        echo "<option name='act' value='0'>".$lang['CLIENT']."...</option>";
+        while ($row = $result->fetch_assoc()) {
+          $cmpnyID = $row['id'];
+          $cmpnyName = $row['name'];
+          if($cmpnyID == $setClient){
+            echo "<option selected value='$cmpnyID'>$cmpnyName</option>";
+          } else {
+            echo "<option value='$cmpnyID'>$cmpnyName</option>";
+          }
+        }
+      }
+      echo '</select>';
+      ?>
+      <select id="projectHint" style='width:200px' class="js-example-basic-single" name="filterProject" onchange="showProjectfields(this.value);">
       </select>
     </div>
   </div>
@@ -392,5 +327,71 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   </div>
   <div class="robot-control"> <input type="text" name="captcha" value="" /></div>
 </form>
-<!-- /BODY -->
+
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover({html : true});
+});
+function textAreaAdjust(o) {
+  o.style.height = "90px";
+  o.style.height = (o.scrollHeight)+"px";
+}
+function showClients(company, client){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getClient.php',
+    data:{companyID:company, clientID:client},
+    type: 'get',
+    success : function(resp){
+      $("#clientHint").html(resp);
+    },
+    error : function(resp){},
+    complete : function(resp){
+      showProjects(client, 0);
+    }
+  });
+}
+function showProjects(client, project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjects.php',
+    data:{clientID:client, projectID:project},
+    type: 'get',
+    success : function(resp){
+      $("#projectHint").html(resp);
+    },
+    error : function(resp){},
+    complete : function(resp){
+      showProjectfields($("#projectHint").val());
+    }
+  });
+}
+function showProjectfields(project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjectFields.php',
+    data:{projectID:project},
+    type: 'get',
+    success : function(resp){
+      $("#project_fields").html(resp);
+    },
+    error : function(resp){}
+  });
+}
+
+function hideMyDiv(o){
+  if(o.checked){
+    document.getElementById('mySelections').style.display='none';
+  } else {
+    document.getElementById('mySelections').style.display='inline';
+  }
+}
+</script>
+
+<?php
+if($setProject){ //i want my filter displayed even if there were no bookings
+  echo '<script>';
+  echo "showClients($setCompany, $setClient);";
+  echo "showProjects($setClient, $setProject);";
+  echo "showProjectfields($setProject)";
+  echo '</script>';
+}
+?>
 <?php include 'footer.php'; ?>

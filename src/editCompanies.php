@@ -8,7 +8,7 @@ $cmpID = intval($_GET['cmp']);
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['deleteCompany']) && $cmpID != 1){
-    $sql = "DELETE FROM $companyTable WHERE id = $cmpID;";
+    $sql = "DELETE FROM companyData WHERE id = $cmpID;";
     $conn->query($sql);
     echo mysqli_error($conn);
   } elseif(isset($_POST['deleteCompany']) && $cmpID == 1){
@@ -56,7 +56,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $sql = "INSERT INTO $companyDefaultProjectTable(companyID, name, status, hourlyPrice, hours, field_1, field_2, field_3) VALUES($cmpID, '$name', '$status', '$hourlyPrice', '$hours', '$field_1', '$field_2', '$field_3')";
     if($conn->query($sql)){ //add default project to all clients with the company. pow.;
-      $sql = "INSERT IGNORE INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) SELECT id,'$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3' FROM $clientTable WHERE companyID = $cmpID";
+      $sql = "INSERT IGNORE INTO projectData (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) SELECT id,'$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3' FROM $clientTable WHERE companyID = $cmpID";
       if($conn->query($sql)){
         echo '<div class="alert alert-success fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -91,7 +91,7 @@ if(isset($_POST['save_defaultProjects']) && isset($_POST['default_projectNames']
     $sql = "UPDATE $companyDefaultProjectTable SET hours = '$hours', status = '$status', hourlyPrice = '$hourlyPrice', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $defaultID";
     $conn->query($sql);
 
-    $sql = "UPDATE $projectTable SET hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3'
+    $sql = "UPDATE projectData SET hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3'
     WHERE name= '$projectName' AND clientID IN (SELECT id FROM $clientTable WHERE companyID = $cmpID)";
     $conn->query($sql);
   }
@@ -105,12 +105,41 @@ if(isset($_POST['save_defaultProjects']) && isset($_POST['default_projectNames']
   }
 }
 
+if(isset($_POST['general_save'])){
+  $address = test_input($_POST['general_address']);
+  $phone = test_input($_POST['general_phone']);
+  $mail = test_input($_POST['general_mail']);
+  $homepage = test_input($_POST['general_homepage']);
+  $erpText = test_input($_POST['general_erpText']);
+  $conn->query("UPDATE companyData SET address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText' WHERE id = $cmpID");
+  echo mysqli_error($conn);
+}
+
+if(isset($_POST['logoUpload'])){
+  require "utilities.php";
+  $filename = uploadFile("fileToUpload", 1, 1);
+  if(!is_array($filename)){
+    //delete old Logo if exists
+    $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
+    if($result && ($row = $result->fetch_assoc())){
+      unlink($row['logo']);
+    }
+    $conn->query("UPDATE companyData SET logo = '$filename' WHERE id = $cmpID");
+    echo mysqli_error($conn);
+  } else {
+    echo '<div class="alert alert-danger fade in">';
+    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo print_r($filename);
+    echo '</div>';
+  }
+}
+
   $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); //selects up to three rows (or at least it should)
   if(isset($_POST['save_additional_fields'])){
     for($i = 1; $i < 4; $i++){
       //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
       $id_save = $cmpID * 3 - 3 + $i;
-      if(!empty($_POST['name_'.$i]) && !empty($_POST['description_'.$i])){
+      if(!empty($_POST['name_'.$i])){
         $name = test_input($_POST['name_'.$i]);
         $description = test_input($_POST['description_'.$i]);
         $active = !empty($_POST['active_'.$i]) ? 'TRUE' : 'FALSE';
@@ -134,13 +163,17 @@ if(isset($_POST['save_defaultProjects']) && isset($_POST['default_projectNames']
         } elseif($forall_old == 'TRUE' && $forall == 'FALSE'){
           $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
         }
+      } elseif(!empty($_POST['active_'.$i])){//if name is empty, but the active button is not
+        echo '<div class="alert alert-danger fade in">';
+        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo "<strong>Could not save Field nr. $i : </strong> Cannot set active field without a name";
+        echo '</div>';
       }
     }
   }
 }
-?>
 
-<?php
+
 $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
   ?>
@@ -149,11 +182,66 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?></h3>
   </div>
 
-  <br>
-  <form method="POST">
+  <br><br>
+  <form method="post" enctype="multipart/form-data">
+    <div class="container-fluid">
+      <div class="row"><h4>Logo</h4></div>
+      <div class="row text-right"><button type="submit" name="logoUpload" class="btn btn-default" value="<?php echo $cmpID;?>"><i class="fa fa-floppy-o"></i> <?php echo $lang['SAVE']; ?></button></div>
+    </div>
+    <div class="container-fluid">
+      <div class="col-sm-4">
+        <img src="<?php echo $row['logo'];?>"></img>
+      </div>
+      <div class="col-sm-8">
+        <input type="file" name="fileToUpload" id="fileToUpload" />
+      </div>
+    </div>
+  </form>
+    <form method="POST">
+    <br><hr><br>
+    <div class="container-fluid">
+      <div class="row"><h4><?php echo $lang['GENERAL_SETTINGS']; ?></h4></div>
+      <div class="row text-right"><button class="btn btn-default" name="general_save"><i class="fa fa-floppy-o"></i> <?php echo $lang['SAVE']; ?></button></div>
+      <br>
+      <div class="col-sm-3">
+        <label><?php echo $lang['ADDRESS']; ?></label>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" name="general_address" placeholder="Address" value="<?php echo $row['address'];?>" />
+      </div>
+      <br><br>
+      <div class="col-sm-3">
+        <label><?php echo $lang['PHONE_NUMBER']; ?></label>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" name="general_phone" placeholder="Tel nr." value="<?php echo $row['phone'];?>"/>
+      </div>
+      <br><br>
+      <div class="col-sm-3">
+        <label>E-Mail</label>
+      </div>
+      <div class="col-sm-9">
+        <input type="mail" class="form-control"  name="general_mail" placeholder="E-Mail" value="<?php echo $row['mail'];?>" />
+      </div>
+      <br><br>
+      <div class="col-sm-3">
+        <label>Homepage</label>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control"  name="general_homepage" placeholder="Homepage" value="<?php echo $row['homepage'];?>" />
+      </div>
+      <br><br>
+      <div class="col-sm-3">
+        <label>ERP Text</label>
+      </div>
+      <div class="col-sm-9">
+        <textarea name="general_erpText" class="form-control" placeholder=""><?php echo $row['erpText'];?></textarea>
+      </div>
+    </div>
+    <br><hr><br>
     <div class="container-fluid">
       <div class="row"><h4><?php echo $lang['DEFAULT'] . " " . $lang['PROJECT']; ?></h4></div>
-      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-new-project-modal"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+      <div class="row text-right"><a href="#" class="btn btn-default" data-toggle="modal" data-target=".cmp-new-project-modal"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
     </div>
     <table class="table table-hover">
       <thead>
@@ -168,8 +256,8 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         <?php
         $query = "SELECT * FROM $companyDefaultProjectTable WHERE companyID = $cmpID";
         $projectResult = mysqli_query($conn, $query);
-        if ($projectResult && $projectResult->num_rows > 0) {
-          while ($projectRow = $projectResult->fetch_assoc()) {
+        if($projectResult && $projectResult->num_rows > 0){
+          while($projectRow = $projectResult->fetch_assoc()){
             $i = $projectRow['id'];
             $projectRowStatus = (!empty($projectRow['status']))? $lang['PRODUCTIVE']:'';
             echo "<tr><td><input type='checkbox' name='indexProject[]' value='$i'></td>";
@@ -187,10 +275,10 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         ?>
       </tbody>
     </table>
-    <br><br>
+    <br><hr><br>
     <div class="container-fluid">
       <div class="row"><h4><?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?></h4></div>
-      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-hire-users-modal" ><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+      <div class="row text-right"><a href="#" class="btn btn-default" data-toggle="modal" data-target=".cmp-hire-users-modal" ><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
     </div>
     <table class="table table-hover">
       <thead>
@@ -213,10 +301,10 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         ?>
       </tbody>
     </table>
-    <br><br>
+    <br><hr><br>
     <div class="container-fluid">
       <div class="row"><h4><?php echo $lang['ADDITIONAL_FIELDS']; ?></h4></div>
-      <div class="row text-right"><a href="#" class="btn btn-warning" data-toggle="modal" data-target=".cmp-additional-fields"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
+      <div class="row text-right"><a href="#" class="btn btn-default" data-toggle="modal" data-target=".cmp-additional-fields"><i class="fa fa-pencil"></i> <?php echo $lang['EDIT']; ?></a></div>
     </div>
     <table class="table table-hover">
       <thead>
@@ -241,8 +329,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         ?>
       </tbody>
     </table>
-
-    <br><br>
+    <br><hr><br>
     <div class="container-fluid text-right">
       <button type="submit" class="btn btn-warning" name="deleteSelection">Auswahl Löschen</button>
       <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?>

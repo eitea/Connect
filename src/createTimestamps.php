@@ -57,11 +57,10 @@ function isHoliday($ts){
 */
 
 function test_input($data) {
-  require "connection.php";
+  $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%&()+*~#-öäüÖÄÜ]/", " ", $data); //allowed charset
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
-  $data = $conn->real_escape_string($data);
   return $data;
 }
 

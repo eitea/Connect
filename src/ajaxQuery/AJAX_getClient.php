@@ -1,9 +1,9 @@
 <?php
 require "../connection.php";
-$cmpID = intval($_GET['company']);
+$cmpID = intval($_GET['companyID']);
 
-if(isset($_GET['p'])){
-  $p = intval($_GET['p']);
+if(isset($_GET['clientID'])){
+  $p = intval($_GET['clientID']);
 } else {
   $p = 0;
 }

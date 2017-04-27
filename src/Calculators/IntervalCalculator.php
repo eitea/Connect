@@ -1,12 +1,18 @@
 <?php
+/* for the good of all of us, write down all users
+getTimestamps.php
+timeCalcTable.php
+*/
 class Interval_Calculator{
   public $days = 0;
-  public $overTimeLump = 0;
-  public $correctionHours = 0;
 
   private $from = 0;
   private $to = 0;
   private $id = 0;
+
+  public $monthly_saldo = array();
+  public $overTimeLump_single = array();
+  public $monthly_correctionHours = array();
 
   public $dayOfWeek = array();
   public $daysAsNumber = array();
@@ -49,7 +55,7 @@ class Interval_Calculator{
     }
 
 
-    $count = 0;
+    $count = $current_saldo_month = 0;
     for($j = 0; $j < $this->days; $j++){ //for each day of the month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
@@ -57,13 +63,10 @@ class Interval_Calculator{
       $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ( (DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)) )";
       $result = $conn->query($sql);
       if($result && $result->num_rows == 1){
-        $row = $result->fetch_assoc();
-        $this->shouldTime[] = $row[strtolower(date('D', strtotime($i)))];
-        //add overTimeLump if month changes
-        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
-          $this->overTimeLump += $row['overTimeLump'];
-        }
+        $interval_row = $result->fetch_assoc();
+        $this->shouldTime[] = $interval_row[strtolower(date('D', strtotime($i)))];
       } else { //if no interval found means i want everything to be 0.
+        $interval_row['overTimeLump'] = 0;
         $this->shouldTime[] = 0;
       }
 
@@ -77,7 +80,7 @@ class Interval_Calculator{
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
         $this->lunchTime[] = $row['breakCredit'];
-        $this->absolvedTime[] = $row['timeEnd'] == '0000-00-00 00:00:00' ? 0 : timeDiff_Hours($row['time'], $row['timeEnd']);
+        $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? 0 : timeDiff_Hours($row['time'], $row['timeEnd']);
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = false;
         $this->end[] = false;
@@ -99,17 +102,28 @@ class Interval_Calculator{
         $this->lunchTime[$count] = 0;
       }
 
+      //end of month calculations
+      $current_saldo_month += $this->absolvedTime[$count] - $this->lunchTime[$count] - $this->shouldTime[$count];
+      if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, write down monthly saldo
+        //saldo
+        $this->monthly_saldo[] = $current_saldo_month;
+        //overtime
+        $this->overTimeLump_single[] = $interval_row['overTimeLump'];
+        //correctionHours
+        $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE(createdOn) >= DATE('".substr($i,0,7)."-01') AND DATE('$i') > DATE(createdOn)");
+        $current_corrections = 0;
+        while($result && ($row = $result->fetch_assoc())){
+          $current_corrections += $row['hours'] * intval($row['addOrSub']);
+        }
+        $this->monthly_correctionHours[] = $current_corrections;
+        $current_saldo_month = 0;
+      }
+
       $i = carryOverAdder_Hours($i, 24);
       $count++;
-    } //endwhile;
+    } //endfor;
     $this->daysAsNumber[] = $count;
 
-    //correction Hours:
-    $i = carryOverAdder_Hours($i, -24);
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE(createdOn) >= DATE('".substr($fromDate,0,7)."-01') AND DATE('$i') > DATE(createdOn)");
-    while($result && ($row = $result->fetch_assoc())){
-      $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
-    }
   }
 
   private function timeDiff_Hours($from, $to) {

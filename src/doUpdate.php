@@ -42,7 +42,6 @@ document.onreadystatechange = function () {
     move();
   }
 }
-
 function move() {
   var elem = document.getElementById("progress");
   var elem_text = document.getElementById("progress_text");
@@ -80,54 +79,6 @@ $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
 $row = $result->fetch_assoc();
 
-if($row['version'] < 47){
-  $sql = "CREATE TABLE $policyTable (
-    passwordLength INT(2) DEFAULT 0,
-    complexity ENUM('0', '1', '2') DEFAULT '0',
-    expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    expirationDuration INT(3),
-    expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Created Passwordpolicy table";
-  }
-
-  $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
-  echo mysqli_error($conn);
-
-  $sql = "ALTER TABLE $userTable ADD COLUMN lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Added expiration Date to PSW";
-  }
-}
-
-if($row['version'] < 48){
-  $sql = "ALTER TABLE $roleTable ADD COLUMN canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Added new Role for editing PDF Templates";
-  }
-}
-
-if($row['version'] < 49){
-  $sql = "ALTER TABLE $configTable ADD COLUMN masterPassword VARCHAR(100)";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Added master Password for encrypting banking information.";
-  }
-  $sql = "ALTER TABLE $roleTable ADD COLUMN isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
-  if (!$conn->query($sql)){
-    echo mysqli_error($conn);
-  } else {
-    echo "<br> Added Report-Admin role.";
-  }
-}
 
 if($row['version'] < 50){
   $sql = "CREATE TABLE $mailOptionsTable(
@@ -723,7 +674,7 @@ if($row['version'] < 77){
     echo mysqli_error($conn);
   }
 
-  $sql = "ALTER TABLE $projectTable MODIFY COLUMN hourlyPrice DECIMAL(6,2) DEFAULT 0";
+  $sql = "ALTER TABLE projectData MODIFY COLUMN hourlyPrice DECIMAL(6,2) DEFAULT 0";
   if($conn->query($sql)){
     echo '<br> Increased price per hours to 4 digit number (projects)';
   } else {
@@ -750,7 +701,7 @@ if($row['version'] < 78){
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     proposalID INT(6) UNSIGNED,
     name VARCHAR(50),
-    description VARCHAR(300),
+    description VARCHAR(600),
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
@@ -763,21 +714,75 @@ if($row['version'] < 78){
     echo mysqli_error($conn);
   }
 
-  $sql = "ALTER TABLE $companyTable ADD COLUMN logo VARCHAR(20)";
+  $sql = "ALTER TABLE companyData ADD COLUMN logo VARCHAR(20)";
   if($conn->query($sql)){
     echo '<br> Added logo to companies';
   } else {
     echo mysqli_error($conn);
   }
 
-  $sql = "ALTER TABLE $roleTable ADD COLUMN isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  $sql = "ALTER TABLE roles ADD COLUMN isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if($conn->query($sql)){
     echo '<br> Added ERP Admin';
   } else {
     echo mysqli_error($conn);
   }
-
 }
+
+if($row['version'] < 79){
+  $sql = "ALTER TABLE companyData ADD COLUMN address VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added address to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE companyData ADD COLUMN phone VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added phone number to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE companyData ADD COLUMN mail VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added email address to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE companyData ADD COLUMN homepage VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added homepage to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE companyData ADD COLUMN erpText TEXT";
+  if($conn->query($sql)){
+    echo '<br> Added ERP footer Text to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE companyData MODIFY COLUMN logo VARCHAR(40)";
+  if($conn->query($sql)){
+    echo '<br> Larger logo names to companies';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
+  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
+  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND breakCredit < hoursOfRest";
+  $result = $conn->query($sql);
+  while($result && ($row = $result->fetch_assoc())){
+    $conn->query("UPDATE $logTable SET breakCredit = (breakCredit +" .$row['hoursOfRest'].") WHERE indexIM = ".$row['indexIM']);
+  }
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Updated new break values';
+  }
+}
+
+
+
 
 
 //------------------------------------------------------------------------------

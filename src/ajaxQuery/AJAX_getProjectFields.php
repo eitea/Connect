@@ -1,20 +1,9 @@
 <?php
 
 require "../connection.php";
-$p = $q = 0;
-if(empty($_GET['q'])){
-  $p = $_GET['p']; //companyID
-} else {
-  $q = intval($_GET['q']); //project
-}
-
-if($p){
-  $result = $conn->query("SELECT id FROM $projectTable WHERE clientID = $p");
-  if($result && ($row = $result->fetch_assoc())){
-    $q = $row['id'];
-  } else {
-    $q = 0;
-  }
+$p = 0;
+if(!empty($_GET['projectID'])){
+  $p = $_GET['projectID'];
 }
 
 $sql="SELECT $companyExtraFieldsTable.*, $projectTable.field_1, $projectTable.field_2, $projectTable.field_3, $clientTable.companyID
@@ -22,7 +11,7 @@ FROM $companyExtraFieldsTable, $clientTable, $projectTable
 WHERE $companyExtraFieldsTable.isActive = 'TRUE'
 AND $companyExtraFieldsTable.companyID = $clientTable.companyID
 AND $clientTable.id = $projectTable.clientID
-AND $projectTable.id = $q";
+AND $projectTable.id = $p";
 
 $result = mysqli_query($conn,$sql);
 while($result && ($row = $result->fetch_assoc())){ //this should probably return 3 rows.

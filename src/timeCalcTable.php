@@ -96,16 +96,19 @@ $("#calendar").datepicker({
       $now = $currentTimeStamp;
       $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
 
-      if($calculator->correctionHours){
+      if(!empty($calculator->monthly_correctionHours[0])){
+        $corrections = array_sum($calculator->monthly_correctionHours);
         echo "<tr style='font-weight:bold;'>";
         echo "<td>".$lang['CORRECTION']." </td>";
-        echo "<td>".$lang_monthToString[intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
-        echo "<td>".sprintf('%+.2f', $calculator->correctionHours)."</td><td></td>";
+        echo "<td>".$lang['MONTH_TOSTRING'][intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
+        echo "<td>".displayAsHoursMins($corrections)."</td><td></td>";
         echo "</tr>";
+      } else {
+        $corrections = 0;
       }
 
       $absolvedHours = array();
-      $accumulatedSaldo = $calculator->correctionHours;
+      $accumulatedSaldo = $corrections;
       for($i = 0; $i < $calculator->days; $i++){
         if($calculator->end[$i] == '0000-00-00 00:00:00'){
           $endTime = getCurrentTimestamp();
@@ -142,34 +145,17 @@ $("#calendar").datepicker({
         $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
 
         echo "<tr $neutralStyle>";
-        echo "<td>" . $lang_weeklyDayToString[$calculator->dayOfWeek[$i]] . "</td>";
+        echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
         echo "<td>" . $calculator->date[$i] . "</td>";
         echo "<td>" . substr($A,11,5) . "</td>";
         echo "<td><small>" . displayAsHoursMins($calculator->lunchTime[$i]) . "</small></td>";
         echo "<td>" . substr($B,11,5) . "</td>";
-        echo "<td>" . $lang_activityToString[$calculator->activity[$i]] . "</td>";
+        echo "<td>" . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]] . "</td>";
         echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
         echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
         echo "<td><button type='submit' form='form1' class='btn btn-default' value='".$calculator->indecesIM[$i].' '.$calculator->date[$i]."' name='aButton' ><i class='fa fa-pencil'></i></button></td>";
-        echo "</tr>";
-      }
-
-      if($calculator->overTimeLump > 0){
-        $accumulatedSaldo -= $calculator->overTimeLump;
-        if($accumulatedSaldo < 0){
-          $accumulatedSaldo += $calculator->overTimeLump;
-          if($accumulatedSaldo > 0){
-            $calculator->overTimeLump -= $accumulatedSaldo;
-            $accumulatedSaldo = 0;
-          }
-        }
-        echo "<tr style='font-weight:bold;'>";
-        echo "<td>".$lang['OVERTIME_ALLOWANCE']." </td>";
-        echo "<td>-</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td>";
-        echo "<td style='color:red'> -".displayAsHoursMins($calculator->overTimeLump)."</td>";
-        echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td><td></td>";
         echo "</tr>";
       }
       ?>

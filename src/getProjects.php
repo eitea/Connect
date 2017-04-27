@@ -18,7 +18,7 @@
 }
 #project_body{
   padding-top:350px;
-  padding-bottom:200px;
+  padding-bottom:300px;
 }
 #project_footer{
   position:fixed;
@@ -620,7 +620,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
         $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
         $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
-        $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE']));
+        $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
 
         $sum_min = 0;
         $addTimeStart = 0;
@@ -685,29 +685,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
           $detailInfo = $row['firstname']." ".$row['lastname'] .' || '. $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
           $interninfo = $row['internInfo'];
-          $optionalinfo = '';
+          $optionalinfo = $csv_optionalinfo = '';
           $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
           if($extraFldRes && $extraFldRes->num_rows > 0){
             $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; }
+            if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; $csv_optionalinfo = $extraFldRow['name'].': '.$row['extra_1']; }
           }
           if($extraFldRes && $extraFldRes->num_rows > 1){
             $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; }
+            if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_2'];}
           }
           if($extraFldRes && $extraFldRes->num_rows > 2){
             $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
+            if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
           }
+          $csv_Add[] = $csv_optionalinfo;
           echo "<td>";
           if($row['booked'] == 'FALSE'){
             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
           }
           echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Person - Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
           if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
-          if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+          if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
           echo "</td>";
-          echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //since we dont know what has been edited: save all.
+          echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //needed to check what has been charged
           echo "</tr>";
 
           $csv->addLine($csv_Add);
@@ -823,7 +824,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <div class="row">
     <?php
     $diabled = 'disabled';
-    if($filterUserID != 0 && !empty($_POST['filterDay']) && !empty($_POST['filterMonth'])&& !empty($_POST['filterYear'])){ $diabled = ''; }
+    if($filterUserID != 0 && preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $filterDate)){ $diabled = ''; }
     ?>
     <div class="col-xs-6">
       <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
@@ -854,8 +855,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </form>
     </div>
   </div>
-  <br><br>
-
+<br>
   <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
 <form method="POST">
   <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
@@ -914,10 +914,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-8">
+        <div class="col-xs-6">
           <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
           <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
         </div>
       </div>

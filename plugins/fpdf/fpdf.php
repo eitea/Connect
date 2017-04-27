@@ -9,8 +9,7 @@
 
 define('FPDF_VERSION','1.81');
 
-class FPDF
-{
+class FPDF{
 protected $page;               // current page number
 protected $n;                  // current object number
 protected $offsets;            // array of object offsets
@@ -71,8 +70,7 @@ protected $PDFVersion;         // PDF version number
 *                               Public methods                                 *
 *******************************************************************************/
 
-function __construct($orientation='P', $unit='mm', $size='A4')
-{
+function __construct($orientation='P', $unit='mm', $size='A4'){
 	// Some checks
 	$this->_dochecks();
 	// Initialization of properties
@@ -102,8 +100,7 @@ function __construct($orientation='P', $unit='mm', $size='A4')
 	$this->WithAlpha = false;
 	$this->ws = 0;
 	// Font path
-	if(defined('FPDF_FONTPATH'))
-	{
+	if(defined('FPDF_FONTPATH'))	{
 		$this->fontpath = FPDF_FONTPATH;
 		if(substr($this->fontpath,-1)!='/' && substr($this->fontpath,-1)!='\\')
 			$this->fontpath .= '/';
@@ -653,8 +650,7 @@ function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link
 		$this->x += $w;
 }
 
-function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false)
-{
+function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false){
 	// Output text with automatic or explicit line breaks
 	if(!isset($this->CurrentFont))
 		$this->Error('No font has been set');

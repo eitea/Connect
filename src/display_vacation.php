@@ -69,7 +69,7 @@ if(!$result || $result->num_rows <= 0){
     $result = $conn->query("SELECT time FROM $logTable WHERE userID = $curID AND status='1' AND DATE(time) <= DATE('$currentDate')");
     while($result && ($row = $result->fetch_assoc())){
       echo '<tr>';
-      echo '<td>'.$lang_weeklyDayToString[strtolower(date('D', strtotime($row['time'])))].'</td>';
+      echo '<td>'.$lang['WEEKDAY_TOSTRING'][strtolower(date('D', strtotime($row['time'])))].'</td>';
       echo '<td>'.substr($row['time'],0,10).'</td>';
       echo '</tr>';
       $usedDays++;

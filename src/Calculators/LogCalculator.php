@@ -26,7 +26,7 @@ class LogCalculator{
   public function calculateValues(){
     require "connection.php";
     $curID = $this->id;
-
+    $current_month_saldo = 0;
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
     while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
       $this->beginDate = $iRow['beginningDate'];
@@ -47,9 +47,6 @@ class LogCalculator{
         $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
 
         while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
-          if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, add the overtime
-            $this->overTimeAdditive += $iRow['overTimeLump'];
-          }
           $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
           if(isHoliday($i)){
             $expectedHours = 0;
@@ -88,34 +85,36 @@ class LogCalculator{
             $this->expectedHours += $expectedHours;
           }
 
+          //overTime
+          if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, check the accumulated saldo
+            $monthly_corrections = 0;
+            //correction Hours:
+            $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE('$i') > DATE(createdOn) AND DATE('".substr($i,0,7)."-01') <= DATE(createdOn)");
+            while($result && ($row = $result->fetch_assoc())){
+              if($row['cType'] == 'log'){
+                $monthly_corrections += $row['hours'] * intval($row['addOrSub']);
+              } elseif($row['cType'] == 'vac'){
+                $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
+              }
+            }
+            $this->correctionHours += $monthly_corrections;
+
+            $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
+            if($this->saldo > 0){
+              if($this->saldo < $iRow['overTimeLump']){
+                $this->overTimeAdditive += $this->saldo;
+              } else {
+                $this->overTimeAdditive += $iRow['overTimeLump'];
+              }
+            }
+          }
+
           $i = carryOverAdder_Hours($i, 24);
         }//end foreach day in intveral
+
       } //end if($diff > 0);
     } //end foreach interval
-
-
-    //correction Hours:
-    $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE(createdOn) >= DATE('".substr($this->beginDate,0,7)."-01')");
-    while($result && ($row = $result->fetch_assoc())){
-      if($row['cType'] == 'log'){
-        $this->correctionHours += $row['hours'] * intval($row['addOrSub']);
-      } elseif($row['cType'] == 'vac'){
-        $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
-      }
-    }
-
-    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
-
-    //sooo.. apparently the overtimelump cannot make our saldo negative
-    if($this->saldo > 0){ //is the overtimelump subtractable?
-      $this->saldo -= $this->overTimeAdditive;
-      if($this->saldo < 0){ //too little saldo
-        $this->overTimeAdditive = ($this->saldo + $this->overTimeAdditive);
-        $this->saldo = 0;
-      }
-    } else {
-      $this->overTimeAdditive = 0;
-    }
+    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
   }
 
   private function timeDiff_Hours($from, $to) {

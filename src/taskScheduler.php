@@ -35,7 +35,7 @@ if($result && ($row = $result->fetch_assoc())){
         <?php
         for($i = -1; $i < 5; $i++){
           if($pattern == $i){ $checked = 'selected'; } else { $checked = ''; }
-          echo "<option $checked value='$i' >".$lang_scheduleToString[$i] .'</option>';
+          echo "<option $checked value='$i' >".$lang['SCHEDULE_TOSTRING'][$i] .'</option>';
         }
         ?>
       </select>

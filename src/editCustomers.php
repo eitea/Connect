@@ -58,6 +58,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if ($result && $result->num_rows > 0) {
       if($result && $result->num_rows > 1) {
         echo '<option value="0">'.$lang['COMPANY'].'...</option>';
+      } else {
+        $filterCompanyID = $available_companies[1];
       }
       while ($row = $result->fetch_assoc()) {
         $i = $row['id'];

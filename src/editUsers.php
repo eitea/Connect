@@ -226,6 +226,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
+    if(isset($_POST['isERPAdmin'.$x])){
+      $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
     if(isset($_POST['canStamp'.$x])){
       $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
     } else {
@@ -355,6 +361,7 @@ $(document).ready(function(){
       $isTimeAdmin = $row['isTimeAdmin'];
       $isProjectAdmin = $row['isProjectAdmin'];
       $isReportAdmin = $row['isReportAdmin'];
+      $isERPAdmin = $row['isERPAdmin'];
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
@@ -460,6 +467,9 @@ $(document).ready(function(){
                     </label><br>
                     <label>
                       <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
                     </label>
                   </div>
                 </div>
@@ -521,31 +531,31 @@ $(document).ready(function(){
                 <br>
                 <div class="row">
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['mon']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['mon']; ?>
                     <input type="number" step="any" class="form-control" name="mon<?php echo $x; ?>" size="2" value= "<?php echo $mon; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['tue']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['tue']; ?>
                     <input type="number" step="any" class="form-control" name="tue<?php echo $x; ?>" size="2" value= "<?php echo $tue; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['wed']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['wed']; ?>
                     <input type="number" step="any" class="form-control" name="wed<?php echo $x; ?>" size="2" value= "<?php echo $wed; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['thu']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['thu']; ?>
                     <input type="number" step="any" class="form-control" name="thu<?php echo $x; ?>" size="2" value= "<?php echo $thu; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['fri']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['fri']; ?>
                     <input type="number" step="any" class="form-control" name="fri<?php echo $x; ?>" size="2" value= "<?php echo $fri; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['sat']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['sat']; ?>
                     <input type="number" step="any" class="form-control" name="sat<?php echo $x; ?>" size="2" value= "<?php echo $sat; ?>" />
                   </div>
                   <div style="width:10%; float:left; margin-left:3%">
-                    <?php echo $lang_weeklyDayToString['sun']; ?>
+                    <?php echo $lang['WEEKDAY_TOSTRING']['sun']; ?>
                     <input type="number" step="any" class="form-control" name="sun<?php echo $x; ?>" size="2" value= "<?php echo $sun; ?>" />
                   </div>
                 </div>

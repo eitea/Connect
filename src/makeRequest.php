@@ -105,7 +105,7 @@ if($result && $result->num_rows > 0): ?>
               echo "<tr>";
               echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
               echo '<td>' . substr($row['toDate'],0,10) . '</td>';
-              echo "<td style='color:$style'>" . $lang_vacationRequestStatus[$row['status']] .'</td>';
+              echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
               echo "<td>" . $row['answerText'] . '</td>';
               echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!">
               <i class="fa fa-trash-o ></i>"</button> </td>';

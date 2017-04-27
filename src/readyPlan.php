@@ -3,14 +3,11 @@
 <?php
 $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
 $row = $result->fetch_assoc();
-
 $isAdmin = $conn->query("SELECT * FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
-
 if(!$row['enableReadyCheck'] && !$isAdmin){
   die("Access restricted, only a CORE Admin can view this page and enable it for others.");
 }
-
- ?>
+?>
 <div class="page-header">
   <h3><?php echo $lang['READY_STATUS']; ?></h3>
 </div>
@@ -23,7 +20,7 @@ if(!$row['enableReadyCheck'] && !$isAdmin){
   <tbody>
     <?php
     $today = substr(getCurrentTimestamp(),0,10);
-    $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEND = '0000-00-00 00:00:00'";
+    $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00'";
     $result = $conn->query($sql);
     if($result && $result->num_rows > 0){
       while($row = $result->fetch_assoc()){
