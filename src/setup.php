@@ -16,16 +16,18 @@ require 'connection_config.php';
 
 $conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {
+  echo mysqli_error($conn);
   echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
   die();
 }
 
 // Create database
 $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
-if ($conn->query($sql)) {
+if($conn->query($sql)) {
   echo "Database was created. <br>";
 } else {
-    echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
+  echo mysqli_error($conn);
+  echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
   die();
 }
 $conn->close();

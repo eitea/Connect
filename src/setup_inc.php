@@ -644,7 +644,7 @@ $sql = "CREATE TABLE $policyTable (
 
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    proposalID INT(6) UNSIQNED,
+    proposalID INT(6) UNSIGNED,
     name VARCHAR(50),
     description VARCHAR(600),
     price DECIMAL(10,2),
@@ -656,7 +656,5 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-
-
 
 ?>
