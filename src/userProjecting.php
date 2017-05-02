@@ -10,7 +10,8 @@ $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00
 $result = mysqli_query($conn, $sql);
 if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
-  $start = substr(carryOverAdder_Hours($row['time'], $timeToUTC), 11, 19);
+  $start = substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5);
+  $end = substr(carryOverAdder_Hours(getCurrentTimestamp(), $row['timeToUTC']), 11, 5);
   $date = substr($row['time'], 0, 10);
   $indexIM = $row['indexIM']; //this value must not change
   $timeToUTC = $row['timeToUTC']; //just in case.
@@ -43,6 +44,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+    if(isset($_POST['add_addendum'])){
+      $oldindexIM = $indexIM; //restore variables at end of this if
+      $oldDate = $date;
+      $indexIM = $_POST['add_addendum'][0];
+      $date = substr($_POST['add_addendum'][1],0,10);
+    }
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
@@ -56,10 +63,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if(isset($_POST['addBreak'])){ //break
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
+        $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
+        $sql= "UPDATE logs SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
         $conn->query($sql);
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
@@ -93,10 +100,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
           if($accept){
             if(isset($_POST['addDrive'])){ //add as driving time
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
             } else { //normal booking
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
             }
             $conn->query($sql);
@@ -122,6 +129,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '<strong>Could not create entry: </strong>Entered times were invalid, click the infobutton for more detail.';
       echo '</div>';
     }
+    $indexIM = $oldindexIM;
+    $date = $oldDate;
   } elseif(isset($_POST['add'])) {
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -132,18 +141,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if(isset($_POST['undo']) && $_POST['undo'] == 'emergency'){
-  $conn->query("UPDATE $userTable SET emUndo = UTC_TIMESTAMP WHERE id = $userID");
+  $conn->query("UPDATE UserData SET emUndo = UTC_TIMESTAMP WHERE id = $userID");
 }
 
-$result = $conn->query("SELECT emUndo FROM $userTable WHERE id = $userID");
+$result = $conn->query("SELECT emUndo FROM UserData WHERE id = $userID");
 $row = $result->fetch_assoc();
 if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   $showEmergencyUndoButton = TRUE;
 }
+
+$request_addendum = array();
+$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('$date') > time"); //168 = 7 days      ".carryOverAdder_Hours($start, -168)."
+while($result && ($row = $result->fetch_assoc())){
+  $i = $row['indexIM'];
+  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
+  if($res_b && $res_b->num_rows > 0){
+    $row_b_prev = $res_b->fetch_assoc();
+    $endTime = $row_b_prev['end'];
+    while($row_b = $res_b->fetch_assoc()){ //next
+      if(timeDiff_Hours($endTime, $row_b['start']) > $bookingTimeBuffer/60){ //compare
+        $request_addendum['timeToUTC'] = $row['timeToUTC'];
+        $request_addendum['prev_row'] = $row_b_prev;
+        $request_addendum['cur_row'] = $row_b;
+        break;
+      }
+      $endTime = $row_b['end'];
+      $row_b_prev = $row_b; //trivial
+    }
+    if($request_addendum) break;
+  }
+}
+echo mysqli_error($conn);
 ?>
 
-
 <form method="post">
+<?php if(!$request_addendum): ?>
   <div style='text-align:right;'>
     <?php if($showUndoButton): ?>
       <button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button>
@@ -242,7 +274,12 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
       </table>
     </div>
   </div>
-
+<?php
+else:
+  $timeToUTC =
+  include "userProjecting_addendum.php";
+endif;
+?>
   <br><br><br>
 
   <div class="container-fluid">
@@ -317,9 +354,9 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
-        <input type="time" class="form-control" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
+        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>">
+        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />
         <div class="input-group-btn">
           <button class="btn btn-warning" type="submit"  name="add"> + </button>
         </div>

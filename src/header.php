@@ -22,7 +22,7 @@ if($this_page != "editCustomer_detail.php"){
 if($userID == 1){
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $canBook = $canStamp  = $canEditTemplates = 'TRUE';
 } else {
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID";
+  $sql = "SELECT * FROM roles WHERE userID = $userID";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
     $row = $result->fetch_assoc();
@@ -37,11 +37,11 @@ if($userID == 1){
   }
 }
 
-$result = $conn->query("SELECT lastPswChange FROM $userTable WHERE id = $userID");
+$result = $conn->query("SELECT lastPswChange FROM UserData WHERE id = $userID");
 $row = $result->fetch_assoc();
 $lastPswChange = $row['lastPswChange'];
 
-$result = $conn->query("SELECT enableReadyCheck FROM $configTable");
+$result = $conn->query("SELECT enableReadyCheck FROM configurationData");
 $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
 
@@ -250,6 +250,10 @@ $(document).ready(function() {
   if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $cd = $row['cooldownTimer'];
+    $bookingTimeBuffer = $row['bookingTimeBuffer'];
+  } else {
+    $cd = 0;
+    $bookingTimeBuffer = 5;
   }
   //display checkin or checkout + disabled
   $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";

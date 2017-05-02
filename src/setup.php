@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 
 // Create database
 $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
-if($conn->query($sql)) {
+if($conn->query($sql)){
   echo "Database was created. <br>";
 } else {
   echo mysqli_error($conn);
@@ -44,6 +44,7 @@ if(isset($_GET)){
 }
 
 function test_input($data) {
+  $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%()+*~#-öäüÖÄÜ]/", " ", $data); //allowed charset
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
