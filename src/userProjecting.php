@@ -102,6 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->query($sql);
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
+            echo mysqli_error($conn);
           } else {
             echo '<div class="alert alert-danger fade in">';
             echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

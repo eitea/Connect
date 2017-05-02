@@ -9,7 +9,8 @@
 
 <form method=post>
 
-<?php
+<?phpgithub
+
 if(isset($_POST['imtotallyFineWithThisOK'])):
 
 $sql = "SELECT * FROM $adminGitHubTable WHERE sslVerify = 'TRUE'";
