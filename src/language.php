@@ -262,6 +262,9 @@ $lang_ger['FOR_ALL_PROJECTS'] = 'Für Alle Projekte';
 $lang_eng['FOUNDERRORS'] = 'Found Errors';
 $lang_ger['FOUNDERRORS'] = 'Gefundene Fehler';
 
+$lang_eng['GAPS_FOUND_PLEASE_CORRECT'] = 'Please fill out the missing gaps';
+$lang_ger['GAPS_FOUND_PLEASE_CORRECT'] = 'Bitte die fehlenden Einträge nachtragen';
+
 $lang_eng['GENDER'] = 'Gender';
 $lang_ger['GENDER'] = 'Gender';
 

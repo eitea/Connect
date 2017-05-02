@@ -1,10 +1,5 @@
-<?php include 'header.php'; ?>
+<?php require_once 'header.php'; ?>
 <?php enableToBookings($userID);?>
-<style>
-.robot-control{
-  display:none;
-}
-</style>
 <?php
 $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
 $result = mysqli_query($conn, $sql);
@@ -18,13 +13,35 @@ if($result && $result->num_rows > 0){
 } else {
   redirect("home.php");
 }
-?>
 
-<div class="page-header">
-  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
-</div>
+//ADDENDUMS
+$request_addendum = array();
+$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('$date') > time"); //168 = 7 days      ".carryOverAdder_Hours($start, -168)."
+while($result && ($row = $result->fetch_assoc())){
+  $i = $row['indexIM'];
+  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
+  if($res_b && $res_b->num_rows > 0){
+    $row_b_prev = $res_b->fetch_assoc();
+    $endTime = $row_b_prev['end'];
+    while($row_b = $res_b->fetch_assoc()){ //next
+      if(timeDiff_Hours($endTime, $row_b['start']) > $bookingTimeBuffer/60){
+        //user will be FORCED to add, i know the next add has boundaries
+        $request_addendum['timeToUTC'] = $row['timeToUTC'];
+        $request_addendum['prev_row'] = $row_b_prev;
+        $request_addendum['cur_row'] = $row_b;
+        //for the post request, we have to know what he is currently editing
+        $indexIM = $i;
+        $date = substr($row_b['start'],0,10);
+        $timeToUTC = $row['timeToUTC'];
+        break;
+      }
+      $endTime = $row_b['end'];
+      $row_b_prev = $row_b; //trivial
+    }
+    if($request_addendum) break;
+  }
+}
 
-<?php
 $setCompany = $setClient = $setProject = 0;
 $showUndoButton = $showEmergencyUndoButton = 0;
 $insertInfoText = $insertInternInfoText = '';
@@ -44,12 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
-    if(isset($_POST['add_addendum'])){
-      $oldindexIM = $indexIM; //restore variables at end of this if
-      $oldDate = $date;
-      $indexIM = $_POST['add_addendum'][0];
-      $date = substr($_POST['add_addendum'][1],0,10);
-    }
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
@@ -129,15 +140,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '<strong>Could not create entry: </strong>Entered times were invalid, click the infobutton for more detail.';
       echo '</div>';
     }
-    $indexIM = $oldindexIM;
-    $date = $oldDate;
-  } elseif(isset($_POST['add'])) {
+  } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
     echo '<strong>Could not create entry: </strong>Fields may not be empty.';
     echo '</div>';
   }
-  echo '<br>';
+  redirect('userProjecting.php');
 }
 
 if(isset($_POST['undo']) && $_POST['undo'] == 'emergency'){
@@ -150,29 +159,18 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   $showEmergencyUndoButton = TRUE;
 }
 
-$request_addendum = array();
-$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('$date') > time"); //168 = 7 days      ".carryOverAdder_Hours($start, -168)."
-while($result && ($row = $result->fetch_assoc())){
-  $i = $row['indexIM'];
-  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
-  if($res_b && $res_b->num_rows > 0){
-    $row_b_prev = $res_b->fetch_assoc();
-    $endTime = $row_b_prev['end'];
-    while($row_b = $res_b->fetch_assoc()){ //next
-      if(timeDiff_Hours($endTime, $row_b['start']) > $bookingTimeBuffer/60){ //compare
-        $request_addendum['timeToUTC'] = $row['timeToUTC'];
-        $request_addendum['prev_row'] = $row_b_prev;
-        $request_addendum['cur_row'] = $row_b;
-        break;
-      }
-      $endTime = $row_b['end'];
-      $row_b_prev = $row_b; //trivial
-    }
-    if($request_addendum) break;
-  }
-}
 echo mysqli_error($conn);
 ?>
+
+<style>
+.robot-control{
+  display:none;
+}
+</style>
+
+<div class="page-header">
+  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
+</div>
 
 <form method="post">
 <?php if(!$request_addendum): ?>
@@ -276,7 +274,6 @@ echo mysqli_error($conn);
   </div>
 <?php
 else:
-  $timeToUTC =
   include "userProjecting_addendum.php";
 endif;
 ?>
@@ -432,4 +429,4 @@ if($setProject){ //i want my filter displayed even if there were no bookings
   echo '</script>';
 }
 ?>
-<?php include 'footer.php'; ?>
+<?php require_once 'footer.php'; ?>

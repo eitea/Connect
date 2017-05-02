@@ -1,6 +1,6 @@
-
-<h4>Meep Meep</h4>
-
+<br>
+<h4><?php echo $lang['GAPS_FOUND_PLEASE_CORRECT']; ?></h4>
+<br><br>
 <table class="table">
 <thead>
   <th>Start</th>
@@ -28,6 +28,3 @@
     ?>
 </tbody>
 </table>
-
-<input type="text" name="add_addendum[]" readonly style="display:none" value="<?php echo $request_addendum['prev_row']['timestampID']; ?>" />
-<input type="text" name="add_addendum[]" readonly style="display:none" value="<?php echo $request_addendum['prev_row']['end']; ?>" />
