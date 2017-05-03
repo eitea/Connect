@@ -16,7 +16,7 @@ if($result && $result->num_rows > 0){
 
 //ADDENDUMS
 $request_addendum = array();
-$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('$date') > time"); //168 = 7 days      ".carryOverAdder_Hours($start, -168)."
+$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //168 = 7 days
 while($result && ($row = $result->fetch_assoc())){
   $i = $row['indexIM'];
   $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
@@ -42,25 +42,15 @@ while($result && ($row = $result->fetch_assoc())){
   }
 }
 
-$setCompany = $setClient = $setProject = 0;
 $showUndoButton = $showEmergencyUndoButton = 0;
-$insertInfoText = $insertInternInfoText = '';
+$insertInfoText = $insertInternInfoText = $missing_highlights = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all Operations.");
   }
-  if(isset($_POST['filterCompany'])){
-    $setCompany = intval($_POST['filterCompany']);
-  }
-  if(isset($_POST['filterClient'])){
-    $setClient = intval($_POST['filterClient']);
-  }
-  if(isset($_POST['filterProject'])){
-    $setProject = intval($_POST['filterProject']);
-  }
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
@@ -120,12 +110,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->query($sql);
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
-            echo mysqli_error($conn);
+            redirect('userProjecting.php');
           } else {
             echo '<div class="alert alert-danger fade in">';
             echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Could not create entry: </strong>Required field may not be empty (orange highlighted).';
+            echo '<strong>Could not create entry: </strong>Required fields may not be empty. (Highlighted)';
             echo '</div>';
+            $missing_highlights = 'required-field';
           }
         } else {
           echo '<div class="alert alert-danger fade in">';
@@ -143,10 +134,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
+    echo '<strong>Could not create entry: </strong> Fields may not be empty. (Highlighted)';
+    $missing_highlights = 'required-field';
     echo '</div>';
   }
-  redirect('userProjecting.php');
 }
 
 if(isset($_POST['undo']) && $_POST['undo'] == 'emergency'){
@@ -292,7 +283,8 @@ endif;
   <div class="row">
     <div id=mySelections class="col-xs-9"><br>
       <?php if(count($available_companies) > 2): ?>
-        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0);">
+        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0)">
+          <option value="0"><?php echo $lang['COMPANY']; ?>...</option>
           <?php
           $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
           $result = mysqli_query($conn, $query);
@@ -300,32 +292,26 @@ endif;
             while ($row = $result->fetch_assoc()) {
               $cmpnyID = $row['id'];
               $cmpnyName = $row['name'];
-              if($cmpnyID == $setCompany){
-                echo "<option selected name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-              } else {
-                echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-              }
+              echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
             }
           }
           ?>
         </select>
       <?php
+        $setCompany = 0;
       else:
         $setCompany = $available_companies[1];
       endif;
-      $query = "SELECT * FROM $clientTable WHERE companyID=".$available_companies[1];
-      $result = mysqli_query($conn, $query);
+      echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
+      $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID=$setCompany");
+      if ($result && $result->num_rows > 1) {
+        echo "<option value='0'>".$lang['CLIENT']."...</option>";
+      }
       if ($result && $result->num_rows > 0) {
-        echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0);">';
-        echo "<option name='act' value='0'>".$lang['CLIENT']."...</option>";
         while ($row = $result->fetch_assoc()) {
           $cmpnyID = $row['id'];
           $cmpnyName = $row['name'];
-          if($cmpnyID == $setClient){
-            echo "<option selected value='$cmpnyID'>$cmpnyName</option>";
-          } else {
-            echo "<option value='$cmpnyID'>$cmpnyName</option>";
-          }
+          echo "<option value='$cmpnyID'>$cmpnyName</option>";
         }
       }
       echo '</select>';
@@ -338,7 +324,7 @@ endif;
 
   <div class="row">
     <div class="col-md-8">
-      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
+      <br><textarea class="form-control <?php echo $missing_highlights; ?>" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
     </div>
     <div class="col-md-4">
       <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
@@ -420,13 +406,4 @@ function hideMyDiv(o){
 }
 </script>
 
-<?php
-if($setProject){ //i want my filter displayed even if there were no bookings
-  echo '<script>';
-  echo "showClients($setCompany, $setClient);";
-  echo "showProjects($setClient, $setProject);";
-  echo "showProjectfields($setProject)";
-  echo '</script>';
-}
-?>
 <?php require_once 'footer.php'; ?>

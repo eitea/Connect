@@ -1,5 +1,6 @@
 <?php
 require "../connection.php";
+include "../language.php";
 $q = intval($_GET['clientID']);
 
 if(isset($_GET['projectID'])){
@@ -9,6 +10,9 @@ if(isset($_GET['projectID'])){
 }
 $sql="SELECT * FROM $projectTable WHERE clientID = $q";
 $result = mysqli_query($conn,$sql);
+if($result && $result->num_rows > 1){
+  echo "<option name='prj' value=0 >".$lang['PROJECT']."...</option>";
+}
 if($result && $result->num_rows >0){
   while($row = mysqli_fetch_array($result)) {
     $selected = "";

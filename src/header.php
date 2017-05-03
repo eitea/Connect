@@ -245,7 +245,7 @@ $(document).ready(function() {
   </form>
   <!-- /modal -->
   <?php
-  $showProjectBookingLink = $cd = 0;
+  $showProjectBookingLink = $cd = $diff = 0;
   $result = mysqli_query($conn, "SELECT * FROM $configTable");
   if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -262,32 +262,32 @@ $(document).ready(function() {
     $row = $result->fetch_assoc();
     $diff = timeDiff_Hours($row['time'],getCurrentTimestamp());
     $indexIM = $row['indexIM'];
-    if($diff > $cd/60){ //he has waited long enough to stamp out
+    if($diff > $cd/60){ //he has waited long enough to check out
       $disabled = '';
     } else {
       $disabled = 'disabled';
     }
     $buttonVal = $lang['CHECK_OUT'];
-    $checkInButton =  "<li><br><div class='container-fluid'>
-    <div><form method='post'><button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>&nbsp
-    <span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>
-    </div></form></div><br></li>";
+    $checkInButton =  "<button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
     $showProjectBookingLink = TRUE;
   } else {
     $today = getCurrentTimestamp();
     $timeIsLikeToday = substr($today, 0, 10) ." %";
     $disabled = '';
 
-    $sql = "SELECT * FROM $logTable WHERE userID = $userID
-    AND status = '0'
-    AND time LIKE '$timeIsLikeToday'
-    AND TIMESTAMPDIFF(MINUTE, timeEnd, '$today') < $cd";
+    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND status = '0' AND time LIKE '$timeIsLikeToday'";
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows > 0){
-      $disabled = 'disabled';
+      $row = $result->fetch_assoc();
+      $diff = timeDiff_Hours($row['timeEnd'], $today);
+      if($diff > $cd/60){ //he has waited long enough to check in
+        $disabled = '';
+      } else {
+        $disabled = 'disabled';
+      }
     }
     $buttonVal = $lang['CHECK_IN'];
-    $checkInButton = "<li><br><div class='container-fluid'><form method='post'><button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button></form></div><br></li>";
+    $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button>";
   }
   ?>
 
@@ -296,12 +296,23 @@ $(document).ready(function() {
     <div class="inner">
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
-          <?php if($canStamp == 'TRUE'): echo $checkInButton; ?>
+          <?php if($canStamp == 'TRUE'): ?>
+            <li>
+              <div class='container-fluid'>
+                <form method='post'><br>
+                  <?php
+                  echo $checkInButton;
+                  if($diff)
+                  echo "&nbsp <span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
+                  ?>
+                </form><br>
+              </div>
+            </li>
             <!-- User-Section: BASIC -->
             <li><a <?php if($this_page =='home.php'){echo $setActiveLink;}?> href="home.php"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
             <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="timeCalcTable.php"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
             <li><a <?php if($this_page =='calendar.php'){echo $setActiveLink;}?> href="calendar.php"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
-            <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="makeRequest.php"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
             <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="travelingForm.php"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
 
             <?php if($showReadyPlan == 'TRUE'): ?>

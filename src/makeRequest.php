@@ -5,45 +5,44 @@
 <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
 
 <div class="page-header">
-  <h3><?php echo $lang['VACATION'] .' '. $lang['REQUESTS']?></h3>
+  <h3><?php echo $lang['MY_REQUESTS']?></h3>
 </div>
 
-<form method="post">
-  <?php
-  if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
-      if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-        $begin = test_input($_POST['start']);
-        $end = test_input($_POST['end']);
-        $infoText = test_input($_POST['requestText']);
-        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '$begin 04:00:00', '$end 04:00:00', '$infoText')";
-        $conn->query($sql);
-        echo mysqli_error($conn);
-      } else {
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Failed! </strong>Invalid Dates.';
-        echo '</div>';
-      }
+<?php
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
+    if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
+      $begin = test_input($_POST['start']);
+      $end = test_input($_POST['end']);
+      $infoText = test_input($_POST['requestText']);
+      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText) VALUES($userID, '$begin 04:00:00', '$end 04:00:00', '$infoText')";
+      $conn->query($sql);
+      echo mysqli_error($conn);
     } else {
-      $sql = "SELECT * FROM $userRequests WHERE userID = $userID";
-      $result = $conn->query($sql);
-      if($result && $result->num_rows > 0){
-        while($row = $result->fetch_assoc()){
-          if(isset($_POST['del'.$row['id']])){
-            $sql = "DELETE FROM $userRequests WHERE id =". $row['id'];
-            $conn->query($sql);
-            echo mysqli_error($conn);
-          }
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Failed! </strong>Invalid Dates.';
+      echo '</div>';
+    }
+  } else {
+    $sql = "SELECT * FROM $userRequests WHERE userID = $userID";
+    $result = $conn->query($sql);
+    if($result && $result->num_rows > 0){
+      while($row = $result->fetch_assoc()){
+        if(isset($_POST['del'.$row['id']])){
+          $sql = "DELETE FROM $userRequests WHERE id =". $row['id'];
+          $conn->query($sql);
+          echo mysqli_error($conn);
         }
       }
     }
   }
-  ?>
+}
+?>
 
-  <br><br>
+<br><br>
 
-
+<form method="post">
   <div class="row">
     <div class="col-xs-6">
       <div class="input-group input-daterange">
@@ -56,7 +55,7 @@
   <br>
   <div class="row">
     <div class="col-xs-6">
-        <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
+      <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
     </div>
   </div>
   <br>
@@ -65,18 +64,19 @@
       <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
     </div>
   </div>
+</form>
 
-  <script>
-  var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-  myCalendar.setSkin("material");
-  myCalendar.setDateFormat("%Y-%m-%d");
-  </script>
+<script>
+var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+myCalendar.setSkin("material");
+myCalendar.setDateFormat("%Y-%m-%d");
+</script>
 
 <?php
 $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType = 'vac'";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>
-
+<form method="post">
   <div class="container">
     <br><br>
     <div>
@@ -90,34 +90,34 @@ if($result && $result->num_rows > 0): ?>
         </tr>
         <tbody>
           <?php
-            while($row = $result->fetch_assoc()){
-              if(timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
-                continue;
-              }
-              $style = "";
-              if($row['status'] == 0) {
-                $style="";
-              } elseif ($row['status'] == 1) {
-                $style="#b52140";
-              } elseif ($row['status'] == 2) {
-                $style="#13b436";
-              }
-              echo "<tr>";
-              echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
-              echo '<td>' . substr($row['toDate'],0,10) . '</td>';
-              echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
-              echo "<td>" . $row['answerText'] . '</td>';
-              echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!">
-              <i class="fa fa-trash-o ></i>"</button> </td>';
-              echo '</tr>';
+          while($row = $result->fetch_assoc()){
+            if(timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
+              continue;
             }
+            $style = "";
+            if($row['status'] == 0) {
+              $style="";
+            } elseif ($row['status'] == 1) {
+              $style="#b52140";
+            } elseif ($row['status'] == 2) {
+              $style="#13b436";
+            }
+            echo "<tr>";
+            echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
+            echo '<td>' . substr($row['toDate'],0,10) . '</td>';
+            echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
+            echo "<td>" . $row['answerText'] . '</td>';
+            echo '<td class="text-center"> <button type="submit" name="del'.$row['id'].'" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Only deletes the Request!">
+            <i class="fa fa-trash-o ></i>"</button> </td>';
+            echo '</tr>';
+          }
           ?>
         </tbody>
       </table>
     </div>
   </div>
+</form>
 <?php endif; ?>
 
-</form>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

@@ -130,6 +130,10 @@ function match_passwordpolicy($p, &$out = ''){
   return true;
 }
 
+function split_booking($booking, $splits){
+  
+}
+
 /*
 echo $test=strtotime('2016-02-3 05:44:21');
 echo date('Y-m-d H:i:s', $test);

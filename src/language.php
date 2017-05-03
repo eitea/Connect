@@ -367,6 +367,9 @@ $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 $lang_eng['MONTH_TOSTRING'] = array("", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 $lang_ger['MONTH_TOSTRING'] = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 
+$lang_eng['MY_REQUESTS'] = 'My Requests';
+$lang_ger['MY_REQUESTS'] = 'Meine Anfragen';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 
@@ -465,6 +468,9 @@ $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';
 
 $lang_eng['PROJECT_INFORMATION'] = 'Reports';
 $lang_ger['PROJECT_INFORMATION'] = 'Reports';
+
+$lang_eng['PROPERTIES'] = 'Properties';
+$lang_ger['PROPERTIES'] = 'Eigenschaften';
 
 $lang_eng['QUANTITY'] = 'Quantity';
 $lang_ger['QUANTITY'] = 'Menge';
