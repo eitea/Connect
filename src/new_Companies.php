@@ -41,7 +41,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </select>
   </div>
   <div class="col-md-2 text-right">
-    <button type="submit" class="btn btn-warning btn-sm" name="compaCreate">Hinzufügen</button>
+    <button type="submit" class="btn btn-warning " name="compaCreate">Hinzufügen</button>
   </div>
 </div>
 </form>

@@ -72,7 +72,7 @@ class LogCalculator{
               $this->breakCreditHours += $row['breakCredit'];
               break;
               case 1:
-              $this->vacationHours += timeDiff_Hours($row['time'], $timeEnd);
+              $this->vacationHours += $expectedHours;
               $this->vacationDays--;
               break;
               case 2:

@@ -693,7 +693,7 @@ if($row['version'] < 78){
     ON DELETE CASCADE
   )";
   if($conn->query($sql)){
-    echo '<br> Created table for proposals)';
+    echo '<br> Created table for proposals';
   } else {
     echo mysqli_error($conn);
   }
@@ -767,8 +767,8 @@ if($row['version'] < 79){
     echo mysqli_error($conn);
   }
 
-  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
-  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
   WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND breakCredit < hoursOfRest";
   $result = $conn->query($sql);
   while($result && ($row = $result->fetch_assoc())){
@@ -781,9 +781,30 @@ if($row['version'] < 79){
   }
 }
 
+if($row['version'] < 80){
+  $sql = "ALTER TABLE logs MODIFY COLUMN status INT(3)";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added new log status';
+  }
 
+  $sql = "UPDATE logs SET status = (status - 2)";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Adjusted log status';
+  }
 
+  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac'";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added school and special leave requests';
+  }
+}
 
+//if($row['version'] < 81){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

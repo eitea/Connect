@@ -117,7 +117,7 @@ function showClients(company, client){
       </select>
       <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' >
       </select>
-      <button type="submit" class="btn btn-warning btn-sm" name="filter">Filter</button><br><br>
+      <button type="submit" class="btn btn-warning " name="filter">Filter</button><br><br>
     </div>
     <div class="col-md-6 text-right">
       <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-info">Return <i class="fa fa-arrow-right"></i></a>

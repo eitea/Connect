@@ -74,7 +74,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     ?>
   </select>
-  &nbsp <button type="submit" class="btn btn-warning btn-sm" name='filter'> Filter</button>
+  &nbsp <button type="submit" class="btn btn-warning " name='filter'> Filter</button>
 
   <br><br>
   <?php $query = "SELECT * FROM $clientTable WHERE companyID = $filterCompanyID AND companyID IN (".implode(', ', $available_companies).")  ORDER BY name ASC";
@@ -163,7 +163,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       <br>
       <div class="text-right">
         <br>
-        <button type="submit" class="btn btn-warning btn-sm" name="create"> <?php echo $lang['ADD']; ?></button>
+        <button type="submit" class="btn btn-warning " name="create"> <?php echo $lang['ADD']; ?></button>
       </div>
 
     </form>

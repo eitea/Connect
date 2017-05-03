@@ -14,7 +14,8 @@ $lang_eng['ACTIVITY_TOSTRING'] = array(
   "1" => "Vacation",
   "2" => "Special Leave",
   "3" => "Sick",
-  "4" => "Vocational School"
+  "4" => "Education",
+  "5" => "Mixed"
 );
 $lang_ger['ACTIVITY_TOSTRING'] = array(
   "-1" => "Abwesend",
@@ -22,7 +23,8 @@ $lang_ger['ACTIVITY_TOSTRING'] = array(
   "1" => "Urlaub",
   "2" => "Sonderurlaub",
   "3" => "Krankenstand",
-  "4" => "Berufsschule"
+  "4" => "Weiterbildung",
+  "5" => "Gemischt"
 );
 
 $lang_eng['ACTIVE'] = 'Active';
@@ -241,6 +243,9 @@ $lang_ger['EXPECTED'] = 'Erwartet';
 $lang_eng['EXPECTED_HOURS'] = 'Expected Hours';
 $lang_ger['EXPECTED_HOURS'] = 'Erwartete Stunden';
 
+$lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
+$lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
+
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 
@@ -354,6 +359,9 @@ $lang_ger['MARK_AS_ABSENT'] = 'Als Abwesend eintragen';
 
 $lang_eng['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
 $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
+
+$lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
+$lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur die Anfrage, NICHT die eigentlichen Stunden!';
 
 $lang_eng['MINUTES'] = 'Minutes';
 $lang_ger['MINUTES'] = 'Minuten';
@@ -520,12 +528,18 @@ $lang_ger['REQUESTS'] = "Anfragen";
 $lang_eng['REQUEST_TOSTRING'] = array(
   "vac" => "Vacation",
   "acc" => "New Account",
-  "log" => "Time Change"
+  "log" => "Time Change",
+  "scl" => "Education",
+  "spl" => "Special Leave",
+  "brk" => "Missing Break"
 );
 $lang_ger['REQUEST_TOSTRING'] = array(
   "vac" => "Urlaub",
   "acc" => "Neuer Account",
-  "log" => "Zeitänderung"
+  "log" => "Zeitänderung",
+  "scl" => "Weiterbildung",
+  "spl" => "Sonderurlaub",
+  "brk" => "Fehlende Pause"
 );
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
@@ -617,6 +631,9 @@ $lang_ger['TODAY'] = 'Heute';
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';
 
+$lang_eng['TYPE'] = 'Type';
+$lang_ger['TYPE'] = 'Art';
+
 $lang_eng['UNDO'] ='Undo';
 $lang_ger['UNDO'] = 'Rückgängig';
 
@@ -686,8 +703,8 @@ $lang_ger['VIEW_TIMESTAMPS'] = 'Zeitstempel Ansehen';
 $lang_eng['VIEW_USER'] = 'View Users';
 $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
 
-$lang_eng['VOCATIONAL_SCHOOL'] = 'Vocational School';
-$lang_ger['VOCATIONAL_SCHOOL'] = 'Berufsschule';
+$lang_eng['VOCATIONAL_SCHOOL'] = 'Training';
+$lang_ger['VOCATIONAL_SCHOOL'] = 'Weiterbildung';
 
 $lang_eng['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
 $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';

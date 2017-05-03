@@ -138,7 +138,7 @@ require "language.php";
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css">
   <script src='../plugins/select2/js/select2.js'></script>
 
   <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">

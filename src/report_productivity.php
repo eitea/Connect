@@ -147,7 +147,7 @@ endforeach;
       }
       ?>
     </select>
-    <button class="btn btn-warning btn-sm" type="submit" name="filterUserIDs" value="<?php echo $filterIDs; ?>" form="FILTER_FORM"> + </button>
+    <button class="btn btn-warning " type="submit" name="filterUserIDs" value="<?php echo $filterIDs; ?>" form="FILTER_FORM"> + </button>
   </div>
 
   <script>

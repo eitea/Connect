@@ -103,6 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <span class="input-group-addon"> - </span>
         <input id="calendar2" type="text" maxlength="7" class="form-control"  name="filterDateTo" value="<?php echo substr($filterDateTo,0,7); ?>">
       </div>
+      <br>
     </div>
     <div class="col-md-3 text-right"> <!-- Filter User -->
       <select name='filteredUserID' style="width:200px" class="js-example-basic-single">
@@ -130,7 +131,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </select>
     </div>
     <div class="col-sm-1">
-      <button id="myFilter" type="submit" class="btn btn-sm btn-warning" name="filter" value="1">Filter</button>
+      <button id="myFilter" type="submit" class="btn btn-warning" name="filter" value="1">Filter</button>
     </div>
   </div>
   <script>

@@ -49,7 +49,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <option value="1" <?php if($filterStatus == 1) echo 'selected'; ?>><?php echo $lang['OFFERSTATUS_TOSTRING'][1]; ?></option>
     <option value="2" <?php if($filterStatus == 2) echo 'selected'; ?>><?php echo $lang['OFFERSTATUS_TOSTRING'][2]; ?></option>
   </select>
-  <button type="submit" class="btn btn-warning btn-sm">Filter</button>
+  <button type="submit" class="btn btn-warning ">Filter</button>
 </form>
   <br><hr><br>
   <table class="table table-hover">

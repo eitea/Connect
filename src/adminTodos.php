@@ -53,8 +53,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   //user Requests
-  if(isset($_POST['okay'])){ //vacation
+  if(isset($_POST['okay'])){ //vacation, special leave or school
     $requestID = $_POST['okay'];
+    $result = $conn->query("SELECT requestType FROM userRequestsData WHERE id = $requestID");
+    $type = ($result->fetch_assoc())['requestType'];
+
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
@@ -67,7 +70,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $expectedMinutes = ($expected * 60) % 60;
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', 0)";
+          if($type == 'vac'){
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', 0)";
+          } elseif($type == 'scl'){
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '4', 0)";
+          } elseif($type == 'spl'){
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '2', 0)";
+          }
           $conn->query($sql);
           echo mysqli_error($conn);
         }
@@ -113,6 +122,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
+  //break
+  if(isset($_POST['okay_brk'])){ //do nothing
+    $requestID = intval($_POST['okay_brk']);
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+  } elseif(isset($_POST['nokay_brk'])){
+    $requestID = intval($_POST['nokay_brk']);
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+    //delete break
+    $result = $conn->query("SELECT requestID FROM $userRequests WHERE id = $requestID");
+    $bookingID = ($result->fetch_assoc())['requestID'];
+    $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
+    echo $conn->error;
+  }
   echo mysqli_error($conn);
 }
 ?>
@@ -146,7 +170,7 @@ if($result && $result->num_rows > 0):
               echo '<td> --- </td>';
               echo '<td class="text-center"><button type="submit" class="btn btn-default" name="okay_acc" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_acc" value="'.$row['userID'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button></td>';
-            } elseif($row['requestType'] == 'vac') {
+            } elseif($row['requestType'] == 'vac' || $row['requestType'] == 'spl' || $row['requestType'] == 'scl') {
               echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
               echo '<td>'. $row['requestText'].'</td>';
               echo '<td><div class="input-group">';
@@ -163,6 +187,15 @@ if($result && $result->num_rows > 0):
               echo '<span class="input-group-btn">';
               echo '<button type="submit" class="btn btn-default" name="okay_log" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_log" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
+              echo '</span></div></td>';
+            } elseif($row['requestType'] == 'brk') {
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
+              echo '<td></td>';
+              echo '<td><div class="input-group">';
+              echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<span class="input-group-btn">';
+              echo '<button type="submit" class="btn btn-default" name="okay_brk" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_brk" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             }
             echo '</tr>';
