@@ -38,6 +38,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $from = carryOverAdder_Hours($from, $timeToUTC);
       $to = carryOverAdder_Hours($to, $timeToUTC);
       $conn->query("INSERT INTO $userRequests (userID, fromDate, toDate, requestType, requestID) VALUES($userID, '$from', '$to', 'brk', $insertId)");
+      //update breakCredit
+      $breakDiff = timeDiff_Hours($from, $to);
+      $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + $breakDiff) WHERE indexIM = $timestampID");
     }
     echo mysqli_error($conn);
   }

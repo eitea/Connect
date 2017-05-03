@@ -123,7 +123,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //break
-  if(isset($_POST['okay_brk'])){ //do nothing
+  if(isset($_POST['okay_brk'])){ //does nothing
     $requestID = intval($_POST['okay_brk']);
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
@@ -131,9 +131,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $requestID = intval($_POST['nokay_brk']);
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
-    //delete break
     $result = $conn->query("SELECT requestID FROM $userRequests WHERE id = $requestID");
     $bookingID = ($result->fetch_assoc())['requestID'];
+    //reupdate breakCredit
+    $result = $conn->query("SELECT timestampID, start, end FROM $projectBookingTable WHERE id = $bookingID");
+    $row = $result->fetch_assoc();
+    $timestampID = $row['timestampID'];
+    $breakDiff = timeDiff_Hours($row['start'], $row['end']);
+    $conn->query("UPDATE $logTable SET breakCredit = (breakCredit - $breakDiff) WHERE indexIM = $timestampID");
+    //delete break
     $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
     echo $conn->error;
   }
