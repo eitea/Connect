@@ -804,7 +804,10 @@ if($row['version'] < 80){
   }
 }
 
-//if($row['version'] < 81){}
+if($row['version'] < 81){
+  $sql = "DELETE FROM "
+
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

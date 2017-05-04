@@ -1,7 +1,7 @@
 <?php require_once 'header.php'; ?>
 <?php enableToBookings($userID);?>
 <?php
-$sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
+$sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'";
 $result = mysqli_query($conn, $sql);
 if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
@@ -16,7 +16,7 @@ if($result && $result->num_rows > 0){
 
 //ADDENDUMS
 $request_addendum = array();
-$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //168 = 7 days
+$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
 while($result && ($row = $result->fetch_assoc())){
   $i = $row['indexIM'];
   $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");

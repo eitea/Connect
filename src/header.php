@@ -154,7 +154,9 @@ document.onreadystatechange = function () {
   }
 }
 $(document).ready(function() {
-  $(".js-example-basic-single").select2();
+  if ($(".js-example-basic-single")[0]){
+    $(".js-example-basic-single").select2();
+  }
 
   if ($('#seconds').length) { //something like a if(exists(..))
     var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;

@@ -4,25 +4,27 @@ function checkIn($userID) {
   $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) . ' %';
   $timeToUTC =  $_SESSION['timeToUTC'];
 
-  $sql = "SELECT * FROM $logTable WHERE userID = $userID
-  AND status = '0'
-  AND time LIKE '$timeIsLikeToday'";
+  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday'";
 
   $result = mysqli_query($conn, $sql);
-  if($result && $result->num_rows > 0){ //user already stamped in today
+  if($result && $result->num_rows > 0){ //user already has a stamp for today
     $row = $result->fetch_assoc();
     $diff = timeDiff_Hours($row['timeEnd'], getCurrentTimestamp());
     if($diff <= 0){
       $diff = 0;
     }
-    //create a break stamping
-    $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break', 'break')";
-    $conn->query($sql);
-    echo mysqli_error($conn);
-    //update timestamp
-    $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
-    $conn->query($sql);
-    echo mysqli_error($conn);
+    if(!$row['status']){
+      //create a break stamping
+      $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break', 'break')";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+      //update timestamp
+      $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', breakCredit = (breakCredit + $diff) WHERE indexIM =". $row['indexIM'];
+      $conn->query($sql);
+      echo mysqli_error($conn);
+    } else {
+      echo "Hm.";
+    }
   } else { //create new stamp
     $sql = "INSERT INTO $logTable (time, userID, status, timeToUTC) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC);";
     $conn->query($sql);
