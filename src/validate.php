@@ -82,7 +82,7 @@ function enableToERP($userID){
 
 function denyToContainer(){
   if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
-    die("Feature not accessible in current environment.")
+    die("Feature not accessible in current environment.");
   }
 }
 ?>
