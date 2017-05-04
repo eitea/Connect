@@ -122,7 +122,7 @@ if(isset($_POST['logoUpload'])){
     //delete old Logo if exists
     $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
     if($result && ($row = $result->fetch_assoc())){
-      if($row['logo']){
+      if(file_exists($row['logo'])){
         unlink($row['logo']);
       }
     }
