@@ -25,7 +25,7 @@ $sql = "INSERT INTO $intervalTable (userID) VALUES (1);";
 $conn->query($sql);
 
 //insert roletable
-$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, canStamp) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
+$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, canStamp) VALUES(1, 'TRUE', 'TRUE');";
 $conn->query($sql);
 
 //insert ldap config

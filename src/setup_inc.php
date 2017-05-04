@@ -76,7 +76,7 @@ $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
   companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-',
-  logo VARCHAR(20),
+  logo VARCHAR(40),
   address VARCHAR(100),
   phone VARCHAR(100),
   mail VARCHAR(100),
