@@ -199,7 +199,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             $sql = "SELECT end FROM $projectBookingTable WHERE timestampID = " . $calculator->indecesIM[$i] ." AND bookingType = 'project' ORDER BY end DESC";
             $result = $conn->query($sql);
-            if($result && $result->num_rows > 0) {
+            if($result && $result->num_rows > 0){
               $config2 = $result->fetch_assoc();
 
               $bookingTimeDifference = timeDiff_Hours($config2['end'], $calculator->end[$i]) * 60;
@@ -265,7 +265,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
             echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
             echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
-            echo '<td><button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';
+            if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
+              echo '<td><button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';
+            } else {
+              echo '<td><button type="button" class="btn" style="visibility:hidden">A</button></td>';
+            }
             if($bookingResults && $bookingResults->num_rows > 0){
               echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
               $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop

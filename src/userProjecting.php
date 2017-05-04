@@ -304,9 +304,7 @@ endif;
       endif;
       echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
       $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID=$setCompany");
-      if ($result && $result->num_rows > 1) {
-        echo "<option value='0'>".$lang['CLIENT']."...</option>";
-      }
+      echo "<option value='0'>".$lang['CLIENT']."...</option>";
       if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
           $cmpnyID = $row['id'];

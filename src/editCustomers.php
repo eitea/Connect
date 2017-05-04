@@ -143,7 +143,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="col-md-6">
           <select name="createCompany" class="js-example-basic-single btn-block" onchange="showClients(this.value)" style="width:150px">
             <?php
-            $query = "SELECT * FROM $companyTable";
+            $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
             $result = mysqli_query($conn, $query);
             if ($result && $result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {

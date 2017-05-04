@@ -90,12 +90,10 @@ if ($travellingFile) {
     }
   fclose($travellingFile);
 }
-//insert example report
+//insert main report
 $exampleTemplate = "<h1>Main Report</h1>
-<p>[REPEAT]</p>
-<p>[NAME]: [DATE] &nbsp;FROM &nbsp;[FROM] TO &nbsp;[TO]</p>
-<p>[INFOTEXT]</p>
-<p><br />[REPEAT END]</p>";
+[TIMESTAMPS] <br>
+[BOOKINGS] ";
 $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
 
 
