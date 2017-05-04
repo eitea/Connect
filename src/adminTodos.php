@@ -56,7 +56,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['okay'])){ //vacation, special leave or school
     $requestID = $_POST['okay'];
     $result = $conn->query("SELECT requestType FROM userRequestsData WHERE id = $requestID");
-    $type = ($result->fetch_assoc())['requestType'];
+    $row = $result->fetch_assoc();
+    $type = $row['requestType'];
 
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
@@ -132,7 +133,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
     $result = $conn->query("SELECT requestID FROM $userRequests WHERE id = $requestID");
-    $bookingID = ($result->fetch_assoc())['requestID'];
+    $row = $result->fetch_assoc();
+    $bookingID = $row['requestID'];
     //reupdate breakCredit
     $result = $conn->query("SELECT timestampID, start, end FROM $projectBookingTable WHERE id = $bookingID");
     $row = $result->fetch_assoc();
