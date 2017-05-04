@@ -138,7 +138,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $row = $result->fetch_assoc();
     $timestampID = $row['timestampID'];
     $breakDiff = timeDiff_Hours($row['start'], $row['end']);
-    $conn->query("UPDATE $logTable SET breakCredit = (breakCredit - $breakDiff) WHERE indexIM = $timestampID");
+    $conn->query("UPDATE logs SET breakCredit = (breakCredit - $breakDiff) WHERE indexIM = $timestampID");
     //delete break
     $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
     echo $conn->error;
