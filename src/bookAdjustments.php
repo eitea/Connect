@@ -56,7 +56,7 @@ echo mysqli_error($conn);
     }
     ?>
   </select>
-    <button type="submit" class="btn btn-warning btn-sm">Select</button>
+    <button type="submit" class="btn btn-warning ">Select</button>
 </form>
 
 <br><br><br>

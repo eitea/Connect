@@ -122,8 +122,11 @@ if(isset($_POST['logoUpload'])){
     //delete old Logo if exists
     $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
     if($result && ($row = $result->fetch_assoc())){
-      unlink($row['logo']);
+      if($row['logo']){
+        unlink($row['logo']);
+      }
     }
+    //set new logo
     $conn->query("UPDATE companyData SET logo = '$filename' WHERE id = $cmpID");
     echo mysqli_error($conn);
   } else {

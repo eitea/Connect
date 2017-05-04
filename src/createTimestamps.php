@@ -57,7 +57,7 @@ function isHoliday($ts){
 */
 
 function test_input($data) {
-  $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%&()+*~#-öäüÖÄÜ]/", " ", $data); //allowed charset
+  $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%()+*~#-öäüÖÄÜ]/", " ", $data); //allowed charset
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
@@ -128,6 +128,10 @@ function match_passwordpolicy($p, &$out = ''){
     }
   }
   return true;
+}
+
+function split_booking($booking, $splits){
+  
 }
 
 /*

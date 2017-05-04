@@ -79,4 +79,10 @@ function enableToERP($userID){
     die('Access denied. <a href="logout.php"> return</a>');
   }
 }
+
+function denyToContainer(){
+  if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
+    die("Feature not accessible in current environment.");
+  }
+}
 ?>

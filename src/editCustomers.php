@@ -74,7 +74,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     ?>
   </select>
-  &nbsp <button type="submit" class="btn btn-warning btn-sm" name='filter'> Filter</button>
+  &nbsp <button type="submit" class="btn btn-warning " name='filter'> Filter</button>
 
   <br><br>
   <?php $query = "SELECT * FROM $clientTable WHERE companyID = $filterCompanyID AND companyID IN (".implode(', ', $available_companies).")  ORDER BY name ASC";
@@ -143,7 +143,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="col-md-6">
           <select name="createCompany" class="js-example-basic-single btn-block" onchange="showClients(this.value)" style="width:150px">
             <?php
-            $query = "SELECT * FROM $companyTable";
+            $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
             $result = mysqli_query($conn, $query);
             if ($result && $result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -163,7 +163,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       <br>
       <div class="text-right">
         <br>
-        <button type="submit" class="btn btn-warning btn-sm" name="create"> <?php echo $lang['ADD']; ?></button>
+        <button type="submit" class="btn btn-warning " name="create"> <?php echo $lang['ADD']; ?></button>
       </div>
 
     </form>

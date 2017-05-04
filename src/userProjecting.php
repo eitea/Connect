@@ -1,48 +1,56 @@
-<?php include 'header.php'; ?>
+<?php require_once 'header.php'; ?>
 <?php enableToBookings($userID);?>
-<style>
-.robot-control{
-  display:none;
-}
-</style>
 <?php
 $sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' AND status = '0'";
 $result = mysqli_query($conn, $sql);
 if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
-  $start = substr(carryOverAdder_Hours($row['time'], $timeToUTC), 11, 19);
+  $start = substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5);
+  $end = substr(carryOverAdder_Hours(getCurrentTimestamp(), $row['timeToUTC']), 11, 5);
   $date = substr($row['time'], 0, 10);
   $indexIM = $row['indexIM']; //this value must not change
   $timeToUTC = $row['timeToUTC']; //just in case.
 } else {
   redirect("home.php");
 }
-?>
 
-<div class="page-header">
-  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
-</div>
+//ADDENDUMS
+$request_addendum = array();
+$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //168 = 7 days
+while($result && ($row = $result->fetch_assoc())){
+  $i = $row['indexIM'];
+  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
+  if($res_b && $res_b->num_rows > 0){
+    $row_b_prev = $res_b->fetch_assoc();
+    $endTime = $row_b_prev['end'];
+    while($row_b = $res_b->fetch_assoc()){ //next
+      if(timeDiff_Hours($endTime, $row_b['start']) > $bookingTimeBuffer/60){
+        //user will be FORCED to add, i know the next add has boundaries
+        $request_addendum['timeToUTC'] = $row['timeToUTC'];
+        $request_addendum['prev_row'] = $row_b_prev;
+        $request_addendum['cur_row'] = $row_b;
+        //for the post request, we have to know what he is currently editing
+        $indexIM = $i;
+        $date = substr($row_b['start'],0,10);
+        $timeToUTC = $row['timeToUTC'];
+        break;
+      }
+      $endTime = $row_b['end'];
+      $row_b_prev = $row_b; //trivial
+    }
+    if($request_addendum) break;
+  }
+}
 
-<?php
-$setCompany = $setClient = $setProject = 0;
 $showUndoButton = $showEmergencyUndoButton = 0;
-$insertInfoText = $insertInternInfoText = '';
+$insertInfoText = $insertInternInfoText = $missing_highlights = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all Operations.");
   }
-  if(isset($_POST['filterCompany'])){
-    $setCompany = intval($_POST['filterCompany']);
-  }
-  if(isset($_POST['filterClient'])){
-    $setClient = intval($_POST['filterClient']);
-  }
-  if(isset($_POST['filterProject'])){
-    $setProject = intval($_POST['filterProject']);
-  }
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))) {
+  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
@@ -56,10 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if(isset($_POST['addBreak'])){ //break
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
+        $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
         $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
+        $sql= "UPDATE logs SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
         $conn->query($sql);
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
@@ -93,21 +101,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
           if($accept){
             if(isset($_POST['addDrive'])){ //add as driving time
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
             } else { //normal booking
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
             }
             $conn->query($sql);
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
-            echo mysqli_error($conn);
+            redirect('userProjecting.php');
           } else {
             echo '<div class="alert alert-danger fade in">';
             echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Could not create entry: </strong>Required field may not be empty (orange highlighted).';
+            echo '<strong>Could not create entry: </strong>Required fields may not be empty. (Highlighted)';
             echo '</div>';
+            $missing_highlights = 'required-field';
           }
         } else {
           echo '<div class="alert alert-danger fade in">';
@@ -122,28 +131,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '<strong>Could not create entry: </strong>Entered times were invalid, click the infobutton for more detail.';
       echo '</div>';
     }
-  } elseif(isset($_POST['add'])) {
+  } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger fade in">';
     echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
+    echo '<strong>Could not create entry: </strong> Fields may not be empty. (Highlighted)';
+    $missing_highlights = 'required-field';
     echo '</div>';
   }
-  echo '<br>';
 }
 
 if(isset($_POST['undo']) && $_POST['undo'] == 'emergency'){
-  $conn->query("UPDATE $userTable SET emUndo = UTC_TIMESTAMP WHERE id = $userID");
+  $conn->query("UPDATE UserData SET emUndo = UTC_TIMESTAMP WHERE id = $userID");
 }
 
-$result = $conn->query("SELECT emUndo FROM $userTable WHERE id = $userID");
+$result = $conn->query("SELECT emUndo FROM UserData WHERE id = $userID");
 $row = $result->fetch_assoc();
 if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   $showEmergencyUndoButton = TRUE;
 }
+
+echo mysqli_error($conn);
 ?>
 
+<style>
+.robot-control{
+  display:none;
+}
+</style>
+
+<div class="page-header">
+  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
+</div>
 
 <form method="post">
+<?php if(!$request_addendum): ?>
   <div style='text-align:right;'>
     <?php if($showUndoButton): ?>
       <button type='submit' class="btn btn-warning" name='undo' value='noEmergency'>Undo</button>
@@ -242,7 +263,11 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
       </table>
     </div>
   </div>
-
+<?php
+else:
+  include "userProjecting_addendum.php";
+endif;
+?>
   <br><br><br>
 
   <div class="container-fluid">
@@ -258,7 +283,8 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   <div class="row">
     <div id=mySelections class="col-xs-9"><br>
       <?php if(count($available_companies) > 2): ?>
-        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0);">
+        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0)">
+          <option value="0"><?php echo $lang['COMPANY']; ?>...</option>
           <?php
           $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
           $result = mysqli_query($conn, $query);
@@ -266,32 +292,24 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
             while ($row = $result->fetch_assoc()) {
               $cmpnyID = $row['id'];
               $cmpnyName = $row['name'];
-              if($cmpnyID == $setCompany){
-                echo "<option selected name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-              } else {
-                echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-              }
+              echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
             }
           }
           ?>
         </select>
       <?php
+        $setCompany = 0;
       else:
         $setCompany = $available_companies[1];
       endif;
-      $query = "SELECT * FROM $clientTable WHERE companyID=".$available_companies[1];
-      $result = mysqli_query($conn, $query);
+      echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
+      $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID=$setCompany");
+      echo "<option value='0'>".$lang['CLIENT']."...</option>";
       if ($result && $result->num_rows > 0) {
-        echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0);">';
-        echo "<option name='act' value='0'>".$lang['CLIENT']."...</option>";
         while ($row = $result->fetch_assoc()) {
           $cmpnyID = $row['id'];
           $cmpnyName = $row['name'];
-          if($cmpnyID == $setClient){
-            echo "<option selected value='$cmpnyID'>$cmpnyName</option>";
-          } else {
-            echo "<option value='$cmpnyID'>$cmpnyName</option>";
-          }
+          echo "<option value='$cmpnyID'>$cmpnyName</option>";
         }
       }
       echo '</select>';
@@ -304,7 +322,7 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
 
   <div class="row">
     <div class="col-md-8">
-      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
+      <br><textarea class="form-control <?php echo $missing_highlights; ?>" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
     </div>
     <div class="col-md-4">
       <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
@@ -317,9 +335,9 @@ if(timeDiff_Hours($row['emUndo'], getCurrentTimestamp()) > 2){
   <div class="row">
     <div class="col-md-6">
       <div class="input-group input-daterange">
-        <input type="time" class="form-control" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
+        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo substr(carryOverAdder_Hours(getCurrentTimestamp(), $timeToUTC), 11, 5); ?>">
+        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />
         <div class="input-group-btn">
           <button class="btn btn-warning" type="submit"  name="add"> + </button>
         </div>
@@ -386,13 +404,4 @@ function hideMyDiv(o){
 }
 </script>
 
-<?php
-if($setProject){ //i want my filter displayed even if there were no bookings
-  echo '<script>';
-  echo "showClients($setCompany, $setClient);";
-  echo "showProjects($setClient, $setProject);";
-  echo "showProjectfields($setProject)";
-  echo '</script>';
-}
-?>
-<?php include 'footer.php'; ?>
+<?php require_once 'footer.php'; ?>

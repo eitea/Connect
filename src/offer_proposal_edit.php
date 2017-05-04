@@ -100,7 +100,7 @@ if($filterProposal){
       </select>
       <select id="proposalHint" style='width:200px' class="js-example-basic-single" name="filterProposal">
       </select>
-      <button type="submit" class="btn btn-warning btn-sm" name="apply_filter">Filter</button>
+      <button type="submit" class="btn btn-warning " name="apply_filter">Filter</button>
     </div>
   </div>
 

@@ -48,7 +48,7 @@ class Interval_Calculator{
     require "connection.php";
     $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
     if($result && ($row = $result->fetch_assoc())){
-      $this->beginDate = $beginDate = $row['beginningDate'];
+      $this->beginDate = $beginDate = substr($row['beginningDate'],0,11).'00:00:00';
       $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
     } else { //should never occur
       return "Invalid userID";
