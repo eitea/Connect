@@ -213,7 +213,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     //get the timestamp. if it doesnt exist -> display a biiiig fat error
     $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
     $result = mysqli_query($conn, $sql);
-    if($result && $result->num_rows>0){
+    if($result && $result->num_rows > 0){
       $row = $result->fetch_assoc();
       $indexIM = $row['indexIM'];
       $timeToUTC = $row['timeToUTC'];
@@ -818,6 +818,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </form>
   <?php endwhile;?>
+<?php endif; //end if($result && $result->num_rows > 0) ?>
 
 <div id="project_footer">
   <br><!-- BUTTONS -->
@@ -830,6 +831,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
       <button class="btn btn-default" <?php echo $diabled; ?> data-toggle="collapse" href="#add_bookings_collapse" title="Specify day and user to add bookings"><?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?></button>
     </div>
+    <?php if($result && $result->num_rows > 0): ?>
     <div class="col-xs-2">
       <form action="csvDownload.php" method="post" target='_blank'>
         <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
@@ -854,9 +856,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </form>
     </div>
+    <?php endif; //end if($result && $result->num_rows > 0) ?>
   </div>
 <br>
-  <!-- ADD BOOKING TO USER, IF DAY AND USER SELECTED -->
+
+  <!-- ADD BOOKING TO USER -->
 <form method="POST">
   <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
     <div class="well">
@@ -938,6 +942,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </form>
 <!-- END ADD-BOOKING FIELD -->
 </div>
-<?php endif; //end if($result && $result->num_rows > 0) ?>
+
 
 <?php include 'footer.php'; ?>
