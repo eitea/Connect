@@ -6,7 +6,6 @@
 
 <?php
 require_once 'Calculators/IntervalCalculator.php';
-$scrollPos = 0;
 
 $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
 $filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom)); // t returns the number of days in the month
@@ -24,9 +23,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterStatus'])){
     $filterStatus = $_POST['filterStatus'];
   }
-  if(isset($_POST['scrollPos'])){ //scrolling
-    $scrollPos = intval($_POST['scrollPos']);
-  }
+
   if(!empty($_POST['set_all_filters'])){
     $arr = explode(',', $_POST['set_all_filters']);
     $filterDateFrom = $arr[0];
@@ -122,12 +119,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         ?>
       </select>
       <br><br><!-- Filter Status -->
-      <select name='filterStatus' style="width:100px" class="js-example-basic-single">
+      <select name='filterStatus' style="width:150px" class="js-example-basic-single">
         <option value="" >---</option>
-        <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][0]; ?></option>
-        <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][1]; ?></option>
-        <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][2]; ?></option>
-        <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][3]; ?></option>
+        <?php
+        for($i = 0; $i < 6; $i++){
+          $selected = ($filterStatus == "$i") ? 'selected' : '';
+          echo "<option value='$i' $selected>".$lang['ACTIVITY_TOSTRING'][$i]."</option>";
+        }
+        ?>
       </select>
     </div>
     <div class="col-sm-1">
@@ -381,26 +380,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </tbody>
       </table>
       <br><br>
+
       <div class="text-right">
-        <br>
         <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>"><?php echo $lang['DELETE']; ?></button>
       </div>
-
-      <div id="menu_summary" class="tab-pane fade"><br>
-        <?php
-        $curID = $filterID;
-        include 'tableSummary.php';
-        ?>
-      </div>
-
-      <?php
-    else:
-      echo '<br><div class="alert alert-info">Select a User to Continue </div>';
-    endif;  //end if filterUserID
-    ?>
-
+    <?php else: echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>'; endif; ?>
   </form>
-
 
   <!-- Editing Modall -->
   <?php if($filterID) for($i = 0; $i < $calculator->days; $i++): ?>
@@ -431,7 +416,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $B = $calculator->end[$i];
                   }
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
-                  for($j = 0; $j < 6; $j++){
+                  for($j = 0; $j < 5; $j++){ //can't do mixed
                     if($calculator->activity[$i] == $j){
                       echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     } else {
@@ -479,7 +464,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
         </div>
       </div>
-      <input id="scrollPos" type="text" name="scrollPos" value="<?php echo $scrollPos; ?>" style="display:none;" />
     </form>
   <?php endfor; ?>
 
@@ -545,22 +529,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
   <?php endfor; ?>
-  <script>
-  window.onload = function () {
-    var value = $("#scrollPos").val();
-    if (value != 0 ) {
-      setTimeout(function(){
-        window.scrollTo(0, value);
-      }, 200);
-    }
-  }
-  $(document).ready(function() {
-    // When scrolling happens....
-    window.onscroll = function (e) {
-      $("#scrollPos").val($("#body_container").scrollTop());
-    }
-  });
-  </script>
 
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

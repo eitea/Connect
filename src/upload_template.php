@@ -4,11 +4,11 @@ if(isset($_POST["templateUpload"])) {
     echo "Error: " . $_FILES["file"]["error"] . "<br />";
   } elseif ($_FILES["fileToUpload"]["size"] > 500000) {
     echo "Sorry, your file is too large.";
-  } elseif ($_FILES["fileToUpload"]["type"] != "text/html") {
+  } elseif ($_FILES["fileToUpload"]["type"] != "application/sql") {
     echo "File must be .html";
   }
   if(empty($_POST['uploadName'])){
-    $name = basename($_FILES["fileToUpload"]["name"], '.html');
+    $name = basename($_FILES["fileToUpload"]["name"], '.sql');
   } else {
     $name = test_input($_POST['uploadName']);
   }

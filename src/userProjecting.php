@@ -238,8 +238,8 @@ echo mysqli_error($conn);
                 $extraFldRow = $extraFldRes->fetch_assoc();
                 if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
               }
-              if(!empty($row['exp_unit'])) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
-              if(!empty($row['exp_price'])) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
+              if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
+              if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
               if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
 
               echo "<tr>";
@@ -337,10 +337,10 @@ endif;
   <div id="hide_expenses" class="row" style="display:none">
     <br>
     <div class="col-md-2">
-      <input type="number" step="any" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+      <input type="number" step="0.01" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
     </div>
     <div class="col-md-2">
-      <input type="number" step="any" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+      <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
     </div>
     <div class="col-md-8">
       <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />

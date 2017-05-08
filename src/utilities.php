@@ -182,7 +182,6 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
 
   //Make sure that there is a file
   if((!empty($_FILES[$file_field])) && ($_FILES[$file_field]['error'] == 0)) {
-
     // Get filename
     $file_info = pathinfo($_FILES[$file_field]['name']);
     $name = $file_info['filename'];
