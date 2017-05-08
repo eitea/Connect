@@ -94,12 +94,30 @@ class Interval_Calculator{
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
-      //special leave treated same as holiday
-      if($this->activity[$count] == '2'){
+      //special leave treated like holiday
+      if($this->activity[$count] == 2){
         $this->shouldTime[$count] = 0;
         $this->absolvedTime[$count] = 0;
         $this->end[$count] = $row['time'];
         $this->lunchTime[$count] = 0;
+      } elseif($this->activity[$count] == 4){
+        $this->start[$count] = false;
+        $this->end[$count] = false;
+        $this->absolvedTime[$count] = $this->shouldTime[$count];
+      }
+      //mixed Timestamps
+      if($this->activity[$count] == 5){
+        $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$this->indecesIM[$count]." AND mixedStatus != '-1'");
+        if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+          $this->start[$count] = $mixed_row['end'];
+        }
+        $mixed_absolved = ($this->end[$count] == '0000-00-00 00:00:00') ? 0 : timeDiff_Hours($this->start[$count], $this->end[$count]);
+        //too little
+        if($mixed_absolved < $this->shouldTime[$count]){
+          $this->absolvedTime[$count] = $this->shouldTime[$count] + $this->lunchTime[$count]; //match
+        } else { //overtime
+          $this->absolvedTime[$count] = $mixed_absolved;
+        }
       }
 
       //end of month calculations

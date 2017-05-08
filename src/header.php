@@ -258,30 +258,22 @@ $(document).ready(function() {
     $bookingTimeBuffer = 5;
   }
   //display checkin or checkout + disabled
-  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";
+  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0) { //open timestamps must be closed
-    $row = $result->fetch_assoc();
-    $diff = timeDiff_Hours($row['time'],getCurrentTimestamp());
-    $indexIM = $row['indexIM'];
-    if($diff > $cd/60){ //he has waited long enough to check out
-      $disabled = '';
-    } else {
-      $disabled = 'disabled';
-    }
     $buttonVal = $lang['CHECK_OUT'];
-    $checkInButton =  "<button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
+    $checkInButton =  "<button type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
     $showProjectBookingLink = TRUE;
   } else {
     $today = getCurrentTimestamp();
     $timeIsLikeToday = substr($today, 0, 10) ." %";
     $disabled = '';
 
-    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND status = '0' AND time LIKE '$timeIsLikeToday'";
+    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday' AND status = '0'";
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows > 0){
       $row = $result->fetch_assoc();
-      $diff = timeDiff_Hours($row['timeEnd'], $today);
+      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
       if($diff > $cd/60){ //he has waited long enough to check in
         $disabled = '';
       } else {

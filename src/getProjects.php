@@ -263,7 +263,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>TIMESTAMP REQUIRED: </strong>Could not create entry. No Timestamp found for that date and user, please create a check-in timestamp first.';
+      echo '<strong>TIMESTAMP REQUIRED: </strong>Could not create entry. No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
       echo '</div>';
     }
   } elseif(isset($_POST['add'])) {
@@ -534,7 +534,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $bookedQuery
   $filterProjectClientCompany $filterUserIDAdd
   $filterNoBreakAdd $filterNoDriveAdd
-  ORDER BY $projectBookingTable.end ASC";
+  ORDER BY $projectBookingTable.start ASC";
   /*
   $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
   LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)

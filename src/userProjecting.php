@@ -72,6 +72,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
       } else {
+        if(isset($_POST['addExpenses'])){
+          $expenses_price = test_input($_POST['expenses_price']);
+          $expenses_info = test_input($_POST['expenses_info']);
+          $expenses_unit = test_input($_POST['expenses_unit']);
+        } else {
+          $expenses_price = $expenses_info = $expenses_unit = '';
+        }
         if(isset($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);
           $accept = 'TRUE';
@@ -101,16 +108,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
           if($accept){
             if(isset($_POST['addDrive'])){ //add as driving time
-              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
-              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3)";
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             } else { //normal booking
-              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3)
-              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3)";
+              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             }
             $conn->query($sql);
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
-            redirect('userProjecting.php');
+            if($request_addendum) redirect('userProjecting.php');
           } else {
             echo '<div class="alert alert-danger fade in">';
             echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -217,7 +224,7 @@ echo mysqli_error($conn);
                 $icon = "fa fa-bookmark"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
               }
               $interninfo = $row['internInfo'];
-              $optionalinfo = '';
+              $expensesinfo = $optionalinfo = '';
               $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
               if($extraFldRes && $extraFldRes->num_rows > 0){
                 $extraFldRow = $extraFldRes->fetch_assoc();
@@ -231,6 +238,10 @@ echo mysqli_error($conn);
                 $extraFldRow = $extraFldRes->fetch_assoc();
                 if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
               }
+              if(!empty($row['exp_unit'])) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
+              if(!empty($row['exp_price'])) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
+              if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
+
               echo "<tr>";
               echo "<td><i class='$icon'></i></td>";
               echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
@@ -241,7 +252,7 @@ echo mysqli_error($conn);
               echo "<td style='text-align:left'>";
               if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
               if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
-              echo '</td>';
+              if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
               echo "</tr>";
 
               $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
@@ -273,10 +284,13 @@ endif;
   <div class="container-fluid">
     <div class="checkbox">
       <div class="col-sm-3">
-        <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+        <input type="checkbox" name="addDrive" /> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> <?php echo $lang['TRAVEL_TIME']; ?>
       </div>
+      <div class="col-sm-3">
+        <input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?>
+      </div>
+      <div id="hide_break" class="col-sm-3"></div>
     </div>
-    <div id="hide_break"></div>
   </div>
 
   <!-- SELECTS -->
@@ -320,12 +334,25 @@ endif;
   </div>
   <!-- /SELECTS -->
 
+  <div id="hide_expenses" class="row" style="display:none">
+    <br>
+    <div class="col-md-2">
+      <input type="number" step="any" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+    </div>
+    <div class="col-md-2">
+      <input type="number" step="any" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+    </div>
+    <div class="col-md-8">
+      <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-md-8">
       <br><textarea class="form-control <?php echo $missing_highlights; ?>" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);'><?php echo $insertInfoText; ?></textarea><br>
     </div>
     <div class="col-md-4">
-      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
+      <br><textarea class="form-control required-field-subtle" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);'><?php echo $insertInternInfoText; ?></textarea><br>
     </div>
   </div>
 
@@ -394,12 +421,11 @@ function showProjectfields(project){
     error : function(resp){}
   });
 }
-
-function hideMyDiv(o){
+function showMyDiv(o, toShow){
   if(o.checked){
-    document.getElementById('mySelections').style.display='none';
+    document.getElementById(toShow).style.display='block';
   } else {
-    document.getElementById('mySelections').style.display='inline';
+    document.getElementById(toShow).style.display='none';
   }
 }
 </script>

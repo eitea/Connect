@@ -243,6 +243,9 @@ $lang_ger['EXPECTED'] = 'Erwartet';
 $lang_eng['EXPECTED_HOURS'] = 'Expected Hours';
 $lang_ger['EXPECTED_HOURS'] = 'Erwartete Stunden';
 
+$lang_eng['EXPENSES'] = 'Expenses';
+$lang_ger['EXPENSES'] = 'Spesen';
+
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 
@@ -630,6 +633,9 @@ $lang_ger['TODAY'] = 'Heute';
 
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';
+
+$lang_eng['TRAVEL_TIME'] = 'Travel Time';
+$lang_ger['TRAVEL_TIME'] = 'Fahrzeit';
 
 $lang_eng['TYPE'] = 'Type';
 $lang_ger['TYPE'] = 'Art';

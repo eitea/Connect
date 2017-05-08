@@ -805,9 +805,43 @@ if($row['version'] < 80){
 }
 
 if($row['version'] < 81){
-  $sql = "DELETE FROM "
+  $sql = "ALTER TABLE projectBookingData MODIFY COLUMN bookingType ENUM('project', 'break', 'drive', 'mixed')";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added mixed booking type';
+  }
 
+  $sql = "ALTER TABLE projectBookingData ADD COLUMN mixedStatus INT(3) DEFAULT -1";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added mixed status to bookings';
+  }
 }
+
+if($row['version'] < 82){
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_info TEXT";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added expenses info to bookings';
+  }
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_price DECIMAL(10,2)";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added expenses price to bookings';
+  }
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_unit DECIMAL(10,2)";
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    echo '<br> Added expenses quantity to bookings';
+  }
+}
+
+//if($row['version'] < 83){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
@@ -816,12 +850,12 @@ $conn->query($sql);
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
 ?>
 <script type="text/javascript">
-  window.setInterval(function(){
-    window.location.href="home.php";
-  }, 6000);
+window.setInterval(function(){
+  window.location.href="home.php";
+}, 6000);
 </script>
 <noscript>
-<meta http-equiv="refresh" content="0;url='.$url.'" />';
+  <meta http-equiv="refresh" content="0;url='.$url.'" />';
 </noscript>
 </div>
 </body>

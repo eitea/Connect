@@ -200,7 +200,10 @@ i{
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
 }
-
+.required-field-subtle:focus{
+  border: 1px solid #fbc871;
+  box-shadow: 0 0 2px #fbc871;
+}
 .alert-over{
   position:fixed;
   z-index: 50;

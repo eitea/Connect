@@ -107,7 +107,6 @@ $("#calendar").datepicker({
         $corrections = 0;
       }
 
-      $absolvedHours = array();
       $accumulatedSaldo = $corrections;
       for($i = 0; $i < $calculator->days; $i++){
         if($calculator->end[$i] == '0000-00-00 00:00:00'){
@@ -115,9 +114,6 @@ $("#calendar").datepicker({
         } else {
           $endTime = $calculator->end[$i];
         }
-
-        $difference = timeDiff_Hours($calculator->start[$i], $endTime );
-        $absolvedHours[] = $difference - $calculator->lunchTime[$i];
 
         if($calculator->start[$i]){
           $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
@@ -130,7 +126,7 @@ $("#calendar").datepicker({
           $B = $calculator->end[$i];
         }
 
-        $theSaldo = round($difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i], 2);
+        $theSaldo = round($calculator->absolvedTime[$i] - $calculator->shouldTime[$i], 2);
         $saldoStyle = '';
         if($theSaldo < 0){
           $saldoStyle = 'style=color:#fc8542;'; //red
@@ -138,11 +134,11 @@ $("#calendar").datepicker({
           $saldoStyle = 'style=color:#6fcf2c;'; //green
         }
         $neutralStyle = '';
-        if($calculator->shouldTime[$i] == 0 && $difference == 0){
+        if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
           $neutralStyle = "style=color:#c7c6c6;";
         }
 
-        $accumulatedSaldo += $difference - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
+        $accumulatedSaldo += $theSaldo;
 
         echo "<tr $neutralStyle>";
         echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
@@ -152,7 +148,7 @@ $("#calendar").datepicker({
         echo "<td>" . substr($B,11,5) . "</td>";
         echo "<td>" . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]] . "</td>";
         echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
-        echo "<td>" . displayAsHoursMins($difference - $calculator->lunchTime[$i]) . "</td>";
+        echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i]) . "</td>";
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
         echo "<td><button type='submit' form='form1' class='btn btn-default' value='".$calculator->indecesIM[$i].' '.$calculator->date[$i]."' name='aButton' ><i class='fa fa-pencil'></i></button></td>";
