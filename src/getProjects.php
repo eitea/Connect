@@ -146,7 +146,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hours = timeDiff_Hours($new_A, $new_B);
         $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
         $conn->query($sql);
-        echo mysqli_error($conn);
       }
       if(!mysqli_error($conn)){
         echo '<div class="alert alert-success alert-over fade in">';
@@ -156,8 +155,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     } else {
       echo '<div class="alert alert-danger alert-over fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Could not change entry: </strong>Input was not correct.';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>Input incorrect.';
       echo '</div>';
     }
     echo mysqli_error($conn);
@@ -199,9 +198,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
             $conn->query($sql);
-            echo mysqli_error($conn);
           }
         }
+      }
+      if(!mysqli_error($conn)){
+        echo '<div class="alert alert-success alert-over fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo $lang['OK_SAVE'];
+        echo '</div>';
       }
     } //end if isset charged
   }
@@ -275,23 +279,45 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
               }
               $conn->query($sql);
-              echo mysqli_error($conn);
+              if(mysqli_error($conn)){
+                echo mysqli_error($conn);
+              } else {
+                echo '<div class="alert alert-success fade in">';
+                echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                echo $lang['OK_ADD'];
+                echo '</div>';
+              }
               $insertInfoText = $insertInternInfoText = '';
             } else {
-              $error_output = $lang['ERROR_MISSING_FIELDS'];
+              echo '<div class="alert alert-danger alert-over fade in">';
+              echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+              echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
+              echo '</div>';
             }
           } else {
-            $error_output = $lang['ERROR_MISSING_SELECTION'];
+            echo '<div class="alert alert-danger alert-over fade in">';
+            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
+            echo '</div>';
           }
         }
       } else {
-        $error_output = $lang['ERROR_TIMES_INVALID'];
+        echo '<div class="alert alert-danger alert-over fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
+        echo '</div>';
       }
     } else {
-      $error_output = $lang['ERROR_MISSING_TIMESTAMP'];
+      echo '<div class="alert alert-danger alert-over fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_TIMESTAMP'];
+      echo '</div>';
     }
   } elseif(isset($_POST['add'])) {
-    $error_output = $lang['ERROR_MISSING_FIELDS'];
+    echo '<div class="alert alert-danger alert-over fade in">';
+    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
+    echo '</div>';
   }
 } //end if POST
 ?>
@@ -356,19 +382,7 @@ function changeValue(cVal, id, val){
   <form method='post'>
   <div id="project_filters" class="container-fluid">
     <div class="page-header">
-      <div class="row">
-        <div class="col-sm-4">
-          <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
-        </div>
-        <div class="col-sm-8">
-          <?php if($error_output): ?>
-          <div class="alert alert-danger fade in">
-            <a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Error: </strong> <?php echo $error_output; ?>
-          </div>
-          <?php endif; ?>
-        </div>
-      </div>
+      <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
     </div>
     <div class="col-xs-3 custom">
       <!-- SELECT COMPANY -->

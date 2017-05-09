@@ -506,6 +506,7 @@ $(document).ready(function(){
                     }
                     ?>
                   </div>
+                  <small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small>
                 </div>
               </div>
               <br><br>

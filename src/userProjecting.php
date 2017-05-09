@@ -50,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     die("Bot detected. Aborting all Operations.");
   }
 
+
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
@@ -115,35 +116,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             }
             $conn->query($sql);
+            if(mysqli_error($conn)){
+              echo mysqli_error($conn);
+            } else {
+              echo '<div class="alert alert-success fade in">';
+              echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+              echo $lang['OK_ADD'];
+              echo '</div>';
+            }
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
             if($request_addendum) redirect('userProjecting.php');
           } else {
             echo '<div class="alert alert-danger fade in">';
-            echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Could not create entry: </strong>Required fields may not be empty. (Highlighted)';
+            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
             echo '</div>';
             $missing_highlights = 'required-field';
           }
         } else {
           echo '<div class="alert alert-danger fade in">';
           echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-          echo '<strong>Could not create entry: </strong>No Project selected.';
+          echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
           echo '</div>';
         }
       }
     } else {
       echo '<div class="alert alert-danger fade in">';
       echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Could not create entry: </strong>Entered times were invalid, click the infobutton for more detail.';
+      echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
       echo '</div>';
     }
   } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong> Fields may not be empty. (Highlighted)';
-    $missing_highlights = 'required-field';
+    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
     echo '</div>';
+    $missing_highlights = 'required-field';
   }
 }
 

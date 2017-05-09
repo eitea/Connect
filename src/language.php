@@ -240,6 +240,9 @@ $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Ange
 $lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
 $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
 
+$lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in your settings.';
+$lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten unter den Einstellung nachtragen.';
+
 $lang_eng['ERROR_MISSING_FIELDS'] = 'Fields are missing. Please fill out every required field.';
 $lang_ger['ERROR_MISSING_FIELDS'] = 'Fehlende Felder. Alle benötigten Felder müssen ausgefüllt werden.';
 
@@ -360,6 +363,9 @@ $lang_ger['INFO_CHECKIN'] = 'Checkin wurde erkannt.';
 $lang_eng['INFO_CHECKOUT'] = 'Check-Out recognized! This page will refresh in 2 Minutes.';
 $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minuten aktualisiert.';
 
+$lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
+$lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
+
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
 
@@ -452,6 +458,9 @@ $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
 
 $lang_eng['OK_SAVE'] = 'Changes were successfully saved.';
 $lang_ger['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
+
+$lang_eng['OK_ADD'] = 'Entry was added.';
+$lang_ger['OK_ADD'] = 'Eintrag wurde hinzugefügt.';
 
 $lang_eng['OPTIONS'] = 'Options';
 $lang_ger['OPTIONS'] = 'Optionen';
