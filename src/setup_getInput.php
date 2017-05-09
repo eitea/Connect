@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
-
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
   <script src='../plugins/select2/js/select2.js'></script>
 </head>
@@ -18,31 +17,7 @@ $(document).ready(function() {
 </script>
 
 <?php
-function redirect($url){
-  if (!headers_sent()) {
-    header('Location: '.$url);
-    exit;
-  } else {
-    echo '<script type="text/javascript">';
-    echo 'window.location.href="'.$url.'";';
-    echo '</script>';
-    echo '<noscript>';
-    echo '<meta http-equiv="refresh" content="0;url='.$url.'" />';
-    echo '</noscript>'; exit;
-  }
-}
-
-//leave only numbers and letters
-function clean($string) {
-  return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
-}
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-
+$accept = false;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
     $myfile = fopen('connection_config.php', 'w');
@@ -57,24 +32,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!file_exists('connection_config.php')){
       die('Permission denied. Please grant PHP permission to create files.');
     } else {
+      $accept = true;
       $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
-      $companyName = rawurlencode(test_input($_POST['companyName']));
-      $companyType = rawurlencode(test_input($_POST['type']));
-      $firstname = rawurlencode(test_input($_POST['firstname']));
-      $lastname = rawurlencode(test_input($_POST['lastname']));
-      $loginname = rawurlencode(clean($_POST['localPart']) .'@'.clean($_POST['domainPart']));
-
-      echo "<script> var b = document.getElementById('continueButton'); b.disabled = true; b.innerHTML = 'Please wait...'; </script>";
-      redirect("setup.php?companyName=$companyName&companyType=$companyType&psw=$psw&first=$firstname&last=$lastname&login=$loginname");
     }
   } else {
     echo 'Missing Fields. <br><br>';
   }
 }
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
 ?>
 
 <body class="text-center">
-  <form method='post'>
+  <form id="setup_form" method='post'>
     <h1>Login Data</h1><br><br>
 
     <div class="row">
@@ -84,7 +59,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon" style=min-width:150px>
               Firstname
             </span>
-            <input type="text" class="form-control" name="firstname" placeholder="Firstname..">
+            <input type="text" class="form-control" name="firstname" placeholder="Firstname.." value="<?php if($accept) echo $_POST['firstname']; ?>" />
           </div>
         </div>
       </div>
@@ -94,7 +69,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon" style=min-width:150px>
               Lastname
             </span>
-            <input type="text" class="form-control" name="lastname" placeholder="Lastname..">
+            <input type="text" class="form-control" name="lastname" placeholder="Lastname.." value="<?php if($accept) echo $_POST['lastname']; ?>" />
           </div>
         </div>
       </div>
@@ -107,7 +82,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon text-warning" style=min-width:150px>
               Login Password
             </span>
-            <input type='password' class="form-control" name='adminPass' value=''>
+            <input type='password' class="form-control" name='adminPass' value="<?php if($accept) echo $psw; ?>">
           </div>
         </div>
       </div>
@@ -119,7 +94,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon text-warning" style=min-width:150px>
               Company Name
             </span>
-            <input type='text' class="form-control" name='companyName' placeholder='Company Name'>
+            <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php if($accept) echo $_POST['companyName']; ?>">
           </div>
         </div>
       </div>
@@ -127,12 +102,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="form-group">
           <select name="type" class="js-example-basic-single btn-block">
             <option selected>...</option>
-            <option value="GmbH">GmbH</option>
-            <option value="AG">AG</option>
-            <option value="OG">OG</option>
-            <option value="KG">KG</option>
-            <option value="EU">EU</option>
-            <option value="-">Sonstiges</option>
+            <option <?php if($accept && $_POST['type'] == "GmbH") echo "selected"; ?> value="GmbH">GmbH</option>
+            <option <?php if($accept && $_POST['type'] == "AG") echo "selected"; ?> value="AG">AG</option>
+            <option <?php if($accept && $_POST['type'] == "OG") echo "selected"; ?> value="OG">OG</option>
+            <option <?php if($accept && $_POST['type'] == "KG") echo "selected"; ?> value="KG">KG</option>
+            <option <?php if($accept && $_POST['type'] == "EU") echo "selected"; ?> value="EU">EU</option>
+            <option <?php if($accept && $_POST['type'] == "-") echo "selected"; ?> value="-">Sonstiges</option>
           </select>
         </div>
       </div>
@@ -144,11 +119,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="col-xs-6 col-xs-offset-3">
         <div class="form-group">
           <div class="input-group">
-            <input type='text' class="form-control" name='localPart' placeholder='name' >
+            <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php if($accept) echo $_POST['localPart']; ?>">
             <span class="input-group-addon text-warning">
               @
             </span>
-            <input type='text' class="form-control" name='domainPart' placeholder="domain.com">
+            <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php if($accept) echo $_POST['domainPart']; ?>">
           </div>
         </div>
         <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
@@ -224,4 +199,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
   </form>
+
+  <?php if($accept): ?>
+    <script>
+    var myForm = document.getElementById("setup_form");
+    myForm.action = "setup.php";
+    myForm.submit();
+    </script>
+  <?php endif; ?>
 </body>

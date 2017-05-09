@@ -20,8 +20,6 @@ if ($conn->connect_error) {
   echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
   die();
 }
-
-// Create database
 $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
 if($conn->query($sql)){
   echo "Database was created. <br>";
@@ -30,18 +28,19 @@ if($conn->query($sql)){
   echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
   die();
 }
-$conn->close();
 
+$conn->close();
 require 'connection.php';
 
-if(isset($_GET)){
-  $psw = $_GET['psw'];
-  $companyName = test_input(rawurldecode($_GET['companyName']));
-  $companyType = test_input(rawurldecode($_GET['companyType']));
-  $firstname = test_input(rawurldecode($_GET['first']));
-  $lastname = test_input(rawurldecode($_GET['last']));
-  $loginname = test_input(rawurldecode($_GET['login']));
+if(isset($_POST['adminPass'])){
+  $psw = $_POST['adminPass'];
+  $companyName = test_input($_POST['companyName']);
+  $companyType = test_input($_POST['type']);
+  $firstname = test_input($_POST['firstname']);
+  $lastname = test_input($_POST['lastname']);
+  $loginname = clean($_POST['localPart']) .'@'.clean($_POST['domainPart']);
 }
+echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
 function test_input($data) {
   $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%()+*~#-öäüÖÄÜ]/", " ", $data); //allowed charset
@@ -50,11 +49,11 @@ function test_input($data) {
   $data = htmlspecialchars($data);
   return $data;
 }
-
-echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
+function clean($string) {
+  return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+}
 
 require "setup_inc.php"; //creates all tables
-
 //define rest of necessary variables so setup_ins.php works:
 $holidayFile = '../Feiertage.txt';
 $travellingFile = fopen("../Laender.txt", "r");

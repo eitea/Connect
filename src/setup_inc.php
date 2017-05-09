@@ -1,6 +1,6 @@
 <?php
 /* SETTING UP A NEW TABLE:
-1. Put the name of your table as a new variable in connection_vars.php
+1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php
 3. Put your CREATE TABLE statement in setup_inc.php (this page), like in already existing code.
 4. increment the version number in version_number.php by 1.
 5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
