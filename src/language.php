@@ -354,6 +354,12 @@ $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 $lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
 $lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 
+$lang_eng['INFO_CHECKIN'] = 'You have been checked in.';
+$lang_ger['INFO_CHECKIN'] = 'Checkin wurde erkannt.';
+
+$lang_eng['INFO_CHECKOUT'] = 'Check-Out recognized! This page will refresh in 2 Minutes.';
+$lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minuten aktualisiert.';
+
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
 

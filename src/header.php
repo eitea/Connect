@@ -14,7 +14,7 @@ $setActiveLink = 'style="color:#ed9c21;"';
 require "connection.php";
 require "createTimestamps.php";
 require 'validate.php';
-//language require is below
+require "language.php";
 
 if($this_page != "editCustomer_detail.php"){
   unset($_SESSION['unlock']);
@@ -99,12 +99,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
     require "ckInOut.php";
     $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    $validation_output .= '<strong>Checkin/out recognized: </strong> Refresh in a few minutes.</div>';
-
     if(isset($_POST['stampIn'])){
       checkIn($userID);
+      $validation_output .= $lang['INFO_CHECKIN'].'</div>';
     } elseif(isset($_POST['stampOut'])){
       $error_output = checkOut($userID);
+      $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
     }
   } elseif(isset($_POST["GERMAN"])){
     $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
@@ -118,8 +118,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $validation_output = mysqli_error($conn);
   }
 }
-
-require "language.php";
 ?>
 
 <!DOCTYPE html>

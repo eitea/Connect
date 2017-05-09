@@ -110,6 +110,7 @@ if($result && $result->num_rows > 0): ?>
         } elseif ($row['status'] == 2) {
           $style="#13b436";
         }
+        
         echo "<tr>";
         echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
         echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
