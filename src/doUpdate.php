@@ -823,6 +823,9 @@ if($row['version'] < 82){
     echo mysqli_error($conn);
   }
 
+  //fix default projects
+  $conn->query("INSERT IGNORE INTO projectData (clientID, name) SELECT id, 'Diverses' FROM clientData WHERE companyID = 2");
+
 }
 
 //if($row['version'] < 83){}
