@@ -48,6 +48,7 @@ if(!$result || $result->num_rows <= 0){
   <?php endif; ?>
     <div class="col-xs-3">
       <div class="input-group">
+        <span class="input-group-addon"><?php echo $lang['TO']; ?></span>
         <input id="calendar" type="text" class="form-control from" name="newDate" value= <?php echo $currentDate; ?> >
         <span class="input-group-btn">
           <button class="btn btn-warning" type="submit">Filter</button>

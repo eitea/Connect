@@ -2,7 +2,7 @@
 if(isset($_POST['download_proposal'])){
   $proposalID = intval($_POST['download_proposal']);
 } else {
-die("Access denied.");
+  die("Access denied.");
 }
 
 require "../plugins/fpdf/fpdf.php";
@@ -28,7 +28,7 @@ class PDF extends FPDF {
     $this->SetY(-15);
     $this->SetFont('Times','',6);
     // Page number
-    $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+    $this->Cell(0,10,$this->PageNo().'/{nb}',0,0,'C');
   }
   function ImprovedTable($header, $data){
     $this->SetFillColor(200,200,200);
@@ -83,7 +83,11 @@ $result = $conn->query("SELECT *, companyData.name AS companyName, clientData.na
   INNER JOIN companyData ON clientData.companyID = companyData.id
   WHERE proposals.id = $proposalID");
 $row = $result->fetch_assoc();
-echo mysqli_error($conn);
+if(mysqli_error($conn) || empty($row['logo']) || empty($row['address'])){
+  echo mysqli_error($conn);
+  echo '<br> '.$lang['ERROR_MISSING_DATA']. "(Logo, Adr.)";
+  die();
+}
 
 $pdf = new PDF();
 $pdf->glob['logo'] = $row['logo'];

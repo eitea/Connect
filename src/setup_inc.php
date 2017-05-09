@@ -137,6 +137,9 @@ $sql = "CREATE TABLE $projectBookingTable (
   extra_1 VARCHAR(200) NULL DEFAULT NULL,
   extra_2 VARCHAR(200) NULL DEFAULT NULL,
   extra_3 VARCHAR(200) NULL DEFAULT NULL,
+  exp_info TEXT,
+  exp_price DECIMAL(10,2),
+  exp_unit DECIMAL(10,2),
   FOREIGN KEY (projectID) REFERENCES $projectTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE,
