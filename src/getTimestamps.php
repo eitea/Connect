@@ -6,7 +6,6 @@
 
 <?php
 require_once 'Calculators/IntervalCalculator.php';
-$scrollPos = 0;
 
 $filterDateFrom = substr(getCurrentTimestamp(),0,8) .'01 12:00:00';
 $filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom)); // t returns the number of days in the month
@@ -24,17 +23,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterStatus'])){
     $filterStatus = $_POST['filterStatus'];
   }
-  if(isset($_POST['scrollPos'])){ //scrolling
-    $scrollPos = intval($_POST['scrollPos']);
-  }
+
   if(!empty($_POST['set_all_filters'])){
     $arr = explode(',', $_POST['set_all_filters']);
-      $filterDateFrom = $arr[0];
-      $filterDateTo = $arr[1];
-      $filterID = $arr[2];
-      $filterStatus = $arr[3];
-    }
-    // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+    $filterDateFrom = $arr[0];
+    $filterDateTo = $arr[1];
+    $filterID = $arr[2];
+    $filterStatus = $arr[3];
+  }
+  // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
   if(isset($_POST['saveChanges'])){
     $imm = $_POST['saveChanges'];
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
@@ -122,12 +119,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         ?>
       </select>
       <br><br><!-- Filter Status -->
-      <select name='filterStatus' style="width:100px" class="js-example-basic-single">
+      <select name='filterStatus' style="width:150px" class="js-example-basic-single">
         <option value="" >---</option>
-        <option value="0" <?php if($filterStatus == '0'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][0]; ?></option>
-        <option value="1" <?php if($filterStatus == '1'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][1]; ?></option>
-        <option value="2" <?php if($filterStatus == '2'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][2]; ?></option>
-        <option value="3" <?php if($filterStatus == '3'){echo 'selected';} ?>><?php echo $lang['ACTIVITY_TOSTRING'][3]; ?></option>
+        <?php
+        for($i = 0; $i < 6; $i++){
+          $selected = ($filterStatus == "$i") ? 'selected' : '';
+          echo "<option value='$i' $selected>".$lang['ACTIVITY_TOSTRING'][$i]."</option>";
+        }
+        ?>
       </select>
     </div>
     <div class="col-sm-1">
@@ -192,7 +191,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $row = $result->fetch_assoc();
           $canBook = $row['canBook'];
 
-          if($calculator->end[$i] != '-' && $calculator->end[$i] != '0000-00-00 00:00:00' && $calculator->activity[$i] == 0 && $canBook == 'TRUE'){
+          if($calculator->end[$i] != '0000-00-00 00:00:00' && $calculator->activity[$i] == 0 && $canBook == 'TRUE'){
             $sql = "SELECT bookingTimeBuffer FROM $configTable";
             $result = $conn->query($sql);
             $config = $result->fetch_assoc();
@@ -215,7 +214,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               if($bookingTimeDifference < 0){
                 $style = "color:#f0621c;font-weight:bold"; //monsterred
               }
-              if($calculator->end[$i] != '-'){
+              if($calculator->end[$i]){
                 $tinyEndTime = substr(carryOverAdder_Hours($config2['end'], $calculator->timeToUTC[$i]),11,5);
               }
             }
@@ -246,7 +245,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
             LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
             WHERE timestampID = '".$calculator->indecesIM[$i]."' ORDER BY end ASC");
-            echo mysqli_error($conn);
 
             $neutralStyle = '';
             if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
@@ -265,17 +263,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
             echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
             echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
+            echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
-              echo '<td><button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';
+              echo '<button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';
             } else {
-              echo '<td><button type="button" class="btn" style="visibility:hidden">A</button></td>';
+              echo '<button type="button" class="btn" style="visibility:hidden">A</button>';
             }
             if($bookingResults && $bookingResults->num_rows > 0){
               echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
               $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
               $bookingResultsResults['timeToUTC'][] = $calculator->timeToUTC[$i];
             }
-            if($calculator->indecesIM[$i] != 0){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/></td>';}
+            if($calculator->indecesIM[$i] != 0){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/>';}
+            echo '</td>';
             echo "</tr>";
 
             $lunchbreakSUM += $calculator->lunchTime[$i];
@@ -380,37 +380,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </tbody>
       </table>
       <br><br>
+
       <div class="text-right">
-        <br>
         <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>"><?php echo $lang['DELETE']; ?></button>
       </div>
-
-      <div id="menu_summary" class="tab-pane fade"><br>
-        <?php
-        $curID = $filterID;
-        include 'tableSummary.php';
-        ?>
-      </div>
-
-      <?php
-    else:
-      echo '<br><div class="alert alert-info">Select a User to Continue </div>';
-    endif;  //end if filterUserID
-    ?>
-
+    <?php else: echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>'; endif; ?>
   </form>
-
 
   <!-- Editing Modall -->
   <?php if($filterID) for($i = 0; $i < $calculator->days; $i++): ?>
-  <form method="POST">
-    <div class="modal fade editingModal-<?php echo $i; ?>" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-md">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><?php echo substr($calculator->date[$i], 0, 10); ?></h4>
-          </div>
-          <div class="modal-body">
+    <form method="POST">
+      <div class="modal fade editingModal-<?php echo $i; ?>" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo substr($calculator->date[$i], 0, 10); ?></h4>
+            </div>
+            <div class="modal-body">
               <div class="row">
                 <div class="col-md-6">
                   <label><?php echo $lang['LUNCHBREAK']; ?></label>
@@ -430,7 +416,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $B = $calculator->end[$i];
                   }
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
-                  for($j = 0; $j < 4; $j++){
+                  for($j = 0; $j < 5; $j++){ //can't do mixed
                     if($calculator->activity[$i] == $j){
                       echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     } else {
@@ -470,16 +456,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   <div style="margin-top:5px;"><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><span style="margin-left:20px;"><?php echo $lang['OPEN']; ?></span></div>
                 </div>
               </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" name="saveChanges" class="btn btn-warning" title="Save" value="<?php echo $calculator->indecesIM[$i]; ?>"><?php echo $lang['SAVE']; ?></button>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" name="saveChanges" class="btn btn-warning" title="Save" value="<?php echo $calculator->indecesIM[$i]; ?>"><?php echo $lang['SAVE']; ?></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <input id="scrollPos" type="text" name="scrollPos" value="<?php echo $scrollPos; ?>" style="display:none;" />
-  </form>
+    </form>
   <?php endfor; ?>
 
   <!-- Projectbooking Modall -->
@@ -510,20 +495,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               <tbody>
                 <?php
                 do {
+                  $A = substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5);
+                  $B = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5);
+                  $C = $row['infoText'];
                   $icon = "fa fa-bookmark";
                   if($row['bookingType'] == 'break'){
                     $icon = "fa fa-cutlery";
                   } elseif($row['bookingType'] == 'drive'){
                     $icon = "fa fa-car";
+                  } elseif($row['bookingType'] == 'mixed'){
+                    $icon = "fa fa-plus";
+                    $A = $B = '';
+                    $C = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
                   }
                   echo '<tr>';
                   echo "<td><i class='$icon'></i></td>";
                   echo "<td>". $row['name'] ."</td>";
                   echo "<td>". $row['projectName'] ."</td>";
                   echo "<td>". substr($row['start'], 0, 10) ."</td>";
-                  echo "<td>". substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5) ."</td>";
-                  echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
-                  echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
+                  echo "<td>$A</td>";
+                  echo "<td>$B</td>";
+                  echo "<td style='text-align:left'>$C</td>";
                   echo '</tr>';
                 } while($row = $bookingResult->fetch_assoc());
                 ?>
@@ -537,23 +529,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
   <?php endfor; ?>
-
-  <script>
-  window.onload = function () {
-    var value = $("#scrollPos").val();
-    if (value != 0 ) {
-      setTimeout(function(){
-        window.scrollTo(0, value);
-      }, 200);
-    }
-  }
-  $(document).ready(function() {
-    // When scrolling happens....
-    window.onscroll = function (e) {
-      $("#scrollPos").val($("#body_container").scrollTop());
-    }
-  });
-  </script>
 
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

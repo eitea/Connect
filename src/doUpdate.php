@@ -766,48 +766,69 @@ if($row['version'] < 79){
   } else {
     echo mysqli_error($conn);
   }
-
-  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
-  INNER JOIN UserData ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND breakCredit < hoursOfRest";
-  $result = $conn->query($sql);
-  while($result && ($row = $result->fetch_assoc())){
-    $conn->query("UPDATE $logTable SET breakCredit = (breakCredit +" .$row['hoursOfRest'].") WHERE indexIM = ".$row['indexIM']);
-  }
-  if(mysqli_error($conn)){
-    echo mysqli_error($conn);
-  } else {
-    echo '<br> Updated new break values';
-  }
-}
-
-if($row['version'] < 80){
-  $sql = "ALTER TABLE logs MODIFY COLUMN status INT(3)";
-  if(mysqli_error($conn)){
-    echo mysqli_error($conn);
-  } else {
-    echo '<br> Added new log status';
-  }
-
-  $sql = "UPDATE logs SET status = (status - 2)";
-  if(mysqli_error($conn)){
-    echo mysqli_error($conn);
-  } else {
-    echo '<br> Adjusted log status';
-  }
-
-  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac'";
-  if(mysqli_error($conn)){
-    echo mysqli_error($conn);
-  } else {
-    echo '<br> Added school and special leave requests';
-  }
 }
 
 if($row['version'] < 81){
-  $sql = "DELETE FROM "
+  $sql = "ALTER TABLE logs MODIFY COLUMN status INT(3)";
+  if($conn->query($sql)){
+    echo '<br> Log savetype changes...';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "UPDATE logs SET status = (status - 2)";
+  if($conn->query($sql)){
+    echo '<br> ... Recalculations';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac'";
+  if($conn->query($sql)){
+    echo '<br> Extended request types';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
+if($row['version'] < 82){
+  $sql = "ALTER TABLE projectBookingData MODIFY COLUMN bookingType ENUM('project', 'break', 'drive', 'mixed')";
+  if($conn->query($sql)){
+    echo '<br> Extended booking Types';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE projectBookingData ADD COLUMN mixedStatus INT(3) DEFAULT -1";
+  if($conn->query($sql)){
+    echo '<br> Added mixed status';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_info TEXT";
+  if($conn->query($sql)){
+    echo '<br> Added expenses: description';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_price DECIMAL(10,2)";
+  if($conn->query($sql)){
+    echo '<br> Added expenses: price';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_unit DECIMAL(10,2)";
+  if($conn->query($sql)){
+    echo '<br> Added expenses: quantity';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  //fix default projects
+  $conn->query("INSERT IGNORE INTO projectData (clientID, name) SELECT id, 'Diverses' FROM clientData WHERE companyID = 2");
 
 }
+
+//if($row['version'] < 83){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
@@ -816,12 +837,12 @@ $conn->query($sql);
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
 ?>
 <script type="text/javascript">
-  window.setInterval(function(){
-    window.location.href="home.php";
-  }, 6000);
+window.setInterval(function(){
+  window.location.href="home.php";
+}, 6000);
 </script>
 <noscript>
-<meta http-equiv="refresh" content="0;url='.$url.'" />';
+  <meta http-equiv="refresh" content="0;url='.$url.'" />';
 </noscript>
 </div>
 </body>

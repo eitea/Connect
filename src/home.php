@@ -16,6 +16,12 @@
   </div>
 </div>
 
+<script type="text/javascript">
+setTimeout(function(){
+  location = ''
+},120000)
+</script>
+
 <?php
 $curID = $userID;
 include 'tableSummary.php'; //this is how it goes
@@ -131,17 +137,6 @@ $(function(){
       }
     }
   });
-  //increase values every 3 minutes, by 3 minutes
-  window.setInterval(function(){
-    if(myStatisticChart.data.datasets[0].data[2] > 0){
-      myStatisticChart.data.datasets[0].data[0] += 0.05; //0,05h = 3min
-      myStatisticChart.data.datasets[0].data[2] -= 0.05;
-    } else {
-      myStatisticChart.data.datasets[0].data[2] = 0;
-      myStatisticChart.data.datasets[0].data[3] += 0.05;
-    }
-    myStatisticChart.update(); //Calling update now animates the new positions
-  }, 180000);
 });
 </script>
 

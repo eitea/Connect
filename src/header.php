@@ -14,7 +14,7 @@ $setActiveLink = 'style="color:#ed9c21;"';
 require "connection.php";
 require "createTimestamps.php";
 require 'validate.php';
-//language require is below
+require "language.php";
 
 if($this_page != "editCustomer_detail.php"){
   unset($_SESSION['unlock']);
@@ -99,12 +99,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
     require "ckInOut.php";
     $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    $validation_output .= '<strong>Checkin/out recognized: </strong> Refresh in a few minutes.</div>';
-
     if(isset($_POST['stampIn'])){
       checkIn($userID);
+      $validation_output .= $lang['INFO_CHECKIN'].'</div>';
     } elseif(isset($_POST['stampOut'])){
       $error_output = checkOut($userID);
+      $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
     }
   } elseif(isset($_POST["GERMAN"])){
     $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
@@ -118,8 +118,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $validation_output = mysqli_error($conn);
   }
 }
-
-require "language.php";
 ?>
 
 <!DOCTYPE html>
@@ -258,30 +256,22 @@ $(document).ready(function() {
     $bookingTimeBuffer = 5;
   }
   //display checkin or checkout + disabled
-  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID AND status = '0' ";
+  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0) { //open timestamps must be closed
-    $row = $result->fetch_assoc();
-    $diff = timeDiff_Hours($row['time'],getCurrentTimestamp());
-    $indexIM = $row['indexIM'];
-    if($diff > $cd/60){ //he has waited long enough to check out
-      $disabled = '';
-    } else {
-      $disabled = 'disabled';
-    }
     $buttonVal = $lang['CHECK_OUT'];
-    $checkInButton =  "<button $disabled type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
+    $checkInButton =  "<button type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
     $showProjectBookingLink = TRUE;
   } else {
     $today = getCurrentTimestamp();
     $timeIsLikeToday = substr($today, 0, 10) ." %";
     $disabled = '';
 
-    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND status = '0' AND time LIKE '$timeIsLikeToday'";
+    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday' AND status = '0'";
     $result = mysqli_query($conn, $sql);
     if($result && $result->num_rows > 0){
       $row = $result->fetch_assoc();
-      $diff = timeDiff_Hours($row['timeEnd'], $today);
+      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
       if($diff > $cd/60){ //he has waited long enough to check in
         $disabled = '';
       } else {
@@ -391,12 +381,13 @@ $(document).ready(function() {
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                        <li><a <?php if($this_page == 'taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
+                        <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                       </ul>
                     </div>
                   </li>
-                  <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"> <i class="fa fa-database"></i> <span> DB Backup</span> </a></li>
+                  <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><i class="fa fa-database"></i> <span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
+                  <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><i class="fa fa-database"></i> <span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                   <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="templateSelect.php"> <i class="fa fa-file-pdf-o"></i> <span>Report Designer</span> </a></li><?php endif; ?>
                 </ul>
               </div>
@@ -409,7 +400,7 @@ $(document).ready(function() {
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php") {
+          } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php") {
             echo "<script>document.getElementById('adminOption_CORE').click();</script>";
           }
           ?>

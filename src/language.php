@@ -177,6 +177,12 @@ $lang_ger['DATE'] = 'Datum';
 $lang_eng['DAYS'] = 'Days';
 $lang_ger['DAYS'] = 'Tage';
 
+$lang_eng['DB_BACKUP'] = 'DB Backup';
+$lang_ger['DB_BACKUP'] = 'DB Sichern';
+
+$lang_eng['DB_RESTORE'] = 'DB Restore';
+$lang_ger['DB_RESTORE'] = 'DB Wiederherstellen';
+
 $lang_eng['DEACTIVATE'] = 'Deactivate';
 $lang_ger['DEACTIVATE'] = 'Deaktivieren';
 
@@ -231,6 +237,21 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
+$lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
+$lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
+
+$lang_eng['ERROR_MISSING_FIELDS'] = 'Fields are missing. Please fill out every required field.';
+$lang_ger['ERROR_MISSING_FIELDS'] = 'Fehlende Felder. Alle benötigten Felder müssen ausgefüllt werden.';
+
+$lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
+$lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
+
+$lang_eng['ERROR_MISSING_SELECTION'] = 'A selection was missing. Please check all selections';
+$lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie alle Auswahlmöglichkeiten.';
+
+$lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
+$lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben';
+
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
 
@@ -242,6 +263,9 @@ $lang_ger['EXPECTED'] = 'Erwartet';
 
 $lang_eng['EXPECTED_HOURS'] = 'Expected Hours';
 $lang_ger['EXPECTED_HOURS'] = 'Erwartete Stunden';
+
+$lang_eng['EXPENSES'] = 'Expenses';
+$lang_ger['EXPENSES'] = 'Spesen';
 
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
@@ -326,6 +350,15 @@ $lang_ger['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
 
 $lang_eng['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
 $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
+
+$lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
+$lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
+
+$lang_eng['INFO_CHECKIN'] = 'You have been checked in.';
+$lang_ger['INFO_CHECKIN'] = 'Checkin wurde erkannt.';
+
+$lang_eng['INFO_CHECKOUT'] = 'Check-Out recognized! This page will refresh in 2 Minutes.';
+$lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minuten aktualisiert.';
 
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
@@ -631,6 +664,9 @@ $lang_ger['TODAY'] = 'Heute';
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';
 
+$lang_eng['TRAVEL_TIME'] = 'Travel Time';
+$lang_ger['TRAVEL_TIME'] = 'Fahrzeit';
+
 $lang_eng['TYPE'] = 'Type';
 $lang_ger['TYPE'] = 'Art';
 
@@ -658,14 +694,17 @@ $lang_ger['USER_INACTIVE'] = 'Deaktivierte Benutzer';
 $lang_eng['USER_MODULES'] = 'User Modules';
 $lang_ger['USER_MODULES'] = 'Benutzer Module';
 
-$lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter a valid time and fill out the infobox.
-Entries with negative dates are not valid. Breaks have to be checked out.
-Lunchbreaks have to be consumed as a whole, otherwise a complete one will be added additionally afterwards.
-Time gaps between breaks and bookings may not be longer than 2 Minutes.';
+$lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter a valid time and fill out the infobox. Following rules apply:<ul>
+<li>Entries with negative dates are not valid. Breaks have to be checked out.</li>
+<li>Lunchbreaks have to be consumed as a whole, otherwise a complete one will be added additionally afterwards.</li>
+<li>Gaps between bookings and breaks may not be too big.</li>
+</ul>';
 $lang_ger['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
-Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.
-Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein Zeitunterschied von mehr als 2 Minuten muss ein Nachtrag gemacht werden.
-Eine Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.';
+Dabei sind die folgenden Regeln zu beachten: <ul>
+<li>Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.</li>
+<li>Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
+<li>Die Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.</li>
+</ul>';
 
 $lang_eng['VACATION'] = 'Vacation';
 $lang_ger['VACATION'] = 'Urlaub';
@@ -705,6 +744,9 @@ $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
 
 $lang_eng['VOCATIONAL_SCHOOL'] = 'Training';
 $lang_ger['VOCATIONAL_SCHOOL'] = 'Weiterbildung';
+
+$lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
+$lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';
 
 $lang_eng['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
 $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';

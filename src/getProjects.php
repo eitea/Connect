@@ -27,9 +27,6 @@
   bottom:0;
   padding-bottom:5px;
 }
-.seperated_header{
-  padding-top: 37px;
-}
 .seperated_header th{
   height: 0;
   line-height: 0;
@@ -234,43 +231,67 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $duration = timeDiff_Hours($startDate, $endDate);
           $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
           $conn->query($sql);
-          $showUndoButton = TRUE;
         } else {
+          if(isset($_POST['addExpenses'])){
+            $expenses_price = test_input($_POST['expenses_price']);
+            $expenses_info = test_input($_POST['expenses_info']);
+            $expenses_unit = test_input($_POST['expenses_unit']);
+          } else {
+            $expenses_price = $expenses_info = $expenses_unit = '';
+          }
           if(isset($_POST['project'])){
             $projectID = test_input($_POST['project']);
-            if(isset($_POST['addDrive'])){ //add as driving time
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive')";
-            } else { //normal booking
-              $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, internInfo, bookingType) VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project')";
+            $accept = 'TRUE';
+            if(isset($_POST['required_1'])){
+              $field_1 = "'".test_input($_POST['required_1'])."'";
+              if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
+            } elseif(!empty($_POST['optional_1'])){
+              $field_1 = "'".test_input($_POST['optional_1'])."'";
+            } else {
+              $field_1 = 'NULL';
             }
-            $conn->query($sql);
-            echo mysqli_error($conn);
-            $insertInfoText = $insertInternInfoText = '';
-            $showUndoButton = TRUE;
+            if(isset($_POST['required_2'])){
+              $field_2 = "'".test_input($_POST['required_2'])."'";
+              if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
+            } elseif(!empty($_POST['optional_2'])){
+              $field_2 = "'".test_input($_POST['optional_2'])."'";
+            } else {
+              $field_2 = 'NULL';
+            }
+            if(isset($_POST['required_3'])){
+              $field_3 = "'".test_input($_POST['required_3'])."'";
+              if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
+            } elseif(!empty($_POST['optional_3'])){
+              $field_3 = "'".test_input($_POST['optional_3'])."'";
+            } else {
+              $field_3 = 'NULL';
+            }
+            if($accept){
+              if(isset($_POST['addDrive'])){ //add as driving time
+                $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+              } else { //normal booking
+                $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+              }
+              $conn->query($sql);
+              echo mysqli_error($conn);
+              $insertInfoText = $insertInternInfoText = '';
+            } else {
+              $error_output = $lang['ERROR_MISSING_FIELDS'];
+            }
           } else {
-            echo '<div class="alert alert-danger fade in">';
-            echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Could not create entry: </strong>No Project selected.';
-            echo '</div>';
+            $error_output = $lang['ERROR_MISSING_SELECTION'];
           }
         }
       } else {
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Could not create entry: </strong>Times were not valid.';
-        echo '</div>';
+        $error_output = $lang['ERROR_TIMES_INVALID'];
       }
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>TIMESTAMP REQUIRED: </strong>Could not create entry. No Timestamp found for that date and user, please create a check-in timestamp first.';
-      echo '</div>';
+      $error_output = $lang['ERROR_MISSING_TIMESTAMP'];
     }
   } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Could not create entry: </strong>Fields may not be empty.';
-    echo '</div>';
+    $error_output = $lang['ERROR_MISSING_FIELDS'];
   }
 } //end if POST
 ?>
@@ -289,7 +310,6 @@ function showClients(company, client){
 
   showProjects(client, 0);
 };
-
 function showProjects(client, project){
   $.ajax({
     url:'ajaxQuery/AJAX_project.php',
@@ -301,7 +321,24 @@ function showProjects(client, project){
     error : function(resp){}
   });
 };
-
+function showProjectfields(project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjectFields.php',
+    data:{projectID:project},
+    type: 'get',
+    success : function(resp){
+      $("#project_fields").html(resp);
+    },
+    error : function(resp){}
+  });
+}
+function showMyDiv(o, toShow){
+  if(o.checked){
+    document.getElementById(toShow).style.display='block';
+  } else {
+    document.getElementById(toShow).style.display='none';
+  }
+}
 function showFilters(divID){
   document.getElementById(divID).style.visibility='visible';
 }
@@ -319,7 +356,19 @@ function changeValue(cVal, id, val){
   <form method='post'>
   <div id="project_filters" class="container-fluid">
     <div class="page-header">
-      <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
+      <div class="row">
+        <div class="col-sm-4">
+          <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
+        </div>
+        <div class="col-sm-8">
+          <?php if($error_output): ?>
+          <div class="alert alert-danger fade in">
+            <a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error: </strong> <?php echo $error_output; ?>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
     </div>
     <div class="col-xs-3 custom">
       <!-- SELECT COMPANY -->
@@ -534,7 +583,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $bookedQuery
   $filterProjectClientCompany $filterUserIDAdd
   $filterNoBreakAdd $filterNoDriveAdd
-  ORDER BY $projectBookingTable.end ASC";
+  ORDER BY $projectBookingTable.start ASC";
   /*
   $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
   LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
@@ -685,7 +734,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
           $detailInfo = $row['firstname']." ".$row['lastname'] .' || '. $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
           $interninfo = $row['internInfo'];
-          $optionalinfo = $csv_optionalinfo = '';
+          $optionalinfo = $csv_optionalinfo = $expensesinfo = '';
           $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
           if($extraFldRes && $extraFldRes->num_rows > 0){
             $extraFldRow = $extraFldRes->fetch_assoc();
@@ -699,6 +748,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $extraFldRow = $extraFldRes->fetch_assoc();
             if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
           }
+          if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
+          if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
+          if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
           $csv_Add[] = $csv_optionalinfo;
           echo "<td>";
           if($row['booked'] == 'FALSE'){
@@ -707,6 +759,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Person - Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
           if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
           if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+          if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
           echo "</td>";
           echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //needed to check what has been charged
           echo "</tr>";
@@ -869,8 +922,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <div class="col-sm-2">
             <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-2">
             <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+          </div>
+          <div class="col-sm-2">
+            <input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?>
           </div>
         </div>
       </div>
@@ -899,8 +955,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients('#addSelectClient', this.value, 0)">
               <option name=cmp value=0>Select...</option>
               <?php
-              $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
-              $result = mysqli_query($conn, $query);
               if ($result && $result->num_rows > 1) {
                 while ($row = $result->fetch_assoc()) {
                   $cmpnyID = $row['id'];
@@ -913,8 +967,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects('#addSelectProject', this.value, 0)">
             </select>
           <?php endif; ?>
-          <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project">
+          <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
           </select>
+        </div>
+      </div>
+      <div id="hide_expenses" class="row" style="display:none">
+        <br>
+        <div class="col-md-2">
+          <input type="number" step="0.01" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+        </div>
+        <div class="col-md-2">
+          <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+        </div>
+        <div class="col-md-8">
+          <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
         </div>
       </div>
       <div class="row">
@@ -925,6 +991,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
         </div>
       </div>
+      <div id="project_fields" class="row">
+      </div><br>
       <div class="row">
         <div class="col-xs-6">
           <div class="input-group">

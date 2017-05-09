@@ -3,12 +3,13 @@ class LogCalculator{
   public $overTimeAdditive = 0;
   public $vacationDays = 0; //can be understood as 'still available vacation days' (considers already used vacation)
 
-  public $vacationHours = 0;
   public $expectedHours = 0;
   public $absolvedHours = 0;
   public $breakCreditHours = 0;
+  public $vacationHours = 0;
   public $specialLeaveHours = 0;
   public $sickHours = 0;
+  public $educationHours = 0;
 
   public $correctionHours = 0;
   public $saldo = 0;
@@ -80,6 +81,24 @@ class LogCalculator{
               break;
               case 3:
               $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
+              break;
+              case 4:
+              $this->educationHours += $expectedHours;
+              break;
+              case 5:
+              $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND mixedStatus != '-1'"); //select booking which tells us when she checked in.
+              $mixed_absolved = 0;
+              if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+                 $mixed_absolved = timeDiff_Hours( $mixed_row['end'], $timeEnd);
+              }
+              //too little
+              if($mixed_absolved < $expectedHours){
+                $this->absolvedHours += $expectedHours + $row['breakCredit']; //match
+              } else { //overtime
+                $this->absolvedHours += $mixed_absolved;
+              }
+
+              $this->breakCreditHours += $row['breakCredit'];
             }
           } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
             $this->expectedHours += $expectedHours;
@@ -114,7 +133,7 @@ class LogCalculator{
 
       } //end if($diff > 0);
     } //end foreach interval
-    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
+    $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->educationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
   }
 
   private function timeDiff_Hours($from, $to) {
