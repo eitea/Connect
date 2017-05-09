@@ -293,7 +293,7 @@ $(document).ready(function() {
           <?php if($canStamp == 'TRUE'): ?>
             <li>
               <div class='container-fluid'>
-                <form method='post'><br>
+                <form method='post' action="home.php"><br>
                   <?php
                   echo $checkInButton;
                   if($diff)
