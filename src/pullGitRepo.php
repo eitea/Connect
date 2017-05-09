@@ -6,10 +6,10 @@
   <h3>Update</h3>
 </div>
 
-<form method=post>
+<form method="post">
   <?php
   if(isset($_POST['imtotallyFineWithThisOK'])){
-
+    $output = '';
     $sql = "SELECT * FROM $adminGitHubTable WHERE sslVerify = 'TRUE'";
     $result = $conn->query($sql);
 
@@ -30,14 +30,14 @@
     echo implode('<br>', $output);
 
     session_destroy();
-    echo "<br><br><input type=submit name=okey value='O.K & Continue' /></form>";
+    echo "<br><br><input type='submit' name='okey' value='O.K & Continue' /></form>";
 
     die($lang['LOGOUT_MESSAGE']);
   }
   echo $lang['DO_YOU_REALLY_WANT_TO_UPDATE'] .'<br><br>';
   echo $lang['MAY_TAKE_A_WHILE'] .'<br><br>';
   ?>
-  
+
   <input type="submit" name="imtotallyFineWithThisOK" class="btn btn-warning" value="<?php echo $lang['YES_I_WILL']?>" />
 </form>
 

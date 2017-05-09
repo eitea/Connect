@@ -68,6 +68,7 @@ $available_users = array('-1');
 while($result && ($row = $result->fetch_assoc())){
   $available_users[] = $row['userID'];
 }
+
 $validation_output = $error_output = '';
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){

@@ -41,7 +41,7 @@
   background: transparent;
   color: black;
   padding: 9px 25px;
-  top:400px;
+  top:415px;
   margin-left: -25px;
   line-height: normal;
 }
@@ -410,7 +410,7 @@ function changeValue(cVal, id, val){
           }
         }
         if($result && $result->num_rows == 1) {
-          $filterUserID = $available_users[0]; //lemon squeezy
+          $filterUserID = $available_users[1]; //lemon squeezy
           echo '<option value="0">- Empty -</option>';
         }
         ?>
@@ -777,100 +777,97 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </table>
   </form>
 </div>
-  <script>
-  $(function () {
-    $('[data-toggle="popover"]').popover({html : true});
-  })
-  </script>
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover({html : true});
+})
+</script>
 
-  <!-- Projectbooking Modal -->
-  <?php
-  while($row = $editingResult->fetch_assoc()):
-    $x = $row['projectBookingID'];
-?>
+<!-- Projectbooking Modal -->
+<?php while($row = $editingResult->fetch_assoc()): $x = $row['projectBookingID']; ?>
 <form method="post">
-    <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
-          </div>
-          <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
-            <?php
-            echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
-            if($row['bookingType'] != 'break'){ //if this is a break, do not display client/project selection
-              echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
-              $sql = "SELECT * FROM $clientTable ORDER BY NAME ASC";
-              if($filterCompany){
-                $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
-              }
-              $clientResult = $conn->query($sql);
-              while($clientRow = $clientResult->fetch_assoc()){
-                $selected = '';
-                if($clientRow['id'] == $row['clientID']){
-                  $selected = 'selected';
-                }
-                echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
-              }
-              echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
-              $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
-              $clientResult = $conn->query($sql);
-              while($clientRow = $clientResult->fetch_assoc()){
-                $selected = '';
-                if($clientRow['id'] == $row['projectID']){
-                  $selected = 'selected';
-                }
-                echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
-              }
-              echo "</select> <br><br>";
-            } //end if(break)
-
-            $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
-            $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
-
-            if($row['chargedTimeStart'] == '0000-00-00 00:00:00'){
-              $A_charged = '0000-00-00 00:00:00';
-            } else {
-              $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
+  <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
+        </div>
+        <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
+          <?php
+          echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
+          if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+            echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+            $sql = "SELECT * FROM $clientTable ORDER BY NAME ASC";
+            if($filterCompany){
+              $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
             }
-            if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
-              $B_charged = '0000-00-00 00:00:00';
-            } else {
-              $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
+            $clientResult = $conn->query($sql);
+            while($clientRow = $clientResult->fetch_assoc()){
+              $selected = '';
+              if($clientRow['id'] == $row['clientID']){
+                $selected = 'selected';
+              }
+              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
-            ?>
+            echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+            $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
+            $clientResult = $conn->query($sql);
+            while($clientRow = $clientResult->fetch_assoc()){
+              $selected = '';
+              if($clientRow['id'] == $row['projectID']){
+                $selected = 'selected';
+              }
+              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+            }
+            echo "</select> <br><br>";
+          } //end if(break)
 
-            <label><?php echo $lang['DATE']; ?>:</label>
-            <div class="row">
-              <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
-              <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
-            </div>
-            <br>
-            <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
-            <div class="row">
-              <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
-              <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
-            </div>
-            <br>
-            <label>Infotext</label>
-            <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
-            <br>
-            <?php
-            if($row['bookingType'] != 'break'){//cant charge a break, can you
-              echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' $selected name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>"; //gotta know which ones he wants checked.
-              echo "<div class='col-xs-2'><input id='".$x."_2' type='checkbox' onclick='toggle2(\"".$x."_1\")' name='editing_nocharge' value='".$x."' /> <label>".$lang['NOT_CHARGEABLE']. "</label> </div></div>";
-            }
-            ?>
+          $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
+          $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+
+          if($row['chargedTimeStart'] == '0000-00-00 00:00:00'){
+            $A_charged = '0000-00-00 00:00:00';
+          } else {
+            $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
+          }
+          if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
+            $B_charged = '0000-00-00 00:00:00';
+          } else {
+            $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
+          }
+          ?>
+
+          <label><?php echo $lang['DATE']; ?>:</label>
+          <div class="row">
+            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
+            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
           </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <br>
+          <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
+          <div class="row">
+            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
+            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
           </div>
+          <br>
+          <label>Infotext</label>
+          <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
+          <br>
+          <?php
+          if($row['bookingType'] != 'break'){//cant charge a break, can you
+            echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' $selected name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>"; //gotta know which ones he wants checked.
+            echo "<div class='col-xs-2'><input id='".$x."_2' type='checkbox' onclick='toggle2(\"".$x."_1\")' name='editing_nocharge' value='".$x."' /> <label>".$lang['NOT_CHARGEABLE']. "</label> </div></div>";
+          }
+          ?>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         </div>
       </div>
     </div>
-  </form>
-  <?php endwhile;?>
+  </div>
+</form>
+<?php endwhile;?>
 <?php endif; //end if($result && $result->num_rows > 0) ?>
 
 <div id="project_footer">
@@ -909,7 +906,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </form>
     </div>
-    <?php endif; //end if($result && $result->num_rows > 0) ?>
+  <?php endif; //end if($result && $result->num_rows > 0) ?>
   </div>
 <br>
 
@@ -934,7 +931,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div id="mySelections" class="col-xs-9"><br>
           <?php
           echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
-          $query = "SELECT * FROM $companyTable WHERE id IN (SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $filterUserID) ";
+          $query = "SELECT * FROM companyData WHERE id IN (SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $filterUserID) ";
           $result = mysqli_query($conn, $query);
           if($result->num_rows == 1):
             $row = $result->fetch_assoc();
