@@ -27,6 +27,7 @@ if(isset($_POST['accept'])){
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){
+      $line = utf8_decode($line);
       //Skip comments
       if (substr($line, 0, 2) == '--' || $line == '') continue;
 
@@ -39,7 +40,7 @@ if(isset($_POST['accept'])){
     }
     $conn->query("SET FOREIGN_KEY_CHECKS=1;");
     if(!mysqli_error($conn)){
-      echo "<div class='alert alert-success'>O.K.</div>";
+      redirect("logout.php");
     } else {
       $error_output = mysqli_error($conn);
     }
