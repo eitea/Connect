@@ -1,5 +1,6 @@
 <?php
 require "../connection.php";
+require_once "../language.php";
 $clientID = intval($_GET['client']);
 
 if(isset($_GET['p'])){
@@ -7,7 +8,7 @@ if(isset($_GET['p'])){
 } else {
   $p = 0;
 }
-echo "<option name='act' value=0 >New Proposal</option>";
+echo "<option name='act' value=0 >".$lang['NEW_PROPOSAL']."</option>";
 $result = mysqli_query($conn, "SELECT * FROM proposals WHERE clientID = $clientID");
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {

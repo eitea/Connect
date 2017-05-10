@@ -639,6 +639,21 @@ $sql = "CREATE TABLE $policyTable (
     id_number VARCHAR(10) NOT NULL,
     clientID INT(6) UNSIGNED,
     status ENUM('0', '1', '2'),
+    curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deliveryDate DATETIME,
+    yourSign VARCHAR(50),
+    yourOrder VARCHAR(50),
+    ourSign VARCHAR(50),
+    ourMessage VARCHAR(50),
+    daysNetto INT(4),
+    skonto1 DECIMAL(8,2),
+    skonto2 DECIMAL(8,2),
+    skonto1Days INT(4),
+    skonto2Days INT(4),
+    paymentMethod VARCHAR(100),
+    shipmentType VARCHAR(100),
+    representative VARCHAR(50),
+    porto DECIMAL(8,2),
     FOREIGN KEY (clientID) REFERENCES $clientTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

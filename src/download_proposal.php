@@ -76,17 +76,23 @@ class PDF extends FPDF {
 
 require "connection.php";
 require "language.php";
-$result = $conn->query("SELECT *, companyData.name AS companyName, clientData.name AS clientName, clientInfoData.name AS dude, proposals.id AS proposalID
+$result = $conn->query("SELECT proposals.*, companyData. *, clientData.*, companyData.name AS companyName,
+  clientInfoData.gender, clientInfoData.nameAddition, clientInfoData.address_Street, clientInfoData.address_Country, clientInfoData.title,
+  clientData.name AS clientName, clientInfoData.name AS dude, proposals.id AS proposalID
   FROM proposals
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
   WHERE proposals.id = $proposalID");
-$row = $result->fetch_assoc();
-if(mysqli_error($conn) || empty($row['logo']) || empty($row['address'])){
+if(mysqli_error($conn)){
   echo mysqli_error($conn);
-  echo '<br> '.$lang['ERROR_MISSING_DATA']. "(Logo, Adr.)";
   die();
+}
+$row = $result->fetch_assoc();
+if(empty($row['logo']) || empty($row['address'])){
+  die($lang['ERROR_MISSING_DATA']. "(Logo, Adr.)");
+} elseif(empty($row['gender'])){
+  $row['gender'] = 'male';
 }
 
 $pdf = new PDF();
@@ -101,15 +107,20 @@ $pdf->SetLeftMargin(15);
 $pdf->SetRightMargin(15);
 //client general data
 $pdf->MultiCell(0, 5 , iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$lang['GENDER_TOSTRING'][$row['gender']].' '.$row['title'].' '.$row['dude'].' '.$row['nameAddition']."\n".$row['address_Street']."\n".$row['address_Country']));
-$pdf->Ln(10);
+$pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
 $pdf->MultiColCell(110, 7, $lang['OFFER']."\n".$row['id_number']);
 $pdf->SetFontSize(8);
-$pdf->MultiColCell(40, 5, $lang['CLIENTS'].' '.$lang['NUMBER'].': '."\n".$lang['REPRESENTATIVE'].': ');
-$pdf->MultiColCell(30, 5, $row['clientNumber'] ."\n".$row['representative']);
 
-$pdf->Ln(5);
+$pdf->MultiColCell(40, 5, $lang['DATE'].': '."\n".iconv('UTF-8', 'windows-1252',$lang['EXPIRATION_DATE']).': '."\n".$lang['CLIENTS'].' '.$lang['NUMBER'].': '."\n".$lang['REPRESENTATIVE'].': ');
+$pdf->MultiColCell(30, 5, $row['curDate']."\n".$row['deliveryDate']."\n".$row['clientNumber']."\n".$row['representative']);
+$pdf->Ln(25);
+
+$pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
+$pdf->MultiColCell(50, 4, $lang['PROP_YOUR_ORDER']."\n".$row['yourOrder']);
+$pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
+$pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 //products
 $pdf->SetFontSize(10);
 $result = $conn->query("SELECT name, description, quantity, price, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID']);

@@ -126,7 +126,7 @@ $("#calendar").datepicker({
           $B = $calculator->end[$i];
         }
 
-        $theSaldo = round($calculator->absolvedTime[$i] - $calculator->shouldTime[$i], 2);
+        $theSaldo = round($calculator->absolvedTime[$i] - $calculator->lunchTime[$i] - $calculator->shouldTime[$i], 2);
         $saldoStyle = '';
         if($theSaldo < 0){
           $saldoStyle = 'style=color:#fc8542;'; //red
@@ -148,7 +148,7 @@ $("#calendar").datepicker({
         echo "<td>" . substr($B,11,5) . "</td>";
         echo "<td>" . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]] . "</td>";
         echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
-        echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i]) . "</td>";
+        echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
         echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
         echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
         echo "<td><button type='submit' form='form1' class='btn btn-default' value='".$calculator->indecesIM[$i].' '.$calculator->date[$i]."' name='aButton' ><i class='fa fa-pencil'></i></button></td>";

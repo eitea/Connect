@@ -50,7 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     die("Bot detected. Aborting all Operations.");
   }
 
-
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
@@ -78,7 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $expenses_info = test_input($_POST['expenses_info']);
           $expenses_unit = test_input($_POST['expenses_unit']);
         } else {
-          $expenses_price = $expenses_info = $expenses_unit = 0.0;
+          $expenses_price = $expenses_unit = 0.0;
+          $expenses_info = '';
         }
         if(isset($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);

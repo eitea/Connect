@@ -95,7 +95,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </table>
   <br><hr><br>
 
-
 <script>
 function showClients(company, client){
   if(company != ""){

@@ -35,8 +35,9 @@ if($result && $result->num_rows > 0){
   $canBook = $canStamp = $canEditTemplates = FALSE;
 }
 
-if($userID == 1){//superuser
+if($userID == 1){ //superuser
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'TRUE';
+  $canStamp = 'TRUE';
 }
 
 $result = $conn->query("SELECT lastPswChange FROM UserData WHERE id = $userID");
@@ -504,7 +505,7 @@ $(document).ready(function() {
               <div class="panel-body">
                 <ul class="nav navbar-nav">
                   <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFER']; ?></span></a></li>
-                  <li><a <?php if($this_page =='offer_proposal_edit.php'){echo $setActiveLink;}?> href="offer_proposal_edit.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_OFFER']; ?></span></a></li>
+                  <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                 </ul>
               </div>
             </div>

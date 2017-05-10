@@ -193,7 +193,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
     <div class="container-fluid">
       <div class="col-sm-4">
-        <img src="<?php echo $row['logo'];?>"></img>
+        <img style="max-width:350px;max-height:200px;" src="<?php echo $row['logo'];?>"></img>
       </div>
       <div class="col-sm-8">
         <input type="file" name="fileToUpload" id="fileToUpload" />
@@ -343,14 +343,14 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         <div class="modal-dialog modal-sm" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
+              <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $row['name']); ?></h4>
             </div>
             <div class="modal-body">
-              All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?
+              <?php echo $lang['WARNING_DELETE_COMPANY']; ?>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>
-              <button type="submit" name='deleteCompany' class="btn btn-warning">Yes, delete it.</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
+              <button type="submit" name='deleteCompany' class="btn btn-warning"><?php echo $lang['CONFIRM']; ?></button>
             </div>
           </div>
         </div>
