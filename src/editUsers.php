@@ -140,8 +140,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if(!empty($_POST['exitDate'.$x]) && test_Date($_POST['exitDate'.$x] .' 00:00:00')) {
-      $exitDate = test_Input($_POST['exitDate'.$x]) . ' 00:00:00';
+      $exitDate = test_input($_POST['exitDate'.$x]) . ' 00:00:00';
       $conn->query("UPDATE $userTable SET exitDate = '$exitDate' WHERE id = '$x'");
+    }
+
+    if(!empty($_POST['coreTime'.$x])) {
+      $coreTime = test_input($_POST['coreTime'.$x]);
+      $conn->query("UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$x'");
     }
 
     if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
@@ -341,6 +346,7 @@ $(document).ready(function(){
       $email = $row['email'];
       $begin = $row['beginningDate'];
       $end = $row['exitDate'];
+      $coreTime = $row['coreTime'];
 
       $intervalStart = $row['startDate'];
 
@@ -443,10 +449,14 @@ $(document).ready(function(){
                 </div>
               </div>
               <div class="container-fluid">
-                <div class=col-md-6>
+                <div class="col-md-5">
                   <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($begin,0,10); ?></p>
                 </div>
-                <div class=col-md-6>
+                <div class="col-md-2">
+                  <?php echo $lang['CORE_TIME']; ?>
+                  <p><input type="text" class="form-control" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
+                </div>
+                <div class="col-md-5">
                   <?php echo $lang['EXIT_DATE']; ?>
                   <input type="text" class="form-control" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
                 </div>
@@ -573,7 +583,7 @@ $(document).ready(function(){
                     <input type="text" class="form-control" name="intervalEnd" placeholder="yyyy-mm-dd" />
                   </div>
                   <div class="col-xs-2">
-                    <button type="submit" class="btn btn-warning" name="addNewInterval" value="<?php echo $x; ?>"> Close Interval</button>
+                    <button type="submit" class="btn btn-default" name="addNewInterval" value="<?php echo $x; ?>"> <?php echo $lang['CLOSE_INTERVAL']; ?></button>
                   </div>
                 </div>
               </div>

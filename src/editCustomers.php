@@ -36,8 +36,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $sql = "INSERT INTO $clientTable (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
     if($conn->query($sql)){//if ok, give him default projects
       $id = $conn->insert_id;
-      $sql = "INSERT INTO $projectTable (clientID, name, status, hours)
-      SELECT '$id', name, status, hours FROM $companyDefaultProjectTable WHERE companyID = $companyID";
+      $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
+      SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
       $conn->query($sql);
 
       //and his details

@@ -94,17 +94,7 @@ class Interval_Calculator{
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
-      //special leave treated like holiday
-      if($this->activity[$count] == 2){
-        $this->shouldTime[$count] = 0;
-        $this->absolvedTime[$count] = 0;
-        $this->end[$count] = $row['time'];
-        $this->lunchTime[$count] = 0;
-      } elseif($this->activity[$count] == 4){
-        $this->start[$count] = false;
-        $this->end[$count] = false;
-        $this->absolvedTime[$count] = $this->shouldTime[$count];
-      }
+      
       //mixed Timestamps
       if($this->activity[$count] == 5){
         $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$this->indecesIM[$count]." AND mixedStatus != '-1'");

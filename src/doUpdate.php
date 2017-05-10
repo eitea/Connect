@@ -822,13 +822,21 @@ if($row['version'] < 82){
   } else {
     echo mysqli_error($conn);
   }
-
-  //fix default projects
-  $conn->query("INSERT IGNORE INTO projectData (clientID, name) SELECT id, 'Diverses' FROM clientData WHERE companyID = 2");
-
 }
 
-//if($row['version'] < 83){}
+if($row['version'] < 83){
+  $sql = "ALTER TABLE UserData ADD COLUMN coreTime TIME DEFAULT '08:00:00'";
+  if($conn->query($sql)){
+    echo '<br> Added user Core Time';
+  } //no elso in here
+}
+
+//if($row['version'] < 84){}
+//if($row['version'] < 85){}
+//if($row['version'] < 86){}
+//if($row['version'] < 87){}
+//if($row['version'] < 88){}
+//if($row['version'] < 89){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

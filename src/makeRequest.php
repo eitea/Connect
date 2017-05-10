@@ -12,11 +12,13 @@
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-      $begin = test_input($_POST['start']);
-      $end = test_input($_POST['end']);
+      $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
+      $row = $result->fetch_assoc();
+      $begin = test_input($_POST['start'].' '.$row['coreTime']);
+      $end = test_input($_POST['end'].' '.$row['coreTime']);
       $infoText = test_input($_POST['requestText']);
       $type = test_input($_POST['requestType']);
-      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin 04:00:00', '$end 04:00:00', '$infoText', '$type')";
+      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin', '$end', '$infoText', '$type')";
       $conn->query($sql);
       echo mysqli_error($conn);
     } else {
@@ -110,7 +112,7 @@ if($result && $result->num_rows > 0): ?>
         } elseif ($row['status'] == 2) {
           $style="#13b436";
         }
-        
+
         echo "<tr>";
         echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
         echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
