@@ -144,6 +144,9 @@ $lang_ger['CLIENT'] = 'Kunde';
 $lang_eng['CLIENTS'] = 'Clients';
 $lang_ger['CLIENTS'] = 'Kunden';
 
+$lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
+$lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
+
 $lang_eng['COMPANIES'] = 'Companies';
 $lang_ger['COMPANIES'] = 'Mandanten';
 
@@ -193,7 +196,7 @@ $lang_eng['DELETE'] = 'Delete';
 $lang_ger['DELETE'] = 'Löschen';
 
 $lang_eng['DELETE_COMPANY'] = 'Delete Company';
-$lang_ger['DELETE_COMPANY'] = 'Firma Löschen';
+$lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
 
 $lang_eng['DESCRIPTION'] = 'Description';
 $lang_ger['DESCRIPTION'] = 'Beschreibung';

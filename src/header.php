@@ -6,8 +6,6 @@ if(empty($_SESSION['userid'])){
 
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-$isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isERPAdmin = FALSE;
-$canBook = $canStamp = FALSE;
 $this_page = basename($_SERVER['PHP_SELF']);
 $setActiveLink = 'style="color:#ed9c21;"';
 
@@ -32,9 +30,12 @@ if($result && $result->num_rows > 0){
   $canBook = $row['canBook'];
   $canStamp = $row['canStamp'];
   $canEditTemplates = $row['canEditTemplates'];
+} else {
+  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = FALSE;
+  $canBook = $canStamp = $canEditTemplates = FALSE;
 }
 
-if($userID == 1){
+if($userID == 1){//superuser
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'TRUE';
 }
 
