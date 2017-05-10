@@ -54,8 +54,8 @@ $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
 $lang_eng['ADMIN_DELETE'] = 'Please do not delete the Admin';
 $lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
 
-$lang_eng['ADMIN_CORE_OPTIONS'] = 'System Options';
-$lang_ger['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
+$lang_eng['ADMIN_CORE_OPTIONS'] = 'General';
+$lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';

@@ -17,7 +17,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     echo '<strong>Error: </strong>Cannot delete first Company.';
     echo '</div>';
   }
-
+  if(isset($_POST['delete_logo'])){
+    $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
+    if($result && ($row = $result->fetch_assoc())){
+      if(file_exists($row['logo'])){
+        unlink($row['logo']);
+      }
+    }
+    if(!mysqli_error($conn)){
+      $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
+    }
+  }
   if(isset($_POST['deleteSelection'])){
     if(isset($_POST['indexProject'])){
       foreach ($_POST['indexProject'] as $i) {
@@ -182,13 +192,13 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
   ?>
 
   <div class="page-header">
-    <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?></h3>
+    <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?> &nbsp <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><i class="fa fa-trash-o"></i></h3>
   </div>
 
   <br><br>
   <form method="post" enctype="multipart/form-data">
     <div class="container-fluid">
-      <div class="row"><h4>Logo</h4></div>
+      <div class="row"><h4>Logo <button type="submit" style="background:none;border:none" name="delete_logo"><img width="10px" height="10px" src="../images/minus_circle.png"></button></h4></div>
       <div class="row text-right"><button type="submit" name="logoUpload" class="btn btn-default" value="<?php echo $cmpID;?>"><i class="fa fa-floppy-o"></i> <?php echo $lang['SAVE']; ?></button></div>
     </div>
     <div class="container-fluid">
@@ -335,7 +345,6 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     <br><hr><br>
     <div class="container-fluid text-right">
       <button type="submit" class="btn btn-warning" name="deleteSelection">Auswahl Löschen</button>
-      <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".cmp-delete-confirm-modal"><?php echo $lang['DELETE_COMPANY']; ?>
       </div>
 
       <!-- Delete confirm modal -->

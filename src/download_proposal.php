@@ -143,13 +143,13 @@ $pdf->Ln(25);
 
 //end of document
 $pdf->SetFontSize(7);
-$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252',$row['erpText']));
+$pdf->MultiCell(0, 3, iconv('UTF-8', 'windows-1252',$row['erpText']));
 $pdf->SetFontSize(10);
 
 $pdf->SetFont('Helvetica', 'UB');
 $pdf->Cell(0, 10, $lang['PAYMENT_CONDITIONS'].':', 0, 1);
 $pdf->SetFont('Helvetica', '');
-$pdf->Cell(0, 0, $lang['PAYMENT_NETTO_CONDITION'].$row['daysNetto'].$lang['DAYS'], 0, 1);
+$pdf->Cell(0, 0, $lang['PAYMENT_NETTO_CONDITION'].$row['daysNetto'].' '.$lang['DAYS'], 0, 1);
 
 //Footer
 
