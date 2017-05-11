@@ -76,8 +76,8 @@ class PDF extends FPDF {
 
 require "connection.php";
 require "language.php";
-$result = $conn->query("SELECT proposals.*, companyData. *, clientData.*, companyData.name AS companyName,
-  clientInfoData.gender, clientInfoData.nameAddition, clientInfoData.address_Street, clientInfoData.address_Country, clientInfoData.title,
+$result = $conn->query("SELECT *, companyData.name AS companyName,
+  clientInfoData.daysNetto as client_daysNetto,
   clientData.name AS clientName, clientInfoData.name AS dude, proposals.id AS proposalID
   FROM proposals
   INNER JOIN clientData ON proposals.clientID = clientData.id
@@ -92,7 +92,9 @@ $row = $result->fetch_assoc();
 if(empty($row['logo']) || empty($row['address'])){
   die($lang['ERROR_MISSING_DATA']. "(Logo, Adr.)");
 } elseif(empty($row['gender'])){
-  $row['gender'] = 'male';
+  $gender_exception = ' ';
+} else {
+  $gender_exception = $lang['GENDER_TOSTRING'][$row['gender']]
 }
 
 $pdf = new PDF();
@@ -106,7 +108,8 @@ $pdf->SetFont('Helvetica','',10);
 $pdf->SetLeftMargin(15);
 $pdf->SetRightMargin(15);
 //client general data
-$pdf->MultiCell(0, 5 , iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$lang['GENDER_TOSTRING'][$row['gender']].' '.$row['title'].' '.$row['dude'].' '.$row['nameAddition']."\n".$row['address_Street']."\n".$row['address_Country']));
+$pdf->MultiCell(0, 5 , iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$gender_exception.' '.$row['title'].' '.
+$row['firstname'].' '.$row['dude'].' '.$row['nameAddition']."\n".$row['address_Street']."\n".$row['address_Country'].' '.$row['address_Country_Postal'].' '.$row['address_Country_City']));
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);

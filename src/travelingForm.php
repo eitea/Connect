@@ -69,32 +69,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <br><br>
     Monat: <?php echo $lang['MONTH_TOSTRING'][intval(substr($currentMonth,5,2))]; ?>
   </div>
-
   <div class="col-md-4">
     <strong>Kilometergeld: <?php echo $kmMoney; ?> <small> pro km </small></strong>
   </div>
 </div>
 <br><br>
-<table class="table table-condensed table-hover h6">
-  <thead style="border-width:medium; border-top-style:solid; border-color:#e8e8e8">
+<table class="table table-hover table-condensed">
+  <thead class="h6" style="border-width:medium; border-top-style:solid; border-color:#e8e8e8">
     <th>Reiseantritt</th>
     <th>Reiseende</th>
     <th style="text-center">km Anfang</th>
     <th style="text-center">km Ende</th>
-
     <th>Grund-Ort-Firma</th>
-
     <th style="background-color:#f1f3f4">Dauer</th>
     <th style="background-color:#f1f3f4">Land</th>
     <th style="background-color:#f1f3f4">Taggeld</th>
     <th style="background-color:#f1f3f4">km</th>
     <th style="background-color:#f1f3f4">kmGeld</th>
-
     <th>Hotel</th>
     <th style="text-center">Bewirtung 10%</th>
     <th style="text-center">Bewirtung 20%</th>
     <th>Spesen</th>
-
     <th style="background-color:#f1f3f4">Total</th>
   </thead>
   <tbody>
