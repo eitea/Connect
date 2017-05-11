@@ -241,7 +241,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $expenses_info = test_input($_POST['expenses_info']);
             $expenses_unit = test_input($_POST['expenses_unit']);
           } else {
-            $expenses_price = $expenses_info = $expenses_unit = '';
+            $expenses_price = $expenses_unit = 0;
+            $expenses_info = '';
           }
           if(isset($_POST['project'])){
             $projectID = test_input($_POST['project']);

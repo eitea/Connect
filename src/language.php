@@ -45,8 +45,11 @@ $lang_ger['ADD'] = 'Hinzufügen';
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
-$lang_eng['ADDRESS'] = 'Address';
-$lang_ger['ADDRESS'] = 'Adresse';
+$lang_eng['ADDRESS'] = 'Address Form';
+$lang_ger['ADDRESS'] = 'Anrede';
+
+$lang_eng['ADDRESS_FORM'] = 'Address';
+$lang_ger['ADDRESS_FORM'] = 'Adresse';
 
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
@@ -144,6 +147,9 @@ $lang_ger['CHECKLIST'] = 'Checkliste';
 $lang_eng['CHOOSE_PROCESS'] = 'Choose Process';
 $lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
 
+$lang_eng['CITY'] = 'City';
+$lang_ger['CITY'] = 'Ort';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
@@ -179,6 +185,9 @@ $lang_ger['CORRECTION'] = 'Korrektur';
 
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
+
+$lang_eng['COUNTRY'] = 'Country';
+$lang_ger['COUNTRY'] = 'Land';
 
 $lang_eng['DAILY_USER_PROJECT'] = 'Daily User Project';
 $lang_ger['DAILY_USER_PROJECT'] = 'Tagesbericht';
@@ -341,6 +350,9 @@ $lang_ger['GREETING_AFTERNOON'] = 'Hallo';
 
 $lang_eng['GREETING_EVENING'] = 'Good Evening';
 $lang_ger['GREETING_EVENING'] = 'Guten Abend';
+
+$lang_eng['GENERAL_INFORMATION'] = 'General Information';
+$lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
 
 $lang_eng['GENERAL_SETTINGS'] = 'General Settings';
 $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
@@ -525,6 +537,9 @@ $lang_ger['PDF_TEMPLATES'] = 'Pdf Vorlagen';
 $lang_eng['PHONE_NUMBER'] = 'Telephone Number';
 $lang_ger['PHONE_NUMBER'] = 'Telefonnummer';
 
+$lang_eng['PLZ'] = 'Postal Code';
+$lang_ger['PLZ'] = 'PLZ';
+
 $lang_eng['PREVIEW'] = 'Preview';
 $lang_ger['PREVIEW'] = 'Vorschau';
 
@@ -638,6 +653,12 @@ $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 $lang_eng['SAVE'] = 'Save';
 $lang_ger['SAVE'] = 'Speichern';
 
+$lang_eng['SALDO_DAY'] = 'Daily Saldo';
+$lang_ger['SALDO_DAY'] = 'Tagessaldo';
+
+$lang_eng['SALDO_MONTH'] = 'Monthly Saldo';
+$lang_ger['SALDO_MONTH'] = 'Monatssaldo';
+
 $lang_eng['SCHEDULE_TOSTRING'] = array(
   '-1' => 'Inactive',
   '0' => 'Once',
@@ -672,6 +693,9 @@ $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
+
+$lang_eng['STREET'] = 'Street';
+$lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';

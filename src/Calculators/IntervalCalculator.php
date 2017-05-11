@@ -94,7 +94,7 @@ class Interval_Calculator{
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
-      
+
       //mixed Timestamps
       if($this->activity[$count] == 5){
         $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$this->indecesIM[$count]." AND mixedStatus != '-1'");

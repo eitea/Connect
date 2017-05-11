@@ -923,6 +923,33 @@ if($row['version'] < 84){
   } else {
     echo mysqli_error($conn);
   }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN firstname VARCHAR(45)";
+  if($conn->query($sql)){
+    echo '<br> Splitting name to first and lastname in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_Postal VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Splitting postal code off country in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_City VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Splitting city off country in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN fax_number VARCHAR(30)";
+  if($conn->query($sql)){
+    echo '<br> Added fax number to client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+
 }
 //if($row['version'] < 85){}
 //if($row['version'] < 86){}
