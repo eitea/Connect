@@ -147,43 +147,43 @@ if(isset($_POST['logoUpload'])){
   }
 }
 
-  $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); //selects up to three rows (or at least it should)
-  if(isset($_POST['save_additional_fields'])){
-    for($i = 1; $i < 4; $i++){
-      //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
-      $id_save = $cmpID * 3 - 3 + $i;
-      if(!empty($_POST['name_'.$i])){
-        $name = test_input($_POST['name_'.$i]);
-        $description = test_input($_POST['description_'.$i]);
-        $active = !empty($_POST['active_'.$i]) ? 'TRUE' : 'FALSE';
-        $required = !empty($_POST['required_'.$i]) ? 'TRUE' : 'FALSE';
-        $forall = !empty($_POST['forall_'.$i]) ? 'TRUE' : 'FALSE';
+if(isset($_POST['save_additional_fields'])){
+  for($i = 1; $i < 4; $i++){
+    //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
+    $id_save = $cmpID * 3 - 3 + $i;
+    if(!empty($_POST['name_'.$i])){
+      $name = test_input($_POST['name_'.$i]);
+      $description = test_input($_POST['description_'.$i]);
+      $active = !empty($_POST['active_'.$i]) ? 'TRUE' : 'FALSE';
+      $required = !empty($_POST['required_'.$i]) ? 'TRUE' : 'FALSE';
+      $forall = !empty($_POST['forall_'.$i]) ? 'TRUE' : 'FALSE';
 
-        if($active == 'FALSE'){
-          $forall = 'FALSE';
-        }
-        if($result->num_rows > ($i -1)){ //first row
-          $row = $result->fetch_assoc();
-          $forall_old = $row['isForAllProjects'];
-          $conn->query("UPDATE $companyExtraFieldsTable SET name='$name', isActive = '$active' , isRequired = '$required', isForAllProjects = '$forall', description = '$description' WHERE id = $id_save");
-        } else {
-          $forall_old = 'FALSE';
-          $conn->query("INSERT INTO $companyExtraFieldsTable (id, companyID, name, isActive, isRequired, isForAllProjects, description) VALUES ($id_save, $cmpID, '$name', '$active', '$required', '$forall', '$description')");
-        }
-
-        if($forall_old == 'FALSE' && $forall == 'TRUE'){
-          $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'TRUE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
-        } elseif($forall_old == 'TRUE' && $forall == 'FALSE'){
-          $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
-        }
-      } elseif(!empty($_POST['active_'.$i])){//if name is empty, but the active button is not
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo "<strong>Could not save Field nr. $i : </strong> Cannot set active field without a name";
-        echo '</div>';
+      if($active == 'FALSE'){
+        $forall = 'FALSE';
       }
+      $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE id = $id_save");
+      if($result->num_rows > 0){
+        $row = $result->fetch_assoc();
+        $forall_old = $row['isForAllProjects'];
+        $conn->query("UPDATE $companyExtraFieldsTable SET name='$name', isActive = '$active' , isRequired = '$required', isForAllProjects = '$forall', description = '$description' WHERE id = $id_save");
+      } else {
+        $forall_old = 'FALSE';
+        $conn->query("INSERT INTO $companyExtraFieldsTable (id, companyID, name, isActive, isRequired, isForAllProjects, description) VALUES ($id_save, $cmpID, '$name', '$active', '$required', '$forall', '$description')");
+      }
+      echo mysqli_error($conn);
+      if($forall_old == 'FALSE' && $forall == 'TRUE'){
+        $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = '$active' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
+      } elseif($forall_old == 'TRUE' && $forall == 'FALSE'){
+        $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
+      }
+    } elseif(!empty($_POST['active_'.$i])){//if name is empty, but the active button is not
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo "<strong>Could not save Field nr. $i : </strong> Cannot set active field without a name";
+      echo '</div>';
     }
   }
+}
 }
 
 
@@ -544,10 +544,11 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
                 </thead>
                 <tbody>
                   <?php
-                  $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID");
                   for($i = 1; $i < 4; $i++){
+                    $a = $cmpID * 3 - 3 + $i ;
+                    $result = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE id = ($a)");
                     echo '<tr>';
-                    if($result->num_rows > ($i-1)){
+                    if($result->num_rows > 0){
                       $row = $result->fetch_assoc();
                       $active = $row['isActive'] == 'TRUE' ? 'checked' : '';
                       $name = $row['name'];

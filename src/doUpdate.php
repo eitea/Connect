@@ -950,7 +950,20 @@ if($row['version'] < 84){
     echo mysqli_error($conn);
   }
 
+  //fixing additional fields activity
+  $result = $conn->query("SELECT * FROM companyDefaultProjects");
+  while($result && ($row = $result->fetch_assoc())){
+    $conn->query("UPDATE projectData p1 SET field_1 = '".$row['field_1']."', field_2 = '".$row['field_2']."', field_3 = '".$row['field_3']."'
+    WHERE clientID IN (SELECT clientData.id FROM clientData, companyDefaultProjects
+    WHERE clientData.companyID = companyDefaultProjects.companyID AND p1.name = companyDefaultProjects.name AND companyDefaultProjects.id = ".$row['id'].")");
+  }
+  if($conn->query($sql)){
+    echo '<br> Fixed additional field assigning';
+  } else {
+    echo mysqli_error($conn);
+  }
 }
+
 //if($row['version'] < 85){}
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}
