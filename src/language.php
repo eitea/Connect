@@ -171,6 +171,12 @@ $lang_ger['COMPANY_2'] = 'Firma';
 $lang_eng['COMPLETE'] = 'Complete';
 $lang_ger['COMPLETE'] = 'Komplett';
 
+$lang_eng['COMPLEXITY'] = 'Complexity';
+$lang_ger['COMPLEXITY'] = 'Komplexität';
+
+$lang_eng['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Simple', "MEDIUM" => 'Medium', "STRONG" => 'Strong');
+$lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mittel', "STRONG" => 'Stark');
+
 $lang_eng['CONFIRM'] = 'Confirm';
 $lang_ger['CONFIRM'] = 'Bestätigen';
 
@@ -402,6 +408,13 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
 
+$lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
+                                      Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
+                                      Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
+$lang_ger['INFO_PASSWORD_GENERAL'] = 'Einfach - Keine Restriktion <br>
+                                      Mittel - Passwörter müssen mind. 1 Großbuchstaben und 1 Zahl enthalten <br>
+                                      Stark - Passwörter müssen mind. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>';
+
 $lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
 $lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
 
@@ -524,6 +537,9 @@ $lang_ger['OVERVIEW'] = 'Übersicht';
 
 $lang_eng['PASSWORD'] = 'Password';
 $lang_ger['PASSWORD'] = 'Passwort';
+
+$lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
+$lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
 
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';

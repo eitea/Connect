@@ -29,7 +29,7 @@ while($result && ($row = $result->fetch_assoc())){
       $request_addendum = $i;
       //to process the next ADD, we need to know what he is editing
       $indexIM = $i;
-      $date = substr($row_b['start'],0,10);
+      $date = substr($B,0,10);
       $timeToUTC = $row['timeToUTC'];
       $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
       $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
@@ -42,7 +42,7 @@ while($result && ($row = $result->fetch_assoc())){
   if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
     $request_addendum = $i;
     $indexIM = $i;
-    $date = substr($row_b['start'],0,10);
+    $date = substr($B,0,10);
     $timeToUTC = $row['timeToUTC'];
     $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
     $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);

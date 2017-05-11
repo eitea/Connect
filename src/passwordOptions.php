@@ -91,55 +91,54 @@ $row = $result->fetch_assoc();
 ?>
 
 <div class="page-header">
-  <h3>Passwordpolicy <a role="button" data-toggle="collapse" href="#passwordpolicyInfo"> <i class="fa fa-info-circle"> </i> </a> </h3>
-</div>
-
-<div class="collapse" id="passwordpolicyInfo">
-  <div class="well">
-    Einstellungen der Länge und Komplexität der Passwörter der Benutzer. <br>
-    Einfach - Keine Restriktion <br>
-    Mittel - Passwörter müssen mind. 1 Großbuchstaben und 1 Zahl enthalten <br>
-    Stark - Passwörter müssen mind. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>
-    <br>
-    Passwörter können ein Verfallsdatum besitzen (Erweitert - Aktiv), wodurch nach Ablauf der Zeit der Benutzer dazu aufgefordert wird sein Passwort zu ändern.
-    Die Aufforderung kann den Benutzer entweder Zwingen, oder ihm die Entscheidung überlassen.
-    <br>
-    Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
-  </div>
+  <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></h3>
 </div>
 
 <form method="POST">
-  <h4>Allgemein</h4>
-  <br><br>
+  <h4><?php echo $lang['ADMIN_CORE_OPTIONS']; ?> <a role="button" data-toggle="collapse" href="#password_info_general"> <i class="fa fa-info-circle"> </i> </a></h4>
+  <br>
+  <div class="collapse" id="password_info_general">
+    <div class="well"><?php echo $lang['INFO_PASSWORD_GENERAL']; ?></div>
+  </div>
+  <br>
   <div class="container-fluid">
     <div class="col-md-4">
-      Minimale Passwortlänge:
+      <?php echo $lang['PASSWORD_MINLENGTH'] ?>:
     </div>
     <div class="col-md-8">
       <input type="number" class="form-control" name="passwordLength" value="<?php echo $row['passwordLength']; ?>" />
     </div>
     <br><br><br>
     <div class="col-md-4">
-      Komplexität:
+      <?php echo $lang['COMPLEXITY']; ?>:
     </div>
     <div class="col-md-4">
       <select class="form-control" name="passwordComplexity">
-        <option value="0" <?php if($row['complexity'] === '0'){echo 'selected';} ?>>Einfach</option>
-        <option value="1" <?php if($row['complexity'] === '1'){echo 'selected';} ?>>Medium</option>
-        <option value="2" <?php if($row['complexity'] === '2'){echo 'selected';} ?>>Stark</option>
+        <option value="0" <?php if($row['complexity'] === '0'){echo 'selected';} ?>><?php echo $lang['COMPLEXITY_TOSTRING']['SIMPLE']; ?></option>
+        <option value="1" <?php if($row['complexity'] === '1'){echo 'selected';} ?>><?php echo $lang['COMPLEXITY_TOSTRING']['MEDIUM']; ?></option>
+        <option value="2" <?php if($row['complexity'] === '2'){echo 'selected';} ?>><?php echo $lang['COMPLEXITY_TOSTRING']['STRONG']; ?></option>
       </select>
     </div>
   </div>
 
   <br><hr><br>
 
-  <div class="col-xs-8">
-    <h4>Verfallsdatum</h4>
+  <div class="row">
+    <div class="col-xs-8">
+      <h4>Verfallsdatum <a role="button" data-toggle="collapse" href="#password_info_expiry"><i class="fa fa-info-circle"></i></a></h4>
+    </div>
+    <div class="col-xs-2 checkbox">
+      <input type="checkbox" value="person" name="enableTimechange"  <?php if($row['expiration'] == 'TRUE'){echo 'checked';} ?> /> Aktiv
+    </div>
   </div>
-  <div class="col-xs-2 checkbox">
-    <input type="checkbox" value="person" name="enableTimechange"  <?php if($row['expiration'] == 'TRUE'){echo 'checked';} ?> /> Aktiv
+  <br>
+  <div class="collapse" id="password_info_expiry">
+    <div class="well">
+      Passwörter können ein Verfallsdatum besitzen (Erweitert - Aktiv), wodurch nach Ablauf der Zeit der Benutzer dazu aufgefordert wird sein Passwort zu ändern.
+      Die Aufforderung kann den Benutzer entweder Zwingen, oder ihm die Entscheidung überlassen.
+    </div>
   </div>
-  <br><br><br>
+  <br>
   <div class="container-fluid">
     <div class="col-md-4">
       Änderung nach Monaten:
@@ -161,10 +160,15 @@ $row = $result->fetch_assoc();
 
   <br><hr><br>
 
-  <div class="col-xs-12">
-    <h4>Master Passwort Setzen</h4>
+
+  <h4>Master Passwort Setzen <a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <br>
+  <div class="collapse" id="password_info_master">
+    <div class="well">
+      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
+    </div>
   </div>
-  <br><br><br>
+  <br>
   <div class="container-fluid">
     <div class="col-md-4">
       Aktuelles Passwort:
