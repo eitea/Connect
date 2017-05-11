@@ -38,7 +38,8 @@ if(isset($_POST['adminPass'])){
   $companyType = test_input($_POST['type']);
   $firstname = test_input($_POST['firstname']);
   $lastname = test_input($_POST['lastname']);
-  $loginname = clean($_POST['localPart']) .'@'.clean($_POST['domainPart']);
+  $domainname = clean($_POST['domainPart']); //needed for admin account
+  $loginname = clean($_POST['localPart']) .'@'.$domainname;
 }
 echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 

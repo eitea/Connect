@@ -12,7 +12,7 @@ require_once "connection_vars.php";
 
 $sql = "CREATE TABLE $userTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  firstname VARCHAR(30) NOT NULL,
+  firstname VARCHAR(30),
   lastname VARCHAR(30) NOT NULL,
   psw VARCHAR(60) NOT NULL,
   coreTime TIME DEFAULT '08:00:00',

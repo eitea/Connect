@@ -17,48 +17,55 @@ $travellingFile
 */
 
 //dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
-//insert first core user
-$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
+//insert ADMIN
+$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$psw');";
 $conn->query($sql);
-
+//interval
 $sql = "INSERT INTO $intervalTable (userID) VALUES (1);";
 $conn->query($sql);
-
-//insert roletable
+//role
 $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, canStamp, canBook) VALUES(1, 'TRUE', 'TRUE', 'TRUE');";
+$conn->query($sql);
+//insert company-client relationship
+$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,1)";
+$conn->query($sql);
+
+//insert Core User
+$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
+$conn->query($sql);
+//insert intervaltable
+$sql = "INSERT INTO $intervalTable (userID) VALUES (2);";
+$conn->query($sql);
+//insert roletable
+$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE');";
+$conn->query($sql);
+//insert company-client relationship
+$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,2)";
 $conn->query($sql);
 
 //insert ldap config
 $sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
 $conn->query($sql);
-
 //insert main company
 $sql = "INSERT INTO $companyTable (name, companyType) VALUES ('$companyName', '$companyType')";
 $conn->query($sql);
-
-//insert company-client relationship
-$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,1)";
-$conn->query($sql);
-
-//insert module en/disable
-$conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
-
 //insert password policy
 $conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
-
+//insert module en/disable
+$conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
 //insert holidays
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
   if($holidayFile[$i]['BEGIN'] == 'VEVENT'){
     $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
-    $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 23:59:59";
+    $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
     $n = $holidayFile[$i]['SUMMARY'];
-
-    $sql = "INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+    $conn->query("INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');");
   }
+}
+
+if (!$conn->query($sql)) {
+  echo mysqli_error($conn);
 }
 
 //insert travelling expenses
