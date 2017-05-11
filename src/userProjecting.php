@@ -15,30 +15,38 @@ if($result && $result->num_rows > 0){
 }
 
 //ADDENDUMS
-$request_addendum = array();
-$result = $conn->query("SELECT indexIM, timeToUTC FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
+$request_addendum = false;
+$result = $conn->query("SELECT indexIM, timeToUTC, time, timeEnd FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
 while($result && ($row = $result->fetch_assoc())){
+  $has_bookings = false;
   $i = $row['indexIM'];
+  $A = $row['time']; //also check beginning
   $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
-  if($res_b && $res_b->num_rows > 0){
-    $row_b_prev = $res_b->fetch_assoc();
-    $endTime = $row_b_prev['end'];
-    while($row_b = $res_b->fetch_assoc()){ //next
-      if(timeDiff_Hours($endTime, $row_b['start']) > $bookingTimeBuffer/60){
-        //user will be FORCED to add, i know the next add has boundaries
-        $request_addendum['timeToUTC'] = $row['timeToUTC'];
-        $request_addendum['prev_row'] = $row_b_prev;
-        $request_addendum['cur_row'] = $row_b;
-        //for the post request, we have to know what he is currently editing
-        $indexIM = $i;
-        $date = substr($row_b['start'],0,10);
-        $timeToUTC = $row['timeToUTC'];
-        break;
-      }
-      $endTime = $row_b['end'];
-      $row_b_prev = $row_b; //trivial
+  while($row_b = $res_b->fetch_assoc()){
+    $has_bookings = true;
+    $B = $row_b['start'];
+    if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //buffer comes from header
+      $request_addendum = $i;
+      //to process the next ADD, we need to know what he is editing
+      $indexIM = $i;
+      $date = substr($row_b['start'],0,10);
+      $timeToUTC = $row['timeToUTC'];
+      $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
+      $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
+      break;
     }
-    if($request_addendum) break;
+    $A = $row_b['end'];
+  }
+  if($request_addendum) break;
+  $B = $row['timeEnd'];
+  if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
+    $request_addendum = $i;
+    $indexIM = $i;
+    $date = substr($row_b['start'],0,10);
+    $timeToUTC = $row['timeToUTC'];
+    $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
+    $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
+    break;
   }
 }
 
@@ -49,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all Operations.");
   }
-
 
   if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $startDate = $date." ".$_POST['start'];
@@ -78,7 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $expenses_info = test_input($_POST['expenses_info']);
           $expenses_unit = test_input($_POST['expenses_unit']);
         } else {
-          $expenses_price = $expenses_info = $expenses_unit = 0.0;
+          $expenses_price = $expenses_unit = 0.0;
+          $expenses_info = '';
         }
         if(isset($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);

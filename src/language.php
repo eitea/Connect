@@ -45,8 +45,11 @@ $lang_ger['ADD'] = 'Hinzufügen';
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
-$lang_eng['ADDRESS'] = 'Address';
-$lang_ger['ADDRESS'] = 'Adresse';
+$lang_eng['ADDRESS'] = 'Address Form';
+$lang_ger['ADDRESS'] = 'Anrede';
+
+$lang_eng['ADDRESS_FORM'] = 'Address';
+$lang_ger['ADDRESS_FORM'] = 'Adresse';
 
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
@@ -54,8 +57,8 @@ $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
 $lang_eng['ADMIN_DELETE'] = 'Please do not delete the Admin';
 $lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
 
-$lang_eng['ADMIN_CORE_OPTIONS'] = 'System Options';
-$lang_ger['ADMIN_CORE_OPTIONS'] = 'Systemeinstellungen';
+$lang_eng['ADMIN_CORE_OPTIONS'] = 'General';
+$lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';
@@ -80,6 +83,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
+
+$lang_eng['ASK_DELETE'] = 'Do you really wish to delete %s?';
+$lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
@@ -138,6 +144,12 @@ $lang_ger['CHECK_OUT'] = 'Ausstempeln';
 $lang_eng['CHECKLIST'] = 'Checklist';
 $lang_ger['CHECKLIST'] = 'Checkliste';
 
+$lang_eng['CHOOSE_PROCESS'] = 'Choose Process';
+$lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
+
+$lang_eng['CITY'] = 'City';
+$lang_ger['CITY'] = 'Ort';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
@@ -153,8 +165,17 @@ $lang_ger['COMPANIES'] = 'Mandanten';
 $lang_eng['COMPANY'] = 'Company';
 $lang_ger['COMPANY'] = 'Mandant';
 
+$lang_eng['COMPANY_2'] = 'Company';
+$lang_ger['COMPANY_2'] = 'Firma';
+
 $lang_eng['COMPLETE'] = 'Complete';
 $lang_ger['COMPLETE'] = 'Komplett';
+
+$lang_eng['CONFIRM'] = 'Confirm';
+$lang_ger['CONFIRM'] = 'Bestätigen';
+
+$lang_eng['CONFIRM_CANCEL'] = 'No, I\'m sorry.';
+$lang_ger['CONFIRM_CANCEL'] = 'Nein, tut mir leid.';
 
 $lang_eng['CONSUMED'] = 'Consumed';
 $lang_ger['CONSUMED'] = 'Konsumiert';
@@ -168,6 +189,9 @@ $lang_ger['CORRECTION'] = 'Korrektur';
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
 
+$lang_eng['COUNTRY'] = 'Country';
+$lang_ger['COUNTRY'] = 'Land';
+
 $lang_eng['DAILY_USER_PROJECT'] = 'Daily User Project';
 $lang_ger['DAILY_USER_PROJECT'] = 'Tagesbericht';
 
@@ -176,6 +200,9 @@ $lang_ger['DATA'] = 'Daten';
 
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
+
+$lang_eng['DATE_DELIVERY'] = 'Date of Delivery';
+$lang_ger['DATE_DELIVERY'] = 'Lieferdatum';
 
 $lang_eng['DAYS'] = 'Days';
 $lang_ger['DAYS'] = 'Tage';
@@ -273,6 +300,9 @@ $lang_ger['EXPECTED_HOURS'] = 'Erwartete Stunden';
 $lang_eng['EXPENSES'] = 'Expenses';
 $lang_ger['EXPENSES'] = 'Spesen';
 
+$lang_eng['EXPIRATION_DATE'] = 'Expiration Date';
+$lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
+
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 
@@ -324,6 +354,9 @@ $lang_ger['GREETING_AFTERNOON'] = 'Hallo';
 $lang_eng['GREETING_EVENING'] = 'Good Evening';
 $lang_ger['GREETING_EVENING'] = 'Guten Abend';
 
+$lang_eng['GENERAL_INFORMATION'] = 'General Information';
+$lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
+
 $lang_eng['GENERAL_SETTINGS'] = 'General Settings';
 $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 
@@ -368,6 +401,9 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
+
+$lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
+$lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
 
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
@@ -435,6 +471,15 @@ $lang_ger['NEW_PASSWORD'] = 'Neues Passwort';
 $lang_eng['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
 $lang_ger['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
 
+$lang_eng['NEW_PROCESS'] = 'New Process';
+$lang_ger['NEW_PROCESS'] = 'Neuer Vorgang';
+
+$lang_eng['NEW_PROPOSAL'] = 'New Proposal';
+$lang_ger['NEW_PROPOSAL'] = 'Neues Angebot';
+
+$lang_eng['NEW_RECEIPT'] = 'New Receipt';
+$lang_ger['NEW_RECEIPT'] = 'Neue Rechnung';
+
 $lang_eng['NEW_TEMPLATE'] = 'New Template';
 $lang_ger['NEW_TEMPLATE'] = 'Neue Vorlage';
 
@@ -495,6 +540,9 @@ $lang_ger['PDF_TEMPLATES'] = 'Pdf Vorlagen';
 $lang_eng['PHONE_NUMBER'] = 'Telephone Number';
 $lang_ger['PHONE_NUMBER'] = 'Telefonnummer';
 
+$lang_eng['PLZ'] = 'Postal Code';
+$lang_ger['PLZ'] = 'PLZ';
+
 $lang_eng['PREVIEW'] = 'Preview';
 $lang_ger['PREVIEW'] = 'Vorschau';
 
@@ -521,6 +569,18 @@ $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';
 
 $lang_eng['PROJECT_INFORMATION'] = 'Reports';
 $lang_ger['PROJECT_INFORMATION'] = 'Reports';
+
+$lang_eng['PROP_OUR_SIGN'] = 'Our Sign';
+$lang_ger['PROP_OUR_SIGN'] = 'Unser Zeichen';
+
+$lang_eng['PROP_OUR_MESSAGE'] = 'Our Message';
+$lang_ger['PROP_OUR_MESSAGE'] = 'Unsere Nachricht';
+
+$lang_eng['PROP_YOUR_SIGN'] = 'Your Sign';
+$lang_ger['PROP_YOUR_SIGN'] = 'Ihr Zeichen';
+
+$lang_eng['PROP_YOUR_ORDER'] = 'Your Order';
+$lang_ger['PROP_YOUR_ORDER'] = 'Ihre Bestellung';
 
 $lang_eng['PROPERTIES'] = 'Properties';
 $lang_ger['PROPERTIES'] = 'Eigenschaften';
@@ -596,6 +656,12 @@ $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 $lang_eng['SAVE'] = 'Save';
 $lang_ger['SAVE'] = 'Speichern';
 
+$lang_eng['SALDO_DAY'] = 'Daily Saldo';
+$lang_ger['SALDO_DAY'] = 'Tagessaldo';
+
+$lang_eng['SALDO_MONTH'] = 'Monthly Saldo';
+$lang_ger['SALDO_MONTH'] = 'Monatssaldo';
+
 $lang_eng['SCHEDULE_TOSTRING'] = array(
   '-1' => 'Inactive',
   '0' => 'Once',
@@ -630,6 +696,9 @@ $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
+
+$lang_eng['STREET'] = 'Street';
+$lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';
@@ -710,13 +779,15 @@ $lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter
 <li>Entries with negative dates are not valid. Breaks have to be checked out.</li>
 <li>Lunchbreaks have to be consumed as a whole, otherwise a complete one will be added additionally afterwards.</li>
 <li>Gaps between bookings and breaks may not be too big.</li>
-</ul>';
+</ul>
+<a href="makeRequest.php">Forgot to Checkout your lunchbreak?</a>';
 $lang_ger['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
 Dabei sind die folgenden Regeln zu beachten: <ul>
 <li>Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.</li>
 <li>Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
 <li>Die Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.</li>
-</ul>';
+</ul>
+<a href="makeRequest.php">Mittagspause vergessen?</a>';
 
 $lang_eng['VACATION'] = 'Vacation';
 $lang_ger['VACATION'] = 'Urlaub';
@@ -757,11 +828,14 @@ $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
 $lang_eng['VOCATIONAL_SCHOOL'] = 'Training';
 $lang_ger['VOCATIONAL_SCHOOL'] = 'Weiterbildung';
 
-$lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
-$lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';
-
 $lang_eng['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
 $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';
+
+$lang_eng['WARNING_DELETE_COMPANY'] = 'All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?';
+$lang_ger['WARNING_DELETE_COMPANY'] = 'Alle Kunden, Projekte und Buchungen die zu diesem Mandanten gehören werden permanent gelöscht. Wollen Sie dennoch fortfahren?';
+
+$lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
+$lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';
 
 $lang_eng['WEEKDAY_TOSTRING'] = array(
   "mon" => "Monday",

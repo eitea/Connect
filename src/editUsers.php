@@ -7,6 +7,7 @@
 </div>
 <?php
 $activeTab = 0;
+if(isset($_GET['ACT'])){$activeTab = $_GET['ACT']; }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1){
     $x = $_POST['deactivate'];
@@ -302,12 +303,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sun = test_input($_POST['sun'.$x]);
     }
 
-    //close up the old one
+    //update latest interval
     $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
       vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest'
       WHERE userID = $x AND endDate IS NULL");
 
     echo mysqli_error($conn);
+    if($userID == $x){
+      redirect("editUsers.php?ACT=$x");
+    }
   }//end if isset submitX
 }
 ?>

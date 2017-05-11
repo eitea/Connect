@@ -29,8 +29,8 @@ if(isset($_POST['saveAll'])){
 
   if(isset($_POST['contactType'])){
     $val = $_POST['contactType'];
-    $conn->query("UPDATE $clientDetailTable SET contactType = '$val' WHERE id = $detailID");
-  }
+  } else { $val = ''; }
+  $conn->query("UPDATE $clientDetailTable SET contactType = '$val' WHERE id = $detailID");
 
   if(isset($_POST['gender'])){
     $val = $_POST['gender'];
@@ -45,6 +45,11 @@ if(isset($_POST['saveAll'])){
   if(isset($_POST['name'])){
     $val = test_input($_POST['name']);
     $conn->query("UPDATE $clientDetailTable SET name = '$val' WHERE id = $detailID");
+  }
+
+  if(isset($_POST['firstname'])){
+    $val = test_input($_POST['firstname']);
+    $conn->query("UPDATE $clientDetailTable SET firstname = '$val' WHERE id = $detailID");
   }
 
   if(isset($_POST['nameAddition'])){
@@ -62,9 +67,24 @@ if(isset($_POST['saveAll'])){
     $conn->query("UPDATE $clientDetailTable SET address_Country = '$val' WHERE id = $detailID");
   }
 
+  if(isset($_POST['address_Country_City'])){
+    $val = test_input($_POST['address_Country_City']);
+    $conn->query("UPDATE $clientDetailTable SET address_Country_City = '$val' WHERE id = $detailID");
+  }
+
+  if(isset($_POST['address_Country_Postal'])){
+    $val = test_input($_POST['address_Country_Postal']);
+    $conn->query("UPDATE $clientDetailTable SET address_Country_Postal = '$val' WHERE id = $detailID");
+  }
+
   if(isset($_POST['phone'])){
     $val = test_input($_POST['phone']);
     $conn->query("UPDATE $clientDetailTable SET phone = '$val' WHERE id = $detailID");
+  }
+
+  if(isset($_POST['fax_number'])){
+    $val = test_input($_POST['fax_number']);
+    $conn->query("UPDATE $clientDetailTable SET fax_number = '$val' WHERE id = $detailID");
   }
 
   if(isset($_POST['debitNumber'])){
@@ -263,29 +283,21 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
 <form method="post">
   <div class="tab-content">
     <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
-      <div class="row radio">
-        <div class="col-xs-8">
-          <h3>Allgemeine Informationen</h3>
-        </div>
-        <br>
-        <div class="col-xs-2">
-          <input type="radio" value="person" name="contactType" <?php if($row['contactType'] == 'person'){echo 'checked';} ?> /> Person
-        </div>
-        <div class="col-xs-2">
-          <input type="radio" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> Company
-        </div>
-      </div>
+        <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
       <hr>
       <div class="container">
-        <div class="row radio">
+        <div class="row">
           <div class="col-xs-3">
-            Anrede
+            <?php echo $lang['ADDRESS_FORM']; ?>
           </div>
           <div class="col-xs-2">
-            <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> Herr
+            <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?>
           </div>
-          <div class="col-xs-2">
-            <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> Frau
+          <div class="col-sm-2">
+            <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?>
+          </div>
+          <div class="col-sm-2">
+            <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?>
           </div>
         </div>
         <br>
@@ -299,7 +311,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </div>
         <div class="row form-group">
           <div class="col-xs-3">
-            Name
+            <?php echo $lang['LASTNAME']; ?>
           </div>
           <div class="col-xs-9">
             <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
@@ -307,7 +319,15 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </div>
         <div class="row form-group">
           <div class="col-xs-3">
-            Addition/Zusatz
+            <?php echo $lang['FIRSTNAME']; ?>
+          </div>
+          <div class="col-xs-9">
+            <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" />
+          </div>
+        </div>
+        <div class="row form-group">
+          <div class="col-xs-3">
+            Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>
           </div>
           <div class="col-xs-9">
             <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
@@ -315,7 +335,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </div>
         <div class="row form-group">
           <div class="col-xs-3">
-            Straße
+            <?php echo $lang['STREET']; ?>
           </div>
           <div class="col-xs-9">
             <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
@@ -323,7 +343,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </div>
         <div class="row form-group">
           <div class="col-xs-3">
-            Land/PLZ/Ort
+            <?php echo $lang['COUNTRY']; ?>
           </div>
           <div class="col-xs-9">
             <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
@@ -331,16 +351,40 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </div>
         <div class="row form-group">
           <div class="col-xs-3">
-            Handy
+            <?php echo $lang['PLZ']; ?>
+          </div>
+          <div class="col-xs-9">
+            <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" />
+          </div>
+        </div>
+        <div class="row form-group">
+          <div class="col-xs-3">
+            <?php echo $lang['CITY']; ?>
+          </div>
+          <div class="col-xs-9">
+            <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" />
+          </div>
+        </div>
+        <div class="row form-group">
+          <div class="col-xs-3">
+            <?php echo $lang['PHONE_NUMBER']; ?>
           </div>
           <div class="col-xs-9">
             <input type="text" class="form-control" name="phone" value="<?php echo $row['phone']; ?>" />
           </div>
         </div>
+        <div class="row form-group">
+          <div class="col-xs-3">
+            Fax
+          </div>
+          <div class="col-xs-9">
+            <input type="text" class="form-control" name="fax_number" value="<?php echo $row['fax_number']; ?>" />
+          </div>
+        </div>
       </div>
 
       <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="home">Speichern</button>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="home"><?php echo $lang['SAVE']; ?></button>
     </div>
 
     <div id="menuTaxes" class="tab-pane fade <?php if($activeTab == 'taxes'){echo 'in active';}?>">

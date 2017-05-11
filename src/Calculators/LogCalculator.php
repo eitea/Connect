@@ -76,16 +76,16 @@ class LogCalculator{
               $this->vacationHours += $expectedHours;
               $this->vacationDays--;
               break;
-              case 2:
-              $this->specialLeaveHours += $expectedHours;
+              case 2: //Can have ZA
+              $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
               break;
               case 3:
-              $this->sickHours += timeDiff_Hours($row['time'], $timeEnd);
+              $this->sickHours += $expectedHours;
               break;
               case 4:
-              $this->educationHours += $expectedHours;
+              $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
               break;
-              case 5:
+              case 5: //Mixed
               $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND mixedStatus != '-1'"); //select booking which tells us when she checked in.
               $mixed_absolved = 0;
               if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
@@ -99,7 +99,8 @@ class LogCalculator{
               }
 
               $this->breakCreditHours += $row['breakCredit'];
-            }
+
+            }//END SWITCH
           } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
             $this->expectedHours += $expectedHours;
           }

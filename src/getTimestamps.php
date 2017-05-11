@@ -163,13 +163,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <th><?php echo $lang['BEGIN']; ?></th>
         <th><?php echo $lang['BREAK']; ?></th>
         <th><?php echo $lang['END']; ?></th>
-        <th width="60px"><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></th>
+        <th width="60px"><small><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></small></th>
         <th><?php echo $lang['ACTIVITY']; ?></th>
         <th><?php echo $lang['SHOULD_TIME']; ?></th>
         <th><?php echo $lang['IS_TIME']; ?></th>
-        <th><?php echo $lang['DIFFERENCE']; ?></th>
-        <th>Saldo</th>
-        <th style="text-align:right;"><div>Option</div></th>
+        <th><?php echo $lang['SALDO_DAY']; ?></th>
+        <th><?php echo $lang['SALDO_MONTH']; ?></th>
+        <th>Option</th>
       </thead>
       <tbody>
         <?php
@@ -262,7 +262,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
             echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
             echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
-            echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
+            echo "<td>" . displayAsHoursMins($accumulatedSaldo) . "</td>";
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
               echo '<button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';

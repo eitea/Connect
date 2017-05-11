@@ -831,7 +831,126 @@ if($row['version'] < 83){
   } //no elso in here
 }
 
-//if($row['version'] < 84){}
+if($row['version'] < 84){
+  $sql = "ALTER TABLE proposals ADD COLUMN curDate DATETIME DEFAULT CURRENT_TIMESTAMP";
+  if($conn->query($sql)){
+    echo '<br> Added date to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN deliveryDate DATETIME";
+  if($conn->query($sql)){
+    echo '<br> Added date of delivery to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN yourSign VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added sign 1 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN yourOrder VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added order to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN ourSign VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added sign 2 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN ourMessage VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added mesasge to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE proposals ADD COLUMN daysNetto INT(4)";
+  if($conn->query($sql)){
+    echo '<br> Added days Netto to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN skonto1 DECIMAL(6,2)";
+  if($conn->query($sql)){
+    echo '<br> Added skonto 1 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN skonto2 DECIMAL(6,2)";
+  if($conn->query($sql)){
+    echo '<br> Added skonto 2 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN skonto1Days INT(4)";
+  if($conn->query($sql)){
+    echo '<br> Added days to skonto 1 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN skonto2Days INT(4)";
+  if($conn->query($sql)){
+    echo '<br> Added days to skonto 2 to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN paymentMethod VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added payment method to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN shipmentType VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added shipment type to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN representative VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added representative to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE proposals ADD COLUMN porto DECIMAL(8,2)";
+  if($conn->query($sql)){
+    echo '<br> Added porto to Proposals';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN firstname VARCHAR(45)";
+  if($conn->query($sql)){
+    echo '<br> Splitting name to first and lastname in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_Postal VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Splitting postal code off country in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_City VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Splitting city off country in client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN fax_number VARCHAR(30)";
+  if($conn->query($sql)){
+    echo '<br> Added fax number to client data';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+}
 //if($row['version'] < 85){}
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}
@@ -840,8 +959,7 @@ if($row['version'] < 83){
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
-$sql = "UPDATE $adminLDAPTable SET version=$VERSION_NUMBER";
-$conn->query($sql);
+$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
 ?>
 <script type="text/javascript">
