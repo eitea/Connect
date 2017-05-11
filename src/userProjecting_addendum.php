@@ -2,13 +2,13 @@
 <h4><?php echo $lang['GAPS_FOUND_PLEASE_CORRECT']; ?></h4>
 <br><br>
 <table class="table">
-<thead>
-  <th>Start</th>
-  <th><?php echo $lang['END']; ?></th>
-  <th>Info</th>
-  <th>Intern</th>
-</thead>
-<tbody>
+  <thead>
+    <th>Start</th>
+    <th><?php echo $lang['END']; ?></th>
+    <th>Info</th>
+    <th>Intern</th>
+  </thead>
+  <tbody>
     <?php
     $result = $conn->query("SELECT indexIM, timeToUTC, time, timeEnd FROM logs WHERE indexIM = $request_addendum");
     echo mysqli_error($conn);
@@ -33,5 +33,5 @@
       echo '<tr style="background-color:#feffec;"><td>?</td><td>?</td><td>?</td><td>?</td></tr>';
     }
     ?>
-</tbody>
+  </tbody>
 </table>

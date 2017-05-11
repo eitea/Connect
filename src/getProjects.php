@@ -643,7 +643,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       success : function(resp){
         $(selectID).html(resp);
       },
-      error : function(resp){}
+      error : function(resp){},
+      complete : function(resp){
+        showProjectfields($('#addSelectProject').val());
+      }
     });
   };
   function showNewClients(selectID, company, client){

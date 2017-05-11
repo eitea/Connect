@@ -126,11 +126,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->query($sql);
             if(mysqli_error($conn)){
               echo mysqli_error($conn);
-            } else {
-              echo '<div class="alert alert-success fade in">';
-              echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-              echo $lang['OK_ADD'];
-              echo '</div>';
             }
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
