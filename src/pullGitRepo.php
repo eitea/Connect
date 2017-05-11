@@ -21,14 +21,18 @@
       echo implode('<br>', $output) .'<br><br>';
     }
 
-    $command = "git -C $repositoryPath fetch --all 2>&1";
-    exec($command, $output, $returnValue);
+    if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
+      $command = "git -C $repositoryPath fetch --all 2>&1";
+      exec($command, $output, $returnValue);
+    } else {
+      $command = "git -C $repositoryPath fetch --all 2>&1";
+      exec($command, $output, $returnValue);
 
-    $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
-    exec($command, $output, $returnValue);
+      $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
+      exec($command, $output, $returnValue);
+    }
 
     echo implode('<br>', $output);
-
     session_destroy();
     echo "<br><br><input type='submit' name='okey' value='O.K & Continue' /></form>";
 

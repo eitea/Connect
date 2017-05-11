@@ -291,13 +291,13 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             <?php echo $lang['ADDRESS_FORM']; ?>
           </div>
           <div class="col-xs-2">
-            <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> Herr
+            <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?>
           </div>
           <div class="col-sm-2">
-            <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> Frau
+            <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?>
           </div>
           <div class="col-sm-2">
-            <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> Company
+            <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?>
           </div>
         </div>
         <br>
@@ -384,7 +384,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       </div>
 
       <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="home">Speichern</button>
+      <button type="submit" class="btn btn-warning" name="saveAll" value="home"><?php echo $lang['SAVE']; ?></button>
     </div>
 
     <div id="menuTaxes" class="tab-pane fade <?php if($activeTab == 'taxes'){echo 'in active';}?>">

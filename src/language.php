@@ -165,6 +165,9 @@ $lang_ger['COMPANIES'] = 'Mandanten';
 $lang_eng['COMPANY'] = 'Company';
 $lang_ger['COMPANY'] = 'Mandant';
 
+$lang_eng['COMPANY_2'] = 'Company';
+$lang_ger['COMPANY_2'] = 'Firma';
+
 $lang_eng['COMPLETE'] = 'Complete';
 $lang_ger['COMPLETE'] = 'Komplett';
 

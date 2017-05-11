@@ -283,7 +283,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               if(mysqli_error($conn)){
                 echo mysqli_error($conn);
               } else {
-                echo '<div class="alert alert-success fade in">';
+                echo '<div class="alert alert-success alert-over fade in">';
                 echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
                 echo $lang['OK_ADD'];
                 echo '</div>';
