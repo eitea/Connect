@@ -179,10 +179,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           //filterStatus, let's just skip all those taht dont fit?
           if($filterStatus !== '' && $calculator->activity[$i] != $filterStatus) continue;
 
-          if($calculator->end[$i] == '0000-00-00 00:00:00'){
-            $calculator->absolvedTime[$i] = timeDiff_Hours($calculator->start[$i], getCurrentTimestamp());
-          }
-
           $style = "";
           $tinyEndTime = '-';
 

@@ -233,7 +233,7 @@ echo mysqli_error($conn);
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
               } else {
-                $icon = "fa fa-bookmark"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
+                $icon = "fa fa-bookmark"; //snowflake-o, heart, umbrella, tree, music, bookmark, globe
               }
               $interninfo = $row['internInfo'];
               $expensesinfo = $optionalinfo = '';

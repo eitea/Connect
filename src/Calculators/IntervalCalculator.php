@@ -80,7 +80,7 @@ class Interval_Calculator{
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
         $this->lunchTime[] = $row['breakCredit'];
-        $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? 0 : timeDiff_Hours($row['time'], $row['timeEnd']);
+        $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? timeDiff_Hours($row['time'], getCurrentTimestamp()) : timeDiff_Hours($row['time'], $row['timeEnd']);
       } else { //user wasnt here today = 0 absolved hours
         $this->start[] = false;
         $this->end[] = false;
