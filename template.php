@@ -6,6 +6,5 @@
 </div>
 
 
-
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

@@ -572,7 +572,7 @@ $sql = "CREATE TABLE $policyTable (
     sat DECIMAL(4,2) DEFAULT 0,
     sun DECIMAL(4,2) DEFAULT 0,
     vacPerYear INT(2) DEFAULT 25,
-    overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+    overTimeLump DECIMAL(5,2) DEFAULT 0.0,
     pauseAfterHours DECIMAL(4,2) DEFAULT 6,
     hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
     userID INT(6) UNSIGNED,

@@ -964,7 +964,14 @@ if($row['version'] < 84){
   }
 }
 
-//if($row['version'] < 85){}
+if($row['version'] < 85){
+  $sql = "ALTER TABLE intervalData MODIFY COLUMN overTimeLump DECIMAL(5,2) DEFAULT 0.0";
+  if($conn->query($sql)){
+    echo '<br> Max overtime from 99.00 to 999.00';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}

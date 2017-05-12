@@ -148,7 +148,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <title>Connect</title>
 </head>
 <script>
-document.onreadystatechange = function () {
+document.onreadystatechange = function() {
   var state = document.readyState
   if (state == 'complete') {
     document.getElementById("loader").style.display = "none";
