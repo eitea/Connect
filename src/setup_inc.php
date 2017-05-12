@@ -38,7 +38,6 @@ $sql = "CREATE TABLE $logTable (
   timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   status INT(3),
   timeToUTC INT(2) DEFAULT '2',
-  breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
@@ -326,7 +325,6 @@ $sql = "CREATE TABLE $deactivatedUserLogs (
   timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   status ENUM('-1', '0', '1', '2', '3', '4'),
   timeToUTC INT(2) DEFAULT '2',
-  breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
   ON UPDATE CASCADE

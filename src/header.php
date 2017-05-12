@@ -54,10 +54,16 @@ if($isTimeAdmin){
   $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
   if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   //forgotten checkouts
-  $result = $conn->query("SELECT COUNT(*) FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0");
+  $result = $conn->query("SELECT COUNT(*) FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
   if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
   //gemini date in logs
   $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 WHERE EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+  if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+  //illegal Lunchbreaks
+  $result = $conn->query("SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
+  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
+  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)");
   if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
 }
 

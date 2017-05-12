@@ -74,9 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
-        $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE logs SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
-        $conn->query($sql);
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
       } else {
@@ -272,11 +269,6 @@ echo mysqli_error($conn);
             }
             if(isset($_POST['undo'])){
               $row = $result->fetch_assoc();
-              if($row['bookingType'] == 'break'){ //undo breaks
-                $timeDiff = timeDiff_Hours($row['start'], $row['end']);
-                $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
-                $conn->query($sql);
-              }
               $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
               $conn->query($sql);
             }

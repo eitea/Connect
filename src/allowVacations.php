@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
 
-          $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', 0)";
+          $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
           $conn->query($sql);
           echo mysqli_error($conn);
         }

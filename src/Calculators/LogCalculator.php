@@ -36,40 +36,44 @@ class LogCalculator{
       $i = $iRow['startDate'];
       $now = $j = $iRow['endDate'];
 
-      if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
+      if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //until today
         $now = getCurrentTimestamp();
         $j = carryOverAdder_Hours($now, 24);
-      } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
+      } elseif(empty($j)){ //exit date
         $j = $iRow['exitDate'];
       }
 
       $diff = timeDiff_Hours($i, $j);
-      $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
-
-      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
+      $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24);
+      //days
+      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
         if(isHoliday($i)){
           $expectedHours = 0;
         }
         $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
-        if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
+        if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){
           if($row['timeEnd'] == '0000-00-00 00:00:00'){
-            //open timestamp lowers expected Hours according to how long user has been checked in
+            //adjust expected Hours to current time
             $timeEnd = $now;
-            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
+            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){
               $this->expectedHours += $expectedHours;
             } else {
-              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //else: reduce expected hours to match time he has been here already, so there's no minus he can't keep up to.
+              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd);
             }
           } else {
             $timeEnd = $row['timeEnd'];
             $this->expectedHours += $expectedHours;
           }
 
+          $break_hours = 0;
+          $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
+          while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+
           switch($row['status']){
             case 0:
             $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
-            $this->breakCreditHours += $row['breakCredit'];
+            $this->breakCreditHours += $break_hours;
             break;
             case 1:
             $this->vacationHours += $expectedHours;
@@ -92,19 +96,19 @@ class LogCalculator{
             }
             //too little
             if($mixed_absolved < $expectedHours){
-              $this->absolvedHours += $expectedHours + $row['breakCredit']; //match
+              $this->absolvedHours += $expectedHours + $break_hours; //match
             } else { //overtime
               $this->absolvedHours += $mixed_absolved;
             }
 
-            $this->breakCreditHours += $row['breakCredit'];
+            $this->breakCreditHours += $break_hours;
 
           } //END SWITCH
-        } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
+        } elseif(substr($i,0, 10) != substr($now,0,10)) {
           $this->expectedHours += $expectedHours;
         }
-
-        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, check the accumulated saldo
+        //EOM Calculations
+        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
           $monthly_corrections = 0;
           //correction Hours:
           $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE('$i') > DATE(createdOn) AND DATE('".substr($i,0,7)."-01') <= DATE(createdOn)");

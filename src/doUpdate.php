@@ -68,9 +68,6 @@ function move() {
   <div id="content" style="display:none;">
 <br>
 <?php
-/*
-* To add a new Update: increase the version number in version_number.php. For more information see head of setup_inc.php
-*/
 require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
@@ -338,17 +335,6 @@ if($row['version'] < 64){
     }
   }
   echo "<br>Inserted complete (!) lunchbreaks";
-  //recalculate all break values that need recalculating.
-  $result = $conn->query("SELECT indexIM FROM $logTable WHERE status = '0'");
-  while($result && ($row = $result->fetch_assoc())){
-    $indexIM = $row['indexIM'];
-    $resultBreak = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS mySum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break'");
-    if($resultBreak && ($rowBreak = $resultBreak->fetch_assoc())){
-      $hours = sprintf("%.2f", $rowBreak['mySum'] / 60);
-      $conn->query("UPDATE $logTable SET breakCredit = '$hours' WHERE indexIM = $indexIM");
-    }
-  }
-  echo "<br>Recalculated all breaks.";
 
   //correct wrong expectedHours on all timestamps that are not 0s.
   $conn->query("UPDATE $logTable SET expectedHours = (TIMESTAMPDIFF(MINUTE, time, timeEnd) / 60) WHERE status != '0' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) - expectedHours*60 != 0 ");
@@ -971,6 +957,14 @@ if($row['version'] < 85){
   } else {
     echo mysqli_error($conn);
   }
+
+  $sql = "ALTER TABLE logs DROP COLUMN breakCredit";
+  if($conn->query($sql)){
+    echo '<br> Removed break field';
+  } else {
+    echo mysqli_error($conn);
+  }
+
 }
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}

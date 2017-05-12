@@ -10,11 +10,10 @@ function checkIn($userID) {
     $row = $result->fetch_assoc();
     $diff = 0;
 
-    if($row['status'] && $row['status'] != 5){
+    if($row['status'] && $row['status'] != 5){ //mixed
       //break timestamp down
       $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, mixedStatus) VALUES('".$row['time']."', '".getCurrentTimestamp()."', '".$row['indexIM']."', 'Checkin Time', 'mixed', '".$row['status']."')";
       $conn->query($sql);
-      //change timestamp to mixed
       $conn->query("UPDATE $logTable SET status = '5' WHERE indexIM =". $row['indexIM']);
     } else {
       //create a break stamping
@@ -28,7 +27,7 @@ function checkIn($userID) {
     }
 
     //update timestamp
-    $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', breakCredit = (breakCredit + $diff), timeToUTC = '$timeToUTC' WHERE indexIM =". $row['indexIM'];
+    $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', timeToUTC = '$timeToUTC' WHERE indexIM =". $row['indexIM'];
     $conn->query($sql);
     echo mysqli_error($conn);
   } else { //create new stamp
@@ -70,15 +69,7 @@ function checkOut($userID) {
           $end = carryOverAdder_Minutes($start, $minutesOfRest);
           //create the lunchbreak booking
           $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$start', '$end', $indexIM, 'Lunchbreak for $userID', 'break')";
-          if($conn->query($sql)){
-            //update timestamp
-            $sql = "UPDATE $logTable SET breakCredit = (breakCredit + ".$row['hoursOfRest'].") WHERE indexIM = $indexIM";
-            if($conn->query($sql)){
-              return "Unconsumed Lunchbreak detected.";
-            } else {
-              return mysqli_error($conn);
-            }
-          } else {
+          if(!$conn->query($sql)){
             return mysqli_error($conn);
           }
         }

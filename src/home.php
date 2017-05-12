@@ -27,28 +27,32 @@ $curID = $userID;
 include 'tableSummary.php'; //this is how it goes
 
 $mean_mon = $mean_tue = $mean_wed = $mean_thu = $mean_fri = $mean_sat = $mean_sun = 0;
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_mon = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows); }
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 1 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 1 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_tue = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 2 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 2 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_wed = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 3 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 3 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_thu = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 4 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 4 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_fri = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 5 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 5 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_sat = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
-$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 - breakCredit) AS times FROM $logTable WHERE WEEKDAY(time) = 6 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+$result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) AS times FROM $logTable WHERE WEEKDAY(time) = 6 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_sun = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 
 $today = getCurrentTimestamp();
 $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $userID AND endDate IS NULL");
 $row = $result->fetch_assoc();
 $expected_today = floatval($row[strtolower(date('D', strtotime($today)))]);
-$result = $conn->query("SELECT time, timeEnd, breakCredit FROM $logTable WHERE userID = $userID AND timeEnd ='0000-00-00 00:00:00'");
+$result = $conn->query("SELECT indexIM, time, timeEnd FROM $logTable WHERE userID = $userID AND timeEnd ='0000-00-00 00:00:00'");
 $row = $result->fetch_assoc();
-$break_today = floatval($row['breakCredit']);
+$break_hours = 0;
+$result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
+while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+
+$break_today = $break_hours;
 if($row['timeEnd'] == '0000-00-00 00:00:00'){
   $absolved_today = timeDiff_Hours($row['time'], $today);
 } else {

@@ -78,11 +78,14 @@ foreach($arr_IDs as $i): //i canBook
   $result_name = $conn->query("SELECT firstname FROM $userTable WHERE id = $i");
   $row_name = $result_name->fetch_assoc();
   $userName = '"'.$row_name['firstname'].'"';
-  $full = $break = $productive = $nonproductive = $drive = 0;
+  $full = $break_hours = $productive = $nonproductive = $drive = 0;
   $result_log = $conn->query("SELECT * FROM $logTable WHERE userID = $i AND status = '0' AND timeEnd != '0000-00-00 00:00:00' AND DATE('$filter_begin') <= DATE(time) AND Date(time) <= DATE('$filter_end')");
   while($result_log && ($row_log = $result_log->fetch_assoc())){
     $full += timeDiff_Hours($row_log['time'], $row_log['timeEnd']);
-    $break = $row_log['breakCredit'];
+
+    $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row_log['indexIM']);
+    while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+
     $result_proj = $conn->query("SELECT start, end, bookingType, status FROM $projectBookingTable LEFT JOIN $projectTable ON projectID = $projectTable.id
                                  WHERE bookingType != 'break' AND timestampID =".$row_log['indexIM']." AND start != '0000-00-00 00:00:00' AND end != '0000-00-00 00:00:00'");
     while($result_proj && ($row_proj = $result_proj->fetch_assoc())){
@@ -100,29 +103,22 @@ foreach($arr_IDs as $i): //i canBook
   echo mysqli_error($conn);
   $height += 50;
   //normalize numbers
-  /*
-  echo 'Full: ' . $full;
-  echo '<br> Productive: '. $productive;
-  echo '<br> Not Productive: '. $nonproductive;
-  echo '<br> Breaks: ' . $break;
-  echo '<br> Drives: '. $drive;
-  */
 
-  if(($productive + $nonproductive + $break + $drive) > $full){
-    $full = $productive + $nonproductive + $break + $drive;
+  if(($productive + $nonproductive + $break_hours + $drive) > $full){
+    $full = $productive + $nonproductive + $break_hours + $drive;
   }
 
   if($full > 0){
-    $break = ($break / $full) * 100;
+    $break_hours = ($break_hours / $full) * 100;
     $productive = $productive / $full * 100;
     $drive = $drive / $full * 100;
-    $nonproductive = 100 - $productive - $break - $drive;
+    $nonproductive = 100 - $productive - $break_hours - $drive;
   } else {
-    $break = $productive = $drive = $nonproductive = 0;
+    $break_hours = $productive = $drive = $nonproductive = 0;
   }
 
   $userNames .= $userName .', ';
-  $breaks .= $break.', ';
+  $breaks .= $break_hours.', ';
   $productives .= $productive.', ';
   $drives .= $drive.', ';
   $nonproductives .= $nonproductive.', ';
