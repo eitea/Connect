@@ -18,7 +18,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterStatus = 0;
   }
 }
-?>
+
+
+$result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
+if(!$result || $result->num_rows <= 0){
+  echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
+  include "new_client.php";
+  echo '</div>';
+}
+ ?>
 
 <form method="POST">
   <select style='width:200px' name="filterCompany" class="js-example-basic-single" onchange="showClients(this.value)">

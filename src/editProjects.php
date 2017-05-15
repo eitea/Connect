@@ -90,7 +90,7 @@ function showClients(company, client){
 <?php
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
-  echo '<div class="alert alert-info"'.$lang['WARNING_NO_CLIENTS'];
+  echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
   include "new_client.php";
   echo '</div>';
 }

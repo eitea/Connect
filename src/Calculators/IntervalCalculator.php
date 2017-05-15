@@ -29,6 +29,7 @@ class Interval_Calculator{
   public $activity = array();
 
   public $beginDate = '';
+  public $exitDate = "";
 
   public function __construct($from, $to, $userid){
     $this->from = substr($from, 0, 10).' 12:00:00';
@@ -48,11 +49,11 @@ class Interval_Calculator{
     $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
     if($result && ($row = $result->fetch_assoc())){
       $this->beginDate = $beginDate = substr($row['beginningDate'],0,11).'00:00:00';
-      $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
-    } else { //should never occur
+      //PHP funfact #038: 32Bit servers running php cannot calculate dates past 2038 (not enough bits).
+      $this->exitDate = $exitDate =  ($row['exitDate'] == '0000-00-00 00:00:00') ? '2037-12-30 23:00:00' : $row['exitDate'];
+    } else {
       return "Invalid userID";
     }
-
 
     $count = $current_saldo_month = 0;
     for($j = 0; $j < $this->days; $j++){ //for each day of the month
@@ -96,8 +97,10 @@ class Interval_Calculator{
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
-
       if($this->absolvedTime[$count] == 0 && timeDiff_Hours($i, substr(getCurrentTimestamp(), 0, 10).' 12:00:00') < 0 ){
+        $this->shouldTime[$count] = 0;
+      }
+      if(timeDiff_Hours($i, substr($exitDate, 0, 10).' 12:00:00') < 0 ){ //past entry dates
         $this->shouldTime[$count] = 0;
       }
 

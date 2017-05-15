@@ -98,9 +98,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <br><br>
   <?php elseif($filterCompanyID): ?>
     <div class="alert alert-info" role="alert">
-      <strong>No Clients yet: </strong> Please create a client first, so you can start assigning projects.<br>
-      Clients can only be assigned to one company each. <br>
-      For project inheritance from company to client, visit <a href="editCompanies.php" class="alert-link"> the default project creation page</a>
+      <?php echo $lang['WARNING_NO_CLIENTS']; ?>
     </div>
   <?php endif; ?>
 

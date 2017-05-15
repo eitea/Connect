@@ -235,7 +235,7 @@ if($result && $result->num_rows > 0):
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
-
+        <?php echo $lang['INFO_ILLEGAL_LUNCHBREAK']; ?>
       </div>
     </div>
 

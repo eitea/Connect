@@ -410,7 +410,7 @@ $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswä
 
 $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
                                         Autocorrecting them adds an complete lunchbreak to the day. (This break will be added)';
-$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine komplette Mittagspause gefunden.<br>
+$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
                                         Die Korrektur trägt eine vollständige Mittagspause nach. (Diese Pause wird dazugerechnet)';
 
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
@@ -855,10 +855,10 @@ $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht ü
 $lang_eng['WARNING_DELETE_COMPANY'] = 'All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?';
 $lang_ger['WARNING_DELETE_COMPANY'] = 'Alle Kunden, Projekte und Buchungen die zu diesem Mandanten gehören werden permanent gelöscht. Wollen Sie dennoch fortfahren?';
 
-$lang_eng['WARNING_NO_CLIENTS'] = 'To use this Module, please create a client first! Projects can only be assigned to clients.<br>
-                                   To assign every client the same project, use the default creation function in your companys settings!';
-$lang_ger['WARNING_NO_CLIENTS'] = 'Um dieses Modul verwenden zu können, benötigen Sie Kunden! Projekte können nur Kunden zugewiesen werden. <br>
-                                   Um allen Kunden das gleiche Projekt zu zuweisen, verwenden Sie die Standardprojekt-Funktion unter den Einstellungen ihres Mandanten';
+$lang_eng['WARNING_NO_CLIENTS'] = 'To use this Module, please create a client first.<br>
+                                   To assign the same project to every client, use the default creation function in your companys settings.';
+$lang_ger['WARNING_NO_CLIENTS'] = 'Um diese Funktion verwenden zu können, benötigen Sie zuerst Kunden.<br>
+                                   Um allen Kunden das gleiche Projekt zuweisen zu können, verwenden Sie die Standardprojekt-Funktion unter den Einstellungen ihres Mandanten.';
 
 $lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
 $lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';

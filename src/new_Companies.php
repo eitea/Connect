@@ -17,6 +17,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
       echo '</div>';
     }
+    $ins_id = mysqli_insert_id($conn);
+    $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
