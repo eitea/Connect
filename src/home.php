@@ -46,31 +46,34 @@ $today = getCurrentTimestamp();
 $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $userID AND endDate IS NULL");
 $row = $result->fetch_assoc();
 $expected_today = floatval($row[strtolower(date('D', strtotime($today)))]);
-$result = $conn->query("SELECT indexIM, time, timeEnd FROM $logTable WHERE userID = $userID AND timeEnd ='0000-00-00 00:00:00'");
-$row = $result->fetch_assoc();
-$break_hours = 0;
-$result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
-while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+$result = $conn->query("SELECT indexIM, time, timeEnd FROM $logTable WHERE userID = $userID AND (time LIKE '".substr($today, 0, 10)." %' OR timeEnd = '0000-00-00 00:00:00')");
+if($result && ($row = $result->fetch_assoc())){
+  $break_hours = 0;
+  $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
+  while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
 
-$break_today = $break_hours;
-if($row['timeEnd'] == '0000-00-00 00:00:00'){
-  $absolved_today = timeDiff_Hours($row['time'], $today);
+  $break_today = $break_hours;
+  if($row['timeEnd'] == '0000-00-00 00:00:00'){
+    $absolved_today = timeDiff_Hours($row['time'], $today);
+  } else {
+    $absolved_today = timeDiff_Hours($row['time'], $row['timeEnd']);
+  }
+  $absolved_today += 0.01;
+  $absolved_today -= $break_today;
+  if($absolved_today > $expected_today){
+    $surplus_today = $absolved_today - $expected_today;
+    $absolved_today = $expected_today;
+    $expected_today = 0;
+  } else {
+    $surplus_today = 0;
+    $expected_today -= $absolved_today;
+  }
+  $absolved_today = sprintf('%.2f', $absolved_today);
+  $expected_today = sprintf('%.2f', $expected_today);
+  $surplus_today = sprintf('%.2f', $surplus_today);
 } else {
-  $absolved_today = timeDiff_Hours($row['time'], $row['timeEnd']);
+  $absolved_today = 0;
 }
-$absolved_today -= $break_today;
-if($absolved_today > $expected_today){
-  $surplus_today = $absolved_today - $expected_today;
-  $absolved_today = $expected_today;
-  $expected_today = 0;
-} else {
-  $surplus_today = 0;
-  $expected_today -= $absolved_today;
-}
-
-$absolved_today = sprintf('%.2f', $absolved_today);
-$expected_today = sprintf('%.2f', $expected_today);
-$surplus_today = sprintf('%.2f', $surplus_today);
 ?>
 
 <script>
@@ -103,6 +106,7 @@ $(function(){
     ]}
   });
 
+  <?php if($absolved_today): ?>
   var ctx_statistic = document.getElementById("statisticChart");
   var myStatisticChart = new Chart(ctx_statistic, {
     type: 'doughnut',
@@ -141,6 +145,7 @@ $(function(){
       }
     }
   });
+  <?php endif; ?>
 });
 </script>
 

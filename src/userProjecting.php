@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $expenses_price = $expenses_unit = 0.0;
           $expenses_info = '';
         }
-        if(isset($_POST['filterProject'])){
+        if(!empty($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);
           $accept = 'TRUE';
           if(isset($_POST['required_1'])){
@@ -121,9 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             }
             $conn->query($sql);
-            if(mysqli_error($conn)){
-              echo mysqli_error($conn);
-            }
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
             if($request_addendum) redirect('userProjecting.php');

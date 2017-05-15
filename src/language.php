@@ -408,6 +408,11 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
 
+$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
+                                        Autocorrecting them adds an complete lunchbreak to the day. (This break will be added)';
+$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine komplette Mittagspause gefunden.<br>
+                                        Die Korrektur trägt eine vollständige Mittagspause nach. (Diese Pause wird dazugerechnet)';
+
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
                                       Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
@@ -849,6 +854,11 @@ $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht ü
 
 $lang_eng['WARNING_DELETE_COMPANY'] = 'All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?';
 $lang_ger['WARNING_DELETE_COMPANY'] = 'Alle Kunden, Projekte und Buchungen die zu diesem Mandanten gehören werden permanent gelöscht. Wollen Sie dennoch fortfahren?';
+
+$lang_eng['WARNING_NO_CLIENTS'] = 'To use this Module, please create a client first! Projects can only be assigned to clients.<br>
+                                   To assign every client the same project, use the default creation function in your companys settings!';
+$lang_ger['WARNING_NO_CLIENTS'] = 'Um dieses Modul verwenden zu können, benötigen Sie Kunden! Projekte können nur Kunden zugewiesen werden. <br>
+                                   Um allen Kunden das gleiche Projekt zu zuweisen, verwenden Sie die Standardprojekt-Funktion unter den Einstellungen ihres Mandanten';
 
 $lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
 $lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';

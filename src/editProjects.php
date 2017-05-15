@@ -84,10 +84,17 @@ function showClients(company, client){
     },
     error : function(resp){}
   });
-  showProjects(client, 0);
 };
 </script>
 <br>
+<?php
+$result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
+if(!$result || $result->num_rows <= 0){
+  echo '<div class="alert alert-info"'.$lang['WARNING_NO_CLIENTS'];
+  include "new_client.php";
+  echo '</div>';
+}
+?>
 <form method="post">
   <!-- SELECT COMPANY -->
   <div class="row">
@@ -145,7 +152,7 @@ function showClients(company, client){
         echo '<tr>';
         echo '<td><input type="checkbox" name="index[]" value='. $row['id'].'> </td>';
         echo '<td>'. $row['name'] .'</td>';
-        echo '<td><div class="checkbox text-center"><input type="checkbox" name="statii[]" '. $row['status'] .' value="'.$row['id'].'"> <i class="fa fa-tags"></i></div></td>';
+        echo '<td><input type="checkbox" name="statii[]" '. $row['status'] .' value="'.$row['id'].'"> <i class="fa fa-tags"></i></td>';
         echo '<td><small>';
         $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $filterCompany ORDER BY id ASC");
         if($resF->num_rows > 0){

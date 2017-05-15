@@ -27,7 +27,7 @@ class LogCalculator{
   public function calculateValues(){
     require "connection.php";
     $curID = $this->id;
-    $current_month_saldo = 0;
+    $current_month_saldo = $is_corrected = 0;
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
     while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
       $this->beginDate = $iRow['beginningDate'];
@@ -46,7 +46,7 @@ class LogCalculator{
       $diff = timeDiff_Hours($i, $j);
       $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24);
       //days
-      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) {
+      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)){
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
         if(isHoliday($i)){
           $expectedHours = 0;
@@ -100,15 +100,14 @@ class LogCalculator{
             } else { //overtime
               $this->absolvedHours += $mixed_absolved;
             }
-
             $this->breakCreditHours += $break_hours;
-
           } //END SWITCH
-        } elseif(substr($i,0, 10) != substr($now,0,10)) {
+        } else {
           $this->expectedHours += $expectedHours;
         }
-        //EOM Calculations
-        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
+
+        //corrections
+        if(!$is_corrected){ //if month not corrected yet
           $monthly_corrections = 0;
           //correction Hours:
           $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE('$i') > DATE(createdOn) AND DATE('".substr($i,0,7)."-01') <= DATE(createdOn)");
@@ -120,6 +119,11 @@ class LogCalculator{
             }
           }
           $this->correctionHours += $monthly_corrections;
+          $is_corrected = true;
+        }
+
+        //EOM Calculations
+        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
           $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->educationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
           //overTime
           if($this->saldo > 0){
@@ -129,6 +133,7 @@ class LogCalculator{
               $this->overTimeAdditive += $iRow['overTimeLump'];
             }
           }
+          $is_corrected = false;
         }
 
         $i = carryOverAdder_Hours($i, 24);

@@ -24,7 +24,6 @@ if($result_Sum && $result_Sum->num_rows > 0){
   </div>
 </div>
 
-
 <div class="container-fluid">
   <div class="col-md-4">
     <h4>Saldo</h4><hr>
@@ -35,7 +34,8 @@ if($result_Sum && $result_Sum->num_rows > 0){
       </thead>
       <tbody>
         <?php
-        echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($logSums->expectedHours - $logSums->vacationHours, 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($logSums->absolvedHours , 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
         echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($logSums->specialLeaveHours,2, '.', '').'</td></tr>';
         echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($logSums->sickHours,2,'.','').'</td></tr>';

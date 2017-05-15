@@ -41,7 +41,7 @@ class Interval_Calculator{
   }
 
   public function calculateValues(){
-    $fromDate = $i = $this->from;
+    $i = $this->from;
     $id = $this->id;
 
     require "connection.php";
@@ -59,7 +59,7 @@ class Interval_Calculator{
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
       //get the expectedHours
-      $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ( (DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)) )";
+      $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ((DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)))";
       $result = $conn->query($sql);
       if($result && $result->num_rows == 1){
         $interval_row = $result->fetch_assoc();
@@ -94,6 +94,10 @@ class Interval_Calculator{
       }
 
       if(isHoliday($i)){
+        $this->shouldTime[$count] = 0;
+      }
+
+      if($this->absolvedTime[$count] == 0 && timeDiff_Hours($i, substr(getCurrentTimestamp(), 0, 10).' 12:00:00') < 0 ){
         $this->shouldTime[$count] = 0;
       }
 

@@ -11,7 +11,6 @@
 
 <?php
 $filterCompanyID = 0;
-
 if(isset($_GET['custID'])){
   $customerID = test_input($_GET['custID']);
   $result = $conn->query("SELECT companyID FROM $clientTable WHERE id = $customerID");
@@ -20,38 +19,21 @@ if(isset($_GET['custID'])){
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-  $filterCompanyID = $_POST['filterCompany'];
-  if (isset($_POST['delete']) && isset($_POST['index'])) {
+  $filterCompanyID = $_POST['filterCompanyID'];
+  if(isset($_POST['delete']) && isset($_POST['index'])){
     $index = $_POST["index"];
-    foreach ($index as $x) {
+    foreach($index as $x) {
       $sql = "DELETE FROM $clientTable WHERE id = $x;";
       if (!$conn->query($sql)) {
         echo mysqli_error($conn);
       }
-    }
-  } elseif(isset($_POST['create']) && !empty($_POST['name']) && $_POST['createCompany'] != 0){
-    $name = test_input($_POST['name']);
-    $companyID = intval($_POST['createCompany']);
-
-    $sql = "INSERT INTO $clientTable (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
-    if($conn->query($sql)){ //if ok, give him default projects
-      $id = $conn->insert_id;
-      $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
-      SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
-      $conn->query($sql);
-
-      //and his details
-      $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
-      echo mysqli_error($conn);
-    } else {
-      echo mysqli_error($conn);
     }
   }
 }
 ?>
 <br>
 <form method="post">
-  <select name="filterCompany" class="js-example-basic-single" style="width:200px">
+  <select name="filterCompanyID" class="js-example-basic-single" style="width:200px">
     <?php
     $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
     $result = mysqli_query($conn, $query);
@@ -122,53 +104,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
   <?php endif; ?>
 
-  <div class="row">
-    <div class="col-md-3">
-      <button class="btn btn-warning btn-block" type="button" data-toggle="collapse" data-target="#newcompanyDrop" aria-expanded="false" aria-controls="collapseExample">
-        <?php echo $lang['NEW_CLIENT_CREATE']; ?> <i class="fa fa-caret-down"></i>
-      </button>
-    </div>
-    <div class="col-md-2">
-      <button type="submit" class="btn btn-danger" name="delete">Delete</button>
-    </div>
+  <div class="text-right">
+    <button type="submit" class="btn btn-danger" name="delete"><?php echo $lang['DELETE']; ?></button>
   </div>
-  <br><br>
-
-  <div class="collapse col-md-5 well" id="newcompanyDrop">
-    <form method="post">
-      <br>
-      <input type="text" class="form-control" name="name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;">
-      <br>
-      <div class="row">
-        <div class="col-md-6">
-          <select name="createCompany" class="js-example-basic-single btn-block" onchange="showClients(this.value)" style="width:150px">
-            <?php
-            $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
-            $result = mysqli_query($conn, $query);
-            if ($result && $result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $cmpnyID = $row['id'];
-                $cmpnyName = $row['name'];
-                echo "<option name='cmp' value=$cmpnyID>$cmpnyName</option>";
-              }
-            }
-            ?>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <input type="text" class="form-control" name="clientNumber" placeholder="#" >
-          <small> &nbsp Kundennummer - Optional</small>
-        </div>
-      </div>
-      <br>
-      <div class="text-right">
-        <br>
-        <button type="submit" class="btn btn-warning " name="create"> <?php echo $lang['ADD']; ?></button>
-      </div>
-
-    </form>
-  </div>
+  <br>
 </form>
+
+<?php include "new_client.php"; ?>
 
 <script>
 $(document).ready(function() {

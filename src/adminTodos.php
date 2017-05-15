@@ -6,7 +6,6 @@
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
 <?php
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
@@ -142,15 +141,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
     echo $conn->error;
   }
-  echo mysqli_error($conn);
+  //error or redirect
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    redirect("adminTodos.php");
+  }
 }
 ?>
 
 <!--GENERAL REQUESTS -------------------------------------------------------------------------->
 
 <?php
-$sql ="SELECT * FROM $userRequests WHERE status = '0'";
-$result = $conn->query($sql);
+$result = $conn->query("SELECT * FROM $userRequests WHERE status = '0'");
 if($result && $result->num_rows > 0):
   echo '<h4>'.$lang['UNANSWERED_REQUESTS'].': </h4><br>';
 ?>
@@ -232,8 +235,7 @@ if($result && $result->num_rows > 0):
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
-        Für die gelisteten Zeitstempel wurde keine komplette Mittagspause gefunden.<br>
-        Die Korrektur trägt eine vollständige Mittagspause am Ende des Tages nach (Diese Pause wird dazugerechnet).
+
       </div>
     </div>
 

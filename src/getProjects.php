@@ -612,6 +612,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } else {
   $result = false;
 }
+
+$addTimeStart = 0;
 ?>
 
 <?php if($filterCompany || $filterUserID ): //i want my filter displayed even if there were no bookings ?>
