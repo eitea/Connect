@@ -248,17 +248,3 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
     return $out;
   }
 }
-
-
-if (isset($_POST['submit'])) {
-  $file = uploadFile('file', true, true);
-  if (is_array($file['error'])) {
-    $message = '';
-    foreach ($file['error'] as $msg) {
-      $message .= '<p>'.$msg.'</p>';
-    }
-  } else {
-    $message = "File uploaded successfully".$newname;
-  }
-  echo $message;
-}

@@ -89,17 +89,11 @@ class LogCalculator{
             $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
             break;
             case 5: //Mixed
-            $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND mixedStatus != '-1'"); //select booking which tells us when she checked in.
-            $mixed_absolved = 0;
-            if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-              $mixed_absolved = timeDiff_Hours( $mixed_row['end'], $timeEnd);
-            }
-            //match mixed
-            if($mixed_absolved < $expectedHours){
-              $this->absolvedHours += $expectedHours + $break_hours;
-            } else {
-              $this->absolvedHours += $mixed_absolved;
-            }
+            //TODO:
+            //select all mixed bookings in this timestamp, and add hours accordingly
+            //$mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
+            //calculate absolved hours: subtract all mixed times and breaks from end-start time of log
+            $this->absolvedHours += $expectedHours;
             $this->breakCreditHours += $break_hours;
           } //END SWITCH
         } else {

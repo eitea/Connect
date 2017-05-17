@@ -47,7 +47,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <br>
         <div class="row">
           <div class="col-md-6">
-            <select name="create_client_company" class="js-example-basic-single" onchange="showClients(this.value)" style="width:200px">
+            <select id="create_client_company" name="create_client_company" class="js-example-basic-single" style="width:200px">
               <?php
               $result_cc = $conn->query("SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
               while ($result_cc && ($row_cc = $result_cc->fetch_assoc())) {

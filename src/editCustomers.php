@@ -5,9 +5,6 @@
 <script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
 <script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
 
-<div class="page-header">
-  <h3><?php echo $lang['CLIENT']; ?></h3>
-</div>
 
 <?php
 $filterCompanyID = 0;
@@ -31,9 +28,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   }
 }
 ?>
+
+<div class="page-header">
+  <div class="row">
+    <div class="col-xs-10">
+      <h3><?php echo $lang['CLIENT']; ?></h3>
+    </div>
+    <div class="col-xs-2 ">
+      <br>
+      <?php include "new_client.php"; ?>
+    </div>
+  </div>
+</div>
+
 <br>
 <form method="post">
-  <select name="filterCompanyID" class="js-example-basic-single" style="width:200px">
+  <select name="filterCompanyID" class="js-example-basic-single" style="width:200px" onchange="$('#create_client_company').val(this.value).trigger('change');">
     <?php
     $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
     $result = mysqli_query($conn, $query);
@@ -107,8 +117,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   </div>
   <br>
 </form>
-
-<?php include "new_client.php"; ?>
 
 <script>
 $(document).ready(function() {

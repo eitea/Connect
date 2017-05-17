@@ -226,6 +226,9 @@ echo mysqli_error($conn);
                 $icon = "fa fa-cutlery";
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
+              } elseif($row['bookingType'] == 'mixed'){
+                $icon = "fa fa-plus";
+                $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
               } else {
                 $icon = "fa fa-bookmark"; //snowflake-o, heart, umbrella, tree, music, bookmark, globe
               }

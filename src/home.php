@@ -112,10 +112,11 @@ $(function(){
     type: 'doughnut',
     data: {
       labels: [
-        "Absolviert",
-        "Pause",
-        "Erwartet",
-        "Überstunden"
+        "<?php echo $lang['ABSOLVED']; ?>",
+        "<?php echo $lang['BREAK']; ?>",
+        "<?php echo $lang['EXPECTED']; ?>",
+        "<?php echo $lang['OVERTIME']; ?>",
+        "Extra"
       ],
       datasets: [{
         data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],

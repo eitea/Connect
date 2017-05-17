@@ -37,10 +37,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
     $status = intval($_POST['newActivity']);
-    $newBreakVal = floatval($_POST['newBreakValues']);
     if($imm == 0){ //create new
       $creatUser = $filterID;
       $timeToUTC = intval($_POST['creatTimeZone']);
+      $newBreakVal = floatval($_POST['newBreakValues']);
       if($_POST['is_open']){
         $timeFin = '0000-00-00 00:00:00';
       } else {
@@ -77,7 +77,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
     }
-  } elseif (isset($_POST['delete'])) {
+  } elseif (isset($_POST['delete'])){
     $activeTab = $_POST['delete'];
     if(isset($_POST['index'])){
       $index = $_POST["index"];
@@ -86,6 +86,102 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query($sql);
       }
     }
+  } elseif(isset($_POST['splits_save'])){
+    $bookingID = intval($_POST['splits_save']);
+    if(!empty($_POST['splits_from_'.$bookingID]) && !empty($_POST['splits_to_'.$bookingID])){
+      $splitting_activity = intval($_POST['splits_activity_'.$bookingID]);
+      $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $bookingID");
+      if($result && ($row = $result->fetch_assoc())){
+        $row['start'] = substr($row['start'],0, 16).':00'; //UTC
+        $row['end'] = substr($row['end'],0, 16).':00';
+        $split_A = carryOverAdder_Hours(substr_replace($row['start'], $_POST['splits_from_'.$bookingID], 11), $row['timeToUTC'] *-1);
+        $split_B = carryOverAdder_Hours(substr_replace($row['end'], $_POST['splits_to_'.$bookingID], 11), $row['timeToUTC'] *-1);
+        //valid times
+        if(timeDiff_Hours($split_A, $row['start']) <= 0 && timeDiff_Hours($row['end'], $split_B) <= 0 && timeDiff_Hours($split_A, $split_B) > 0){
+          if($splitting_activity){
+            //create mixed booking
+            $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType, mixedStatus ) VALUES('$split_A', '$split_B', ".$row['timestampID'].", 'Split - $splitting_activity', 'mixed', '$splitting_activity') ");
+            //update mixed log
+            $conn->query("UPDATE $logTable SET status = '5' WHERE indexIM = ".$row['timestampID']);
+          }
+          //update break start time
+          if(timeDiff_Hours($split_B, $row['end']) > 0){
+            $conn->query("UPDATE $projectBookingTable SET start = '$split_B' WHERE id = ".$row['id']);
+            echo mysqli_error($conn);
+            //create second break
+            if(timeDiff_Hours($row['start'], $split_A) > 0){ //break in the middle
+              $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('".$row['start']."', '$split_A', ".$row['timestampID'].", 'Split Start', 'break') ");
+            }
+          } elseif(timeDiff_Hours($row['start'], $split_A) > 0) { //change start time
+            $conn->query("UPDATE $projectBookingTable SET end = '$split_A' WHERE id = ".$row['id']);
+          } else { //delete break
+            $conn->query("DELETE FROM $projectBookingTable WHERE id = ".$row['id']);
+          }
+          echo mysqli_error($conn);
+        } else {
+          echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+        }
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
+      echo '</div>';
+    }
+  } elseif(!empty($_POST['editing_save'])){ //comes from the modal
+    $x = $_POST['editing_save'];
+    $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
+    $row = $result->fetch_assoc();
+    $toUtc = $row['timeToUTC'] * -1;
+    if(test_Date($_POST["editing_time_from_".$x].':00') && test_Date($_POST["editing_time_to_".$x].':00')){
+      if(!empty($_POST["editing_projectID_".$x])){
+        $new_projectID = $_POST["editing_projectID_".$x];
+      } else { //break
+        $new_projectID = 'NULL';
+      }
+      $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
+      $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
+
+      $chargedTimeStart= '0000-00-00 00:00:00';
+      $chargedTimeFin = '0000-00-00 00:00:00';
+      if($_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+        $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
+      }
+      if($_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+        $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
+      }
+      $new_text = test_input($_POST['editing_infoText_'.$x]);
+
+      $new_charged = 'FALSE';
+      if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
+        $new_charged = 'TRUE';
+      }
+      $conn->query("UPDATE $projectBookingTable SET start='$new_A', end='$new_B', projectID=$new_projectID, infoText='$new_text', booked='$new_charged', chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $x");
+      //update charged
+      if(isset($_POST['editing_charge'])){
+        if($chargedTimeStart != '0000-00-00 00:00:00'){
+          $new_A = $chargedTimeStart;
+        }
+        if($chargedTimeFin != '0000-00-00 00:00:00'){
+          $new_B = $chargedTimeFin;
+        }
+        $hours = timeDiff_Hours($new_A, $new_B);
+        $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
+        $conn->query($sql);
+      }
+      if(!mysqli_error($conn)){
+        echo '<div class="alert alert-success fade in">';
+        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        echo $lang['OK_SAVE'];
+        echo '</div>';
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
+      echo '</div>';
+    }
+    echo mysqli_error($conn);
   }
 } //endif post
 ?>
@@ -187,7 +283,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $row = $result->fetch_assoc();
           $canBook = $row['canBook'];
 
-          if($calculator->end[$i] != '0000-00-00 00:00:00' && $calculator->activity[$i] == 0 && $canBook == 'TRUE'){
+          if($calculator->end[$i] != '0000-00-00 00:00:00' && ($calculator->activity[$i] == 0 || $calculator->activity[$i] == 5) && $canBook == 'TRUE'){
             $sql = "SELECT bookingTimeBuffer FROM $configTable";
             $result = $conn->query($sql);
             $config = $result->fetch_assoc();
@@ -237,6 +333,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $saldoStyle = 'style=color:#6fcf2c;'; //green
           }
 
+          //has to stay unfetched
           $bookingResults = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
             LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
             LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
@@ -395,10 +492,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-6">
-                  <label><?php echo $lang['LUNCHBREAK']; ?></label>
-                  <input type="number" step="any" class="form-control input-sm" name="newBreakValues" value="<?php echo sprintf('%.2f', $calculator->lunchTime[$i]); ?>" style='width:70px' />
-                </div>
-                <div class="col-md-6">
                   <br>
                   <?php
                   if($calculator->start[$i]){
@@ -433,9 +526,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                     echo "</select>";
                   }
-                  echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+                  echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
                   ?>
                 </div>
+                <?php
+                if(!$calculator->indecesIM[$i]){
+                  echo '<div class="col-md-6">';
+                  echo '<label>'.$lang['LUNCHBREAK'].'</label>';
+                  echo '<input type="number" step="any" class="form-control input-sm" name="newBreakValues" value="'.sprintf('%.2f', $calculator->lunchTime[$i]).'" style="width:70px" />';
+                  echo '</div>';
+                }
+                ?>
               </div>
               <br><br>
               <div class="row">
@@ -467,11 +568,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <?php
   if($filterID)
   for($i = 0; $i < count($bookingResultsResults)-1; $i++): //timeToUTC takes up 1 count too much
-    $bookingResult = $bookingResultsResults[$i];
     $timeToUTC = $bookingResultsResults['timeToUTC'][$i];
+    $bookingResult = $bookingResultsResults[$i]; //uncloneable object
     $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
     ?>
-    <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+  <form method="post">
+    <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -487,10 +589,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <th>Start</th>
                 <th><?php echo $lang['END']; ?></th>
                 <th>Info</th>
+                <th></th>
               </thead>
               <tbody>
                 <?php
+                echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
                 do {
+                  $x = $row['bookingTableID'];
                   $A = substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5);
                   $B = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5);
                   $C = $row['infoText'];
@@ -501,7 +606,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $icon = "fa fa-car";
                   } elseif($row['bookingType'] == 'mixed'){
                     $icon = "fa fa-plus";
-                    $A = $B = '';
                     $C = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
                   }
                   echo '<tr>';
@@ -512,7 +616,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo "<td>$A</td>";
                   echo "<td>$B</td>";
                   echo "<td style='text-align:left'>$C</td>";
+                  echo '<td><button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button></td>';
                   echo '</tr>';
+                  if($row['bookingType'] == 'break'){
+                    echo '<tr style="background-color:#f0f0f0">';
+                    echo "<td></td><td></td><td><i class='fa fa-arrow-right'</td><td>Split:</td>";
+                    echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_from_'.$x.'" />'.'</td>';
+                    echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_to_'.$x.'" />'.'</td>';
+                    echo '<td>';
+                    echo "<select name='splits_activity_".$x."' class='js-example-basic-single' style='width:150px'>";
+                    for($j = 0; $j < 5; $j++){ //can't do mixed
+                      echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                    }
+                    echo "</select>";
+                    echo '</td>';
+                    echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'"><i class="fa fa-floppy-o"></i></button></td>';
+                    echo '</tr>';
+                  }
                 } while($row = $bookingResult->fetch_assoc());
                 ?>
               </tbody>
@@ -524,7 +644,115 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
       </div>
     </div>
-  <?php endfor; ?>
+  </form>
+  <?php
+  //loop through this shit again
+  mysqli_data_seek($bookingResult,0);
+  while($row = $bookingResult->fetch_assoc()):
+  $x = $row['bookingTableID'];
+  ?>
+    <!-- Edit bookings (time only) -->
+    <form method="post">
+      <div class="modal fade editingModal-<?php echo $x ?>">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
+            </div>
+            <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
+              <?php
+              echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+              if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+                echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+                $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
+                $clientResult = $conn->query($sql);
+                while($clientRow = $clientResult->fetch_assoc()){
+                  $selected = '';
+                  if($clientRow['id'] == $row['clientID']){
+                    $selected = 'selected';
+                  }
+                  echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+                }
+                echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+                $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
+                $clientResult = $conn->query($sql);
+                while($clientRow = $clientResult->fetch_assoc()){
+                  $selected = '';
+                  if($clientRow['id'] == $row['projectID']){
+                    $selected = 'selected';
+                  }
+                  echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+                }
+                echo "</select> <br><br>";
+              } //end if(break)
 
+              $A = carryOverAdder_Hours($row['start'],$timeToUTC);
+              $B = carryOverAdder_Hours($row['end'],$timeToUTC);
+
+              if($row['chargedTimeStart'] == '0000-00-00 00:00:00'){
+                $A_charged = '0000-00-00 00:00:00';
+              } else {
+                $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$timeToUTC);
+              }
+              if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
+                $B_charged = '0000-00-00 00:00:00';
+              } else {
+                $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$timeToUTC);
+              }
+              ?>
+              <label><?php echo $lang['DATE']; ?>:</label>
+              <div class="row">
+                <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
+                <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
+              </div>
+              <br>
+              <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
+              <div class="row">
+                <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
+                <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
+              </div>
+              <br>
+              <label>Infotext</label>
+              <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
+              <br>
+              <?php
+              if($row['bookingType'] != 'break' && $row['booked'] == 'FALSE'){//cant charge a break, can you
+                echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>"; //gotta know which ones he wants checked.
+                echo "<div class='col-xs-2'><input id='".$x."_2' type='checkbox' onclick='toggle2(\"".$x."_1\")' name='editing_nocharge' value='".$x."' /> <label>".$lang['NOT_CHARGEABLE']. "</label> </div></div>";
+              }
+              ?>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  <?php endwhile; ?>
+<?php endfor; ?>
+<script>
+$('.modal').on('hidden.bs.modal', function (e) {
+  if($('.modal').hasClass('in')) {
+    $('body').addClass('modal-open');
+  }
+});
+function showNewProjects(selectID, client, project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_project.php',
+    data:{clientID:client, projectID:project},
+    type: 'post',
+    success : function(resp){
+      $(selectID).html(resp);
+    },
+    error : function(resp){}
+  });
+};
+function toggle2(uncheckID){
+  uncheckBox = document.getElementById(uncheckID);
+  uncheckBox.checked = false;
+}
+</script>
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

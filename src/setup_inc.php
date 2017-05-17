@@ -679,4 +679,20 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE mixedInfoData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    status INT(3),
+    timeStart DATETIME,
+    timeEnd DATETIME,
+    isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    FOREIGN KEY (timestampID) REFERENCES $logTable(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+
 ?>

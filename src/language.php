@@ -2,6 +2,9 @@
 $lang_eng = array();
 $lang_ger = array();
 
+$lang_eng['ABSOLVED'] = 'Absolved';
+$lang_ger['ABSOLVED'] = 'Absolviert';
+
 $lang_eng['ABSOLVED_HOURS'] = 'Absolved Hours';
 $lang_ger['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
 
@@ -289,7 +292,7 @@ $lang_eng['ERROR_MISSING_SELECTION'] = 'A selection was missing. Please check al
 $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie alle Auswahlmöglichkeiten.';
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
-$lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben';
+$lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
@@ -533,6 +536,9 @@ $lang_ger['OPTIONS'] = 'Optionen';
 
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
+
+$lang_eng['OVERTIME'] = 'Overtime';
+$lang_ger['OVERTIME'] = 'Überstunden';
 
 $lang_eng['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
 $lang_ger['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';

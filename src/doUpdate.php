@@ -965,7 +965,26 @@ if($row['version'] < 85){
     echo mysqli_error($conn);
   }
 
+  $conn->query("DELETE FROM $projectBookingData WHERE start = '0000-00-00 00:00:00'");
+
+  $sql = "CREATE TABLE mixedInfoData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    status INT(3),
+    timeStart DATETIME,
+    timeEnd DATETIME,
+    isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    FOREIGN KEY (timestampID) REFERENCES $logTable(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br> Additional info storage for mixed timestamps';
+  } else {
+    echo mysqli_error($conn);
+  }
 }
+
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}
