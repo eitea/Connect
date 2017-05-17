@@ -182,6 +182,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '</div>';
     }
     echo mysqli_error($conn);
+  } elseif(isset($_POST['delete_bookings']) && !empty($_POST['delete_bookings_ids'])){
+    foreach ($_POST['delete_bookings_ids'] as $x) {
+      $conn->query("DELETE FROM projectBookingData WHERE id = $x;");
+      if(mysqli_error($conn)){
+        echo $conn->error;
+      } else {
+        echo '<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a>O.K.</div>';
+      }
+    }
   }
 } //endif post
 ?>
@@ -618,7 +627,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo "<td style='text-align:left'>$C</td>";
                   echo '<td>';
                   echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
-                  echo '<input type="checkbox" name="delete_booking_ids[]" value="'.$x.'" /> ';
+                  echo '<input type="checkbox" name="delete_bookings_ids[]" value="'.$x.'" /> ';
                   echo '</td>';
                   echo '</tr>';
                   if($row['bookingType'] == 'break'){

@@ -110,7 +110,6 @@ class LogCalculator{
               }
             }
             $mixed_absolvedHours = timeDiff_Hours($row['time'], $timeEnd) - $mixed_diff;
-
             //cancel out possible minus
             $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$row['indexIM']);
             if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
@@ -133,7 +132,7 @@ class LogCalculator{
         //correction hours
         if(!$is_corrected){
           $monthly_corrections = 0;
-          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND LAST_DAY('$i') > DATE(createdOn) AND DATE('".substr($i,0,10)."') <= DATE(createdOn)");
+          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
           while($result && ($row = $result->fetch_assoc())){
             if($row['cType'] == 'log'){
               $monthly_corrections += $row['hours'] * intval($row['addOrSub']);
