@@ -1,6 +1,8 @@
 <?php
 if(isset($_POST['download_proposal'])){
   $proposalID = intval($_POST['download_proposal']);
+} elseif(isset($_GET['propID'])){
+  $proposalID = intval($_GET['propID']);
 } else {
   die("Access denied.");
 }
@@ -94,7 +96,7 @@ if(empty($row['logo']) || empty($row['address'])){
 } elseif(empty($row['gender'])){
   $gender_exception = ' ';
 } else {
-  $gender_exception = $lang['GENDER_TOSTRING'][$row['gender']]
+  $gender_exception = $lang['GENDER_TOSTRING'][$row['gender']];
 }
 
 $pdf = new PDF();
@@ -116,8 +118,10 @@ $pdf->SetFontSize(14);
 $pdf->MultiColCell(110, 7, $lang['OFFER']."\n".$row['id_number']);
 $pdf->SetFontSize(8);
 
-$pdf->MultiColCell(40, 5, $lang['DATE'].': '."\n".iconv('UTF-8', 'windows-1252',$lang['EXPIRATION_DATE']).': '."\n".$lang['CLIENTS'].' '.$lang['NUMBER'].': '."\n".$lang['REPRESENTATIVE'].': ');
-$pdf->MultiColCell(30, 5, $row['curDate']."\n".$row['deliveryDate']."\n".$row['clientNumber']."\n".$row['representative']);
+$pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
+$pdf->MultiColCell(40, 4, $lang['DATE'].": \n".iconv('UTF-8', 'windows-1252',$lang['EXPIRATION_DATE']).": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n". $lang['VAT'] ." ID: \n". $lang['REPRESENTATIVE'].': ');
+$pdf->MultiColCell(30, 4, $row['curDate']."\n".$row['deliveryDate']."\n".$row['clientNumber']."\n".$row['vatnumber']."\n".$row['representative']);
+$pdf->SetY($pdf->GetY() + 5, false);
 $pdf->Ln(25);
 
 $pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);

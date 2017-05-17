@@ -1,34 +1,27 @@
 <?php
 function checkIn($userID) {
   require 'connection.php';
-  $timeIsLikeToday = substr(getCurrentTimestamp(), 0, 10) . ' %';
-  $timeToUTC =  $_SESSION['timeToUTC'];
 
-  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday'";
+  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). "' %";
   $result = mysqli_query($conn, $sql);
-  if($result && $result->num_rows > 0){ //user already has a stamp for today
+  //user already has a stamp for today
+  if($result && $result->num_rows > 0){
     $row = $result->fetch_assoc();
-
     if($row['status'] && $row['status'] != 5){ //mixed
-      //break timestamp down if not early (core time exception)
-      if(timeDiff_Hours($row['time'], getCurrentTimestamp()) < 0){
-        $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, mixedStatus) VALUES('".$row['time']."', '".getCurrentTimestamp()."', '".$row['indexIM']."', 'Checkin Time', 'mixed', '".$row['status']."')";
-        $conn->query($sql);
-      }
-      $conn->query("UPDATE $logTable SET status = '5' WHERE indexIM =". $row['indexIM']);
-      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd, isFillable) VALUES(".$row['indexIM'].", '".$row['status']."', '".$row['time']."', '".$row['timeEnd']."', 'TRUE')");
+      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$row['status']."', '".$row['time']."', '".$row['timeEnd']."')");
+      $conn->query("UPDATE $logTable SET status = '5', time = '".getCurrentTimestamp()."' WHERE indexIM =". $row['indexIM']);
     } else {
       //create a break stamping if youre not early (a silly admin edit)
-      if(timeDiff_Hours($row['time'], getCurrentTimestamp()) < 0){
+      if(timeDiff_Hours($row['timeEnd'], getCurrentTimestamp()) > 0){
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('".$row['timeEnd']."', '".getCurrentTimestamp()."', ".$row['indexIM'].", 'Checkin auto-break', 'break')";
+        $conn->query($sql);
       }
-      $conn->query($sql);
     }
     //update timestamp
-    $sql = "UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00', timeToUTC = '$timeToUTC' WHERE indexIM =". $row['indexIM'];
-    $conn->query($sql);
+    $conn->query("UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00' WHERE indexIM =". $row['indexIM']);
     echo mysqli_error($conn);
   } else { //create new stamp
+    $timeToUTC =  $_SESSION['timeToUTC'];
     $sql = "INSERT INTO logs (time, userID, status, timeToUTC) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC);";
     $conn->query($sql);
     echo mysqli_error($conn);

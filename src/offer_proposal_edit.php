@@ -215,9 +215,16 @@ if($filterProposal){
       ?>
     </tbody>
   </table>
-  <br>
+  <br><br>
   <div class="container-fluid">
-    <button type="submit" class="btn btn-warning" name="delete_selection"><?php echo $lang['DELETE']; ?></button>
+    <div class="col-xs-6">
+      <button type="submit" class="btn btn-warning" name="delete_selection"><?php echo $lang['DELETE']; ?></button>
+    </div>
+    <?php if($filterProposal): ?>
+      <div class="col-xs-6 text-right">
+        <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-warning" >PDF Download</a>
+      </div>
+    <?php endif; ?>
   </div>
 
   <?php if($filterClient): ?>
@@ -399,15 +406,6 @@ if($filterProposal){
     </div>
   <?php endif; ?>
 </form>
-
-<?php if($filterProposal): ?>
-<br><hr><br>
-  <div class="container-fluid text-right">
-    <form method="POST" action="download_proposal.php" target="_blank">
-      <button class="btn btn-warning" value='<?php echo $filterProposal; ?>' name='download_proposal'>PDF Download</button>
-    </form>
-  </div>
-<?php endif; ?>
 
 <script>
 function showClients(company, client){

@@ -421,7 +421,8 @@ $sql = "CREATE TABLE $clientDetailTable(
   debitNumber INT(10),
   datev INT(10),
   accountName VARCHAR(100),
-  taxnumber INT(50),
+  taxnumber VARCHAR(50),
+  vatnumber VARCHAR(50)
   taxArea VARCHAR(50),
   customerGroup VARCHAR(50),
   representative VARCHAR(50),

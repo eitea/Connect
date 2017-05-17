@@ -983,6 +983,20 @@ if($row['version'] < 85){
   } else {
     echo mysqli_error($conn);
   }
+
+  $sql = "ALTER TABLE clientInfoData MODIFY COLUMN taxnumber VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Changed tax number to text in client details';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN vatnumber VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added VAT number to client details';
+  } else {
+    echo mysqli_error($conn);
+  }
 }
 
 //if($row['version'] < 86){}
