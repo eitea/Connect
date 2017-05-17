@@ -89,11 +89,41 @@ class LogCalculator{
             $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
             break;
             case 5: //Mixed
-            //TODO:
+            $mixed_diff = 0;
             //select all mixed bookings in this timestamp, and add hours accordingly
-            //$mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
-            //calculate absolved hours: subtract all mixed times and breaks from end-start time of log
-            $this->absolvedHours += $expectedHours;
+            $mixed_result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
+            while($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+              $mixed_diff = timeDiff_Hours($row['start'], $row['end']);
+              switch($row['mixedStatus']){
+                case 1:
+                $this->vacationHours += $mixed_diff;
+                break;
+                case 2: //Can have ZA
+                $this->specialLeaveHours += $mixed_diff;
+                break;
+                case 3:
+                $this->sickHours += $mixed_diff;
+                break;
+                case 4:
+                $this->educationHours += $mixed_diff;
+                break;
+              }
+            }
+            $mixed_absolvedHours = timeDiff_Hours($row['time'], $timeEnd) - $mixed_diff;
+
+            //cancel out possible minus
+            $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$row['indexIM']);
+            if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+              $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
+              //if hours are missing (any breaks will cause a minus)
+              if($mixed_absolved > 0 && $mixed_absolvedHours < $expectedHours){
+                $mixed_absolvedHours += $mixed_absolved; //fill up
+                if($mixed_absolvedHours > $expectedHours){ //if too much: reduce
+                  $mixed_absolvedHours = $expectedHours;
+                }
+              }
+            }
+            $this->absolvedHours += $mixed_absolvedHours;
             $this->breakCreditHours += $break_hours;
           } //END SWITCH
         } else {

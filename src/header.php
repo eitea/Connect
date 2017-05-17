@@ -240,6 +240,7 @@ $(document).ready(function() {
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary" name="savePAS">Save Password</button>
           </div>
+          <!--
           <div class="modal-body">
             PIN-Code: <br>
             <input type="number" class="form-control" name="pinCode" > <br><br>
@@ -248,6 +249,7 @@ $(document).ready(function() {
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-info" name="savePIN">Save PIN</button>
           </div>
+        -->
         </div>
       </div>
     </div>

@@ -505,7 +505,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $B = $calculator->end[$i];
                   }
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
-                  for($j = 0; $j < 5; $j++){ //can't do mixed
+                  for($j = 0; $j < 6; $j++){
                     if($calculator->activity[$i] == $j){
                       echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     } else {
@@ -589,7 +589,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <th>Start</th>
                 <th><?php echo $lang['END']; ?></th>
                 <th>Info</th>
-                <th></th>
+                <th>Option</th>
               </thead>
               <tbody>
                 <?php
@@ -616,7 +616,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo "<td>$A</td>";
                   echo "<td>$B</td>";
                   echo "<td style='text-align:left'>$C</td>";
-                  echo '<td><button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button></td>';
+                  echo '<td>';
+                  echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
+                  echo '<input type="checkbox" name="delete_booking_ids[]" value="'.$x.'" /> ';
+                  echo '</td>';
                   echo '</tr>';
                   if($row['bookingType'] == 'break'){
                     echo '<tr style="background-color:#f0f0f0">';
@@ -625,7 +628,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_to_'.$x.'" />'.'</td>';
                     echo '<td>';
                     echo "<select name='splits_activity_".$x."' class='js-example-basic-single' style='width:150px'>";
-                    for($j = 0; $j < 5; $j++){ //can't do mixed
+                    for($j = 0; $j < 5; $j++){ //can't do mixed split
                       echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     }
                     echo "</select>";
@@ -640,6 +643,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            <button type="submit" class="btn btn-warning" name="delete_bookings"><?php echo $lang['DELETE_SELECTION']; ?></button>
           </div>
         </div>
       </div>

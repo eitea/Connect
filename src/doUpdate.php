@@ -997,6 +997,22 @@ if($row['version'] < 85){
   } else {
     echo mysqli_error($conn);
   }
+
+  $result = $conn->query("SELECT * FROM logs WHERE status = '5'"); //select all mixed timestamps
+  while($result && ($row = $result->fetch_assoc())){
+    //select all mixed bookings
+    $bookings_result = $conn->query("SELECT * FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$row['indexIM']);
+    if($bookings_result && ($booking_row = $bookings_result->fetch_assoc())){
+      //correct starting time
+      $conn->query("UPDATE logs SET time = '".$booking_row['end']."' WHERE indexIM = ".$row['indexIM']);
+      //enter full hours
+      $A = substr_replace($row['time'], '08:00', 11, 5);
+      $B = carryOverAdder_Hours($A, 9);
+      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$bookings_result['mixedStatus']."', '$A', '$B')");
+      //remove the mixed bookings
+      $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
+    }
+  }
 }
 
 //if($row['version'] < 86){}

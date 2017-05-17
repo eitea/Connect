@@ -106,23 +106,19 @@ class Interval_Calculator{
 
       //mixed Timestamps
       if($this->activity[$count] == 5){
-        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$this->indecesIM[$count]." AND bookingType = 'mixed'");
+        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$this->indecesIM[$count]);
         if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
           $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
-          //in case of splitted break, we do not want to add mixed_absolved twice
+          //in case of splitted break, we only want to add what's left of mixed_absolved to the end of the day.
           $splits_result = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS split_absolved FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$this->indecesIM[$count]);
           if($splits_result && ($splits_row = $splits_result->fetch_assoc())){
             $mixed_absolved -= $splits_row['split_absolved'];
           }
-          //TODO: do we consider breaks or not?
-          $is_time = $this->absolvedTime[$count] - $this->lunchTime[$count];
-          //missing hours: add the mixed time
-          if($mixed_absolved > 0 && $is_time < $this->shouldTime[$count]){
-            $is_time += $mixed_absolved;
-            $this->absolvedTime[$count] += $mixed_absolved;
-            //reduce again, he did not need the complete mixed hours (he can always split to reduce breaks)
-            if($is_time > $this->shouldTime[$count]){
-              $this->absolvedTime[$count] = $this->shouldTime[$count] + $this->lunchTime[$count]; //lunchbreaks should not cause a minus? (TODO: ask admin)
+          //if hours are missing (any breaks will cause a minus)
+          if($mixed_absolved > 0 && $this->absolvedTime[$count] < $this->shouldTime[$count]){
+            $this->absolvedTime[$count] += $mixed_absolved; //fill up
+            if($this->absolvedTime[$count] > $this->shouldTime[$count]){ //if too much: reduce
+              $this->absolvedTime[$count] = $this->shouldTime[$count];
             }
           }
         }

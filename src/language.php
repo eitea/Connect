@@ -231,6 +231,9 @@ $lang_ger['DEFAULT'] = 'Standard';
 $lang_eng['DELETE'] = 'Delete';
 $lang_ger['DELETE'] = 'Löschen';
 
+$lang_eng['DELETE_SELECTION'] = 'Delete Selection';
+$lang_ger['DELETE_SELECTION'] = 'Auswahl Löschen';
+
 $lang_eng['DELETE_COMPANY'] = 'Delete Company';
 $lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
 

@@ -158,12 +158,10 @@ $pdf->Cell(0, 10, $lang['PAYMENT_CONDITIONS'].':', 0, 1);
 $pdf->SetFont('Helvetica', '');
 $pdf->Cell(0, 0, $lang['PAYMENT_NETTO_CONDITION'].$row['daysNetto'].' '.$lang['DAYS'], 0, 1);
 
-//Footer
-
 /*
 Cell(wdith, height, text, border, ln, align, fill, link)
 MultiCell(float w, float h, string txt [, mixed border [, string align [, boolean fill]]])
 Line(left margin, x, right margin, y)
 */
-$pdf->Output(); //header
+$pdf->Output();
 ?>

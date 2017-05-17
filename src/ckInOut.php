@@ -2,7 +2,7 @@
 function checkIn($userID) {
   require 'connection.php';
 
-  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). "' %";
+  $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). " %'";
   $result = mysqli_query($conn, $sql);
   //user already has a stamp for today
   if($result && $result->num_rows > 0){
