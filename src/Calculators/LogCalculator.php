@@ -91,14 +91,14 @@ class LogCalculator{
             case 5: //Mixed
             $mixed_diff = 0;
             //select all mixed bookings in this timestamp, and add hours accordingly
-            $mixed_result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
+            $mixed_result = $conn->query("SELECT mixedStatus, start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
             while($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-              $mixed_diff = timeDiff_Hours($row['start'], $row['end']);
-              switch($row['mixedStatus']){
+              $mixed_diff = timeDiff_Hours($mixed_row['start'], $mixed_row['end']);
+              switch($mixed_row['mixedStatus']){
                 case 1:
                 $this->vacationHours += $mixed_diff;
                 break;
-                case 2: //Can have ZA
+                case 2:
                 $this->specialLeaveHours += $mixed_diff;
                 break;
                 case 3:

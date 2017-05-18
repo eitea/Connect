@@ -415,9 +415,9 @@ $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectabl
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
 
 $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
-                                        Autocorrecting them adds an complete lunchbreak to the day. (This break will be added)';
+                                        Autocorrecting them adds an complete lunchbreak in the middle of the day. (This break will be added)';
 $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
-                                        Die Korrektur trägt eine vollständige Mittagspause nach. (Diese Pause wird dazugerechnet)';
+                                        Die Korrektur trägt eine vollständige Mittagspause zur Mitte des Tages nach. (Diese Pause wird dazugerechnet)';
 
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>

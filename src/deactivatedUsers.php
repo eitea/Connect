@@ -23,8 +23,8 @@ if(isset($_POST['delete'])  && isset($_POST['indeces'])){
     if(!$conn->query($sql)){$acc = false; echo 'logErr: '.mysqli_error($conn);}
 
     //insert projectBookings
-    $sql = "INSERT INTO $projectBookingTable (start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType)
-    SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType
+    $sql = "INSERT IGNORE INTO $projectBookingTable (start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $deactivatedUserProjects INNER JOIN $deactivatedUserLogs ON $deactivatedUserLogs.indexIM = $deactivatedUserProjects.timestampID WHERE $deactivatedUserLogs.userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
 

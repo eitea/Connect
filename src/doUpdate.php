@@ -965,7 +965,7 @@ if($row['version'] < 85){
     echo mysqli_error($conn);
   }
 
-  $conn->query("DELETE FROM $projectBookingData WHERE start = '0000-00-00 00:00:00'");
+  $conn->query("DELETE FROM projectBookingData WHERE start = '0000-00-00 00:00:00'");
 
   $sql = "CREATE TABLE mixedInfoData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1017,6 +1017,42 @@ if($row['version'] < 85){
   $sql = "ALTER IGNORE TABLE projectbookingdata ADD UNIQUE double_submit (timestampID, start, end)";
   if($conn->query($sql)){
     echo '<br> Remove all the duplicate entries and create a key';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN breakCredit";
+  if($conn->query($sql)){
+    echo '<br> Remove breaks from deactivated logs';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE DeactivatedUserLogData MODIFY COLUMN status INT(3)";
+  if($conn->query($sql)){
+    echo '<br> Changed status';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE DeactivatedUserData ADD COLUMN id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY";
+  if($conn->query($sql)){
+    echo '<br> Remove breaks from deactivated logs';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN mixedStatus INT(3) DEFAULT -1");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN extra_1 VARCHAR(200) NULL DEFAULT NULL");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN extra_2 VARCHAR(200) NULL DEFAULT NULL");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN extra_3 VARCHAR(200) NULL DEFAULT NULL");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN exp_info TEXT");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN exp_price DECIMAL(10,2)");
+  $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN exp_unit DECIMAL(10,2)");
+
+  $sql = "ALTER TABLE DeactivatedUserProjectData MODIFY COLUMN bookingType ENUM('project', 'break', 'drive', 'mixed')";
+  if($conn->query($sql)){
+    echo '<br> Expanded deactivated booking type';
   } else {
     echo mysqli_error($conn);
   }
