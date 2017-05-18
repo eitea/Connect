@@ -1035,13 +1035,6 @@ if($row['version'] < 85){
     echo mysqli_error($conn);
   }
 
-  $sql = "ALTER TABLE DeactivatedUserData ADD COLUMN id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY";
-  if($conn->query($sql)){
-    echo '<br> Remove breaks from deactivated logs';
-  } else {
-    echo mysqli_error($conn);
-  }
-
   $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN mixedStatus INT(3) DEFAULT -1");
   $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN extra_1 VARCHAR(200) NULL DEFAULT NULL");
   $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN extra_2 VARCHAR(200) NULL DEFAULT NULL");

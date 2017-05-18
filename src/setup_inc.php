@@ -303,7 +303,7 @@ if (!$conn->query($sql)) {
 }
 
 //deactivated tables
-$sql = "CREATE TABLE $deactivatedUserTable SELECT * FROM $userTable WHERE 1 = 0";
+$sql = "CREATE TABLE $deactivatedUserTable AS SELECT * FROM $userTable WHERE 1 = 0";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
@@ -325,7 +325,6 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $deactivatedUserDataTable(
   userID INT(6) UNSIGNED,
-  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   endDate DATETIME DEFAULT NULL,
   mon DECIMAL(4,2) DEFAULT 8.5,
