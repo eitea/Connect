@@ -68,9 +68,6 @@ function move() {
   <div id="content" style="display:none;">
 <br>
 <?php
-/*
-* To add a new Update: increase the version number in version_number.php. For more information see head of setup_inc.php
-*/
 require  "connection.php";
 require  "createTimestamps.php";
 include 'validate.php';
@@ -338,17 +335,6 @@ if($row['version'] < 64){
     }
   }
   echo "<br>Inserted complete (!) lunchbreaks";
-  //recalculate all break values that need recalculating.
-  $result = $conn->query("SELECT indexIM FROM $logTable WHERE status = '0'");
-  while($result && ($row = $result->fetch_assoc())){
-    $indexIM = $row['indexIM'];
-    $resultBreak = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS mySum FROM $projectBookingTable WHERE timestampID = $indexIM AND bookingType = 'break'");
-    if($resultBreak && ($rowBreak = $resultBreak->fetch_assoc())){
-      $hours = sprintf("%.2f", $rowBreak['mySum'] / 60);
-      $conn->query("UPDATE $logTable SET breakCredit = '$hours' WHERE indexIM = $indexIM");
-    }
-  }
-  echo "<br>Recalculated all breaks.";
 
   //correct wrong expectedHours on all timestamps that are not 0s.
   $conn->query("UPDATE $logTable SET expectedHours = (TIMESTAMPDIFF(MINUTE, time, timeEnd) / 60) WHERE status != '0' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) - expectedHours*60 != 0 ");
@@ -964,7 +950,78 @@ if($row['version'] < 84){
   }
 }
 
-//if($row['version'] < 85){}
+if($row['version'] < 85){
+  $sql = "ALTER TABLE intervalData MODIFY COLUMN overTimeLump DECIMAL(5,2) DEFAULT 0.0";
+  if($conn->query($sql)){
+    echo '<br> Max overtime from 99.00 to 999.00';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE logs DROP COLUMN breakCredit";
+  if($conn->query($sql)){
+    echo '<br> Removed break field';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $conn->query("DELETE FROM $projectBookingData WHERE start = '0000-00-00 00:00:00'");
+
+  $sql = "CREATE TABLE mixedInfoData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    status INT(3),
+    timeStart DATETIME,
+    timeEnd DATETIME,
+    isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    FOREIGN KEY (timestampID) REFERENCES $logTable(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br> Additional info storage for mixed timestamps';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData MODIFY COLUMN taxnumber VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Changed tax number to text in client details';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE clientInfoData ADD COLUMN vatnumber VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added VAT number to client details';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $result = $conn->query("SELECT * FROM logs WHERE status = '5'"); //select all mixed timestamps
+  while($result && ($row = $result->fetch_assoc())){
+    //select all mixed bookings
+    $bookings_result = $conn->query("SELECT * FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$row['indexIM']);
+    if($bookings_result && ($booking_row = $bookings_result->fetch_assoc())){
+      //correct starting time
+      $conn->query("UPDATE logs SET time = '".$booking_row['end']."' WHERE indexIM = ".$row['indexIM']);
+      //enter full hours
+      $A = substr_replace($row['time'], '08:00', 11, 5);
+      $B = carryOverAdder_Hours($A, 9);
+      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$bookings_result['mixedStatus']."', '$A', '$B')");
+      //remove the mixed bookings
+      $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
+    }
+  }
+
+  $sql = "ALTER IGNORE TABLE projectbookingdata ADD UNIQUE double_submit (timestampID, start, end)";
+  if($conn->query($sql)){
+    echo '<br> Remove all the duplicate entries and create a key';
+  } else {
+    echo mysqli_error($conn);
+  }
+}
+
 //if($row['version'] < 86){}
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}

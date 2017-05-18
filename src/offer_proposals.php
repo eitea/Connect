@@ -18,7 +18,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterStatus = 0;
   }
 }
-?>
+
+
+$result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
+if(!$result || $result->num_rows <= 0){
+  echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
+  include "new_client.php";
+  echo '</div>';
+}
+ ?>
 
 <form method="POST">
   <select style='width:200px' name="filterCompany" class="js-example-basic-single" onchange="showClients(this.value)">
@@ -84,7 +92,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</dl></td>';
         echo '<td>';
         echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="edit_proposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
-        echo '<form method="POST" style="display:inline" action="download_proposal.php">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
+        echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
         echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-danger" title="Delete" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form> ';
         echo '</td>';
         echo '</tr>';

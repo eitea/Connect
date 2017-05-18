@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php die("Blocked Access."); include 'header.php'; ?>
 <?php enableToCore($userID);?>
 <!-- BODY -->
 

@@ -27,7 +27,7 @@ class LogCalculator{
   public function calculateValues(){
     require "connection.php";
     $curID = $this->id;
-    $current_month_saldo = 0;
+    $is_corrected = 0;
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");
     while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
       $this->beginDate = $iRow['beginningDate'];
@@ -36,120 +36,146 @@ class LogCalculator{
       $i = $iRow['startDate'];
       $now = $j = $iRow['endDate'];
 
-      if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){ //current interval no endDate, user no exit date => calculate until today
+       //today or endof int or exit
+      if(empty($j) && $iRow['exitDate'] == '0000-00-00 00:00:00' ){
         $now = getCurrentTimestamp();
         $j = carryOverAdder_Hours($now, 24);
-      } elseif(empty($j)){ //current interval and he HAS an exitDate, calculate until the exitDate.
-        $j = $iRow['exitDate'];
+      } elseif(empty($j)){
+        $j = carryOverAdder_Hours($iRow['exitDate'],24); //include
       }
 
       $diff = timeDiff_Hours($i, $j);
-      if($diff > 0){ //in case for future dates
-        $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24); //accumulated vacation
-
-        while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)) { //for each day in interval
-          $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
-          if(isHoliday($i)){
-            $expectedHours = 0;
-          }
-          $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
-          if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){ //user has absolved hours for today (Checkin/Vacation/..)
-            if($row['timeEnd'] == '0000-00-00 00:00:00'){
-              //open timestamp lowers expected Hours according to how long user has been checked in
-              $timeEnd = $now;
-              if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){ //user has been checked in longer than his expected Hours -> no need to adjust anything
-                $this->expectedHours += $expectedHours;
-              } else {
-                $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd); //else: reduce expected hours to match time he has been here already, so there's no minus he can't keep up to.
-              }
-            } else {
-              $timeEnd = $row['timeEnd'];
+      $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24);
+      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)){ //days
+        $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
+        if(isHoliday($i)){
+          $expectedHours = 0;
+        }
+        $result = $conn->query("SELECT * FROM $logTable WHERE userID = $curID AND time LIKE'". substr($i, 0, 10) ." %'");
+        if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){
+          if($row['timeEnd'] == '0000-00-00 00:00:00'){
+            //adjust expected Hours to current time
+            $timeEnd = $now;
+            if(timeDiff_Hours($row['time'], $timeEnd) >= $expectedHours){
               $this->expectedHours += $expectedHours;
+            } else {
+              $this->expectedHours += timeDiff_Hours($row['time'], $timeEnd);
             }
-
-            switch($row['status']){
-              case 0:
-              $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
-              $this->breakCreditHours += $row['breakCredit'];
-              break;
-              case 1:
-              $this->vacationHours += $expectedHours;
-              $this->vacationDays--;
-              break;
-              case 2: //Can have ZA
-              $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
-              break;
-              case 3:
-              $this->sickHours += $expectedHours;
-              break;
-              case 4:
-              $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
-              break;
-              case 5: //Mixed
-              $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND mixedStatus != '-1'"); //select booking which tells us when she checked in.
-              $mixed_absolved = 0;
-              if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-                 $mixed_absolved = timeDiff_Hours( $mixed_row['end'], $timeEnd);
-              }
-              //too little
-              if($mixed_absolved < $expectedHours){
-                $this->absolvedHours += $expectedHours + $row['breakCredit']; //match
-              } else { //overtime
-                $this->absolvedHours += $mixed_absolved;
-              }
-
-              $this->breakCreditHours += $row['breakCredit'];
-
-            }//END SWITCH
-          } elseif(substr($i,0, 10) != substr($now,0,10)) { //no log for today, because its today: I dont want todays expectedHours to be counted if he hasnt checked in yet.
+          } else {
+            $timeEnd = $row['timeEnd'];
             $this->expectedHours += $expectedHours;
           }
 
-          //overTime
-          if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, check the accumulated saldo
-            $monthly_corrections = 0;
-            //correction Hours:
-            $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND DATE('$i') > DATE(createdOn) AND DATE('".substr($i,0,7)."-01') <= DATE(createdOn)");
-            while($result && ($row = $result->fetch_assoc())){
-              if($row['cType'] == 'log'){
-                $monthly_corrections += $row['hours'] * intval($row['addOrSub']);
-              } elseif($row['cType'] == 'vac'){
-                $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
+          $break_hours = 0;
+          $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
+          while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+
+          switch($row['status']){
+            case 0:
+            $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
+            $this->breakCreditHours += $break_hours;
+            break;
+            case 1:
+            $this->vacationHours += $expectedHours;
+            $this->vacationDays--;
+            break;
+            case 2: //Can have ZA
+            $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
+            break;
+            case 3:
+            $this->sickHours += $expectedHours;
+            break;
+            case 4:
+            $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
+            break;
+            case 5: //Mixed
+            $mixed_diff = 0;
+            //select all mixed bookings in this timestamp, and add hours accordingly
+            $mixed_result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
+            while($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+              $mixed_diff = timeDiff_Hours($row['start'], $row['end']);
+              switch($row['mixedStatus']){
+                case 1:
+                $this->vacationHours += $mixed_diff;
+                break;
+                case 2: //Can have ZA
+                $this->specialLeaveHours += $mixed_diff;
+                break;
+                case 3:
+                $this->sickHours += $mixed_diff;
+                break;
+                case 4:
+                $this->educationHours += $mixed_diff;
+                break;
               }
             }
-            $this->correctionHours += $monthly_corrections;
-
-            $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours;
-            if($this->saldo > 0){
-              if($this->saldo < $iRow['overTimeLump']){
-                $this->overTimeAdditive += $this->saldo;
-              } else {
-                $this->overTimeAdditive += $iRow['overTimeLump'];
+            $mixed_absolvedHours = timeDiff_Hours($row['time'], $timeEnd) - $mixed_diff;
+            //cancel out possible minus
+            $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$row['indexIM']);
+            if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+              $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
+              //if hours are missing (any breaks will cause a minus)
+              if($mixed_absolved > 0 && $mixed_absolvedHours < $expectedHours){
+                $mixed_absolvedHours += $mixed_absolved; //fill up
+                if($mixed_absolvedHours > $expectedHours){ //if too much: reduce
+                  $mixed_absolvedHours = $expectedHours;
+                }
               }
+            }
+            $this->absolvedHours += $mixed_absolvedHours;
+            $this->breakCreditHours += $break_hours;
+          } //END SWITCH
+        } else {
+          $this->expectedHours += $expectedHours;
+        }
+
+        //correction hours
+        if(!$is_corrected){
+          $monthly_corrections = 0;
+          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
+          while($result && ($row = $result->fetch_assoc())){
+            if($row['cType'] == 'log'){
+              $monthly_corrections += $row['hours'] * intval($row['addOrSub']);
+            } elseif($row['cType'] == 'vac'){
+              $this->vacationDays += $row['hours'] * intval($row['addOrSub']);
             }
           }
+          $this->correctionHours += $monthly_corrections;
+          $is_corrected = true;
+        }
 
-          $i = carryOverAdder_Hours($i, 24);
-        }//end foreach day in intveral
+        //EOM Calculations
+        if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
+          $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->educationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
+          if($this->saldo > 0){
+            if($this->saldo < $iRow['overTimeLump']){
+              $this->overTimeAdditive += $this->saldo;
+            } else {
+              $this->overTimeAdditive += $iRow['overTimeLump'];
+            }
+          }
+          $is_corrected = false;
+        }
 
-      } //end if($diff > 0);
+        $i = carryOverAdder_Hours($i, 24);
+      } //end foreach day in intveral
     } //end foreach interval
     $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->educationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
   }
 
-  private function timeDiff_Hours($from, $to) {
+  private function timeDiff_Hours($from, $to){
     $timeEnd = strtotime($to) / 3600;
     $timeBegin = strtotime($from) /3600;
     return $timeEnd - $timeBegin;
   }
 
-  private function getCurrentTimestamp() {
+  private function getCurrentTimestamp(){
     ini_set('date.timezone', 'UTC');
     $t = localtime(time(), true);
     return ($t["tm_year"] + 1900 . "-" . sprintf("%02d", ($t["tm_mon"]+1)) . "-". sprintf("%02d", $t["tm_mday"]) . " " . sprintf("%02d", $t["tm_hour"]) . ":" . sprintf("%02d", $t["tm_min"]) . ":" . sprintf("%02d", $t["tm_sec"]));
   }
 
-  private function carryOverAdder_Hours($a, $b) {
+  private function carryOverAdder_Hours($a, $b){
     if($a == '0000-00-00 00:00:00'){
       return $a;
     }

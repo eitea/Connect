@@ -50,15 +50,20 @@ $showReadyPlan = $row['enableReadyCheck'];
 
 if($isTimeAdmin){
   $numberOfAlerts = 0;
-  //vacation requests
-  $result = $conn->query("SELECT COUNT(*) FROM $userRequests WHERE status = '0'");
-  if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+  //requests
+  $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
+  if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   //forgotten checkouts
-  $result = $conn->query("SELECT COUNT(*) FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0");
-  if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+  $result = $conn->query("SELECT indexIM FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
+  if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   //gemini date in logs
-  $result = $conn->query("SELECT COUNT(*) FROM $logTable l1 WHERE EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
-  if($result && ($row = $result->fetch_assoc())){ $numberOfAlerts += reset($row); }
+  $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+  if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
+  //lunchbreaks
+  $result = $conn->query("SELECT indexIM FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
+  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)");
+  if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
 }
 
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
@@ -148,7 +153,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <title>Connect</title>
 </head>
 <script>
-document.onreadystatechange = function () {
+document.onreadystatechange = function() {
   var state = document.readyState
   if (state == 'complete') {
     document.getElementById("loader").style.display = "none";
@@ -235,6 +240,7 @@ $(document).ready(function() {
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary" name="savePAS">Save Password</button>
           </div>
+          <!--
           <div class="modal-body">
             PIN-Code: <br>
             <input type="number" class="form-control" name="pinCode" > <br><br>
@@ -243,6 +249,7 @@ $(document).ready(function() {
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-info" name="savePIN">Save PIN</button>
           </div>
+        -->
         </div>
       </div>
     </div>
@@ -350,7 +357,7 @@ $(document).ready(function() {
                       <ul class="nav nav-list">
                         <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
                         <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="admin_saldoview.php"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                        <li><a <?php if($this_page =='register_choice.php'){echo $setActiveLink;}?> href="register_choice.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
+                        <li><a <?php if($this_page =='register_basic.php'){echo $setActiveLink;}?> href="register_basic.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
                         <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
                       </ul>
                     </div>
@@ -381,7 +388,6 @@ $(document).ready(function() {
                     </a>
                     <div class="collapse" id="toggleSettings" style="height: 0px;">
                       <ul class="nav nav-list">
-                        <li><a <?php if($this_page =='configureLDAP.php'){echo $setActiveLink;}?> href="configureLDAP.php"><span>LDAP</span></a></li>
                         <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="editHolidays.php"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
@@ -390,7 +396,6 @@ $(document).ready(function() {
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                         <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
-
                       </ul>
                     </div>
                   </li>
@@ -400,9 +405,9 @@ $(document).ready(function() {
             </div>
           </div>
           <?php
-          if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_choice.php" || $this_page == "deactivatedUsers.php"){
+          if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_basic.php" || $this_page == "deactivatedUsers.php"){
             echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "reportOptions.php" || $this_page == "configureLDAP.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -492,7 +497,7 @@ $(document).ready(function() {
           ?>
           <!-- Section Five: ERP -->
           <?php
-          if($isReportAdmin == 'TRUE'):
+          if($isERPAdmin == 'TRUE'):
           ?>
           <div class="panel panel-default panel-borderless">
             <div class="panel-heading" role="tab" id="headingERP">
@@ -503,7 +508,7 @@ $(document).ready(function() {
             <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
               <div class="panel-body">
                 <ul class="nav navbar-nav">
-                  <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFER']; ?></span></a></li>
+                  <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFERS']; ?></span></a></li>
                   <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                 </ul>
               </div>

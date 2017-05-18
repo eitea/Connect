@@ -29,59 +29,62 @@ class Interval_Calculator{
   public $activity = array();
 
   public $beginDate = '';
+  public $exitDate = "";
 
-  //month like yyyy-mm-dd hh-mm-ss
   public function __construct($from, $to, $userid){
     $this->from = substr($from, 0, 10).' 12:00:00';
     $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = (timeDiff_Hours($from, $to) / 24)+1; //24h covers up 2 days
+    $this->days = (timeDiff_Hours($from, $to) / 24)+1;
     if($this->days > 1){
       $this->calculateValues();
     }
   }
 
   public function calculateValues(){
-    $fromDate = $i = $this->from;
+    $i = $this->from;
     $id = $this->id;
 
     require "connection.php";
     $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
     if($result && ($row = $result->fetch_assoc())){
       $this->beginDate = $beginDate = substr($row['beginningDate'],0,11).'00:00:00';
-      $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '5000-12-30 23:59:59' : $row['exitDate'];
-    } else { //should never occur
+      //PHP funfact #038: 32Bit servers running php cannot calculate dates past 2038 (not enough bits).
+      $this->exitDate = $exitDate =  ($row['exitDate'] == '0000-00-00 00:00:00') ? '2037-12-30 23:00:00' : $row['exitDate'];
+    } else {
       return "Invalid userID";
     }
-
 
     $count = $current_saldo_month = 0;
     for($j = 0; $j < $this->days; $j++){ //for each day of the month
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
-      //get the expectedHours from the matching interval
-      $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ( (DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)) )";
+      //get the expectedHours
+      $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND ((DATE(startDate) <= DATE('$i') AND endDate IS NULL) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)))";
       $result = $conn->query($sql);
       if($result && $result->num_rows == 1){
         $interval_row = $result->fetch_assoc();
         $this->shouldTime[] = $interval_row[strtolower(date('D', strtotime($i)))];
-      } else { //if no interval found means i want everything to be 0.
+      } else { //no interval
         $interval_row['overTimeLump'] = 0;
         $this->shouldTime[] = 0;
       }
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND time LIKE'". substr($i, 0, 10) ." %' ";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND DATE_ADD(time, INTERVAL timeToUTC  hour) LIKE'". substr($i, 0, 10) ." %' ";
       $result = $conn->query($sql);
-      if($result && $result->num_rows > 0){ //user has absolved hours for today (Checkin/Vacation/..)
+      if($result && $result->num_rows > 0){
         $row = $result->fetch_assoc();
         $this->start[] = $row['time'];
         $this->end[] = $row['timeEnd'];
         $this->activity[] = $row['status'];
         $this->timeToUTC[] = $row['timeToUTC'];
         $this->indecesIM[] = $row['indexIM'];
-        $this->lunchTime[] = $row['breakCredit'];
-        $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? 0 : timeDiff_Hours($row['time'], $row['timeEnd']);
-      } else { //user wasnt here today = 0 absolved hours
+        $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? timeDiff_Hours($row['time'], getCurrentTimestamp()) : timeDiff_Hours($row['time'], $row['timeEnd']);
+        $break_hours = 0;
+        $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
+        while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
+        $this->lunchTime[] = $break_hours;
+      } else {
         $this->start[] = false;
         $this->end[] = false;
         $this->absolvedTime[] = 0;
@@ -90,32 +93,42 @@ class Interval_Calculator{
         $this->timeToUTC[] = 0;
         $this->indecesIM[] = 0;
       }
-      //if today is a holiday, poot poot
+
       if(isHoliday($i)){
+        $this->shouldTime[$count] = 0;
+      }
+      if($this->absolvedTime[$count] == 0 && timeDiff_Hours($i, substr(getCurrentTimestamp(), 0, 10).' 12:00:00') < 0 ){
+        $this->shouldTime[$count] = 0;
+      }
+      if(timeDiff_Hours($i, substr($exitDate, 0, 10).' 12:00:00') < 0 ){ //past entry dates
         $this->shouldTime[$count] = 0;
       }
 
       //mixed Timestamps
       if($this->activity[$count] == 5){
-        $mixed_result = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = ".$this->indecesIM[$count]." AND mixedStatus != '-1'");
+        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$this->indecesIM[$count]);
         if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-          $this->start[$count] = $mixed_row['end'];
-        }
-        $mixed_absolved = ($this->end[$count] == '0000-00-00 00:00:00') ? 0 : timeDiff_Hours($this->start[$count], $this->end[$count]);
-        //too little
-        if($mixed_absolved < $this->shouldTime[$count]){
-          $this->absolvedTime[$count] = $this->shouldTime[$count] + $this->lunchTime[$count]; //match
-        } else { //overtime
-          $this->absolvedTime[$count] = $mixed_absolved;
+          $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
+          //in case of splitted break, we only want to add what's left of mixed_absolved to the end of the day.
+          $splits_result = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS split_absolved FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$this->indecesIM[$count]);
+          if($splits_result && ($splits_row = $splits_result->fetch_assoc())){
+            $mixed_absolved -= $splits_row['split_absolved'];
+          }
+          //if hours are missing (any breaks will cause a minus)
+          if($mixed_absolved > 0 && $this->absolvedTime[$count] < $this->shouldTime[$count]){
+            $this->absolvedTime[$count] += $mixed_absolved; //fill up
+            if($this->absolvedTime[$count] > $this->shouldTime[$count]){ //if too much: reduce
+              $this->absolvedTime[$count] = $this->shouldTime[$count];
+            }
+          }
         }
       }
 
-      //end of month calculations
+      //EOM calculations
       $current_saldo_month += $this->absolvedTime[$count] - $this->lunchTime[$count] - $this->shouldTime[$count];
-      if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){ //whenever a month is over, write down monthly saldo
-        //saldo
+      if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
+        //clean values
         $this->monthly_saldo[] = $current_saldo_month;
-        //overtime
         $this->overTimeLump_single[] = $interval_row['overTimeLump'];
         //correctionHours
         $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE(createdOn) >= DATE('".substr($i,0,7)."-01') AND DATE('$i') > DATE(createdOn)");

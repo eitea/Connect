@@ -103,8 +103,13 @@ if(isset($_POST['saveAll'])){
   }
 
   if(isset($_POST['taxnumber'])){
-    $val = intval($_POST['taxnumber']);
+    $val = test_input($_POST['taxnumber']);
     $conn->query("UPDATE $clientDetailTable SET taxnumber = '$val' WHERE id = $detailID");
+  }
+
+  if(isset($_POST['vatnumber'])){
+    $val = test_input($_POST['vatnumber']);
+    $conn->query("UPDATE $clientDetailTable SET vatnumber = '$val' WHERE id = $detailID");
   }
 
   if(isset($_POST['taxArea'])){
@@ -428,8 +433,14 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         <div class="col-xs-3">
           Steuernummer
         </div>
-        <div class="col-xs-3">
+        <div class="col-xs-4">
           <input type="text" class="form-control" name="taxnumber" value="<?php echo $row['taxnumber']; ?>" />
+        </div>
+        <div class="col-xs-2 text-center">
+          USt. Ident-Nr.
+        </div>
+        <div class="col-xs-3">
+          <input type="text" class="form-control" name="vatnumber" value="<?php echo $row['vatnumber']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -586,7 +597,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Tage Netto
         </div>
         <div class="col-xs-6">
-          <input type="text" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
+          <input type="number" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -594,13 +605,13 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Skonto 1
         </div>
         <div class="col-xs-3">
-          <input type="text" class="form-control" name="skonto1" value="<?php echo $row['skonto1']; ?>" />
+          <input type="number" step="0.01" class="form-control" name="skonto1" value="<?php echo $row['skonto1']; ?>" />
         </div>
         <div class="col-xs-2">
           % Innerhalb von
         </div>
         <div class="col-xs-3">
-          <input type="text" class="form-control" name="skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
+          <input type="number" class="form-control" name="skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
         </div>
         <div class="col-xs-1">
           Tagen
@@ -611,13 +622,13 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Skonto 2
         </div>
         <div class="col-xs-3">
-          <input type="text" class="form-control" name="skonto2" value="<?php echo $row['skonto2']; ?>" />
+          <input type="number" step="0.01" class="form-control" name="skonto2" value="<?php echo $row['skonto2']; ?>" />
         </div>
         <div class="col-xs-2">
           % Innerhalb von
         </div>
         <div class="col-xs-3">
-          <input type="text" class="form-control" name="skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
+          <input type="number" class="form-control" name="skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
         </div>
         <div class="col-xs-1">
           Tagen
@@ -638,7 +649,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Karenztage
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="karenztage" value="<?php echo $row['karenztage']; ?>" />
+          <input type="number" class="form-control" name="karenztage" value="<?php echo $row['karenztage']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -654,7 +665,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Mahnung 1
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="warning1" value="<?php echo $row['warning1']; ?>" />
+          <input type="number" step="0.01" class="form-control" name="warning1" value="<?php echo $row['warning1']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -662,7 +673,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Mahnung 2
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="warning2" value="<?php echo $row['warning2']; ?>" />
+          <input type="number" step="0.01" class="form-control" name="warning2" value="<?php echo $row['warning2']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -670,7 +681,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Mahnung 3
         </div>
         <div class="col-xs-9">
-          <input type="text" class="form-control" name="warning3" value="<?php echo $row['warning3']; ?>" />
+          <input type="number" step="0.01" class="form-control" name="warning3" value="<?php echo $row['warning3']; ?>" />
         </div>
       </div>
       <hr>

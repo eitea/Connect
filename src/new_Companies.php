@@ -17,6 +17,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
       echo '</div>';
     }
+    $ins_id = mysqli_insert_id($conn);
+    $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -26,24 +28,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 ?>
 <form method="post">
   <div class="container-fluid">
-  <div class="col-md-6">
-    <input type="text" class="form-control" name="compaName" placeholder="Name...">
+    <div class="col-md-6">
+      <input type="text" class="form-control" name="compaName" placeholder="Name...">
+    </div>
+    <div class="col-md-4">
+      <select name="compaType" class="js-example-basic-single btn-block">
+        <option selected value="0">Typ...</option>
+        <option value="GmbH">GmbH</option>
+        <option value="AG">AG</option>
+        <option value="OG">OG</option>
+        <option value="KG">KG</option>
+        <option value="EU">EU</option>
+        <option value="-">Sonstiges</option>
+      </select>
+    </div>
+    <div class="col-md-2 text-right">
+      <button type="submit" class="btn btn-warning " name="compaCreate">Hinzufügen</button>
+    </div>
   </div>
-  <div class="col-md-4">
-    <select name="compaType" class="js-example-basic-single btn-block">
-      <option selected value="0">Typ...</option>
-      <option value="GmbH">GmbH</option>
-      <option value="AG">AG</option>
-      <option value="OG">OG</option>
-      <option value="KG">KG</option>
-      <option value="EU">EU</option>
-      <option value="-">Sonstiges</option>
-    </select>
-  </div>
-  <div class="col-md-2 text-right">
-    <button type="submit" class="btn btn-warning " name="compaCreate">Hinzufügen</button>
-  </div>
-</div>
 </form>
 
 <!-- /BODY -->

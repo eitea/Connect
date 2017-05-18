@@ -1,3 +1,24 @@
+<?php
+if(!empty($_POST['captcha'])){
+  die("");
+} else {
+  require 'language.php';
+}
+
+if (!empty($_POST["firstname"]) && !empty($_POST['lastname'])) {
+  $firstname = test_input($_POST["firstname"]);
+  $lastname = test_input($_POST['lastname']);
+  header("Location: selfregistration_2.php?gn=$firstname&sn=$lastname" );
+}
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,27 +47,6 @@ body{
   </div>
 </nav>
 <!-- /navbar -->
-<?php
-if(!empty($_POST['captcha'])){
-  die("");
-} else {
-  require 'language.php';
-}
-
-if (!empty($_POST["firstname"]) && !empty($_POST['lastname'])) {
-  $firstname = test_input($_POST["firstname"]);
-  $lastname = test_input($_POST['lastname']);
-  header("Location: selfregistration_2.php?gn=$firstname&sn=$lastname" );
-}
-
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-?>
-
 <body>
   <div class="page-header">
     <h3><?php echo $lang['REGISTER_NEW_USER']; ?></h3>

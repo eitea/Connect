@@ -2,6 +2,9 @@
 $lang_eng = array();
 $lang_ger = array();
 
+$lang_eng['ABSOLVED'] = 'Absolved';
+$lang_ger['ABSOLVED'] = 'Absolviert';
+
 $lang_eng['ABSOLVED_HOURS'] = 'Absolved Hours';
 $lang_ger['ABSOLVED_HOURS'] = 'Absolvierte Stunden';
 
@@ -228,6 +231,9 @@ $lang_ger['DEFAULT'] = 'Standard';
 $lang_eng['DELETE'] = 'Delete';
 $lang_ger['DELETE'] = 'Löschen';
 
+$lang_eng['DELETE_SELECTION'] = 'Delete Selection';
+$lang_ger['DELETE_SELECTION'] = 'Auswahl Löschen';
+
 $lang_eng['DELETE_COMPANY'] = 'Delete Company';
 $lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
 
@@ -289,7 +295,7 @@ $lang_eng['ERROR_MISSING_SELECTION'] = 'A selection was missing. Please check al
 $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie alle Auswahlmöglichkeiten.';
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
-$lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben';
+$lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
@@ -408,6 +414,11 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
 
+$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
+                                        Autocorrecting them adds an complete lunchbreak to the day. (This break will be added)';
+$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
+                                        Die Korrektur trägt eine vollständige Mittagspause nach. (Diese Pause wird dazugerechnet)';
+
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
                                       Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
@@ -511,6 +522,9 @@ $lang_ger['NUMBER'] = 'Nummer';
 $lang_eng['OFFER'] = 'Offer';
 $lang_ger['OFFER'] = 'Angebot';
 
+$lang_eng['OFFERS'] = 'Offers';
+$lang_ger['OFFERS'] = 'Angebote';
+
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
 
@@ -528,6 +542,9 @@ $lang_ger['OPTIONS'] = 'Optionen';
 
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
+
+$lang_eng['OVERTIME'] = 'Overtime';
+$lang_ger['OVERTIME'] = 'Überstunden';
 
 $lang_eng['OVERTIME_ALLOWANCE'] = 'Overtime Plus';
 $lang_ger['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
@@ -849,6 +866,11 @@ $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht ü
 
 $lang_eng['WARNING_DELETE_COMPANY'] = 'All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?';
 $lang_ger['WARNING_DELETE_COMPANY'] = 'Alle Kunden, Projekte und Buchungen die zu diesem Mandanten gehören werden permanent gelöscht. Wollen Sie dennoch fortfahren?';
+
+$lang_eng['WARNING_NO_CLIENTS'] = 'To use this Module, please create a client first.<br>
+                                   To assign the same project to every client, use the default creation function in your companys settings.';
+$lang_ger['WARNING_NO_CLIENTS'] = 'Um diese Funktion verwenden zu können, benötigen Sie zuerst Kunden.<br>
+                                   Um allen Kunden das gleiche Projekt zuweisen zu können, verwenden Sie die Standardprojekt-Funktion unter den Einstellungen ihres Mandanten.';
 
 $lang_eng['WARNING_RESTORE'] = 'This process will permanently delete unsaved data. Are you sure you want to proceed?';
 $lang_ger['WARNING_RESTORE'] = 'Dieser Prozess löscht alle ungesicherten Daten dauerhaft. Wollen Sie dennoch fortfahren?';

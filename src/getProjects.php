@@ -612,6 +612,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } else {
   $result = false;
 }
+
+$addTimeStart = 0;
 ?>
 
 <?php if($filterCompany || $filterUserID ): //i want my filter displayed even if there were no bookings ?>
@@ -705,6 +707,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $icon = "fa fa-cutlery";
           } elseif($row['bookingType'] == 'drive'){
             $icon = "fa fa-car";
+          } elseif($row['bookingType'] == 'mixed'){
+            $icon = "fa fa-plus";
+            $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
           } else {
             $icon = "fa fa-bookmark";
           }
@@ -717,8 +722,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
           $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
           $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
-          $A_charged = $B_charged = '--';
 
+          $A_charged = $B_charged = '--';
           if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
             $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
           }
@@ -815,7 +820,7 @@ $(function () {
           echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
           if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
             echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
-            $sql = "SELECT * FROM $clientTable ORDER BY NAME ASC";
+            $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterCompany){
               $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
             }
@@ -871,8 +876,8 @@ $(function () {
           <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
           <br>
           <?php
-          if($row['bookingType'] != 'break'){//cant charge a break, can you
-            echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' $selected name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>"; //gotta know which ones he wants checked.
+          if($row['bookingType'] != 'break' && $row['booked'] == 'FALSE'){//cant charge a break, can you
+            echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>";
             echo "<div class='col-xs-2'><input id='".$x."_2' type='checkbox' onclick='toggle2(\"".$x."_1\")' name='editing_nocharge' value='".$x."' /> <label>".$lang['NOT_CHARGEABLE']. "</label> </div></div>";
           }
           ?>

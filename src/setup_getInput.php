@@ -53,7 +53,7 @@ function test_input($data) {
     <h1>Login Data</h1><br><br>
 
     <div class="row">
-      <div class="col-xs-3 col-xs-offset-3">
+      <div class="col-md-3 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -63,7 +63,7 @@ function test_input($data) {
           </div>
         </div>
       </div>
-      <div class="col-xs-3">
+      <div class="col-md-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon" style=min-width:150px>
@@ -76,7 +76,7 @@ function test_input($data) {
     </div>
 
     <div class="row">
-      <div class="col-xs-6 col-xs-offset-3">
+      <div class="col-md-6 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -88,7 +88,7 @@ function test_input($data) {
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-4 col-xs-offset-3">
+      <div class="col-md-4 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -98,7 +98,7 @@ function test_input($data) {
           </div>
         </div>
       </div>
-      <div class="col-xs-2">
+      <div class="col-md-2">
         <div class="form-group">
           <select name="type" class="js-example-basic-single btn-block">
             <option selected>...</option>
@@ -116,7 +116,7 @@ function test_input($data) {
 
     <p>Your Login E-Mail</p>
     <div class="row">
-      <div class="col-xs-6 col-xs-offset-3">
+      <div class="col-md-6 col-md-offset-3">
         <div class="form-group">
           <div class="input-group">
             <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php if($accept) echo $_POST['localPart']; ?>">
@@ -135,7 +135,7 @@ function test_input($data) {
       <h1>MySQL Database Connection</h1><br><br>
 
       <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
+        <div class="col-md-6 col-md-offset-3">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -147,7 +147,7 @@ function test_input($data) {
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
+        <div class="col-md-6 col-md-offset-3">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -159,7 +159,7 @@ function test_input($data) {
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
+        <div class="col-md-6 col-md-offset-3">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -171,7 +171,7 @@ function test_input($data) {
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
+        <div class="col-md-6 col-md-offset-3">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -194,7 +194,7 @@ function test_input($data) {
     <?php endif; ?>
 
     <div class="container">
-      <div class="col-xs-3 col-xs-offset-9">
+      <div class="col-md-3 col-md-offset-9">
         <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
       </div>
     </div>

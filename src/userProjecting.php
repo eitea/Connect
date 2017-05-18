@@ -74,9 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
-        $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE logs SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM"; //update break credit
-        $conn->query($sql);
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
       } else {
@@ -88,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $expenses_price = $expenses_unit = 0.0;
           $expenses_info = '';
         }
-        if(isset($_POST['filterProject'])){
+        if(!empty($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);
           $accept = 'TRUE';
           if(isset($_POST['required_1'])){
@@ -124,9 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             }
             $conn->query($sql);
-            if(mysqli_error($conn)){
-              echo mysqli_error($conn);
-            }
             $insertInfoText = $insertInternInfoText = '';
             $showUndoButton = TRUE;
             if($request_addendum) redirect('userProjecting.php');
@@ -232,8 +226,11 @@ echo mysqli_error($conn);
                 $icon = "fa fa-cutlery";
               } elseif($row['bookingType'] == 'drive'){
                 $icon = "fa fa-car";
+              } elseif($row['bookingType'] == 'mixed'){
+                $icon = "fa fa-plus";
+                $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
               } else {
-                $icon = "fa fa-bookmark"; //fa-paw, fa-moon-o, star-o, snowflake-o, heart, umbrella, leafs, bolt, music, bookmark
+                $icon = "fa fa-bookmark"; //snowflake-o, heart, umbrella, tree, music, bookmark, globe
               }
               $interninfo = $row['internInfo'];
               $expensesinfo = $optionalinfo = '';
@@ -272,11 +269,6 @@ echo mysqli_error($conn);
             }
             if(isset($_POST['undo'])){
               $row = $result->fetch_assoc();
-              if($row['bookingType'] == 'break'){ //undo breaks
-                $timeDiff = timeDiff_Hours($row['start'], $row['end']);
-                $sql = "UPDATE $logTable SET breakCredit = (breakCredit - $timeDiff) WHERE indexIM = " . $row['timestampID'];
-                $conn->query($sql);
-              }
               $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
               $conn->query($sql);
             }

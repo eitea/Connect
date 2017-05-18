@@ -6,14 +6,16 @@
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
 <?php
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
-      $result = $conn->query("SELECT hoursOfRest FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
+      $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, indexIM, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
       if($result && ($row = $result->fetch_assoc())){
-        $conn->query("UPDATE $logTable SET breakCredit = (breakCredit +" .$row['hoursOfRest'].") WHERE indexIM = $indexIM"); //add a complete additional break.
+        //add a new break in the middle of the day, we don't care about overlappings
+        $break_begin = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
+        $break_end = carryOverAdder_Minutes($break_begin, $row['hoursOfRest'] * 60);
+        $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', ".$row['indexIM'].")");
         echo mysqli_error($conn);
       }
     }
@@ -35,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
         WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
         $result = mysqli_query($conn, $sql);
-        if ($result && $result->num_rows > 0) { //does a booking exist?
+        if($result && $result->num_rows > 0){ //does a booking exist?
           $rowLastBooking = $result->fetch_assoc();
           $adjustedTime = $rowLastBooking['end'];
         }
@@ -72,11 +74,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
           if($type == 'vac'){
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '1', 0)";
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
           } elseif($type == 'scl'){
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '4', 0)";
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '4')";
           } elseif($type == 'spl'){
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status, breakCredit) VALUES('$i', '$i2', ".$row['userID'].", '0', '2', 0)";
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '2')";
           }
           $conn->query($sql);
           echo mysqli_error($conn);
@@ -114,7 +116,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($indexIM != 0){
       $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
     } else { //timestamp doesnt exist
-      $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, breakCredit, status) VALUES('$timeStart', '$timeFin', $user, 0, 0, '0')");
+      $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, status) VALUES('$timeStart', '$timeFin', $user, 0, '0')");
     }
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
@@ -135,25 +137,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $result = $conn->query("SELECT requestID FROM $userRequests WHERE id = $requestID");
     $row = $result->fetch_assoc();
     $bookingID = $row['requestID'];
-    //reupdate breakCredit
-    $result = $conn->query("SELECT timestampID, start, end FROM $projectBookingTable WHERE id = $bookingID");
-    $row = $result->fetch_assoc();
-    $timestampID = $row['timestampID'];
-    $breakDiff = timeDiff_Hours($row['start'], $row['end']);
-    $conn->query("UPDATE logs SET breakCredit = (breakCredit - $breakDiff) WHERE indexIM = $timestampID");
     //delete break
     $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
     echo $conn->error;
   }
-  echo mysqli_error($conn);
+  //error or redirect
+  if(mysqli_error($conn)){
+    echo mysqli_error($conn);
+  } else {
+    redirect("adminTodos.php");
+  }
 }
 ?>
 
 <!--GENERAL REQUESTS -------------------------------------------------------------------------->
 
 <?php
-$sql ="SELECT * FROM $userRequests WHERE status = '0'";
-$result = $conn->query($sql);
+$result = $conn->query("SELECT * FROM $userRequests WHERE status = '0'");
 if($result && $result->num_rows > 0):
   echo '<h4>'.$lang['UNANSWERED_REQUESTS'].': </h4><br>';
 ?>
@@ -222,12 +222,9 @@ if($result && $result->num_rows > 0):
   <?php //select all timestamps that do not have enough break
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
   INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-  WHERE status = '0' AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND breakCredit < hoursOfRest";
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
+  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)";
   $result = $conn->query($sql);
-  /* Please note: cannot check for complete project bookings anymore, since correcting them would have to insert another complete booking.
-  selecting overlapping times is too much effort atm. breakCredit and bookings are two seperate units. breakCredit shoud always be more or equal all break bookings.
-  corrections and editings will affect breakCredit value only.
-  */
   if($result && $result->num_rows > 0):
   ?>
     <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
@@ -238,9 +235,7 @@ if($result && $result->num_rows > 0):
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">
-        Für die gelisteten Zeitstempel wurde keine Mittagspause gefunden.<br>
-        Die Autokorrektur trägt eine vollständige Mittagspause nach (Diese Pause wird dazugerechnet). <br>
-        Hier werden nur Benutzer angezeigt, die ihre Pause nicht selbst buchen können.
+        <?php echo $lang['INFO_ILLEGAL_LUNCHBREAK']; ?>
       </div>
     </div>
 
@@ -248,7 +243,6 @@ if($result && $result->num_rows > 0):
       <th>Name</th>
       <th><?php echo $lang['TIME']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
-      <th><?php echo $lang['LUNCHBREAK']; ?></th>
       <th><input type="checkbox" onclick="toggle(this, 'lunchbreakIndeces');" /></th>
       <tbody>
         <?php
@@ -257,7 +251,6 @@ if($result && $result->num_rows > 0):
           echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-          echo '<td>'. $row['breakCredit'].'</td>';
           echo '<td><input type="checkbox" name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';
           echo '</tr>';
         }
@@ -274,8 +267,7 @@ if($result && $result->num_rows > 0):
   <?php
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.* FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
-  WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR (TIMESTAMPDIFF(MINUTE, time, timeEnd) - breakCredit*60) < 0";
-
+  WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
   ?>
@@ -296,7 +288,6 @@ if($result && $result->num_rows > 0):
       <th>User</th>
       <th>Status</th>
       <th><?php echo $lang['TIME']; ?></th>
-      <th><?php echo $lang['BREAK']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
       <th>Autocorrect</th>
       <tbody>
@@ -306,8 +297,7 @@ if($result && $result->num_rows > 0):
           echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
           echo '<td>'. $lang['ACTIVITY_TOSTRING'][$row['status']] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
-          echo '<td>'. $row['breakCredit'].'</td>';
-          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']) - $row['breakCredit'], 2, '.', '') .'</td>';
+          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
           echo '<td><input type=checkbox name="autoCorrects[]" value='.$row['indexIM'].' ></td>';
           echo '</tr>';
         }
@@ -323,7 +313,7 @@ if($result && $result->num_rows > 0):
 
   <?php
   $sql = "SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id
-  AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
+  AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):

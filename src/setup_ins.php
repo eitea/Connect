@@ -17,8 +17,16 @@ $travellingFile
 */
 
 //dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
+//insert main company
+$sql = "INSERT INTO $companyTable (name, companyType) VALUES ('$companyName', '$companyType')";
+$conn->query($sql);
+//insert password policy
+$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+//insert module en/disable
+$conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
+
 //insert ADMIN
-$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$psw');";
+$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
 $conn->query($sql);
 //interval
 $sql = "INSERT INTO $intervalTable (userID) VALUES (1);";
@@ -46,13 +54,8 @@ $conn->query($sql);
 //insert ldap config
 $sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
 $conn->query($sql);
-//insert main company
-$sql = "INSERT INTO $companyTable (name, companyType) VALUES ('$companyName', '$companyType')";
-$conn->query($sql);
-//insert password policy
-$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
-//insert module en/disable
-$conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
+
+
 //insert holidays
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){

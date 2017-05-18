@@ -38,7 +38,6 @@ $sql = "CREATE TABLE $logTable (
   timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   status INT(3),
   timeToUTC INT(2) DEFAULT '2',
-  breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
   FOREIGN KEY (userID) REFERENCES $userTable(id)
   ON UPDATE CASCADE
@@ -129,7 +128,7 @@ $sql = "CREATE TABLE $projectBookingTable (
   chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00',
   chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00',
   projectID INT(6) UNSIGNED,
-  timestampID INT(10) UNSIGNED,
+  timestampID INT(10) UNSIGNED NOT NULL,
   infoText VARCHAR(500),
   internInfo VARCHAR(500),
   booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -153,6 +152,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+//INSERT INTO `projectbookingdata` (timestampID, start, end, projectID) VALUES(201, '2017-01-01 10:00:00', '2017-01-01 10:00:00', 8)
 
 $sql = "CREATE TABLE $companyToUserRelationshipTable (
   companyID INT(6) UNSIGNED,
@@ -326,7 +326,6 @@ $sql = "CREATE TABLE $deactivatedUserLogs (
   timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   status ENUM('-1', '0', '1', '2', '3', '4'),
   timeToUTC INT(2) DEFAULT '2',
-  breakCredit	DECIMAL(4,2),
   userID INT(6) UNSIGNED,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
   ON UPDATE CASCADE
@@ -423,7 +422,8 @@ $sql = "CREATE TABLE $clientDetailTable(
   debitNumber INT(10),
   datev INT(10),
   accountName VARCHAR(100),
-  taxnumber INT(50),
+  taxnumber VARCHAR(50),
+  vatnumber VARCHAR(50)
   taxArea VARCHAR(50),
   customerGroup VARCHAR(50),
   representative VARCHAR(50),
@@ -572,7 +572,7 @@ $sql = "CREATE TABLE $policyTable (
     sat DECIMAL(4,2) DEFAULT 0,
     sun DECIMAL(4,2) DEFAULT 0,
     vacPerYear INT(2) DEFAULT 25,
-    overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+    overTimeLump DECIMAL(5,2) DEFAULT 0.0,
     pauseAfterHours DECIMAL(4,2) DEFAULT 6,
     hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
     userID INT(6) UNSIGNED,
@@ -680,5 +680,21 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
+
+  $sql = "CREATE TABLE mixedInfoData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    status INT(3),
+    timeStart DATETIME,
+    timeEnd DATETIME,
+    isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    FOREIGN KEY (timestampID) REFERENCES $logTable(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
 
 ?>

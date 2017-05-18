@@ -18,8 +18,8 @@ if(isset($_POST['delete'])  && isset($_POST['indeces'])){
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
 
     //insert logs
-    $sql = "INSERT INTO $logTable (userID, time, timeEnd, status, timeToUTC, breakCredit, indexIM)
-    SELECT userID, time, timeEnd, status, timeToUTC, breakCredit, indexIM FROM $deactivatedUserLogs WHERE userID = $x";
+    $sql = "INSERT INTO $logTable (userID, time, timeEnd, status, timeToUTC, indexIM)
+    SELECT userID, time, timeEnd, status, timeToUTC, indexIM FROM $deactivatedUserLogs WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo 'logErr: '.mysqli_error($conn);}
 
     //insert projectBookings

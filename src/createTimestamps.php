@@ -1,8 +1,8 @@
 <?php
 //$to - $from in Hours.
 function timeDiff_Hours($from, $to) {
-  $timeEnd = strtotime($to) / 3600;
   $timeBegin = strtotime($from) /3600;
+  $timeEnd = strtotime($to) / 3600;
   return $timeEnd - $timeBegin;
 }
 
@@ -131,7 +131,7 @@ function match_passwordpolicy($p, &$out = ''){
 }
 
 function split_booking($booking, $splits){
-  
+
 }
 
 /*

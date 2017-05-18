@@ -2,20 +2,7 @@
 require 'Calculators/LogCalculator.php';
 $logSums = new LogCalculator($curID);
 
-$breakCreditHours = $logSums->breakCreditHours;
-$absolvedHours = $logSums->absolvedHours;
-$expectedHours = $logSums->expectedHours - $logSums->vacationHours;
-$vacationHours = $logSums->vacationHours;
-$specialLeaveHours = $logSums->specialLeaveHours;
-$sickHours = $logSums->sickHours;
-$overTimeAdditive = $logSums->overTimeAdditive;
-$correctionHours = $logSums->correctionHours;
-$availableVacationDays = $logSums->vacationDays;
-
-$beginDate = $logSums->beginDate;
-$theBigSum = $logSums->saldo;
-
-if($theBigSum < 0){
+if($logSums->saldo < 0){
   $color = 'style=color:red';
 } else {
   $color = 'style=color:#00ba29';
@@ -37,7 +24,6 @@ if($result_Sum && $result_Sum->num_rows > 0){
   </div>
 </div>
 
-
 <div class="container-fluid">
   <div class="col-md-4">
     <h4>Saldo</h4><hr>
@@ -48,14 +34,14 @@ if($result_Sum && $result_Sum->num_rows > 0){
       </thead>
       <tbody>
         <?php
-        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($absolvedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($expectedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($specialLeaveHours,2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($sickHours,2,'.','').'</td></tr>';
-        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . ': </td> <td> -' . number_format($overTimeAdditive,2,'.','') . ' </td></tr>';
-        echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a>: </td><td>'.sprintf('%+.2f',$correctionHours).'</td></tr>';
-        echo "<tr><td style='font-weight:bold;'>".$lang['SUM'].": </td><td $color>". number_format($theBigSum, 2, '.', ''). '</td></tr>';
+        echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($logSums->absolvedHours + $logSums->vacationHours , 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
+        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($logSums->specialLeaveHours,2, '.', '').'</td></tr>';
+        echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($logSums->sickHours,2,'.','').'</td></tr>';
+        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . ': </td> <td> -' . number_format($logSums->overTimeAdditive,2,'.','') . ' </td></tr>';
+        echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a>: </td><td>'.sprintf('%+.2f',$logSums->correctionHours).'</td></tr>';
+        echo "<tr><td style='font-weight:bold;'>".$lang['SUM'].": </td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
         ?>
       </tbody>
     </table>
@@ -94,7 +80,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td><a href="display_vacation.php?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $availableVacationDays) .'</td></tr>';
+        echo '<tr><td><a href="display_vacation.php?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
         echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>
