@@ -156,7 +156,14 @@ if($filterProposal){
   $row['curDate'] = $row['deliveryDate'] = $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
 } else {
   $id_num = '-';
-  echo '<div class="alert alert-info">'.$lang['INFO_SELECT_CLIENT'].'</div>';
+  $result_c = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
+  if(!$result_c || $result_c->num_rows <= 0){
+    echo '<br><div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
+    include "new_client.php";
+    echo '</div>';
+  } else {
+    echo '<br><div class="alert alert-info">'.$lang['INFO_SELECT_CLIENT'].'</div>';
+  }
 }
 ?>
 <div class="page-header">

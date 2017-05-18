@@ -1,7 +1,7 @@
 <?php
 class LogCalculator{
   public $overTimeAdditive = 0;
-  public $vacationDays = 0; //can be understood as 'still available vacation days' (considers already used vacation)
+  public $vacationDays = 0; //still available vacation days (considers already used vacation)
 
   public $expectedHours = 0;
   public $absolvedHours = 0;
@@ -132,7 +132,7 @@ class LogCalculator{
         //correction hours
         if(!$is_corrected){
           $monthly_corrections = 0;
-          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
+          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
           while($result && ($row = $result->fetch_assoc())){
             if($row['cType'] == 'log'){
               $monthly_corrections += $row['hours'] * intval($row['addOrSub']);

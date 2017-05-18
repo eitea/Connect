@@ -74,7 +74,7 @@ if (!$conn->query($sql)) {
 //insert travelling expenses
 if ($travellingFile) {
     while (($line = fgets($travellingFile)) !== false) {
-      $line = iconv('windows-1250', 'UTF-8', $line);
+      $line = iconv('UTF-8', 'windows-1252', $line);
       $thisLineIsNotOK = true;
       while($thisLineIsNotOK){
         $data = preg_split('/\s+/', $line);
