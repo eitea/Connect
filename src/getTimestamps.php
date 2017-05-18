@@ -523,7 +523,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   }
                   echo "</select> ";
                   if(!$calculator->indecesIM[$i]){ //timestamp doesnt exist
-                    $A = $B = $calculator->date[$i].' 00:00:00';
+                    $A = $B = $calculator->date[$i].' 12:00:00';
                     //existing timestamps cant have timeToUTC edited
                     echo ' <select name="creatTimeZone" class="js-example-basic-single" style="width:90px">';
                     for($i_utc = -12; $i_utc <= 12; $i_utc++){

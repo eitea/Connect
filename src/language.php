@@ -522,6 +522,9 @@ $lang_ger['NUMBER'] = 'Nummer';
 $lang_eng['OFFER'] = 'Offer';
 $lang_ger['OFFER'] = 'Angebot';
 
+$lang_eng['OFFERS'] = 'Offers';
+$lang_ger['OFFERS'] = 'Angebote';
+
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
 

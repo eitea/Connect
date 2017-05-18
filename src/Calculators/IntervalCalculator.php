@@ -70,7 +70,7 @@ class Interval_Calculator{
         $this->shouldTime[] = 0;
       }
 
-      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND time LIKE'". substr($i, 0, 10) ." %' ";
+      $sql = "SELECT $logTable.* FROM $logTable WHERE userID = $id AND DATE(time) >= DATE('$beginDate') AND DATE(time) <= DATE('$exitDate') AND DATE_ADD(time, INTERVAL timeToUTC  hour) LIKE'". substr($i, 0, 10) ." %' ";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){
         $row = $result->fetch_assoc();

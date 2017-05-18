@@ -128,7 +128,7 @@ $sql = "CREATE TABLE $projectBookingTable (
   chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00',
   chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00',
   projectID INT(6) UNSIGNED,
-  timestampID INT(10) UNSIGNED,
+  timestampID INT(10) UNSIGNED NOT NULL,
   infoText VARCHAR(500),
   internInfo VARCHAR(500),
   booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -152,6 +152,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+//INSERT INTO `projectbookingdata` (timestampID, start, end, projectID) VALUES(201, '2017-01-01 10:00:00', '2017-01-01 10:00:00', 8)
 
 $sql = "CREATE TABLE $companyToUserRelationshipTable (
   companyID INT(6) UNSIGNED,

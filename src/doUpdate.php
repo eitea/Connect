@@ -1013,6 +1013,13 @@ if($row['version'] < 85){
       $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
     }
   }
+
+  $sql = "ALTER IGNORE TABLE projectbookingdata ADD UNIQUE double_submit (timestampID, start, end)";
+  if($conn->query($sql)){
+    echo '<br> Remove all the duplicate entries and create a key';
+  } else {
+    echo mysqli_error($conn);
+  }
 }
 
 //if($row['version'] < 86){}

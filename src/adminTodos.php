@@ -313,7 +313,7 @@ if($result && $result->num_rows > 0):
 
   <?php
   $sql = "SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id
-  AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(l1.time) = DATE(l2.time) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
+  AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC";
 
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
