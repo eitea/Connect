@@ -1,7 +1,7 @@
 <?php
 class LogCalculator{
   public $overTimeAdditive = 0;
-  public $vacationDays = 0; //can be understood as 'still available vacation days' (considers already used vacation)
+  public $vacationDays = 0; //still available vacation days (considers already used vacation)
 
   public $expectedHours = 0;
   public $absolvedHours = 0;
@@ -91,14 +91,14 @@ class LogCalculator{
             case 5: //Mixed
             $mixed_diff = 0;
             //select all mixed bookings in this timestamp, and add hours accordingly
-            $mixed_result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
+            $mixed_result = $conn->query("SELECT mixedStatus, start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
             while($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-              $mixed_diff = timeDiff_Hours($row['start'], $row['end']);
-              switch($row['mixedStatus']){
+              $mixed_diff = timeDiff_Hours($mixed_row['start'], $mixed_row['end']);
+              switch($mixed_row['mixedStatus']){
                 case 1:
                 $this->vacationHours += $mixed_diff;
                 break;
-                case 2: //Can have ZA
+                case 2:
                 $this->specialLeaveHours += $mixed_diff;
                 break;
                 case 3:
@@ -132,7 +132,7 @@ class LogCalculator{
         //correction hours
         if(!$is_corrected){
           $monthly_corrections = 0;
-          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND cType='log' AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
+          $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $curID AND LAST_DAY('$i') >= DATE(createdOn) AND DATE('".substr_replace($i, '01',8,2)."') <= DATE(createdOn)");
           while($result && ($row = $result->fetch_assoc())){
             if($row['cType'] == 'log'){
               $monthly_corrections += $row['hours'] * intval($row['addOrSub']);

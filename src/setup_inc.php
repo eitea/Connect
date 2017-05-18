@@ -302,20 +302,8 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "CREATE TABLE $deactivatedUserTable (
-  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  firstname VARCHAR(30) NOT NULL,
-  lastname VARCHAR(30) NOT NULL,
-  psw VARCHAR(60) NOT NULL,
-  terminalPin INT(8) DEFAULT 4321,
-  sid VARCHAR(50),
-  email VARCHAR(50) UNIQUE NOT NULL,
-  gender ENUM('female', 'male'),
-  beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-  preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
-  coreTime TIME DEFAULT '8:00',
-  kmMoney DECIMAL(4,2) DEFAULT 0.42
-)";
+//deactivated tables
+$sql = "CREATE TABLE $deactivatedUserTable SELECT * FROM $userTable WHERE 1 = 0";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
@@ -324,7 +312,7 @@ $sql = "CREATE TABLE $deactivatedUserLogs (
   indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   time DATETIME NOT NULL,
   timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-  status ENUM('-1', '0', '1', '2', '3', '4'),
+  status INT(3),
   timeToUTC INT(2) DEFAULT '2',
   userID INT(6) UNSIGNED,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
@@ -337,8 +325,9 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $deactivatedUserDataTable(
   userID INT(6) UNSIGNED,
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  endDate DATETIME,
+  endDate DATETIME DEFAULT NULL,
   mon DECIMAL(4,2) DEFAULT 8.5,
   tue DECIMAL(4,2) DEFAULT 8.5,
   wed DECIMAL(4,2) DEFAULT 8.5,
@@ -346,15 +335,15 @@ $sql = "CREATE TABLE $deactivatedUserDataTable(
   fri DECIMAL(4,2) DEFAULT 4.5,
   sat DECIMAL(4,2) DEFAULT 0,
   sun DECIMAL(4,2) DEFAULT 0,
-  overTimeLump DECIMAL(4,2) DEFAULT 0.0,
+  vacPerYear INT(2) DEFAULT 25,
+  overTimeLump DECIMAL(5,2) DEFAULT 0.0,
   pauseAfterHours DECIMAL(4,2) DEFAULT 6,
   hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
-  daysPerYear INT(2) DEFAULT 25,
   FOREIGN KEY (userID) REFERENCES $deactivatedUserTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 )";
-if (!$conn->query($sql)) {
+if (!$conn->query($sql)){
   echo mysqli_error($conn);
 }
 
@@ -365,11 +354,18 @@ $sql = "CREATE TABLE $deactivatedUserProjects (
   chargedTimeStart DATETIME DEFAULT '0000-00-00 00:00:00',
   chargedTimeEnd DATETIME DEFAULT '0000-00-00 00:00:00',
   projectID INT(6) UNSIGNED,
-  timestampID INT(10) UNSIGNED,
+  timestampID INT(10) UNSIGNED NOT NULL,
   infoText VARCHAR(500),
   internInfo VARCHAR(500),
   booked ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  bookingType ENUM('project', 'break', 'drive'),
+  bookingType ENUM('project', 'break', 'drive', 'mixed'),
+  mixedStatus INT(3) DEFAULT -1,
+  extra_1 VARCHAR(200) NULL DEFAULT NULL,
+  extra_2 VARCHAR(200) NULL DEFAULT NULL,
+  extra_3 VARCHAR(200) NULL DEFAULT NULL,
+  exp_info TEXT,
+  exp_price DECIMAL(10,2),
+  exp_unit DECIMAL(10,2),
   FOREIGN KEY (projectID) REFERENCES $projectTable(id)
   ON UPDATE CASCADE
   ON DELETE CASCADE,
@@ -423,7 +419,7 @@ $sql = "CREATE TABLE $clientDetailTable(
   datev INT(10),
   accountName VARCHAR(100),
   taxnumber VARCHAR(50),
-  vatnumber VARCHAR(50)
+  vatnumber VARCHAR(50),
   taxArea VARCHAR(50),
   customerGroup VARCHAR(50),
   representative VARCHAR(50),

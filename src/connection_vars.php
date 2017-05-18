@@ -21,9 +21,8 @@ $correctionTable = "correctionData";
 
 //deactivated users disappear from the program like deleted ones, but keeps their data.
 $deactivatedUserTable = "DeactivatedUsers";
-$deactivatedUserDataTable = "DeactivatedUserData"; //bookingtable, vacationtable
+$deactivatedUserDataTable = "DeactivatedUserData"; //intervals
 $deactivatedUserLogs = "DeactivatedUserLogData";
-$deactivatedUserUnLogs = "DeactivatedUserUnLogData"; //deleted
 $deactivatedUserProjects = "DeactivatedUserProjectData";
 $deactivatedUserTravels = "DeactivatedUserTravelData";
 

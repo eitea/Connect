@@ -107,7 +107,7 @@ NEP	Nepal	31,80	34,20
 NIC	Nicaragua	31,80	36,40
 NIRL	Nordirland	36,80	36,40
 NL	Niederlande	35,30	27,90
-NLA	Niederl�ndische Antillen	43,60	27,70
+NLA	Niederländische Antillen	43,60	27,70
 NY	New York	65,40	51,00
 NZ	Neuseeland	32,50	36,40
 OM	Oman	54,10	37,50
@@ -131,16 +131,16 @@ RL	Libanon	31,80	35,10
 RM	Madagaskar	36,40	36,40
 RMM	Mali	39,20	31,20
 RN	Niger	39,20	21,10
-RO	Rum�nien	36,80	27,30
+RO	Rumänien	36,80	27,30
 ROK	Korea, Republik	45,30	32,50
 ROM	Rom	40,60	36,40
 ROU	Uruguay	33,10	25,10
 RP	Philippinen	32,50	32,50
 RT	Togo	36,20	26,60
-RUS	Russische F�deration	36,80	31,00
+RUS	Russische Föderation	36,80	31,00
 RWA	Ruanda	37,90	37,90
 S	Schweden	42,90	41,40
-SA	S�dafrika	34,90	34,00
+SA	Südafrika	34,90	34,00
 SGP	Singapur	43,60	44,70
 SK	Slowakei	27,90	15,90
 SLO	Slowenien	31,00	23,30
@@ -148,7 +148,7 @@ SLO-GR	Slowenien-Grenzorte	27,90	15,90
 SME	Suriname	39,20	25,10
 SN	Senegal	49,30	31,20
 SP	Somalia	32,70	29,00
-STRB	Stra�burg	35,80	32,70
+STRB	Straßburg	35,80	32,70
 SUD	Sudan	43,60	41,40
 SY	Seychellen	36,40	36,40
 SYR	Syrien	32,70	29,00
@@ -157,7 +157,7 @@ THA	Thailand	39,20	42,10
 TJ	Tadschikistan	36,80	31,00
 TM	Turkmenistan	36,80	31,00
 TN	Tunesien	36,20	29,20
-TR	T�rkei	31,00	36,40
+TR	Türkei	31,00	36,40
 TT	Trinidad und Tobago	51,00	43,60
 TW	Taiwan	39,20	37,50
 UA	Ukraine	36,80	31,00
