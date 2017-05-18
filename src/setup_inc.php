@@ -423,7 +423,7 @@ $sql = "CREATE TABLE $clientDetailTable(
   datev INT(10),
   accountName VARCHAR(100),
   taxnumber VARCHAR(50),
-  vatnumber VARCHAR(50)
+  vatnumber VARCHAR(50),
   taxArea VARCHAR(50),
   customerGroup VARCHAR(50),
   representative VARCHAR(50),
