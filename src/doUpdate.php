@@ -1008,7 +1008,7 @@ if($row['version'] < 85){
       //enter full hours
       $A = substr_replace($row['time'], '08:00', 11, 5);
       $B = carryOverAdder_Hours($A, 9);
-      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$bookings_result['mixedStatus']."', '$A', '$B')");
+      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$booking_row['mixedStatus']."', '$A', '$B')");
       //remove the mixed bookings
       $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
     }
@@ -1051,7 +1051,49 @@ if($row['version'] < 85){
   }
 }
 
-//if($row['version'] < 86){}
+$sql = "CREATE TABLE taxRates (
+  id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  description VARCHAR(200),
+  percentage INT(3)
+)";
+if($conn->query($sql)){
+  echo '<br> Created table for tax rates';
+} else {
+  echo mysqli_error($conn);
+}
+
+if($row['version'] < 86){
+  $sql = "CREATE TABLE articles (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    description VARCHAR(600),
+    taxPercentage INT(3)
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created article list for products';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE products ADD COLUMN unit VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Added units to products';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "ALTER TABLE products ADD COLUMN taxPercentage INT(3)";
+  if($conn->query($sql)){
+    echo '<br> Added tax percentage to products';
+  } else {
+    echo mysqli_error($conn);
+  }
+
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normal', 20)");
+  //TODO: Continue adding taxes, idk how manytaxes i have to add and what to do about the multilanguage thingy
+}
+
+
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}
 //if($row['version'] < 89){}
