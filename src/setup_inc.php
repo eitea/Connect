@@ -303,7 +303,24 @@ if (!$conn->query($sql)) {
 }
 
 //deactivated tables
-$sql = "CREATE TABLE $deactivatedUserTable SELECT * FROM $userTable WHERE 1 = 0";
+$sql = "CREATE TABLE $deactivatedUserTable (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  firstname VARCHAR(30),
+  lastname VARCHAR(30) NOT NULL,
+  psw VARCHAR(60) NOT NULL,
+  coreTime TIME DEFAULT '08:00:00',
+  terminalPin INT(8) DEFAULT 4321,
+  lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP,
+  beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+  exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  email VARCHAR(50) UNIQUE NOT NULL,
+  sid VARCHAR(50),
+  gender ENUM('female', 'male'),
+  preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
+  kmMoney DECIMAL(4,2) DEFAULT 0.42,
+  emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
+  real_email VARCHAR(50)
+)";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
@@ -325,7 +342,6 @@ if (!$conn->query($sql)) {
 
 $sql = "CREATE TABLE $deactivatedUserDataTable(
   userID INT(6) UNSIGNED,
-  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   endDate DATETIME DEFAULT NULL,
   mon DECIMAL(4,2) DEFAULT 8.5,

@@ -342,7 +342,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $saldoStyle = 'style=color:#6fcf2c;'; //green
           }
 
-          //has to stay unfetched
           $bookingResults = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
             LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
             LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
@@ -626,7 +625,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo "<td>$B</td>";
                   echo "<td style='text-align:left'>$C</td>";
                   echo '<td>';
-                  echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
+                  echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingProjectsModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
                   echo '<input type="checkbox" name="delete_bookings_ids[]" value="'.$x.'" /> ';
                   echo '</td>';
                   echo '</tr>';
@@ -666,7 +665,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   ?>
     <!-- Edit bookings (time only) -->
     <form method="post">
-      <div class="modal fade editingModal-<?php echo $x ?>">
+      <div class="modal fade editingProjectsModal-<?php echo $x ?>">
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
