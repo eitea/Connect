@@ -27,11 +27,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterProposal'])){
     $filterProposal = $_POST['filterProposal'];
   }
-  if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'])){
-    $meta_curDate = test_input($_POST['meta_curDate']);
+  if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'].' 12:00:00')){
+    $meta_curDate = test_input($_POST['meta_curDate'].' 12:00:00');
   }
-  if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'])){
-    $meta_deliveryDate = test_input($_POST['meta_deliveryDate']);
+  if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'].' 12:00:00')){
+    $meta_deliveryDate = test_input($_POST['meta_deliveryDate'].' 12:00:00');
   }
   if(isset($_POST['meta_yourSign'])){
     $meta_yourSign = test_input($_POST['meta_yourSign']);
@@ -78,7 +78,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_price = floatval($_POST['add_product_price']);
     if($_POST['select_new_product'] && $_POST['select_new_product_true']){
       $i = intval($_POST['select_new_product_true']);
-      $result = $conn->query("SELECT name, description FROM products WHERE id = $i");
+      $result = $conn->query("SELECT name, description FROM articles WHERE id = $i");
       $row = $result->fetch_assoc();
       $product_name = $row['name'];
       $product_description = $row['description'];
@@ -153,7 +153,8 @@ if($filterProposal){
 } elseif($filterClient) {
   $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = $filterClient");
   $row = $result->fetch_assoc();
-  $row['curDate'] = $row['deliveryDate'] = $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
+  $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
+  $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
 } else {
   $id_num = '-';
   $result_c = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
@@ -167,7 +168,7 @@ if($filterProposal){
 }
 ?>
 <div class="page-header">
-  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?></h3>
+  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?> <?php if($filterClient): ?><button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i><?php endif; ?></h3>
 </div>
 
 <form method="POST">
@@ -245,7 +246,7 @@ if($filterProposal){
         <select class="js-example-basic-single" name="select_new_product_true" style="width:200px">
           <option value="0"><?php echo $lang['PRODUCTS']; ?> ...</option>
           <?php
-          $result = $conn->query("SELECT products.* FROM products, clientData WHERE clientData.companyID = $filterCompany GROUP BY(name)");
+          $result = $conn->query("SELECT articles.* FROM articles");
           while($result && ($prod_row = $result->fetch_assoc())){
             echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
           }
@@ -277,138 +278,142 @@ if($filterProposal){
       </div>
     </div>
 
-    <br><hr>
-    <h5>META: </h5>
-    <hr><br>
-
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
-      <div class="col-md-6">
-        <input type="text" class="form-control" name="meta_curDate" value="<?php echo $row['curDate']; ?>"/>
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
-      <div class="col-md-6">
-        <input type="text" class="form-control" name="meta_deliveryDate" value="<?php echo $row['deliveryDate']; ?>" />
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
-      <div class="col-md-8">
-        <input type="text" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
-      <div class="col-md-8">
-        <input type="text" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
-      <div class="col-md-8">
-        <input type="text" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
-      <div class="col-md-8">
-        <input type="text" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
-      </div>
-    </div>
-    <hr>
-    <h5>Zahlungsdaten</h5>
-    <hr>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Tage Netto
-      </div>
-      <div class="col-xs-8">
-        <input type="text" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Skonto 1
-      </div>
-      <div class="col-xs-3">
-        <input type="text" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
-      </div>
-      <div class="col-xs-2 text-center">
-        % Innerhalb von
-      </div>
-      <div class="col-xs-3">
-        <input type="text" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
-      </div>
-      <div class="col-xs-1">
-        Tagen
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Skonto 2
-      </div>
-      <div class="col-xs-3">
-        <input type="text" class="form-control" name="meta_skonto2" value="<?php echo $row['skonto2']; ?>" />
-      </div>
-      <div class="col-xs-2 text-center">
-        % Innerhalb von
-      </div>
-      <div class="col-xs-3">
-        <input type="text" class="form-control" name="meta_skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
-      </div>
-      <div class="col-xs-1">
-        Tagen
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Zahlungsweise
-      </div>
-      <div class="col-xs-9">
-        <input type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Versandart
-      </div>
-      <div class="col-xs-9">
-        <input type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" />
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Vertreter
-      </div>
-      <div class="col-xs-9">
-        <input type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" />
-      </div>
-    </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-xs-2">
-        Porto
-      </div>
-      <div class="col-xs-9">
-        <input type="text" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
-      </div>
-    </div>
-    <br><br>
-    <div class="container-fluid">
-      <div class="col-md-12">
-        <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
+    <div class="modal fade proposal_details" >
+      <div class="modal-dialog modal-lg modal-content" role="document">
+        <div class="modal-header">
+          <h5>META: </h5>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
+            <div class="col-md-6">
+              <input type="date" class="form-control" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
+            <div class="col-md-6">
+              <input type="date" class="form-control" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
+            <div class="col-md-8">
+              <input type="text" maxlength="25" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
+            <div class="col-md-8">
+              <input type="text" maxlength="25" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
+            <div class="col-md-8">
+              <input type="text" maxlength="25" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-md-2"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
+            <div class="col-md-8">
+              <input type="text" maxlength="25" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h5>Zahlungsdaten</h5>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Tage Netto
+            </div>
+            <div class="col-xs-8">
+              <input type="text" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Skonto 1
+            </div>
+            <div class="col-xs-3">
+              <input type="text" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
+            </div>
+            <div class="col-xs-2 text-center">
+              % Innerhalb von
+            </div>
+            <div class="col-xs-3">
+              <input type="text" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
+            </div>
+            <div class="col-xs-1">
+              Tagen
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Skonto 2
+            </div>
+            <div class="col-xs-3">
+              <input type="text" class="form-control" name="meta_skonto2" value="<?php echo $row['skonto2']; ?>" />
+            </div>
+            <div class="col-xs-2 text-center">
+              % Innerhalb von
+            </div>
+            <div class="col-xs-3">
+              <input type="text" class="form-control" name="meta_skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
+            </div>
+            <div class="col-xs-1">
+              Tagen
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Zahlungsweise
+            </div>
+            <div class="col-xs-9">
+              <input type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Versandart
+            </div>
+            <div class="col-xs-9">
+              <input type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" />
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Vertreter
+            </div>
+            <div class="col-xs-9">
+              <input type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" />
+            </div>
+          </div>
+          <br>
+          <div class="container-fluid">
+            <div class="col-xs-2">
+              Porto
+            </div>
+            <div class="col-xs-9">
+              <input type="text" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
+        </div>
       </div>
     </div>
   <?php endif; ?>
