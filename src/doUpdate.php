@@ -1051,22 +1051,22 @@ if($row['version'] < 85){
   }
 }
 
-$sql = "CREATE TABLE taxRates (
-  id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  description VARCHAR(200),
-  percentage INT(3)
-)";
-if($conn->query($sql)){
-  echo '<br> Created table for tax rates';
-} else {
-  echo '<br>'.$conn->error;
-}
-
 if($row['version'] < 86){
+  $sql = "CREATE TABLE taxRates (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(200),
+    percentage INT(3)
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table for tax rates';
+  }
+
   $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50),
     description VARCHAR(600),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
     taxPercentage INT(3)
   )";
   if($conn->query($sql)){
@@ -1082,14 +1082,33 @@ if($row['version'] < 86){
     echo '<br>'.$conn->error;
   }
 
-  $sql = "ALTER TABLE products ADD COLUMN taxPercentage INT(3)";
+  $sql = "ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED";
   if($conn->query($sql)){
-    echo '<br> Added tax percentage to products';
+    echo '<br> Added taxes to products';
   } else {
     echo '<br>'.$conn->error;
   }
 
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normal', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
 }
 
 

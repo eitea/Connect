@@ -678,6 +678,17 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE taxRates (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(200),
+    percentage INT(3)
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table for tax rates';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     proposalID INT(6) UNSIGNED,
@@ -685,9 +696,14 @@ $sql = "CREATE TABLE $policyTable (
     description VARCHAR(600),
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
+    taxID INT(4) UNSIGNED,
+    unit VARCHAR(20),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (taxID) REFERENCES taxRates (id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -707,6 +723,21 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
+
+  $sql = "CREATE TABLE articles (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    description VARCHAR(600),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
+    taxPercentage INT(3)
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created article list for products';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
 
 
 ?>

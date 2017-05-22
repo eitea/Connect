@@ -40,7 +40,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
   </div>
 </div>
-
 <br>
 <form method="post">
   <select name="filterCompanyID" class="js-example-basic-single" style="width:200px" onchange="$('#create_client_company').val(this.value).trigger('change');">

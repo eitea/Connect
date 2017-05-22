@@ -87,6 +87,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
 
+$lang_eng['ARTICLE'] = 'Article';
+$lang_ger['ARTICLE'] = 'Artikel';
+
 $lang_eng['ASK_DELETE'] = 'Do you really wish to delete %s?';
 $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
@@ -561,9 +564,6 @@ $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';
 
-$lang_eng['PAYMENT_NETTO_CONDITION'] = 'Netto within ';
-$lang_ger['PAYMENT_NETTO_CONDITION'] = 'Netto innerhalb ';
-
 $lang_eng['PAYMENT_CONDITIONS'] = 'Payment Conditions';
 $lang_ger['PAYMENT_CONDITIONS'] = 'Zahlungsbedingungen';
 
@@ -745,6 +745,9 @@ $lang_ger['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
 $lang_eng['TAXES'] = 'Taxes';
 $lang_ger['TAXES'] = 'Steuern';
 
+$lang_eng['TAX_RATES'] = 'Tax Rates';
+$lang_ger['TAX_RATES'] = 'Steuersätze';
+
 $lang_eng['TEMPLATES'] = 'Templates';
 $lang_ger['TEMPLATES'] = 'Vorlagen';
 
@@ -789,6 +792,9 @@ $lang_ger['UNDO'] = 'Rückgängig';
 
 $lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
 $lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
+
+$lang_eng['UNIT'] ='Unit';
+$lang_ger['UNIT'] = 'Einheit';
 
 $lang_eng['UPDATE_REQUIRED'] = 'Update required. ';
 $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
@@ -899,6 +905,9 @@ $lang_ger['WEEKLY_DAY'] = 'Wochentag';
 
 $lang_eng['WEEKLY_HOURS'] = 'Weekly Hours';
 $lang_ger['WEEKLY_HOURS'] = 'Wochenstunden';
+
+$lang_eng['WITHIN'] = 'within';
+$lang_ger['WITHIN'] = 'innerhalb';
 
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.'; //ha-ha.

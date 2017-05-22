@@ -66,7 +66,6 @@ for($i = 1; $i < count($holidayFile); $i++){
     $conn->query("INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');");
   }
 }
-
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
@@ -100,12 +99,34 @@ if ($travellingFile) {
     }
   fclose($travellingFile);
 }
+
 //insert main report
 $exampleTemplate = "<h1>Main Report</h1>
 [TIMESTAMPS] <br>
 [BOOKINGS] ";
 $conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
 
+//insert taxRates
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
+$conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
 
 //------------------------------------------------------------------------------
 

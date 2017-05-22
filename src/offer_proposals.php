@@ -64,7 +64,8 @@ if(!$result || $result->num_rows <= 0){
       <th>ID</th>
       <th><?php echo $lang['CLIENT']; ?></th>
       <th>Status</th>
-      <th><?php echo $lang['PRODUCTS']; ?></th>
+      <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
+      <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
       <th>Option</th>
     </thead>
     <tbody>
@@ -81,14 +82,9 @@ if(!$result || $result->num_rows <= 0){
         echo '<tr>';
         echo '<td>'.$row['id_number'].'</td>';
         echo '<td>'.$row['clientName'].'</td>';
-        echo'<td>'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'</td>';
-        echo '<td><dl>';
-        $productRes = $conn->query("SELECT * FROM products WHERE proposalID = $i");
-        while($productRes && ($prodrow = $productRes->fetch_assoc())){
-          echo '<dt>'.$prodrow['quantity'].'x '.$prodrow['name'].'</dt>';
-          echo '<dd style="margin-left:15px;">'.$prodrow['description'].'</dd>';
-        }
-        echo '</dl></td>';
+        echo '<td>'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'</td>';
+        echo '<td>'.$row['ourSign'].'</td>';
+        echo '<td>'.$row['ourMessage'].'</td>';
         echo '<td>';
         echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="edit_proposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
         echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
