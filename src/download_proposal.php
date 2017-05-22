@@ -16,6 +16,7 @@ class PDF extends FPDF {
     $this->Image($this->glob["logo"], 10, 10, 40); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
     $this->SetFont('Helvetica','',8);
     //move 5cm away from right, 1.2cm down
+    $this->SetXY(-49, $this->GetY()+12);
     // Address
     $this->MultiCell(40, 4, $this->glob["headerAddress"], 0, 'R');
     //2cm Line break
@@ -133,6 +134,7 @@ $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 $pdf->SetFontSize(10);
 $result = $conn->query("SELECT products.*,taxRates.percentage, taxRates.description AS taxName, (quantity * price) AS total FROM products, taxRates WHERE proposalID = ".$row['proposalID'].' AND taxID = taxRates.id');
 if($result && $result->num_rows > 0){
+  $productResults = '';
   $pdf->Ln(10);
   $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TOTAL_PRICE']), $productResults = $result->fetch_all(MYSQLI_ASSOC), array());
 }
@@ -154,6 +156,7 @@ $pdf->SetFont('Helvetica', 'B');
 $pdf->Cell(0, 13, '', 0 , 1);
 $pdf->Cell(120);
 $pdf->Cell(30, 6, $lang['SUM']);
+$pdf->Cell(30, 6, ($amount_netto + $amount_vat).' EUR', 0 , 1, 'R');
 $pdf->SetFont('Helvetica');
 $pdf->Ln(5);
 
