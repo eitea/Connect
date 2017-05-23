@@ -1010,7 +1010,7 @@ if($row['version'] < 85){
       $B = carryOverAdder_Hours($A, 9);
       $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$booking_row['mixedStatus']."', '$A', '$B')");
       //remove the mixed bookings
-      $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
+      $conn->query("DELETE FROM projectBookingData WHERE id = ". $booking_row['id']);
     }
   }
 
@@ -1052,6 +1052,7 @@ if($row['version'] < 85){
 }
 
 if($row['version'] < 86){
+  $conn->query("DROP TABLE IF EXISTS taxRates");
   $sql = "CREATE TABLE taxRates (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(200),
@@ -1061,6 +1062,7 @@ if($row['version'] < 86){
     echo '<br> Created table for tax rates';
   }
 
+  $conn->query("DROP TABLE IF EXISTS articles");
   $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50),
@@ -1121,6 +1123,14 @@ if($row['version'] < 86){
     echo '<br> Added percentage to porto in proposals';
   } else {
     echo '<br>'.$conn->error;
+  }
+
+  $conn->query("DELETE FROM projectBookingData WHERE bookingType = 'mixed'");
+
+  if(mysqli_error($conn)){
+    echo '<br>'.$conn->error;
+  } else {
+    echo "<br> Repaired wrong booking types";
   }
 }
 

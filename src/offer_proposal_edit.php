@@ -1,6 +1,6 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <?php
-$filterCompany = $filterClient = $filterProposal = 0;
+$filterClient = $filterProposal = 0;
 $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
@@ -9,18 +9,7 @@ $result = $conn->query("SELECT COUNT(*) as num FROM proposals");
 $row = $result->fetch_assoc();
 $id_num = 'ANG' . sprintf('%07d', $row['num'] +1);
 
-if(isset($_POST['edit_proposal'])){
-  $filterProposal = intval($_POST['edit_proposal']);
-  $result = $conn->query("SELECT clientData.* FROM clientData, proposals WHERE proposals.id = $filterProposal AND proposals.clientId = clientData.id");
-  if($row = $result->fetch_assoc()){
-    $filterClient = $row['id'];
-    $filterCompany = $row['companyID'];
-  }
-}
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['filterCompany'])){
-    $filterCompany = $_POST['filterCompany'];
-  }
   if(isset($_POST['filterClient'])){
     $filterClient = $_POST['filterClient'];
   }
@@ -71,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 
   if(isset($_POST['add_product']) && ($filterClient || $filterProposal)){
-    if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity'])){
+    if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity']) && !empty($_POST['add_product_price'])){
       $product_name = test_input($_POST['add_product_name']);
       $product_description = test_input($_POST['add_product_description']);
       $product_quantity = floatval($_POST['add_product_quantity']);
@@ -137,10 +126,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['meta_save'])){
     if($_POST['meta_save']){ //existing
+      $filterProposal = intval($_POST['meta_save']);
       $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
         ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
         paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
-        WHERE id = " . intval($_POST['meta_save']));
+        WHERE id = $filterProposal");
     } else { //new proposal
       $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign,
         ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
@@ -169,15 +159,7 @@ if($filterProposal){
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
   $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
 } else {
-  $id_num = '-';
-  $result_c = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
-  if(!$result_c || $result_c->num_rows <= 0){
-    echo '<br><div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
-    include "new_client.php";
-    echo '</div>';
-  } else {
-    echo '<br><div class="alert alert-info">'.$lang['INFO_SELECT_CLIENT'].'</div>';
-  }
+  redirect('offer_proposal_process.php');
 }
 ?>
 <div class="page-header">
@@ -185,31 +167,9 @@ if($filterProposal){
 </div>
 
 <form method="POST">
-  <div class="container-fluid">
-    <div class="col-md-8">
-      <select style='width:200px' name="filterCompany" class="js-example-basic-single" onchange="showClients(this.value, '<?php echo $filterClient; ?>');">
-        <?php
-        $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
-        if($result_fc && $result_fc->num_rows > 1) {
-          echo '<option value="0">Select Company...</option>';
-        } else {
-          $filterCompany = $available_companies[1];
-        }
-        while($result && ($row_fc = $result_fc->fetch_assoc())){
-          $checked = '';
-          if($filterCompany == $row_fc['id']) {
-            $checked = 'selected';
-          }
-          echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
-        }
-        ?>
-      </select>
-      <select id="clientHint" style='width:200px' class="js-example-basic-single" name="filterClient" onchange="showProposals(this.value,'<?php echo $filterProposal; ?>');">
-      </select>
-      <select id="proposalHint" style='width:200px' class="js-example-basic-single" name="filterProposal">
-      </select>
-      <button type="submit" class="btn btn-warning " name="apply_filter">Filter</button>
-    </div>
+  <div style="display:none;">
+    <input type="hidden" value="<?php echo $filterClient; //proposal doesnt exist ?>" name="filterClient" />
+    <input type="hidden" value="<?php echo $filterProposal; ?>" name="filterProposal" />
   </div>
 
   <br><br><br>
@@ -301,234 +261,203 @@ $x = $prod_row['id'];
     </div>
   </div>
 <?php endwhile; ?>
-  <br><br>
-  <div class="container-fluid">
-    <div class="col-xs-6">
-      <button type="submit" class="btn btn-danger" name="delete_selection"><?php echo $lang['DELETE']; ?></button>
-    </div>
-    <?php if($filterProposal): ?>
-      <div class="col-xs-6 text-right">
-        <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-warning" >PDF Download</a>
-      </div>
-    <?php endif; ?>
+<br><br>
+<div class="container-fluid">
+  <div class="col-xs-6">
+    <button type="submit" class="btn btn-danger" name="delete_selection"><?php echo $lang['DELETE']; ?></button>
   </div>
-
-  <?php if($filterClient): ?>
-    <br><hr>
-    <h5><?php echo $lang['ADD'] .': '; ?></h5>
-    <hr><br>
-    <div class="container-fluid">
-      <div class="col-md-2"><label><?php echo $lang['EXISTING']; ?>:</label></div>
-      <div class="col-md-3">
-        <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">
-          <option value="0"><?php echo $lang['ARTICLE']; ?> ...</option>
-          <?php
-          $result = $conn->query("SELECT articles.* FROM articles");
-          while($result && ($prod_row = $result->fetch_assoc())){
-            echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
-          }
-          ?>
-        </select>
-      </div>
+  <div class="col-xs-6 text-right">
+    <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-warning" >PDF Download</a>
+  </div>
+</div>
+<br><hr>
+<h5><?php echo $lang['ADD'] .': '; ?></h5>
+<hr><br>
+<div class="container-fluid">
+  <div class="col-md-2"><label><?php echo $lang['EXISTING']; ?>:</label></div>
+  <div class="col-md-3">
+    <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">
+      <option value="0"><?php echo $lang['ARTICLE']; ?> ...</option>
+      <?php
+      $result = $conn->query("SELECT articles.* FROM articles");
+      while($result && ($prod_row = $result->fetch_assoc())){
+        echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
+      }
+      ?>
+    </select>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="col-md-2"><label><?php echo $lang['NEW']; ?>:</label></div>
+  <div class="col-md-4">
+    <input type="text" class="form-control required-field" name="add_product_name" placeholder="Product Name" maxlength="48"/>
+  </div>
+  <div class="col-md-6">
+    <input type="text" class="form-control" name="add_product_description" placeholder="Product Description" maxlength="190"/>
+  </div>
+</div>
+<br><br>
+<div class="container-fluid">
+  <div class="col-md-2 col-md-offset-2">
+    <input type="number" class="form-control required-field" name="add_product_quantity" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+  </div>
+  <div class="col-md-2">
+    <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+  </div>
+  <div class="col-md-2">
+    <input type="text" maxlength="20" class="form-control" name="add_product_unit" placeholder="<?php echo $lang['UNIT']; ?>" />
+  </div>
+  <div class="col-md-4">
+    <select class="js-example-basic-single btn-block" name="add_product_taxes">
+      <?php
+      $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+      while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+        echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+      }
+      ?>
+    </select>
+  </div>
+  <br><br><br>
+  <div class="col-md-12 text-right">
+    <button type="submit" class="btn btn-warning" name="add_product"><?php echo $lang['ADD']; ?></button>
+  </div>
+</div>
+<div class="modal fade proposal_details">
+  <div class="modal-dialog modal-lg modal-content" role="document">
+    <div class="modal-header">
+      <h5>META: </h5>
     </div>
-    <br>
-    <div class="container-fluid">
-      <div class="col-md-2"><label><?php echo $lang['NEW']; ?>:</label></div>
-      <div class="col-md-4">
-        <input type="text" class="form-control" name="add_product_name" placeholder="Product Name" maxlength="48"/>
-      </div>
-      <div class="col-md-6">
-        <input type="text" class="form-control" name="add_product_description" placeholder="Product Description" maxlength="190"/>
-      </div>
-    </div>
-    <br><br>
-    <div class="container-fluid">
-      <div class="col-md-2 col-md-offset-2">
-        <input type="number" class="form-control required-field" name="add_product_quantity" placeholder="<?php echo $lang['QUANTITY']; ?>" />
-      </div>
-      <div class="col-md-2">
-        <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
-      </div>
-      <div class="col-md-2">
-        <input type="text" maxlength="20" class="form-control" name="add_product_unit" placeholder="<?php echo $lang['UNIT']; ?>" />
-      </div>
-      <div class="col-md-4">
-        <select class="js-example-basic-single btn-block" name="add_product_taxes">
-          <?php
-          $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-          while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-            echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-          }
-          ?>
-        </select>
-      </div>
-      <br><br><br>
-      <div class="col-md-12 text-right">
-        <button type="submit" class="btn btn-warning" name="add_product"><?php echo $lang['ADD']; ?></button>
-      </div>
-    </div>
-    <div class="modal fade proposal_details">
-      <div class="modal-dialog modal-lg modal-content" role="document">
-        <div class="modal-header">
-          <h5>META: </h5>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
+        <div class="col-md-6">
+          <input type="date" class="form-control" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
         </div>
-        <div class="modal-body">
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
-            <div class="col-md-6">
-              <input type="date" class="form-control" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
-            <div class="col-md-6">
-              <input type="date" class="form-control" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
-            <div class="col-md-8">
-              <input type="text" maxlength="25" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
-            <div class="col-md-8">
-              <input type="text" maxlength="25" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
-            <div class="col-md-8">
-              <input type="text" maxlength="25" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-md-2"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
-            <div class="col-md-8">
-              <input type="text" maxlength="25" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
-            </div>
-          </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
+        <div class="col-md-6">
+          <input type="date" class="form-control" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
         </div>
-        <div class="modal-header">
-          <h5>Zahlungsdaten</h5>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
+        <div class="col-md-8">
+          <input type="text" maxlength="25" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
         </div>
-        <div class="modal-body">
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Tage Netto
-            </div>
-            <div class="col-xs-8">
-              <input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Skonto 1
-            </div>
-            <div class="col-xs-3">
-              <input type="number" step="0.01" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
-            </div>
-            <div class="col-xs-2 text-center">
-              % Innerhalb von
-            </div>
-            <div class="col-xs-3">
-              <input type="number" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
-            </div>
-            <div class="col-xs-1">
-              Tagen
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Zahlungsweise
-            </div>
-            <div class="col-xs-9">
-              <input type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Versandart
-            </div>
-            <div class="col-xs-9">
-              <input type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" />
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Vertreter
-            </div>
-            <div class="col-xs-9">
-              <input type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" />
-            </div>
-          </div>
-          <br>
-          <div class="container-fluid">
-            <div class="col-xs-2">
-              Porto
-            </div>
-            <div class="col-xs-6">
-              <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
-            </div>
-            <div class="col-xs-3">
-              <select class="js-example-basic-single" name="meta_porto_percentage">
-                <?php
-                $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-                while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                  $selected = '';
-                  if($row['portoRate'] == $tax_row['id']) $selected = 'selected';
-                  echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-                }
-                ?>
-              </select>
-            </div>
-          </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
+        <div class="col-md-8">
+          <input type="text" maxlength="25" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
+        <div class="col-md-8">
+          <input type="text" maxlength="25" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-md-2"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
+        <div class="col-md-8">
+          <input type="text" maxlength="25" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
         </div>
       </div>
     </div>
-  <?php endif; ?>
+    <div class="modal-header">
+      <h5>Zahlungsdaten</h5>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Tage Netto
+        </div>
+        <div class="col-xs-8">
+          <input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Skonto 1
+        </div>
+        <div class="col-xs-3">
+          <input type="number" step="0.01" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
+        </div>
+        <div class="col-xs-2 text-center">
+          % Innerhalb von
+        </div>
+        <div class="col-xs-3">
+          <input type="number" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
+        </div>
+        <div class="col-xs-1">
+          Tagen
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Zahlungsweise
+        </div>
+        <div class="col-xs-9">
+          <input type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Versandart
+        </div>
+        <div class="col-xs-9">
+          <input type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" />
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Vertreter
+        </div>
+        <div class="col-xs-9">
+          <input type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" />
+        </div>
+      </div>
+      <br>
+      <div class="container-fluid">
+        <div class="col-xs-2">
+          Porto
+        </div>
+        <div class="col-xs-6">
+          <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
+        </div>
+        <div class="col-xs-3">
+          <select class="js-example-basic-single" name="meta_porto_percentage">
+            <?php
+            $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+            while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+              $selected = '';
+              if($row['portoRate'] == $tax_row['id']) $selected = 'selected';
+              echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+            }
+            ?>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
+    </div>
+  </div>
+</div>
 </form>
 
 <script>
-function showClients(company, client){
-  if(company != ""){
-    $.ajax({
-      url:'ajaxQuery/AJAX_getClient.php',
-      data:{companyID:company, clientID:client},
-      type: 'get',
-      success : function(resp){
-        $(clientHint).html(resp);
-      },
-      error : function(resp){}
-    });
-  }
-}
-function showProposals(clientID, proposalID){
-  if(clientID != ""){
-    $.ajax({
-      url:'ajaxQuery/AJAX_getProposals.php',
-      data:{client:clientID, p:proposalID},
-      type: 'get',
-      success : function(resp){
-        $(proposalHint).html(resp);
-      },
-      error : function(resp){}
-    });
-  }
-}
 function displayArticle(i){
   if(i != ""){
     $.ajax({
@@ -548,12 +477,5 @@ function displayArticle(i){
   }
 }
 </script>
-<?php
-if($filterCompany){
-  echo '<script>';
-  echo "showClients('$filterCompany', '$filterClient');";
-  echo "showProposals('$filterClient', '$filterProposal');";
-  echo '</script>';
-}
-?>
+
 <?php require 'footer.php';?>

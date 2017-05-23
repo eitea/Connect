@@ -34,7 +34,7 @@ class PDF extends FPDF {
   function ImprovedTable($header, $data, $w){
     $this->SetFillColor(200,200,200);
     // Column widths
-    $w = array(20, 70, 20, 30, 40);
+    $w = array(15, 75, 20, 30, 40);
     // Header
     for($i=0;$i<count($header);$i++){
       if($i < 3) $this->Cell($w[$i],7,$header[$i],'B',0,'L',1);
@@ -46,20 +46,22 @@ class PDF extends FPDF {
       //Position
       $this->Cell($w[0],6,sprintf('#%03d', $i), 'T');
       //Name
-      $this->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$row['name']),'T',2);
+      $this->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$row['name']),'',2);
       //Description
       $this->SetFont('Arial','',8);
       $x = $this->GetX();
       $y = $this->GetY();
-      $this->MultiCell($w[1],6,iconv('UTF-8', 'windows-1252',$row['description']),'');
+      $this->MultiCell($w[1],5,iconv('UTF-8', 'windows-1252',$row['description']."\n".$row['taxName'].' '.$row['percentage'].'%'),'B');
       $this->SetFont('Helvetica','',10);
       if($row['description']){
-        $this->SetXY($x + $w[1], $this->GetY());
+        $this->SetXY($x + $w[1], $this->GetY() - 6);
       } else {
-        $this->SetXY($x + $w[1], $y);
+        $this->SetXY($x + $w[1], $y + 4);
       }
+
       $this->Cell($w[2],6,$row['quantity'].' '.iconv('UTF-8', 'windows-1252',$row['unit']),'B',0,'L');
       $this->Cell($w[3],6,sprintf('%.2f', $row['price']). ' EUR','B',0,'R');
+      //$this->Cell($w[5],6,sprintf('%.2f', $row['total'] * $row['percentage'] / 100). ' EUR','B',0,'R');
       $this->Cell($w[4],6,sprintf('%.2f', $row['total']). ' EUR','B',0,'R');
       $this->Ln();
 
@@ -140,9 +142,9 @@ if($result && $result->num_rows > 0){
   $pdf->Ln(10);
   $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TOTAL_PRICE']), $productResults , array());
 }
-$pdf->Line(15, $pdf->GetY() + 10, 210-15, $pdf->GetY() + 10);
-$pdf->Line(15, $pdf->GetY() + 11, 210-15, $pdf->GetY() + 11);
-$pdf->Ln(12);
+$pdf->Line(15, $pdf->GetY(), 210-15, $pdf->GetY());
+$pdf->Line(15, $pdf->GetY() + 1, 210-15, $pdf->GetY() + 1);
+$pdf->Ln(5);
 
 if(260 - $pdf->GetY() < 20){ $pdf->AddPage(); } //if writable space is less than 2cm: new page
 //Summary

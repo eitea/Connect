@@ -22,7 +22,7 @@
     }
 
     if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
-      $command = "git -C $repositoryPath fetch --all 2>&1";
+      $command = "git -C $repositoryPath pull 2>&1";
       exec($command, $output, $returnValue);
     } else {
       $command = "git -C $repositoryPath fetch --all 2>&1";
