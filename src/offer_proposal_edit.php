@@ -163,7 +163,7 @@ if($filterProposal){
 }
 ?>
 <div class="page-header">
-  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?> <?php if($filterClient): ?><button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i><?php endif; ?></h3>
+  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?> <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i></h3>
 </div>
 
 <form method="POST">
@@ -171,8 +171,7 @@ if($filterProposal){
     <input type="hidden" value="<?php echo $filterClient; //proposal doesnt exist ?>" name="filterClient" />
     <input type="hidden" value="<?php echo $filterProposal; ?>" name="filterProposal" />
   </div>
-
-  <br><br><br>
+  <br>
   <table class="table">
     <thead>
       <th><?php echo $lang['SAVE'] ?></th>

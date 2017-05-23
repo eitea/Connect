@@ -27,43 +27,44 @@ class PDF extends FPDF {
   function Footer(){
     // Position at 1.5 cm from bottom
     $this->SetY(-15);
-    $this->SetFont('Times','',6);
+    $this->SetFont('Times','',8);
     // Page number
     $this->Cell(0,10,$this->PageNo().'/{nb}',0,1,'C');
   }
   function ImprovedTable($header, $data, $w){
     $this->SetFillColor(200,200,200);
     // Column widths
-    $w = array(15, 75, 20, 30, 40);
+    $w = array(15, 70, 15, 30, 20, 30);
     // Header
     for($i=0;$i<count($header);$i++){
-      if($i < 3) $this->Cell($w[$i],7,$header[$i],'B',0,'L',1);
-      if($i > 2) $this->Cell($w[$i],7,$header[$i],'B',0,'R',1);
+      if($i < 2) $this->Cell($w[$i],7,$header[$i],'',0,'L',1);
+      if($i > 1) $this->Cell($w[$i],7,$header[$i],'',0,'R',1);
     }
     $this->Ln();
     $i = 1;
     foreach($data as $row){
       //Position
-      $this->Cell($w[0],6,sprintf('#%03d', $i), 'T');
+      $this->Cell($w[0],6,sprintf('#%03d', $i), '');
       //Name
       $this->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$row['name']),'',2);
       //Description
       $this->SetFont('Arial','',8);
       $x = $this->GetX();
       $y = $this->GetY();
-      $this->MultiCell($w[1],5,iconv('UTF-8', 'windows-1252',$row['description']."\n".$row['taxName'].' '.$row['percentage'].'%'),'B');
+      $this->MultiCell($w[1],4,iconv('UTF-8', 'windows-1252',$row['description']),'');
       $this->SetFont('Helvetica','',10);
       if($row['description']){
         $this->SetXY($x + $w[1], $this->GetY() - 6);
       } else {
-        $this->SetXY($x + $w[1], $y + 4);
+        $this->SetXY($x + $w[1], $y - 1);
       }
 
-      $this->Cell($w[2],6,$row['quantity'].' '.iconv('UTF-8', 'windows-1252',$row['unit']),'B',0,'L');
-      $this->Cell($w[3],6,sprintf('%.2f', $row['price']). ' EUR','B',0,'R');
-      //$this->Cell($w[5],6,sprintf('%.2f', $row['total'] * $row['percentage'] / 100). ' EUR','B',0,'R');
-      $this->Cell($w[4],6,sprintf('%.2f', $row['total']). ' EUR','B',0,'R');
+      $this->Cell($w[2],6,$row['quantity'].' '.iconv('UTF-8', 'windows-1252',$row['unit']),'',0,'R');
+      $this->Cell($w[3],6,sprintf('%.2f', $row['price']). ' EUR','',0,'R');
+      $this->Cell($w[4],6,$row['percentage']. '%','',0,'R');
+      $this->Cell($w[5],6,sprintf('%.2f', $row['total']). ' EUR','',0,'R');
       $this->Ln();
+      $this->Line(15, $this->GetY(), 210-15, $this->GetY());
 
       $this->netto_value += $row['total'];
       $this->vat_value += $row['total'] * $row['percentage'] / 100;
@@ -140,9 +141,9 @@ $result = $conn->query("SELECT products.*,taxRates.percentage, taxRates.descript
 if($result && $result->num_rows > 0){
   $productResults = $result->fetch_all(MYSQLI_ASSOC);
   $pdf->Ln(10);
-  $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TOTAL_PRICE']), $productResults , array());
+  $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TAXES'], $lang['TOTAL_PRICE']), $productResults , array());
 }
-$pdf->Line(15, $pdf->GetY(), 210-15, $pdf->GetY());
+
 $pdf->Line(15, $pdf->GetY() + 1, 210-15, $pdf->GetY() + 1);
 $pdf->Ln(5);
 
