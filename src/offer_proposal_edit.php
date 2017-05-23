@@ -2,7 +2,7 @@
 <?php
 $filterCompany = $filterClient = $filterProposal = 0;
 $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
-$meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = '';
+$meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
 //new proposal
 $result = $conn->query("SELECT COUNT(*) as num FROM proposals");
@@ -66,6 +66,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto'])){
     $meta_porto = floatval($_POST['meta_porto']);
   }
+  if(isset($_POST['meta_porto_percentage'])){
+    $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
+  }
 
   if(isset($_POST['add_product']) && ($filterClient || $filterProposal)){
     if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity'])){
@@ -76,9 +79,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $product_tax_id = intval($_POST['add_product_taxes']);
       $product_unit = test_input($_POST['add_product_unit']);
       if(!$filterProposal){ //new proposal: create proposal first
-        $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto)
+        $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
         VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
-        '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto')");
+        '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
         $filterProposal = mysqli_insert_id($conn);
       }
       $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxID, unit) VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', $product_tax_id, '$product_unit')");
@@ -136,13 +139,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($_POST['meta_save']){ //existing
       $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
         ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
-        paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto'
+        paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
         WHERE id = " . intval($_POST['meta_save']));
     } else { //new proposal
       $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign,
-        ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto)
+        ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
       VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
-        '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto')");
+        '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
       $filterProposal = mysqli_insert_id($conn);
     }
     if(mysqli_error($conn)){
@@ -474,8 +477,20 @@ $x = $prod_row['id'];
             <div class="col-xs-2">
               Porto
             </div>
-            <div class="col-xs-9">
+            <div class="col-xs-6">
               <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
+            </div>
+            <div class="col-xs-3">
+              <select class="js-example-basic-single" name="meta_porto_percentage">
+                <?php
+                $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+                while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+                  $selected = '';
+                  if($row['portoRate'] == $tax_row['id']) $selected = 'selected';
+                  echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+                }
+                ?>
+              </select>
             </div>
           </div>
         </div>

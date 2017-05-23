@@ -1071,15 +1071,11 @@ if($row['version'] < 86){
   )";
   if($conn->query($sql)){
     echo '<br> Created article list for products';
-  } else {
-    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE products ADD COLUMN unit VARCHAR(20)";
   if($conn->query($sql)){
     echo '<br> Added units to products';
-  } else {
-    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED";
@@ -1109,6 +1105,23 @@ if($row['version'] < 86){
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
+
+
+  $sql = "ALTER TABLE proposals ADD COLUMN history VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added transitions to proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $conn->query("UPDATE logs SET timeToUTC = 2 WHERE timeToUTC = 0 AND status = 5 ");
+
+  $sql = "ALTER TABLE proposals ADD COLUMN portoRate INT(3)";
+  if($conn->query($sql)){
+    echo '<br> Added percentage to porto in proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 

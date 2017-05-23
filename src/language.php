@@ -18,7 +18,8 @@ $lang_eng['ACTIVITY_TOSTRING'] = array(
   "2" => "Special Leave",
   "3" => "Sick",
   "4" => "Education",
-  "5" => "Mixed"
+  "5" => "Mixed",
+  "6" => "Compensatory Time"
 );
 $lang_ger['ACTIVITY_TOSTRING'] = array(
   "-1" => "Abwesend",
@@ -27,7 +28,8 @@ $lang_ger['ACTIVITY_TOSTRING'] = array(
   "2" => "Sonderurlaub",
   "3" => "Krankenstand",
   "4" => "Weiterbildung",
-  "5" => "Gemischt"
+  "5" => "Gemischt",
+  "6" => "Zeitausgleich"
 );
 
 $lang_eng['ACTIVE'] = 'Active';

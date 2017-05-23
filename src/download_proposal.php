@@ -11,7 +11,8 @@ require "../plugins/fpdf/fpdf.php";
 
 class PDF extends FPDF {
   public $glob = array();
-  public $good_value = 0;
+  public $netto_value= 0;
+  public $vat_value= 0;
   function Header(){
     $this->Image($this->glob["logo"], 10, 10, 40); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
     $this->SetFont('Helvetica','',8);
@@ -62,7 +63,8 @@ class PDF extends FPDF {
       $this->Cell($w[4],6,sprintf('%.2f', $row['total']). ' EUR','B',0,'R');
       $this->Ln();
 
-      $this->good_value += $row['total'];
+      $this->netto_value += $row['total'];
+      $this->vat_value += $row['total'] * $row['percentage'] / 100;
       $i++;
     }
   }
@@ -134,9 +136,9 @@ $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 $pdf->SetFontSize(10);
 $result = $conn->query("SELECT products.*,taxRates.percentage, taxRates.description AS taxName, (quantity * price) AS total FROM products, taxRates WHERE proposalID = ".$row['proposalID'].' AND taxID = taxRates.id');
 if($result && $result->num_rows > 0){
-  $productResults = '';
+  $productResults = $result->fetch_all(MYSQLI_ASSOC);
   $pdf->Ln(10);
-  $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TOTAL_PRICE']), $productResults = $result->fetch_all(MYSQLI_ASSOC), array());
+  $pdf->ImprovedTable(array('Position', 'Name', $lang['QUANTITY'], $lang['PRICE_STK'], $lang['TOTAL_PRICE']), $productResults , array());
 }
 $pdf->Line(15, $pdf->GetY() + 10, 210-15, $pdf->GetY() + 10);
 $pdf->Line(15, $pdf->GetY() + 11, 210-15, $pdf->GetY() + 11);
@@ -145,18 +147,25 @@ $pdf->Ln(12);
 if(260 - $pdf->GetY() < 20){ $pdf->AddPage(); } //if writable space is less than 2cm: new page
 //Summary
 $pdf->SetFontSize(8);
-$pdf->MultiColCell(30, 4, "Rabatt \nRabattbetrag \nWarenwert \nPorto");
-$pdf->MultiColCell(30, 4, "xx %\n xx EUR\n ".$pdf->good_value." EUR\n  ".$row['porto']." EUR", 0, 'R');
+$pdf->MultiColCell(30, 4, "Warenwert \nPorto");
+$pdf->MultiColCell(30, 4, $pdf->netto_value." EUR\n  ".$row['porto']." EUR", 0, 'R');
 $pdf->SetFontSize(10);
-$amount_netto = $pdf->good_value + $row['porto'];
-$amount_vat = $amount_netto * 0.2;
+
+//porto is just another product
+$result = $conn->query("SELECT percentage from taxRates WHERE id = ".$row['portoRate']);
+if($result && $result->num_rows > 0){
+  $porto_row = $result->fetch_assoc();
+  $porto_vat = $row['porto'] * $porto_row['percentage'] / 100;
+}
+$amount_netto = $pdf->netto_value + $row['porto'];
+$amount_vat = $pdf->vat_value + $porto_vat;
 $pdf->MultiColCell(30, 6, $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT'], 'B', 1, 0, 60);
-$pdf->MultiColCell(30, 6, $amount_netto." EUR\n".$amount_vat." EUR", 'B', 'R');
+$pdf->MultiColCell(30, 6, sprintf('%.2f', $amount_netto)." EUR\n".sprintf('%.2f', $amount_vat)." EUR", 'B', 'R');
 $pdf->SetFont('Helvetica', 'B');
 $pdf->Cell(0, 13, '', 0 , 1);
 $pdf->Cell(120);
 $pdf->Cell(30, 6, $lang['SUM']);
-$pdf->Cell(30, 6, ($amount_netto + $amount_vat).' EUR', 0 , 1, 'R');
+$pdf->Cell(30, 6, sprintf('%.2f', $amount_netto + $amount_vat).' EUR', 0 , 1, 'R');
 $pdf->SetFont('Helvetica');
 $pdf->Ln(5);
 
