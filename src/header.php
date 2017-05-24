@@ -514,7 +514,7 @@ $(document).ready(function() {
                   <li><a href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFERS']; ?></span></a></li>
                   <li><a href="offer_proposals.php?trans=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ORDER_CONFIRMATIONS']; ?></span></a></li>
                   <li><a href="offer_proposals.php?trans=2"><i class="fa fa-file-text-o"></i><span><?php echo $lang['RECEIPTS']; ?></span></a></li>
-                  </ul>
+                </ul>
               </div>
             </div>
           </div>

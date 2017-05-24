@@ -65,6 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <option value="vac"><?php echo $lang['VACATION']; ?></option>
         <option value="scl"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
         <option value="spl"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+        <option value="cto"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
       </select>
       <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
     </div>

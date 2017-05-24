@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterClient'])){
     $filterClient = $_POST['filterClient'];
   }
-  if(isset($_POST['filterProposal'])){
+  if(!empty($_POST['filterProposal'])){
     $filterProposal = $_POST['filterProposal'];
   }
   if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'].' 12:00:00')){
@@ -70,6 +70,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
         $filterProposal = mysqli_insert_id($conn);
+        echo $conn->error;
       }
       $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxID, unit) VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', $product_tax_id, '$product_unit')");
       if(mysqli_error($conn)){

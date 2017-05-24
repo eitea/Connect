@@ -211,7 +211,7 @@ $sql = "CREATE TABLE $userRequests(
   fromDate DATETIME NOT NULL,
   toDate DATETIME,
   status ENUM('0', '1', '2') DEFAULT '0',
-  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac',
+  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
   requestID INT(10) DEFAULT 0,
@@ -670,6 +670,7 @@ $sql = "CREATE TABLE $policyTable (
     shipmentType VARCHAR(100),
     representative VARCHAR(50),
     porto DECIMAL(8,2),
+    portoRate INT(3),
     history VARCHAR(100),
     FOREIGN KEY (clientID) REFERENCES $clientTable(id)
     ON UPDATE CASCADE
@@ -684,10 +685,8 @@ $sql = "CREATE TABLE $policyTable (
     description VARCHAR(200),
     percentage INT(3)
   )";
-  if($conn->query($sql)){
-    echo '<br> Created table for tax rates';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
   $sql = "CREATE TABLE products(
@@ -733,10 +732,8 @@ $sql = "CREATE TABLE $policyTable (
     unit VARCHAR(20),
     taxPercentage INT(3)
   )";
-  if($conn->query($sql)){
-    echo '<br> Created article list for products';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
 
