@@ -802,7 +802,7 @@ $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
 
 $lang_eng['TRANSITION'] = 'Transition';
-$lang_ger['TRANSITION'] = 'Übergang';
+$lang_ger['TRANSITION'] = 'Überleitung';
 
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';

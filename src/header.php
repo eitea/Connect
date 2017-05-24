@@ -511,14 +511,16 @@ $(document).ready(function() {
                 <ul class="nav navbar-nav">
                   <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                   <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="product_articles.php"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
-                  <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFERS']; ?></span></a></li>
+                  <li><a href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFERS']; ?></span></a></li>
+                  <li><a href="offer_proposals.php?trans=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ORDER_CONFIRMATIONS']; ?></span></a></li>
+                  <li><a href="offer_proposals.php?trans=2"><i class="fa fa-file-text-o"></i><span><?php echo $lang['RECEIPTS']; ?></span></a></li>
                   </ul>
               </div>
             </div>
           </div>
           <br>
           <?php
-          if($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ||$this_page == "product_articles.php" || $this_page == "offer_confirms.php" ||$this_page == "offer_receipts.php"){
+          if($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
             echo "<script>$('#adminOption_ERP').click();</script>";
           }
           ?>
