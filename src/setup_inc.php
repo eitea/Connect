@@ -684,10 +684,8 @@ $sql = "CREATE TABLE $policyTable (
     description VARCHAR(200),
     percentage INT(3)
   )";
-  if($conn->query($sql)){
-    echo '<br> Created table for tax rates';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
   $sql = "CREATE TABLE products(
@@ -733,10 +731,8 @@ $sql = "CREATE TABLE $policyTable (
     unit VARCHAR(20),
     taxPercentage INT(3)
   )";
-  if($conn->query($sql)){
-    echo '<br> Created article list for products';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
 

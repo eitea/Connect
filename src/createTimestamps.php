@@ -133,7 +133,7 @@ function match_passwordpolicy($p, &$out = ''){
 function getNextERP($identifier){
   require "connection.php";
   $result = $conn->query("SELECT id_number, history FROM proposals WHERE id_number LIKE '$identifier%' OR history LIKE '%$identifier%'");
-  $vals = array();
+  $vals = array(0);
   while($result && ($row = $result->fetch_assoc())){
     $history = explode(' ', $row['history']);
     $history[] = $row['id_number'];
