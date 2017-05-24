@@ -697,6 +697,7 @@ $sql = "CREATE TABLE $policyTable (
     quantity DECIMAL(8,2),
     taxID INT(4) UNSIGNED,
     unit VARCHAR(20),
+    portoRate INT(3),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
