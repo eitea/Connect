@@ -1115,8 +1115,6 @@ if($row['version'] < 86){
     echo '<br>'.$conn->error;
   }
 
-  $conn->query("UPDATE logs SET timeToUTC = 2 WHERE timeToUTC = 0 AND status = 5 ");
-
   $sql = "ALTER TABLE proposals ADD COLUMN portoRate INT(3)";
   if($conn->query($sql)){
     echo '<br> Added percentage to porto in proposals';
@@ -1124,6 +1122,8 @@ if($row['version'] < 86){
     echo '<br>'.$conn->error;
   }
 
+  $conn->query("UPDATE logs SET timeToUTC = 2 WHERE timeToUTC = 0 AND status = 5 ");
+  
   $conn->query("DELETE FROM projectBookingData WHERE bookingType = 'mixed'");
 
   if(mysqli_error($conn)){

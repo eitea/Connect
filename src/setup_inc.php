@@ -670,6 +670,7 @@ $sql = "CREATE TABLE $policyTable (
     shipmentType VARCHAR(100),
     representative VARCHAR(50),
     porto DECIMAL(8,2),
+    portoRate INT(3),
     history VARCHAR(100),
     FOREIGN KEY (clientID) REFERENCES $clientTable(id)
     ON UPDATE CASCADE
@@ -696,8 +697,7 @@ $sql = "CREATE TABLE $policyTable (
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
     taxID INT(4) UNSIGNED,
-    unit VARCHAR(20),
-    portoRate INT(3),
+    unit VARCHAR(20)
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
