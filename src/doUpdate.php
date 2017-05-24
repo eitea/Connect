@@ -1108,7 +1108,6 @@ if($row['version'] < 86){
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
 
-
   $sql = "ALTER TABLE proposals ADD COLUMN history VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added transitions to proposals';
@@ -1132,12 +1131,24 @@ if($row['version'] < 86){
   } else {
     echo "<br> Repaired wrong booking types";
   }
+
+  $conn->query("ALTER TABLE proposals MODIFY COLUMN status INT(2)");
+
+  $sql = "UPDATE proposals SET status = status - 1";
+  if($conn->query($sql)){
+    echo '<br> Extended status of proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}
 //if($row['version'] < 89){}
+//if($row['version'] < 90){}
+//if($row['version'] < 91){}
+//if($row['version'] < 92){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

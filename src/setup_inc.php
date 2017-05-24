@@ -47,7 +47,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
-$sql = "CREATE TABLE  $adminLDAPTable (
+$sql = "CREATE TABLE $adminLDAPTable (
   ldapConnect VARCHAR(30),
   ldapPassword VARCHAR(30),
   ldapUsername VARCHAR(30),
@@ -670,6 +670,7 @@ $sql = "CREATE TABLE $policyTable (
     shipmentType VARCHAR(100),
     representative VARCHAR(50),
     porto DECIMAL(8,2),
+    history VARCHAR(100),
     FOREIGN KEY (clientID) REFERENCES $clientTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

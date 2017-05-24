@@ -130,8 +130,21 @@ function match_passwordpolicy($p, &$out = ''){
   return true;
 }
 
-function split_booking($booking, $splits){
-
+function getNextERP($identifier){
+  require "connection.php";
+  $result = $conn->query("SELECT id_number, history FROM proposals WHERE id_number LIKE '$identifier%' OR history LIKE '%$identifier%'");
+  $vals = array();
+  while($result && ($row = $result->fetch_assoc())){
+    $history = explode(' ', $row['history']);
+    $history[] = $row['id_number'];
+    foreach($history as $h){
+      if(substr($h, 0, strlen($identifier)) == $identifier){
+        $vals[] = intval(substr($h, strlen($identifier))); //trim 0s
+      }
+    }
+  }
+  $max = max($vals);
+  return $identifier . sprintf('%07d', $max +1);
 }
 
 /*

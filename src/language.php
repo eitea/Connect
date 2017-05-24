@@ -131,6 +131,9 @@ $lang_ger['BREAKS'] = 'Pausen';
 $lang_eng['CALENDAR'] = 'Calendar';
 $lang_ger['CALENDAR'] = 'Kalender';
 
+$lang_eng['CANCELLATION'] = 'Cancellation';
+$lang_ger['CANCELLATION'] = 'Stornierung';
+
 $lang_eng['CAN_CHECKIN'] = 'Can Checkin';
 $lang_ger['CAN_CHECKIN'] = 'Kann Einstempeln';
 
@@ -203,6 +206,9 @@ $lang_ger['CORRECTION'] = 'Korrektur';
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
 
+$lang_eng['CREDIT'] = 'Credit';
+$lang_ger['CREDIT'] = 'Gutschrift';
+
 $lang_eng['COUNTRY'] = 'Country';
 $lang_ger['COUNTRY'] = 'Land';
 
@@ -241,6 +247,9 @@ $lang_ger['DELETE_SELECTION'] = 'Auswahl Löschen';
 
 $lang_eng['DELETE_COMPANY'] = 'Delete Company';
 $lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
+
+$lang_eng['DELIVERY_NOTE'] = 'Delivery Note';
+$lang_ger['DELIVERY_NOTE'] = 'Lieferschein';
 
 $lang_eng['DESCRIPTION'] = 'Description';
 $lang_ger['DESCRIPTION'] = 'Beschreibung';
@@ -548,6 +557,12 @@ $lang_ger['OPTIONS'] = 'Optionen';
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
 
+$lang_eng['ORDER_CONFIRMATION'] = 'Order Confirmation';
+$lang_ger['ORDER_CONFIRMATION'] = 'Auftragsbestätigung';
+
+$lang_eng['ORDER_CONFIRMATIONS'] = 'Order Confirmations';
+$lang_ger['ORDER_CONFIRMATIONS'] = 'Auftragsbestätigungen';
+
 $lang_eng['OVERTIME'] = 'Overtime';
 $lang_ger['OVERTIME'] = 'Überstunden';
 
@@ -634,6 +649,12 @@ $lang_ger['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
 
 $lang_eng['RECIPIENTS'] = 'Recipients';
 $lang_ger['RECIPIENTS'] = 'Empfänger';
+
+$lang_eng['RECEIPT'] = 'Receipt';
+$lang_ger['RECEIPT'] = 'Rechnung';
+
+$lang_eng['RECEIPTS'] = 'Receipts';
+$lang_ger['RECEIPTS'] = 'Rechnungen';
 
 $lang_eng['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
 $lang_ger['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
@@ -779,6 +800,9 @@ $lang_ger['TOTAL_PRICE'] = 'Gesamtpreis';
 
 $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
+
+$lang_eng['TRANSITION'] = 'Transition';
+$lang_ger['TRANSITION'] = 'Übergang';
 
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';

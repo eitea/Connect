@@ -5,9 +5,7 @@ $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ou
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
 //new proposal
-$result = $conn->query("SELECT COUNT(*) as num FROM proposals");
-$row = $result->fetch_assoc();
-$id_num = 'ANG' . sprintf('%07d', $row['num'] +1);
+$id_num = getNextERP('ANG');
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterClient'])){
