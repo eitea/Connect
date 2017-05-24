@@ -18,7 +18,8 @@ $lang_eng['ACTIVITY_TOSTRING'] = array(
   "2" => "Special Leave",
   "3" => "Sick",
   "4" => "Education",
-  "5" => "Mixed"
+  "5" => "Mixed",
+  "6" => "Compensatory Time"
 );
 $lang_ger['ACTIVITY_TOSTRING'] = array(
   "-1" => "Abwesend",
@@ -27,7 +28,8 @@ $lang_ger['ACTIVITY_TOSTRING'] = array(
   "2" => "Sonderurlaub",
   "3" => "Krankenstand",
   "4" => "Weiterbildung",
-  "5" => "Gemischt"
+  "5" => "Gemischt",
+  "6" => "Zeitausgleich"
 );
 
 $lang_eng['ACTIVE'] = 'Active';
@@ -87,6 +89,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
 
+$lang_eng['ARTICLE'] = 'Article';
+$lang_ger['ARTICLE'] = 'Artikel';
+
 $lang_eng['ASK_DELETE'] = 'Do you really wish to delete %s?';
 $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
@@ -125,6 +130,9 @@ $lang_ger['BREAKS'] = 'Pausen';
 
 $lang_eng['CALENDAR'] = 'Calendar';
 $lang_ger['CALENDAR'] = 'Kalender';
+
+$lang_eng['CANCELLATION'] = 'Cancellation';
+$lang_ger['CANCELLATION'] = 'Stornierung';
 
 $lang_eng['CAN_CHECKIN'] = 'Can Checkin';
 $lang_ger['CAN_CHECKIN'] = 'Kann Einstempeln';
@@ -198,6 +206,9 @@ $lang_ger['CORRECTION'] = 'Korrektur';
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
 
+$lang_eng['CREDIT'] = 'Credit';
+$lang_ger['CREDIT'] = 'Gutschrift';
+
 $lang_eng['COUNTRY'] = 'Country';
 $lang_ger['COUNTRY'] = 'Land';
 
@@ -236,6 +247,9 @@ $lang_ger['DELETE_SELECTION'] = 'Auswahl Löschen';
 
 $lang_eng['DELETE_COMPANY'] = 'Delete Company';
 $lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
+
+$lang_eng['DELIVERY_NOTE'] = 'Delivery Note';
+$lang_ger['DELIVERY_NOTE'] = 'Lieferschein';
 
 $lang_eng['DESCRIPTION'] = 'Description';
 $lang_ger['DESCRIPTION'] = 'Beschreibung';
@@ -543,6 +557,12 @@ $lang_ger['OPTIONS'] = 'Optionen';
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
 
+$lang_eng['ORDER_CONFIRMATION'] = 'Order Confirmation';
+$lang_ger['ORDER_CONFIRMATION'] = 'Auftragsbestätigung';
+
+$lang_eng['ORDER_CONFIRMATIONS'] = 'Order Confirmations';
+$lang_ger['ORDER_CONFIRMATIONS'] = 'Auftragsbestätigungen';
+
 $lang_eng['OVERTIME'] = 'Overtime';
 $lang_ger['OVERTIME'] = 'Überstunden';
 
@@ -560,9 +580,6 @@ $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
 
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';
-
-$lang_eng['PAYMENT_NETTO_CONDITION'] = 'Netto within ';
-$lang_ger['PAYMENT_NETTO_CONDITION'] = 'Netto innerhalb ';
 
 $lang_eng['PAYMENT_CONDITIONS'] = 'Payment Conditions';
 $lang_ger['PAYMENT_CONDITIONS'] = 'Zahlungsbedingungen';
@@ -632,6 +649,12 @@ $lang_ger['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
 
 $lang_eng['RECIPIENTS'] = 'Recipients';
 $lang_ger['RECIPIENTS'] = 'Empfänger';
+
+$lang_eng['RECEIPT'] = 'Receipt';
+$lang_ger['RECEIPT'] = 'Rechnung';
+
+$lang_eng['RECEIPTS'] = 'Receipts';
+$lang_ger['RECEIPTS'] = 'Rechnungen';
 
 $lang_eng['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
 $lang_ger['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
@@ -745,6 +768,9 @@ $lang_ger['TAKE_BREAK_AFTER'] = 'Stunden bis Mittagspause';
 $lang_eng['TAXES'] = 'Taxes';
 $lang_ger['TAXES'] = 'Steuern';
 
+$lang_eng['TAX_RATES'] = 'Tax Rates';
+$lang_ger['TAX_RATES'] = 'Steuersätze';
+
 $lang_eng['TEMPLATES'] = 'Templates';
 $lang_ger['TEMPLATES'] = 'Vorlagen';
 
@@ -775,6 +801,9 @@ $lang_ger['TOTAL_PRICE'] = 'Gesamtpreis';
 $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
 
+$lang_eng['TRANSITION'] = 'Transition';
+$lang_ger['TRANSITION'] = 'Überleitung';
+
 $lang_eng['TRAVEL_FORM'] = 'Traveling Expenses';
 $lang_ger['TRAVEL_FORM'] = 'Reisekosten';
 
@@ -789,6 +818,9 @@ $lang_ger['UNDO'] = 'Rückgängig';
 
 $lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
 $lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
+
+$lang_eng['UNIT'] ='Unit';
+$lang_ger['UNIT'] = 'Einheit';
 
 $lang_eng['UPDATE_REQUIRED'] = 'Update required. ';
 $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
@@ -899,6 +931,9 @@ $lang_ger['WEEKLY_DAY'] = 'Wochentag';
 
 $lang_eng['WEEKLY_HOURS'] = 'Weekly Hours';
 $lang_ger['WEEKLY_HOURS'] = 'Wochenstunden';
+
+$lang_eng['WITHIN'] = 'within';
+$lang_ger['WITHIN'] = 'innerhalb';
 
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.'; //ha-ha.

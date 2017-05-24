@@ -1,7 +1,8 @@
 <?php
 function checkIn($userID) {
   require 'connection.php';
-
+  $timeToUTC =  $_SESSION['timeToUTC'];
+  
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). " %'";
   $result = mysqli_query($conn, $sql);
   //user already has a stamp for today
@@ -9,7 +10,7 @@ function checkIn($userID) {
     $row = $result->fetch_assoc();
     if($row['status'] && $row['status'] != 5){ //mixed
       $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$row['status']."', '".$row['time']."', '".$row['timeEnd']."')");
-      $conn->query("UPDATE $logTable SET status = '5', time = '".getCurrentTimestamp()."' WHERE indexIM =". $row['indexIM']);
+      $conn->query("UPDATE $logTable SET status = '5', time = '".getCurrentTimestamp()."', timeToUTC = $timeToUTC  WHERE indexIM =". $row['indexIM']);
     } else {
       //create a break stamping if youre not early (a silly admin edit)
       if(timeDiff_Hours($row['timeEnd'], getCurrentTimestamp()) > 0){
@@ -21,7 +22,6 @@ function checkIn($userID) {
     $conn->query("UPDATE $logTable SET timeEnd = '0000-00-00 00:00:00' WHERE indexIM =". $row['indexIM']);
     echo mysqli_error($conn);
   } else { //create new stamp
-    $timeToUTC =  $_SESSION['timeToUTC'];
     $sql = "INSERT INTO logs (time, userID, status, timeToUTC) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC);";
     $conn->query($sql);
     echo mysqli_error($conn);

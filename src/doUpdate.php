@@ -85,7 +85,7 @@ if($row['version'] < 50){
     port VARCHAR(50)
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created table for email options.";
   }
@@ -95,7 +95,7 @@ if($row['version'] < 50){
 if($row['version'] < 51){
   $sql = "ALTER TABLE $clientDetailBankTable ADD COLUMN iv VARCHAR(100)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added random key encryption.";
   }
@@ -104,7 +104,7 @@ if($row['version'] < 51){
 if($row['version'] < 52){
   $sql = "ALTER TABLE $clientDetailBankTable MODIFY COLUMN bic VARCHAR(200)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Modified table for encryption.";
   }
@@ -113,7 +113,7 @@ if($row['version'] < 52){
 
   $sql = "ALTER TABLE $clientDetailBankTable ADD COLUMN iv2 VARCHAR(50)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added random key random key encryption.";
   }
@@ -123,14 +123,14 @@ if($row['version'] < 52){
 if($row['version'] < 54){
   $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls'";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added smtpSecure option.";
   }
 
   $sql = "ALTER TABLE $pdfTemplateTable ADD COLUMN repeatCount VARCHAR(50)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added smtpSecure option.";
   }
@@ -148,14 +148,14 @@ if($row['version'] < 54){
     ON DELETE CASCADE
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created table for list of e-mail recipients. Report specific.";
   }
 
   $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN sender VARCHAR(50) DEFAULT 'noreplay@mail.com'";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added sending address.";
   }
@@ -172,7 +172,7 @@ if($row['version'] < 55){
 
   $sql = "ALTER TABLE $mailOptionsTable ADD COLUMN enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Enabled Option for email logging.";
   }
@@ -183,7 +183,7 @@ if($row['version'] < 55){
     changeStatement TEXT NOT NULL
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created table for audit logging.";
   }
@@ -195,7 +195,7 @@ if($row['version'] < 55){
     messageLog TEXT
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created table for email logging.";
   }
@@ -204,7 +204,7 @@ if($row['version'] < 55){
 if($row['version'] < 57){
   $sql = "SET GLOBAL event_scheduler=ON";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "CREATE EVENT IF NOT EXISTS `daily_logs_event`
@@ -222,7 +222,7 @@ if($row['version'] < 57){
     AND u.id = u2.id
   );";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "CREATE EVENT IF NOT EXISTS `daily_vacation_event`
@@ -231,20 +231,20 @@ if($row['version'] < 57){
   DO
   UPDATE $vacationTable SET vacationHoursCredit = vacationHoursCredit + ((daysPerYear / 365) * 24)";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   echo "<br>Recreated Events";
 
   $sql="SELECT userID, daysPerYear, beginningDate  FROM $userTable INNER JOIN $vacationTable ON $userTable.id = $vacationTable.userID";
   $result = $conn->query($sql);
-  echo mysqli_error($conn);
+  echo '<br>'.$conn->error;
   while($row = $result->fetch_assoc()){
     $time = $row['daysPerYear'] / 365;
     $time *= timeDiff_Hours(substr($row['beginningDate'],0,11) .'05:00:00', substr(getCurrentTimestamp(),0,11) .'05:00:00');
     $sql = "UPDATE $vacationTable SET vacationHoursCredit = '$time' WHERE userID = " . $row['userID'];
     $conn->query($sql);
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -261,7 +261,7 @@ if($row['version'] < 59){
 if($row['version'] < 60){
   $sql = "ALTER TABLE $userTable ADD COLUMN emUndo DATETIME DEFAULT CURRENT_TIMESTAMP";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added column for emergency undos.";
   }
@@ -279,7 +279,7 @@ if($row['version'] < 61){
     $start = $rowTime['time'];
     $conn->query("UPDATE $projectBookingTable SET start = '$start', end = DATE_ADD('$start', INTERVAL $minutes MINUTE) WHERE id = $id");
 
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -296,7 +296,7 @@ if($row['version'] < 62){
     ON DELETE CASCADE
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added table for adjustments.";
   }
@@ -305,7 +305,7 @@ if($row['version'] < 62){
 if($row['version'] < 63){
   $sql = "ALTER TABLE $pdfTemplateTable ADD COLUMN userIDs VARCHAR(200)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added column for userIDs to be included in reports.";
   }
@@ -314,7 +314,7 @@ if($row['version'] < 63){
 if($row['version'] < 64){
   $sql = "UPDATE $projectBookingTable SET bookingType = 'break' WHERE bookingType = '' OR bookingType IS NULL";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Repaired missing Bookingtypes.";
   }
@@ -331,7 +331,7 @@ if($row['version'] < 64){
       $start = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
       $end = carryOverAdder_Minutes($start, $row['hoursOfRest'] * 60);
       $conn->query("INSERT INTO $projectBookingTable (timestampID, bookingType, start, end, infoText) VALUES($indexIM, 'break', '$start', '$end', 'Admin added missing lunchbreak')");
-      echo mysqli_error($conn);
+      echo '<br>'.$conn->error;
     }
   }
   echo "<br>Inserted complete (!) lunchbreaks";
@@ -344,14 +344,14 @@ if($row['version'] < 64){
 if($row['version'] < 65){
   $sql = "ALTER TABLE $correctionTable ADD COLUMN cType VARCHAR(10) NOT NULL DEFAULT 'log'";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added column for correction vacation / log";
   }
 
   $sql = "ALTER TABLE $correctionTable ADD COLUMN createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added column for correction date / log";
   }
@@ -379,7 +379,7 @@ if($row['version'] < 66){
     ON DELETE CASCADE
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created interval table";
   }
@@ -388,38 +388,38 @@ if($row['version'] < 66){
   SELECT beginningDate, mon, tue, wed, thu, fri, sat, sun, daysPerYear, overTimeLump, pauseAfterHours, hoursOfRest, $userTable.id
   FROM $userTable INNER JOIN $vacationTable ON $vacationTable.userID = $userTable.id INNER JOIN $bookingTable ON $bookingTable.userID = $userTable.id";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Inserted $intervalTable";
   }
 
   $sql = "DROP TABLE $negative_logTable";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped unlogs";
   }
   $sql = "DROP EVENT IF EXISTS daily_logs_event ";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped unlog event";
   }
   $sql = "DROP EVENT IF EXISTS daily_vacation_event ";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped vacation event";
   }
   $sql = "DROP TABLE $bookingTable";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped bookingTable";
   }
   $sql = "DROP TABLE $vacationTable";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped vacationTable";
   }
@@ -436,7 +436,7 @@ if($row['version'] < 66){
 if($row['version'] < 67){
   $sql = "ALTER TABLE $logTable DROP COLUMN expectedHours";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Removed expected Hours from logs.";
   }
@@ -449,7 +449,7 @@ if($row['version'] < 67){
 
   $sql = "DROP TABLE $deactivatedUserUnLogs";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Dropped deactivated negative logs";
   }
@@ -462,7 +462,7 @@ if($row['version'] < 67){
 
   $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN expectedHours";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Removed expected Hours from negative logs.";
   }
@@ -471,14 +471,14 @@ if($row['version'] < 67){
 if($row['version'] < 69){
   $sql = "ALTER TABLE $projectBookingTable ADD UNIQUE KEY double_submit (timestampID, start, end)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added unique key for duplicate entries.";
   }
 
   $sql = "DELETE p1 FROM $projectBookingTable p1, $projectBookingTable p2 WHERE p1.id < p2.id AND p1.timestampID = p2.timestampID AND p1.start = p2.start AND p1.infoText = p2.infoText AND p1.end = p2.end";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Deleted all duplicates from projectbooking table.";
   }
@@ -487,7 +487,7 @@ if($row['version'] < 69){
 if($row['version'] < 70){
   $sql = "ALTER TABLE $userTable ADD COLUMN real_email VARCHAR(50)";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Added real email Adress to user.";
   }
@@ -503,7 +503,7 @@ if($row['version'] < 71){
     ON DELETE CASCADE
   )";
   if (!$conn->query($sql)){
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created table for teams.";
   }
@@ -519,7 +519,7 @@ if($row['version'] < 71){
     ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br> Created relationship table for teams and users.";
   }
@@ -528,26 +528,26 @@ if($row['version'] < 71){
 if($row['version'] < 72){
   $sql = "ALTER TABLE $userRequests MODIFY COLUMN toDate DATETIME";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br>Alter request table to match expansion";
   }
   $sql = "ALTER TABLE $userRequests ADD COLUMN requestType ENUM('vac', 'log', 'acc') DEFAULT 'vac'";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br>Expanded request type table";
   }
   $sql="ALTER TABLE $userRequests ADD COLUMN requestID INT(10) DEFAULT 0";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br>Added volatile request ID to request Table";
   }
 
   $sql = "ALTER TABLE $configTable ADD COLUMN enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'";
   if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   } else {
     echo "<br>Added DB check for enabling self registration";
   }
@@ -558,7 +558,7 @@ if($row['version'] < 73){
   if($conn->query($sql)){
     echo '<br> Removed possible wrong log-requests';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -569,7 +569,7 @@ if($row['version'] < 74){
   if($conn->query($sql)){
     echo '<br> Added three optional booking fields to logs';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
 //through my mapping from companyID to extraField ID, this is possible
@@ -579,7 +579,7 @@ if($row['version'] < 74){
   if($conn->query($sql)){
     echo '<br> Added three additional fields to projects';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $conn->query("ALTER TABLE $companyDefaultProjectTable ADD COLUMN field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
@@ -588,7 +588,7 @@ if($row['version'] < 74){
   if($conn->query($sql)){
     echo '<br> Added three additional fields to default projects';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "CREATE TABLE $companyExtraFieldsTable (
@@ -606,14 +606,14 @@ if($row['version'] < 74){
   if($conn->query($sql)){
     echo '<br> Created table to save additional fields to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "RENAME TABLE companyToClientRelationshipData TO $companyToUserRelationshipTable";
   if($conn->query($sql)){
     echo '<br> Quick table rename';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -629,7 +629,7 @@ if($row['version'] < 75){
   if($conn->query($sql)){
     echo '<br> Added task schedules';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -638,7 +638,7 @@ if($row['version'] < 76){
   if($conn->query($sql)){
     echo '<br> Added unqiue constraint';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   echo '<br> Table cleanup';
 }
@@ -650,21 +650,21 @@ if($row['version'] < 77){
   if($conn->query($sql)){
     echo '<br> Added unqiue constraint';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE $companyDefaultProjectTable MODIFY COLUMN hourlyPrice DECIMAL(6,2) DEFAULT 0";
   if($conn->query($sql)){
     echo '<br> Increased price per hours to 4 digit number (default projects)';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE projectData MODIFY COLUMN hourlyPrice DECIMAL(6,2) DEFAULT 0";
   if($conn->query($sql)){
     echo '<br> Increased price per hours to 4 digit number (projects)';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -681,7 +681,7 @@ if($row['version'] < 78){
   if($conn->query($sql)){
     echo '<br> Created table for proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -697,21 +697,21 @@ if($row['version'] < 78){
   if($conn->query($sql)){
     echo '<br> Created table for products';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE companyData ADD COLUMN logo VARCHAR(20)";
   if($conn->query($sql)){
     echo '<br> Added logo to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE roles ADD COLUMN isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if($conn->query($sql)){
     echo '<br> Added ERP Admin';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -720,37 +720,37 @@ if($row['version'] < 79){
   if($conn->query($sql)){
     echo '<br> Added address to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE companyData ADD COLUMN phone VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added phone number to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE companyData ADD COLUMN mail VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added email address to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE companyData ADD COLUMN homepage VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added homepage to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE companyData ADD COLUMN erpText TEXT";
   if($conn->query($sql)){
     echo '<br> Added ERP footer Text to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE companyData MODIFY COLUMN logo VARCHAR(40)";
   if($conn->query($sql)){
     echo '<br> Larger logo names to companies';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -759,21 +759,21 @@ if($row['version'] < 81){
   if($conn->query($sql)){
     echo '<br> Log savetype changes...';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "UPDATE logs SET status = (status - 2)";
   if($conn->query($sql)){
     echo '<br> ... Recalculations';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac'";
   if($conn->query($sql)){
     echo '<br> Extended request types';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -782,31 +782,31 @@ if($row['version'] < 82){
   if($conn->query($sql)){
     echo '<br> Extended booking Types';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE projectBookingData ADD COLUMN mixedStatus INT(3) DEFAULT -1";
   if($conn->query($sql)){
     echo '<br> Added mixed status';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_info TEXT";
   if($conn->query($sql)){
     echo '<br> Added expenses: description';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_price DECIMAL(10,2)";
   if($conn->query($sql)){
     echo '<br> Added expenses: price';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql =  "ALTER TABLE projectBookingData ADD COLUMN exp_unit DECIMAL(10,2)";
   if($conn->query($sql)){
     echo '<br> Added expenses: quantity';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -822,118 +822,118 @@ if($row['version'] < 84){
   if($conn->query($sql)){
     echo '<br> Added date to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN deliveryDate DATETIME";
   if($conn->query($sql)){
     echo '<br> Added date of delivery to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN yourSign VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added sign 1 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN yourOrder VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added order to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN ourSign VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added sign 2 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN ourMessage VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added mesasge to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE proposals ADD COLUMN daysNetto INT(4)";
   if($conn->query($sql)){
     echo '<br> Added days Netto to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN skonto1 DECIMAL(6,2)";
   if($conn->query($sql)){
     echo '<br> Added skonto 1 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN skonto2 DECIMAL(6,2)";
   if($conn->query($sql)){
     echo '<br> Added skonto 2 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN skonto1Days INT(4)";
   if($conn->query($sql)){
     echo '<br> Added days to skonto 1 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN skonto2Days INT(4)";
   if($conn->query($sql)){
     echo '<br> Added days to skonto 2 to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN paymentMethod VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added payment method to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN shipmentType VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added shipment type to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN representative VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added representative to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE proposals ADD COLUMN porto DECIMAL(8,2)";
   if($conn->query($sql)){
     echo '<br> Added porto to Proposals';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE clientInfoData ADD COLUMN firstname VARCHAR(45)";
   if($conn->query($sql)){
     echo '<br> Splitting name to first and lastname in client data';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_Postal VARCHAR(20)";
   if($conn->query($sql)){
     echo '<br> Splitting postal code off country in client data';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
   $sql = "ALTER TABLE clientInfoData ADD COLUMN address_Country_City VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Splitting city off country in client data';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE clientInfoData ADD COLUMN fax_number VARCHAR(30)";
   if($conn->query($sql)){
     echo '<br> Added fax number to client data';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   //fixing additional fields activity
@@ -946,7 +946,7 @@ if($row['version'] < 84){
   if($conn->query($sql)){
     echo '<br> Fixed additional field assigning';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
@@ -955,14 +955,14 @@ if($row['version'] < 85){
   if($conn->query($sql)){
     echo '<br> Max overtime from 99.00 to 999.00';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE logs DROP COLUMN breakCredit";
   if($conn->query($sql)){
     echo '<br> Removed break field';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $conn->query("DELETE FROM projectBookingData WHERE start = '0000-00-00 00:00:00'");
@@ -981,21 +981,21 @@ if($row['version'] < 85){
   if($conn->query($sql)){
     echo '<br> Additional info storage for mixed timestamps';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE clientInfoData MODIFY COLUMN taxnumber VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Changed tax number to text in client details';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE clientInfoData ADD COLUMN vatnumber VARCHAR(50)";
   if($conn->query($sql)){
     echo '<br> Added VAT number to client details';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $result = $conn->query("SELECT * FROM logs WHERE status = '5'"); //select all mixed timestamps
@@ -1010,7 +1010,7 @@ if($row['version'] < 85){
       $B = carryOverAdder_Hours($A, 9);
       $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES(".$row['indexIM'].", '".$booking_row['mixedStatus']."', '$A', '$B')");
       //remove the mixed bookings
-      $conn->query("DELETE projectBookingData WHERE id = ". $booking_row['id']);
+      $conn->query("DELETE FROM projectBookingData WHERE id = ". $booking_row['id']);
     }
   }
 
@@ -1018,21 +1018,21 @@ if($row['version'] < 85){
   if($conn->query($sql)){
     echo '<br> Remove all the duplicate entries and create a key';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE $deactivatedUserLogs DROP COLUMN breakCredit";
   if($conn->query($sql)){
     echo '<br> Remove breaks from deactivated logs';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE DeactivatedUserLogData MODIFY COLUMN status INT(3)";
   if($conn->query($sql)){
     echo '<br> Changed status';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
   $conn->query("ALTER TABLE DeactivatedUserProjectData ADD COLUMN mixedStatus INT(3) DEFAULT -1");
@@ -1047,56 +1047,108 @@ if($row['version'] < 85){
   if($conn->query($sql)){
     echo '<br> Expanded deactivated booking type';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 }
 
-$sql = "CREATE TABLE taxRates (
-  id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  description VARCHAR(200),
-  percentage INT(3)
-)";
-if($conn->query($sql)){
-  echo '<br> Created table for tax rates';
-} else {
-  echo mysqli_error($conn);
-}
-
 if($row['version'] < 86){
+  $conn->query("DROP TABLE IF EXISTS taxRates");
+  $sql = "CREATE TABLE taxRates (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(200),
+    percentage INT(3)
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created table for tax rates';
+  }
+
+  $conn->query("DROP TABLE IF EXISTS articles");
   $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50),
     description VARCHAR(600),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
     taxPercentage INT(3)
   )";
   if($conn->query($sql)){
     echo '<br> Created article list for products';
-  } else {
-    echo mysqli_error($conn);
   }
 
   $sql = "ALTER TABLE products ADD COLUMN unit VARCHAR(20)";
   if($conn->query($sql)){
     echo '<br> Added units to products';
-  } else {
-    echo mysqli_error($conn);
   }
 
-  $sql = "ALTER TABLE products ADD COLUMN taxPercentage INT(3)";
+  $sql = "ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED";
   if($conn->query($sql)){
-    echo '<br> Added tax percentage to products';
+    echo '<br> Added taxes to products';
   } else {
-    echo mysqli_error($conn);
+    echo '<br>'.$conn->error;
   }
 
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normal', 20)");
-  //TODO: Continue adding taxes, idk how manytaxes i have to add and what to do about the multilanguage thingy
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
+  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
+
+  $sql = "ALTER TABLE proposals ADD COLUMN history VARCHAR(100)";
+  if($conn->query($sql)){
+    echo '<br> Added transitions to proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $conn->query("UPDATE logs SET timeToUTC = 2 WHERE timeToUTC = 0 AND status = 5 ");
+
+  $sql = "ALTER TABLE proposals ADD COLUMN portoRate INT(3)";
+  if($conn->query($sql)){
+    echo '<br> Added percentage to porto in proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $conn->query("DELETE FROM projectBookingData WHERE bookingType = 'mixed'");
+
+  if(mysqli_error($conn)){
+    echo '<br>'.$conn->error;
+  } else {
+    echo "<br> Repaired wrong booking types";
+  }
+
+  $conn->query("ALTER TABLE proposals MODIFY COLUMN status INT(2)");
+
+  $sql = "UPDATE proposals SET status = status - 1";
+  if($conn->query($sql)){
+    echo '<br> Extended status of proposals';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 
 //if($row['version'] < 87){}
 //if($row['version'] < 88){}
 //if($row['version'] < 89){}
+//if($row['version'] < 90){}
+//if($row['version'] < 91){}
+//if($row['version'] < 92){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
