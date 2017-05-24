@@ -179,6 +179,9 @@ $lang_ger['COMPANY'] = 'Mandant';
 $lang_eng['COMPANY_2'] = 'Company';
 $lang_ger['COMPANY_2'] = 'Firma';
 
+$lang_eng['COMPENSATORY_TIME'] = 'Compensatory time';
+$lang_ger['COMPENSATORY_TIME'] = 'Zeitausgleich';
+
 $lang_eng['COMPLETE'] = 'Complete';
 $lang_ger['COMPLETE'] = 'Komplett';
 

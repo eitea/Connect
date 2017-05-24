@@ -211,7 +211,7 @@ $sql = "CREATE TABLE $userRequests(
   fromDate DATETIME NOT NULL,
   toDate DATETIME,
   status ENUM('0', '1', '2') DEFAULT '0',
-  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk') DEFAULT 'vac',
+  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
   requestID INT(10) DEFAULT 0,

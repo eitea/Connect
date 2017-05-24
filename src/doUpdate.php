@@ -1123,7 +1123,7 @@ if($row['version'] < 86){
   }
 
   $conn->query("UPDATE logs SET timeToUTC = 2 WHERE timeToUTC = 0 AND status = 5 ");
-  
+
   $conn->query("DELETE FROM projectBookingData WHERE bookingType = 'mixed'");
 
   if(mysqli_error($conn)){
@@ -1143,7 +1143,10 @@ if($row['version'] < 86){
 }
 
 
-//if($row['version'] < 87){}
+if($row['version'] < 87){
+  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',"
+
+}
 //if($row['version'] < 88){}
 //if($row['version'] < 89){}
 //if($row['version'] < 90){}
