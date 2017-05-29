@@ -57,10 +57,8 @@ function isHoliday($ts){
 */
 
 function test_input($data) {
-  $data = preg_replace("/[^A-Za-z0-9\-?!=:.,\/@€§$%()+*~# öäüÖÄÜß]/", "", $data); //allowed charset
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
+  $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $data);
+  //$data = trim($data);
   return $data;
 }
 
@@ -144,7 +142,7 @@ function getNextERP($identifier){
     }
   }
   $max = max($vals);
-  return $identifier . sprintf('%07d', $max +1);
+  return $identifier . sprintf('%0'.(10-strlen($identifier)).'d', $max +1);
 }
 
 /*

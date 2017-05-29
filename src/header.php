@@ -140,7 +140,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -295,7 +295,7 @@ $(document).ready(function() {
   ?>
 
   <!-- side menu -->
-  <div id="sidemenu" class="affix-sidebar sidebar-nav hidden-scrollbar">
+  <div id="sidemenu" class="affix-sidebar sidebar-nav">
     <div class="inner">
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
@@ -336,7 +336,6 @@ $(document).ready(function() {
           <?php endif; ?>
         </ul>
       </div>
-      <br>
       <div class="panel-group" id="sidebar-accordion">
         <!-- Section One: CORE -->
         <?php if($isCoreAdmin == 'TRUE'): ?>
@@ -510,10 +509,8 @@ $(document).ready(function() {
               <div class="panel-body">
                 <ul class="nav navbar-nav">
                   <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
+                  <li><a href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['PROCESSES']; ?></span></a></li>
                   <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="product_articles.php"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
-                  <li><a href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['OFFERS']; ?></span></a></li>
-                  <li><a href="offer_proposals.php?trans=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ORDER_CONFIRMATIONS']; ?></span></a></li>
-                  <li><a href="offer_proposals.php?trans=2"><i class="fa fa-file-text-o"></i><span><?php echo $lang['RECEIPTS']; ?></span></a></li>
                 </ul>
               </div>
             </div>

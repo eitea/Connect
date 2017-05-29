@@ -304,7 +304,16 @@ $x = $prod_row['id'];
     <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
   </div>
   <div class="col-md-2">
-    <input type="text" maxlength="20" class="form-control" name="add_product_unit" placeholder="<?php echo $lang['UNIT']; ?>" />
+    <select class="js-example-basic-single" name="add_product_unit">
+      <option value=""><?php echo $lang['UNIT']; ?></option>
+      <option value="Stk">Stück</option>
+      <option value="Pkg">Packungen</option>
+      <option value="h">Stunden</option>
+      <option value="g">Gramm</option>
+      <option value="m">Meter</option>
+      <option value="m2">Quadratmeter</option>
+      <option value="m3">Kubikmeter</option>
+    </select>
   </div>
   <div class="col-md-4">
     <select class="js-example-basic-single btn-block" name="add_product_taxes">

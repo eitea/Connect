@@ -335,6 +335,9 @@ $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 
+$lang_eng['FORWARDED'] = 'Forwarded';
+$lang_ger['FORWARDED'] = 'Weitergeleitet';
+
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 
@@ -599,8 +602,14 @@ $lang_ger['PLZ'] = 'PLZ';
 $lang_eng['PREVIEW'] = 'Preview';
 $lang_ger['PREVIEW'] = 'Vorschau';
 
+$lang_eng['PREVIOUS'] = 'Previous';
+$lang_ger['PREVIOUS'] = 'Vorheriges';
+
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
+
+$lang_eng['PROCESSES'] = 'Processes';
+$lang_ger['PROCESSES'] = 'Vorgänge';
 
 $lang_eng['PRODUCTIVE'] = 'Productive';
 $lang_ger['PRODUCTIVE'] = 'Produktiv';
@@ -695,7 +704,8 @@ $lang_eng['REQUEST_TOSTRING'] = array(
   "log" => "Time Change",
   "scl" => "Education",
   "spl" => "Special Leave",
-  "brk" => "Missing Break"
+  "brk" => "Missing Break",
+  "cto" => "Compensatory time"
 );
 $lang_ger['REQUEST_TOSTRING'] = array(
   "vac" => "Urlaub",
@@ -703,7 +713,8 @@ $lang_ger['REQUEST_TOSTRING'] = array(
   "log" => "Zeitänderung",
   "scl" => "Weiterbildung",
   "spl" => "Sonderurlaub",
-  "brk" => "Fehlende Pause"
+  "brk" => "Fehlende Pause",
+  "cto" => "Zeitausgleich"
 );
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");

@@ -26,10 +26,13 @@ class PDF extends FPDF {
   }
   function Footer(){
     // Position at 1.5 cm from bottom
-    $this->SetY(-15);
+    $this->SetXY(10, -15);
+    $this->Line(10, 280, 210-10, 280); //1cm from each edge
     $this->SetFont('Times','',8);
+    $this->MultiColCell(90, 3, $this->glob['footer_left']);
     // Page number
-    $this->Cell(0,10,$this->PageNo().'/{nb}',0,1,'C');
+    $this->Cell(10,10,$this->PageNo().'/{nb}',0,0,'C');
+    $this->MultiColCell(90, 3, $this->glob['footer_right'], 0, 'R');
   }
   function ImprovedTable($header, $data, $w){
     $this->SetFillColor(200,200,200);
@@ -107,8 +110,10 @@ if(empty($row['logo']) || empty($row['address'])){
 $pdf = new PDF();
 $pdf->glob['logo'] = $row['logo'];
 $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252',$row['companyName']).' '.$row['companyType']. "\n" .$row['address']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail'];
+$pdf->glob['footer_left'] = $row['detailLeft'];
+$pdf->glob['footer_right'] = $row['detailRight'];
 $pdf->AliasNbPages();
-$pdf->SetAutoPageBreak(1, 30);
+$pdf->SetAutoPageBreak(1, 20); //(true [margin])
 $pdf->AddPage();
 $pdf->SetFont('Helvetica','',10);
 //narrow down page margins
@@ -147,7 +152,7 @@ if($result && $result->num_rows > 0){
 $pdf->Line(15, $pdf->GetY() + 1, 210-15, $pdf->GetY() + 1);
 $pdf->Ln(5);
 
-if(260 - $pdf->GetY() < 20){ $pdf->AddPage(); } //if writable space is less than 2cm: new page
+if(280 - $pdf->GetY() < 30){ $pdf->AddPage(); } //if writable space is less than 3cm: new page
 //Summary
 $pdf->SetFontSize(8);
 $pdf->MultiColCell(30, 4, "Warenwert \nPorto");

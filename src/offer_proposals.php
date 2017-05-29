@@ -3,14 +3,9 @@
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $trans_lans = array('ANG' => $lang['OFFERS'], 'AUB' => $lang['ORDER_CONFIRMATION'], 'RE' => $lang['RECEIPT'], 'LFS' => $lang['DELIVERY_NOTE'], 'GUT' => $lang['CREDIT'], 'STN' => $lang['CANCELLATION']);
 
-if(isset($_GET['trans']) && $_GET['trans'] < 6 ){
-  $CURRENT_TRANSITION = $transitions[intval($_GET['trans'])]; //wanna do something crazy?
-} else {
-  $CURRENT_TRANSITION = 'ANG';
-}
-
 $filterCompany = $filterClient = 0;
 $filterStatus = -1;
+$filterProcess = array();
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterCompany'])){
     $filterCompany = $_POST['filterCompany'];
@@ -18,10 +13,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterClient'])){
     $filterClient = $_POST['filterClient'];
   }
+  if(isset($_POST['filterProcess'])){
+    $filterProcess = $_POST['filterProcess'];
+  }
   if(isset($_POST['filterStatus'])){
     $filterStatus = $_POST['filterStatus'];
   } else {
-    $filterStatus = 0;
+    $filterStatus = 0; //waiting
   }
   if(isset($_POST['translate']) && !empty($_POST['transit'])){
     $proposalID = intval($_POST['translate']);
@@ -32,6 +30,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 
+$CURRENT_TRANSITIONS = empty($filterProcess) ? $transitions : $filterProcess;
+
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
@@ -41,7 +41,7 @@ if(!$result || $result->num_rows <= 0){
 ?>
 
 <div class="page-header">
-  <h3><?php echo $trans_lans[$CURRENT_TRANSITION]; ?></h3>
+  <h3><?php echo $lang['PROCESSES']; ?></h3>
 </div>
 
 <form method="POST">
@@ -65,14 +65,31 @@ if(!$result || $result->num_rows <= 0){
   </select>
   <select id="clientHint" style='width:200px' class="js-example-basic-single" name="filterClient">
   </select>
-
-  <select class="js-example-basic-single" style='width:150px'  name="filterStatus">
-    <option value="-1" <?php if($filterStatus == -1) echo 'selected'; ?>><?php echo $lang['DISPLAY_ALL']; ?></option>
-    <option value="0" <?php if($filterStatus == 0) echo 'selected'; ?>><?php echo $lang['OFFERSTATUS_TOSTRING'][0]; ?></option>
-    <option value="1" <?php if($filterStatus == 1) echo 'selected'; ?>><?php echo $lang['OFFERSTATUS_TOSTRING'][1]; ?></option>
-    <option value="2" <?php if($filterStatus == 2) echo 'selected'; ?>><?php echo $lang['OFFERSTATUS_TOSTRING'][2]; ?></option>
-  </select>
   <button type="submit" class="btn btn-warning ">Filter</button>
+  <br><br>
+  <select class="js-example-basic-single" style='width:400px' name="filterProcess[]" multiple="multiple">
+    <?php
+    for($i=0; $i < count($transitions); $i++){
+      $selected = '';
+      if(in_array($i, $filterProcess)){
+        $selected = 'selected';
+      }
+      echo "<option $selected value='$i'>".$trans_lans[$transitions[$i]].'</option>';
+    }
+    ?>
+  </select>
+  <select class="js-example-basic-single" style='width:150px'  name="filterStatus">
+    <option value="-1"><?php echo $lang['DISPLAY_ALL']; ?></option>
+    <?php
+    for($i=0; $i < 3; $i++){
+      $selected = '';
+      if($i == $filterStatus){
+        $selected = 'selected';
+      }
+      echo '<option value="2" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
+    }
+    ?>
+  </select>
 </form>
   <br><hr><br>
   <?php
@@ -88,6 +105,7 @@ if(!$result || $result->num_rows <= 0){
       <th>ID</th>
       <th><?php echo $lang['CLIENT']; ?></th>
       <th>Status</th>
+      <th><?php echo $lang['PREVIOUS']; ?></th>
       <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
       <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
       <th>Option</th>
@@ -96,31 +114,58 @@ if(!$result || $result->num_rows <= 0){
     <tbody>
       <?php
       while($result && ($row = $result->fetch_assoc())){
-        if(substr($row['id_number'], 0, strlen($CURRENT_TRANSITION)) != $CURRENT_TRANSITION){
-          if(strpos($row['history'], $CURRENT_TRANSITION) !== false){ //it may have used to be it
-            $id_name = substr($row['history'], strpos($row['history'], $CURRENT_TRANSITION), strlen($CURRENT_TRANSITION)+7);
-            $status = $trans_lans[preg_replace('/\d/', '', $row['id_number'])];
+        foreach($CURRENT_TRANSITIONS as $currentProcess){
+          $transitable = false;
+          $transited_from = $transited_into = '';
+          $current_transition = preg_replace('/\d/', '', $row['id_number']);
+          $lineColor = '';
+          if($current_transition == $currentProcess){
+            $id_name = $row['id_number'];
+            $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
+            $transitable = true;
+            $transited_from = substr($row['history'],-10);
+            if($row['status'] == 2){
+              $lineColor = '#c7c6c6';
+            }
           } else {
-            continue;
+            $p = strpos($row['history'], $currentProcess);
+            if($p !== false){ //it may also! have used to be it
+              $id_name = substr($row['history'], $p, 10);
+              $status = $lang['FORWARDED'].': '.$row['id_number'];
+              if($p > 8){
+                $transited_from = substr($row['history'], $p-11, 10);
+              }
+              if(strlen($row['history']) > $p + 15){
+                $status = $lang['FORWARDED'].': '.substr($row['history'], $p+11, 10);
+              }
+              $lineColor = '#6fcf2c';
+            } else {
+              continue;
+            }
           }
-        } else {
-          $id_name = $row['id_number'];
-          $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
+
+          $i = $row['id'];
+          echo "<tr style='color:$lineColor'>";
+          echo '<td>'.$id_name.'</td>';
+          echo '<td>'.$row['clientName'].'</td>';
+          echo '<td>'.$status.'</td>';
+          echo '<td>'.$transited_from.'</td>';
+          echo '<td>'.$row['ourSign'].'</td>';
+          echo '<td>'.$row['ourMessage'].'</td>';
+          echo '<td>';
+          echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
+          if($transitable){
+            echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
+            echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-danger" title="Deleting will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form> ';
+          }
+          echo '</td>';
+          echo '<td style="text-align:right;">';
+          if($transitable){
+            echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info"><i class="fa fa-arrow-right"></i></a>';
+          }
+          echo '</td>';
+          echo '</tr>';
         }
-        $i = $row['id'];
-        echo '<tr>';
-        echo '<td>'.$id_name.'</td>';
-        echo '<td>'.$row['clientName'].'</td>';
-        echo '<td>'.$status.'</td>';
-        echo '<td>'.$row['ourSign'].'</td>';
-        echo '<td>'.$row['ourMessage'].'</td>';
-        echo '<td>';
-        echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
-        echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
-        echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-danger" title="Delete: Deleting this will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form> ';
-        echo '</td>';
-        echo '<td style="text-align:right;"><a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info"><i class="fa fa-arrow-right"></i></a></td>';
-        echo '</tr>';
       }
       echo mysqli_error($conn);
       ?>

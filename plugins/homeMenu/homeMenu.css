@@ -11,16 +11,13 @@ body{
 .panel-borderless {
   border: 0;
 }
-.panel-group .panel-borderless{
-  padding-top:5px;
-}
 .navbar-nav {
   margin: 0;
 }
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
 }
-/* whitespaces do matter. */
+/* SIDEBAR */
 .panel-body .nav.navbar-nav {
   width:100%;
 }
@@ -52,16 +49,16 @@ ul.nav.navbar-nav .nav.nav-list {
   max-height:80vh;
   overflow-y:auto;
 }
+.navbar-default{
+  background-color:#f5f5f5;
+}
 .sidebar-nav .navbar li a,  .navbar-nav > li > a{
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
   background-color: #428bca;
   color: white;
-}
-.sidebar-nav .navbar li a > .caret {
-  margin-top: 8px;
 }
 .sidebar-nav .navbar .navbar-collapse {
   padding: 0;
@@ -71,6 +68,9 @@ ul.nav.navbar-nav .nav.nav-list {
   border-radius:0;
   margin-bottom:0;
   border:0;
+}
+.panel-group .panel+.panel{
+  margin-top:0px;
 }
 
 /* RESPONSIVE SIDEMENU */
@@ -208,6 +208,10 @@ i{
   position:fixed;
   z-index: 50;
   margin-left: 50%;
+}
+
+.js-example-basic-single{
+  width:100%;
 }
 
 /* html calendar date-picker */
