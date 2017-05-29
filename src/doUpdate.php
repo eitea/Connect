@@ -1144,7 +1144,10 @@ if($row['version'] < 86){
 
 
 if($row['version'] < 87){
-  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',"
+  $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac'";
+  if($conn->query($sql)){
+    echo '<br> Added compensatory time';
+  }
 
 }
 //if($row['version'] < 88){}

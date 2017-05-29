@@ -695,7 +695,8 @@ $lang_eng['REQUEST_TOSTRING'] = array(
   "log" => "Time Change",
   "scl" => "Education",
   "spl" => "Special Leave",
-  "brk" => "Missing Break"
+  "brk" => "Missing Break",
+  "cto" => "Compensatory time"
 );
 $lang_ger['REQUEST_TOSTRING'] = array(
   "vac" => "Urlaub",
@@ -703,7 +704,8 @@ $lang_ger['REQUEST_TOSTRING'] = array(
   "log" => "Zeitänderung",
   "scl" => "Weiterbildung",
   "spl" => "Sonderurlaub",
-  "brk" => "Fehlende Pause"
+  "brk" => "Fehlende Pause",
+  "cto" => "Zeitausgleich"
 );
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");

@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   //user Requests
-  if(isset($_POST['okay'])){ //vacation, special leave or school
+  if(isset($_POST['okay'])){ //vacation, special leave, compensatory time or school
     $requestID = $_POST['okay'];
     $result = $conn->query("SELECT requestType FROM userRequestsData WHERE id = $requestID");
     $row = $result->fetch_assoc();
@@ -79,6 +79,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '4')";
           } elseif($type == 'spl'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '2')";
+          } elseif($type == 'cto'){
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '6')";
           }
           $conn->query($sql);
           echo mysqli_error($conn);
@@ -178,7 +180,7 @@ if($result && $result->num_rows > 0):
               echo '<td> --- </td>';
               echo '<td class="text-center"><button type="submit" class="btn btn-default" name="okay_acc" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_acc" value="'.$row['userID'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button></td>';
-            } elseif($row['requestType'] == 'vac' || $row['requestType'] == 'spl' || $row['requestType'] == 'scl') {
+            } elseif($row['requestType'] == 'vac' || $row['requestType'] == 'spl' || $row['requestType'] == 'scl' || $row['requestType'] == 'cto') {
               echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
               echo '<td>'. $row['requestText'].'</td>';
               echo '<td><div class="input-group">';
