@@ -17,7 +17,7 @@ body{
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
 }
-/* whitespaces do matter. */
+/* SIDEBAR */
 .panel-body .nav.navbar-nav {
   width:100%;
 }
@@ -208,6 +208,10 @@ i{
   position:fixed;
   z-index: 50;
   margin-left: 50%;
+}
+
+.js-example-basic-single{
+  width:100%;
 }
 
 /* html calendar date-picker */

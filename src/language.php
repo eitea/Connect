@@ -335,6 +335,9 @@ $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 
+$lang_eng['FORWARDED'] = 'Forwarded';
+$lang_ger['FORWARDED'] = 'Weitergeleitet';
+
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 
@@ -599,8 +602,14 @@ $lang_ger['PLZ'] = 'PLZ';
 $lang_eng['PREVIEW'] = 'Preview';
 $lang_ger['PREVIEW'] = 'Vorschau';
 
+$lang_eng['PREVIOUS'] = 'Previous';
+$lang_ger['PREVIOUS'] = 'Vorheriges';
+
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
+
+$lang_eng['PROCESSES'] = 'Processes';
+$lang_ger['PROCESSES'] = 'Vorgänge';
 
 $lang_eng['PRODUCTIVE'] = 'Productive';
 $lang_ger['PRODUCTIVE'] = 'Produktiv';

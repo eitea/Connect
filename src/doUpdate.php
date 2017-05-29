@@ -1149,6 +1149,15 @@ if($row['version'] < 87){
     echo '<br> Added compensatory time';
   }
 
+  $sql = "ALTER TABLE companyData ADD COLUMN detailLeft VARCHAR(180)";
+  if($conn->query($sql)){
+    echo '<br> Added left-bound details';
+  }
+
+  $sql = "ALTER TABLE companyData ADD COLUMN detailRight VARCHAR(180)";
+  if($conn->query($sql)){
+    echo '<br> Added right-bound details';
+  }
 }
 //if($row['version'] < 88){}
 //if($row['version'] < 89){}
