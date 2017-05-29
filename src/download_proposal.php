@@ -127,7 +127,7 @@ $row['firstname'].$row['lastname'].' '.$row['nameAddition']."\n".$row['address_S
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-$pdf->MultiColCell(110, 7, $lang['OFFER']."\n".$row['id_number']);
+$pdf->MultiColCell(110, 7, $lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $row['id_number'])]."\n".$row['id_number']);
 $pdf->SetFontSize(8);
 
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])

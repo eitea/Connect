@@ -1,7 +1,6 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <?php
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$trans_lans = array('ANG' => $lang['OFFERS'], 'AUB' => $lang['ORDER_CONFIRMATION'], 'RE' => $lang['RECEIPT'], 'LFS' => $lang['DELIVERY_NOTE'], 'GUT' => $lang['CREDIT'], 'STN' => $lang['CANCELLATION']);
 
 $filterCompany = $filterClient = 0;
 $filterStatus = -1;
@@ -74,7 +73,7 @@ if(!$result || $result->num_rows <= 0){
       if(in_array($i, $filterProcess)){
         $selected = 'selected';
       }
-      echo "<option $selected value='$i'>".$trans_lans[$transitions[$i]].'</option>';
+      echo "<option $selected value='$i'>".$lang['PROPOSAL_TOSTRING'][$transitions[$i]].'</option>';
     }
     ?>
   </select>

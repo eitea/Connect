@@ -647,6 +647,9 @@ $lang_ger['PROP_YOUR_ORDER'] = 'Ihre Bestellung';
 $lang_eng['PROPERTIES'] = 'Properties';
 $lang_ger['PROPERTIES'] = 'Eigenschaften';
 
+$lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cencellation');
+$lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Storniernug');
+
 $lang_eng['QUANTITY'] = 'Quantity';
 $lang_ger['QUANTITY'] = 'Menge';
 
