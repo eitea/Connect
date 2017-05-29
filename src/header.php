@@ -140,7 +140,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
 
   <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -295,7 +295,7 @@ $(document).ready(function() {
   ?>
 
   <!-- side menu -->
-  <div id="sidemenu" class="affix-sidebar sidebar-nav hidden-scrollbar">
+  <div id="sidemenu" class="affix-sidebar sidebar-nav">
     <div class="inner">
       <div class="navbar navbar-default" role="navigation">
         <ul class="nav navbar-nav" id="sidenav01">
@@ -336,7 +336,6 @@ $(document).ready(function() {
           <?php endif; ?>
         </ul>
       </div>
-      <br>
       <div class="panel-group" id="sidebar-accordion">
         <!-- Section One: CORE -->
         <?php if($isCoreAdmin == 'TRUE'): ?>
