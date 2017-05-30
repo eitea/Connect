@@ -1154,9 +1154,37 @@ if($row['version'] < 87){
     echo '<br> Added left-bound details';
   }
 
+  $sql = "ALTER TABLE companyData ADD COLUMN detailMiddle VARCHAR(180)";
+  if($conn->query($sql)){
+    echo '<br> Added centered details';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
   $sql = "ALTER TABLE companyData ADD COLUMN detailRight VARCHAR(180)";
   if($conn->query($sql)){
     echo '<br> Added right-bound details';
+  }
+
+  $sql = "ALTER TABLE companyData ADD COLUMN uid VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Added UID to company data';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE companyData ADD COLUMN cmpDescription VARCHAR(50)";
+  if($conn->query($sql)){
+    echo '<br> Added UID to company data';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE companyData ADD COLUMN companyPostal VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Added UID to company data';
+  } else {
+    echo '<br>'.$conn->error;
   }
 }
 //if($row['version'] < 88){}

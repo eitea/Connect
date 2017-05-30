@@ -4,6 +4,18 @@ if(isset($_POST['download_proposal'])){
 } elseif(isset($_GET['propID'])){
   $proposalID = intval($_GET['propID']);
 } else {
+  $proposalID = 0;
+}
+
+if(isset($_POST['num'])){
+  $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_POST['num']);
+} elseif(isset($_GET['num'])){
+  $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_GET['num']);
+} else {
+  $proposal_number = 0;
+}
+
+if(!$proposalID && !$proposal_number){
   die("Access denied.");
 }
 
@@ -14,25 +26,25 @@ class PDF extends FPDF {
   public $netto_value= 0;
   public $vat_value= 0;
   function Header(){
-    $this->Image($this->glob["logo"], 10, 10, 40); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
+    $this->Image($this->glob["logo"], 10, 10, 0, 27); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
     $this->SetFont('Helvetica','',8);
-    //move 5cm away from right, 1.2cm down
-    $this->SetXY(-49, $this->GetY()+12);
     // Address
-    $this->MultiCell(40, 4, $this->glob["headerAddress"], 0, 'R');
+    $this->Cell(91,5);
+    $this->MultiCell(100, 4, $this->glob["headerAddress"], 0, 'R');
     //2cm Line break
-    $this->Line(10, 42, 210-10, 42); //1cm from each edge
+    $this->Line(10, 38, 210-10, 38); //1cm from each edge
     $this->Ln(5);
   }
   function Footer(){
     // Position at 1.5 cm from bottom
     $this->SetXY(10, -15);
+    //$this->Cell(0,5,$this->PageNo().'/{nb}',0,2,'C');
+
+    $this->SetFont('Helvetica','', 8);
     $this->Line(10, 280, 210-10, 280); //1cm from each edge
-    $this->SetFont('Times','',8);
-    $this->MultiColCell(90, 3, $this->glob['footer_left']);
-    // Page number
-    $this->Cell(10,10,$this->PageNo().'/{nb}',0,0,'C');
-    $this->MultiColCell(90, 3, $this->glob['footer_right'], 0, 'R');
+    $this->MultiColCell(60, 3, $this->glob['footer_left']);
+    $this->MultiColCell(70, 3, $this->glob['footer_middle'], 0 , 'C');
+    $this->MultiColCell(60, 3, $this->glob['footer_right'], 0, 'R');
   }
   function ImprovedTable($header, $data, $w){
     $this->SetFillColor(200,200,200);
@@ -86,14 +98,14 @@ class PDF extends FPDF {
 require "connection.php";
 require "language.php";
 
-$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, companyData.name AS companyName, clientData.*, clientData.name AS clientName,
+$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City
   FROM proposals
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
-  WHERE proposals.id = $proposalID");
+  WHERE proposals.id = $proposalID OR proposals.id_number = '$proposal_number' OR proposals.history LIKE '%$proposal_number%'");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);
   die();
@@ -109,8 +121,9 @@ if(empty($row['logo']) || empty($row['address'])){
 
 $pdf = new PDF();
 $pdf->glob['logo'] = $row['logo'];
-$pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252',$row['companyName']).' '.$row['companyType']. "\n" .$row['address']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail'];
+$pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252',$row['cmpDescription'])."\n".$row['address']."\n".$row['companyPostal']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail'];
 $pdf->glob['footer_left'] = $row['detailLeft'];
+$pdf->glob['footer_middle'] = $row['detailMiddle'];
 $pdf->glob['footer_right'] = $row['detailRight'];
 $pdf->AliasNbPages();
 $pdf->SetAutoPageBreak(1, 20); //(true [margin])
@@ -127,7 +140,11 @@ $row['firstname'].$row['lastname'].' '.$row['nameAddition']."\n".$row['address_S
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-$pdf->MultiColCell(110, 7, $lang['OFFER']."\n".$row['id_number']);
+if($proposal_number){
+  $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
+} else {
+  $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $row['id_number'])])."\n".$row['id_number']);
+}
 $pdf->SetFontSize(8);
 
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])

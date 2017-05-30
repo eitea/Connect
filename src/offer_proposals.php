@@ -1,7 +1,6 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <?php
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$trans_lans = array('ANG' => $lang['OFFERS'], 'AUB' => $lang['ORDER_CONFIRMATION'], 'RE' => $lang['RECEIPT'], 'LFS' => $lang['DELIVERY_NOTE'], 'GUT' => $lang['CREDIT'], 'STN' => $lang['CANCELLATION']);
 
 $filterCompany = $filterClient = 0;
 $filterStatus = -1;
@@ -74,7 +73,7 @@ if(!$result || $result->num_rows <= 0){
       if(in_array($i, $filterProcess)){
         $selected = 'selected';
       }
-      echo "<option $selected value='$i'>".$trans_lans[$transitions[$i]].'</option>';
+      echo "<option $selected value='$i'>".$lang['PROPOSAL_TOSTRING'][$transitions[$i]].'</option>';
     }
     ?>
   </select>
@@ -153,7 +152,7 @@ if(!$result || $result->num_rows <= 0){
           echo '<td>'.$row['ourSign'].'</td>';
           echo '<td>'.$row['ourMessage'].'</td>';
           echo '<td>';
-          echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
+          echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$id_name' name='num'><i class='fa fa-download'></i></button></form> ";
           if($transitable){
             echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
             echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-danger" title="Deleting will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form> ';

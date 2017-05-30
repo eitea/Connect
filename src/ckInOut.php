@@ -2,7 +2,7 @@
 function checkIn($userID) {
   require 'connection.php';
   $timeToUTC =  $_SESSION['timeToUTC'];
-  
+
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). " %'";
   $result = mysqli_query($conn, $sql);
   //user already has a stamp for today
@@ -30,7 +30,7 @@ function checkIn($userID) {
 
 function checkOut($userID) {
   require 'connection.php';
-  $query = "SELECT time, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
+  $query = "SELECT time, timeEnd, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
   $result= mysqli_query($conn, $query);
   $row = $result->fetch_assoc();
 
@@ -44,9 +44,9 @@ function checkOut($userID) {
   $interval_row = $result->fetch_assoc();
 
   $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
-  $row = $result->fetch_assoc();
+  $row_canBook = $result->fetch_assoc();
   //add break if user cannot book, and was here long enough
-  if($row['canBook'] == 'FALSE' && timeDiff_Hours($row['start'], $row['end']) > $row['pauseAfterHours'] && $row['hoursOfRest'] > 0){
+  if($row_canBook['canBook'] == 'FALSE' && timeDiff_Hours($row['time'], $row['timeEnd']) > $interval_row['pauseAfterHours'] && $interval_row['hoursOfRest'] > 0){
     $minutesOfRest = $row['hoursOfRest'] * 60;
     $result = $conn->query("SELECT $projectBookingTable.id FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM AND TIMESTAMPDIFF(MINUTE, start, end) >= $minutesOfRest ");
     //no existing lunchbreak found
