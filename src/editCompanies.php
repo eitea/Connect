@@ -117,6 +117,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   }
   if(isset($_POST['general_save'])){
+    function max4Lines($str){
+      $str = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $str);
+      while(substr_count($str, "\n") > 3){
+        $str = substr_replace($str, ' ', strpos($str, "\n"), 1); //remove first occurence
+      }
+      return $str;
+    }
     $descr = test_input($_POST['general_description']);
     $address = test_input($_POST['general_address']);
     $plz = test_input($_POST['general_postal']);
@@ -125,9 +132,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $mail = test_input($_POST['general_mail']);
     $homepage = test_input($_POST['general_homepage']);
     $erpText = test_input($_POST['general_erpText']);
-    $left = test_input($_POST['general_detail_left']);
-    $middle = test_input($_POST['general_detail_middle']);
-    $right = test_input($_POST['general_detail_right']);
+    $left = max4Lines($_POST['general_detail_left']);
+    $middle = max4Lines($_POST['general_detail_middle']);
+    $right = max4Lines($_POST['general_detail_right']);
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
       detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid' WHERE id = $cmpID");
     echo mysqli_error($conn);
@@ -191,7 +198,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   }
 }
-
 $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
   ?>
@@ -287,13 +293,13 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
             <label>Detail (<?php echo $lang['FOOT_NOTE']; ?>)</label>
           </div>
           <div class="col-sm-3">
-            <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailLeft'];?></textarea>
+            <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailLeft'];?></textarea>
           </div>
           <div class="col-sm-3 text-center">
-            <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailMiddle'];?></textarea>
+            <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailMiddle'];?></textarea>
           </div>
           <div class="col-sm-3 text-right">
-            <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailRight'];?></textarea>
+            <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailRight'];?></textarea>
           </div>
         </div>
       </div>

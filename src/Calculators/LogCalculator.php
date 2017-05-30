@@ -124,6 +124,9 @@ class LogCalculator{
             }
             $this->absolvedHours += $mixed_absolvedHours;
             $this->breakCreditHours += $break_hours;
+            break;
+            case 6: //ZA do nothin
+
           } //END SWITCH
         } else {
           $this->expectedHours += $expectedHours;

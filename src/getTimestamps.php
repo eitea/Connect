@@ -513,11 +513,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $B = $calculator->end[$i];
                   }
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
-                  for($j = 0; $j < 6; $j++){
-                    if($calculator->activity[$i] == $j){
-                      echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
-                    } else {
-                      echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                  for($j = 0; $j < 7; $j++){
+                    if($j != 5){
+                      if($calculator->activity[$i] == $j){
+                        echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                      } else {
+                        echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                      }
                     }
                   }
                   echo "</select> ";

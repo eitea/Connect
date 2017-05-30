@@ -512,6 +512,9 @@ $lang_ger['NEW'] = 'Neu';
 $lang_eng['NEW_CLIENT_CREATE'] = 'Create a new Client';
 $lang_ger['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
 
+$lang_eng['NEW_CONFIRMATION'] = 'New Order Confrimation';
+$lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
+
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 

@@ -5,7 +5,11 @@ $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ou
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
 //new proposal
-$id_num = getNextERP('ANG');
+if(!empty($_GET['nERP']) && array_key_exists($_GET['nERP'], $lang['PROPOSAL_TOSTRING'])){
+  $id_num = getNextERP($_GET['nERP']);
+} else {
+  $id_num = getNextERP('ANG');
+}
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterClient'])){
@@ -56,7 +60,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
-
   if(isset($_POST['add_product']) && ($filterClient || $filterProposal)){
     if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity']) && !empty($_POST['add_product_price'])){
       $product_name = test_input($_POST['add_product_name']);
@@ -146,8 +149,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '</div>';
     }
   }
+} // END IF POST
+if(isset($_GET['num'])){
+  $filterProposal = intval($_GET['num']);
 }
-
 if($filterProposal){
   $result = $conn->query("SELECT * FROM proposals WHERE id = $filterProposal");
   $row = $result->fetch_assoc();

@@ -12,7 +12,7 @@ if(isset($_POST['num'])){
 } elseif(isset($_GET['num'])){
   $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_GET['num']);
 } else {
-  $proposal_number = 0;
+  $proposal_number = 'empty'; //false == 0 -> returns TRUE when mysql search for string LIKE %0%
 }
 
 if(!$proposalID && !$proposal_number){
@@ -140,7 +140,7 @@ $row['firstname'].$row['lastname'].' '.$row['nameAddition']."\n".$row['address_S
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-if($proposal_number){
+if($proposal_number != 'empty'){
   $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
 } else {
   $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $row['id_number'])])."\n".$row['id_number']);
