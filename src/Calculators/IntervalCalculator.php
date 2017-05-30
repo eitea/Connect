@@ -1,5 +1,5 @@
 <?php
-/* for the good of all of us, write down all users
+/* for the good of all of us, write down all callers
 getTimestamps.php
 timeCalcTable.php
 */
@@ -123,6 +123,10 @@ class Interval_Calculator{
           }
         }
       }
+      //ZA
+      if($this->activity[$count] == 6){
+        $this->absolvedTime[$count] = 0;
+      }
 
       //EOM calculations
       $current_saldo_month += $this->absolvedTime[$count] - $this->lunchTime[$count] - $this->shouldTime[$count];
@@ -139,7 +143,6 @@ class Interval_Calculator{
         $this->monthly_correctionHours[] = $current_corrections;
         $current_saldo_month = 0;
       }
-
       $i = carryOverAdder_Hours($i, 24);
       $count++;
     } //endfor;
