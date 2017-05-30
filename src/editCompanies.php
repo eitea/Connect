@@ -293,13 +293,13 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
             <label>Detail (<?php echo $lang['FOOT_NOTE']; ?>)</label>
           </div>
           <div class="col-sm-3">
-            <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailLeft'];?></textarea>
+            <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailLeft'];?></textarea>
           </div>
           <div class="col-sm-3 text-center">
-            <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailMiddle'];?></textarea>
+            <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailMiddle'];?></textarea>
           </div>
           <div class="col-sm-3 text-right">
-            <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="160" rows="3"><?php echo $row['detailRight'];?></textarea>
+            <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailRight'];?></textarea>
           </div>
         </div>
       </div>
