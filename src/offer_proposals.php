@@ -156,7 +156,7 @@ if(!$result || $result->num_rows <= 0){
             echo '<td>';
             echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
             if($transitable){
-              echo '<a href="offer_proposal_edit.php" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></a> ';
+              echo '<a href="offer_proposal_edit.php?num='.$row['id'].'" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></a> ';
               echo '<button type="submit" class="btn btn-danger" title="Deleting will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button>';
             }
             echo '</td>';
