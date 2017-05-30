@@ -117,14 +117,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   }
   if(isset($_POST['general_save'])){
+    $descr = test_input($_POST['general_description']);
     $address = test_input($_POST['general_address']);
+    $plz = test_input($_POST['general_postal']);
+    $uid = test_input($_POST['general_uid']);
     $phone = test_input($_POST['general_phone']);
     $mail = test_input($_POST['general_mail']);
     $homepage = test_input($_POST['general_homepage']);
     $erpText = test_input($_POST['general_erpText']);
     $left = test_input($_POST['general_detail_left']);
+    $middle = test_input($_POST['general_detail_middle']);
     $right = test_input($_POST['general_detail_right']);
-    $conn->query("UPDATE companyData SET address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText', detailLeft = '$left', detailRight = '$right' WHERE id = $cmpID");
+    $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
+      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid' WHERE id = $cmpID");
     echo mysqli_error($conn);
   }
   if(isset($_POST['logoUpload'])){
@@ -215,10 +220,34 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         <div class="row text-right"><button class="btn btn-default" name="general_save"><i class="fa fa-floppy-o"></i> <?php echo $lang['SAVE']; ?></button></div>
         <div class="row">
           <div class="col-sm-3">
+            <label><?php echo $lang['COMPANY_NAME']; ?></label>
+          </div>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" name="general_description" value="<?php echo $row['cmpDescription'];?>" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
             <label><?php echo $lang['ADDRESS']; ?></label>
           </div>
           <div class="col-sm-9">
             <input type="text" class="form-control" name="general_address" placeholder="Address" value="<?php echo $row['address'];?>" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <label><?php echo $lang['PLZ']; ?></label>
+          </div>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" name="general_postal" value="<?php echo $row['companyPostal'];?>" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <label>UID</label>
+          </div>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" name="general_uid" value="<?php echo $row['uid'];?>" />
           </div>
         </div>
         <div class="row">
@@ -255,12 +284,15 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <label>Detail</label>
+            <label>Detail (<?php echo $lang['FOOT_NOTE']; ?>)</label>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailLeft'];?></textarea>
           </div>
-          <div class="col-sm-4 col-sm-offset-1 text-right">
+          <div class="col-sm-3 text-center">
+            <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailMiddle'];?></textarea>
+          </div>
+          <div class="col-sm-3 text-right">
             <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="200" rows="3"><?php echo $row['detailRight'];?></textarea>
           </div>
         </div>

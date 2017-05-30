@@ -75,13 +75,19 @@ if (!$conn->query($sql)) {
 $sql = "CREATE TABLE $companyTable (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
+  cmpDescription VARCHAR(50),
   companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-',
   logo VARCHAR(40),
   address VARCHAR(100),
+  companyPostal VARCHAR(20),
   phone VARCHAR(100),
   mail VARCHAR(100),
   homepage VARCHAR(100),
-  erpText TEXT
+  erpText TEXT,
+  detailLeft VARCHAR(120),
+  detailMiddle VARCHAR(120),
+  detailRight VARCHAR(120),
+  uid VARCHAR(20)
 )";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);

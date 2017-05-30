@@ -50,11 +50,11 @@ $lang_ger['ADD'] = 'Hinzufügen';
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
-$lang_eng['ADDRESS'] = 'Address Form';
-$lang_ger['ADDRESS'] = 'Anrede';
+$lang_eng['ADDRESS_FORM'] = 'Address Form';
+$lang_ger['ADDRESS_FORM'] = 'Anrede';
 
-$lang_eng['ADDRESS_FORM'] = 'Address';
-$lang_ger['ADDRESS_FORM'] = 'Adresse';
+$lang_eng['ADDRESS'] = 'Address';
+$lang_ger['ADDRESS'] = 'Adresse';
 
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
@@ -175,6 +175,9 @@ $lang_ger['COMPANIES'] = 'Mandanten';
 
 $lang_eng['COMPANY'] = 'Company';
 $lang_ger['COMPANY'] = 'Mandant';
+
+$lang_eng['COMPANY_NAME'] = 'Company Name';
+$lang_ger['COMPANY_NAME'] = 'Firmenbezeichnung';
 
 $lang_eng['COMPANY_2'] = 'Company';
 $lang_ger['COMPANY_2'] = 'Firma';
@@ -334,6 +337,9 @@ $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
+
+$lang_eng['FOOT_NOTE'] = 'Foot Note';
+$lang_ger['FOOT_NOTE'] = 'Fußzeile';
 
 $lang_eng['FORWARDED'] = 'Forwarded';
 $lang_ger['FORWARDED'] = 'Weitergeleitet';

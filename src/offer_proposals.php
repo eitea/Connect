@@ -152,7 +152,7 @@ if(!$result || $result->num_rows <= 0){
           echo '<td>'.$row['ourSign'].'</td>';
           echo '<td>'.$row['ourMessage'].'</td>';
           echo '<td>';
-          echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$i' name='download_proposal'><i class='fa fa-download'></i></button></form> ";
+          echo '<form method="POST" style="display:inline" action="download_proposal.php" target="_blank">'."<button type='submit' class='btn btn-default' value='$id_name' name='num'><i class='fa fa-download'></i></button></form> ";
           if($transitable){
             echo '<form method="POST" style="display:inline" action="offer_proposal_edit.php"><button type="submit" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
             echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-danger" title="Deleting will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form> ';
