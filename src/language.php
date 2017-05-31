@@ -560,6 +560,9 @@ $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebroch
 $lang_eng['OK_CREATE'] = 'New entry was successfully created.';
 $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
 
+$lang_eng['OK_REQUEST'] = 'Your request has been successfully registered. Please wait until an Administrator processed your issue.';
+$lang_ger['OK_REQUEST'] = 'Ihr Antrag wurde erfolgreich erstellt. Bitte warten Sie bis sich ein Administrator um ihr Anliegen gekümmert hat.';
+
 $lang_eng['OK_SAVE'] = 'Changes were successfully saved.';
 $lang_ger['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
 
