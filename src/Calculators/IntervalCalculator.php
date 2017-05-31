@@ -93,7 +93,6 @@ class Interval_Calculator{
         $this->timeToUTC[] = 0;
         $this->indecesIM[] = 0;
       }
-
       if(isHoliday($i)){
         $this->shouldTime[$count] = 0;
       }
@@ -106,7 +105,7 @@ class Interval_Calculator{
 
       //mixed Timestamps
       if($this->activity[$count] == 5){
-        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$this->indecesIM[$count]);
+        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE status != 6 AND timestampID = ".$this->indecesIM[$count]);
         if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
           $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
           //in case of splitted break, we only want to add what's left of mixed_absolved to the end of the day.
@@ -147,7 +146,6 @@ class Interval_Calculator{
       $count++;
     } //endfor;
     $this->daysAsNumber[] = $count;
-
   }
 
   private function timeDiff_Hours($from, $to) {
