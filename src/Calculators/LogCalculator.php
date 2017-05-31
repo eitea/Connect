@@ -79,7 +79,7 @@ class LogCalculator{
             $this->vacationHours += $expectedHours;
             $this->vacationDays--;
             break;
-            case 2: //Can have ZA
+            case 2:
             $this->specialLeaveHours += $absolved_today;
             break;
             case 3:
