@@ -37,6 +37,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
     $status = intval($_POST['newActivity']);
+    $addBreakVal = floatval($_POST['addBreakValues']);
     if($imm == 0){ //create new
       $creatUser = $filterID;
       $timeToUTC = intval($_POST['creatTimeZone']);
@@ -63,6 +64,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</div>';
       }
     } else { //update old
+      if($addBreakVal){//add a break
+        $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
+        $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
+      }
       if($timeFin == '0001-01-01 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', status='$status' WHERE indexIM = $imm";
       } else {
@@ -499,8 +504,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div>
             <div class="modal-body">
               <div class="row">
-                <div class="col-md-6">
-                  <br>
                   <?php
                   if($calculator->start[$i]){
                     $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
@@ -512,6 +515,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   } else {
                     $B = $calculator->end[$i];
                   }
+                  echo '<div class="col-md-6"><br>';
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
                   for($j = 0; $j < 7; $j++){
                     if($j != 5){
@@ -537,15 +541,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     echo "</select>";
                   }
                   echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
-                  ?>
-                </div>
-                <?php
-                if(!$calculator->indecesIM[$i]){
+                  echo '</div>';
                   echo '<div class="col-md-6">';
                   echo '<label>'.$lang['LUNCHBREAK'].'</label>';
-                  echo '<input type="number" step="any" class="form-control input-sm" name="newBreakValues" value="'.sprintf('%.2f', $calculator->lunchTime[$i]).'" style="width:70px" />';
+                  if(!$calculator->indecesIM[$i]){
+                    echo '<input type="number" step="0.01" class="form-control" name="newBreakValues" value="0.0" style="width:100px" />';
+                  } else {
+                    echo " +<input type='number' step='0.01' name='addBreakValues' value='0.0' class='form-control' style='width:100px' />";
+                  }
                   echo '</div>';
-                }
                 ?>
               </div>
               <br><br>
