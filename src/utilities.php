@@ -173,9 +173,9 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
   $path = '../images/ups/'; //with trailing slash
   $max_size = 500000; //in bytes
   //Set default file extension whitelist
-  $whitelist_ext = array('jpeg','jpg','png','gif');
+  $whitelist_ext = array('jpeg','jpg','png');
   //Set default file type whitelist
-  $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png','image/gif');
+  $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
 
   //Validation
   $out = array('error'=>null);
@@ -211,6 +211,16 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
 
     if (count($out['error'])>0) {
       return $out;
+    }
+
+    //turn interlacing off
+    $im = file_get_contents($_FILES[$file_field]['tmp_name']);
+    $im = imagecreatefromstring($im);
+    imageinterlace($im, 0);
+    if($_FILES[$file_field]["type"] == $whitelist_type[0] || $_FILES[$file_field]["type"] == $whitelist_type[1]){
+      imagejpeg($im, $_FILES[$file_field]['tmp_name']);
+    } else {
+      imagepng($im, $_FILES[$file_field]['tmp_name']);
     }
 
     //Create full filename including path
