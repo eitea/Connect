@@ -115,7 +115,7 @@ if(empty($row['logo']) || empty($row['address'])){
 } elseif(empty($row['gender'])){
   $gender_exception = '';
 } else {
-  $gender_exception = $lang['GENDER_TOSTRING'][$row['gender']].' ';
+  $gender_exception = $lang['GENDER_TOSTRING'][$row['gender']];
 }
 
 $pdf = new PDF();
@@ -132,18 +132,24 @@ $pdf->SetFont('Helvetica','',10);
 $pdf->SetLeftMargin(15);
 $pdf->SetRightMargin(15);
 //client general data
-$row['title'] .= ' ';
-$row['firstname'] .= ' ';
-$pdf->MultiCell(0, 5 , iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$gender_exception.$row['title'].
-$row['firstname'].$row['lastname'].' '.$row['nameAddition']."\n".$row['address_Street']."\n".$row['address_Country'].' '.$row['address_Country_Postal'].' '.$row['address_Country_City']));
+$pdf->Cell(0,5, iconv('UTF-8', 'windows-1252', $row['clientName']), 0, 2);
+if($row['firstname'] || $row['lastname']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['title'].' '.$row['firstname'].' '.$row['lastname'].' '.$row['nameAddition'])), 0, 2 );
+}
+if($row['address_Street']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $row['address_Street']), 0, 2 );
+}
+if($row['address_Country'] || $row['address_Country_Postal'] || $row['address_Country_City']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Country'].' '.$row['address_Country_Postal'].' '.$row['address_Country_City'])), 0, 2 );
+}
+
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-if($proposal_number != 'empty'){
-  $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
-} else {
-  $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $row['id_number'])])."\n".$row['id_number']);
+if($proposal_number == 'empty'){
+  $proposal_number = $row['id_number'];
 }
+$pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
 $pdf->SetFontSize(8);
 
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
@@ -215,5 +221,5 @@ Cell(wdith, height, text, border, ln, align, fill, link)
 MultiCell(float w, float h, string txt [, mixed border [, string align [, boolean fill]]])
 Line(left margin, x, right margin, y)
 */
-$pdf->Output();
+$pdf->Output(0, $proposal_number.'.pdf');
 ?>
