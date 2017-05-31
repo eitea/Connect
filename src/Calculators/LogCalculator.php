@@ -69,10 +69,10 @@ class LogCalculator{
           $break_hours = 0;
           $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
           while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
-
+          $absolved_today = timeDiff_Hours($row['time'], $timeEnd);
           switch($row['status']){
             case 0:
-            $this->absolvedHours += timeDiff_Hours($row['time'], $timeEnd);
+            $this->absolvedHours += $absolved_today;
             $this->breakCreditHours += $break_hours;
             break;
             case 1:
@@ -80,16 +80,17 @@ class LogCalculator{
             $this->vacationDays--;
             break;
             case 2: //Can have ZA
-            $this->specialLeaveHours += timeDiff_Hours($row['time'], $timeEnd);
+            $this->specialLeaveHours += $absolved_today;
             break;
             case 3:
             $this->sickHours += $expectedHours;
             break;
             case 4:
-            $this->educationHours += timeDiff_Hours($row['time'], $timeEnd);
+            $this->educationHours += $absolved_today;
             break;
             case 5: //Mixed
             $mixed_diff = 0;
+            $mixed_absolvedHours = $absolved_today;
             //select all mixed bookings in this timestamp, and add hours accordingly
             $mixed_result = $conn->query("SELECT mixedStatus, start, end FROM projectBookingData WHERE timestampID = ".$row['indexIM']." AND bookingType='mixed'");
             while($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
@@ -97,25 +98,29 @@ class LogCalculator{
               switch($mixed_row['mixedStatus']){
                 case 1:
                 $this->vacationHours += $mixed_diff;
+                $mixed_absolvedHours -= $mixed_diff;
                 break;
                 case 2:
                 $this->specialLeaveHours += $mixed_diff;
+                $mixed_absolvedHours -= $mixed_diff;
                 break;
                 case 3:
                 $this->sickHours += $mixed_diff;
+                $mixed_absolvedHours -= $mixed_diff;
                 break;
                 case 4:
                 $this->educationHours += $mixed_diff;
+                $mixed_absolvedHours -= $mixed_diff;
                 break;
+                case 6:
+                //do nothing
               }
             }
-            $mixed_absolvedHours = timeDiff_Hours($row['time'], $timeEnd) - $mixed_diff;
-            //cancel out possible minus
-            $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE timestampID = ".$row['indexIM']);
+            //cancel out possible minus, if not ZA
+            $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE status != 6 AND timestampID = ".$row['indexIM']);
             if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-              $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
               //if hours are missing (any breaks will cause a minus)
-              if($mixed_absolved > 0 && $mixed_absolvedHours < $expectedHours){
+              if($absolved_today > 0 && $mixed_absolvedHours < $expectedHours){
                 $mixed_absolvedHours += $mixed_absolved; //fill up
                 if($mixed_absolvedHours > $expectedHours){ //if too much: reduce
                   $mixed_absolvedHours = $expectedHours;
@@ -126,7 +131,6 @@ class LogCalculator{
             $this->breakCreditHours += $break_hours;
             break;
             case 6: //ZA do nothin
-
           } //END SWITCH
         } else {
           $this->expectedHours += $expectedHours;

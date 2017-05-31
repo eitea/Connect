@@ -36,15 +36,14 @@ class PDF extends FPDF {
     $this->Ln(5);
   }
   function Footer(){
-    // Position at 1.5 cm from bottom
-    $this->SetXY(10, -15);
-    //$this->Cell(0,5,$this->PageNo().'/{nb}',0,2,'C');
-
     $this->SetFont('Helvetica','', 8);
     $this->Line(10, 280, 210-10, 280); //1cm from each edge
-    $this->MultiColCell(60, 3, $this->glob['footer_left']);
-    $this->MultiColCell(70, 3, $this->glob['footer_middle'], 0 , 'C');
-    $this->MultiColCell(60, 3, $this->glob['footer_right'], 0, 'R');
+    // Position at 1.6 cm from bottom
+    $this->SetXY(9, -16);
+    //$this->Cell(0,5,$this->PageNo().'/{nb}',0,2,'C');
+    $this->MultiColCell(61, 3, iconv('UTF-8', 'windows-1252',$this->glob['footer_left']));
+    $this->MultiColCell(70, 3, iconv('UTF-8', 'windows-1252',$this->glob['footer_middle']), 0 , 'C');
+    $this->MultiColCell(61, 3, iconv('UTF-8', 'windows-1252',$this->glob['footer_right']), 0, 'R');
   }
   function ImprovedTable($header, $data, $w){
     $this->SetFillColor(200,200,200);
