@@ -119,9 +119,10 @@ class LogCalculator{
             //cancel out possible minus, if not ZA
             $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE status != 6 AND timestampID = ".$row['indexIM']);
             if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-              //if hours are missing (any breaks will cause a minus)
-              if($absolved_today > 0 && $mixed_absolvedHours < $expectedHours){
-                $mixed_absolvedHours += $mixed_absolved; //fill up
+              $mixed_absolved = timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
+              //if hours WITHOUT breaks are missing
+              if($mixed_absolved > 0 && $absolved_today < $expectedHours){
+                $mixed_absolvedHours += $mixed_absolved;
                 if($mixed_absolvedHours > $expectedHours){ //if too much: reduce
                   $mixed_absolvedHours = $expectedHours;
                 }
