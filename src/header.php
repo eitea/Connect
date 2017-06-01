@@ -150,6 +150,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
   <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
   <script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
+
+  <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
+  <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
   <title>Connect</title>
 </head>
 <script>

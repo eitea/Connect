@@ -47,6 +47,12 @@ $lang_ger['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
 $lang_eng['ADD'] = 'Add';
 $lang_ger['ADD'] = 'Hinzufügen';
 
+$lang_eng['ADDITION'] = 'Addition';
+$lang_ger['ADDITION'] = 'Zusatz';
+
+$lang_eng['ADD_TIMESTAMPS'] = 'Add mutliple Timestamps';
+$lang_ger['ADD_TIMESTAMPS'] = 'Mehrere Zeitstempel hinzufügen';
+
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
@@ -445,6 +451,9 @@ $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunc
 $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
                                         Die Korrektur trägt eine vollständige Mittagspause zur Mitte des Tages nach. (Diese Pause wird dazugerechnet)';
 
+$lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
+$lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
+
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
                                       Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
@@ -454,6 +463,9 @@ $lang_ger['INFO_PASSWORD_GENERAL'] = 'Einfach - Keine Restriktion <br>
 
 $lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
 $lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
+
+$lang_eng['INTERVAL'] = 'Interval';
+$lang_ger['INTERVAL'] = 'Intervall';
 
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';

@@ -13,9 +13,9 @@ $filterID = 0;
 $filterStatus ='';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['filterDateFrom']) && !empty($_POST['filterDateTo']) && strlen($_POST['filterDateFrom']) == 7 && strlen($_POST['filterDateTo']) == 7){
+  if(!empty($_POST['filterDateFrom']) && strlen($_POST['filterDateFrom']) == 7){
     $filterDateFrom = $_POST['filterDateFrom'] .'-01 12:00:00';
-    $filterDateTo = date('Y-m-t H:i:s', strtotime($_POST['filterDateTo']));
+    $filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom));
   }
   if(!empty($_POST['filteredUserID'])){
     $filterID = $_POST['filteredUserID'];
@@ -27,11 +27,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['set_all_filters'])){
     $arr = explode(',', $_POST['set_all_filters']);
     $filterDateFrom = $arr[0];
-    $filterDateTo = $arr[1];
-    $filterID = $arr[2];
-    $filterStatus = $arr[3];
+    $filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom));
+    $filterID = $arr[1];
+    $filterStatus = $arr[2];
   }
-  // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+  // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
   if(isset($_POST['saveChanges'])){
     $imm = $_POST['saveChanges'];
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
@@ -196,6 +196,46 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a>O.K.</div>';
       }
     }
+  } elseif(isset($_POST['add_multiple'])){
+    if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
+      $status = intval($_POST['add_multiple_status']);
+      $i = $_POST['add_multiple_start'].' 08:00:00';
+      $days = (timeDiff_Hours($i, $_POST['add_multiple_end'].' 08:00:00')/24) + 1; //days
+      for($j = 0; $j < $days; $j++){
+        //get the expected Hours for currenct day (read the latest interval which matches criteria)
+        $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) < DATE('$i') ORDER BY startDate DESC");
+        if ($result && ($row = $result->fetch_assoc())) {
+          $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
+          if($expected != 0){
+            $i2 = carryOverAdder_Minutes($i, intval($expected * 60));
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', $filterID, '0', '$status')";
+            $conn->query($sql);
+          }
+          $i = carryOverAdder_Hours($i, 24);
+        } else {
+          echo '<div class="alert alert-danger fade in">';
+          echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+          echo '<strong>Error 01: </strong>'. mysqli_error($conn);
+          echo '</div>';
+        }
+      }
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
+      echo '</div>';
+    }
+    if(!mysqli_error($conn)){
+      echo '<div class="alert alert-success fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>O.K: </strong>'.$lang['OK_ADD'];
+      echo '</div>';
+    } else {
+      echo '<div class="alert alert-danger fade in">';
+      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      echo '<strong>Error 02: </strong>'.mysqli_error($conn);
+      echo '</div>';
+    }
   }
 } //endif post
 ?>
@@ -205,11 +245,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <form method="post">
   <div class="row">
     <div class="col-md-4"> <!-- Date Interval-->
-      <div class="input-group">
-        <input id="calendar" type="text" maxlength="7" class="form-control from" name="filterDateFrom" value=<?php echo substr($filterDateFrom,0,7); ?> >
-        <span class="input-group-addon"> - </span>
-        <input id="calendar2" type="text" maxlength="7" class="form-control"  name="filterDateTo" value="<?php echo substr($filterDateTo,0,7); ?>">
-      </div>
+      <input id="calendar" type="text" maxlength="7" class="form-control" name="filterDateFrom" value=<?php echo substr($filterDateFrom,0,7); ?> >
       <br>
     </div>
     <div class="col-md-3 text-right"> <!-- Filter User -->
@@ -245,11 +281,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </div>
   <script>
   $("#calendar").datepicker({
-    format: "yyyy-mm",
-    viewMode: "months",
-    minViewMode: "months"
-  });
-  $("#calendar2").datepicker({
     format: "yyyy-mm",
     viewMode: "months",
     minViewMode: "months"
@@ -485,8 +516,35 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <tr><td colspan="12"><small>*Angaben in Stunden</small></td></tr>
         </tbody>
       </table>
-      <br><br>
 
+      <br><br>
+      <a class="btn btn-default" data-toggle="collapse" href="#add-interval"><?php echo $lang['ADD_TIMESTAMPS']; ?></a>
+      <div id="add-interval" class="container-fluid collapse" >
+        <br>
+        <div class="row"><small> *<?php echo $lang['INFO_INTERVALS_AS_EXPECTED']; ?></small></div>
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="input-group input-daterange">
+              <input id='multiple_calendar' type="date" class="form-control" value="" placeholder="Von" name="add_multiple_start">
+              <span class="input-group-addon"> - </span>
+              <input id='multiple_calendar2' type="date" class="form-control" value="" placeholder="Bis" name="add_multiple_end">
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-6 text-right">
+            <select name="add_multiple_status" class="js-example-basic-single">
+              <option value="1"><?php echo $lang['VACATION']; ?></option>
+              <option value="4"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
+              <option value="2"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+              <option value="6"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+            </select>
+            <button class="btn btn-warning" type="submit" name="add_multiple"><?php echo $lang['ADD']; ?></button>
+          </div>
+        </div>
+        <br>
+      </div>
       <div class="text-right">
         <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>"><?php echo $lang['DELETE']; ?></button>
       </div>
@@ -540,14 +598,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                     echo "</select>";
                   }
-                  echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+                  echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
                   echo '</div>';
                   echo '<div class="col-md-6">';
                   echo '<label>'.$lang['LUNCHBREAK'].'</label>';
                   if(!$calculator->indecesIM[$i]){
                     echo '<input type="number" step="0.01" class="form-control" name="newBreakValues" value="0.0" style="width:100px" />';
                   } else {
-                    echo " +<input type='number' step='0.01' name='addBreakValues' value='0.0' class='form-control' style='width:100px' />";
+                    echo ': '.$lang['ADDITION']."<input type='number' step='0.01' name='addBreakValues' value='0.0' class='form-control' style='width:100px' />";
                   }
                   echo '</div>';
                 ?>
@@ -556,13 +614,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               <div class="row">
                 <div class="col-md-6">
                   <label><?php echo $lang['BEGIN']; ?></label>
-                  <input id="calendar" type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,10).'T'. substr($A,11,5) ?>"/>
+                  <input type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,10).'T'. substr($A,11,5) ?>"/>
                 </div>
                 <div class="col-md-6">
                   <label><?php echo $lang['END']; ?></label>
                   <div class="input-group">
                     <span class="input-group-addon active"><input type="radio" name="is_open" value="0" checked="checked" /></span>
-                    <input id="calendar2" type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
+                    <input type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
                   </div>
                   <div style="margin-top:5px;"><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><span style="margin-left:20px;"><?php echo $lang['OPEN']; ?></span></div>
                 </div>
@@ -607,7 +665,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               </thead>
               <tbody>
                 <?php
-                echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+                echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
                 do {
                   $x = $row['bookingTableID'];
                   $A = substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5);
@@ -679,7 +737,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div>
             <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
               <?php
-              echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterDateTo,$filterID,$filterStatus' />";
+              echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
               if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
                 echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
                 $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
@@ -771,6 +829,10 @@ function toggle2(uncheckID){
   uncheckBox = document.getElementById(uncheckID);
   uncheckBox.checked = false;
 }
+
+var myCalendar = new dhtmlXCalendarObject(["multiple_calendar","multiple_calendar2"]);
+myCalendar.setSkin("material");
+myCalendar.setDateFormat("%Y-%m-%d");
 </script>
   <!-- /BODY -->
   <?php include 'footer.php'; ?>
