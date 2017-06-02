@@ -210,7 +210,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query($sql);
         echo mysqli_error($conn);
         //create roletable
-        $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin canStamp, canBook, canEditTemplates)
+        $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canEditTemplates)
         VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit');";
         $conn->query($sql);
         echo mysqli_error($conn);
