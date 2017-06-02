@@ -1188,12 +1188,16 @@ if($row['version'] < 87){
   }
 }
 if($row['version'] < 88){
-    $sql = "ALTER TABLE companyData ADD COLUMN companyCity VARCHAR(20)";
-    if($conn->query($sql)){
-      echo '<br> Added city field to company data';
-    } else {
-      echo '<br>'.$conn->error;
-    }
+  $sql = "ALTER TABLE companyData ADD COLUMN companyCity VARCHAR(20)";
+  if($conn->query($sql)){
+    echo '<br> Added city field to company data';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
+  $conn->query("UPDATE deactivatedUserData vacPerYear = daysPerYear");
+  $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
 //if($row['version'] < 89){}
 //if($row['version'] < 90){}
