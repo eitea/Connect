@@ -33,7 +33,7 @@ class PDF extends FPDF {
     $this->MultiCell(100, 4, $this->glob["headerAddress"], 0, 'R');
     //2cm Line break
     $this->Line(10, 38, 210-10, 38); //1cm from each edge
-    $this->Ln(5);
+    $this->Ln(3);
   }
   function Footer(){
     $this->SetFont('Helvetica','', 8);
@@ -110,8 +110,8 @@ if(mysqli_error($conn)){
   die();
 }
 $row = $result->fetch_assoc();
-if(empty($row['logo']) || empty($row['address'])){
-  die($lang['ERROR_MISSING_DATA']. "(Logo, Adr.)");
+if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription'])){
+  die($lang['ERROR_MISSING_DATA']. "(Name, Logo, Adr.)");
 } elseif(empty($row['gender'])){
   $gender_exception = '';
 } else {
@@ -120,17 +120,22 @@ if(empty($row['logo']) || empty($row['address'])){
 
 $pdf = new PDF();
 $pdf->glob['logo'] = $row['logo'];
-$pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252',$row['cmpDescription'])."\n".$row['address']."\n".$row['companyPostal']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail'];
+$pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
 $pdf->glob['footer_left'] = $row['detailLeft'];
 $pdf->glob['footer_middle'] = $row['detailMiddle'];
 $pdf->glob['footer_right'] = $row['detailRight'];
 $pdf->AliasNbPages();
-$pdf->SetAutoPageBreak(1, 20); //(true [margin])
+$pdf->SetAutoPageBreak(1, 20); //(true [margin-bot])
 $pdf->AddPage();
-$pdf->SetFont('Helvetica','',10);
 //narrow down page margins
 $pdf->SetLeftMargin(15);
 $pdf->SetRightMargin(15);
+
+//abs
+$pdf->SetFont('Helvetica','U',7);
+$pdf->Cell(0,3, iconv('UTF-8', 'windows-1252', 'Abs.: '.$row['cmpDescription'].' · '.$row['address'].' · '.$row['companyPostal'].' '.$row['companyCity']), 0, 1);
+$pdf->Ln(2);
+$pdf->SetFont('Helvetica','',10);
 //client general data
 $pdf->Cell(0,5, iconv('UTF-8', 'windows-1252', $row['clientName']), 0, 2);
 if($row['firstname'] || $row['lastname']){

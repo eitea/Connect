@@ -190,11 +190,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } elseif(isset($_POST['delete_bookings']) && !empty($_POST['delete_bookings_ids'])){
     foreach ($_POST['delete_bookings_ids'] as $x) {
       $conn->query("DELETE FROM projectBookingData WHERE id = $x;");
-      if(mysqli_error($conn)){
-        echo $conn->error;
-      } else {
-        echo '<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a>O.K.</div>';
-      }
+    }
+    if(mysqli_error($conn)){
+      echo $conn->error;
+    } else {
+      echo '<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a>O.K.</div>';
     }
   } elseif(isset($_POST['add_multiple'])){
     if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){

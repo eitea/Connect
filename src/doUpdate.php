@@ -1175,19 +1175,26 @@ if($row['version'] < 87){
 
   $sql = "ALTER TABLE companyData ADD COLUMN cmpDescription VARCHAR(50)";
   if($conn->query($sql)){
-    echo '<br> Added UID to company data';
+    echo '<br> Added name to company data';
   } else {
     echo '<br>'.$conn->error;
   }
 
   $sql = "ALTER TABLE companyData ADD COLUMN companyPostal VARCHAR(20)";
   if($conn->query($sql)){
-    echo '<br> Added UID to company data';
+    echo '<br> Added postal code to company data';
   } else {
     echo '<br>'.$conn->error;
   }
 }
-//if($row['version'] < 88){}
+if($row['version'] < 88){
+    $sql = "ALTER TABLE companyData ADD COLUMN companyCity VARCHAR(20)";
+    if($conn->query($sql)){
+      echo '<br> Added city field to company data';
+    } else {
+      echo '<br>'.$conn->error;
+    }
+}
 //if($row['version'] < 89){}
 //if($row['version'] < 90){}
 //if($row['version'] < 91){}
