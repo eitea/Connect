@@ -463,6 +463,7 @@ $x = $prod_row['id'];
       </div>
     </div>
     <div class="modal-footer">
+      <button type="submit" class="btn btn-warning" data-dismiss="modal">Cancel</button>
       <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
     </div>
   </div>

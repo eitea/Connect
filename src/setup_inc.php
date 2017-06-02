@@ -80,6 +80,7 @@ $sql = "CREATE TABLE $companyTable (
   logo VARCHAR(40),
   address VARCHAR(100),
   companyPostal VARCHAR(20),
+  companyCity VARCHAR(20),
   phone VARCHAR(100),
   mail VARCHAR(100),
   homepage VARCHAR(100),
