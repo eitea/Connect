@@ -54,11 +54,14 @@ if(empty($emailpostfix)){
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $accept = true;
-
-  $begin = substr(getCurrentTimestamp(),0,10) . ' 05:00:00';
+  //last monday or first of month
+  $t = strtotime(carryOverAdder_Hours(getCurrentTimestamp(), 24));
+  $begin = date('Y-m-d', strtotime('last Monday', $t)). ' 01:00:00';
+  if(substr($begin, 5, 2) != substr(getCurrentTimestamp(), 5, 2)){ //different month
+    $begin = date('Y-m-01'). ' 01:00:00';
+  }
   $gender = $_POST['gender'];
   $pass = randomPassword();
-
   if(!empty($_POST['mail']) && filter_var($_POST['mail'].$emailpostfix, FILTER_VALIDATE_EMAIL)){
     $email = test_input($_POST['mail']) .$emailpostfix;
   } else {
