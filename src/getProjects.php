@@ -48,9 +48,8 @@
 </style>
 
 <?php
-$filterDate = substr(getCurrentTimestamp(),0,10); //granularity: day
+$filterDate = substr(getCurrentTimestamp(),0,10);
 $booked = '1';
-
 $filterCompany = $filterClient = $filterProject = $filterUserID = 0;
 $filterAddBreaks = $filterAddDrives = "checked";
 
@@ -166,7 +165,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
       }
     }
-
     if(isset($_POST['editingIndeces'])) {
       //update free of charge
       if(isset($_POST['noCheckCheckingIndeces'])){
@@ -323,62 +321,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //end if POST
 ?>
 
-<script>
-function showClients(company, client){
-  $.ajax({
-    url:'ajaxQuery/AJAX_client.php',
-    data:{companyID:company, clientID:client},
-    type: 'post',
-    success : function(resp){
-      $("#filterClient").html(resp);
-    },
-    error : function(resp){}
-  });
-
-  showProjects(client, 0);
-};
-function showProjects(client, project){
-  $.ajax({
-    url:'ajaxQuery/AJAX_project.php',
-    data:{clientID:client, projectID:project},
-    type: 'post',
-    success : function(resp){
-      $("#filterProject").html(resp);
-    },
-    error : function(resp){}
-  });
-};
-function showProjectfields(project){
-  $.ajax({
-    url:'ajaxQuery/AJAX_getProjectFields.php',
-    data:{projectID:project},
-    type: 'get',
-    success : function(resp){
-      $("#project_fields").html(resp);
-    },
-    error : function(resp){}
-  });
-}
-function showMyDiv(o, toShow){
-  if(o.checked){
-    document.getElementById(toShow).style.display='block';
-  } else {
-    document.getElementById(toShow).style.display='none';
-  }
-}
-function showFilters(divID){
-  document.getElementById(divID).style.visibility='visible';
-}
-
-function changeValue(cVal, id, val){
-  if(cVal == ''){
-    document.getElementById(id).selectedIndex = val;
-    $('#' + id).val(val).change();
-  }
-}
-</script>
-
-
   <!-- ####################-FILTERS-######################################## -->
   <form method='post'>
   <div id="project_filters" class="container-fluid">
@@ -387,7 +329,7 @@ function changeValue(cVal, id, val){
     </div>
     <div class="col-xs-3 custom">
       <!-- SELECT COMPANY -->
-      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
+      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients("#filterClient", this.value, 0, 0, "#filterProject"); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
         <?php
         $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
         $result = mysqli_query($conn, $sql);
@@ -497,7 +439,7 @@ function changeValue(cVal, id, val){
           <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
         </div>
         <div class='form-group'>
-          <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects(this.value, 0)' >
+          <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects("#filterProject", this.value, <?php echo $filterProject; ?>)' >
           </select>
         </div>
         <div class='form-group'>
@@ -615,58 +557,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 $addTimeStart = 0;
 ?>
-
-<?php if($filterCompany || $filterUserID ): //i want my filter displayed even if there were no bookings ?>
-  <script>
-  showClients(<?php echo $filterCompany; ?>, <?php echo $filterClient; ?>);
-  showProjects(<?php echo $filterClient; ?>, <?php echo $filterProject; ?>);
-  document.getElementById("projectAndClientDiv").style.visibility='visible';
-  document.getElementById("dateDiv").style.visibility='visible';
-
-  function toggle(checkId, uncheckId) {
-    checkboxes = document.getElementsByName(checkId + '[]');
-    checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
-    for(var i = 0; i<checkboxes.length; i++) {
-      checkboxes[i].checked = true;
-      checkboxesUncheck[i].checked = false;
-    }
-  }
-
-  function toggle2(uncheckID){
-    uncheckBox = document.getElementById(uncheckID);
-    uncheckBox.checked = false;
-  }
-
-  function showNewProjects(selectID, client, project){
-    $.ajax({
-      url:'ajaxQuery/AJAX_project.php',
-      data:{clientID:client, projectID:project},
-      type: 'post',
-      success : function(resp){
-        $(selectID).html(resp);
-      },
-      error : function(resp){},
-      complete : function(resp){
-        showProjectfields($('#addSelectProject').val());
-      }
-    });
-  };
-  function showNewClients(selectID, company, client){
-    $.ajax({
-      url:'ajaxQuery/AJAX_client.php',
-      data:{companyID:company, clientID:client},
-      type: 'post',
-      success : function(resp){
-        $(selectID).html(resp);
-      },
-      error : function(resp){}
-    });
-
-    showProjects(client, 0);
-  };
-  </script>
-<?php endif; ?>
-
 <?php if($result && $result->num_rows > 0): ?>
 <div id="project_body">
   <form id="project_table" method="post">
@@ -681,9 +571,9 @@ $addTimeStart = 0;
         <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
         <th>1234567890<div style="margin-top:-10px"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
           <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
-          <th>Detail<div>Detail</div></th>
-          <th></th>
-        </thead>
+        <th>Detail<div>Detail</div></th>
+        <th></th>
+      </thead>
         <?php
         $csv = new Csv();
         $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
@@ -819,7 +709,7 @@ $(function () {
           <?php
           echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
           if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-            echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+            echo "<select style='width:200px' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterCompany){
               $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
@@ -935,6 +825,7 @@ $(function () {
 
   <!-- ADD BOOKING TO USER -->
 <form method="POST">
+  <?php echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />"; ?>
   <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
     <div class="well">
       <div class="container-fluid">
@@ -954,37 +845,39 @@ $(function () {
         <div id="mySelections" class="col-xs-9"><br>
           <?php
           echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
-          $query = "SELECT * FROM companyData WHERE id IN (SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $filterUserID) ";
+          $query = "SELECT * FROM companyData WHERE id IN (SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $filterUserID)";
           $result = mysqli_query($conn, $query);
-          if($result->num_rows == 1):
+          if($result->num_rows == 1): //only one company: display clients
             $row = $result->fetch_assoc();
             $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
             $result = mysqli_query($conn, $query);
             if ($result && $result->num_rows > 0) {
-              echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showNewProjects(\'#addSelectProject\', this.value, 0)">';
+              echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showProjects(\'#addSelectProject\', this.value, '.$filterProject.')">';
               echo "<option name='act' value='0'>Select...</option>";
               while ($row = $result->fetch_assoc()) {
                 $cmpnyID = $row['id'];
                 $cmpnyName = $row['name'];
-                echo "<option name='act' value='$cmpnyID'>$cmpnyName</option>";
+                $selected = '';
+                if($filterClient == $cmpnID){ $selected = 'selected'; }
+                echo "<option $selected name='act' value='$cmpnyID'>$cmpnyName</option>";
               }
             }
             echo '</select>';
-          else:
+          else: //select company
             ?>
-            <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showNewClients('#addSelectClient', this.value, 0)">
-              <option name=cmp value=0>Select...</option>
+            <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients('#addSelectClient', this.value, <?php echo $filterClient; ?>, 0, '#addSelectProject')">
+              <option name="cmp" value="0">Select...</option>
               <?php
               if ($result && $result->num_rows > 1) {
                 while ($row = $result->fetch_assoc()) {
-                  $cmpnyID = $row['id'];
-                  $cmpnyName = $row['name'];
-                  echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
+                  $selected = '';
+                  if($row['id'] == $filterCompany){ $selected = 'selected'; }
+                  echo "<option $selected name='cmp' value='".$row['id']."'>".$row['name']."</option>";
                 }
               }
               ?>
             </select>
-            <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showNewProjects('#addSelectProject', this.value, 0)">
+            <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showProjects('#addSelectProject', this.value, <?php echo $filterProject; ?>)">
             </select>
           <?php endif; ?>
           <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
@@ -1012,7 +905,8 @@ $(function () {
         </div>
       </div>
       <div id="project_fields" class="row">
-      </div><br>
+      </div>
+      <br>
       <div class="row">
         <div class="col-xs-6">
           <div class="input-group">
@@ -1031,5 +925,82 @@ $(function () {
 <!-- END ADD-BOOKING FIELD -->
 </div>
 
+<script>
+function showClients(place, company, client, project, projectPlace){
+  $.ajax({
+    url:'ajaxQuery/AJAX_client.php',
+    data:{companyID:company, clientID:client},
+    type: 'post',
+    success : function(resp){
+      $(place).html(resp);
+    },
+    error : function(resp){}
+  });
+  showProjects(projectPlace, client, project);
+};
+function showProjects(place, client, project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_project.php',
+    data:{clientID:client, projectID:project},
+    type: 'post',
+    success : function(resp){
+      $(place).html(resp);
+    },
+    error : function(resp){}
+  });
+  showProjectfields(project);
+};
+function showProjectfields(project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjectFields.php',
+    data:{projectID:project},
+    type: 'get',
+    success : function(resp){
+      $("#project_fields").html(resp);
+    },
+    error : function(resp){}
+  });
+}
+function showMyDiv(o, toShow){
+  if(o.checked){
+    document.getElementById(toShow).style.display='block';
+  } else {
+    document.getElementById(toShow).style.display='none';
+  }
+}
+function showFilters(divID){
+  document.getElementById(divID).style.visibility='visible';
+}
+function changeValue(cVal, id, val){
+  if(cVal == ''){
+    document.getElementById(id).selectedIndex = val;
+    $('#' + id).val(val).change();
+  }
+}
+function toggle(checkId, uncheckId) {
+  checkboxes = document.getElementsByName(checkId + '[]');
+  checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
+  for(var i = 0; i<checkboxes.length; i++) {
+    checkboxes[i].checked = true;
+    checkboxesUncheck[i].checked = false;
+  }
+}
+function toggle2(uncheckID){
+  uncheckBox = document.getElementById(uncheckID);
+  uncheckBox.checked = false;
+}
+</script>
 
+<?php if($filterCompany || $filterUserID ): //i want my filter displayed even if there were no bookings ?>
+  <script>
+  showClients("#filterClient", <?php echo $filterCompany; ?>, <?php echo $filterClient; ?>, <?php echo $filterProject; ?>, "#filterProject"); //i wiish we could overlooaaad
+  document.getElementById("projectAndClientDiv").style.visibility='visible';
+  document.getElementById("dateDiv").style.visibility='visible';
+  </script>
+<?php endif; ?>
+<?php if($filterCompany): ?>
+  <script>
+  showClients("#addSelectClient", <?php echo $filterCompany; ?>, <?php echo $filterClient; ?>, <?php echo $filterProject; ?>, "#addSelectProject");
+  </script>
+<?php endif; ?>
 <?php include 'footer.php'; ?>

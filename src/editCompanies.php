@@ -127,6 +127,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $descr = test_input($_POST['general_description']);
     $address = test_input($_POST['general_address']);
     $plz = test_input($_POST['general_postal']);
+    $city = test_input($_POST['general_city']);
     $uid = test_input($_POST['general_uid']);
     $phone = test_input($_POST['general_phone']);
     $mail = test_input($_POST['general_mail']);
@@ -136,7 +137,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $middle = max4Lines($_POST['general_detail_middle']);
     $right = max4Lines($_POST['general_detail_right']);
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
-      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid' WHERE id = $cmpID");
+      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city' WHERE id = $cmpID");
     echo mysqli_error($conn);
   }
   if(isset($_POST['logoUpload'])){
@@ -242,10 +243,13 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <label><?php echo $lang['PLZ']; ?></label>
+            <label><?php echo $lang['PLZ'].' / '.$lang['CITY']; ?></label>
           </div>
-          <div class="col-sm-9">
+          <div class="col-sm-4">
             <input type="text" class="form-control" name="general_postal" value="<?php echo $row['companyPostal'];?>" />
+          </div>
+          <div class="col-sm-4 col-sm-offset-1">
+            <input type="text" class="form-control" name="general_city" value="<?php echo $row['companyCity'];?>" />
           </div>
         </div>
         <div class="row">

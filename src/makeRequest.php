@@ -1,8 +1,6 @@
 <?php include 'header.php'; ?>
 <?php enableToStamps($userID); ?>
 <!-- BODY -->
-<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
-<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
 
 <div class="page-header">
   <h3><?php echo $lang['MY_REQUESTS']?></h3>

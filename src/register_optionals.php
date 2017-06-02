@@ -9,8 +9,12 @@
 <?php
 $firstname = test_input($_GET['gn']);
 $lastname = test_input($_GET['sn']);
-$begin = substr(getCurrentTimestamp(),0,10) . ' 05:00:00';
 
+$t = strtotime(carryOverAdder_Hours(getCurrentTimestamp(), 24));
+$begin = date('Y-m-d', strtotime('last Monday', $t)). ' 01:00:00';
+if(substr($begin, 5, 2) != substr(getCurrentTimestamp(), 5, 2)){ //different month
+  $begin = date('Y-m-01'). ' 01:00:00';
+}
 $pass = randomPassword();
 
 $result = $conn->query("SELECT email FROM $userTable");
