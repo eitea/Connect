@@ -206,20 +206,17 @@ echo mysqli_error($conn);
         </thead>
         <tbody>
           <?php
-          $readOnly = "";
           $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
           LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
           LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
           WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
           OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
-
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows > 0){
             $numRows = $result->num_rows;
             if(isset($_POST['undo'])){
               $numRows--;
             }
-
             for($i=0; $i<$numRows; $i++){
               $row = $result->fetch_assoc();
               if($row['bookingType'] == 'break'){
@@ -353,10 +350,10 @@ endif;
 
   <div class="row">
     <div class="col-md-8">
-      <br><textarea class="form-control <?php echo $missing_highlights; ?>" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInfoText; ?></textarea><br>
+      <br><textarea class="form-control <?php echo $missing_highlights; ?> required-field-subtle" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInfoText; ?></textarea><br>
     </div>
     <div class="col-md-4">
-      <br><textarea class="form-control required-field-subtle" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInternInfoText; ?></textarea><br>
+      <br><textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="internInfoText" placeholder="Intern... (Optional)" onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInternInfoText; ?></textarea><br>
     </div>
   </div>
 
@@ -396,7 +393,7 @@ function showClients(company, client){
     },
     error : function(resp){},
     complete : function(resp){
-      showProjects(client, 0);
+      showProjects($("#clientHint").val(), 0);
     }
   });
 }
