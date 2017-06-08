@@ -244,7 +244,7 @@ if($result && $result->num_rows > 0):
               echo '<button type="submit" class="btn btn-default" name="nokay_brk" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'div'){
-              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).' (utc)</td>';
               echo '<td>'. $lang['ACTIVITY_TOSTRING'][$row['requestText']].'</td>';
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
