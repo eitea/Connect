@@ -443,6 +443,9 @@ $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 $lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
 $lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 
+$lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
+$lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
+
 $lang_eng['INFO_CHECKIN'] = 'You have been checked in.';
 $lang_ger['INFO_CHECKIN'] = 'Checkin wurde erkannt.';
 

@@ -461,7 +461,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
         </select>
       </div>
-      <?php if($booked != 1){ echo '<small>*Entries can only be edited if they have not been charged yet</small>'; } ?>
+      <?php if($booked != 1){ echo '<small>*'.$lang['INFO_CHARGED'].'</small>'; } ?>
     </div>
   </div>
   <br><br>
