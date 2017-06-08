@@ -208,22 +208,22 @@ $pdf->Ln(5);
 //erp text
 $pdf->SetFontSize(7);
 $pdf->MultiCell(0, 3, iconv('UTF-8', 'windows-1252',$row['erpText']));
-$pdf->SetFontSize(10);
 
 //payment conditions
-$pdf->SetFont('Helvetica', 'UB');
+$pdf->SetFont('Helvetica', 'UB', 10);
 $pdf->Cell(0, 10, $lang['PAYMENT_CONDITIONS'].':', 0, 1);
 $pdf->SetFont('Helvetica', '');
-if($row['skonto1']){
+if($row['skonto1'] > 0){
   $pdf->Cell(0, 0, $row['skonto1'].'% Skonto '.$lang['WITHIN'].' '.$row['skonto1Days'].' '.$lang['DAYS'], 0, 1);
+  $pdf->Ln(5);
 }
-if($row['daysNetto']){
-  $pdf->Cell(0, 8, 'Netto '.$lang['WITHIN'].' '.$row['daysNetto'].' '.$lang['DAYS'], 0, 1);
+if($row['daysNetto'] > 0){
+  $pdf->Cell(0, 0, 'Netto '.$lang['WITHIN'].' '.$row['daysNetto'].' '.$lang['DAYS'], 0, 1);
 }
 
 /*
 A4 = 210 x 297
-Cell(wdith, height, text, border, ln, align, fill, link)
+Cell(wdith, height, text, border, ln(right, Ln, below), align, fill, link)
 MultiCell(float w, float h, string txt [, mixed border [, string align [, boolean fill]]])
 Line(left margin, x, right margin, y)
 */

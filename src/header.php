@@ -126,9 +126,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $validation_output = mysqli_error($conn);
   }
 }
-
-//TODO: php autoloader for composer dependencies ?
-//plugin cleanup..
 ?>
 
 <!DOCTYPE html>
@@ -142,7 +139,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
 
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css">
@@ -157,7 +154,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../plugins/iCheck/minimal/orange.css" rel="stylesheet">
   <script src="../plugins/iCheck/icheck.min.js"> </script>
 
-  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
   <title>Connect</title>
 </head>
 <script>
