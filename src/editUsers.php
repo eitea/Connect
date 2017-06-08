@@ -460,18 +460,16 @@ $(document).ready(function(){
                 </div>
               </div>
               <br>
-              <div class=container-fluid>
+              <div class="container-fluid">
                 <div class="col-md-4">
                   <?php echo $lang['ADMIN_MODULES']; ?>: <br>
                   <div class="checkbox">
-                    <label>
-                      <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-                    </label><br>
+                    <label><input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?></label><br>
                     <label>
                       <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
                     </label><br>
                     <label>
-                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?>  /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                     </label><br>
                     <label>
                       <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>

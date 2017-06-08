@@ -218,7 +218,7 @@ $sql = "CREATE TABLE $userRequests(
   fromDate DATETIME NOT NULL,
   toDate DATETIME,
   status ENUM('0', '1', '2') DEFAULT '0',
-  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',
+  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
   requestID INT(10) DEFAULT 0,
@@ -704,13 +704,11 @@ $sql = "CREATE TABLE $policyTable (
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
     taxID INT(4) UNSIGNED,
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     unit VARCHAR(20),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
-    ON DELETE CASCADE,
-    FOREIGN KEY (taxID) REFERENCES taxRates (id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL
+    ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

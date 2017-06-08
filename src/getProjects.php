@@ -93,16 +93,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   if(!empty($_POST['set_all_filters'])){
     $arr = explode(',', $_POST['set_all_filters']);
-      $filterDate = $arr[0];
-      $filterCompany = $arr[1];
-      $filterClient = $arr[2];
-      $filterProject = $arr[3];
-      $filterUserID = $arr[4];
-      $filterAddBreaks = $arr[5];
-      $filterAddDrives = $arr[6];
-      $booked = $arr[7];
-    }
-    // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
+    $filterDate = $arr[0];
+    $filterCompany = $arr[1];
+    $filterClient = $arr[2];
+    $filterProject = $arr[3];
+    $filterUserID = $arr[4];
+    $filterAddBreaks = $arr[5];
+    $filterAddDrives = $arr[6];
+    $booked = $arr[7];
+  }
+  // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
 
   if(!empty($_POST['editing_save'])){ //comes from the modal
     $x = $_POST['editing_save'];
@@ -569,8 +569,8 @@ $addTimeStart = 0;
         <th>Date<div><?php echo $lang['DATE']; ?></div></th>
         <th>Datum Verrechnt <div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
         <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
-        <th>1234567890<div style="margin-top:-10px"><input type="radio" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
-          <input type="radio" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
+        <th>1234567890<div style="margin-top:-10px"><input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
+          <input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
         <th>Detail<div>Detail</div></th>
         <th></th>
       </thead>
@@ -606,7 +606,7 @@ $addTimeStart = 0;
 
           $csv_Add = array();
           echo "<tr>";
-          echo "<td><input type='checkbox' name='remove_booking[]' value='$x'/><i class='$icon'></i></td>";
+          echo "<td><label><input type='checkbox' class='disable-styling' name='remove_booking[]' value='$x'/><i class='$icon'></i></label></td>";
           echo "<td>".$row['clientName'].'<br> '.$row['projectName']."</td>";
           echo '<td style="max-width:200px">'.$row['infoText']."</td>";
 
@@ -638,8 +638,8 @@ $addTimeStart = 0;
           echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
 
           if($row['bookingType'] != 'break' && $row['booked'] != 'TRUE'){ //if this is a break or has been charged already, do not display dis
-            echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' onclick='toggle2(\"".$row['projectBookingID']."_02\")' name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-            echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+            echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_02\")' name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+            echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
           } else {
             echo "<td></td>";
           }
@@ -828,16 +828,16 @@ $(function () {
   <?php echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />"; ?>
   <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
     <div class="well">
-      <div class="container-fluid">
+      <div class="row checkbox">
         <div class="checkbox">
           <div class="col-sm-2">
-            <input type="checkbox" onclick="hideMyDiv(this)" name="addBreak" title="Das ist eine Pause"> <a style="color:black;"> <i class="fa fa-cutlery" aria-hidden="true"> </i> </a> Pause
+            <label><input type="checkbox" onclick="hideMyDiv(this, 'mySelections')" name="addBreak" title="Das ist eine Pause"><a style="color:black;"><i class="fa fa-cutlery" aria-hidden="true"></i></a>Pause</label>
           </div>
           <div class="col-sm-2">
-            <input type="checkbox" name="addDrive" title="Fahrzeit"> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> Fahrzeit
+            <label><input type="checkbox" name="addDrive" title="Fahrzeit"><a style="color:black;"><i class="fa fa-car" aria-hidden="true"></i></a>Fahrzeit</label>
           </div>
           <div class="col-sm-2">
-            <input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?>
+            <label><input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?></label>
           </div>
         </div>
       </div>
@@ -966,6 +966,13 @@ function showMyDiv(o, toShow){
     document.getElementById(toShow).style.display='block';
   } else {
     document.getElementById(toShow).style.display='none';
+  }
+}
+function hideMyDiv(o, toShow){
+  if(o.checked){
+    document.getElementById(toShow).style.display='none';
+  } else {
+    document.getElementById(toShow).style.display='block';
   }
 }
 function showFilters(divID){

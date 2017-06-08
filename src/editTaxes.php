@@ -4,8 +4,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['save'])){
     for($i = 0; $i < count($_POST['ids']); $i++){
       $x = $_POST['ids'][$i];
-      $perc = $_POST['percentage'][$i];
-      $desc = $_POST['description'][$i];
+      $perc = test_input($_POST['percentage'][$i]);
+      $desc = test_input($_POST['description'][$i]);
       if($perc === ""){
         $perc = "NULL";
       }
@@ -22,7 +22,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="page-header">
   <h3><?php echo $lang['TAX_RATES']; ?></h3>
 </div>
-
 <form method="POST">
 <table class="table table-hover">
   <thead>
@@ -32,7 +31,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </thead>
   <tbody>
     <?php
-    //TODO: make them editable and deactivateable (NULL as value) BUT NOT DELETABLE
     $result = $conn->query("SELECT * FROM taxRates");
     while ($result && ($row = $result->fetch_assoc())) {
       if($row['percentage']  || $row['percentage'] === "0"){

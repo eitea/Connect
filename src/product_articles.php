@@ -75,13 +75,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <input type="text" class="form-control" name="add_product_description" placeholder="<?php echo $lang['DESCRIPTION']; ?>" maxlength="190"/>
     </div>
   </div>
-  <br><br>
+  <br>
   <div class="container-fluid">
     <div class="col-md-3">
       <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
     </div>
     <div class="col-md-3">
-      <input type="text" maxlength="20" class="form-control" name="add_product_unit" placeholder="<?php echo $lang['UNIT']; ?>" />
+      <select class="js-example-basic-single" name="add_product_unit">
+        <?php
+        $unit_result = $conn->query("SELECT * FROM units");
+        while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
+          echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
+        }
+        ?>
+      </select>
     </div>
     <div class="col-md-4">
       <select class="js-example-basic-single btn-block" name="add_product_taxes">

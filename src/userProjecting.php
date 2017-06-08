@@ -282,16 +282,14 @@ endif;
 ?>
   <br><br><br>
 
-  <div class="container-fluid">
-    <div class="checkbox">
-      <div class="col-sm-3">
-        <input type="checkbox" name="addDrive" /> <a style="color:black;"> <i class="fa fa-car" aria-hidden="true"> </i> </a> <?php echo $lang['TRAVEL_TIME']; ?>
-      </div>
-      <div class="col-sm-3">
-        <input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?>
-      </div>
-      <div id="hide_break" class="col-sm-3"></div>
+  <div class="row checkbox">
+    <div class="col-xs-2">
+      <label><input type="checkbox" name="addDrive" /><a style="color:black;"><i class="fa fa-car" aria-hidden="true"></i></a><?php echo $lang['TRAVEL_TIME']; ?></label>
     </div>
+    <div class="col-xs-2">
+      <label><input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses');" /> <?php echo $lang['EXPENSES']; ?></label>
+    </div>
+    <div id="hide_break" class="col-sm-3"></div>
   </div>
 
   <!-- SELECTS -->
@@ -362,7 +360,7 @@ endif;
 
   <div class="row">
     <div class="col-md-6">
-      <div class="input-group input-daterange">
+      <div class="input-group">
         <input type="time" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
         <input type="time" class="form-control" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />

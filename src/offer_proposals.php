@@ -141,8 +141,8 @@ if(!$result || $result->num_rows <= 0){
               echo '<select class="js-example-basic-single" name="state'.$i.'" style="max-width:150px">';
               for($j = 0; $j < 3; $j++){
                 $selected = '';
-                if($row['status'] == $j){ $selected = 'selected';}
-                echo '<option '.$selected.' value="'.$j.'">'.$lang['OFFERSTATUS_TOSTRING'][$j].'</option>';
+                if($row['status'] == $j){ $selected = 'selected'; }
+                echo "<option $selected value='$j'>".$lang['OFFERSTATUS_TOSTRING'][$j].'</option>';
               }
               echo '</select>';
               echo '<button type="submit" name="saveState" class="btn btn-default" value="'.$i.'"><i class="fa fa-floppy-o"></i></button>';
@@ -176,7 +176,11 @@ if(!$result || $result->num_rows <= 0){
     mysqli_data_seek($result,0);
     while($result && ($row = $result->fetch_assoc())):
       $i = $row['id'];
-      //TODO: Backward transitions are not possible, as are transitions into same state
+      $current_transition = preg_replace('/\d/', '', $row['id_number']);
+      //Backward transitions are not possible, as are transitions into same state
+      $pos = array_search($current_transition, $transitions);
+      $bad = array_slice($transitions, 0, $pos);
+      $bad[] = $transitions[$pos];
       ?>
       <div class="modal fade choose-transition-<?php echo $i; ?>">
         <div class="modal-dialog modal-sm modal-content">
@@ -185,11 +189,20 @@ if(!$result || $result->num_rows <= 0){
           </div>
           <div class="modal-body">
             <div class="radio">
-              <label class="btn btn-link"><input type="radio" checked value="AUB" name="transit"/><?php echo $lang['ORDER_CONFIRMATION']; ?></label><br>
-              <label class="btn btn-link"><input type="radio" value="RE" name="transit" /><?php echo $lang['RECEIPT']; ?></label><br>
-              <label class="btn btn-link"><input type="radio" disabled value="LFS" name="transit" /><?php echo $lang['DELIVERY_NOTE']; ?></label><br>
-              <label class="btn btn-link"><input type="radio" disabled value="GUT" name="transit" /><?php echo $lang['CREDIT']; ?></label><br>
-              <label class="btn btn-link"><input type="radio" disabled value="STN" name="transit" /><?php echo $lang['CANCELLATION']; ?></label><br>
+              <?php
+              foreach($transitions as $t){
+                $disabled = '';
+                if(in_array($t, $bad)){
+                  $disabled = 'disabled';
+                }
+                echo "<label><input type='radio' $disabled $checked checked value='$t' name='transit' />".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
+                if($current_transition == $t){
+                  $checked='checked'; //enable the next transition
+                } else {
+                  $checked = '';
+                }
+              }
+              ?>
             </div>
           </div>
           <div class="modal-footer">
