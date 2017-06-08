@@ -1,5 +1,4 @@
 <?php
-//$to - $from in Hours.
 function timeDiff_Hours($from, $to) {
   $timeBegin = strtotime($from) /3600;
   $timeEnd = strtotime($to) / 3600;
