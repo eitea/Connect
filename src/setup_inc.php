@@ -80,6 +80,7 @@ $sql = "CREATE TABLE $companyTable (
   logo VARCHAR(40),
   address VARCHAR(100),
   companyPostal VARCHAR(20),
+  companyCity VARCHAR(20),
   phone VARCHAR(100),
   mail VARCHAR(100),
   homepage VARCHAR(100),
@@ -217,7 +218,7 @@ $sql = "CREATE TABLE $userRequests(
   fromDate DATETIME NOT NULL,
   toDate DATETIME,
   status ENUM('0', '1', '2') DEFAULT '0',
-  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto') DEFAULT 'vac',
+  requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div') DEFAULT 'vac',
   requestText VARCHAR(150),
   answerText VARCHAR(150),
   requestID INT(10) DEFAULT 0,
@@ -703,13 +704,11 @@ $sql = "CREATE TABLE $policyTable (
     price DECIMAL(10,2),
     quantity DECIMAL(8,2),
     taxID INT(4) UNSIGNED,
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     unit VARCHAR(20),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
-    ON DELETE CASCADE,
-    FOREIGN KEY (taxID) REFERENCES taxRates (id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL
+    ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -742,6 +741,25 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
+
+  $sql = "CREATE TABLE units (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
+    unit VARCHAR(10) NOT NULL
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Packungen', 'Pkg')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Stunden', 'h')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Gramm', 'g')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Kilogramm', 'kg')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Meter', 'm')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Kilometer', 'km')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Quadratmeter', 'm2')");
+  $conn->query("INSERT INTO units (name, unit) VALUES('Kubikmeter', 'm3')");
 
 
 ?>

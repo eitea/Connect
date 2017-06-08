@@ -149,6 +149,9 @@ $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 $lang_eng['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
 $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 
+$lang_eng['CASH_EXPENSE'] = 'Cash Expense';
+$lang_ger['CASH_EXPENSE'] = 'Barauslage';
+
 $lang_eng['CHARGED'] = 'Charged';
 $lang_ger['CHARGED'] = 'Verrechnet';
 
@@ -308,6 +311,9 @@ $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Ange
 $lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
 $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
 
+$lang_eng['ERROR_INVALID_DATA'] = 'Entered Information was invalid. Please try again with valid data.';
+$lang_ger['ERROR_INVALID_DATA'] = 'Eingegebene Information war ungültig. Bitte mit gültigen Daten nochmals versuchen.';
+
 $lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in your settings.';
 $lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten unter den Einstellung nachtragen.';
 
@@ -437,6 +443,9 @@ $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 $lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
 $lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 
+$lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
+$lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
+
 $lang_eng['INFO_CHECKIN'] = 'You have been checked in.';
 $lang_ger['INFO_CHECKIN'] = 'Checkin wurde erkannt.';
 
@@ -445,6 +454,13 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
+
+$lang_eng['INFO_GEMINI'] = "More than one timestamp were detected for the same day.<br>
+                            A User may only posess one kind of timestamp per day. <br>
+                            Please decide on which timestamp to delete. You can also delete both timestamps.";
+$lang_ger['INFO_GEMINI'] = "Es existiert mehr als nur ein Zeitstempel für einen Benutzer an nur einem Tag.<br>
+                            Ein Benutzer darf allerdings pro Tag nur eine Art von Zeitstempel besitzen. <br>
+                            Bitte entscheiden Sie, welcher der beiden Zeitstempel gelöscht werden soll. Sie können auch beide Stempel löschen.";
 
 $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
                                         Autocorrecting them adds an complete lunchbreak in the middle of the day. (This break will be added)';
@@ -732,7 +748,8 @@ $lang_eng['REQUEST_TOSTRING'] = array(
   "scl" => "Education",
   "spl" => "Special Leave",
   "brk" => "Missing Break",
-  "cto" => "Compensatory time"
+  "cto" => "Compensatory time",
+  "div" => "Split Lunchbreak"
 );
 $lang_ger['REQUEST_TOSTRING'] = array(
   "vac" => "Urlaub",
@@ -741,7 +758,8 @@ $lang_ger['REQUEST_TOSTRING'] = array(
   "scl" => "Weiterbildung",
   "spl" => "Sonderurlaub",
   "brk" => "Fehlende Pause",
-  "cto" => "Zeitausgleich"
+  "cto" => "Zeitausgleich",
+  "div" => "Pause Aufteilen"
 );
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
@@ -862,6 +880,9 @@ $lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
 
 $lang_eng['UNIT'] ='Unit';
 $lang_ger['UNIT'] = 'Einheit';
+
+$lang_eng['UNITS'] ='Units';
+$lang_ger['UNITS'] = 'Einheiten';
 
 $lang_eng['UPDATE_REQUIRED'] = 'Update required. ';
 $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';

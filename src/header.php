@@ -76,7 +76,6 @@ $available_users = array('-1');
 while($result && ($row = $result->fetch_assoc())){
   $available_users[] = $row['userID'];
 }
-
 $validation_output = $error_output = '';
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){
@@ -140,9 +139,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
 
-  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet">
-
-  <script src="../plugins/jQuery/jquery-3.1.0.min.js"></script>
+  <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css">
@@ -153,6 +150,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
+
+  <link href="../plugins/iCheck/minimal/orange.css" rel="stylesheet">
+  <script src="../plugins/iCheck/icheck.min.js"> </script>
+
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
   <title>Connect</title>
 </head>
 <script>
@@ -180,6 +182,13 @@ $(document).ready(function() {
       document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
     }, 1000);
   }
+  $('input').not('.disable-styling').iCheck({
+    checkboxClass: 'icheckbox_minimal-orange',
+    radioClass: 'iradio_minimal-orange',
+    increaseArea: '20%' //clickable area
+  });
+  //onChange event trigger workaround
+  $('input').on('ifChanged', function (event) { $(event.target).trigger('change'); });
 });
 </script>
 
@@ -220,7 +229,7 @@ $(document).ready(function() {
       <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT; ?>
       <br>
       The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
-      the Software will perform substantially in accordance with the functional specifications set forth in the documentation.
+      the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
     </div>
   </div>
 
@@ -327,7 +336,6 @@ $(document).ready(function() {
 
             <!-- User-Section: BOOKING -->
             <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-              <hr>
               <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="userProjecting.php"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
             <?php endif; ?>
           <?php endif; //endif(canStamp)?>
@@ -395,6 +403,7 @@ $(document).ready(function() {
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
                         <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
                         <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                         <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
@@ -410,7 +419,7 @@ $(document).ready(function() {
           <?php
           if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_basic.php" || $this_page == "deactivatedUsers.php"){
             echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page =="editTaxes.php"){
+          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page =="editTaxes.php" || $this_page =="editUnits.php"){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";

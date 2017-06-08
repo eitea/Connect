@@ -36,10 +36,35 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
     echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID']." $startTime, $endTime";
     echo '</div>';
   }
+} elseif(!empty($_POST['splits_save'])) {
+  $x = intval($_POST['splits_save']);
+  if(!empty($_POST['splits_from_'.$x]) && !empty($_POST['splits_to_'.$x])){
+    $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $x AND bookingType = 'break'");
+    if($result && ($row = $result->fetch_assoc())){
+      $row['start'] = substr($row['start'],0, 16).':00'; //UTC
+      $row['end'] = substr($row['end'],0, 16).':00';
+      $split_A = carryOverAdder_Hours(substr_replace($row['start'], $_POST['splits_from_'.$x], 11).':00', ($row['timeToUTC']*-1)); //UTC
+      $split_B = carryOverAdder_Hours(substr_replace($row['end'], $_POST['splits_to_'.$x], 11).':00', ($row['timeToUTC']*-1));
+      //valid times
+      if(timeDiff_Hours($row['start'], $split_A) >= 0 && timeDiff_Hours($split_B, $row['end']) >= 0 && timeDiff_Hours($split_A, $split_B) > 0){
+        $splits_activity = intval($_POST['splits_activity_'.$x]);
+        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$split_A', '$split_B', '0', '$splits_activity', 'div', '$x')";
+        if($conn->query($sql)){
+          echo '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
+        }
+      } else {
+        echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+      }
+    } else {
+      die("Please do not try this again. It will not work."); //for later: we should create a strike system.
+    }
+  } else {
+    echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+  }
 }
 ?>
 
-<form method="post" id="form1">
+<form method="POST" id="form1">
   <div class="row form-group">
     <div class="col-xs-6">
       <div class="input-group">
@@ -141,7 +166,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
           <h4>Anfrage: <?php echo $calculator->date[$i]; ?></h4>
         </div>
         <div class="modal-body">
-          <div class="container-fluid">
+          <div class="row">
             <div class="col-md-6">
               <label>Neuer Anfang</label>
               <input type="time" name="request_start" class="form-control" />
@@ -151,8 +176,9 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
               <input type="time" name="request_end" class="form-control" />
             </div>
           </div>
-          <div class="container-fluid">
-            <div class="col-md-4">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
             </div>
@@ -169,74 +195,93 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
   $bookingResult = false;
   if($calculator->indecesIM[$i]){
     $bookingResult = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM projectBookingData
+      LEFT JOIN logs ON logs.indexIM = projectBookingData.timestampID
       LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
       LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
       WHERE timestampID = '".$calculator->indecesIM[$i]."' ORDER BY end ASC");
-  }
-  echo mysqli_error($conn);
-  if($bookingResult && $bookingResult->num_rows > 0):
-  ?>
-  <div class="modal fade my-bookings-<?php echo $calculator->indecesIM[$i]; ?>">
-    <div class="modal-dialog modal-lg modal-content">
-      <div class="modal-header">
-        <h4><?php echo $calculator->date[$i]; ?></h4>
-      </div>
-      <div class="modal-body">
-        <table class="table table-hover">
-          <thead>
-            <th></th>
-            <th><?php echo $lang['CLIENT']; ?></th>
-            <th><?php echo $lang['PROJECT']; ?></th>
-            <th width="15%">Datum</th>
-            <th>Start</th>
-            <th><?php echo $lang['END']; ?></th>
-            <th>Info</th>
-          </thead>
-          <tbody>
-            <?php
-            while($row = $bookingResult->fetch_assoc()) {
-              $x = $row['id'];
-              $A = substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5);
-              $B = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5);
-              $C = $row['infoText'];
-              $icon = "fa fa-bookmark";
-              if($row['bookingType'] == 'break'){
-                $icon = "fa fa-cutlery";
-              } elseif($row['bookingType'] == 'drive'){
-                $icon = "fa fa-car";
-              } elseif($row['bookingType'] == 'mixed'){
-                $icon = "fa fa-plus";
-                $C = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
-              }
-              echo '<tr>';
-              echo "<td><i class='$icon'></i></td>";
-              echo "<td>". $row['name'] ."</td>";
-              echo "<td>". $row['projectName'] ."</td>";
-              echo "<td>". substr($row['start'], 0, 10) ."</td>";
-              echo "<td>$A</td>";
-              echo "<td>$B</td>";
-              echo "<td style='text-align:left'>$C</td>";
-              echo '</tr>';
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" >OK</button>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
-<?php endfor; ?>
+    }
+    echo mysqli_error($conn);
+    if($bookingResult && $bookingResult->num_rows > 0):
+      ?>
+      <form method="POST">
+        <div class="modal fade my-bookings-<?php echo $calculator->indecesIM[$i]; ?>">
+          <div class="modal-dialog modal-lg modal-content">
+            <div class="modal-header">
+              <h4><?php echo $calculator->date[$i]; ?></h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+                <thead>
+                  <th></th>
+                  <th><?php echo $lang['CLIENT']; ?></th>
+                  <th><?php echo $lang['PROJECT']; ?></th>
+                  <th width="15%">Datum</th>
+                  <th>Start</th>
+                  <th><?php echo $lang['END']; ?></th>
+                  <th>Info</th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <?php
+                  while($row = $bookingResult->fetch_assoc()) {
+                    $A = substr(carryOverAdder_Hours($row['start'], $row['timeToUTC']), 11, 5);
+                    $B = substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']), 11, 5);
+                    $C = $row['infoText'];
+                    $icon = "fa fa-bookmark";
+                    if($row['bookingType'] == 'break'){
+                      $icon = "fa fa-cutlery";
+                    } elseif($row['bookingType'] == 'drive'){
+                      $icon = "fa fa-car";
+                    } elseif($row['bookingType'] == 'mixed'){
+                      $icon = "fa fa-plus";
+                      $C = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
+                    }
+                    echo '<tr>';
+                    echo "<td><i class='$icon'></i></td>";
+                    echo "<td>". $row['name'] ."</td>";
+                    echo "<td>". $row['projectName'] ."</td>";
+                    echo "<td>". substr($row['start'], 0, 10) ."</td>";
+                    echo "<td>$A</td>";
+                    echo "<td>$B</td>";
+                    echo "<td style='text-align:left'>$C</td>";
+                    echo '<td></td></tr>';
+                    if($row['bookingType'] == 'break'){
+                      $x = $row['bookingTableID'];
+                      echo '<tr style="background-color:#f0f0f0">';
+                      echo "<td></td><td></td><td><i class='fa fa-arrow-right'</td><td>Split:</td>";
+                      echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_from_'.$x.'" />'.'</td>';
+                      echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_to_'.$x.'" />'.'</td>';
+                      echo '<td>';
+                      echo "<select name='splits_activity_".$x."' class='js-example-basic-single' style='width:150px'>";
+                      for($j = 0; $j < 5; $j++){ //can't do mixed split
+                        echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                      }
+                      echo "</select>";
+                      echo '</td>';
+                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td>';
+                      echo '</tr>';
+                    }
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal" >OK</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    <?php endif; ?>
+  <?php endfor; ?>
 
 
-<script>
-$("#calendar").datepicker({
-  format: "yyyy-mm",
-  viewMode: "months",
-  minViewMode: "months"
-});
-</script>
-<!-- /BODY -->
-<?php include 'footer.php'; ?>
+  <script>
+  $("#calendar").datepicker({
+    format: "yyyy-mm",
+    viewMode: "months",
+    minViewMode: "months"
+  });
+  </script>
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>

@@ -30,7 +30,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //first, match expectedHours. if user has booking, overwrite this var
       $adjustedTime = carryOverAdder_Hours($row['time'], floor($row[strtolower(date('D', strtotime($row['time'])))]));
       $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row[strtolower(date('D', strtotime($row['time'])))] * 60) % 60));
-
       //adjust to match expectedHours OR last projectbooking, if any of these even exist
       $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
       if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){
@@ -94,7 +93,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['nokay'])){
     $requestID = $_POST['nokay'];
-    $answerText = $_POST['answerText'. $requestID];
+    $answerText = test_input($_POST['answerText'. $requestID]);
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //account
@@ -124,13 +123,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_log'])){
     $requestID = $_POST['nokay_log'];
-    $answerText = $_POST['answerText'. $requestID];
+    $answerText = test_input($_POST['answerText'. $requestID]);
     $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //break
   if(isset($_POST['okay_brk'])){ //does nothing
     $requestID = intval($_POST['okay_brk']);
-    $answerText = $_POST['answerText'. $requestID];
+    $answerText = test_input($_POST['answerText'. $requestID]);
     $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_brk'])){
     $requestID = intval($_POST['nokay_brk']);
@@ -143,11 +142,48 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
     echo $conn->error;
   }
-  //error or redirect
+  //splits
+  if(isset($_POST['nokay_div'])){
+    $requestID = intval($_POST['nokay_div']);
+    $answerText = test_input($_POST['answerText'. $requestID]);
+    $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+  } elseif(isset($_POST['okay_div'])){
+    $requestID = intval($_POST['okay_div']);
+    $result = $conn->query("SELECT * FROM $userRequests WHERE id = $requestID");
+    $row = $result->fetch_assoc();
+    $bookingID = $row['requestID'];
+    $split_A = $row['fromDate'];
+    $split_B = $row['toDate'];
+    $splitting_activity = $row['requestText'];
+    $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $bookingID AND bookingType = 'break'");
+    $row = $result->fetch_assoc();
+    $row['start'] = substr($row['start'],0, 16).':00';
+    $row['end'] = substr($row['end'],0, 16).':00';
+    if($splitting_activity){
+      //create mixed booking
+      $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType, mixedStatus ) VALUES('$split_A', '$split_B', ".$row['timestampID'].", 'Split - $splitting_activity', 'mixed', '$splitting_activity') ");
+      //update mixed log
+      $conn->query("UPDATE $logTable SET status = '5' WHERE indexIM = ".$row['timestampID']);
+    }
+    //update break start time
+    if(timeDiff_Hours($split_B, $row['end']) > 0){
+      $conn->query("UPDATE $projectBookingTable SET start = '$split_B' WHERE id = ".$row['id']);
+      echo mysqli_error($conn);
+      //create second break
+      if(timeDiff_Hours($row['start'], $split_A) > 0){ //break in the middle
+        $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('".$row['start']."', '$split_A', ".$row['timestampID'].", 'Split Start', 'break') ");
+      }
+    } elseif(timeDiff_Hours($row['start'], $split_A) > 0) { //change start time
+      $conn->query("UPDATE $projectBookingTable SET end = '$split_A' WHERE id = ".$row['id']);
+    } else { //delete break
+      $conn->query("DELETE FROM $projectBookingTable WHERE id = ".$row['id']);
+    }
+    $answerText = $_POST['answerText'. $requestID];
+    $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+  }
+
   if(mysqli_error($conn)){
     echo mysqli_error($conn);
-  } else {
-    redirect("adminTodos.php");
   }
 }
 ?>
@@ -163,7 +199,7 @@ if($result && $result->num_rows > 0):
     <table class="table table-hover">
       <th>Request Type</th>
       <th>Name</th>
-      <th><?php echo $lang['DATE']; ?></th>
+      <th><?php echo $lang['TIMES']; ?></th>
       <th><?php echo $lang['REASON']; ?></th>
       <th class="text-center"><?php echo $lang['REPLY_TEXT']; ?></th>
       <tbody>
@@ -206,6 +242,15 @@ if($result && $result->num_rows > 0):
               echo '<span class="input-group-btn">';
               echo '<button type="submit" class="btn btn-default" name="okay_brk" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_brk" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
+              echo '</span></div></td>';
+            } elseif($row['requestType'] == 'div'){
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).' (utc)</td>';
+              echo '<td>'. $lang['ACTIVITY_TOSTRING'][$row['requestText']].'</td>';
+              echo '<td><div class="input-group">';
+              echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<span class="input-group-btn">';
+              echo '<button type="submit" class="btn btn-default" name="okay_div" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_div" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             }
             echo '</tr>';
@@ -328,10 +373,7 @@ if($result && $result->num_rows > 0):
     </div>
     <div class="collapse" id="illegal_gemini_info">
       <div class="well">
-        Es existiert mehr als nur ein Zeitstempel für einen Benutzer an nur einem Tag.<br>
-        Ein Benutzer darf allerdings pro Tag nur eine Art von Zeitstempel besitzen. <br>
-        Bitte entscheiden Sie, welcher der beiden Zeitstempel gelöscht werden soll. Sie können auch beide Stempel löschen. <br>
-        (Bemerkung: ZA ist kein Stempel)
+        <?php echo $lang['INFO_GEMINI']; ?>
       </div>
     </div>
     <table id='dubble' class="table table-hover">
@@ -343,9 +385,8 @@ if($result && $result->num_rows > 0):
         $rowDP = $result->fetch_assoc();
         $rowDP2 = $result->fetch_assoc();
         $uneven = $rowDP;
-        //dis is magic. do not touch
+        //not sure how this works anymore. do not touch.
         while(true) {
-          //uneven row handling
           $row = $rowDP;
           if($rowDP['userID'] != $rowDP2['userID']){
             $row2 = $uneven;
@@ -367,7 +408,6 @@ if($result && $result->num_rows > 0):
           echo carryOverAdder_Hours($row2['time'], $row2['timeToUTC']) .' - '. carryOverAdder_Hours($row2['timeEnd'], $row2['timeToUTC']);
           echo '</div></td>';
           echo '</tr>';
-          //uneven incrementation
           if($rowDP['userID'] == $rowDP2['userID']){
             $uneven = $rowDP;
             if(!($rowDP = $result->fetch_assoc()) || !($rowDP2 = $result->fetch_assoc())){

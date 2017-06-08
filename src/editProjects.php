@@ -1,10 +1,4 @@
 <?php include 'header.php'; ?>
-<!-- BODY -->
-
-<div class="page-header">
-  <h3><?php echo $lang['PROJECT']; ?></h3>
-</div>
-
 <?php
 $filterCompany = 0;
 $filterClient = 0;
@@ -72,20 +66,6 @@ if(isset($_POST['save']) && isset($_POST['projectIndeces'])){
   }
 }
 ?>
-
-<script>
-function showClients(company, client){
-  $.ajax({
-    url:'ajaxQuery/AJAX_client.php',
-    data:{companyID:company, clientID:client},
-    type: 'post',
-    success : function(resp){
-      $("#filterClient").html(resp);
-    },
-    error : function(resp){}
-  });
-};
-</script>
 <br>
 <?php
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
@@ -96,41 +76,18 @@ if(!$result || $result->num_rows <= 0){
 }
 ?>
 <form method="post">
+  <div class="page-header">
+    <h3>
+      <div class="col-md-6"><?php echo $lang['PROJECT']; ?></div>
+      <div class="col-md-6 text-right"><a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-info">Return <i class="fa fa-arrow-right"></i></a></div>
+    </h3>
+    <br><br>
+  </div>
   <!-- SELECT COMPANY -->
   <div class="row">
-    <div class="col-md-6">
-      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients(this.value, 0);' class="js-example-basic-single">
-        <option value="0">Select Company...</option>
-        <?php
-        $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
-        $result = mysqli_query($conn, $sql);
-        if($result && $result->num_rows > 0) {
-          if($result && $result->num_rows > 1) {
-            echo '<option value="0">'.$lang['COMPANY'].'...</option>';
-          } else {
-            $filterCompany = $available_companies[1];
-          }
-          $row = $result->fetch_assoc();
-          do {
-            $checked = '';
-            if($filterCompany == $row['id']) {
-              $checked = 'selected';
-            }
-            echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
-
-          } while($row = $result->fetch_assoc());
-        }
-        ?>
-      </select>
-      <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' >
-      </select>
-      <button type="submit" class="btn btn-warning " name="filter">Filter</button><br><br>
-    </div>
-    <div class="col-md-6 text-right">
-      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-info">Return <i class="fa fa-arrow-right"></i></a>
-    </div>
+    <?php require "misc/select_client.php"; ?>
+    <button type="submit" class="btn btn-warning " name="filter">Filter</button>
   </div>
-
   <br><br>
   <table class="table table-hover">
     <thead>
@@ -159,21 +116,21 @@ if(!$result || $result->num_rows <= 0){
           $rowF = $resF->fetch_assoc();
           if($rowF['isActive'] == 'TRUE'){
             $checked = $row['field_1'] == 'TRUE' ? 'checked': '';
-            echo '<input type="checkbox" '.$checked.' name="addField_1_'.$row['id'].'"/>'. $rowF['name'];
+            echo '<input type="checkbox" '.$checked.' name="addField_1_'.$row['id'].'"/> '.$rowF['name'];
           }
         }
         if($resF->num_rows > 1){
           $rowF = $resF->fetch_assoc();
           if($rowF['isActive'] == 'TRUE'){
             $checked = $row['field_2'] == 'TRUE' ? 'checked': '';
-            echo '<br><input type="checkbox" '.$checked.' name="addField_2_'.$row['id'].'" />'. $rowF['name'];
+            echo '<br><input type="checkbox" '.$checked.' name="addField_2_'.$row['id'].'" /> '.$rowF['name'];
           }
         }
         if($resF->num_rows > 2){
           $rowF = $resF->fetch_assoc();
           if($rowF['isActive'] == 'TRUE'){
             $checked = $row['field_3'] == 'TRUE' ? 'checked': '';
-            echo '<br><input type="checkbox" '.$checked.' name="addField_3_'.$row['id'].'" />'. $rowF['name'];;
+            echo '<br><input type="checkbox" '.$checked.' name="addField_3_'.$row['id'].'" /> '.$rowF['name'];;
           }
         }
         echo '</small></td>';

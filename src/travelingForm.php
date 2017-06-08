@@ -172,14 +172,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <input type="date" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
     </div>
     <div class="col-md-3">
-      <div class="input-group input-daterange">
+      <div class="input-group">
         <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" >
         <span class="input-group-addon"> - </span>
         <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd">
       </div>
     </div>
     <div class="col-md-5">
-      <div class="input-group input-daterange">
+      <div class="input-group">
         <input type="number" class="form-control" name="addKmStart" placeholder="km-Stand Anfang">
         <span class="input-group-addon"> - </span>
         <input type="number" class="form-control" name="addKmEnd" placeholder="km-Stand Ende">

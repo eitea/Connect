@@ -214,6 +214,9 @@ i{
 .js-example-basic-single{
   width:100%;
 }
+.icheckbox_minimal-orange, .iradio_minimal-orange{
+  margin-right:8px;
+}
 
 /* html calendar date-picker */
 [type="datetime-local"] {

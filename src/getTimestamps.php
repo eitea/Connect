@@ -37,7 +37,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
     $status = intval($_POST['newActivity']);
-    $addBreakVal = floatval($_POST['addBreakValues']);
     if($imm == 0){ //create new
       $creatUser = $filterID;
       $timeToUTC = intval($_POST['creatTimeZone']);
@@ -64,6 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</div>';
       }
     } else { //update old
+      $addBreakVal = floatval($_POST['addBreakValues']);
       if($addBreakVal){//add a break
         $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
         $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
@@ -95,7 +95,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $bookingID = intval($_POST['splits_save']);
     if(!empty($_POST['splits_from_'.$bookingID]) && !empty($_POST['splits_to_'.$bookingID])){
       $splitting_activity = intval($_POST['splits_activity_'.$bookingID]);
-      $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $bookingID");
+      $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $bookingID AND bookingType = 'break'");
       if($result && ($row = $result->fetch_assoc())){
         $row['start'] = substr($row['start'],0, 16).':00'; //UTC
         $row['end'] = substr($row['end'],0, 16).':00';
@@ -126,6 +126,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
           echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
         }
+      } else {
+        die("Please do not try this again. It will not work."); //damn bastards trying to script like whaddap
       }
     } else {
       echo '<div class="alert alert-danger fade in">';
@@ -576,12 +578,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo '<div class="col-md-6"><br>';
                   echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
                   for($j = 0; $j < 7; $j++){
-                    if($j != 5){
-                      if($calculator->activity[$i] == $j){
-                        echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
-                      } else {
-                        echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
-                      }
+                    if($calculator->activity[$i] == $j){
+                      echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
+                    } else {
+                      echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     }
                   }
                   echo "</select> ";
@@ -618,11 +618,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div>
                 <div class="col-md-6">
                   <label><?php echo $lang['END']; ?></label>
-                  <div class="input-group">
-                    <span class="input-group-addon active"><input type="radio" name="is_open" value="0" checked="checked" /></span>
-                    <input type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
+                  <div class="checkbox">
+                    <label>
+                      <input type="radio" name="is_open" value="0" checked="checked" />
+                      <input type="datetime-local" style="display:inline;max-width:180px;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
+                    </label>
+                    <br><br>
+                    <label><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><?php echo $lang['OPEN']; ?></label>
                   </div>
-                  <div style="margin-top:5px;"><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><span style="margin-left:20px;"><?php echo $lang['OPEN']; ?></span></div>
                 </div>
               </div>
             </div>

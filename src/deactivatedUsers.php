@@ -35,7 +35,7 @@ if(isset($_POST['delete'])  && isset($_POST['indeces'])){
 
     //insert interval
     $sql = "INSERT INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate)
-    SELECT userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, daysPerYear, startDate, endDate FROM $deactivatedUserDataTable WHERE userID = $x";
+    SELECT userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate FROM $deactivatedUserDataTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>vacErr: '.mysqli_error($conn);}
 
 
