@@ -831,7 +831,7 @@ $(function () {
       <div class="row checkbox">
         <div class="checkbox">
           <div class="col-sm-2">
-            <label><input type="checkbox" onclick="hideMyDiv(this, 'mySelections')" name="addBreak" title="Das ist eine Pause"><a style="color:black;"><i class="fa fa-cutlery" aria-hidden="true"></i></a>Pause</label>
+            <label><input type="checkbox" onchange="hideMyDiv(this, 'mySelections');" name="addBreak" title="Das ist eine Pause"><a style="color:black;"><i class="fa fa-cutlery" aria-hidden="true"></i></a>Pause</label>
           </div>
           <div class="col-sm-2">
             <label><input type="checkbox" name="addDrive" title="Fahrzeit"><a style="color:black;"><i class="fa fa-car" aria-hidden="true"></i></a>Fahrzeit</label>
