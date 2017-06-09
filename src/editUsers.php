@@ -148,11 +148,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $email = test_input($_POST['email'.$x]).'@';
       $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$x';";
       $conn->query($sql);
+      if($conn->error){
+        echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EXISTING_EMAIL'].'</div>';
+      }
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Invalid E-mail </strong>May not be empty.';
-      echo '</div>';
+      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EMAIL'].'</div>';
     }
 
     if (!empty($_POST['password'.$x]) && !empty($_POST['passwordConfirm'.$x])) {
@@ -522,7 +522,7 @@ $(document).ready(function(){
                   <div class="col-md-3">
                     <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
                     <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"
-                     data-toggle="popover" title="Important!" data-trigger="focus" data-content="This value will always be read on the beginning of each month, and will be counted for the complete following month."/>
+                     data-toggle="popover" title="Important!" data-trigger="focus" data-content="This value will always be read at the end of each month."/>
                   </div>
                   <div class="col-md-3">
                     <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>

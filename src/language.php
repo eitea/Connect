@@ -308,6 +308,12 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
+$lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';
+$lang_ger['ERROR_EMAIL'] = 'Ungültige e-mail Adresse.';
+
+$lang_eng['ERROR_EXISTING_EMAIL'] = 'Entered e-mail Address already exists.';
+$lang_ger['ERROR_EXISTING_EMAIL'] = 'Die angegebene e-mail Adresse existiert bereits.';
+
 $lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
 $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
 
@@ -320,11 +326,11 @@ $lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten u
 $lang_eng['ERROR_MISSING_FIELDS'] = 'Fields are missing. Please fill out every required field.';
 $lang_ger['ERROR_MISSING_FIELDS'] = 'Fehlende Felder. Alle benötigten Felder müssen ausgefüllt werden.';
 
-$lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
-$lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
-
 $lang_eng['ERROR_MISSING_SELECTION'] = 'A selection was missing. Please check all selections';
 $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie alle Auswahlmöglichkeiten.';
+
+$lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
+$lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
 $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';

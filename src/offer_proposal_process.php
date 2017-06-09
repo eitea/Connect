@@ -31,7 +31,7 @@
        include "new_client.php";
        echo '</div>';
      } else {
-       ?>
+    ?>
        <div style="padding-left:20%">
          <?php include 'misc/select_client.php'; ?>
          <button type="submit" class="btn btn-warning" >OK</button>
