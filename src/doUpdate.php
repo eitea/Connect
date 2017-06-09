@@ -64,7 +64,6 @@ function move() {
     <div id="progress_text">0%</div>
     <div id="progress">.</div>
   </div>
-
   <div id="content" style="display:none;">
 <br>
 <?php
@@ -1194,7 +1193,9 @@ if($row['version'] < 88){
   } else {
     echo '<br>'.$conn->error;
   }
+}
 
+if($row['version'] < 89){
   $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
   $conn->query("UPDATE deactivatedUserData vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
@@ -1202,8 +1203,6 @@ if($row['version'] < 88){
   $sql = "ALTER TABLE products ADD COLUMN cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if($conn->query($sql)){
     echo '<br> Added expenses in cash checkbox';
-  } else {
-    echo '<br>'.$conn->error;
   }
 
   $sql = "CREATE TABLE units (
@@ -1213,8 +1212,6 @@ if($row['version'] < 88){
   )";
   if($conn->query($sql)){
     echo '<br> Units created';
-  } else {
-    echo '<br>'.$conn->error;
   }
 
   $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
@@ -1230,13 +1227,8 @@ if($row['version'] < 88){
   $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div') DEFAULT 'vac'";
   if($conn->query($sql)){
     echo '<br> Extended requests by splitted lunchbreaks';
-  } else {
-    echo '<br>'.$conn->error;
   }
-
 }
-
-//if($row['version'] < 89){}
 //if($row['version'] < 90){}
 //if($row['version'] < 91){}
 //if($row['version'] < 92){}
