@@ -160,6 +160,40 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <body id="body_container" class="is-table-row">
   <div id="loader"></div>
 
+  <script>
+  document.onreadystatechange = function() {
+    var state = document.readyState
+    if (state == 'complete') {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("bodyContent").style.display = "block";
+    }
+  }
+  $(document).ready(function() {
+    if ($(".js-example-basic-single")[0]){
+      $(".js-example-basic-single").select2();
+    }
+
+    if ($('#seconds').length) { //something like a if(exists(..))
+      var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
+      function pad(val) {
+        return val > 9 ? val : "0" + val;
+      }
+      window.setInterval(function(){
+        document.getElementById("seconds").innerHTML = pad(++sec % 60);
+        document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
+        document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
+      }, 1000);
+    }
+    $('input').not('.disable-styling').iCheck({
+      checkboxClass: 'icheckbox_minimal-orange',
+      radioClass: 'iradio_minimal-orange',
+      increaseArea: '20%' //clickable area
+    });
+    //onChange event trigger workaround
+    $('input').on('ifChanged', function (event) { $(event.target).trigger('change'); });
+  });
+  </script>
+  
   <!-- navbar -->
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">

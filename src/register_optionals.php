@@ -38,6 +38,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   if(!empty($_POST['mail']) && filter_var($_POST['mail'].$emailpostfix, FILTER_VALIDATE_EMAIL)){
     $email = test_input($_POST['mail']) .$emailpostfix;
+    $mail_result = $conn->query("SELECT email FROM userData WHERE email = '$email'");
+    if($mail_result && $mail_result->num_rows > 0){
+      $accept = false;
+      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EXISTING_EMAIL'].'</div>';
+    }
   } else {
     $accept = false;
     echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

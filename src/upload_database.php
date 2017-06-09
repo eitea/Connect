@@ -1,5 +1,4 @@
 <?php require 'header.php'; enableToCore($userID); ?>
-
 <?php
 if(isset($_POST['accept'])){
   $accept = true;

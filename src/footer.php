@@ -47,7 +47,6 @@ $(document).ready(function() {
 
   if ($('#seconds').length) { //something like a if(exists(..))
     var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
-
     function pad(val) {
       return val > 9 ? val : "0" + val;
     }
