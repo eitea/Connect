@@ -290,7 +290,7 @@ if($result && $result->num_rows > 0):
       <th>Name</th>
       <th><?php echo $lang['TIME']; ?></th>
       <th><?php echo $lang['HOURS']; ?></th>
-      <th><input type="checkbox" onclick="toggle(this, 'lunchbreakIndeces');" /></th>
+      <th><input type="checkbox" onchange="toggle(this, 'lunchbreakIndeces[]');" /></th>
       <tbody>
         <?php
         while($row = $result->fetch_assoc()){
@@ -432,9 +432,10 @@ if($result && $result->num_rows > 0):
 
 <script>
 function toggle(source, target) {
-  checkboxes = document.getElementsByName(target + '[]');
-  for(var i = 0; i<checkboxes.length; i++) {
-    checkboxes[i].checked = source.checked;
+  if(source.checked){
+    $("[name='"+target+"']").iCheck('check');
+  } else {
+    $("[name='"+target+"']").iCheck('uncheck');
   }
 }
 </script>
