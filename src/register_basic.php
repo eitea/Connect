@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
     <div class="row text-right">
-      <button type="submit" class="btn btn-warning" name="createUser">Next</button>
+      <button type="submit" class="btn btn-warning" name="createUser"><?php echo $lang['CONTINUE']; ?></button>
     </div>
   </div>
 </div>

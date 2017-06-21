@@ -3,7 +3,7 @@
   if(empty($filterClient)){ $filterClient = 0; }
   $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
   if($result_fc && $result_fc->num_rows > 1){
-    echo '<div class="col-sm-3"><select class="js-example-basic-single" name="filterCompany" onchange="showClients(this.value, '.$filterClient.');" >';
+    echo '<div class="col-sm-3"><select class="js-example-basic-single" name="filterCompany" onchange="select_client.showClients(this.value, '.$filterClient.');" >';
     echo '<option value="0">'.$lang['COMPANY'].'... </option>';
     while($result && ($row_fc = $result_fc->fetch_assoc())){
       $checked = '';
@@ -22,7 +22,8 @@
   </select>
 </div>
 <script>
-function showClients(company, client){
+var select_client = {
+showClients: function(company, client){
   if(company != ""){
     $.ajax({
       url:'ajaxQuery/AJAX_getClient.php',
@@ -35,6 +36,7 @@ function showClients(company, client){
     });
   }
 }
+};
 </script>
 
 <?php

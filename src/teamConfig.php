@@ -1,10 +1,4 @@
 <?php include 'header.php'; enableToCore($userID); ?>
-<!-- BODY -->
-
-<div class="page-header">
-<h3>Team</h3>
-</div>
-
 <?php
 $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
@@ -33,12 +27,12 @@ $activeTab = $teamID;
 echo mysqli_error($conn);
 ?>
 
+<div class="page-header">
+  <h3>Team <div class="page-header-button-group"><button type="button" data-toggle="modal" data-target=".bookingModal-newTeam" title="<?php echo $lang['ADD']; ?>" class="btn btn-default">+</button></div></h3>
+</div>
+
 <div class="container-fluid">
   <form method="post">
-    <div class="text-right">
-      <button type="button" data-toggle="modal" data-target=".bookingModal-newTeam"  class="btn btn-warning">+ New Team</button>
-      <br><br>
-    </div>
     <?php
     $result = $conn->query("SELECT * FROM $teamTable");
     while($result && ($row = $result->fetch_assoc())):

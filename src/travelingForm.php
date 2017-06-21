@@ -166,23 +166,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <br>
 <hr><hr>
 <br>
-<form method="POST">
+<form method="POST" autocomplete="off">
   <div class="row">
     <div class="col-md-3">
       <input type="date" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
     </div>
     <div class="col-md-3">
       <div class="input-group">
-        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" >
+        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" />
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd">
+        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd" />
       </div>
     </div>
     <div class="col-md-5">
       <div class="input-group">
-        <input type="number" class="form-control" name="addKmStart" placeholder="km-Stand Anfang">
+        <input type="number" class="form-control" name="addKmStart" placeholder="km-Stand Anfang" />
         <span class="input-group-addon"> - </span>
-        <input type="number" class="form-control" name="addKmEnd" placeholder="km-Stand Ende">
+        <input type="number" class="form-control" name="addKmEnd" placeholder="km-Stand Ende" />
       </div>
     </div>
   </div>
@@ -215,8 +215,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <div class="text-right">
     <button type="submit" class="btn btn-warning" name="addDrive"><?php echo $lang['ADD']; ?></button>
   </div>
-
-  <input class="robot-control" type="text" name="captcha" value="" />
+  <input id="myCaptcha" class="robot-control" type="text" name="captcha" value="" />
 </form>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

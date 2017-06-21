@@ -31,5 +31,13 @@
   </form>
   <!-- /modal -->
 <?php endif; ?>
+<script>
+function turn_on_icheck(checkboxClass){
+  $('input[type=checkbox]').iCheck({
+    checkboxClass: checkboxClass
+  });
+}
+//$('.table').on('draw.dt', function() {  turn_on_icheck(); });
+</script>
 </body>
 </html>

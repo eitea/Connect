@@ -702,10 +702,12 @@ $sql = "CREATE TABLE $policyTable (
     name VARCHAR(50),
     description VARCHAR(600),
     price DECIMAL(10,2),
+    unit VARCHAR(20),
     quantity DECIMAL(8,2),
+    taxPercentage INT(3),
     taxID INT(4) UNSIGNED,
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    unit VARCHAR(20),
+    purchase DECIMAL(10,2)
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -735,7 +737,9 @@ $sql = "CREATE TABLE $policyTable (
     description VARCHAR(600),
     price DECIMAL(10,2),
     unit VARCHAR(20),
-    taxPercentage INT(3)
+    taxPercentage INT(3),
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    purchase DECIMAL(10,2)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

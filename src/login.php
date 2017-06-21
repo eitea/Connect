@@ -17,7 +17,7 @@ include 'version_number.php';
 
 $invalidLogin = "";
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
-  $query = "SELECT * FROM  $userTable  WHERE email = '" . strip_input($_POST['loginName']) . "' ";
+  $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);
   if($result){
     $row = $result->fetch_assoc();
@@ -28,6 +28,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     $_SESSION['language'] = $row['preferredLang'];
     $timeZone = $_POST['funZone'];
     $_SESSION['timeToUTC'] = $timeZone;
+    $_SESSION['filterings'] = array();
 
     //check for updates, if core admin
     require "language.php";
@@ -54,13 +55,6 @@ if($result && $result->num_rows > 0){
   $rowConfigTable = $result->fetch_assoc();
 }
 
-function strip_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  $data = str_replace(' ', '', $data);
-  return $data;
-}
 ?>
 
 <!DOCTYPE html>
@@ -70,7 +64,6 @@ function strip_input($data) {
 <head>
   <title>Login</title>
 </head>
-
 <body>
   <div id="footer">
     <form method="POST" action="login.php">
@@ -81,11 +74,10 @@ function strip_input($data) {
       <input type="submit" name="cancelButton" value="Cancel"> <input type="submit" name="login" value="Submit"><br>
 
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
-      <input type="number" id="funZone" name="funZone" style="display:none" readonly><div class="robot-control"> <input type="text" name="captcha" value="" /></div>
+      <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>
     </form>
     <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a href="selfregistration.php">Register</a>';} ?>
   </div>
-
   <script>
   var today = new Date();
   var timeZone = today.getTimezoneOffset() /(-60);

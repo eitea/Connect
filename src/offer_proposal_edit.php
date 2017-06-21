@@ -68,6 +68,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $product_price = floatval($_POST['add_product_price']);
       $product_tax_id = intval($_POST['add_product_taxes']);
       $product_unit = test_input($_POST['add_product_unit']);
+      $product_purchase = floatval($_POST['add_product_purchase']);
       $product_is_cash = 'FALSE';
       if(!empty($_POST['add_product_as_bar'])){
         $product_is_cash = 'TRUE';
@@ -79,8 +80,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $filterProposal = mysqli_insert_id($conn);
         echo $conn->error;
       }
-      $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxID, cash, unit)
-      VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', $product_tax_id, '$product_is_cash', '$product_unit')");
+      $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxID, cash, unit, purchase)
+      VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', $product_tax_id, '$product_is_cash', '$product_unit', '$product_purchase')");
 
       if(mysqli_error($conn)){
         echo $conn->error;
@@ -102,10 +103,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
     echo '</div>';
   }
-  if(!empty($_POST['delete_product']) && isset($_POST['delete_selection'])){
-    foreach($_POST['delete_product'] as $i){
-      $conn->query("DELETE FROM products WHERE id = $i");
-    }
+  if(!empty($_POST['delete_product'])){
+    $i = intval($_POST['delete_product']);
+    $conn->query("DELETE FROM products WHERE id = $i");
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   }
   if(isset($_POST['update_product'])){
     $x = intval($_POST['update_product']);
@@ -172,8 +173,14 @@ if($filterProposal){
   redirect('offer_proposal_process.php');
 }
 ?>
+
 <div class="page-header">
-  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?> <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i></h3>
+  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?>
+    <div class="page-header-button-group">
+      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i></button>
+      <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-default" ><i class="fa fa-download"></i></a>
+    </div>
+  </h3>
 </div>
 
 <form method="POST">
@@ -184,37 +191,56 @@ if($filterProposal){
   <br>
   <table class="table">
     <thead>
-      <th><?php echo $lang['SAVE'] ?></th>
       <th>Name</th>
       <th><?php echo $lang['DESCRIPTION']; ?></th>
       <th><?php echo $lang['PRICE_STK']; ?></th>
       <th><?php echo $lang['QUANTITY']; ?></th>
       <th><?php echo $lang['TAXES']; ?></th>
-      <th></th>
+      <th>Option</th>
     </thead>
     <tbody>
       <?php
       $result = $conn->query("SELECT products.*, taxRates.percentage, taxRates.description AS taxName FROM products, taxRates WHERE proposalID = $filterProposal AND taxID = taxRates.id");
       while($result && ($prod_row = $result->fetch_assoc())){
         echo '<tr>';
-        echo '<td><input type="checkbox" name="delete_product[]" value="'.$prod_row['id'].'" /></td>';
         echo '<td>'.$prod_row['name'].'</td>';
         echo '<td style="max-width:500px;">'.$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.$prod_row['taxName'].' '.$prod_row['percentage'].'%</td>';
-        echo '<td><a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a></td>';
+        echo '<td style="min-width:120px;">';
+        echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
+        echo '<button type="submit" class="btn btn-default" name="delete_product" value="'.$prod_row['id'].'" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button';
+        echo '</td>';
         echo '</tr>';
       }
       ?>
     </tbody>
   </table>
 
+  <div class="container-fluid">
+    <div class="col-xs-12 text-right">
+      <?php
+      $article_res = $conn->query("SELECT id FROM articles");
+      if($article_res && $article_res->num_rows > 0): ?>
+      <div class="btn-group">
+        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> <?php echo $lang['ADD']; ?></button>
+        <ul class="dropdown-menu">
+          <li><a href="#" data-toggle="modal" data-target=".add_product"><?php echo $lang['FREE_TEXT']; ?></a></li>
+          <li><a href="#" data-toggle="modal" data-target=".add_article"><?php echo $lang['ARTICLE']; ?></a></li>
+        </ul>
+      </div>
+    <?php else: ?>
+      <button type="button" class="btn btn-warning" data-toggle="modal" data-target=".add_product"><i class="fa fa-plus"></i> <?php echo $lang['ADD']; ?></button>
+    <?php endif; ?>
+  </div>
+</div>
 <?php
-mysqli_data_seek($result,0);
+if($result){
+  mysqli_data_seek($result,0);
+}
 while($result && ($prod_row = $result->fetch_assoc())):
 $x = $prod_row['id'];
-//MODAL START
  ?>
   <div class="modal fade modal_edit_product_<?php echo $x ?>">
     <div class="modal-dialog modal-lg modal-content" role="document">
@@ -279,82 +305,87 @@ $x = $prod_row['id'];
   </div>
 <?php endwhile; //MODAL END ?>
 
-<br><br>
-<div class="container-fluid">
-  <div class="col-xs-6">
-    <button type="submit" class="btn btn-danger" name="delete_selection"><?php echo $lang['DELETE']; ?></button>
-  </div>
-  <div class="col-xs-6 text-right">
-    <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-warning" >PDF Download</a>
-  </div>
-</div>
-<br><hr>
-<h5><?php echo $lang['ADD'] .': '; ?></h5>
-<hr><br>
-<div class="container-fluid">
-  <div class="col-md-2"><label><?php echo $lang['EXISTING']; ?>:</label></div>
-  <div class="col-md-3">
-    <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">
-      <option value="0"><?php echo $lang['ARTICLE']; ?> ...</option>
-      <?php
-      $result = $conn->query("SELECT articles.* FROM articles");
-      while($result && ($prod_row = $result->fetch_assoc())){
-        echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
-      }
-      ?>
-    </select>
-  </div>
-</div>
-<br>
-<div class="container-fluid">
-  <div class="col-md-2"><label><?php echo $lang['NEW']; ?>:</label></div>
-  <div class="col-md-4">
-    <input type="text" class="form-control required-field" name="add_product_name" placeholder="Product Name" maxlength="48"/>
-  </div>
-  <div class="col-md-2">
-    <input type="number" class="form-control required-field" name="add_product_quantity" placeholder="<?php echo $lang['QUANTITY']; ?>" />
-  </div>
-  <div class="col-md-2">
-    <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
-  </div>
-  <div class="col-md-2">
-    <select class="js-example-basic-single" name="add_product_unit">
-      <?php
-      $unit_result = $conn->query("SELECT * FROM units");
-      while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
-        echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
-      }
-      ?>
-    </select>
-  </div>
-</div>
-<br>
-<div class="container-fluid">
-  <div class="col-md-2"></div>
-  <div class="col-md-4 ">
-    <select class="js-example-basic-single btn-block" name="add_product_taxes">
-      <?php
-      $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-      while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-        echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-      }
-      ?>
-    </select>
-  </div>
-  <div class="col-md-4 checkbox">
-    <label><input type="checkbox" name="add_product_as_bar" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
+<div class="modal fade add_product">
+  <div class="modal-dialog modal-md modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
+    </div>
+    <div class="modal-body">
+      <label>Name</label>
+      <input type="text" class="form-control required-field" name="add_product_name" placeholder="Product Name" maxlength="48"/>
+      <br>
+      <label><?php echo $lang['DESCRIPTION']; ?></label>
+      <input type="text" class="form-control" name="add_product_description" placeholder="Product Description" maxlength="190"/>
+      <br>
+      <div class="row">
+        <div class="col-md-4">
+          <label><?php echo $lang['QUANTITY']; ?></label>
+          <input type="number" class="form-control required-field" name="add_product_quantity" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+        </div>
+        <div class="col-md-4">
+          <label><?php echo $lang['UNIT']; ?></label>
+          <select class="js-example-basic-single" name="add_product_unit">
+            <?php
+            $unit_result = $conn->query("SELECT * FROM units");
+            while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
+              echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
+            }
+            ?>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label><?php echo $lang['PRICE_STK']; ?></label>
+          <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+        </div>
+      </div>
+      <br><br>
+      <div class="row">
+        <div class="col-md-4 ">
+          <select class="js-example-basic-single btn-block" name="add_product_taxes">
+            <?php
+            $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+            while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+              echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+            }
+            ?>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <input type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="<?php echo $lang['PURCHASE_PRICE']; ?>" />
+        </div>
+        <div class="col-md-4 checkbox">
+          <label><input type="checkbox" name="add_product_as_bar" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      <button type="submit" class="btn btn-warning" name="add_product"><?php echo $lang['ADD']; ?></button>
+    </div>
   </div>
 </div>
-<br>
-<div class="container-fluid">
-  <div class="col-md-2"></div>
-  <div class="col-md-10">
-    <input type="text" class="form-control" name="add_product_description" placeholder="Product Description" maxlength="190"/>
+
+<div class="modal fade add_article">
+  <div class="modal-dialog modal-sm modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title"><?php echo $lang['CHOOSE_ARTICLE']; ?></h4>
+    </div>
+    <div class="modal-body">
+      <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">
+        <option value="0"><?php echo $lang['ARTICLE']; ?> ...</option>
+        <?php
+        $result = $conn->query("SELECT * FROM articles");
+        while($result && ($prod_row = $result->fetch_assoc())){
+          echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
+        }
+        ?>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      <button type="button" data-dismiss="modal" class="btn btn-warning" data-toggle="modal" data-target=".add_product"><?php echo $lang['CONTINUE']; ?></button>
+    </div>
   </div>
-</div>
-<br><br>
-<div class="container-fluid text-right">
-  <button type="submit" class="btn btn-warning" name="add_product"><?php echo $lang['ADD']; ?></button>
 </div>
 
 <div class="modal fade proposal_details">
@@ -485,7 +516,7 @@ $x = $prod_row['id'];
       </div>
     </div>
     <div class="modal-footer">
-      <button type="submit" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+      <button type="submit" class="btn btn-default" data-dismiss="modal">Cancel</button>
       <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
     </div>
   </div>
@@ -506,6 +537,12 @@ function displayArticle(i){
         $("[name='add_product_price']").val(res[3]);
         $("[name='add_product_unit']").val(res[4]).trigger('change');
         $("[name='add_product_taxes']").val(res[5]).trigger('change');
+        if(res[6] == 'TRUE'){
+          $("[name='add_product_as_bar']").iCheck('check');
+        } else {
+          $("[name='add_product_as_bar']").iCheck('uncheck');
+        }
+        $("[name='add_product_purchase']").val(res[7]);
       },
       error : function(resp){}
     });

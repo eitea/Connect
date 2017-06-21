@@ -48,9 +48,6 @@ ul.nav.navbar-nav .nav.nav-list {
   padding-top:5px;
   padding-bottom:5px;
 }
-.navbar-default{
-  background-color:#f5f5f5;
-}
 .sidebar-nav .navbar li a,  .navbar-nav > li > a{
   padding-top: 5px;
   padding-bottom: 5px;
@@ -144,6 +141,14 @@ ul.nav.navbar-nav .nav.nav-list {
   100% { transform: rotate(360deg); }
 }
 
+/* General colors
+.navbar-default{
+  background-color:white;
+}
+.panel-default>.panel-heading{
+  background-color:white;
+}
+*/
 /* hidden scrollbar */
 .hidden-scrollbar {
   overflow:hidden;
@@ -156,33 +161,14 @@ ul.nav.navbar-nav .nav.nav-list {
   padding-right:300px;
 }
 
-/* Scrollable table with fixed header */
-section {
-  position: relative;
-  padding-top: 37px;
+/* Datatables pagination */
+.pagination > .active > a {
+    background-color: #f0ad4e;
+    border-color:#aaa;
 }
-.table-scrollable-container{
-  overflow-y: auto;
-  min-height:10vh; /* i dont know why this works and at this point i am too afraid to ask */
-  max-height:50vh;
-}
-.table-scrollable th{
-  height: 0;
-  line-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  color: transparent;
-  border: none;
-  white-space: nowrap;
-}
-.table-scrollable th div{
-  position:absolute;
-  background: transparent;
-  color: black;
-  padding: 9px 25px;
-  top: 0;
-  margin-left: -25px;
-  line-height: normal;
+.pagination > .active > a:hover {
+    background-color: #eca848;
+    border-color:#aaa;
 }
 
 /* helpings */
@@ -211,11 +197,15 @@ i{
   z-index: 50;
   margin-left: 50%;
 }
-.js-example-basic-single{
-  width:100%;
+span.select2.select2-container.select2-container--default {
+  width: 100% !important;
 }
 .icheckbox_minimal-orange, .iradio_minimal-orange{
   margin-right:8px;
+}
+.page-header-button-group{
+  display:inline;
+  padding-left:15px;
 }
 
 /* html calendar date-picker */

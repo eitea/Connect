@@ -1,8 +1,4 @@
-<?php include 'header.php'; ?>
-<div class="page-header">
-  <h3><?php echo $lang['TASK_SCHEDULER']; ?></h3>
-</div>
-
+<?php include 'header.php'; enableToCore($userID); ?>
 <?php
 if(isset($_POST['save_tasks'])){
   if(!empty($_POST['mail_runtime']) && test_date($_POST['mail_runtime'])){
@@ -25,9 +21,12 @@ if($result && ($row = $result->fetch_assoc())){
   $runtime = $row['runtime'];
 }
 ?>
-<h4>E-Mail Report</h4><br>
 
 <form method="POST">
+  <div class="page-header">
+    <h3><?php echo $lang['TASK_SCHEDULER']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default" name="save_tasks"><i class="fa fa-floppy-o"></i></button></div></h3>
+  </div>
+  <h4>E-Mail Report</h4><br>
   <div class="container-fluid">
     <div class="col-sm-2">
       <label>Status</label>
@@ -44,10 +43,6 @@ if($result && ($row = $result->fetch_assoc())){
       <label>1. Runtime</label>
       <input type='text' maxlength='19' value='<?php echo $runtime; ?>' name='mail_runtime' class='form-control' />
     </div>
-  </div>
-  <br>
-  <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="save_tasks"><?php echo $lang['SAVE']; ?></button>
   </div>
 </form>
 

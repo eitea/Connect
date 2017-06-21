@@ -51,33 +51,37 @@ if(!$result || $result->num_rows <= 0){
 
 <form method="POST">
   <div class="row">
-    <?php include "misc/select_client.php"; ?>
-    <button type="submit" class="btn btn-warning">Filter</button>
+    <div class="col-md-4">
+      <select class="js-example-basic-single" name="filterProcess[]" multiple="multiple">
+        <?php
+        foreach($transitions as $i){
+          $selected = '';
+          if(in_array($i, $filterProcess)){
+            $selected = 'selected';
+          }
+          echo "<option $selected value='$i'>".$lang['PROPOSAL_TOSTRING'][$i].'</option>';
+        }
+        ?>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="js-example-basic-single"  name="filterStatus">
+        <option value="-1"><?php echo $lang['DISPLAY_ALL']; ?></option>
+        <?php
+        for($i=0; $i < 3; $i++){
+          $selected = '';
+          if($i == $filterStatus){
+            $selected = 'selected';
+          }
+          echo '<option value="2" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
+        }
+        ?>
+      </select>
+    </div>
+    <div class="col-xs-1">
+      <button type="submit" class="btn btn-warning">Filter</button>
+    </div>
   </div>
-  <br>
-  <select class="js-example-basic-single" style='width:400px' name="filterProcess[]" multiple="multiple">
-    <?php
-    foreach($transitions as $i){
-      $selected = '';
-      if(in_array($i, $filterProcess)){
-        $selected = 'selected';
-      }
-      echo "<option $selected value='$i'>".$lang['PROPOSAL_TOSTRING'][$i].'</option>';
-    }
-    ?>
-  </select>
-  <select class="js-example-basic-single" style='width:150px'  name="filterStatus">
-    <option value="-1"><?php echo $lang['DISPLAY_ALL']; ?></option>
-    <?php
-    for($i=0; $i < 3; $i++){
-      $selected = '';
-      if($i == $filterStatus){
-        $selected = 'selected';
-      }
-      echo '<option value="2" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
-    }
-    ?>
-  </select>
 
   <br><hr><br>
   <?php
@@ -86,18 +90,18 @@ if(!$result || $result->num_rows <= 0){
 
   $result = $conn->query("SELECT proposals.*, clientData.name as clientName
     FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id
-    WHERE clientData.companyID = $filterCompany $filterClient_query $filterStatus_query");
+    WHERE 1 $filterClient_query $filterStatus_query");
     ?>
     <table class="table table-hover">
       <thead>
         <th>ID</th>
         <th><?php echo $lang['CLIENT']; ?></th>
         <th>Status</th>
+        <th></th>
         <th><?php echo $lang['PREVIOUS']; ?></th>
         <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
         <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
         <th>Option</th>
-        <th style="text-align:right;"><?php echo $lang['TRANSITION']; ?></th>
       </thead>
       <tbody>
         <?php
@@ -136,33 +140,27 @@ if(!$result || $result->num_rows <= 0){
             echo "<tr style='color:$lineColor'>";
             echo '<td>'.$id_name.'</td>';
             echo '<td>'.$row['clientName'].'</td>';
-            echo '<td>';
             if($transitable){
-              echo '<select class="js-example-basic-single" name="state'.$i.'" style="max-width:150px">';
+              echo '<td><select class="js-example-basic-single" name="state'.$i.'" style="max-width:150px">';
               for($j = 0; $j < 3; $j++){
                 $selected = '';
                 if($row['status'] == $j){ $selected = 'selected'; }
                 echo "<option $selected value='$j'>".$lang['OFFERSTATUS_TOSTRING'][$j].'</option>';
               }
-              echo '</select>';
-              echo '<button type="submit" name="saveState" class="btn btn-default" value="'.$i.'"><i class="fa fa-floppy-o"></i></button>';
+              echo '</select></td>';
+              echo '<td><button type="submit" name="saveState" class="btn btn-default" value="'.$i.'"><i class="fa fa-floppy-o"></i></button></td>';
             } else {
-              echo $status;
+              echo "<td>$status</td><td></td>";
             }
-            echo '</td>';
             echo '<td>'.$transited_from.'</td>';
             echo '<td>'.$row['ourSign'].'</td>';
             echo '<td>'.$row['ourMessage'].'</td>';
             echo '<td>';
             echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
             if($transitable){
-              echo '<a href="offer_proposal_edit.php?num='.$row['id'].'" class="btn btn-default" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></a> ';
-              echo '<button type="submit" class="btn btn-danger" title="Deleting will also delete EVERY transition!" name="delete_proposal" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button>';
-            }
-            echo '</td>';
-            echo '<td style="text-align:right;">';
-            if($transitable){
-              echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info"><i class="fa fa-arrow-right"></i></a>';
+              echo '<a href="offer_proposal_edit.php?num='.$row['id'].'" class="btn btn-default" title="'.$lang['EDIT'].'" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></a> ';
+              echo '<button type="submit" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" name="delete_proposal" value="'.$row['id'].'" "><i class="fa fa-trash-o"></i></button> ';
+              echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
             }
             echo '</td>';
             echo '</tr>';
@@ -190,6 +188,7 @@ if(!$result || $result->num_rows <= 0){
           <div class="modal-body">
             <div class="radio">
               <?php
+              $checked = '';
               foreach($transitions as $t){
                 $disabled = '';
                 if(in_array($t, $bad)){

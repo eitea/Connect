@@ -26,7 +26,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 ?>
 <div class="page-header">
-  <h3><?php echo $lang['UNITS']; ?></h3>
+  <h3>
+    <?php echo $lang['UNITS']; ?>
+    <div class="page-header-button-group">
+      <button type="button" class="btn btn-default" title="<?php echo $lang['ADD']; ?>" name="delete" data-toggle="modal" data-target=".add_unit" ><i class="fa fa-plus"></i></button>
+      <button type="submit" class="btn btn-default" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
+      <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="save"><i class="fa fa-floppy-o"></i></button><br>
+    </div>
+  </h3>
 </div>
 <form method="POST">
   <div class="container-fluid">
@@ -51,15 +58,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           }
           ?>
         </tbody>
-      </table><br>
-      <button type="submit" name="delete" class="btn btn-danger"><?php echo $lang['DELETE']; ?></button>
-      <button type="submit" name="save" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button><br>
+      </table>
     </div>
-    <div class="col-md-5 col-md-offset-1"><br>
-      <label><?php echo $lang['ADD']; ?>: </label>
-      <input type="text" name="add_name" class="form-control" maxlength="20" placeholder="Name" /><br>
-      <input type="text" name="add_unit" class="form-control" maxlength="20" placeholder="<?php echo $lang['UNIT']; ?>" /><br>
-      <button type="submit" name="add" class="btn btn-warning"><?php echo $lang['ADD']; ?></button>
+  </div>
+</form>
+<form method="POST">
+  <div class="modal fade add_unit">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header">
+        <h4><?php echo $lang['ADD']; ?></h4>
+      </div>
+      <div class="modal-body">
+        <label>Name</label>
+        <input type="text" name="add_name" class="form-control" maxlength="20" placeholder="Name" /><br>
+        <label><?php echo $lang['UNIT']; ?></label>
+        <input type="text" name="add_unit" class="form-control" maxlength="20" placeholder="<?php echo $lang['UNIT']; ?>" /><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button"  class="btn btn-default" data-dismiss="modal" ><?php echo $lang['CANCEL']; ?></button>
+        <button type="submit" name="add" class="btn btn-warning"><?php echo $lang['ADD']; ?></button>
+      </div>
     </div>
   </div>
 </form>

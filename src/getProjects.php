@@ -1,109 +1,12 @@
-<?php include 'header.php'; ?>
+<?php include 'header.php'; enableToProject($userID); ?>
 <?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
-<?php enableToProject($userID); ?>
-<!-- BODY -->
 <style>
 .popover{
-  max-width: 100%; /* Max Width of the popover (depending on the container!) */
-}
-.custom{
-  width:20%;
-  padding:0;
-}
-#project_filters{
-  position:fixed;
-  background:white;
-  padding-bottom:40px;
-  width:90%;
-}
-#project_body{
-  padding-top:350px;
-  padding-bottom:300px;
-}
-#project_footer{
-  position:fixed;
-  background:white;
-  width:100%;
-  bottom:0;
-  padding-bottom:5px;
-}
-.seperated_header th{
-  height: 0;
-  line-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  color: transparent;
-  border: none;
-  white-space: nowrap;
-}
-.seperated_header th div{
-  position: fixed;
-  background: transparent;
-  color: black;
-  padding: 9px 25px;
-  top:415px;
-  margin-left: -25px;
-  line-height: normal;
+  max-width: 40%; /* Max Width of the popover (depending on the container!) */
 }
 </style>
-
 <?php
-$filterDate = substr(getCurrentTimestamp(),0,10);
-$booked = '1';
-$filterCompany = $filterClient = $filterProject = $filterUserID = 0;
-$filterAddBreaks = $filterAddDrives = "checked";
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['filterYear'])){
-    $filterDate = $_POST['filterYear'];
-  } else {
-    $filterDate = '____';
-  }
-  if(!empty($_POST['filterMonth'])){
-    $filterDate .= '-' . $_POST['filterMonth'];
-  } else {
-    $filterDate .= '-' . '__';
-  }
-  if(!empty($_POST['filterDay'])){
-    $filterDate .= '-' . $_POST['filterDay'];
-  } else {
-    $filterDate .= '-' . '__';
-  }
-  if(isset($_POST['filterCompany'])){
-    $filterCompany = $_POST['filterCompany'];
-  }
-  if(isset($_POST['filterBooked'])){
-    $booked = $_POST['filterBooked'];
-  }
-  if(isset($_POST['filterClient'])){
-    $filterClient = $_POST['filterClient'];
-  }
-  if(isset($_POST['filterProject'])){
-    $filterProject = $_POST['filterProject'];
-  }
-  if(isset($_POST['filterUserID'])){
-    $filterUserID = $_POST['filterUserID'];
-  }
-  if(!isset($_POST['filterAddBreaks'])){
-    $filterAddBreaks = "";
-  }
-  if(!isset($_POST['filterAddDrives'])){
-    $filterAddDrives = "";
-  }
-
-  if(!empty($_POST['set_all_filters'])){
-    $arr = explode(',', $_POST['set_all_filters']);
-    $filterDate = $arr[0];
-    $filterCompany = $arr[1];
-    $filterClient = $arr[2];
-    $filterProject = $arr[3];
-    $filterUserID = $arr[4];
-    $filterAddBreaks = $arr[5];
-    $filterAddDrives = $arr[6];
-    $booked = $arr[7];
-  }
-  // echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
-
   if(!empty($_POST['editing_save'])){ //comes from the modal
     $x = $_POST['editing_save'];
     $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
@@ -146,25 +49,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
         $conn->query($sql);
       }
-      if(!mysqli_error($conn)){
-        echo '<div class="alert alert-success alert-over fade in">';
-        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo $lang['OK_SAVE'];
-        echo '</div>';
-      }
+      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
     } else {
-      echo '<div class="alert alert-danger alert-over fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>Input incorrect.';
-      echo '</div>';
+      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
     echo mysqli_error($conn);
   } elseif(isset($_POST['saveChanges'])){ //i dont want one save button to trigger the other
-    if(!empty($_POST['remove_booking'])){
-      foreach($_POST['remove_booking'] as $bookingID){
-        $conn->query("DELETE FROM $projectBookingTable WHERE id = $bookingID");
-      }
-    }
     if(isset($_POST['editingIndeces'])) {
       //update free of charge
       if(isset($_POST['noCheckCheckingIndeces'])){
@@ -178,538 +68,347 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         foreach ($_POST["checkingIndeces"] as $e) {
           $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
           $conn->query($sql);
-
           $sql = "SELECT start, end, chargedTimeStart, chargedTimeEnd, projectID FROM $projectBookingTable WHERE id = $e";
           if($result = $conn->query($sql)){
             $row = $result->fetch_assoc();
             $A = $row['start'];
             $B = $row['end'];
-
             if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
               $A = $row['chargedTimeStart'];
             }
             if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
               $B = $row['chargedTimeEnd'];
             }
-
             $hours = timeDiff_Hours($A, $B);
-
             $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
             $conn->query($sql);
           }
         }
       }
       if(!mysqli_error($conn)){
-        echo '<div class="alert alert-success alert-over fade in">';
-        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo $lang['OK_SAVE'];
-        echo '</div>';
+        echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
       }
     } //end if isset charged
   }
+  if(isset($_POST['delete_booking'])){
+    $x = intval($_POST['delete_booking']);
+    $conn->query("DELETE FROM projectBookingData WHERE id = $x");
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+  }
+  if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+    $filterDate = $_POST['add_date'];
+    if(test_Date($filterDate.' 08:00:00')){
+      $filterUserID = intval($_POST['user']);
+      //get the timestamp. if it doesnt exist -> display a biiiig fat error
+      $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
+      $result = mysqli_query($conn, $sql);
+      if($result && $result->num_rows > 0){
+        $row = $result->fetch_assoc();
+        $indexIM = $row['indexIM'];
+        $timeToUTC = $row['timeToUTC'];
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
-    //get the timestamp. if it doesnt exist -> display a biiiig fat error
-    $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
-    $result = mysqli_query($conn, $sql);
-    if($result && $result->num_rows > 0){
-      $row = $result->fetch_assoc();
-      $indexIM = $row['indexIM'];
-      $timeToUTC = $row['timeToUTC'];
+        $startDate = $filterDate." ".$_POST['start'];
+        $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
-      $startDate = $filterDate." ".$_POST['start'];
-      $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+        $endDate = $filterDate." ".$_POST['end'];
+        $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-      $endDate = $filterDate." ".$_POST['end'];
-      $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+        $insertInfoText = test_input($_POST['infoText']);
+        $insertInternInfoText = test_input($_POST['internInfoText']);
 
-      $insertInfoText = test_input($_POST['infoText']);
-      $insertInternInfoText = test_input($_POST['internInfoText']);
-
-      if(timeDiff_Hours($startDate, $endDate) > 0){
-        if(isset($_POST['addBreak'])){ //checkbox
-          $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
-          $conn->query($sql);
-          $duration = timeDiff_Hours($startDate, $endDate);
-          $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
-          $conn->query($sql);
-        } else {
-          if(isset($_POST['addExpenses'])){
-            $expenses_price = test_input($_POST['expenses_price']);
-            $expenses_info = test_input($_POST['expenses_info']);
-            $expenses_unit = test_input($_POST['expenses_unit']);
+        if(timeDiff_Hours($startDate, $endDate) > 0){
+          if(isset($_POST['addBreak'])){ //checkbox
+            $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
+            $conn->query($sql);
+            $duration = timeDiff_Hours($startDate, $endDate);
+            $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+            $conn->query($sql);
           } else {
-            $expenses_price = $expenses_unit = 0;
-            $expenses_info = '';
-          }
-          if(isset($_POST['project'])){
-            $projectID = test_input($_POST['project']);
-            $accept = 'TRUE';
-            if(isset($_POST['required_1'])){
-              $field_1 = "'".test_input($_POST['required_1'])."'";
-              if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
-            } elseif(!empty($_POST['optional_1'])){
-              $field_1 = "'".test_input($_POST['optional_1'])."'";
+            if(isset($_POST['addExpenses'])){
+              $expenses_price = test_input($_POST['expenses_price']);
+              $expenses_info = test_input($_POST['expenses_info']);
+              $expenses_unit = test_input($_POST['expenses_unit']);
             } else {
-              $field_1 = 'NULL';
+              $expenses_price = $expenses_unit = 0;
+              $expenses_info = '';
             }
-            if(isset($_POST['required_2'])){
-              $field_2 = "'".test_input($_POST['required_2'])."'";
-              if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
-            } elseif(!empty($_POST['optional_2'])){
-              $field_2 = "'".test_input($_POST['optional_2'])."'";
-            } else {
-              $field_2 = 'NULL';
-            }
-            if(isset($_POST['required_3'])){
-              $field_3 = "'".test_input($_POST['required_3'])."'";
-              if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
-            } elseif(!empty($_POST['optional_3'])){
-              $field_3 = "'".test_input($_POST['optional_3'])."'";
-            } else {
-              $field_3 = 'NULL';
-            }
-            if($accept){
-              if(isset($_POST['addDrive'])){ //add as driving time
-                $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
-                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
-              } else { //normal booking
-                $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
-                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
-              }
-              $conn->query($sql);
-              if(mysqli_error($conn)){
-                echo mysqli_error($conn);
+            if(isset($_POST['project'])){
+              $projectID = test_input($_POST['project']);
+              $accept = 'TRUE';
+              if(isset($_POST['required_1'])){
+                $field_1 = "'".test_input($_POST['required_1'])."'";
+                if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_1'])){
+                $field_1 = "'".test_input($_POST['optional_1'])."'";
               } else {
-                echo '<div class="alert alert-success alert-over fade in">';
-                echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-                echo $lang['OK_ADD'];
-                echo '</div>';
+                $field_1 = 'NULL';
               }
-              $insertInfoText = $insertInternInfoText = '';
+              if(isset($_POST['required_2'])){
+                $field_2 = "'".test_input($_POST['required_2'])."'";
+                if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_2'])){
+                $field_2 = "'".test_input($_POST['optional_2'])."'";
+              } else {
+                $field_2 = 'NULL';
+              }
+              if(isset($_POST['required_3'])){
+                $field_3 = "'".test_input($_POST['required_3'])."'";
+                if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_3'])){
+                $field_3 = "'".test_input($_POST['optional_3'])."'";
+              } else {
+                $field_3 = 'NULL';
+              }
+              if($accept){
+                if(isset($_POST['addDrive'])){ //add as driving time
+                  $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                  VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                } else { //normal booking
+                  $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                  VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                }
+                $conn->query($sql);
+                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+                $insertInfoText = $insertInternInfoText = '';
+              } else {
+                echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+              }
             } else {
-              echo '<div class="alert alert-danger alert-over fade in">';
-              echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-              echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-              echo '</div>';
+              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
             }
-          } else {
-            echo '<div class="alert alert-danger alert-over fade in">';
-            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
-            echo '</div>';
           }
+        } else {
+          echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
         }
       } else {
-        echo '<div class="alert alert-danger alert-over fade in">';
-        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
-        echo '</div>';
+        echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
       }
     } else {
-      echo '<div class="alert alert-danger alert-over fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_TIMESTAMP'];
-      echo '</div>';
+      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
   } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger alert-over fade in">';
-    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-    echo '</div>';
+    echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //end if POST
+
+$filterDate = substr(getCurrentTimestamp(), 0, 10);
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => $filterDate); //init: display all
 ?>
 
-  <!-- ####################-FILTERS-######################################## -->
-  <form method='post'>
-  <div id="project_filters" class="container-fluid">
-    <div class="page-header">
-      <h3><?php echo $lang['VIEW_PROJECTS']; ?></h3>
-    </div>
-    <div class="col-xs-3 custom">
-      <!-- SELECT COMPANY -->
-      <select style='width:200px' id="filterCompany" name="filterCompany" onchange='showClients("#filterClient", this.value, 0, 0, "#filterProject"); showFilters("projectAndClientDiv", this.value);showFilters("dateDiv");' class="js-example-basic-single">
-        <?php
-        $sql = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")";
-        $result = mysqli_query($conn, $sql);
-        if($result && $result->num_rows > 1) {
-          echo '<option value="0">Select Company...</option>';
-        }
-        while($result && ($row = $result->fetch_assoc())){
-          $checked = '';
-          if($filterCompany == $row['id']) {
-            $checked = 'selected';
-          }
-          echo "<option $checked value='".$row['id']."' >".$row['name']."</option>";
-        }
-        if($result && $result->num_rows == 1) {
-          $filterCompany = $available_companies[1]; //easy peasy
-          echo '<option value="0">- Empty -</option>';
-        }
-        ?>
-      </select>
-      <br><br>
-      <!-- SELECT USER -->
-      <select id="filterUserID" name="filterUserID" class="js-example-basic-single" style='width:200px' onchange='showFilters("dateDiv");'>
-        <?php
-        $query = "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");";
-        $result = mysqli_query($conn, $query);
-        if($result && $result->num_rows > 1) {
-          echo "<option name=filterUserID value=0>User...</option>";
-        }
-        while($row = $result->fetch_assoc()){
-          $i = $row['id'];
-          if ($filterUserID == $i) {
-            echo "<option value=$i selected>".$row['firstname'] . " " . $row['lastname']."</option>";
-          } else {
-            echo "<option value=$i>".$row['firstname'] . " " . $row['lastname']."</option>";
-          }
-        }
-        if($result && $result->num_rows == 1) {
-          $filterUserID = $available_users[1]; //lemon squeezy
-          echo '<option value="0">- Empty -</option>';
-        }
-        ?>
-      </select>
-      <br><br>
-      <div class="container">
-        <div class="checkbox">
-          <input type="checkbox" name="filterAddBreaks" <?php echo $filterAddBreaks; ?>> <?php echo $lang['BREAKS']; ?> <br><br>
-        </div>
-        <div class="checkbox">
-          <input type="checkbox" name="filterAddDrives" <?php echo $filterAddDrives; ?>> <?php echo $lang['DRIVES']; ?>
-        </div>
-      </div>
-      <br>
-      <button type="submit" class="btn btn-warning" name="filter">Filter</button><br><br>
-    </div>
-
-    <!-- SELECTS DATE -->
-    <div id="dateDiv" class="invisible">
-      <div class="col-xs-3 custom">
-        <div class="form-group">
-          <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['DATE']; ?>">
-        </div>
-        <select style='width:200px' onchange="changeValue(this.value, 'filterMonth', '')" class="js-example-basic-single" name="filterYear">
-          <option value=""> --- </option>
-          <?php
-          for($i = 2015; $i < 2025; $i++){
-            $selected = ($i == substr($filterDate,0,4))?'selected':'';
-            echo "<option $selected value=$i>$i</option>";
-          }
+<div class="container-fluid" style="position:fixed;background:white;width:100%;">
+  <div class="page-header">
+    <h3><?php echo $lang['VIEW_PROJECTS']; ?>
+      <div class="page-header-button-group">
+        <?php include "misc/set_filter.php"; //this is where the magic happens ?>
+        <button type='submit' class="btn btn-default" name='saveChanges' form="project_table"><i class="fa fa-floppy-o"></i></button>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-booking" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
+        <form id="csvDownPlace" action="csvDownload.php" method="POST" target='_blank' style="display:inline"></form>
+        <form action="pdfDownload.php" method="POST" target='_blank' style="display:inline-block">
+          <?php //quess who needs queries.
+          $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
+          if($filterings['company']){$companyQuery = " AND $companyTable.id = ".$filterings['company']; }
+          if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
+          if($filterings['project'][0]){$projectQuery = " AND $projectTable.id = ".$filterings['project'][0]; }
+          if($filterings['project'][1]){$productiveQuery = " AND $projectTable.status = 'checked'"; }
+          if($filterings['user']){$userQuery = " AND $userTable.id = ".$filterings['user']; }
+          if($filterings['bookings'][0] == '2'){$chargedQuery = " AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
+          if(!$filterings['bookings'][1]){$breakQuery = " AND $projectBookingTable.bookingType != 'break' "; }
+          if(!$filterings['bookings'][2]){$driveQuery = " AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-        </select>
-        <br><br>
-        <select style='width:200px' onchange="changeValue(this.value, 'filterDay', '')" class="js-example-basic-single" name="filterMonth" id="filterMonth">
-          <option value=""> --- </option>
-          <?php
-          for($i = 1; $i < 13; $i++) {
-            $selected= '';
-            if ($i == substr($filterDate,5,2)) {
-              $selected = 'selected';
-            }
-            $dateObj = DateTime::createFromFormat('!m', $i);
-            $option = $dateObj->format('F');
-            echo "<option $selected name=filterUserID value=".sprintf("%02d",$i).">$option</option>";
-          }
-          ?>
-        </select>
-        <br><br>
-        <select style='width:200px' class="js-example-basic-single" name="filterDay" id="filterDay">
-          <option value=""> --- </option>
-          <?php
-          for($i = 1; $i < 32; $i++){
-            $selected= '';
-            if ($i == intval(substr($filterDate,8,2))) {
-              $selected = 'selected';
-            }
-            echo "<option $selected value=".sprintf("%02d",$i).">$i</option>";
-          }
-          ?>
-        </select>
-        <br><br>
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '".$filterings['date']."%' $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
+          <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
+            <ul class="dropdown-menu">
+              <?php
+              $res = $conn->query("SELECT * FROM $pdfTemplateTable");
+              while($res && ($row = $res->fetch_assoc())){ echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>"; }
+              ?>
+            </ul>
+          </div>
+        </form>
       </div>
-    </div>
-
-    <!-- SELECTS CLIENT AND PROJECT -->
-    <div id="projectAndClientDiv" class="invisible">
-      <div class="col-xs-3 custom">
-        <div class="form-group">
-          <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?>">
-        </div>
-        <div class='form-group'>
-          <select id="filterClient" name="filterClient" class="js-example-basic-single" style='width:200px' onchange='showProjects("#filterProject", this.value, <?php echo $filterProject; ?>)' >
-          </select>
-        </div>
-        <div class='form-group'>
-          <select id="filterProject" name="filterProject" class="js-example-basic-single" style='width:200px'>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- SELECTS CHARGED -->
-    <div class="col-xs-3 custom">
-      <div class="form-group">
-        <input type=text style='width:200px;border:none;background-color:#dbecf7' readonly class="form-control input-sm" value="<?php echo $lang['CHARGED']; ?>">
-      </div>
-      <div class='form-group'>
-        <select name="filterBooked" style='width:200px' class="js-example-basic-single">
-          <option value='0' <?php if($booked == '0'){echo 'selected';}?> >---</option>
-          <option value='1' <?php if($booked == '1'){echo 'selected';}?> ><?php echo $lang['NOT_CHARGED']; ?></option>
-          <option value='2' <?php if($booked == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
-        </select>
-      </div>
-      <?php if($booked != 1){ echo '<small>*'.$lang['INFO_CHARGED'].'</small>'; } ?>
-    </div>
+    </h3>
   </div>
-  <br><br>
-</form>
-<!----------------------------------------------------------------------------->
+</div>
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  //build your query depending on filter options
-  if($booked == '2'){
-    $bookedQuery= " AND $projectBookingTable.booked = 'TRUE' ";
-  } elseif($booked == '1'){
-    $bookedQuery= " AND $projectBookingTable.booked = 'FALSE' ";
-  } else {
-    $bookedQuery = " ";
-  }
-  if($filterUserID == 0){
-    $filterUserIDAdd = '';
-  } else {
-    $filterUserIDAdd = " AND $userTable.id = $filterUserID ";
-  }
-  if($filterCompany == 0){
-    $filterCompanyAdd = "";
-  } else {
-    $filterCompanyAdd = " AND $companyTable.id = $filterCompany ";
-  }
-  if($filterClient == 0){
-    $filterClientAdd = "";
-  } else {
-    $filterClientAdd = " AND $clientTable.id = $filterClient ";
-  }
-  if($filterProject == 0){
-    $filterProjectAdd = "";
-  } else {
-    $filterProjectAdd = " AND $projectTable.id = $filterProject ";
-  }
-  //filter activates if he does NOT want to show drives or breaks
-  $filterNoDriveAdd = ""; //he wants drives
-  if($filterAddDrives == ""){
-    $filterNoDriveAdd = " AND $projectBookingTable.bookingType != 'drive' "; //he doesnt want drives
-  }
-  $filterProjectClientCompany = $filterCompanyAdd . $filterClientAdd . $filterProjectAdd;
-  //he does NOT want breaks
-  if($filterAddBreaks == ""){
-    $filterNoBreakAdd = " AND $projectBookingTable.bookingType != 'break' "; //he doesnt want breaks
-  } else { //he wants breaks -> a break doesnt have a project, company, client. only a user.
-    $filterNoBreakAdd = "";
-    if($filterUserID != 0){ //a break can only be assigned to a user
-      if(strlen($filterProjectClientCompany) > 3){ //he filters for something
-        $filterProjectClientCompany = " AND ((".substr($filterProjectClientCompany,4).") OR ($projectTable.id IS NULL)) ";
-      }
-    } else {
-      echo "<div class='alert alert-info' role='alert'>Select a User to display his breaks. Breaks cannot be assigned to a Project.</div>";
-    }
-  }
-
-  $sql="SELECT $projectTable.id AS projectID,
-  $clientTable.id AS clientID,
-  $companyTable.id AS companyID,
-  $clientTable.name AS clientName,
-  $projectTable.name AS projectName,
-  $userTable.id AS userID,
-  $projectBookingTable.*,
-  $projectBookingTable.id AS projectBookingID,
-  $logTable.timeToUTC,
-  $userTable.firstname, $userTable.lastname,
-  $projectTable.hours,
-  $projectTable.hourlyPrice,
-  $projectTable.status
-  FROM $projectBookingTable
-  INNER JOIN $logTable ON  $projectBookingTable.timeStampID = $logTable.indexIM
-  INNER JOIN $userTable ON $logTable.userID = $userTable.id
-  LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
-  LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
-  LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-  WHERE $projectBookingTable.start LIKE '$filterDate%'
-  $bookedQuery
-  $filterProjectClientCompany $filterUserIDAdd
-  $filterNoBreakAdd $filterNoDriveAdd
-  ORDER BY $projectBookingTable.start ASC";
-  /*
-  $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
-  LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
-  LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-
-  WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
-  OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
-  */
-  $result = $conn->query($sql);
-  $editingResult = $conn->query($sql); //f*ck you php
-} else {
-  $result = false;
-}
-
+$sql = "SELECT $projectTable.id AS projectID,
+$clientTable.id AS clientID, $companyTable.id AS companyID,
+$companyTable.name AS companyName, $clientTable.name AS clientName, $projectTable.name AS projectName,
+$userTable.id AS userID, $userTable.firstname, $userTable.lastname,
+$projectBookingTable.*, $projectBookingTable.id AS projectBookingID,
+$logTable.timeToUTC,
+$projectTable.hours, $projectTable.hourlyPrice, $projectTable.status
+FROM $projectBookingTable
+INNER JOIN $logTable ON  $projectBookingTable.timeStampID = $logTable.indexIM
+INNER JOIN $userTable ON $logTable.userID = $userTable.id
+LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
+LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
+LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
+WHERE $projectBookingTable.start LIKE '".$filterings['date']."%'
+$chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery
+ORDER BY $projectBookingTable.start ASC";
+$result = $conn->query($sql);
+$editingResult = $conn->query($sql); //f*ck you php
 $addTimeStart = 0;
 ?>
-<?php if($result && $result->num_rows > 0): ?>
-<div id="project_body">
-  <form id="project_table" method="post">
-    <?php echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />"; ?>
-    <table class="table table-striped table-condensed seperated_header">
-      <thead>
-        <th><div><?php echo $lang['DELETE']; ?></div></th>
-        <th>Kunde und Pro<div><?php echo $lang['CLIENT'].' & '.$lang['PROJECT']; ?></div></th>
-        <th>Info <div>Infotext</div></th>
-        <th>Date<div><?php echo $lang['DATE']; ?></div></th>
-        <th>Datum Verrechnt <div><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></div></th>
-        <th>Minuten<div><?php echo $lang['MINUTES']; ?></div></th>
-        <th>1234567890<div style="margin-top:-10px"><input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
-          <input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></div></th>
-        <th>Detail<div>Detail</div></th>
-        <th></th>
-      </thead>
-        <?php
-        $csv = new Csv();
-        $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
-        $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
-        $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
-        $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
+<form id="project_table" method="post">
+  <table class="table table-striped table-condensed" style="margin-top:120px;">
+    <thead>
+      <th></th>
+      <th><?php echo $lang['COMPANY'].', '.$lang['CLIENT'].', '.$lang['PROJECT']; ?></th>
+      <th><?php echo $lang['USERS']; ?></th>
+      <th>Infotext</th>
+      <th><?php echo $lang['DATE']; ?></th>
+      <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
+      <th><?php echo $lang['MINUTES']; ?></th>
+      <th style="min-width:140px;">
+        <input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
+        <input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?>
+      </th>
+      <th style="min-width:130px;">Detail</th>
+      <th></th>
+    </thead>
+    <tbody>
+      <?php
+      $csv = new Csv();
+      $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
+      $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
+      $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
+      $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
 
-        $sum_min = 0;
-        $addTimeStart = 0;
-        $numRows = $result->num_rows;
-        for($i = 0; $i < $numRows; $i++) {
-          $row = $result->fetch_assoc();
-          //have to make sure admin can only see what is available to him
-          if(($row['companyID'] && !in_array($row['companyID'], $available_companies)) || ($row['userID'] && !in_array($row['userID'], $available_users))){
-            continue;
-          }
-          $x = $row['projectBookingID'];
-          $timeDiff = timeDiff_Hours($row['start'], $row['end']);
+      $sum_min = 0;
+      $addTimeStart = 0;
+      $numRows = $result->num_rows;
+      for($i = 0; $i < $numRows; $i++) {
+        $row = $result->fetch_assoc();
+        //have to make sure admin can only see what is available to him
+        if(($row['companyID'] && !in_array($row['companyID'], $available_companies)) || ($row['userID'] && !in_array($row['userID'], $available_users))){
+          continue;
+        }
+        $x = $row['projectBookingID'];
+        $timeDiff = timeDiff_Hours($row['start'], $row['end']);
 
-          if($row['bookingType'] == 'break'){
-            $icon = "fa fa-cutlery";
-          } elseif($row['bookingType'] == 'drive'){
-            $icon = "fa fa-car";
-          } elseif($row['bookingType'] == 'mixed'){
-            $icon = "fa fa-plus";
-            $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
-          } else {
-            $icon = "fa fa-bookmark";
-          }
+        if($row['bookingType'] == 'break'){
+          $icon = "fa fa-cutlery";
+        } elseif($row['bookingType'] == 'drive'){
+          $icon = "fa fa-car";
+        } elseif($row['bookingType'] == 'mixed'){
+          $icon = "fa fa-plus";
+          $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
+        } else {
+          $icon = "fa fa-bookmark";
+        }
 
-          $csv_Add = array();
-          echo "<tr>";
-          echo "<td><label><input type='checkbox' class='disable-styling' name='remove_booking[]' value='$x'/><i class='$icon'></i></label></td>";
-          echo "<td>".$row['clientName'].'<br> '.$row['projectName']."</td>";
-          echo '<td style="max-width:200px">'.$row['infoText']."</td>";
+        $csv_Add = array();
+        echo '<tr>';
+        echo "<td style='width:10px'><i class='$icon'></i></td>";
+        echo '<td>'.$row['companyName'].'<br> '.$row['clientName'].'<br> '.$row['projectName'].'</td>';
+        echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+        echo '<td style="max-width:300px">'.$row['infoText'].'</td>';
 
-          $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
-          $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+        $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
+        $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
 
-          $A_charged = $B_charged = '--';
-          if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
-            $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
-          }
-          if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
-            $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
-          }
+        $A_charged = $B_charged = '--';
+        if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+          $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
+        }
+        if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+          $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
+        }
 
-          $csv_Add[] = $row['clientName'];
-          $csv_Add[] = $row['projectName'];
-          $csv_Add[] = str_replace(array("\r", "\n",";"), ' ', $row['infoText']);
-          $csv_Add[] = substr($A,0,10);
-          $csv_Add[] = substr($B,0,10);
-          $csv_Add[] = substr($A,11,6);
-          $csv_Add[] = substr($B,11,6);
-          $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
-          $csv_Add[] = $row['hours'];
-          $csv_Add[] = $row['firstname']." ".$row['lastname'];
-          $csv_Add[] = ' '.$row['hourlyPrice'].' ';
+        $csv_Add[] = $row['clientName'];
+        $csv_Add[] = $row['projectName'];
+        $csv_Add[] = str_replace(array("\r", "\n",";"), ' ', $row['infoText']);
+        $csv_Add[] = substr($A,0,10);
+        $csv_Add[] = substr($B,0,10);
+        $csv_Add[] = substr($A,11,6);
+        $csv_Add[] = substr($B,11,6);
+        $csv_Add[] = number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '');
+        $csv_Add[] = $row['hours'];
+        $csv_Add[] = $row['firstname']." ".$row['lastname'];
+        $csv_Add[] = ' '.$row['hourlyPrice'].' ';
 
-          echo '<td style="width:200px;white-space: pre;">'.$lang['FROM'].': '.substr($A,0,16)."<br>".$lang['TO'].':   '.substr($B,0,16)."</td>";
-          echo '<td style="max-width:200px;white-space: pre;">'.$lang['FROM'].': '.substr($A_charged,0,16)."<br>".$lang['TO'].':   '.substr($B_charged,0,16)."</td>";
-          echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
+        echo '<td style="width:200px;">'.$lang['FROM'].': '.substr($A,0,16)."<br>".$lang['TO'].':   '.substr($B,0,16)."</td>";
+        echo '<td style="max-width:200px;whitpre;">'.$lang['FROM'].': '.substr($A_charged,0,16)."<br>".$lang['TO'].':   '.substr($B_charged,0,16)."</td>";
+        echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
 
-          if($row['bookingType'] != 'break' && $row['booked'] != 'TRUE'){ //if this is a break or has been charged already, do not display dis
-            echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_02\")' name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
-            echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
-          } else {
-            echo "<td></td>";
-          }
+        if($row['bookingType'] != 'break' && $row['booked'] != 'TRUE'){ //if this is a break or has been charged already, do not display dis
+          echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_02\")' name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+          echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+        } else {
+          echo "<td></td>";
+        }
 
-          $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
-          $detailInfo = $row['firstname']." ".$row['lastname'] .' || '. $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
-          $interninfo = $row['internInfo'];
-          $optionalinfo = $csv_optionalinfo = $expensesinfo = '';
-          $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
-          if($extraFldRes && $extraFldRes->num_rows > 0){
-            $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; $csv_optionalinfo = $extraFldRow['name'].': '.$row['extra_1']; }
-          }
-          if($extraFldRes && $extraFldRes->num_rows > 1){
-            $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_2'];}
-          }
-          if($extraFldRes && $extraFldRes->num_rows > 2){
-            $extraFldRow = $extraFldRes->fetch_assoc();
-            if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
-          }
-          if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
-          if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
-          if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
-          $csv_Add[] = $csv_optionalinfo;
-          echo "<td>";
-          if($row['booked'] == 'FALSE'){
-            echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
-          }
-          echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Person - Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
-          if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
-          if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
-          if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
-          echo "</td>";
-          echo '<td><input type="text" style="display:none;" name="editingIndeces[]" value="' . $row['projectBookingID'] . '"></td>'; //needed to check what has been charged
-          echo "</tr>";
-
-          $csv->addLine($csv_Add);
-          $sum_min += timeDiff_Hours($row['start'], $row['end']);
-          $addTimeStart = $B;
-        } //end while fetch_assoc
-
-        echo "<tr>";
-        echo "<td style='font-weight:bold'>Summary</td> <td></td> <td></td> <td></td> <td></td>";
-        echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
+        $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
+        $detailInfo = $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
+        $interninfo = $row['internInfo'];
+        $optionalinfo = $csv_optionalinfo = $expensesinfo = '';
+        $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
+        if($extraFldRes && $extraFldRes->num_rows > 0){
+          $extraFldRow = $extraFldRes->fetch_assoc();
+          if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; $csv_optionalinfo = $extraFldRow['name'].': '.$row['extra_1']; }
+        }
+        if($extraFldRes && $extraFldRes->num_rows > 1){
+          $extraFldRow = $extraFldRes->fetch_assoc();
+          if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_2'];}
+        }
+        if($extraFldRes && $extraFldRes->num_rows > 2){
+          $extraFldRow = $extraFldRes->fetch_assoc();
+          if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
+        }
+        if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
+        if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
+        if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
+        $csv_Add[] = $csv_optionalinfo;
+        echo "<td>";
+        if($row['booked'] == 'FALSE'){
+          echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
+        }
+        echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
+        if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+        if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+        if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }
+        echo "<button type='submit' class='btn btn-default' value='$x' name='delete_booking'><i class='fa fa-trash-o'></i></button>";
+        echo '</td>';
+        echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged
         echo "</tr>";
-        ?>
-    </table>
-  </form>
-</div>
+
+        $csv->addLine($csv_Add);
+        $sum_min += timeDiff_Hours($row['start'], $row['end']);
+        $addTimeStart = $B;
+      } //end while fetch_assoc
+
+      echo "<tr>";
+      echo "<td style='font-weight:bold'>Summary</td> <td></td> <td></td> <td></td>";
+      echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
+      echo "</tr>";
+      ?>
+    </tbody>
+  </table>
+</form>
+
+<button id="csvDown" type='submit' class="btn btn-default" name="csv" value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?> ><i class="fa fa-download"></i> CSV</button>
 <script>
 $(function () {
   $('[data-toggle="popover"]').popover({html : true});
+  $("#csvDown").appendTo("#csvDownPlace");
 })
 </script>
 
 <!-- Projectbooking Modal -->
 <?php while($row = $editingResult->fetch_assoc()): $x = $row['projectBookingID']; ?>
-<form method="post">
-  <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
+  <form method="post">
+    <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
+      <div class="modal-dialog modal-lg modal-content" role="document">
         <div class="modal-header">
           <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
         </div>
         <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
+          <div class="row">
           <?php
-          echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
           if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-            echo "<select style='width:200px' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
+            echo "<div class='col-md-6'><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterCompany){
               $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
@@ -722,7 +421,7 @@ $(function () {
               }
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
-            echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+            echo "</select></div><div class='col-md-6'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
             $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){
@@ -732,7 +431,7 @@ $(function () {
               }
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
-            echo "</select> <br><br>";
+            echo "</select></div> <br><br>";
           } //end if(break)
 
           $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
@@ -749,7 +448,7 @@ $(function () {
             $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
           }
           ?>
-
+        </div>
           <label><?php echo $lang['DATE']; ?>:</label>
           <div class="row">
             <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
@@ -778,159 +477,142 @@ $(function () {
         </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
 <?php endwhile;?>
-<?php endif; //end if($result && $result->num_rows > 0) ?>
 
-<div id="project_footer">
-  <br><!-- BUTTONS -->
-  <div class="row">
-    <?php
-    $diabled = 'disabled';
-    if($filterUserID != 0 && preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $filterDate)){ $diabled = ''; }
-    ?>
-    <div class="col-xs-6">
-      <button type='submit' class="btn btn-warning" name='saveChanges' form="project_table"><?php echo $lang['SAVE']; ?></button>
-      <button class="btn btn-default" <?php echo $diabled; ?> data-toggle="collapse" href="#add_bookings_collapse" title="Specify day and user to add bookings"><?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?></button>
-    </div>
-    <?php if($result && $result->num_rows > 0): ?>
-    <div class="col-xs-2">
-      <form action="csvDownload.php" method="post" target='_blank'>
-        <button type='submit' class="btn btn-default btn-block" name=csv value=<?php $csv->setEncoding("UTF-16LE"); echo rawurlencode($csv->compile()); ?>> Download as CSV </button>
-      </form>
-    </div>
-    <div class="col-xs-2">
-      <form action="pdfDownload.php" method="post" target='_blank'>
-        <input type="text" style="display:none" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '$filterDate%' ". $bookedQuery. $filterProjectClientCompany. $filterUserIDAdd. $filterNoBreakAdd. $filterNoDriveAdd; ?>" />
-        <div class="dropup">
-          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Download as PDF
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-            <?php
-            $result = $conn->query("SELECT * FROM $pdfTemplateTable");
-            while($result && ($row = $result->fetch_assoc())){
-              echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>";
-            }
-            ?>
-          </ul>
-        </div>
-      </form>
-    </div>
-  <?php endif; //end if($result && $result->num_rows > 0) ?>
-  </div>
-<br>
 
-  <!-- ADD BOOKING TO USER -->
+<!-- ADD BOOKING TO USER -->
 <form method="POST">
-  <?php echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />"; ?>
-  <div class="collapse" id="add_bookings_collapse" aria-expanded="false">
-    <div class="well">
-      <div class="row checkbox">
-        <div class="checkbox">
-          <div class="col-sm-2">
+  <div class="modal fade add-booking">
+    <div class="modal-dialog modal-lg modal-content" role="document">
+      <div class="modal-header">
+        <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row checkbox">
+          <div class="col-sm-3">
             <label><input type="checkbox" onchange="hideMyDiv(this, 'mySelections');" name="addBreak" title="Das ist eine Pause"><a style="color:black;"><i class="fa fa-cutlery" aria-hidden="true"></i></a>Pause</label>
           </div>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <label><input type="checkbox" name="addDrive" title="Fahrzeit"><a style="color:black;"><i class="fa fa-car" aria-hidden="true"></i></a>Fahrzeit</label>
           </div>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <label><input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?></label>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div id="mySelections" class="col-xs-9"><br>
-          <?php
-          echo "<input type='text' name='set_all_filters' style='display:none' value='$filterDate,$filterCompany,$filterClient,$filterProject,$filterUserID,$filterAddBreaks,$filterAddDrives,$booked' />";
-          $query = "SELECT * FROM companyData WHERE id IN (SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $filterUserID)";
-          $result = mysqli_query($conn, $query);
-          if($result->num_rows == 1): //only one company: display clients
-            $row = $result->fetch_assoc();
-            $query = "SELECT * FROM $clientTable WHERE companyID=".$row['id'];
-            $result = mysqli_query($conn, $query);
-            if ($result && $result->num_rows > 0) {
-              echo '<select style="width:200px" class="js-example-basic-single" id="addSelectClient" name="client" onchange="showProjects(\'#addSelectProject\', this.value, '.$filterProject.')">';
-              echo "<option name='act' value='0'>Select...</option>";
-              while ($row = $result->fetch_assoc()) {
-                $cmpnyID = $row['id'];
-                $cmpnyName = $row['name'];
-                $selected = '';
-                if($filterClient == $cmpnID){ $selected = 'selected'; }
-                echo "<option $selected name='act' value='$cmpnyID'>$cmpnyName</option>";
-              }
-            }
-            echo '</select>';
-          else: //select company
-            ?>
-            <select name="company"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients('#addSelectClient', this.value, <?php echo $filterClient; ?>, 0, '#addSelectProject')">
-              <option name="cmp" value="0">Select...</option>
+        <div class="row">
+          <div class="col-xs-3">
+            <label><?php echo $lang['USERS']; ?></label>
+            <select class="js-example-basic-single" name="user">
               <?php
-              if ($result && $result->num_rows > 1) {
-                while ($row = $result->fetch_assoc()) {
-                  $selected = '';
-                  if($row['id'] == $filterCompany){ $selected = 'selected'; }
-                  echo "<option $selected name='cmp' value='".$row['id']."'>".$row['name']."</option>";
+              $result = $conn->query("SELECT * FROM userData WHERE id IN (".implode(', ', $available_users).")");
+              while ($result && ($row = $result->fetch_assoc())) {
+                $selected = '';
+                if($filterings['user'] == $row['id']) {
+                  $selected = 'selected';
                 }
+                echo '<option '.$selected.' value="'.$row['id'].'">'.$row['firstname'].' '.$row['lastname'].'</option>';
               }
               ?>
             </select>
-            <select id="addSelectClient" style='width:200px' class="js-example-basic-single" name="client" onchange="showProjects('#addSelectProject', this.value, <?php echo $filterProject; ?>)">
-            </select>
-          <?php endif; ?>
-          <select id="addSelectProject" style='width:200px' class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
-          </select>
+          </div>
+          <div id="mySelections" style="display:inline">
+            <?php
+            $result = $conn->query("SELECT * FROM companyData WHERE id IN(".implode(', ', $available_companies).")");
+            if($result && $result->num_rows > 1):
+              ?>
+              <div class="col-xs-3">
+                <label><?php echo $lang['COMPANY']; ?></label>
+                <select name="company" class="js-example-basic-single" onchange="showClients('#addSelectClient', this.value, 0, 0, '#addSelectProject');">
+                  <option value="0">...</option>
+                  <?php
+                  while ($row = $result->fetch_assoc()) {
+                    $selected = '';
+                    if($filterings['company'] == $row['id']) {
+                      $selected = 'selected';
+                    }
+                    echo "<option $selected value='".$row['id']."'>".$row['name']."</option>";
+                  }
+                  ?>
+                </select>
+              </div>
+            <?php endif; ?>
+            <div class="col-xs-3">
+              <label><?php echo $lang['CLIENT']; ?></label>
+              <select class="js-example-basic-single" id="addSelectClient" name="client" onchange="showProjects('#addSelectProject', this.value, 0);">
+                <option value="0">...</option>
+                <?php
+                $row = $result->fetch_assoc();
+                $query = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")";
+                $result = mysqli_query($conn, $query);
+                if ($result && $result->num_rows > 1) {
+                  while ($row = $result->fetch_assoc()) {
+                    echo "<option value='".$row['id']."'>".$row['name']."</option>";
+                  }
+                }
+                ?>
+              </select>
+            </div>
+            <div class="col-xs-3">
+              <label><?php echo $lang['PROJECT']; ?></label>
+              <select id="addSelectProject" class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
+              </select>
+            </div>
+          </div>
+
         </div>
-      </div>
-      <div id="hide_expenses" class="row" style="display:none">
+        <div id="hide_expenses" class="row" style="display:none">
+          <br>
+          <div class="col-md-3">
+            <input type="number" step="0.01" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+          </div>
+          <div class="col-md-3">
+            <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+          </div>
+          <div class="col-md-6">
+            <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">
+            <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
+          </div>
+          <div class="col-xs-4">
+            <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
+          </div>
+        </div>
+        <div id="project_fields" class="row">
+        </div>
         <br>
-        <div class="col-md-2">
-          <input type="number" step="0.01" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
-        </div>
-        <div class="col-md-2">
-          <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
-        </div>
-        <div class="col-md-8">
-          <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-6">
-          <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
-        </div>
-        <div class="col-xs-3">
-          <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
-        </div>
-      </div>
-      <div id="project_fields" class="row">
-      </div>
-      <br>
-      <div class="row">
-        <div class="col-xs-6">
-          <div class="input-group">
-            <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
-            <span class="input-group-addon"> - </span>
-            <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
-            <div class="input-group-btn">
-              <button class="btn btn-primary" type="submit"  name="add"> + </button>
+        <div class="row">
+          <div class="col-sm-3">
+            <label><?php echo $lang['DATE']; ?></label>
+            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date']; ?>"/>
+          </div>
+          <div class="col-xs-6">
+            <label><?php echo $lang['TIME']; ?></label>
+            <div class="input-group">
+              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
+              <span class="input-group-addon"> - </span>
+              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
             </div>
           </div>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" name="add" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+        <button type="submit" class="btn btn-warning" name="add"><?php echo $lang['ADD']; ?></button>
+      </div>
     </div>
   </div>
 </form>
-<!-- END ADD-BOOKING FIELD -->
-</div>
 
 <script>
 function showClients(place, company, client, project, projectPlace){
   $.ajax({
-    url:'ajaxQuery/AJAX_client.php',
+    url:'ajaxQuery/AJAX_getClient.php',
     data:{companyID:company, clientID:client},
-    type: 'post',
+    type: 'get',
     success : function(resp){
       $(place).html(resp);
     },
@@ -940,9 +622,9 @@ function showClients(place, company, client, project, projectPlace){
 };
 function showProjects(place, client, project){
   $.ajax({
-    url:'ajaxQuery/AJAX_project.php',
+    url:'ajaxQuery/AJAX_getProjects.php',
     data:{clientID:client, projectID:project},
-    type: 'post',
+    type: 'get',
     success : function(resp){
       $(place).html(resp);
     },
@@ -975,15 +657,6 @@ function hideMyDiv(o, toShow){
     document.getElementById(toShow).style.display='block';
   }
 }
-function showFilters(divID){
-  document.getElementById(divID).style.visibility='visible';
-}
-function changeValue(cVal, id, val){
-  if(cVal == ''){
-    document.getElementById(id).selectedIndex = val;
-    $('#' + id).val(val).change();
-  }
-}
 function toggle(checkId, uncheckId) {
   checkboxes = document.getElementsByName(checkId + '[]');
   checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
@@ -998,16 +671,11 @@ function toggle2(uncheckID){
 }
 </script>
 
-<?php if($filterCompany || $filterUserID ): //i want my filter displayed even if there were no bookings ?>
-  <script>
-  showClients("#filterClient", <?php echo $filterCompany; ?>, <?php echo $filterClient; ?>, <?php echo $filterProject; ?>, "#filterProject"); //i wiish we could overlooaaad
-  document.getElementById("projectAndClientDiv").style.visibility='visible';
-  document.getElementById("dateDiv").style.visibility='visible';
-  </script>
-<?php endif; ?>
-<?php if($filterCompany): ?>
-  <script>
-  showClients("#addSelectClient", <?php echo $filterCompany; ?>, <?php echo $filterClient; ?>, <?php echo $filterProject; ?>, "#addSelectProject");
-  </script>
-<?php endif; ?>
+<?php
+if(!empty($filterings['company'])){
+  echo '<script>';
+  echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'][0].', "#addSelectProject");';
+  echo '</script>';
+}
+?>
 <?php include 'footer.php'; ?>

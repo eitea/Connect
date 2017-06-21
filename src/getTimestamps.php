@@ -1,9 +1,4 @@
 <?php include 'header.php'; enableToTime($userID); ?>
-
-<div class="page-header">
-  <h3><?php echo $lang['TIMESTAMPS']; ?></h3>
-</div>
-
 <?php
 require_once 'Calculators/IntervalCalculator.php';
 
@@ -23,7 +18,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['filterStatus'])){
     $filterStatus = $_POST['filterStatus'];
   }
-
   if(!empty($_POST['set_all_filters'])){
     $arr = explode(',', $_POST['set_all_filters']);
     $filterDateFrom = $arr[0];
@@ -82,15 +76,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
     }
-  } elseif (isset($_POST['delete'])){
-    $activeTab = $_POST['delete'];
-    if(isset($_POST['index'])){
-      $index = $_POST["index"];
-      foreach ($index as $x) {
-        $sql = "DELETE FROM $logTable WHERE indexIM=$x;";
-        $conn->query($sql);
-      }
-    }
+  } elseif (isset($_POST['ts_remove'])){
+    $x = intval($_POST['ts_remove']);
+    $conn->query("DELETE FROM $logTable WHERE indexIM=$x;");
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['splits_save'])){
     $bookingID = intval($_POST['splits_save']);
     if(!empty($_POST['splits_from_'.$bookingID]) && !empty($_POST['splits_to_'.$bookingID])){
@@ -242,6 +231,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif post
 ?>
 
+<div class="page-header">
+  <h3>
+    <?php echo $lang['TIMESTAMPS']; ?>
+    <div class="page-header-button-group">
+      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval"><i class="fa fa-plus"></i></a>
+    </div>
+  </h3>
+</div>
+
 <!-- ############################### FILTER ################################### -->
 
 <form method="post">
@@ -266,16 +264,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         ?>
       </select>
-      <br><br><!-- Filter Status -->
-      <select name='filterStatus' style="width:150px" class="js-example-basic-single">
-        <option value="" >---</option>
-        <?php
-        for($i = 0; $i < 6; $i++){
-          $selected = ($filterStatus == "$i") ? 'selected' : '';
-          echo "<option value='$i' $selected>".$lang['ACTIVITY_TOSTRING'][$i]."</option>";
-        }
-        ?>
-      </select>
     </div>
     <div class="col-sm-1">
       <button id="myFilter" type="submit" class="btn btn-warning" name="filter" value="1">Filter</button>
@@ -288,6 +276,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     minViewMode: "months"
   });
   </script>
+  <div class="modal fade addInterval">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header"><h4><?php echo $lang['ADD_TIMESTAMPS']; ?></h4></div>
+      <div class="modal-body">
+        <div class="input-group input-daterange">
+          <input id='multiple_calendar' type="date" class="form-control" value="" placeholder="Von" name="add_multiple_start">
+          <span class="input-group-addon"> - </span>
+          <input id='multiple_calendar2' type="date" class="form-control" value="" placeholder="Bis" name="add_multiple_end">
+        </div>
+        <br>
+        <select name="add_multiple_status" class="js-example-basic-single">
+          <option value="1"><?php echo $lang['VACATION']; ?></option>
+          <option value="4"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
+          <option value="2"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+          <option value="6"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+        </select>
+        <br>
+        <small> *<?php echo $lang['INFO_INTERVALS_AS_EXPECTED']; ?></small>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" type="button" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+        <button class="btn btn-warning" type="submit" name="add_multiple"><?php echo $lang['ADD']; ?></button>
+      </div>
+    </div>
+  </div>
+
   <!-- ############################### TABLE ################################### -->
 
   <?php
@@ -299,7 +313,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $bookingResultsResults = array(); //lets do something fun
     ?>
     <br>
-    <table class="table table-hover table-condensed">
+    <table id="mainTable" class="table table-hover table-condensed">
       <thead>
         <th><?php echo $lang['WEEKLY_DAY']; ?></th>
         <th><?php echo $lang['DATE']; ?></th>
@@ -391,29 +405,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
 
             echo "<tr $neutralStyle>";
-            echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
-            echo "<td>" . $calculator->date[$i] . "</td>";
-            echo "<td>" . substr($A,11,5) . "</td>";
+            echo '<td>' . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . '</td>';
+            echo '<td>' . $calculator->date[$i] . '</td>';
+            echo '<td>' . substr($A,11,5) . '</td>';
             echo "<td><small>" . displayAsHoursMins($calculator->lunchTime[$i]) . "</small></td>";
-            echo "<td>" . substr($B,11,5) . "</td>";
+            echo '<td>' . substr($B,11,5) . '</td>';
             echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
-            echo "<td>" . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]]. "</td>";
-            echo "<td>" . displayAsHoursMins($calculator->shouldTime[$i]) . "</td>";
-            echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
-            echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
-            echo "<td>" . displayAsHoursMins($accumulatedSaldo) . "</td>";
+            echo '<td>' . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]]. '</td>';
+            echo '<td>' . displayAsHoursMins($calculator->shouldTime[$i]) . '</td>';
+            echo '<td>' . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . '</td>';
+            echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . '</td>';
+            echo '<td>' . displayAsHoursMins($accumulatedSaldo) . '</td>';
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
-              echo '<button type="button" class="btn btn-default" title="Edit" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button>';
+              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
             } else {
-              echo '<button type="button" class="btn" style="visibility:hidden">A</button>';
+              echo '<button type="button" class="btn" style="visibility:hidden">A</button> ';
             }
             if($bookingResults && $bookingResults->num_rows > 0){
-              echo ' <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
+              echo '<button type="button" class="btn btn-default" title="'.$lang['PROJECT_BOOKINGS'].'" data-toggle="modal" data-target=".bookingModal-'.$calculator->indecesIM[$i].'" ><i class="fa fa-file-text-o"></i></button> ';
               $bookingResultsResults[] = $bookingResults; //so we can create a modal for each of these valid results outside this loop
               $bookingResultsResults['timeToUTC'][] = $calculator->timeToUTC[$i];
             }
-            if($calculator->indecesIM[$i] != 0){ echo ' <input type="checkbox" name="index[]" value="'.$calculator->indecesIM[$i].'"/>';}
+            if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calculator->indecesIM[$i].'"><i class="fa fa-trash-o"></i></button>';}
             echo '</td>';
             echo "</tr>";
 
@@ -423,7 +437,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           } //endfor
 
           //partial sum
-          echo '<tr class="blank_row"><td colspan="12"></td><tr>';
+          //echo '<tr class="blank_row"><td colspan="12"></td><tr>';
           echo "<tr style='font-weight:bold;'>";
           echo "<td colspan='2'>Zwischensumme:* </td>";
           echo "<td></td>";
@@ -439,8 +453,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $current_corrections = array_sum($calculator->monthly_correctionHours);
           $accumulatedSaldo += $current_corrections;
           echo "<tr>";
-          echo "<td>".$lang['CORRECTION'].":* </td>";
-          echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
+          echo "<td colspan='2'>".$lang['CORRECTION'].":* </td>";
+          echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
           echo "<td style='color:#9222cc'>" . displayAsHoursMins($current_corrections) . "</td>";
           echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
@@ -503,7 +517,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $expectedHoursSUM += $p_shouldTime;
           $absolvedHoursSUM += $p_isTime;
 
-          echo '<tr class="blank_row"><td colspan="12"></td><tr>';
+          //echo '<tr class="blank_row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr>';
           echo "<tr style='font-weight:bold;'>";
           echo "<td colspan='2'>Summe:* </td>";
           echo "<td></td>";
@@ -515,41 +529,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
           echo "<td></td></tr>";
           ?>
-          <tr><td colspan="12"><small>*Angaben in Stunden</small></td></tr>
         </tbody>
       </table>
-
-      <br><br>
-      <a class="btn btn-default" data-toggle="collapse" href="#add-interval"><?php echo $lang['ADD_TIMESTAMPS']; ?></a>
-      <div id="add-interval" class="container-fluid collapse" >
-        <br>
-        <div class="row"><small> *<?php echo $lang['INFO_INTERVALS_AS_EXPECTED']; ?></small></div>
-        <div class="row">
-          <div class="col-xs-6">
-            <div class="input-group input-daterange">
-              <input id='multiple_calendar' type="date" class="form-control" value="" placeholder="Von" name="add_multiple_start">
-              <span class="input-group-addon"> - </span>
-              <input id='multiple_calendar2' type="date" class="form-control" value="" placeholder="Bis" name="add_multiple_end">
-            </div>
-          </div>
-        </div>
-        <br>
-        <div class="row">
-          <div class="col-md-6 text-right">
-            <select name="add_multiple_status" class="js-example-basic-single">
-              <option value="1"><?php echo $lang['VACATION']; ?></option>
-              <option value="4"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
-              <option value="2"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
-              <option value="6"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
-            </select>
-            <button class="btn btn-warning" type="submit" name="add_multiple"><?php echo $lang['ADD']; ?></button>
-          </div>
-        </div>
-        <br>
-      </div>
-      <div class="text-right">
-        <button type="submit" class="btn btn-warning" name="delete" value="<?php echo $x; ?>"><?php echo $lang['DELETE']; ?></button>
-      </div>
+      <small>*Angaben in Stunden</small>
     <?php else: echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>'; endif; ?>
   </form>
 
@@ -685,9 +667,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   }
                   echo '<tr>';
                   echo "<td><i class='$icon'></i></td>";
-                  echo "<td>". $row['name'] ."</td>";
-                  echo "<td>". $row['projectName'] ."</td>";
-                  echo "<td>". substr($row['start'], 0, 10) ."</td>";
+                  echo '<td>'. $row['name'] .'</td>';
+                  echo '<td>'. $row['projectName'] .'</td>';
+                  echo '<td>'. substr($row['start'], 0, 10) .'</td>';
                   echo "<td>$A</td>";
                   echo "<td>$B</td>";
                   echo "<td style='text-align:left'>$C</td>";
@@ -836,6 +818,7 @@ function toggle2(uncheckID){
 var myCalendar = new dhtmlXCalendarObject(["multiple_calendar","multiple_calendar2"]);
 myCalendar.setSkin("material");
 myCalendar.setDateFormat("%Y-%m-%d");
+dhx.zim.first = function(){ return 2000 };
 </script>
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

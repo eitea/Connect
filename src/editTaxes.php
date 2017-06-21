@@ -18,35 +18,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 ?>
-
-<div class="page-header">
-  <h3><?php echo $lang['TAX_RATES']; ?></h3>
-</div>
 <form method="POST">
-<table class="table table-hover">
-  <thead>
-    <th>Name</th>
-    <th></th>
-    <th></th>
-  </thead>
-  <tbody>
-    <?php
-    $result = $conn->query("SELECT * FROM taxRates");
-    while ($result && ($row = $result->fetch_assoc())) {
-      if($row['percentage']  || $row['percentage'] === "0"){
-        $perc = $row['percentage'];
-      } else {
-        $perc = '';
+  <div class="page-header">
+    <h3><?php echo $lang['TAX_RATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default"><i class="fa fa-floppy-o"></i></button></div></h3>
+  </div>
+  <table class="table table-hover">
+    <thead>
+      <th>Name</th>
+      <th></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <?php
+      $result = $conn->query("SELECT * FROM taxRates");
+      while ($result && ($row = $result->fetch_assoc())) {
+        if($row['percentage']  || $row['percentage'] === "0"){
+          $perc = $row['percentage'];
+        } else {
+          $perc = '';
+        }
+        echo '<tr>';
+        echo '<td><input type="text" name="description[]" value="'.$row['description'].'" class="form-control" /></td>';
+        echo '<td style="text-align:right"><input type="number" name="percentage[]" value="'.$perc.'" class="form-control" style="max-width:250px; display:inline;text-align:right;" /> %</td>';
+        echo '<td><input type="hidden" name="ids[]" value="'.$row['id'].'" /></td>';
+        echo '</tr>';
       }
-      echo '<tr>';
-      echo '<td><input type="text" name="description[]" value="'.$row['description'].'" class="form-control" /></td>';
-      echo '<td style="text-align:right"><input type="number" name="percentage[]" value="'.$perc.'" class="form-control" style="max-width:250px; display:inline;text-align:right;" /> %</td>';
-      echo '<td><input type="hidden" name="ids[]" value="'.$row['id'].'" /></td>';
-      echo '</tr>';
-    }
-     ?>
-  </tbody>
-</table>
-<button type="submit" name="save" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+      ?>
+    </tbody>
+  </table>
 </form>
 <?php include "footer.php"; ?>

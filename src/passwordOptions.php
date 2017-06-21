@@ -1,6 +1,4 @@
-<?php require 'header.php'; require_once 'utilities.php'; ?>
-<?php enableToCore($userID);?>
-
+<?php require 'header.php'; require_once 'utilities.php'; enableToCore($userID);?>
 <?php
 if(isset($_POST['saveButton'])){
   //allgemein
@@ -90,11 +88,15 @@ $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
 ?>
 
-<div class="page-header">
-  <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></h3>
-</div>
 
 <form method="POST">
+  <div class="page-header">
+    <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
+      <div class="page-header-button-group">
+        <button type="submit" class="btn btn-default" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button>
+      </div>
+    </h3>
+  </div>
   <h4><?php echo $lang['ADMIN_CORE_OPTIONS']; ?> <a role="button" data-toggle="collapse" href="#password_info_general"> <i class="fa fa-info-circle"> </i> </a></h4>
   <br>
   <div class="collapse" id="password_info_general">
@@ -191,11 +193,6 @@ $row = $result->fetch_assoc();
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
     </div>
     <br><br><br>
-  </div>
-  <br><hr><br>
-
-  <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Speichern </button>
   </div>
 </form>
 <?php require 'footer.php'; ?>
