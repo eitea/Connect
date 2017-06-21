@@ -152,6 +152,29 @@ if(!$result || $result->num_rows <= 0){
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
       <div class="modal-body">
+        <div class="row">
+            <?php
+            $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+            if($result_fc && $result_fc->num_rows > 1){
+              echo '<div class="col-md-6">';
+              echo '<select class="js-example-basic-single" name="searchCompany" onchange="showClients(this.value, 0);" >';
+              echo '<option value="0">...</option>';
+              while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+                $checked = '';
+                if($filterings['company'] == $row_fc['id']) {
+                  $checked = 'selected';
+                }
+                echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+              }
+              echo '</select>';
+              echo '</div>';
+            }
+            ?>
+          <div class="col-md-6">
+            <select class="js-example-basic-single" id="clientHint" name="client">
+            </select>
+          </div>
+        </div>
         <label>Name</label>
         <input type=text class="form-control required-field" name='name' placeholder='Name'>
         <br>
@@ -215,7 +238,6 @@ myCalendar.setSkin("material");
 myCalendar.setDateFormat("%Y-%m-%d");
 dhx.zim.first = function(){ return 2000 };
 
-
 $('.table').DataTable({
   order: [[ 1, "asc" ]],
   columns: [{orderable: false}, null, null, null, null, {orderable: false}, {orderable: false}, {orderable: false}, {orderable: false}],
@@ -228,6 +250,27 @@ $('.table').DataTable({
   }
 });
 
-var table = $('.table').DataTable();
+function showClients(company, client){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getClient.php',
+    data:{companyID:company, clientID:client},
+    type: 'get',
+    success : function(resp){
+      $("#clientHint").html(resp);
+    },
+    error : function(resp){},
+    complete : function(resp){
+      showProjects($("#clientHint").val(), 0);
+    }
+  });
+}
 </script>
+
+<?php
+if($filterings['company']){
+  echo '<script>';
+  echo "showClients(".$filterings['company'].", 0)";
+  echo '</script>';
+}
+ ?>
 <?php include 'footer.php'; ?>
