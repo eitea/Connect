@@ -1,8 +1,11 @@
 <?php include 'header.php'; ?>
-<!-- BODY -->
 <?php
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
+if(isset($_GET['cmp'])){
+  $filterings['company'] = test_input($_GET['cmp']);
+}
 if(isset($_GET['custID'])){
-  $customerID = test_input($_GET['custID']);
+  $filterings['client'] = test_input($_GET['custID']);
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -20,6 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <div class="page-header">
   <h3><?php echo $lang['CLIENT']; ?>
     <div class="page-header-button-group">
+      <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['NEW_CLIENT_CREATE']; ?>"><i class="fa fa-plus"></i></button>
       <button type="submit" class="btn btn-default" form="mainForm" name="delete" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
     </div>
@@ -30,8 +34,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <form id="mainForm" method="POST">
   <?php
+  $companyQuery = $clientQuery = $projectQuery = $productiveQuery = "";
+  if($filterings['company']){$companyQuery = " AND $clientTable.companyID = ".$filterings['company']; }
+  if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
   $query = "SELECT $clientTable.*, $companyTable.name AS companyName FROM $clientTable INNER JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-  WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY name ASC";
+  WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0):
     ?>

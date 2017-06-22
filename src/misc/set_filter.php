@@ -11,7 +11,7 @@
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
 }
-if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else ! only elseif() (THINK)
+if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (THINK)
   if(isset($_POST['searchCompany'])){
     $filterings['company'] = intval($_POST['searchCompany']);
   }
@@ -20,6 +20,13 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else ! o
   }
   if(isset($_POST['searchProject'])){
     $filterings['project'][0] = intval($_POST['searchProject']);
+  }
+  if(isset($filterings['project'][1])){
+    if(isset($_POST['searchProductive'])){
+      $filterings['project'][1] = 'checked';
+    } else {
+      $filterings['project'][1] = '';
+    }
   }
   if(isset($_POST['searchProductive'])){
     $filterings['project'][1] = 'checked';
@@ -30,11 +37,19 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else ! o
   if(isset($_POST['searchCharged'])){
     $filterings['bookings'][0] = intval($_POST['searchCharged']);
   }
-  if(isset($_POST['searchBreaks']) && empty($_POST['searchBreaks'])){
-    $filterings['bookings'][1] = '';
+  if(isset($filterings['bookings'][1])){
+    if(isset($_POST['searchBreaks'])){
+      $filterings['bookings'][1] = 'checked';
+    } else {
+      $filterings['bookings'][1] = '';
+    }
   }
-  if(isset($_POST['searchDrives']) && empty($_POST['searchDrives'])){
-    $filterings['bookings'][2] = '';
+  if(isset($filterings['bookings'][2])){
+    if(isset($_POST['searchDrives'])){
+      $filterings['bookings'][2] = 'checked';
+    } else {
+      $filterings['bookings'][2] = '';
+    }
   }
   if(!empty($_POST['searchYear'])){
     $filterings['date'] = intval($_POST['searchYear']);
@@ -70,7 +85,7 @@ $styles = array(20, 90);
 if(count($filterings) > 4){
   $styles = array(40, 45);
 }
-if(count($filterings) > 7){
+if(count($filterings) > 6){
   $styles = array(60, 32);
 }
 ?>

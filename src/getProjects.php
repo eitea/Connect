@@ -192,7 +192,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //end if POST
 
 $filterDate = substr(getCurrentTimestamp(), 0, 10);
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => $filterDate); //init: display all
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => "2017-02-13"); //init: display all
 ?>
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;">
@@ -252,7 +252,8 @@ $editingResult = $conn->query($sql); //f*ck you php
 $addTimeStart = 0;
 ?>
 <form id="project_table" method="post">
-  <table class="table table-striped table-condensed" style="margin-top:120px;">
+  <div style="margin-top:120px;"></div>
+  <table class="table table-hover table-condensed">
     <thead>
       <th></th>
       <th><?php echo $lang['COMPANY'].', '.$lang['CLIENT'].', '.$lang['PROJECT']; ?></th>
@@ -380,7 +381,7 @@ $addTimeStart = 0;
       } //end while fetch_assoc
 
       echo "<tr>";
-      echo "<td style='font-weight:bold'>Summary</td> <td></td> <td></td> <td></td>";
+      echo "<td style='font-weight:bold'>Summary</td> <td></td> <td></td> <td></td> <td></td> <td></td>";
       echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
       echo "</tr>";
       ?>
