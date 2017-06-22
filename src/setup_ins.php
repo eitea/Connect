@@ -21,7 +21,7 @@ $travellingFile
 $sql = "INSERT INTO $companyTable (name, companyType) VALUES ('$companyName', '$companyType')";
 $conn->query($sql);
 //insert password policy
-$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (0)");
+$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (6)");
 //insert module en/disable
 $conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
 

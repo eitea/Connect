@@ -488,9 +488,6 @@ $lang_ger['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
 $lang_eng['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
 $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
-$lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
-$lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
-
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
 
@@ -502,6 +499,13 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
+
+$lang_eng['INFO_EXPIRATION'] = 'Passwords with valid expiration settings will be invalid once the set timespan has expired. This timespan is defined in months. <br>
+                                Once a password has expired, the corresponding user will receive a notification with a warning. <br>
+                                This warning can be set to optional, which will let the user continue normally instead of forcing a mandatory password change.';
+$lang_ger['INFO_EXPIRATION'] = 'Passwörter mit einem Gültigkeitszeitraum verfallen, nachdem dieser Zeitraum abgelaufen ist. Der Zeitraum wird in Monaten definiert. <br>
+                                Ist ein Passwort abgelaufen, wird dem zugehörigen Benutzer ein Warnhinweis angezeigt. <br>
+                                Wird ein Warnhinweis als Optional definiert, wird der Benutzer nicht gezwungen sein Passwort für die weitere Nutzung ändern zu müssen.';
 
 $lang_eng['INFO_GEMINI'] = "More than one timestamp were detected for the same day.<br>
                             A User may only posess one kind of timestamp per day. <br>
@@ -518,12 +522,16 @@ $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde ke
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
 
-$lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
+
+$lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restriction <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
                                       Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
 $lang_ger['INFO_PASSWORD_GENERAL'] = 'Einfach - Keine Restriktion <br>
-                                      Mittel - Passwörter müssen mind. 1 Großbuchstaben und 1 Zahl enthalten <br>
-                                      Stark - Passwörter müssen mind. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>';
+                                      Mittel - Passwörter müssen min. 1 Großbuchstaben und 1 Zahl enthalten <br>
+                                      Stark - Passwörter müssen min. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>';
+
+$lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
+$lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 
 $lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
 $lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
@@ -686,6 +694,9 @@ $lang_ger['PAYMENT'] = 'Zahlung';
 
 $lang_eng['PAYMENT_CONDITIONS'] = 'Payment Conditions';
 $lang_ger['PAYMENT_CONDITIONS'] = 'Zahlungsbedingungen';
+
+$lang_eng['PAYMENT_METHODS'] = 'Payment Methods';
+$lang_ger['PAYMENT_METHODS'] = 'Zahlungsarten';
 
 $lang_eng['PDF_TEMPLATES'] = 'Pdf Templates';
 $lang_ger['PDF_TEMPLATES'] = 'Pdf Vorlagen';
@@ -857,11 +868,17 @@ $lang_ger['SCHEDULE_TOSTRING'] = array(
 $lang_eng['SEARCH'] = 'Search';
 $lang_ger['SEARCH'] = 'Suche';
 
+$lang_eng['SEARCH_OPTIONS'] = 'Search Options';
+$lang_ger['SEARCH_OPTIONS'] = 'Suchoptionen';
+
 $lang_eng['SEND_ACCESS'] = 'Send Access';
 $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
 $lang_eng['SETTINGS'] = 'Settings';
 $lang_ger['SETTINGS'] = 'Einstellungen';
+
+$lang_eng['SHIPPING_METHODS'] = 'Shipping Methods';
+$lang_ger['SHIPPING_METHODS'] = 'Versandarten';
 
 $lang_eng['SHOULD_TIME'] = 'Should';
 $lang_ger['SHOULD_TIME'] = 'Soll';

@@ -511,10 +511,10 @@ if (!$conn->query($sql)) {
 }
 
 $sql = "CREATE TABLE $policyTable (
-  passwordLength INT(2) DEFAULT 0,
-  complexity ENUM('0', '1', '2') DEFAULT '0',
-  expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  expirationDuration INT(3),
+  passwordLength INT(2) DEFAULT 6,
+  complexity ENUM('0', '1', '2') DEFAULT '1',
+  expiration ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  expirationDuration INT(3) DEFAULT 3,
   expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
   )";
   if (!$conn->query($sql)) {
