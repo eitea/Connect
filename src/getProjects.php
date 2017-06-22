@@ -192,7 +192,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //end if POST
 
 $filterDate = substr(getCurrentTimestamp(), 0, 10);
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => "2017-02-13"); //init: display all
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => $filterDate); //init: display all
 ?>
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;">
