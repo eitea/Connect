@@ -707,7 +707,7 @@ $sql = "CREATE TABLE $policyTable (
     taxPercentage INT(3),
     taxID INT(4) UNSIGNED,
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    purchase DECIMAL(10,2)
+    purchase DECIMAL(10,2),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
