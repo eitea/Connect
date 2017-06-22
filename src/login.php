@@ -29,6 +29,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     $timeZone = $_POST['funZone'];
     $_SESSION['timeToUTC'] = $timeZone;
     $_SESSION['filterings'] = array();
+    $_SESSION['color'] = $row['color'];
 
     //check for updates, if core admin
     require "language.php";

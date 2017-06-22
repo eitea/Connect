@@ -1253,8 +1253,14 @@ if($row['version'] < 90){
   }
 }
 
-
-//if($row['version'] < 91){}
+if($row['version'] < 91){
+  $sql = "ALTER TABLE userData ADD COLUMN color VARCHAR(10) DEFAULT 'default'";
+  if($conn->query($sql)){
+    echo '<br> Color Picker';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+}
 //if($row['version'] < 92){}
 
 //------------------------------------------------------------------------------

@@ -77,6 +77,7 @@ while($result && ($row = $result->fetch_assoc())){
   $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){
     if(test_input($_POST['password']) != $_POST['password']){
@@ -117,19 +118,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
     }
   } elseif(isset($_POST["GERMAN"])){
-    $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
+    $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
     $conn->query($sql);
     $_SESSION['language'] = 'GER';
     $validation_output = mysqli_error($conn);
   } elseif(isset($_POST['ENGLISH'])){
-    $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = 1";
+    $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
     $conn->query($sql);
     $_SESSION['language'] = 'ENG';
     $validation_output = mysqli_error($conn);
   }
+  if(isset($_POST['set_skin'])){
+    $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
+    $conn->query("UPDATE userData SET color = '$txt' WHERE id = $userID");
+  }
+}
+if($_SESSION['color'] == 'default'){
+  $css_file = '../plugins/homeMenu/homeMenu.css';
+} elseif($_SESSION['color'] == 'dark'){
+  $css_file = '../plugins/homeMenu/homeMenu_dark.css';
+} else {
+  $css_file = '../plugins/homeMenu/homeMenu_light.css';
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,12 +170,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link href="../plugins/iCheck/minimal/orange.css" rel="stylesheet"/>
   <script src="../plugins/iCheck/icheck.min.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="<?php echo $css_file; ?>" rel="stylesheet">
   <title>Connect</title>
   <script>
-  if(localStorage.getItem('color')){
-    changeCSS(localStorage.getItem('color'));
-  }
   document.onreadystatechange = function() {
     var state = document.readyState
     if (state == 'complete') {
@@ -187,21 +195,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
     }
-    //skin selector
-    $('.set-skin').on('click', function(){
-      changeCSS(this.value);
-      localStorage.setItem('color', this.value);
-    });
   });
-  function changeCSS(val){
-    if(val == 'default'){
-      document.getElementsByTagName("link").item(7).setAttribute("href", "../plugins/homeMenu/homeMenu.css");
-    } else if(val == 'dark'){
-      document.getElementsByTagName("link").item(7).setAttribute("href", "../plugins/homeMenu/homeMenu_dark.css");
-    } else if(val == 'light'){
-      document.getElementsByTagName("link").item(7).setAttribute("href", "../plugins/homeMenu/homeMenu_light.css");
-    }
-  }
+
   </script>
 </head>
 <body id="body_container" class="is-table-row">
@@ -217,9 +212,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><button type="button" class="btn btn-default set-skin" value="default">Default</button></li>
-              <li><button type="button" class="btn btn-default set-skin" value="dark">Dark</button></li>
-              <li><button type="button" class="btn btn-default set-skin" value="light">Light</button></li>
+              <form method="POST" class="navbar-form navbar-left">
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Default</button></li>
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Dark</button></li>
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
+              </form>
             </ul>
           </li>
         </ul>
@@ -227,7 +224,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <form method=post class="navbar-form navbar-left">
+              <form method="POST" class="navbar-form navbar-left">
                 <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
                 <li class="divider"></li>
                 <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
@@ -527,18 +524,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           if($this_page == "report_productivity.php"){
             echo "<script>$('#adminOption_REPORT').click();</script>";
           }
-
-          endif;
           ?>
-          <!-- Section Five: ERP -->
-          <?php
-          if($isERPAdmin == 'TRUE'):
+        <?php endif; ?>
+        <!-- Section Five: ERP -->
+        <?php
+        if($isERPAdmin == 'TRUE'):
           ?>
           <div class="panel panel-default panel-borderless">
             <div class="panel-heading" role="tab" id="headingERP">
-              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">
-                ERP<i class="fa fa-caret-down pull-right"></i>
-              </a>
+              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">ERP<i class="fa fa-caret-down pull-right"></i></a>
             </div>
             <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
               <div class="panel-body">
