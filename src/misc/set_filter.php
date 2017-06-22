@@ -98,7 +98,7 @@ if(count($filterings) > 6){
 }
 </style>
 <div id="filterings_dropdown" class="dropdown" style="display:inline">
-  <button type="button" class="btn btn-default" data-toggle="dropdown" ><i class="fa fa-search"></i></button>
+  <button type="button" class="btn btn-default" data-toggle="dropdown" title="<?php echo $lang['SEARCH_OPTIONS']; ?>"><i class="fa fa-search"></i></button>
   <div class="dropdown-menu" style="width:<?php echo $styles[0]; ?>vw">
     <form method="POST">
       <div class="container-fluid"><br>
@@ -221,6 +221,11 @@ if(count($filterings) > 6){
             ?>
           </select>
         </div>
+        <?php endif; ?>
+
+        <?php if(isset($filterings['procedures'])): ?>
+          <div class="filter_column">
+          </div>
         <?php endif; ?>
         <div class="container-fluid text-right">
           <div class="col-xs-12"><br><button type="submit" class="btn btn-warning" name="set_filter_apply"><?php echo $lang['APPLY']; ?></button><br><br></div>
