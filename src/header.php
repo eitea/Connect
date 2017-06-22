@@ -185,13 +185,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
     }
-    $('input').not('.disable-styling').iCheck({
-      checkboxClass: 'icheckbox_minimal-orange',
-      radioClass: 'iradio_minimal-orange',
-      increaseArea: '20%' //clickable area
-    });
-    //onChange event trigger workaround
-    $('input').on('ifChanged', function (event) { $(event.target).trigger('change'); });
   });
   </script>
 </head>
@@ -406,7 +399,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
                         <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
                         <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
-                        <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
+                        <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                         <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
@@ -421,7 +414,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <?php
           if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_basic.php" || $this_page == "deactivatedUsers.php"){
             echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page =="editTaxes.php" || $this_page =="editUnits.php"){
+          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -525,13 +518,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                   <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                   <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['PROCESSES']; ?></span></a></li>
                   <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="product_articles.php"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                  <li>
+                    <a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
+                      <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleERPSettings" style="height: 0px;">
+                      <ul class="nav nav-list">
+                        <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editPaymentMethods.php'){echo $setActiveLink;}?> href="editPaymentMethods.php"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editShippingMethods.php'){echo $setActiveLink;}?> href="editShippingMethods.php"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editRepresentative.php'){echo $setActiveLink;}?> href="editRepresentative.php"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
+                      </ul>
+                    </div>
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
           <br>
           <?php
-          if($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
+          if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepresentative.php"){
+            echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+          } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
             echo "<script>$('#adminOption_ERP').click();</script>";
           }
           ?>

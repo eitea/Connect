@@ -32,4 +32,14 @@
   <!-- /modal -->
 <?php endif; ?>
 </body>
+
+<script>
+$('input').not('.disable-styling').iCheck({
+  checkboxClass: 'icheckbox_minimal-orange',
+  radioClass: 'iradio_minimal-orange',
+  increaseArea: '20%' //clickable area
+});
+//onChange event trigger workaround
+$('input').on('ifChanged', function (event) { $(event.target).trigger('change'); });
+</script>
 </html>
