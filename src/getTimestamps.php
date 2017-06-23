@@ -144,6 +144,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['add_multiple']) && !empty($_POST['add_multiple_user'])){
+    $filterID = intval($_POST['add_multiple_user']);
     if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
       $status = intval($_POST['add_multiple_status']);
       $i = $_POST['add_multiple_start'].' 08:00:00';
