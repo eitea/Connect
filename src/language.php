@@ -461,6 +461,9 @@ $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
+$lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
+$lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
+
 $lang_eng['HIRE_USER'] = 'Hire User';
 $lang_ger['HIRE_USER'] = 'Benutzer Einstellen';
 

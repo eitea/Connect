@@ -54,6 +54,13 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   if(isset($_POST['searchActivity'])){
     $filterings['logs'][0] = intval($_POST['searchActivity']);
   }
+  if(isset($filterings['logs'][1])){
+    if(isset($_POST['searchAllTimestamps'])){
+      $filterings['logs'][1] = 'checked';
+    } else {
+      $filterings['logs'][1] = '';
+    }
+  }
   if(!empty($_POST['searchYear'])){
     $filterings['date'] = intval($_POST['searchYear']);
   }
@@ -166,9 +173,7 @@ if($scale > 2){ //3 columns
             $result_fc = mysqli_query($conn, "SELECT * FROM userData WHERE id IN (".implode(', ', $available_users).")");
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
-              if($filterings['user'] == $row_fc['id']) {
-                $checked = 'selected';
-              }
+              if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
               echo "<option $checked value='".$row_fc['id']."' >".$row_fc['firstname'].' '.$row_fc['lastname']."</option>";
             }
             echo '</select>';
@@ -196,8 +201,10 @@ if($scale > 2){ //3 columns
                 <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
                 <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
               </select>
+              <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
           <?php endif; ?>
         </div>
+
         <?php if(isset($filterings['date'])): ?>
         <div class="filter_column">
           <label><?php echo $lang['YEAR']; ?></label>

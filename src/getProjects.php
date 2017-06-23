@@ -195,7 +195,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;">
   <div class="page-header">
-    <h3><?php echo $lang['VIEW_PROJECTS']; ?>
+    <h6><?php echo $lang['VIEW_PROJECTS']; ?>
       <div class="page-header-button-group">
         <?php include "misc/set_filter.php"; //this is where the magic happens ?>
         <button type='submit' class="btn btn-default" name='saveChanges' form="project_table"><i class="fa fa-floppy-o"></i></button>
@@ -225,7 +225,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           </div>
         </form>
       </div>
-    </h3>
+    </h6>
   </div>
 </div>
 <?php
@@ -242,7 +242,7 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %' 
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
