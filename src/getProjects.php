@@ -204,16 +204,16 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
         <form action="pdfDownload.php" method="POST" target='_blank' style="display:inline-block">
           <?php //quess who needs queries.
           $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
-          if($filterings['company']){$companyQuery = " AND $companyTable.id = ".$filterings['company']; }
-          if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
-          if($filterings['project'][0]){$projectQuery = " AND $projectTable.id = ".$filterings['project'][0]; }
-          if($filterings['project'][1]){$productiveQuery = " AND $projectTable.status = 'checked'"; }
-          if($filterings['user']){$userQuery = " AND $userTable.id = ".$filterings['user']; }
-          if($filterings['bookings'][0] == '2'){$chargedQuery = " AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
-          if(!$filterings['bookings'][1]){$breakQuery = " AND $projectBookingTable.bookingType != 'break' "; }
-          if(!$filterings['bookings'][2]){$driveQuery = " AND $projectBookingTable.bookingType != 'drive' "; }
+          if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
+          if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
+          if($filterings['project'][0]){$projectQuery = "AND $projectTable.id = ".$filterings['project'][0]; }
+          if($filterings['project'][1]){$productiveQuery = "AND $projectTable.status = 'checked'"; }
+          if($filterings['user']){$userQuery = "AND $userTable.id = ".$filterings['user']; }
+          if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
+          if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; }
+          if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE('".$filterings['date']."') = DATE(DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR))  $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %' $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
             <ul class="dropdown-menu">
@@ -242,7 +242,7 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE('".$filterings['date']."') = DATE(DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR))
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %' 
 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);

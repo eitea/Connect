@@ -5,7 +5,7 @@
 * Project [id, productive]
 * Users [id]
 * Bookings [charged, break, drive]
-* Activity [index]
+* Logs [activity, all]
 * Dates [date]
 **/
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
@@ -51,6 +51,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
       $filterings['bookings'][2] = '';
     }
   }
+  if(isset($_POST['searchActivity'])){
+    $filterings['logs'][0] = intval($_POST['searchActivity']);
+  }
   if(!empty($_POST['searchYear'])){
     $filterings['date'] = intval($_POST['searchYear']);
   }
@@ -81,11 +84,16 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
   $filterings = $_SESSION['filterings'];
 }
 
+$scale = 0;
+if(isset($filterings['date'])){$scale++;}
+if(isset($filterings['user'])){$scale++;}
+if(isset($filterings['company'])){$scale++;}
+
 $styles = array(20, 90);
-if(count($filterings) > 4){
+if($scale > 1){ //2 columns
   $styles = array(40, 45);
 }
-if(count($filterings) > 6){
+if($scale > 2){ //3 columns
   $styles = array(60, 32);
 }
 ?>
@@ -179,8 +187,17 @@ if(count($filterings) > 6){
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
             </div>
           <?php endif; ?>
+          <?php if(isset($filterings['logs'])): ?><br><br>
+            <label><?php echo $lang['ACTIVITY']; ?></label>
+              <select name="searchActivity" class="js-example-basic-single">
+                <option value="0">...</option>
+                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
+                <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+                <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
+                <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+              </select>
+          <?php endif; ?>
         </div>
-
         <?php if(isset($filterings['date'])): ?>
         <div class="filter_column">
           <label><?php echo $lang['YEAR']; ?></label>

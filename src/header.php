@@ -168,8 +168,8 @@ if($_SESSION['color'] == 'light'){
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
-  <link href="<?php echo $css_file; ?>" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+  <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
   <script>
   document.onreadystatechange = function() {
@@ -195,7 +195,6 @@ if($_SESSION['color'] == 'light'){
       }, 1000);
     }
   });
-
   </script>
 </head>
 <body id="body_container" class="is-table-row">
