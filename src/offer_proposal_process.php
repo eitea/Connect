@@ -9,14 +9,14 @@
     <br><br>
     <div class="container text-center">
       <form method="POST" action="offer_proposal_edit.php">
-        <button class="btn btn-default" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_PROPOSAL']; ?></button>
+        <button class="btn btn-link" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_PROPOSAL']; ?></button>
       </form>
       <br>
       <form method="POST" action="offer_proposal_edit.php?nERP=AUB">
-        <button class="btn btn-default" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_CONFIRMATION']; ?></button>
+        <button class="btn btn-link" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_CONFIRMATION']; ?></button>
       </form><br>
       <form method="POST" action="offer_proposal_edit.php?nERP=RE">
-        <button class="btn btn-default" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_RECEIPT']; ?></button>
+        <button class="btn btn-link" name="filterClient" value="<?php echo $_POST['filterClient']; ?>"><?php echo $lang['NEW_RECEIPT']; ?></button>
       </form>
     </div>
 <?php else: ?>
@@ -32,8 +32,10 @@
        echo '</div>';
      } else {
     ?>
-       <div style="padding-left:20%">
+       <div class="col-md-6">
          <?php include 'misc/select_client.php'; ?>
+       </div>
+       <div class="col-md-1">
          <button type="submit" class="btn btn-warning" >OK</button>
        </div>
        <?php

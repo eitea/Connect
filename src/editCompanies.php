@@ -194,8 +194,8 @@ $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
   ?>
 
-<style> .row{ padding-bottom:5px; }</style>
-<div class="page-header">
+<div class="page-seperated-body">
+<div class="page-header page-seperated-section">
   <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
@@ -223,7 +223,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
 
 
 <!-- LOGO -->
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
       <h4>Logo
@@ -243,10 +243,10 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
   </div>
 </form>
-<br><hr><br>
+<br>
 
 <!-- GENERAL -->
-<form method="POST">
+<form method="POST" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
       <h4>
@@ -338,10 +338,10 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
   </div>
 </form>
-<br><hr><br>
+<br>
 
 <!-- DEFAULT PROJECTS -->
-<form method="POST">
+<form method="POST" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
       <h4>
@@ -509,10 +509,10 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
   </div>
 </form>
-<br><hr><br>
+<br>
 
 <!-- ASSIGNED USERS -->
-<form method="POST">
+<form method="POST" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
       <h4><?php echo $lang['ASSIGNED'] . " " . $lang['USERS']; ?>
@@ -580,12 +580,12 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
   </div>
 </form>
-<br><hr><br>
+<br>
 
 
 <!-- ADDITIONAL BOOKING FIELDS -->
 <?php $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); $i = 1; ?>
-<form method="POST">
+<form method="POST" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
       <h4><?php echo $lang['ADDITIONAL_FIELDS']; ?>
@@ -704,6 +704,6 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
   </div>
 </form>
 <?php endif;?>
-
+</div>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

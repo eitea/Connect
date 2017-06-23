@@ -535,7 +535,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <?php else: echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>'; endif; ?>
   </form>
 
-  <!-- Editing Modall -->
+  <!-- edit timestamps modall -->
   <?php if($filterID) for($i = 0; $i < $calculator->days; $i++): ?>
     <form method="POST">
       <div class="modal fade editingModal-<?php echo $i; ?>" tabindex="-1" role="dialog">
@@ -557,8 +557,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   } else {
                     $B = $calculator->end[$i];
                   }
-                  echo '<div class="col-md-6"><br>';
-                  echo "<select name='newActivity' class='js-example-basic-single' style='width:150px'>";
+                  echo '<div class="col-md-3"><br>';
+                  echo "<select name='newActivity' class='js-example-basic-single'>";
                   for($j = 0; $j < 7; $j++){
                     if($calculator->activity[$i] == $j){
                       echo "<option value='$j' selected>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
@@ -566,11 +566,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                       echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     }
                   }
-                  echo "</select> ";
+                  echo '</select></div><div class="col-md-3"><br>';
                   if(!$calculator->indecesIM[$i]){ //timestamp doesnt exist
                     $A = $B = $calculator->date[$i].' 12:00:00';
                     //existing timestamps cant have timeToUTC edited
-                    echo ' <select name="creatTimeZone" class="js-example-basic-single" style="width:90px">';
+                    echo ' <select name="creatTimeZone" class="js-example-basic-single">';
                     for($i_utc = -12; $i_utc <= 12; $i_utc++){
                       if($i_utc == $timeToUTC){
                         echo "<option name='ttz' value='$i_utc' selected>UTC " . sprintf("%+03d", $i_utc) . "</option>";
@@ -634,7 +634,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
+            <h4 class="modal-title"><?php echo substr(carryOverAdder_Hours($row['start'], $timeToUTC), 0, 10); ?></h4>
           </div>
           <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
             <table class="table table-hover">
@@ -653,7 +653,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
                 do {
                   $x = $row['bookingTableID'];
-                  $A = substr(carryOverAdder_Hours($row['start'], $timeToUTC), 11, 5);
+                  $date = carryOverAdder_Hours($row['start'], $timeToUTC);
+                  $A = substr($date, 11, 5);
                   $B = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5);
                   $C = $row['infoText'];
                   $icon = "fa fa-bookmark";
@@ -669,7 +670,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   echo "<td><i class='$icon'></i></td>";
                   echo '<td>'. $row['name'] .'</td>';
                   echo '<td>'. $row['projectName'] .'</td>';
-                  echo '<td>'. substr($row['start'], 0, 10) .'</td>';
+                  echo '<td>'. substr($date, 0, 10) .'</td>';
                   echo "<td>$A</td>";
                   echo "<td>$B</td>";
                   echo "<td style='text-align:left'>$C</td>";
@@ -712,8 +713,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   while($row = $bookingResult->fetch_assoc()):
   $x = $row['bookingTableID'];
   ?>
-    <!-- Edit bookings (time only) -->
-    <form method="post">
+    <!-- Edit bookings -->
+    <form method="POST">
       <div class="modal fade editingProjectsModal-<?php echo $x ?>">
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">

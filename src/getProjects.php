@@ -95,22 +95,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("DELETE FROM projectBookingData WHERE id = $x");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   }
-  if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
-    $filterDate = $_POST['add_date'];
-    if(test_Date($filterDate.' 08:00:00')){
+  if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+    if(test_Date($_POST['add_date'].' 08:00:00')){
+
       $filterUserID = intval($_POST['user']);
-      //get the timestamp. if it doesnt exist -> display a biiiig fat error
-      $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND time LIKE '$filterDate %' AND status = '0'";
+      //get the timestamp. always(!) compre UTC to UTC
+      $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'";
       $result = mysqli_query($conn, $sql);
       if($result && $result->num_rows > 0){
         $row = $result->fetch_assoc();
         $indexIM = $row['indexIM'];
         $timeToUTC = $row['timeToUTC'];
 
-        $startDate = $filterDate." ".$_POST['start'];
+        $startDate = $_POST['add_date']." ".$_POST['start'];
         $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
-        $endDate = $filterDate." ".$_POST['end'];
+        $endDate = $_POST['add_date']." ".$_POST['end'];
         $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
         $insertInfoText = test_input($_POST['infoText']);
@@ -190,9 +190,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //end if POST
-
-$filterDate = substr(getCurrentTimestamp(), 0, 10);
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" => $filterDate); //init: display all
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
 ?>
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;">
@@ -215,7 +213,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           if(!$filterings['bookings'][1]){$breakQuery = " AND $projectBookingTable.bookingType != 'break' "; }
           if(!$filterings['bookings'][2]){$driveQuery = " AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE $projectBookingTable.start LIKE '".$filterings['date']."%' $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE('".$filterings['date']."') = DATE(DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR))  $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
             <ul class="dropdown-menu">
@@ -244,7 +242,7 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE $projectBookingTable.start LIKE '".$filterings['date']."%'
+WHERE DATE('".$filterings['date']."') = DATE(DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR))
 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
@@ -366,10 +364,10 @@ $addTimeStart = 0;
         if($row['booked'] == 'FALSE'){
           echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
         }
-        echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a>";
-        if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
-        if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
-        if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }
+        echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a> ";
+        if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a> "; }
+        if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a> "; }
+        if(!empty($expensesinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a> "; }
         echo "<button type='submit' class='btn btn-default' value='$x' name='delete_booking'><i class='fa fa-trash-o'></i></button>";
         echo '</td>';
         echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged

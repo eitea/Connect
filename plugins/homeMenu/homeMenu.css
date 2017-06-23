@@ -12,7 +12,7 @@ body{
   border: 0;
 }
 .navbar-nav {
-  margin: 0;
+  margin-top: 10px;
 }
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
@@ -42,7 +42,8 @@ ul.nav.navbar-nav .nav.nav-list {
   max-height: 100%;
   overflow-y: auto;
   z-index: 20;
-  background-color: white;
+  background-color: whitesmoke;
+  border-right: 1px solid #e7e7e7;
 }
 .nav>li>a{
   padding-top:5px;
@@ -61,8 +62,8 @@ ul.nav.navbar-nav .nav.nav-list {
   max-height: none;
 }
 .sidebar-nav .navbar{
-  border-radius:0;
   margin-bottom:0;
+  background-color: #f5f5f5;
   border:0;
 }
 .panel-group .panel+.panel{
@@ -141,14 +142,6 @@ ul.nav.navbar-nav .nav.nav-list {
   100% { transform: rotate(360deg); }
 }
 
-/* General colors
-.navbar-default{
-  background-color:white;
-}
-.panel-default>.panel-heading{
-  background-color:white;
-}
-*/
 /* hidden scrollbar */
 .hidden-scrollbar {
   overflow:hidden;
@@ -172,6 +165,9 @@ ul.nav.navbar-nav .nav.nav-list {
 }
 
 /* helpings */
+.row{
+  padding-bottom:5px;
+}
 i{
   margin-right:5px;
   margin-left:5px;
@@ -206,6 +202,18 @@ span.select2.select2-container.select2-container--default {
 .page-header-button-group{
   display:inline;
   padding-left:15px;
+}
+
+/* seperations */
+.page-seperated-body{
+  background-color: #f8f8f8;
+  padding: 10px 20px 20px;
+  margin: -40px -15px -50px -20px
+}
+.page-seperated-section{
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
 }
 
 /* html calendar date-picker */

@@ -133,12 +133,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn->query("UPDATE userData SET color = '$txt' WHERE id = $userID");
   }
 }
-if($_SESSION['color'] == 'default'){
-  $css_file = '../plugins/homeMenu/homeMenu.css';
+
+if($_SESSION['color'] == 'light'){
+  $css_file = '../plugins/homeMenu/homeMenu_light.css';
 } elseif($_SESSION['color'] == 'dark'){
   $css_file = '../plugins/homeMenu/homeMenu_dark.css';
 } else {
-  $css_file = '../plugins/homeMenu/homeMenu_light.css';
+  $css_file = '';
 }
 ?>
 <!DOCTYPE html>
@@ -167,9 +168,7 @@ if($_SESSION['color'] == 'default'){
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/iCheck/minimal/orange.css" rel="stylesheet"/>
-  <script src="../plugins/iCheck/icheck.min.js"></script>
-
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
   <link href="<?php echo $css_file; ?>" rel="stylesheet">
   <title>Connect</title>
   <script>
@@ -527,9 +526,7 @@ if($_SESSION['color'] == 'default'){
           ?>
         <?php endif; ?>
         <!-- Section Five: ERP -->
-        <?php
-        if($isERPAdmin == 'TRUE'):
-          ?>
+        <?php if($isERPAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
             <div class="panel-heading" role="tab" id="headingERP">
               <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">ERP<i class="fa fa-caret-down pull-right"></i></a>
@@ -558,7 +555,6 @@ if($_SESSION['color'] == 'default'){
               </div>
             </div>
           </div>
-          <br>
           <?php
           if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepresentative.php"){
             echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
@@ -566,8 +562,8 @@ if($_SESSION['color'] == 'default'){
             echo "<script>$('#adminOption_ERP').click();</script>";
           }
           ?>
+          <br><br>
         <?php endif; ?>
-        <br>
       </div> <!-- /accordions -->
       <br><br><br>
     </div>
