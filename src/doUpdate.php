@@ -1253,7 +1253,7 @@ if($row['version'] < 90){
   }
 }
 
-if($row['version'] < 91){
+if($row['version'] < 92){
   $sql = "ALTER TABLE $userTable ADD COLUMN color VARCHAR(10) DEFAULT 'default'";
   if($conn->query($sql)){
     echo '<br> Color Picker';
@@ -1261,7 +1261,11 @@ if($row['version'] < 91){
     echo '<br>'.$conn->error;
   }
 }
-//if($row['version'] < 92){}
+//if($row['version'] < 93){}
+//if($row['version'] < 93){}
+//if($row['version'] < 94){}
+//if($row['version'] < 95){}
+//if($row['version'] < 96){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
