@@ -168,6 +168,7 @@ ul.nav.navbar-nav .nav.nav-list {
 input[type="checkbox"] {
   -webkit-appearance: none;
   -moz-appearance: none;
+  position:relative;
   width:20px;
   height:20px;
   background-color:#ccc;
@@ -177,6 +178,8 @@ input[type="checkbox"] {
   margin-right:5px;
 }
 input[type="checkbox"]:checked {
+  position:relative;
+  margin-right:5px;
   background-color:#f0ad4e;
 }
 input[type="checkbox"]:checked:after {
