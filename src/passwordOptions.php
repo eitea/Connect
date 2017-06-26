@@ -1,6 +1,4 @@
-<?php require 'header.php'; require_once 'utilities.php'; ?>
-<?php enableToCore($userID);?>
-
+<?php require 'header.php'; require_once 'utilities.php'; enableToCore($userID);?>
 <?php
 if(isset($_POST['saveButton'])){
   //allgemein
@@ -90,11 +88,15 @@ $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
 ?>
 
-<div class="page-header">
-  <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></h3>
-</div>
 
 <form method="POST">
+  <div class="page-header">
+    <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
+      <div class="page-header-button-group">
+        <button type="submit" class="btn btn-default" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button>
+      </div>
+    </h3>
+  </div>
   <h4><?php echo $lang['ADMIN_CORE_OPTIONS']; ?> <a role="button" data-toggle="collapse" href="#password_info_general"> <i class="fa fa-info-circle"> </i> </a></h4>
   <br>
   <div class="collapse" id="password_info_general">
@@ -125,7 +127,7 @@ $row = $result->fetch_assoc();
 
   <div class="row">
     <div class="col-xs-8">
-      <h4>Verfallsdatum <a role="button" data-toggle="collapse" href="#password_info_expiry"><i class="fa fa-info-circle"></i></a></h4>
+      <h4><?php echo $lang['EXPIRATION_DATE']; ?> <a role="button" data-toggle="collapse" href="#password_info_expiry"><i class="fa fa-info-circle"></i></a></h4>
     </div>
     <div class="col-xs-2 checkbox">
       <input type="checkbox" value="person" name="enableTimechange"  <?php if($row['expiration'] == 'TRUE'){echo 'checked';} ?> /> Aktiv
@@ -134,8 +136,7 @@ $row = $result->fetch_assoc();
   <br>
   <div class="collapse" id="password_info_expiry">
     <div class="well">
-      Passwörter können ein Verfallsdatum besitzen (Erweitert - Aktiv), wodurch nach Ablauf der Zeit der Benutzer dazu aufgefordert wird sein Passwort zu ändern.
-      Die Aufforderung kann den Benutzer entweder Zwingen, oder ihm die Entscheidung überlassen.
+      <?php echo $lang['INFO_EXPIRATION']; ?>
     </div>
   </div>
   <br>
@@ -161,7 +162,7 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
 
-  <h4>Master Passwort Setzen <a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4>Master Passwort <a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
@@ -191,11 +192,6 @@ $row = $result->fetch_assoc();
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
     </div>
     <br><br><br>
-  </div>
-  <br><hr><br>
-
-  <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Speichern </button>
   </div>
 </form>
 <?php require 'footer.php'; ?>

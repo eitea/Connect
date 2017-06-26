@@ -95,6 +95,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
 
+$lang_eng['APPLY'] = 'Apply';
+$lang_ger['APPLY'] = 'Anwenden';
+
 $lang_eng['ARTICLE'] = 'Article';
 $lang_ger['ARTICLE'] = 'Artikel';
 
@@ -137,6 +140,9 @@ $lang_ger['BREAKS'] = 'Pausen';
 $lang_eng['CALENDAR'] = 'Calendar';
 $lang_ger['CALENDAR'] = 'Kalender';
 
+$lang_eng['CANCEL'] = 'Cancel';
+$lang_ger['CANCEL'] = 'Abbrechen';
+
 $lang_eng['CANCELLATION'] = 'Cancellation';
 $lang_ger['CANCELLATION'] = 'Stornierung';
 
@@ -164,6 +170,9 @@ $lang_ger['CHECK_OUT'] = 'Ausstempeln';
 $lang_eng['CHECKLIST'] = 'Checklist';
 $lang_ger['CHECKLIST'] = 'Checkliste';
 
+$lang_eng['CHOOSE_ARTICLE'] = 'Choose Article';
+$lang_ger['CHOOSE_ARTICLE'] = 'Aritkel Wählen';
+
 $lang_eng['CHOOSE_PROCESS'] = 'Choose Process';
 $lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
 
@@ -178,6 +187,9 @@ $lang_ger['CLIENTS'] = 'Kunden';
 
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
+
+$lang_eng['CONTINUE'] = 'Continue';
+$lang_ger['CONTINUE'] = 'Weiter';
 
 $lang_eng['COMPANIES'] = 'Companies';
 $lang_ger['COMPANIES'] = 'Mandanten';
@@ -233,11 +245,32 @@ $lang_ger['DAILY_USER_PROJECT'] = 'Tagesbericht';
 $lang_eng['DATA'] = 'Data';
 $lang_ger['DATA'] = 'Daten';
 
+$lang_eng['DATATABLES_LANG_OPTIONS'] = '';
+$lang_ger['DATATABLES_LANG_OPTIONS'] = '
+    "emptyTable":     "Keine verfügbaren Daten",
+    "info":           "_START_ bis _END_ von _TOTAL_ Einträgen",
+    "infoEmpty":      "Leer",
+    "infoFiltered":   "(0 von _MAX_ Einträgen)",
+    "lengthMenu":     "Zeige _MENU_ Einträge",
+    "loadingRecords": "Loading...",
+    "processing":     "Processing...",
+    "search":         "Suchen:",
+    "zeroRecords":    "Keine passenden Einträge gefunden",
+    "paginate": {
+        "first":      "Erste",
+        "last":       "Letzte",
+        "next":       "Nächste",
+        "previous":   "Vorherige"
+    }';
+
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
 
 $lang_eng['DATE_DELIVERY'] = 'Date of Delivery';
 $lang_ger['DATE_DELIVERY'] = 'Lieferdatum';
+
+$lang_eng['DAY'] = 'Day';
+$lang_ger['DAY'] = 'Tag';
 
 $lang_eng['DAYS'] = 'Days';
 $lang_ger['DAYS'] = 'Tage';
@@ -308,6 +341,9 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
+$lang_eng['ERROR_DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
+$lang_ger['ERROR_DELETE_COMPANY'] = 'Die erste Firma darf nicht gelöscht werden.';
+
 $lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';
 $lang_ger['ERROR_EMAIL'] = 'Ungültige e-mail Adresse.';
 
@@ -334,6 +370,9 @@ $lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Ta
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
 $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
+
+$lang_eng['ERROR_UNEXPECTED'] = 'An unexpected error has occured. Please try again. If this message continues to be displayed, please contact support.'; //we dont have a support.
+$lang_ger['ERROR_UNEXPECTED'] = 'Ein unerwarteter Fehler ist aufgetaucht. Bitte versuchen Sie es erneut. Wird diese Nachricht weiterhin angezeigt, wenden Sie sich an den Support.';
 
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
@@ -371,11 +410,14 @@ $lang_ger['FIRSTNAME'] = 'Vorname';
 $lang_eng['FUNCTIONS'] = 'Functions';
 $lang_ger['FUNCTIONS'] = 'Funktionen';
 
-$lang_eng['FROM'] ='From';
-$lang_ger['FROM'] ='Von';
+$lang_eng['FREE_TEXT'] = 'Free text';
+$lang_ger['FREE_TEXT'] = 'Freier Text';
 
-$lang_eng['FORMS'] ='Forms';
-$lang_ger['FORMS'] ='Formulare';
+$lang_eng['FROM'] = 'From';
+$lang_ger['FROM'] = 'Von';
+
+$lang_eng['FORMS'] = 'Forms';
+$lang_ger['FORMS'] = 'Formulare';
 
 $lang_eng['FOR_ALL_PROJECTS'] = 'For All Projects';
 $lang_ger['FOR_ALL_PROJECTS'] = 'Für Alle Projekte';
@@ -419,6 +461,9 @@ $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
+$lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
+$lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
+
 $lang_eng['HIRE_USER'] = 'Hire User';
 $lang_ger['HIRE_USER'] = 'Benutzer Einstellen';
 
@@ -446,9 +491,6 @@ $lang_ger['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
 $lang_eng['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
 $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
-$lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
-$lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
-
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
 
@@ -460,6 +502,13 @@ $lang_ger['INFO_CHECKOUT'] = 'Checkout wurde erkannt. Diese Seite wird in 2 Minu
 
 $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectable.';
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
+
+$lang_eng['INFO_EXPIRATION'] = 'Passwords with valid expiration settings will be invalid once the set timespan has expired. This timespan is defined in months. <br>
+                                Once a password has expired, the corresponding user will receive a notification with a warning. <br>
+                                This warning can be set to optional, which will let the user continue normally instead of forcing a mandatory password change.';
+$lang_ger['INFO_EXPIRATION'] = 'Passwörter mit einem Gültigkeitszeitraum verfallen, nachdem dieser Zeitraum abgelaufen ist. Der Zeitraum wird in Monaten definiert. <br>
+                                Ist ein Passwort abgelaufen, wird dem zugehörigen Benutzer ein Warnhinweis angezeigt. <br>
+                                Wird ein Warnhinweis als Optional definiert, wird der Benutzer nicht gezwungen sein Passwort für die weitere Nutzung ändern zu müssen.';
 
 $lang_eng['INFO_GEMINI'] = "More than one timestamp were detected for the same day.<br>
                             A User may only posess one kind of timestamp per day. <br>
@@ -476,12 +525,16 @@ $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde ke
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
 
-$lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restrictions <br>
+
+$lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restriction <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
                                       Strong - Passwords have to contain at least 1 capital letter, 1 special character and 1 number <br>';
 $lang_ger['INFO_PASSWORD_GENERAL'] = 'Einfach - Keine Restriktion <br>
-                                      Mittel - Passwörter müssen mind. 1 Großbuchstaben und 1 Zahl enthalten <br>
-                                      Stark - Passwörter müssen mind. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>';
+                                      Mittel - Passwörter müssen min. 1 Großbuchstaben und 1 Zahl enthalten <br>
+                                      Stark - Passwörter müssen min. 1 Großbuchstaben, 1 Zahl und 1 Sonderzeichen enthalten <br>';
+
+$lang_eng['INFO_REQUIRE_USER'] = 'Select a User to Continue ';
+$lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 
 $lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
 $lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
@@ -531,6 +584,9 @@ $lang_ger['MINUTES'] = 'Minuten';
 $lang_eng['MISSING'] = 'Missing';
 $lang_ger['MISSING'] = 'Fehlend';
 
+$lang_eng['MONTH'] ='Month';
+$lang_ger['MONTH'] ='Monat';
+
 $lang_eng['MONTHLY_REPORT'] ='Monthly Report';
 $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 
@@ -570,6 +626,9 @@ $lang_ger['NEW_RECEIPT'] = 'Neue Rechnung';
 $lang_eng['NEW_TEMPLATE'] = 'New Template';
 $lang_ger['NEW_TEMPLATE'] = 'Neue Vorlage';
 
+$lang_eng['NO'] = 'No';
+$lang_ger['NO'] = 'Nein';
+
 $lang_eng['NOTES'] = 'Notes';
 $lang_ger['NOTES'] = 'Notizen';
 
@@ -593,6 +652,9 @@ $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebroch
 
 $lang_eng['OK_CREATE'] = 'New entry was successfully created.';
 $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
+
+$lang_eng['OK_DELETE'] = 'Your selections have been deleted.';
+$lang_ger['OK_DELETE'] = 'Ihre Auswahl wurde gelöscht.';
 
 $lang_eng['OK_REQUEST'] = 'Your request has been successfully registered. Please wait until an Administrator processed your issue.';
 $lang_ger['OK_REQUEST'] = 'Ihr Antrag wurde erfolgreich erstellt. Bitte warten Sie bis sich ein Administrator um ihr Anliegen gekümmert hat.';
@@ -635,6 +697,9 @@ $lang_ger['PAYMENT'] = 'Zahlung';
 
 $lang_eng['PAYMENT_CONDITIONS'] = 'Payment Conditions';
 $lang_ger['PAYMENT_CONDITIONS'] = 'Zahlungsbedingungen';
+
+$lang_eng['PAYMENT_METHODS'] = 'Payment Methods';
+$lang_ger['PAYMENT_METHODS'] = 'Zahlungsarten';
 
 $lang_eng['PDF_TEMPLATES'] = 'Pdf Templates';
 $lang_ger['PDF_TEMPLATES'] = 'Pdf Vorlagen';
@@ -696,6 +761,9 @@ $lang_ger['PROPERTIES'] = 'Eigenschaften';
 $lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cencellation');
 $lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Storniernug');
 
+$lang_eng['PURCHASE_PRICE'] = 'Price of Purchase';
+$lang_ger['PURCHASE_PRICE'] = 'Einkaufspreis';
+
 $lang_eng['QUANTITY'] = 'Quantity';
 $lang_ger['QUANTITY'] = 'Menge';
 
@@ -717,6 +785,9 @@ $lang_ger['RECEIPT'] = 'Rechnung';
 $lang_eng['RECEIPTS'] = 'Receipts';
 $lang_ger['RECEIPTS'] = 'Rechnungen';
 
+$lang_eng['REGISTER'] ='Register';
+$lang_ger['REGISTER'] = 'Registrieren';
+
 $lang_eng['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
 $lang_ger['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
 
@@ -724,10 +795,7 @@ $lang_eng['REGISTER_FROM_FORM'] = 'Register by Forumlar';
 $lang_ger['REGISTER_FROM_FORM'] = 'Formular Registrierung';
 
 $lang_eng['REGISTER_NEW_USER'] ='Register new User';
-$lang_ger['REGISTER_NEW_USER'] = 'Registrieren';
-
-$lang_eng['REGISTER_USERS'] = "Register LDAP Users";
-$lang_ger['REGISTER_USERS'] = "LDAP Registrierung";
+$lang_ger['REGISTER_NEW_USER'] = 'Neuen Benutzer Registrieren';
 
 $lang_eng['REMOVE_USER'] = 'Remove User';
 $lang_ger['REMOVE_USER'] = 'Benutzer Entfernen';
@@ -800,11 +868,20 @@ $lang_ger['SCHEDULE_TOSTRING'] = array(
   '4' => 'Jährlich'
 );
 
+$lang_eng['SEARCH'] = 'Search';
+$lang_ger['SEARCH'] = 'Suche';
+
+$lang_eng['SEARCH_OPTIONS'] = 'Search Options';
+$lang_ger['SEARCH_OPTIONS'] = 'Suchoptionen';
+
 $lang_eng['SEND_ACCESS'] = 'Send Access';
 $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
 $lang_eng['SETTINGS'] = 'Settings';
 $lang_ger['SETTINGS'] = 'Einstellungen';
+
+$lang_eng['SHIPPING_METHODS'] = 'Shipping Methods';
+$lang_ger['SHIPPING_METHODS'] = 'Versandarten';
 
 $lang_eng['SHOULD_TIME'] = 'Should';
 $lang_ger['SHOULD_TIME'] = 'Soll';
@@ -967,6 +1044,9 @@ $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht ü
 $lang_eng['WARNING_DELETE_COMPANY'] = 'All Clients, Projects and Bookings belonging to this Company will be lost forever. Do you still wish to proceed?';
 $lang_ger['WARNING_DELETE_COMPANY'] = 'Alle Kunden, Projekte und Buchungen die zu diesem Mandanten gehören werden permanent gelöscht. Wollen Sie dennoch fortfahren?';
 
+$lang_eng['WARNING_DELETE_TRANSITION'] = 'Deleting this will also delete every corresponding transition. Do you still want to continue?';
+$lang_ger['WARNING_DELETE_TRANSITION'] = 'Alle zugehörigen Vorgänge werden ebenfalls gelöscht. Wollen Sie dennoch fortfahren?';
+
 $lang_eng['WARNING_NO_CLIENTS'] = 'To use this Module, please create a client first.<br>
                                    To assign the same project to every client, use the default creation function in your companys settings.';
 $lang_ger['WARNING_NO_CLIENTS'] = 'Um diese Funktion verwenden zu können, benötigen Sie zuerst Kunden.<br>
@@ -1002,6 +1082,12 @@ $lang_ger['WEEKLY_HOURS'] = 'Wochenstunden';
 
 $lang_eng['WITHIN'] = 'within';
 $lang_ger['WITHIN'] = 'innerhalb';
+
+$lang_eng['YEAR'] = 'Year';
+$lang_ger['YEAR'] = 'Jahr';
+
+$lang_eng['YES'] = 'Yes';
+$lang_ger['YES'] = 'Ja';
 
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.'; //ha-ha.

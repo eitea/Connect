@@ -19,7 +19,7 @@ $companyToUserRelationshipTable = "relationship_company_client"; //which user wo
 $companyDefaultProjectTable = "companyDefaultProjects";
 $correctionTable = "correctionData";
 
-//deactivated users disappear from the program like deleted ones, but keeps their data.
+//deactivated users disappear from the program like deleted ones, but these keep their data.
 $deactivatedUserTable = "DeactivatedUsers";
 $deactivatedUserDataTable = "DeactivatedUserData"; //intervals
 $deactivatedUserLogs = "DeactivatedUserLogData";

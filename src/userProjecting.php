@@ -294,28 +294,30 @@ endif;
 
   <!-- SELECTS -->
   <div class="row">
-    <div id=mySelections class="col-xs-9"><br>
+    <div id="mySelections"><br>
       <?php if(count($available_companies) > 2): ?>
-        <select name="filterCompany"  class="js-example-basic-single" style='width:200px' class="" onchange="showClients(this.value, 0)">
-          <option value="0"><?php echo $lang['COMPANY']; ?>...</option>
-          <?php
-          $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
-          $result = mysqli_query($conn, $query);
-          if($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-              $cmpnyID = $row['id'];
-              $cmpnyName = $row['name'];
-              echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
+        <div class="col-sm-2">
+          <select name="filterCompany"  class="js-example-basic-single" class="" onchange="showClients(this.value, 0)">
+            <option value="0"><?php echo $lang['COMPANY']; ?>...</option>
+            <?php
+            $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
+            $result = mysqli_query($conn, $query);
+            if($result && $result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $cmpnyID = $row['id'];
+                $cmpnyName = $row['name'];
+                echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
+              }
             }
-          }
-          ?>
-        </select>
+            ?>
+          </select>
+        </div>
       <?php
         $setCompany = 0;
       else:
         $setCompany = $available_companies[1];
       endif;
-      echo '<select id="clientHint" style="width:200px" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
+      echo '<div class="col-sm-2"><select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
       $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID=$setCompany");
       echo "<option value='0'>".$lang['CLIENT']."...</option>";
       if ($result && $result->num_rows > 0) {
@@ -325,10 +327,12 @@ endif;
           echo "<option value='$cmpnyID'>$cmpnyName</option>";
         }
       }
-      echo '</select>';
+      echo '</select></div>';
       ?>
-      <select id="projectHint" style='width:200px' class="js-example-basic-single" name="filterProject" onchange="showProjectfields(this.value);">
-      </select>
+      <div class="col-sm-2">
+        <select id="projectHint" class="js-example-basic-single" name="filterProject" onchange="showProjectfields(this.value);">
+        </select>
+      </div>
     </div>
   </div>
   <!-- /SELECTS -->
@@ -341,7 +345,7 @@ endif;
     <div class="col-md-2">
       <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
     </div>
-    <div class="col-md-8">
+    <div class="col-md-4">
       <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
     </div>
   </div>

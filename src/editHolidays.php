@@ -1,16 +1,13 @@
-<?php include 'header.php'; ?>
-<?php enableToCore($userID)?>
-<!-- BODY -->
-<link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
-<script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
-
-<link rel="stylesheet" type="text/css" href="../plugins/datatables/css/dataTables.bootstrap.min.css">
-<script src="../plugins/datatables/js/jquery.js"></script>
-<script src="../plugins/datatables/js/jquery.dataTables.min.js"></script>
-<script src="../plugins/datatables/js/dataTables.bootstrap.min.js"></script>
+<?php include 'header.php'; enableToCore($userID)?>
 
 <div class="page-header">
-  <h3><?php echo $lang['HOLIDAYS']; ?></h3>
+  <h3>
+    <?php echo $lang['HOLIDAYS']; ?>
+    <div class="page-header-button-group">
+      <button class="btn btn-default" type="button" data-toggle="modal" data-target=".addHolidays" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
+      <button type="submit" form="holidays" class="btn btn-default" name="holidayDelete" title="<?php echo $lang['DELETE_SELECTION']; ?>"><i class="fa fa-trash-o"></i></button>
+    </div>
+  </h3>
 </div>
 
 <?php
@@ -23,9 +20,9 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
     }
   }
 } elseif(isset($_POST['holidayAdd'])){
-  if(!empty($_POST['holidayName']) && isset($_POST['holidayStart'])) {
+  if(!empty($_POST['holidayName']) && isset($_POST['holidayDate'])) {
     $holidayName = test_input($_POST['holidayName']);
-    $holidayStart = $_POST['holidayStart'] .' 08:00:00';
+    $holidayStart = $_POST['holidayDate'] .' 08:00:00';
     $sql = "INSERT INTO $holidayTable (name, begin, end) VALUES('$holidayName', '$holidayStart', '$holidayStart')";
     $conn->query($sql);
     echo mysqli_error($conn);
@@ -33,61 +30,67 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
 }
 ?>
 
-<form method="post">
-  <table id="holidayTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+<form id="holidays" method="POST">
+  <table class="table table-hover" cellspacing="0" width="100%">
     <thead>
       <tr>
-        <th>Delete</th>
-        <th>Occasion</th>
-        <th>Date</th>
+        <th><?php echo $lang['DELETE']; ?></th>
+        <th><?php echo $lang['DESCRIPTION']; ?></th>
+        <th><?php echo $lang['DATE']; ?></th>
       </tr>
     </thead>
-    <?php
-    $query = "SELECT * FROM $holidayTable";
-    $result = mysqli_query($conn, $query);
-    while ($row = $result->fetch_assoc()) {
-      echo "<tr>";
-      echo "<td><input type=checkbox name='checkingIndeces[]' value='".$row['begin']."' /></td>";
-      echo "<td> ". $row['name']."</td><td> ". substr($row['begin'],0,10)."</td>";
-      echo "</tr>";
-    }
-    ?>
-
+    <tbody>
+      <?php
+      $query = "SELECT * FROM $holidayTable";
+      $result = mysqli_query($conn, $query);
+      while ($row = $result->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td><input type=checkbox name='checkingIndeces[]' value='".$row['begin']."' /></td>";
+        echo "<td> ". $row['name']."</td><td> ". substr($row['begin'],0,10)."</td>";
+        echo "</tr>";
+      }
+      ?>
+    </tbody>
   </table>
-  <br><br><br>
-
-  <div class="container">
-    <div class="col-md-1">
-      <button type="submit" class="btn btn-primary" name="holidayDelete">Delete</button>
-    </div>
-    <div class="col-md-4">
-      <div class="input-group">
-        <span class="input-group-addon">Date</span>
-        <input id="calendar" type="text" readonly class="form-control" name="holidayStart" >
+</form>
+<form method="POST">
+  <div class="modal fade addHolidays">
+    <div class="modal-dialog modal-content modal-sm">
+      <div class="modal-header">
+        <h4><?php echo $lang['ADD']; ?></h4>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="input-group">
-        <span class="input-group-addon" id="sizing-addon2">Name</span>
+      <div class="modal-body">
+        <label>Date</label>
+        <input id="calendar" type="date" class="form-control" name="holidayDate" >
+        <br>
+        <label>Name</label>
         <input type="text" class="form-control" name="holidayName" >
-        <span class="input-group-btn">
-          <button class="btn btn-primary" type="submit" name="holidayAdd"> + </button>
-        </span>
+      </div>
+      <div class="modal-footer">
+        <button type="button"  class="btn btn-default" data-dismiss="modal" ><?php echo $lang['CANCEL']; ?></button>
+        <button type="submit"  class="btn btn-warning" name="holidayAdd" ><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
   </div>
+</form>
 
-  <script>
-  var myCalendar = new dhtmlXCalendarObject(["calendar"]);
-  myCalendar.setSkin("material");
-  myCalendar.setDateFormat("%Y-%m-%d");
+<script>
+var myCalendar = new dhtmlXCalendarObject(["calendar"]);
+myCalendar.setSkin("material");
+myCalendar.setDateFormat("%Y-%m-%d");
+dhx.zim.first = function(){ return 2000 };
 
-  $(document).ready(function() {
-    $('#holidayTable').DataTable({
-      "order": [[ 2, "asc" ]]
-    });
-  });
-  </script>
+$('.table').DataTable({
+  order: [[ 2, "asc" ]],
+  columns: [{orderable: false}, null, null],
+  responsive: true,
+   colReorder: true,
+  language: {
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+  },
+  dom: '<"top"i>rt<"bottom"flp><"clear">'
+});
+</script>
 
-    <!-- /BODY -->
-    <?php include 'footer.php'; ?>
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

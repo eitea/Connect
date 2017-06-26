@@ -26,6 +26,7 @@ $sql = "CREATE TABLE $userTable (
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   kmMoney DECIMAL(4,2) DEFAULT 0.42,
   emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
+  color VARCHAR(10) DEFAULT 'default',
   real_email VARCHAR(50)
 )";
 if (!$conn->query($sql)) {
@@ -511,10 +512,10 @@ if (!$conn->query($sql)) {
 }
 
 $sql = "CREATE TABLE $policyTable (
-  passwordLength INT(2) DEFAULT 0,
-  complexity ENUM('0', '1', '2') DEFAULT '0',
-  expiration ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  expirationDuration INT(3),
+  passwordLength INT(2) DEFAULT 6,
+  complexity ENUM('0', '1', '2') DEFAULT '1',
+  expiration ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+  expirationDuration INT(3) DEFAULT 3,
   expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
   )";
   if (!$conn->query($sql)) {
@@ -702,10 +703,12 @@ $sql = "CREATE TABLE $policyTable (
     name VARCHAR(50),
     description VARCHAR(600),
     price DECIMAL(10,2),
+    unit VARCHAR(20),
     quantity DECIMAL(8,2),
+    taxPercentage INT(3),
     taxID INT(4) UNSIGNED,
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    unit VARCHAR(20),
+    purchase DECIMAL(10,2),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -735,7 +738,9 @@ $sql = "CREATE TABLE $policyTable (
     description VARCHAR(600),
     price DECIMAL(10,2),
     unit VARCHAR(20),
-    taxPercentage INT(3)
+    taxPercentage INT(3),
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    purchase DECIMAL(10,2)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

@@ -1229,9 +1229,43 @@ if($row['version'] < 89){
     echo '<br> Extended requests by splitted lunchbreaks';
   }
 }
-//if($row['version'] < 90){}
-//if($row['version'] < 91){}
-//if($row['version'] < 92){}
+
+if($row['version'] < 90){
+  $sql = "ALTER TABLE products ADD COLUMN purchase DECIMAL(10,2)";
+  if($conn->query($sql)){
+    echo '<br> Added purchase price to products';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE articles ADD COLUMN cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo '<br> Update articles to Database';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE articles ADD COLUMN purchase DECIMAL(10,2)";
+  if($conn->query($sql)){
+    echo '<br> Added purchase price to articles';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+}
+
+if($row['version'] < 92){
+  $sql = "ALTER TABLE $userTable ADD COLUMN color VARCHAR(10) DEFAULT 'default'";
+  if($conn->query($sql)){
+    echo '<br> Color Picker';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+}
+//if($row['version'] < 93){}
+//if($row['version'] < 93){}
+//if($row['version'] < 94){}
+//if($row['version'] < 95){}
+//if($row['version'] < 96){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

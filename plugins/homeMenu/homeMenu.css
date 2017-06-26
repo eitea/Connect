@@ -12,7 +12,7 @@ body{
   border: 0;
 }
 .navbar-nav {
-  margin: 0;
+  margin-top: 10px;
 }
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
@@ -42,14 +42,12 @@ ul.nav.navbar-nav .nav.nav-list {
   max-height: 100%;
   overflow-y: auto;
   z-index: 20;
-  background-color: white;
+  background-color: whitesmoke;
+  border-right: 1px solid #e7e7e7;
 }
 .nav>li>a{
   padding-top:5px;
   padding-bottom:5px;
-}
-.navbar-default{
-  background-color:#f5f5f5;
 }
 .sidebar-nav .navbar li a,  .navbar-nav > li > a{
   padding-top: 5px;
@@ -64,8 +62,8 @@ ul.nav.navbar-nav .nav.nav-list {
   max-height: none;
 }
 .sidebar-nav .navbar{
-  border-radius:0;
   margin-bottom:0;
+  background-color: #f5f5f5;
   border:0;
 }
 .panel-group .panel+.panel{
@@ -156,36 +154,20 @@ ul.nav.navbar-nav .nav.nav-list {
   padding-right:300px;
 }
 
-/* Scrollable table with fixed header */
-section {
-  position: relative;
-  padding-top: 37px;
+/* Datatables pagination */
+.pagination > .active > a {
+    background-color: #f0ad4e;
+    border-color:#aaa;
 }
-.table-scrollable-container{
-  overflow-y: auto;
-  min-height:10vh; /* i dont know why this works and at this point i am too afraid to ask */
-  max-height:50vh;
-}
-.table-scrollable th{
-  height: 0;
-  line-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  color: transparent;
-  border: none;
-  white-space: nowrap;
-}
-.table-scrollable th div{
-  position:absolute;
-  background: transparent;
-  color: black;
-  padding: 9px 25px;
-  top: 0;
-  margin-left: -25px;
-  line-height: normal;
+.pagination > .active > a:hover {
+    background-color: #eca848;
+    border-color:#aaa;
 }
 
 /* helpings */
+.row{
+  padding-bottom:5px;
+}
 i{
   margin-right:5px;
   margin-left:5px;
@@ -211,11 +193,27 @@ i{
   z-index: 50;
   margin-left: 50%;
 }
-.js-example-basic-single{
-  width:100%;
+span.select2.select2-container.select2-container--default {
+  width: 100% !important;
 }
 .icheckbox_minimal-orange, .iradio_minimal-orange{
   margin-right:8px;
+}
+.page-header-button-group{
+  display:inline;
+  padding-left:15px;
+}
+
+/* seperations */
+.page-seperated-body{
+  background-color: #f8f8f8;
+  padding: 10px 20px 20px;
+  margin: -40px -15px -50px -20px
+}
+.page-seperated-section{
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
 }
 
 /* html calendar date-picker */

@@ -1,66 +1,63 @@
-<?php include 'header.php'; ?>
-<?php enableToCore($userID);?>
-<!-- BODY -->
+<?php include 'header.php'; enableToCore($userID);?>
+<?php
+if(isset($_POST['saveButton'])){
+  if(isset($_POST['ssl'])){
+    $status = 'TRUE';
+  } else {
+    $status = 'FALSE';
+  }
+  $sql = "UPDATE $adminGitHubTable SET sslVerify = '$status'";
+  $conn->query($sql);
 
-<div class="page-header">
-  <h3><?php echo $lang['ADVANCED_OPTIONS']; ?></h3>
-</div>
-
-<form method=post>
-  <?php
-  if(isset($_POST['saveButton'])){
-    if(isset($_POST['ssl'])){
-      $status = 'TRUE';
-    } else {
-      $status = 'FALSE';
-    }
-    $sql = "UPDATE $adminGitHubTable SET sslVerify = '$status'";
+  if(isset($_POST['userAgent'])){
+    $status = $_POST['userAgent'];
+    $sql = "UPDATE $piConnTable SET header = '$status'";
     $conn->query($sql);
-
-    if(isset($_POST['userAgent'])){
-      $status = $_POST['userAgent'];
-      $sql = "UPDATE $piConnTable SET header = '$status'";
-      $conn->query($sql);
-    }
-
-    if(isset($_POST['cd'])){
-      $cd = $_POST['cd'];
-      $sql = "UPDATE $configTable SET cooldownTimer = '$cd';";
-      $conn->query($sql);
-    }
-
-    if(isset($_POST['bufferTime'])){
-      $bufferTime = $_POST['bufferTime'];
-      $sql = "UPDATE $configTable SET bookingTimeBuffer = '$bufferTime';";
-      $conn->query($sql);
-    }
-
-    if(isset($_POST['enableReadyCheck'])){
-      $status = 'TRUE';
-    } else {
-      $status = 'FALSE';
-    }
-    if(isset($_POST['enableReg'])){
-      $regStatus = 'TRUE';
-    } else {
-      $regStatus = 'FALSE';
-    }
-    $sql = "UPDATE $configTable SET enableReadyCheck = '$status', enableReg = '$regStatus'";
-    $conn->query($sql);
-
-    redirect("advancedOptions.php");
   }
 
+  if(isset($_POST['cd'])){
+    $cd = $_POST['cd'];
+    $sql = "UPDATE $configTable SET cooldownTimer = '$cd';";
+    $conn->query($sql);
+  }
 
-  $result = $conn->query("SELECT sslVerify FROM $adminGitHubTable");
-  $rowGitHubTable = $result->fetch_assoc();
+  if(isset($_POST['bufferTime'])){
+    $bufferTime = $_POST['bufferTime'];
+    $sql = "UPDATE $configTable SET bookingTimeBuffer = '$bufferTime';";
+    $conn->query($sql);
+  }
 
-  $result = $conn->query("SELECT * FROM $configTable");
-  $rowConfigTable = $result->fetch_assoc();
+  if(isset($_POST['enableReadyCheck'])){
+    $status = 'TRUE';
+  } else {
+    $status = 'FALSE';
+  }
+  if(isset($_POST['enableReg'])){
+    $regStatus = 'TRUE';
+  } else {
+    $regStatus = 'FALSE';
+  }
+  $sql = "UPDATE $configTable SET enableReadyCheck = '$status', enableReg = '$regStatus'";
+  $conn->query($sql);
 
-  $result = $conn->query( "SELECT * FROM $piConnTable");
-  $rowPiConnTable = $result->fetch_assoc();
-  ?>
+  redirect("advancedOptions.php");
+}
+
+
+$result = $conn->query("SELECT sslVerify FROM $adminGitHubTable");
+$rowGitHubTable = $result->fetch_assoc();
+
+$result = $conn->query("SELECT * FROM $configTable");
+$rowConfigTable = $result->fetch_assoc();
+
+$result = $conn->query( "SELECT * FROM $piConnTable");
+$rowPiConnTable = $result->fetch_assoc();
+?>
+
+<form method=post>
+  <div class="page-header">
+    <h3><?php echo $lang['ADVANCED_OPTIONS']; ?>  <div class="page-header-button-group"><button type="submit" class="btn btn-default" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
+  </div>
 
   <h4>GitHub</h4>
   <div class="container">
@@ -118,11 +115,6 @@
       Allow Users to Register themselves
     </div>
     <br>
-  </div>
-  <br><hr><br>
-
-  <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton">Save </button>
   </div>
 </form>
 

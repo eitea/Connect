@@ -122,8 +122,13 @@ foreach($arr_IDs as $i): //i canBook
   $productives .= $productive.', ';
   $drives .= $drive.', ';
   $nonproductives .= $nonproductive.', ';
-
 endforeach;
+/*
+echo "Pausen: $breaks";
+echo "<br>Produktiv: $productives";
+echo "<br>Fahrzeiten: $drives";
+echo "<br>Nicht Produktiv: $nonproductives";
+*/
 ?>
 
   <div class="container-fluid">

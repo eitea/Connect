@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['USERS']; ?></h3>
+  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register_basic.php' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
 </div>
 <?php
 $activeTab = 0;
@@ -659,18 +659,13 @@ $(document).ready(function(){
           </div>
         </div>
       </div>
+      <br>
 
       <?php
     }
   }
   ?>
   <br><br>
-</div>
-
-<div class="container-fluid">
-  <div class="text-right">
-    <a class="btn btn-warning" href='register_choice.php'><?php echo $lang['REGISTER_NEW_USER']; ?></a>
-  </div>
 </div>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

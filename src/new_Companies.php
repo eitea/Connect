@@ -11,14 +11,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $compaName = test_input($_POST['compaName']);
     $type = test_input($_POST['compaType']);
     $conn->query("INSERT INTO $companyTable (name, companyType) VALUES('$compaName', '$type')");
-    if(!mysqli_error($conn)){
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
-      echo '</div>';
-    }
     $ins_id = mysqli_insert_id($conn);
     $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
+    if($conn->error){ echo $conn->error; } else { redirect("editCompanies.php?cmp=$ins_id"); }
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

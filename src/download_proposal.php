@@ -86,8 +86,8 @@ $pdf->AliasNbPages();
 $pdf->SetAutoPageBreak(1, 20); //(true [margin-bot])
 $pdf->AddPage();
 //narrow down page margins
-$pdf->SetLeftMargin(15);
-$pdf->SetRightMargin(15);
+$pdf->SetLeftMargin(10);
+$pdf->SetRightMargin(10);
 
 //abs
 $pdf->SetFont('Helvetica','U',7);
@@ -112,17 +112,24 @@ $pdf->SetFontSize(14);
 if($proposal_number == 'empty'){
   $proposal_number = $row['id_number'];
 }
+if($row['representative']){
+  $txt = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n".$lang['VAT']." ID: \n".$lang['REPRESENTATIVE'].':');
+  $txt2 = iconv('UTF-8', 'windows-1252',date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']."\n".$row['representative']);
+} else {
+  $txt = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n".$lang['VAT']." ID: ");
+  $txt2 = iconv('UTF-8', 'windows-1252', date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']);
+}
 $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
 $pdf->SetFontSize(8);
-
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
-$pdf->MultiColCell(40, 4, $lang['DATE'].": \n".iconv('UTF-8', 'windows-1252',$lang['EXPIRATION_DATE']).": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n". $lang['VAT'] ." ID: \n". $lang['REPRESENTATIVE'].': ');
-$pdf->MultiColCell(30, 4, date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']."\n".$row['representative']);
+
+$pdf->MultiColCell(30, 4, $txt, 0, 'L', 0, 25);
+$pdf->MultiColCell(0, 4, $txt2, 0, 'R');
 $pdf->SetY($pdf->GetY() + 5, false);
-$pdf->Ln(25);
-$pdf->MultiColCell(45, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
+$pdf->Ln(20);
+$pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
 $pdf->MultiColCell(55, 4, $lang['PROP_YOUR_ORDER']."\n".$row['yourOrder']);
-$pdf->MultiColCell(45, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
+$pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
 $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 
 //PRODUCT TABLE
@@ -132,7 +139,7 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Ln(10);
   $pdf->SetFillColor(200,200,200);
   // Column widths
-  $w = array(15, 70, 15, 30, 20, 30);
+  $w = array(15, 70, 25, 30, 20, 0);
   // Header
   $pdf->Cell($w[0],7,'Position',0,0,'L',1);
   $pdf->Cell($w[1],7,'Name',0,0,'L',1);
@@ -171,13 +178,13 @@ if($prod_res && $prod_res->num_rows > 0){
       $netto_value += $prod_row['total'];
     }
     $pdf->Cell($w[5],6,sprintf('%.2f', $prod_row['total']). ' EUR','',1,'R');
-    $pdf->Line(15, $pdf->GetY(), 210-15, $pdf->GetY());
+    $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
 
     $i++;
   }
 }
 
-$pdf->Line(15, $pdf->GetY() + 1, 210-15, $pdf->GetY() + 1);
+$pdf->Line(10, $pdf->GetY() + 1, 200, $pdf->GetY() + 1);
 $pdf->Ln(2);
 
 if(280 - $pdf->GetY() < 30){ $pdf->AddPage(); } //if writable space is less than 3cm: new page
@@ -195,11 +202,11 @@ if($result && $result->num_rows > 0){
 }
 $netto_value += $row['porto'];
 $vat_value += $porto_vat;
-$pdf->MultiColCell(30, 5, $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT']."\n".$lang['CASH_EXPENSE'], 'B', 1, 0, 60);
+$pdf->MultiColCell(30, 5, $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT']."\n".$lang['CASH_EXPENSE'], 'B', 1, 0, 70);
 $pdf->MultiColCell(30, 5, sprintf('%.2f', $netto_value)." EUR\n".sprintf('%.2f', $vat_value)." EUR\n".sprintf('%.2f', $cash_value)." EUR", 'B', 'R');
 $pdf->SetFont('Helvetica', 'B');
 $pdf->Ln(15);
-$pdf->Cell(120);
+$pdf->Cell(130);
 $pdf->Cell(30, 6, $lang['SUM']);
 $pdf->Cell(30, 6, sprintf('%.2f', $netto_value + $vat_value + $cash_value).' EUR', 0 , 1, 'R');
 $pdf->SetFont('Helvetica');

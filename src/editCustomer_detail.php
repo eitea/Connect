@@ -1,10 +1,5 @@
 <?php include "header.php"; ?>
 <?php require_once 'utilities.php'; ?>
-
-<div class="page-header">
-  <h3><?php echo $lang['CLIENT'] .' - Details'; ?></h3>
-</div>
-
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = test_input($_GET['custID']);
@@ -272,219 +267,217 @@ $resultNotes = $conn->query("SELECT * FROM $clientDetailNotesTable WHERE parentI
 $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID = $detailID");
 ?>
 
-<div class="text-right">
-  <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-info"><i class="fa fa-arrow-left"></i> Return</a><br>
+<div class="page-header">
+  <h3><?php echo $lang['CLIENT'] .' - Details'; ?>
+    <div class="page-header-button-group">
+      <button id="sav" type="submit" class="btn btn-default" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
+      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-default"><i class="fa fa-briefcase"></i></a><br>
+    </div>
+  </h3>
 </div>
 
 <ul class="nav nav-tabs">
-  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['DATA']; ?></a></li>
-  <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes"><?php echo $lang['TAXES']; ?></a></li>
-  <li <?php if($activeTab == 'banking'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBank">Banking</a></li>
-  <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling"><?php echo $lang['BILLING']; ?></a></li>
-  <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment"><?php echo $lang['PAYMENT']; ?></a></li>
-  <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact"><?php echo $lang['NOTES']; ?></a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['DATA']; ?></a></li>
+  <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes" onclick="$('#sav').val('taxes');"><?php echo $lang['TAXES']; ?></a></li>
+  <li <?php if($activeTab == 'banking'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBank" onclick="$('#sav').val('banking');">Banking</a></li>
+  <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling" onclick="$('#sav').val('billing');"><?php echo $lang['BILLING']; ?></a></li>
+  <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment" onclick="$('#sav').val('payment');"><?php echo $lang['PAYMENT']; ?></a></li>
+  <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact" onclick="$('#sav').val('notes');"><?php echo $lang['NOTES']; ?></a></li>
 </ul>
 
-<form method="post">
+<form id="mainForm" method="post">
   <div class="tab-content">
     <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
-        <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
+      <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
       <hr>
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-3">
-            <?php echo $lang['ADDRESS_FORM']; ?>
-          </div>
-          <div class="col-xs-2">
-            <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?>
-          </div>
-          <div class="col-sm-2">
-            <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?>
-          </div>
-          <div class="col-sm-2">
-            <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?>
-          </div>
+      <div class="row">
+        <div class="col-sm-3">
+          <?php echo $lang['ADDRESS_FORM']; ?>
         </div>
-        <br>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            Title
-          </div>
-          <div class="col-xs-3">
-            <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" />
-          </div>
+        <div class="col-sm-2">
+          <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?>
         </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['LASTNAME']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
-          </div>
+        <div class="col-sm-2">
+          <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?>
         </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['FIRSTNAME']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['STREET']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['COUNTRY']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['PLZ']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['CITY']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            <?php echo $lang['PHONE_NUMBER']; ?>
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="phone" value="<?php echo $row['phone']; ?>" />
-          </div>
-        </div>
-        <div class="row form-group">
-          <div class="col-xs-3">
-            Fax
-          </div>
-          <div class="col-xs-9">
-            <input type="text" class="form-control" name="fax_number" value="<?php echo $row['fax_number']; ?>" />
-          </div>
+        <div class="col-sm-2">
+          <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?>
         </div>
       </div>
-
-      <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="home"><?php echo $lang['SAVE']; ?></button>
+      <br>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          Title
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['LASTNAME']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['FIRSTNAME']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['STREET']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['COUNTRY']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['PLZ']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['CITY']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          <?php echo $lang['PHONE_NUMBER']; ?>
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="phone" value="<?php echo $row['phone']; ?>" />
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-sm-3">
+          Fax
+        </div>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="fax_number" value="<?php echo $row['fax_number']; ?>" />
+        </div>
+      </div>
     </div>
 
     <div id="menuTaxes" class="tab-pane fade <?php if($activeTab == 'taxes'){echo 'in active';}?>">
       <div class="row checkbox">
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <h3>Steuerinformationen</h3>
         </div>
         <br>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="checkbox" name="blockDelivery" <?php if($row['blockDelivery'] == 'true'){echo 'checked';} ?> />
           Liefersperre
         </div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Debit Nr.
         </div>
-        <div class="col-xs-4">
+        <div class="col-sm-4">
           <input type="number" class="form-control" name="debitNumber" value="<?php echo $row['debitNumber']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           DATEV
         </div>
-        <div class="col-xs-4">
+        <div class="col-sm-4">
           <input type="number" class="form-control" name="datev" value="<?php echo $row['datev']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Kontobezeichnung
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="accountName" value="<?php echo $row['accountName']; ?>" />
         </div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Steuernummer
         </div>
-        <div class="col-xs-4">
+        <div class="col-sm-4">
           <input type="text" class="form-control" name="taxnumber" value="<?php echo $row['taxnumber']; ?>" />
         </div>
-        <div class="col-xs-2 text-center">
+        <div class="col-sm-2 text-center">
           USt. Ident-Nr.
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="text" class="form-control" name="vatnumber" value="<?php echo $row['vatnumber']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Steuergebiet
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="taxArea" value="<?php echo $row['taxArea']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Kundengruppe
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="customerGroup" value="<?php echo $row['customerGroup']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Vertreter
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="representative" value="<?php echo $row['representative']; ?>" />
         </div>
       </div>
-      <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="taxes">Speichern</button>
     </div>
 
     <div id="menuBank" class="tab-pane fade <?php if($activeTab == 'banking'){echo 'in active';}?>">
       <div class="row form-group">
         <h3>
-        <div class="col-xs-9">
-          Bankdaten
-        </div>
-        <div class="col-xs-3">
-          <div class="input-group">
-          <input type="password" class="form-control" name="displayBankingDetailPass" value="" />
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-warning" name="displayBank">Unlock</button>
-          </span>
+          <div class="col-sm-9">
+            Bankdaten
           </div>
-        </div>
+          <div class="col-sm-3">
+            <div class="input-group">
+              <input type="password" class="form-control" name="displayBankingDetailPass" value="" />
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-warning" name="displayBank">Unlock</button>
+              </span>
+            </div>
+          </div>
         </h3>
       </div>
       <hr>
@@ -497,95 +490,84 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </thead>
         <tbody>
           <?php
-            while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
-              echo '<tr>';
-              echo '<td>' . $rowBank['bankName'] . '</td>';
-              if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
-                $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $_SESSION['unlock'], 0, $rowBank['iv2']);
-                echo '<td>'.mc_decrypt($rowBank['iban'], $keyValue). '</td>';
-                echo '<td>'.mc_decrypt($rowBank['bic'], $keyValue). '</td>';
-              } else { // **** it.
-                echo '<td>**** **** **** ****</td>';
-                echo '<td>******** ***</td>';
-              }
-              echo '</tr>';
+          while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
+            echo '<tr>';
+            echo '<td>' . $rowBank['bankName'] . '</td>';
+            if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
+              $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $_SESSION['unlock'], 0, $rowBank['iv2']);
+              echo '<td>'.mc_decrypt($rowBank['iban'], $keyValue). '</td>';
+              echo '<td>'.mc_decrypt($rowBank['bic'], $keyValue). '</td>';
+            } else { // **** it.
+              echo '<td>**** **** **** ****</td>';
+              echo '<td>******** ***</td>';
             }
-           ?>
+            echo '</tr>';
+          }
+          ?>
         </tbody>
       </table>
       <br><br><br>
 
       <?php if(isset($_SESSION['unlock'])): ?>
-      <div class="container">
-        <div class="col-md-3">
-          <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />
+        <div class="container">
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />
+          </div>
+          <div class="col-md-5">
+            <input type="text" class="form-control" name="iban" placeholder="Iban" />
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="bic" placeholder="BIC" />
+          </div>
+          <button type="submit" class="btn btn-warning" name="addBankingDetail">+</button>
         </div>
-        <div class="col-md-5">
-          <input type="text" class="form-control" name="iban" placeholder="Iban" />
-        </div>
-        <div class="col-md-3">
-          <input type="text" class="form-control" name="bic" placeholder="BIC" />
-        </div>
-        <button type="submit" class="btn btn-warning" name="addBankingDetail">+</button>
-      </div>
       <?php endif; ?>
-      <!--
-      bic VARCHAR(20),
-      iban VARCHAR(50),
-      bankName VARCHAR(100),
-      parentID  INT(6) UNSIGNED,
-      -->
-
-      <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="billing">Speichern</button>
     </div>
 
     <div id="menuBilling" class="tab-pane fade <?php if($activeTab == 'billing'){echo 'in active';}?>">
       <div class="row checkbox">
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <h3>Rechnungsdaten</h3>
         </div>
         <br>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="checkbox" name="eBill" <?php if($row['eBill'] == 'true'){echo 'checked';} ?> />
           E-Rechnung
         </div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Kreditlimit
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="number" step="any" class="form-control" name="creditLimit" value="<?php echo $row['creditLimit']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Letzte Faktura Buchung
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="datetime-local" class="form-control" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Zahlungsweise
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Versandart
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="text" class="form-control" name="shipmentType" value="<?php echo $row['shipmentType']; ?>" />
         </div>
       </div>
-      <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="billing">Speichern</button>
     </div>
 
 
@@ -593,108 +575,106 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       <h3>Zahlungsdaten</h3>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Tage Netto
         </div>
-        <div class="col-xs-6">
+        <div class="col-sm-6">
           <input type="number" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Skonto 1
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="number" step="0.01" class="form-control" name="skonto1" value="<?php echo $row['skonto1']; ?>" />
         </div>
-        <div class="col-xs-2">
+        <div class="col-sm-2">
           % Innerhalb von
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="number" class="form-control" name="skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
         </div>
-        <div class="col-xs-1">
+        <div class="col-sm-1">
           Tagen
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Skonto 2
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="number" step="0.01" class="form-control" name="skonto2" value="<?php echo $row['skonto2']; ?>" />
         </div>
-        <div class="col-xs-2">
+        <div class="col-sm-2">
           % Innerhalb von
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <input type="number" class="form-control" name="skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
         </div>
-        <div class="col-xs-1">
+        <div class="col-sm-1">
           Tagen
         </div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Mahnungen erlaubt
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="checkbox" name="warningEnabled" <?php if($row['warningEnabled'] == 'true'){echo 'checked';} ?> />
         </div>
       </div>
       <br>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Karenztage
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="number" class="form-control" name="karenztage" value="<?php echo $row['karenztage']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Letzte Mahnung am
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="datetime-local" class="form-control" name="lastWarning" value="<?php echo $row['lastWarning']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Mahnung 1
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="number" step="0.01" class="form-control" name="warning1" value="<?php echo $row['warning1']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Mahnung 2
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="number" step="0.01" class="form-control" name="warning2" value="<?php echo $row['warning2']; ?>" />
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Mahnung 3
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="number" step="0.01" class="form-control" name="warning3" value="<?php echo $row['warning3']; ?>" />
         </div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           Verzugszinsberechnung
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
           <input type="checkbox" name="calculateInterest" <?php if($row['calculateInterest'] == 'true'){echo 'checked';} ?> />
         </div>
       </div>
-      <br><hr><br>
-      <button type="submit" class="btn btn-warning" name="saveAll" value="payment">Speichern</button>
     </div>
 
     <div id="menuContact" class="tab-pane fade <?php if($activeTab == 'notes'){echo 'in active';}?>">

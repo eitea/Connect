@@ -1,44 +1,42 @@
 <?php include 'header.php'; enableToCore($userID);?>
 <!-- BODY -->
+<?php
+if(isset($_POST['saveButton'])){
+  if(!empty($_POST['smtp_host'])){
+    $val = test_input($_POST['smtp_host']);
+    $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
+  }
+  if(!empty($_POST['smtp_port'])){
+    $val = intval($_POST['smtp_port']);
+    $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
+  }
+  if(!empty($_POST['smtp_username'])){
+    $val = test_input($_POST['smtp_username']);
+    $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
+  }
+  if(!empty($_POST['smtp_password'])){
+    $val = test_input($_POST['smtp_password']);
+    $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
+  }
+  if(isset($_POST['smtp_secure'])){
+    $val = test_input($_POST['smtp_secure']);
+    $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
+  }
+  if(isset($_POST['mail_sender'])){
+    $val = test_input($_POST['mail_sender']);
+    $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
+  }
+  echo mysqli_error($conn);
+}
 
-<div class="page-header">
-  <h3> E-mail <?php echo $lang['OPTIONS']; ?></h3>
-</div>
+$result = $conn->query("SELECT * FROM $mailOptionsTable");
+$row = $result->fetch_assoc();
+?>
 
 <form method=post>
-  <?php
-  if(isset($_POST['saveButton'])){
-    if(!empty($_POST['smtp_host'])){
-      $val = test_input($_POST['smtp_host']);
-      $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
-    }
-    if(!empty($_POST['smtp_port'])){
-      $val = intval($_POST['smtp_port']);
-      $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
-    }
-    if(!empty($_POST['smtp_username'])){
-      $val = test_input($_POST['smtp_username']);
-      $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
-    }
-    if(!empty($_POST['smtp_password'])){
-      $val = test_input($_POST['smtp_password']);
-      $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
-    }
-    if(isset($_POST['smtp_secure'])){
-      $val = test_input($_POST['smtp_secure']);
-      $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
-    }
-    if(isset($_POST['mail_sender'])){
-      $val = test_input($_POST['mail_sender']);
-      $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
-    }
-    echo mysqli_error($conn);
-  }
-
-  $result = $conn->query("SELECT * FROM $mailOptionsTable");
-  $row = $result->fetch_assoc();
-  ?>
-
+  <div class="page-header">
+    <h3>E-mail <?php echo $lang['OPTIONS']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
+  </div>
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">
     <br>
@@ -90,12 +88,6 @@
       <input type="password" class="form-control" name="smtp_password" />
     </div>
     <br>
-  </div>
-
-  <br><hr><br>
-
-  <div class="text-right">
-    <button type="submit" class="btn btn-warning" name="saveButton"><?php echo $lang['SAVE']; ?> </button>
   </div>
 </form>
 

@@ -1,6 +1,5 @@
 <?php
 require "../connection.php";
-include "../language.php";
 
 $cmpID = intval($_GET['companyID']);
 
@@ -11,7 +10,7 @@ if(isset($_GET['clientID'])){
 }
 $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID");
 if($result && $result->num_rows > 1){
-  echo "<option name='clnt' value=0 >".$lang['CLIENT']."...</option>";
+  echo "<option name='clnt' value=0 >...</option>";
 }
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
