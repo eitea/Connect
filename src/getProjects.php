@@ -504,7 +504,7 @@ $(function () {
             <label><?php echo $lang['USERS']; ?></label>
             <select class="js-example-basic-single" name="user">
               <?php
-              $result = $conn->query("SELECT * FROM userData WHERE id IN (".implode(', ', $available_users).")");
+              $result = $conn->query("SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
               while ($result && ($row = $result->fetch_assoc())) {
                 $selected = '';
                 if($filterings['user'] == $row['id']) {
