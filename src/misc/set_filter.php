@@ -113,7 +113,7 @@ if($scale > 2){ //3 columns
 }
 </style>
 <div id="filterings_dropdown" class="dropdown" style="display:inline">
-  <button type="button" class="btn btn-default" data-toggle="dropdown" title="<?php echo $lang['SEARCH_OPTIONS']; ?>"><i class="fa fa-search"></i></button>
+  <button id="set_filter_search" type="button" class="btn btn-default" data-toggle="dropdown" title="<?php echo $lang['SEARCH_OPTIONS']; ?>"><i class="fa fa-search"></i></button>
   <div class="dropdown-menu" style="width:<?php echo $styles[0]; ?>vw">
     <form method="POST">
       <div class="container-fluid"><br>

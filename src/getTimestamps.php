@@ -724,8 +724,12 @@ if($filterings['user']):
         </form>
       <?php endwhile; ?>
     <?php endfor; ?>
-
-  <?php else: echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>'; endif; ?>
+    <?php
+  else:
+    echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>';
+    echo '<script>document.getElementById("set_filter_search").click();</script>';
+  endif;
+  ?>
 
 
     <script>
