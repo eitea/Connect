@@ -128,6 +128,23 @@ $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20
 $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
 $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
 
+//insert sum units
+$conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Packungen', 'Pkg')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Stunden', 'h')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Gramm', 'g')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Kilogramm', 'kg')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Meter', 'm')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Kilometer', 'km')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Quadratmeter', 'm2')");
+$conn->query("INSERT INTO units (name, unit) VALUES('Kubikmeter', 'm3')");
+
+//insert payment method
+$sql = "INSERT INTO paymentMethods (name) VALUES ('Überweisung')";
+$conn->query($sql);
+//insert shippign method
+$sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
+$conn->query($sql);
 //------------------------------------------------------------------------------
 
 function icsToArray($paramUrl) {
