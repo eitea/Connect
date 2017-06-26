@@ -248,6 +248,10 @@ ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
 $editingResult = $conn->query($sql); //f*ck you php
 $addTimeStart = 0;
+
+if(!$result || $result->num_rows >= 0){
+  echo '<script>document.getElementById("set_filter_search").click();</script>';
+}
 ?>
 <form id="project_table" method="post">
   <div style="margin-top:120px;"></div>
