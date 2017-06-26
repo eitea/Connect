@@ -136,11 +136,11 @@ if($scale > 2){ //3 columns
                 }
                 echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
               }
-              echo '</select>';
+              echo '</select><br><br>';
             }
           }
           if(isset($filterings['client'])){
-            echo '<br><br><label>'.$lang['CLIENT'].'</label>';
+            echo '<label>'.$lang['CLIENT'].'</label>';
             if(isset($filterings['project'])){
               echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient" onchange="set_filter.showProjects(this.value, \''.$filterings['project'][0].'\');" >';
             } else {
@@ -155,9 +155,9 @@ if($scale > 2){ //3 columns
               }
               echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
             }
-            echo '</select>';
+            echo '</select><br><br>';
           }
-          if(isset($filterings['project'])): ?><br><br>
+          if(isset($filterings['project'])): ?>
             <label><?php echo $lang['PROJECT']; ?></label>
             <select id="searchProjectHint" class="js-example-basic-single" name="searchProject" >
             </select>
@@ -170,16 +170,16 @@ if($scale > 2){ //3 columns
             echo '<label>'.$lang['USERS'].'</label>';
             echo '<select class="js-example-basic-single" name="searchUser" >';
             echo '<option value="0">...</option>';
-            $result_fc = mysqli_query($conn, "SELECT * FROM userData WHERE id IN (".implode(', ', $available_users).")");
+            $result_fc = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
               if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
               echo "<option $checked value='".$row_fc['id']."' >".$row_fc['firstname'].' '.$row_fc['lastname']."</option>";
             }
-            echo '</select>';
+            echo '</select><br><br>';
           }
           ?>
-          <?php if(isset($filterings['bookings'])): ?><br><br>
+          <?php if(isset($filterings['bookings'])): ?>
             <label><?php echo $lang['BOOKINGS']; ?></label>
             <select name="searchCharged" class="js-example-basic-single">
               <option value='0' <?php if($filterings['bookings'][0] == '0'){echo 'selected';}?> >...</option>
@@ -191,8 +191,9 @@ if($scale > 2){ //3 columns
               <label><input type="checkbox" name="searchBreaks" <?php echo $filterings['bookings'][1]; ?> /><?php echo $lang['BREAKS']; ?></label>
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
             </div>
+            <br><br>
           <?php endif; ?>
-          <?php if(isset($filterings['logs'])): ?><br><br>
+          <?php if(isset($filterings['logs'])): ?>
             <label><?php echo $lang['ACTIVITY']; ?></label>
               <select name="searchActivity" class="js-example-basic-single">
                 <option value="0">...</option>
