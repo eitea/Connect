@@ -438,7 +438,7 @@ if($filterings['user']):
                 <select name="add_multiple_user" class="js-example-basic-single">
                   <?php
                   echo '<option value="0">...</option>';
-                  $result_fc = mysqli_query($conn, "SELECT * FROM userData WHERE id IN (".implode(', ', $available_users).")");
+                  $result_fc = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
                   while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
                     $checked = '';
                     if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
