@@ -73,7 +73,7 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(isset($_POST['searchDay'])){
     if(!empty($_POST['searchDay'])){
-      $filterings['date'] .= '-' . intval($_POST['searchDay']);
+      $filterings['date'] .= '-' . sprintf('%02d', intval($_POST['searchDay']));
     } else {
       $filterings['date'] .= '-' . '__';
     }
@@ -187,8 +187,10 @@ if($scale > 2){ //3 columns
               <option value='2' <?php if($filterings['bookings'][0] == '2'){echo 'selected';}?> ><?php echo $lang['CHARGED']; ?></option>
             </select>
             <?php if($filterings['bookings'][0] != 1){ echo '<small>*'.$lang['INFO_CHARGED'].'</small>'; } ?>
+            <div class="checkbox">
               <label><input type="checkbox" name="searchBreaks" <?php echo $filterings['bookings'][1]; ?> /><?php echo $lang['BREAKS']; ?></label>
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
+            </div>
             <br><br>
           <?php endif; ?>
           <?php if(isset($filterings['logs'])): ?>

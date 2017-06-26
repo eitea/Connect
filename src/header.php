@@ -200,7 +200,7 @@ if($_SESSION['color'] == 'light'){
 <body id="body_container" class="is-table-row">
   <div id="loader"></div>
   <!-- navbar -->
-  <nav class="navbar navbar-default navbar-fixed-top">
+  <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header hidden-xs">
         <a class="navbar-brand" href="home.php">Connect</a>

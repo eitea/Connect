@@ -756,15 +756,34 @@ $sql = "CREATE TABLE $policyTable (
     echo mysqli_error($conn);
   }
 
-  $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Packungen', 'Pkg')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Stunden', 'h')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Gramm', 'g')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Kilogramm', 'kg')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Meter', 'm')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Kilometer', 'km')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Quadratmeter', 'm2')");
-  $conn->query("INSERT INTO units (name, unit) VALUES('Kubikmeter', 'm3')");
+  $sql = "CREATE TABLE paymentMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Payment Methods';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 
+  $sql = "CREATE TABLE representatives (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Representatives';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "CREATE TABLE shippingMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Shipping Methods';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 
 ?>

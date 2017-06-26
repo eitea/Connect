@@ -1,9 +1,22 @@
 <?php include 'header.php'; enableToTime($userID); ?>
+
 <?php
 require_once 'Calculators/IntervalCalculator.php';
-
 $filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'checked'), "date" => substr(getCurrentTimestamp(), 0, 8).'__');
+?>
 
+<div class="page-header">
+  <h3>
+    <?php echo $lang['TIMESTAMPS']; ?>
+    <div class="page-header-button-group">
+      <?php include 'misc/set_filter.php'; ?>
+      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
+    </div>
+  </h3>
+</div>
+
+<?php
+//i need some filterings vars in here
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['saveChanges'])){
     $imm = $_POST['saveChanges'];
@@ -11,7 +24,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
     $status = intval($_POST['newActivity']);
     if($imm == 0){ //create new
-      $creatUser = $filterings['user'];
+      $creatUser = intval($filterings['user']);
       $timeToUTC = intval($_POST['creatTimeZone']);
       $newBreakVal = floatval($_POST['newBreakValues']);
       if($_POST['is_open']){
@@ -174,16 +187,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 } //endif post
 ?>
-
-<div class="page-header">
-  <h3>
-    <?php echo $lang['TIMESTAMPS']; ?>
-    <div class="page-header-button-group">
-      <?php include 'misc/set_filter.php'; ?>
-      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
-    </div>
-  </h3>
-</div>
 
 <!-- ############################### TABLE ################################### -->
 

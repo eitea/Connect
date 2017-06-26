@@ -1261,11 +1261,44 @@ if($row['version'] < 92){
     echo '<br>'.$conn->error;
   }
 }
-//if($row['version'] < 93){}
+
+if($row['version'] < 93){
+  $sql = "CREATE TABLE paymentMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Payment Methods';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "CREATE TABLE representatives (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Representatives';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "CREATE TABLE shippingMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Shipping Methods';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+}
 //if($row['version'] < 93){}
 //if($row['version'] < 94){}
 //if($row['version'] < 95){}
 //if($row['version'] < 96){}
+//if($row['version'] < 97){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

@@ -97,7 +97,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     if(test_Date($_POST['add_date'].' 08:00:00')){
-
       $filterUserID = intval($_POST['user']);
       //get the timestamp. always(!) compre UTC to UTC
       $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'";
@@ -122,7 +121,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $conn->query($sql);
             $duration = timeDiff_Hours($startDate, $endDate);
             $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
-            $conn->query($sql);
+            if($conn->query($sql)){
+              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            } else {
+              echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            }
           } else {
             if(isset($_POST['addExpenses'])){
               $expenses_price = test_input($_POST['expenses_price']);
@@ -193,7 +196,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
 ?>
 
-<div class="container-fluid" style="position:fixed;background:white;width:100%;">
+<div class="container-fluid" style="position:fixed;background:white;width:100%;z-index:1">
   <div class="page-header">
     <h3><?php echo $lang['VIEW_PROJECTS']; ?>
       <div class="page-header-button-group">
@@ -213,7 +216,8 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; }
           if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %' $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery"; ?>" />
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
+          AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
             <ul class="dropdown-menu">
@@ -243,13 +247,13 @@ LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
 WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
-$chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery
+AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
 $editingResult = $conn->query($sql); //f*ck you php
 $addTimeStart = 0;
 
-if(!$result || $result->num_rows >= 0){
+if(!$result || $result->num_rows <= 0){
   echo '<script>document.getElementById("set_filter_search").click();</script>';
 }
 ?>
@@ -257,18 +261,18 @@ if(!$result || $result->num_rows >= 0){
   <div style="margin-top:120px;"></div>
   <table class="table table-hover table-condensed">
     <thead>
-      <th></th>
-      <th><?php echo $lang['COMPANY'].', '.$lang['CLIENT'].', '.$lang['PROJECT']; ?></th>
+      <th><?php echo $conn->error ; ?></th>
+      <th><?php echo $lang['COMPANY'].' - '.$lang['CLIENT'].' - '.$lang['PROJECT']; ?></th>
       <th><?php echo $lang['USERS']; ?></th>
-      <th>Infotext</th>
+      <th style="max-width:300px">Infotext</th>
       <th><?php echo $lang['DATE']; ?></th>
       <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
       <th><?php echo $lang['MINUTES']; ?></th>
-      <th style="min-width:140px;">
-        <input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?><br>
-        <input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?>
+      <th>
+        <label><input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?></label>
+        <label><input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></label>
       </th>
-      <th style="min-width:130px;">Detail</th>
+      <th>Detail</th>
       <th></th>
     </thead>
     <tbody>
@@ -332,7 +336,7 @@ if(!$result || $result->num_rows >= 0){
         $csv_Add[] = $row['firstname']." ".$row['lastname'];
         $csv_Add[] = ' '.$row['hourlyPrice'].' ';
 
-        echo '<td style="width:200px;">'.$lang['FROM'].': '.substr($A,0,16)."<br>".$lang['TO'].':   '.substr($B,0,16)."</td>";
+        echo '<td style="width:200px;">'.substr($A,0,16).' - '.substr($B,11,5)."</td>";
         echo '<td style="max-width:200px;whitpre;">'.$lang['FROM'].': '.substr($A_charged,0,16)."<br>".$lang['TO'].':   '.substr($B_charged,0,16)."</td>";
         echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
 
@@ -365,13 +369,11 @@ if(!$result || $result->num_rows >= 0){
         if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
         $csv_Add[] = $csv_optionalinfo;
         echo "<td>";
-        if($row['booked'] == 'FALSE'){
-          echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
-        }
-        echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info'></i></a> ";
-        if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a> "; }
-        if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a> "; }
-        if(!empty($expensesinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a> "; }
+        if($row['booked'] == 'FALSE'){ echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
+        if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}
+        if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+        if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+        if(!empty($expensesinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }
         echo "<button type='submit' class='btn btn-default' value='$x' name='delete_booking'><i class='fa fa-trash-o'></i></button>";
         echo '</td>';
         echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged
@@ -672,6 +674,27 @@ function toggle2(uncheckID){
   uncheckBox = document.getElementById(uncheckID);
   uncheckBox.checked = false;
 }
+
+$(document).ready(function(){
+  $('.table').DataTable({
+    order: [],
+    ordering: false,
+    deferRender: true,
+    responsive: true,
+    autoWidth: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    dom: 'f',
+    paginate: false,
+    fixedHeader: {
+      header: true,
+      headerOffset: 160,
+      zTop: 1
+    }
+  });
+});
+
 </script>
 
 <?php
