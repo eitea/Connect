@@ -195,7 +195,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;">
   <div class="page-header">
-    <h6><?php echo $lang['VIEW_PROJECTS']; ?>
+    <h3><?php echo $lang['VIEW_PROJECTS']; ?>
       <div class="page-header-button-group">
         <?php include "misc/set_filter.php"; //this is where the magic happens ?>
         <button type='submit' class="btn btn-default" name='saveChanges' form="project_table"><i class="fa fa-floppy-o"></i></button>
@@ -225,7 +225,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           </div>
         </form>
       </div>
-    </h6>
+    </h3>
   </div>
 </div>
 <?php

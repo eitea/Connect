@@ -326,7 +326,7 @@ if($filterings['user']):
           //partial sum
           //echo '<tr class="blank_row"><td colspan="12"></td><tr>';
           echo "<tr style='font-weight:bold;'>";
-          echo "<td colspan='2'>Zwischensumme:* </td>";
+          echo "<td colspan='2'>Zwischensumme: </td>";
           echo "<td></td>";
           echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
           echo "<td></td><td></td><td></td>";
@@ -340,7 +340,7 @@ if($filterings['user']):
           $current_corrections = array_sum($calculator->monthly_correctionHours);
           $accumulatedSaldo += $current_corrections;
           echo "<tr>";
-          echo "<td colspan='2'>".$lang['CORRECTION'].":* </td>";
+          echo "<td colspan='2'>".$lang['CORRECTION'].": </td>";
           echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
           echo "<td style='color:#9222cc'>" . displayAsHoursMins($current_corrections) . "</td>";
           echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
@@ -368,7 +368,7 @@ if($filterings['user']):
           $accumulatedSaldo += $saldo_from_zero;
 
           echo "<tr style='color:#626262;'>";
-          echo "<td colspan='2'>Vorheriges Saldo:* </td>";
+          echo "<td colspan='2'>Vorheriges Saldo: </td>";
           echo "<td></td>";
           echo "<td>".displayAsHoursMins($p_lunchTime)."</td>";
           echo "<td></td><td></td><td></td>";
@@ -394,7 +394,7 @@ if($filterings['user']):
 
           //overTimeLump
           echo "<tr>";
-          echo "<td colspan='2'>".$lang['OVERTIME_ALLOWANCE'].":* </td>";
+          echo "<td colspan='2'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
           echo "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
           echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($overTimeLump) . "</td>"; //its always negative. always.
           echo "<td>".displayAsHoursMins($accumulatedSaldo)."</td>";
@@ -406,7 +406,7 @@ if($filterings['user']):
 
           //echo '<tr class="blank_row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><tr>';
           echo "<tr style='font-weight:bold;'>";
-          echo "<td colspan='2'>Summe:* </td>";
+          echo "<td colspan='2'>Summe: </td>";
           echo "<td></td>";
           echo "<td>".displayAsHoursMins($lunchbreakSUM)."</td>";
           echo "<td></td><td></td><td></td>";
@@ -419,7 +419,6 @@ if($filterings['user']):
         </tbody>
       </table>
     </form>
-    <small>*Angaben in Stunden</small>
 
     <!-- add intervals modal -->
     <form method="POST">
