@@ -168,7 +168,9 @@ ul.nav.navbar-nav .nav.nav-list {
 .checkbox input[type=checkbox], .radio input[type=radio] {
   position: initial;
 }
-
+input[type="checkbox"]:focus {
+  outline:0;
+}
 input[type="checkbox"] {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -183,7 +185,6 @@ input[type="checkbox"]:after {
   content: '';
   display:inline-block;
 }
-
 input[type="checkbox"]:checked {
   margin-right:5px;
   background-color:#f0ad4e;
@@ -198,10 +199,6 @@ input[type="checkbox"]:checked:after {
   border-color:white;
   transform: rotate(45deg);
   margin-left:7px;
-}
-
-input[type="checkbox"]:focus {
-  outline:0;
 }
 
 /* seperations */

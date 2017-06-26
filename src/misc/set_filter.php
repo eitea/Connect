@@ -73,7 +73,7 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(isset($_POST['searchDay'])){
     if(!empty($_POST['searchDay'])){
-      $filterings['date'] .= '-' . intval($_POST['searchDay']);
+      $filterings['date'] .= '-' . sprintf('%02d', intval($_POST['searchDay']));
     } else {
       $filterings['date'] .= '-' . '__';
     }
