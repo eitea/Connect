@@ -26,6 +26,7 @@ $sql = "CREATE TABLE $userTable (
   preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
   kmMoney DECIMAL(4,2) DEFAULT 0.42,
   emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
+  color VARCHAR(10) DEFAULT 'default',
   real_email VARCHAR(50)
 )";
 if (!$conn->query($sql)) {
