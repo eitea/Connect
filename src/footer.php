@@ -32,6 +32,4 @@
   <!-- /modal -->
 <?php endif; ?>
 </body>
-
-
 </html>
