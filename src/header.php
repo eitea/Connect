@@ -130,7 +130,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   }
   if(isset($_POST['set_skin'])){
     $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
-    $conn->query("UPDATE userData SET color = '$txt' WHERE id = $userID");
+    $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
   }
 }
 
