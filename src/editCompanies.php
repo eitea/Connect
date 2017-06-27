@@ -712,13 +712,12 @@ $(document).ready(function () {
   $(":input").change(function(){ //triggers change in all input fields including text type
     isDirty = true;
   });
-
   $(':submit').click(function() {
       isDirty = false;
   });
   function unloadPage(){
     if(isDirty){
-      return "You have unsaved changes on this page. Discard your changes?";
+      return "Unsaved changes. Leave this page and discard changes?";
     }
   }
   window.onbeforeunload = unloadPage;
