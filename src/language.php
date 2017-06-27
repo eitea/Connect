@@ -137,6 +137,9 @@ $lang_ger['BREAK'] = 'Pause';
 $lang_eng['BREAKS'] = 'Breaks';
 $lang_ger['BREAKS'] = 'Pausen';
 
+$lang_eng['CALCULATE'] = 'Calculate';
+$lang_ger['CALCULATE'] = 'Berechnen';
+
 $lang_eng['CALENDAR'] = 'Calendar';
 $lang_ger['CALENDAR'] = 'Kalender';
 
@@ -356,7 +359,7 @@ $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bi
 $lang_eng['ERROR_INVALID_DATA'] = 'Entered Information was invalid. Please try again with valid data.';
 $lang_ger['ERROR_INVALID_DATA'] = 'Eingegebene Information war ungültig. Bitte mit gültigen Daten nochmals versuchen.';
 
-$lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in your settings.';
+$lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in the settings.';
 $lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten unter den Einstellung nachtragen.';
 
 $lang_eng['ERROR_MISSING_FIELDS'] = 'Fields are missing. Please fill out every required field.';
@@ -463,6 +466,9 @@ $lang_ger['HEADLINE'] = 'Überschrift';
 
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
+
+$lang_eng['HIDE_PROCESSED_DATA'] = 'Hide processed rows';
+$lang_ger['HIDE_PROCESSED_DATA'] = 'Verarbeitete Daten ausblenden';
 
 $lang_eng['HIRE_USER'] = 'Hire User';
 $lang_ger['HIRE_USER'] = 'Benutzer Einstellen';
@@ -719,6 +725,12 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PROCESS'] = 'Process';
+$lang_ger['PROCESS'] = 'Vorgang';
+
+$lang_eng['PROCESS_STATUS'] = 'Process Status';
+$lang_ger['PROCESS_STATUS'] = 'Prozessstatus';
+
 $lang_eng['PROCESSES'] = 'Processes';
 $lang_ger['PROCESSES'] = 'Vorgänge';
 
@@ -772,9 +784,6 @@ $lang_ger['READY_STATUS'] = 'Bereitschaftsstatus';
 
 $lang_eng['REASON'] = 'Reason';
 $lang_ger['REASON'] = 'Grund';
-
-$lang_eng['RECALCULATE_VACATION'] = 'Recalculate Accumulated Vacation';
-$lang_ger['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
 
 $lang_eng['RECIPIENTS'] = 'Recipients';
 $lang_ger['RECIPIENTS'] = 'Empfänger';

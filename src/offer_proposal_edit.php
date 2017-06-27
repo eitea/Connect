@@ -7,6 +7,8 @@ $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $
 //new proposal
 if(!empty($_GET['nERP']) && array_key_exists($_GET['nERP'], $lang['PROPOSAL_TOSTRING'])){
   $id_num = getNextERP($_GET['nERP']);
+} elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING'])) {
+  $id_num = getNextERP($_POST['nERP']);
 } else {
   $id_num = getNextERP('ANG');
 }
@@ -80,28 +82,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $filterProposal = mysqli_insert_id($conn);
         echo $conn->error;
       }
-      $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxID, cash, unit, purchase)
-      VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', $product_tax_id, '$product_is_cash', '$product_unit', '$product_purchase')");
-
-      if(mysqli_error($conn)){
-        echo $conn->error;
-      } else {
-        echo '<div class="alert alert-success fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
-        echo '</div>';
-      }
+      $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
+      $row_tax = $result_tax->fetch_assoc();
+      $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxPercentage, cash, unit, purchase)
+      VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase')");
+      if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';}
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   } elseif(isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
-    echo '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
   }
   if(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
@@ -118,19 +108,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $product_tax_id = intval($_POST['update_tax_'.$x]);
       $product_unit = test_input($_POST['update_unit_'.$x]);
       $conn->query("UPDATE products SET name='$product_name', description='$product_description', quantity='$product_quantity', price='$product_price', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
-      if(mysqli_error($conn)){
-        echo $conn->error;
-      } else {
-        echo '<div class="alert alert-success fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
-        echo '</div>';
-      }
+      if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     } else {
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   }
   if(isset($_POST['meta_save'])){
@@ -147,14 +127,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
       $filterProposal = mysqli_insert_id($conn);
     }
-    if(mysqli_error($conn)){
-      echo $conn->error;
-    } else {
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
-      echo '</div>';
-    }
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
+  }
+  if(!empty($_POST['translate']) && !empty($_POST['transit'])){
+    $filterProposal = intval($_POST['translate']);
+    $transitionID = getNextERP(test_input($_POST['transit']));
+    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $filterProposal");
+    redirect('offer_proposal_edit.php?num='.$proposalID);
+  } elseif(isset($_POST['translate'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
   }
 } // END IF POST
 if(isset($_GET['num'])){
@@ -170,15 +151,17 @@ if($filterProposal){
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
   $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
 } else {
-  redirect('offer_proposal_process.php');
+  redirect('offer_proposals.php?err=1');
 }
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['OFFER'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?>
+  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?>
     <div class="page-header-button-group">
-      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details"><i class="fa fa-cog"></i></button>
-      <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-default" ><i class="fa fa-download"></i></a>
+      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
+      <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a href="editCustomer_detail?custID=<?php echo $filterClient; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
     </div>
   </h3>
 </div>
@@ -200,14 +183,14 @@ if($filterProposal){
     </thead>
     <tbody>
       <?php
-      $result = $conn->query("SELECT products.*, taxRates.percentage, taxRates.description AS taxName FROM products, taxRates WHERE proposalID = $filterProposal AND taxID = taxRates.id");
+      $result = $conn->query("SELECT * FROM products WHERE proposalID = $filterProposal");
       while($result && ($prod_row = $result->fetch_assoc())){
         echo '<tr>';
         echo '<td>'.$prod_row['name'].'</td>';
         echo '<td style="max-width:500px;">'.$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
-        echo '<td>'.$prod_row['taxName'].' '.$prod_row['percentage'].'%</td>';
+        echo '<td>'.$prod_row['taxPercentage'].'%</td>';
         echo '<td style="min-width:120px;">';
         echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
         echo '<button type="submit" class="btn btn-default" name="delete_product" value="'.$prod_row['id'].'" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button';
@@ -303,7 +286,7 @@ $x = $prod_row['id'];
       </div>
     </div>
   </div>
-<?php endwhile; //MODAL END ?>
+<?php endwhile;?>
 
 <div class="modal fade add_product">
   <div class="modal-dialog modal-md modal-content">
@@ -319,10 +302,30 @@ $x = $prod_row['id'];
       <br>
       <div class="row">
         <div class="col-md-4">
-          <label><?php echo $lang['QUANTITY']; ?></label>
-          <input type="number" class="form-control required-field" name="add_product_quantity" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+          <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
+          <input id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
         </div>
         <div class="col-md-4">
+          <label><?php echo $lang['PRICE_STK'] .' - '. $lang['CALCULATE']; ?></label>
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button id="doSale" class="btn btn-default" type="button">OK</button>
+            </span>
+            <input id="salePercent" type="text" class="form-control" placeholder=" zzgl %">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label><?php echo $lang['PRICE_STK']; ?></label>
+          <input id="product_price" type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="EUR" />
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-md-6">
+          <label><?php echo $lang['QUANTITY']; ?></label>
+          <input type="number" class="form-control required-field" name="add_product_quantity" value="1" />
+        </div>
+        <div class="col-md-6">
           <label><?php echo $lang['UNIT']; ?></label>
           <select class="js-example-basic-single" name="add_product_unit">
             <?php
@@ -333,14 +336,11 @@ $x = $prod_row['id'];
             ?>
           </select>
         </div>
-        <div class="col-md-4">
-          <label><?php echo $lang['PRICE_STK']; ?></label>
-          <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
-        </div>
       </div>
-      <br><br>
+      <br>
       <div class="row">
-        <div class="col-md-4 ">
+        <div class="col-md-6">
+          <?php echo $lang['TAXES']; ?>
           <select class="js-example-basic-single btn-block" name="add_product_taxes">
             <?php
             $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
@@ -350,10 +350,7 @@ $x = $prod_row['id'];
             ?>
           </select>
         </div>
-        <div class="col-md-4">
-          <input type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="<?php echo $lang['PURCHASE_PRICE']; ?>" />
-        </div>
-        <div class="col-md-4 checkbox">
+        <div class="col-md-6 checkbox">
           <label><input type="checkbox" name="add_product_as_bar" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
         </div>
       </div>
@@ -462,7 +459,7 @@ $x = $prod_row['id'];
         <div class="col-xs-3">
           <input type="number" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
         </div>
-        <div class="col-xs-1">
+        <div class="col-xs-2">
           Tagen
         </div>
       </div>
@@ -471,8 +468,19 @@ $x = $prod_row['id'];
         <div class="col-xs-2">
           Zahlungsweise
         </div>
-        <div class="col-xs-9">
-          <input type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" />
+        <div class="col-xs-6">
+          <input id="meta_paymentMethod" type="text" class="form-control" name="meta_paymentMethod" value="<?php echo $row['paymentMethod']; ?>" maxlength="100"/>
+        </div>
+        <div class="col-xs-4">
+          <select class="js-example-basic-single" onchange="$('#meta_paymentMethod').val(this.value);">
+            <option value="">...</option>
+            <?php
+            $tax_result = $conn->query("SELECT * FROM paymentMethods");
+            while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+              echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
+            }
+            ?>
+          </select>
         </div>
       </div>
       <br>
@@ -480,8 +488,19 @@ $x = $prod_row['id'];
         <div class="col-xs-2">
           Versandart
         </div>
-        <div class="col-xs-9">
-          <input type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" />
+        <div class="col-xs-6">
+          <input id="meta_shipmentType" type="text" class="form-control" name="meta_shipmentType" value="<?php echo $row['shipmentType']; ?>" maxlength="100" />
+        </div>
+        <div class="col-xs-4">
+          <select class="js-example-basic-single" onchange="$('#meta_shipmentType').val(this.value);">
+            <option value="">...</option>
+            <?php
+            $tax_result = $conn->query("SELECT * FROM shippingMethods");
+            while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+              echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
+            }
+            ?>
+          </select>
         </div>
       </div>
       <br>
@@ -489,8 +508,19 @@ $x = $prod_row['id'];
         <div class="col-xs-2">
           Vertreter
         </div>
-        <div class="col-xs-9">
-          <input type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" />
+        <div class="col-xs-6">
+          <input id="meta_representative" type="text" class="form-control" name="meta_representative" value="<?php echo $row['representative']; ?>" maxlength="50" />
+        </div>
+        <div class="col-xs-4">
+          <select class="js-example-basic-single" onchange="$('#meta_representative').val(this.value);">
+            <option value="">...</option>
+            <?php
+            $tax_result = $conn->query("SELECT * FROM representatives");
+            while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+              echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
+            }
+            ?>
+          </select>
         </div>
       </div>
       <br>
@@ -498,17 +528,19 @@ $x = $prod_row['id'];
         <div class="col-xs-2">
           Porto
         </div>
-        <div class="col-xs-6">
+        <div class="col-xs-3">
           <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
         </div>
         <div class="col-xs-3">
-          <select class="js-example-basic-single" name="meta_porto_percentage">
+          <input id="meta_porto_percentage" type="number" step="0.01" class="form-control" name="meta_porto_percentage" value="<?php echo $row['portoRate']; ?>" />
+        </div>
+        <div class="col-xs-4">
+          <select class="js-example-basic-single" onchange="$('#meta_porto_percentage').val(this.value);">
+            <option value="">...</option>
             <?php
             $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              $selected = '';
-              if($row['portoRate'] == $tax_row['id']) $selected = 'selected';
-              echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+              echo '<option value="'.$tax_row['percentage'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
             }
             ?>
           </select>
@@ -521,6 +553,47 @@ $x = $prod_row['id'];
     </div>
   </div>
 </div>
+</form>
+
+<?php
+$current_transition = preg_replace('/\d/', '', $id_num);
+//Backward transitions are not possible, as are transitions into same state
+$transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
+$pos = array_search($current_transition, $transitions);
+$bad = array_slice($transitions, 0, $pos);
+$bad[] = $transitions[$pos];
+?>
+<form method="POST" action="offer_proposals.php">
+  <div class="modal fade choose-transition">
+    <div class="modal-dialog modal-sm modal-content">
+      <div class="modal-header">
+        <h3><?php echo $lang['TRANSITION']; ?></h3>
+      </div>
+      <div class="modal-body">
+        <div class="radio">
+          <?php
+          $checked = '';
+          foreach($transitions as $t){
+            $disabled = '';
+            if(in_array($t, $bad)){
+              $disabled = 'disabled';
+            }
+            echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
+            if($current_transition == $t){
+              $checked = 'checked'; //enable the next transition
+            } else {
+              $checked = '';
+            }
+          }
+          ?>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $filterProposal; ?>">OK</button>
+      </div>
+    </div>
+  </div>
 </form>
 
 <script>
@@ -548,6 +621,11 @@ function displayArticle(i){
     });
   }
 }
+
+$("#doSale").on("click", function(){
+  var purchase = parseFloat($("#product_purchase").val());
+  $("#product_price").val(purchase + purchase * parseFloat($("#salePercent").val()) / 100 )
+});
 </script>
 
 <?php require 'footer.php';?>

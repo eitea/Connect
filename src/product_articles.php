@@ -82,11 +82,38 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <input type="text" class="form-control" name="add_product_description" placeholder="<?php echo $lang['DESCRIPTION']; ?>" maxlength="190"/>
         <br>
         <div class="row">
-          <div class="col-md-6">
-            <label><?php echo $lang['PRICE_STK']; ?></label>
-            <input type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+          <div class="col-md-4">
+            <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
+            <input id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" />
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
+            <label><?php echo $lang['PRICE_STK'] .' - '. $lang['CALCULATE']; ?></label>
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button id="doSale" class="btn btn-default" type="button">OK</button>
+              </span>
+              <input id="salePercent" type="text" class="form-control" placeholder=" zzgl %">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label><?php echo $lang['PRICE_STK']; ?></label>
+            <input id="product_price" type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+          </div>
+        </div>
+        <br><br>
+        <div class="row">
+          <div class="col-md-4">
+            <?php echo $lang['TAXES']; ?>
+            <select class="js-example-basic-single btn-block" name="add_product_taxes">
+              <?php
+              $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+              while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+                echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+              }
+              ?>
+            </select>
+          </div>
+          <div class="col-md-4">
             <label><?php echo $lang['UNIT']; ?></label>
             <select class="js-example-basic-single" name="add_product_unit">
               <?php
@@ -97,24 +124,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               ?>
             </select>
           </div>
-        </div>
-        <br><br>
-        <div class="row">
-          <div class="col-md-4">
-            <select class="js-example-basic-single btn-block" name="add_product_taxes">
-              <?php
-              $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-              while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-              }
-              ?>
-            </select>
-          </div>
           <div class="col-md-4 checkbox">
             <label><input type="checkbox" name="add_product_as_bar" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
-          </div>
-          <div class="col-md-4">
-            <input type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="<?php echo $lang['PURCHASE_PRICE']; ?>" />
           </div>
         </div>
       </div>
@@ -125,5 +136,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </div>
 </form>
+
+<script>
+$("#doSale").on("click", function(){
+  var purchase = parseFloat($("#product_purchase").val());
+  $("#product_price").val(purchase + purchase * parseFloat($("#salePercent").val()) / 100 )
+});
+</script>
 
 <?php include 'footer.php'; ?>

@@ -168,7 +168,7 @@ if($_SESSION['color'] == 'light'){
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
   <script>
@@ -533,7 +533,6 @@ if($_SESSION['color'] == 'light'){
             <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
               <div class="panel-body">
                 <ul class="nav navbar-nav">
-                  <li><a <?php if($this_page =='offer_proposal_process.php'){echo $setActiveLink;}?> href="offer_proposal_process.php"><i class="fa fa-file-o"></i><span><?php echo $lang['NEW_PROCESS']; ?></span></a></li>
                   <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="offer_proposals.php"><i class="fa fa-file-text-o"></i><span><?php echo $lang['PROCESSES']; ?></span></a></li>
                   <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="product_articles.php"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
                   <li>

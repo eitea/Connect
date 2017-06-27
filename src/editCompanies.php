@@ -708,13 +708,16 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
 
 <script>
 $(document).ready(function () {
-  var unsaved = false;
-  $(":input").change(function(){ //trigers change in all input fields including text type
-    unsaved = true;
+  var isDirty = false;
+  $(":input").change(function(){ //triggers change in all input fields including text type
+    isDirty = true;
+  });
+  $(':submit').click(function() {
+      isDirty = false;
   });
   function unloadPage(){
-    if(unsaved){
-      return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
+    if(isDirty){
+      return "Unsaved changes. Leave this page and discard changes?";
     }
   }
   window.onbeforeunload = unloadPage;

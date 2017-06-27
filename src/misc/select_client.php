@@ -4,8 +4,8 @@
   $filterClient = empty($filterings['client']) ? 0 : $filterings['client'];
   $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
   if($result_fc && $result_fc->num_rows > 1){
-    echo '<div class="col-sm-6"><select class="js-example-basic-single" name="filterCompany" onchange="select_client.showClients(this.value, '.$filterClient.');" >';
-    echo '<option value="0">'.$lang['COMPANY'].'... </option>';
+    echo '<div class="col-sm-6"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" onchange="select_client.showClients(this.value, '.$filterClient.');" >';
+    echo '<option value="0">...</option>';
     while($result && ($row_fc = $result_fc->fetch_assoc())){
       $checked = '';
       if($filterCompany == $row_fc['id']) {
@@ -19,6 +19,7 @@
   }
   ?>
   <div class="col-sm-6">
+    <label><?php echo $lang['CLIENT']; ?></label>
     <select id="clientHint" class="js-example-basic-single" name="filterClient">
     </select>
   </div>

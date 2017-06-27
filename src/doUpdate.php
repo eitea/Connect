@@ -754,6 +754,13 @@ if($row['version'] < 79){
 }
 
 if($row['version'] < 81){
+  $sql = "ALTER TABLE products ADD COLUMN taxPercentage INT(3) UNSIGNED";
+  if($conn->query($sql)){
+    echo '<br> Added taxes to products';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
   $sql = "ALTER TABLE logs MODIFY COLUMN status INT(3)";
   if($conn->query($sql)){
     echo '<br> Log savetype changes...';
@@ -1079,13 +1086,6 @@ if($row['version'] < 86){
     echo '<br> Added units to products';
   }
 
-  $sql = "ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED";
-  if($conn->query($sql)){
-    echo '<br> Added taxes to products';
-  } else {
-    echo '<br>'.$conn->error;
-  }
-
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
   $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
@@ -1275,7 +1275,7 @@ if($row['version'] < 93){
 
   $sql = "CREATE TABLE representatives (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100)
+    name VARCHAR(50)
   )";
   if($conn->query($sql)){
     echo '<br>Representatives';
@@ -1292,6 +1292,13 @@ if($row['version'] < 93){
   } else {
     echo '<br>'.$conn->error;
   }
+
+  //insert payment method
+  $sql = "INSERT INTO paymentMethods (name) VALUES ('Überweisung')";
+  $conn->query($sql);
+  //insert shippign method
+  $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
+  $conn->query($sql);
 
 }
 //if($row['version'] < 93){}

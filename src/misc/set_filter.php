@@ -5,8 +5,9 @@
 * Project [id, productive]
 * Users [id]
 * Bookings [charged, break, drive]
-* Logs [activity, all]
+* Logs [activity, hideAll]
 * Dates [date]
+* Procedures [transitions[id], status, hideAll]
 **/
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
@@ -78,6 +79,19 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
       $filterings['date'] .= '-' . '__';
     }
   }
+  if(isset($_POST['searchTransitions'])){
+    $filterings['procedures'][0] = array_map("test_input", $_POST['searchTransitions']);
+  }
+  if(isset($_POST['searchProcessStatus'])){
+    $filterings['procedures'][1] = intval($_POST['searchProcessStatus']);
+  }
+  if(isset($filterings['procedures'][2])){
+    if(isset($_POST['searchAllProcesses'])){
+      $filterings['procedures'][2] = 'checked';
+    } else {
+      $filterings['procedures'][2] = '';
+    }
+  }
 
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
@@ -95,7 +109,7 @@ $scale = 0;
 if(isset($filterings['date'])){$scale++;}
 if(isset($filterings['user'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
-
+if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);
 if($scale > 1){ //2 columns
   $styles = array(40, 45);
@@ -250,6 +264,33 @@ if($scale > 2){ //3 columns
 
         <?php if(isset($filterings['procedures'])): ?>
           <div class="filter_column">
+            <label><?php echo $lang['PROCESSES']; ?></label>
+            <select class="js-example-basic-single" name="searchTransitions[]" multiple="multiple">
+              <?php
+              foreach($transitions as $i){
+                $selected = '';
+                if(in_array($i, $filterings['procedures'][0])){
+                  $selected = 'selected';
+                }
+                echo "<option $selected value='$i'>".$lang['PROPOSAL_TOSTRING'][$i].'</option>';
+              }
+              ?>
+            </select>
+            <br><br>
+            <label><?php echo $lang['PROCESS_STATUS']; ?></label>
+            <select class="js-example-basic-single"  name="searchProcessStatus">
+              <option value="-1"><?php echo $lang['DISPLAY_ALL']; ?></option>
+              <?php
+              for($i=0; $i < 3; $i++){
+                $selected = '';
+                if($i == $filterings['procedures'][1]){
+                  $selected = 'selected';
+                }
+                echo '<option value="2" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
+              }
+              ?>
+            </select>
+            <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['procedures'][2]; ?> name="searchAllProcesses"/><?php echo $lang['HIDE_PROCESSED_DATA']; ?></label></div>
           </div>
         <?php endif; ?>
         <div class="container-fluid text-right">
