@@ -464,6 +464,9 @@ $lang_ger['HEADLINE'] = 'Überschrift';
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
 
+$lang_eng['HIDE_PROCESSED_DATA'] = 'Hide processed rows';
+$lang_ger['HIDE_PROCESSED_DATA'] = 'Verarbeitete Daten ausblenden';
+
 $lang_eng['HIRE_USER'] = 'Hire User';
 $lang_ger['HIRE_USER'] = 'Benutzer Einstellen';
 
@@ -718,6 +721,12 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
+
+$lang_eng['PROCESS'] = 'Process';
+$lang_ger['PROCESS'] = 'Vorgang';
+
+$lang_eng['PROCESS_STATUS'] = 'Process Status';
+$lang_ger['PROCESS_STATUS'] = 'Prozessstatus';
 
 $lang_eng['PROCESSES'] = 'Processes';
 $lang_ger['PROCESSES'] = 'Vorgänge';

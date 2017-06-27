@@ -165,13 +165,13 @@ ul.nav.navbar-nav .nav.nav-list {
 }
 
 /* checkboxes */
-.checkbox input[type=checkbox], .radio input[type=radio] {
+.checkbox input[type=checkbox], .radio input[type=radio]{
   position: initial;
 }
-input[type="checkbox"]:focus {
+input[type="checkbox"]:focus, input[type="radio"]:focus {
   outline:0;
 }
-input[type="checkbox"] {
+input[type="checkbox"]{
   -webkit-appearance: none;
   -moz-appearance: none;
   width:20px;
