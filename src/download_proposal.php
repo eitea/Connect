@@ -194,7 +194,6 @@ $pdf->MultiColCell(30, 4, $netto_value." EUR\n  ".$row['porto']." EUR", 0, 'R');
 $pdf->SetFontSize(10);
 
 //porto is just another product
-
 $porto_vat = $row['porto'] * $row['portoRate'] / 100;
 
 $netto_value += $row['porto'];
