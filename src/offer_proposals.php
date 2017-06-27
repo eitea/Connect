@@ -190,7 +190,7 @@ while($result && ($row = $result->fetch_assoc())):
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>"><?php echo $lang['CONTINUE']; ?></button>
+        <button type="submit" class="btn btn-warning" name="add_new_process" value="<?php echo $i; ?>"><?php echo $lang['CONTINUE']; ?></button>
       </div>
     </div>
   </div>
