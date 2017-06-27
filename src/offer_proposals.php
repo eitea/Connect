@@ -24,7 +24,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 }
-
+if(isset($_GET['err']) && $_GET['err'] == 1){echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';}
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
@@ -34,19 +34,24 @@ if(!$result || $result->num_rows <= 0){
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['PROCESSES']; ?><div class="page-header-button-group"><?php include 'misc/set_filter.php'; ?></div></h3>
+  <h3><?php echo $lang['PROCESSES']; ?>
+    <div class="page-header-button-group">
+      <?php include 'misc/set_filter.php'; ?>
+      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add_process" title="<?php echo $lang['NEW_PROCESS']; ?>"><i class="fa fa-plus"></i></button>
+    </div>
+  </h3>
 </div>
 
-<form method="POST">
-  <?php
-  $CURRENT_TRANSITIONS = empty($filterings['procedures'][0]) ? $transitions : $filterings['procedures'][0];
-  $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$filterings['company'] : "";
-  $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
-  $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
+<?php
+$CURRENT_TRANSITIONS = empty($filterings['procedures'][0]) ? $transitions : $filterings['procedures'][0];
+$filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$filterings['company'] : "";
+$filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
+$filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
 
-  $result = $conn->query("SELECT proposals.*, clientData.name as clientName FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id
-  WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
-  ?>
+$result = $conn->query("SELECT proposals.*, clientData.name as clientName FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id
+WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
+?>
+<form method="POST" action="offer_proposals.php">
   <table class="table table-hover">
     <thead>
       <th>ID</th>
@@ -123,49 +128,72 @@ if(!$result || $result->num_rows <= 0){
       ?>
     </tbody>
   </table>
-  </form>
+</form>
 
-  <?php
-  mysqli_data_seek($result,0);
-  while($result && ($row = $result->fetch_assoc())):
-    $i = $row['id'];
-    $current_transition = preg_replace('/\d/', '', $row['id_number']);
-    //Backward transitions are not possible, as are transitions into same state
-    $pos = array_search($current_transition, $transitions);
-    $bad = array_slice($transitions, 0, $pos);
-    $bad[] = $transitions[$pos];
-    ?>
-    <form method="POST">
-      <div class="modal fade choose-transition-<?php echo $i; ?>">
-        <div class="modal-dialog modal-sm modal-content">
-          <div class="modal-header">
-            <h3><?php echo $lang['TRANSITION']; ?></h3>
-          </div>
-          <div class="modal-body">
-            <div class="radio">
-              <?php
-              $checked = '';
-              foreach($transitions as $t){
-                $disabled = '';
-                if(in_array($t, $bad)){
-                  $disabled = 'disabled';
-                }
-                echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
-                if($current_transition == $t){
-                  $checked = 'checked'; //enable the next transition
-                } else {
-                  $checked = '';
-                }
+<?php
+mysqli_data_seek($result,0);
+while($result && ($row = $result->fetch_assoc())):
+  $i = $row['id'];
+  $current_transition = preg_replace('/\d/', '', $row['id_number']);
+  //Backward transitions are not possible, as are transitions into same state
+  $pos = array_search($current_transition, $transitions);
+  $bad = array_slice($transitions, 0, $pos);
+  $bad[] = $transitions[$pos];
+  ?>
+  <form method="POST" action="offer_proposals.php">
+    <div class="modal fade choose-transition-<?php echo $i; ?>">
+      <div class="modal-dialog modal-sm modal-content">
+        <div class="modal-header">
+          <h3><?php echo $lang['TRANSITION']; ?></h3>
+        </div>
+        <div class="modal-body">
+          <div class="radio">
+            <?php
+            $checked = '';
+            foreach($transitions as $t){
+              $disabled = '';
+              if(in_array($t, $bad)){
+                $disabled = 'disabled';
               }
-              ?>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-            <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>">OK</button>
+              echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
+              if($current_transition == $t){
+                $checked = 'checked'; //enable the next transition
+              } else {
+                $checked = '';
+              }
+            }
+            ?>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>">OK</button>
+        </div>
       </div>
-    </form>
-  <?php endwhile; ?>
+    </div>
+  </form>
+<?php endwhile; ?>
+
+<form method="POST" action="offer_proposal_edit.php">
+  <div class="modal fade add_process">
+    <div class="modal-dialog modal-md modal-content">
+      <div class="modal-header"><h4><?php echo $lang['NEW_PROCESS']; ?></h4></div>
+      <div class="modal-body">
+        <?php include 'misc/select_client.php'; ?>
+        <br>
+        <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
+        <select class="js-example-basic-single" name="nERP">
+          <option value="ANG"><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></option>
+          <option value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
+          <option value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>"><?php echo $lang['CONTINUE']; ?></button>
+      </div>
+    </div>
+  </div>
+</form>
+
 <?php include 'footer.php'; ?>

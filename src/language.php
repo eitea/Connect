@@ -137,6 +137,9 @@ $lang_ger['BREAK'] = 'Pause';
 $lang_eng['BREAKS'] = 'Breaks';
 $lang_ger['BREAKS'] = 'Pausen';
 
+$lang_eng['CALCULATE'] = 'Calculate';
+$lang_ger['CALCULATE'] = 'Berechnen';
+
 $lang_eng['CALENDAR'] = 'Calendar';
 $lang_ger['CALENDAR'] = 'Kalender';
 
@@ -781,9 +784,6 @@ $lang_ger['READY_STATUS'] = 'Bereitschaftsstatus';
 
 $lang_eng['REASON'] = 'Reason';
 $lang_ger['REASON'] = 'Grund';
-
-$lang_eng['RECALCULATE_VACATION'] = 'Recalculate Accumulated Vacation';
-$lang_ger['RECALCULATE_VACATION'] = 'Urlaub Rekalkulieren';
 
 $lang_eng['RECIPIENTS'] = 'Recipients';
 $lang_ger['RECIPIENTS'] = 'Empfänger';

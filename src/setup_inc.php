@@ -706,7 +706,6 @@ $sql = "CREATE TABLE $policyTable (
     unit VARCHAR(20),
     quantity DECIMAL(8,2),
     taxPercentage INT(3),
-    taxID INT(4) UNSIGNED,
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     purchase DECIMAL(10,2),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
@@ -758,7 +757,7 @@ $sql = "CREATE TABLE $policyTable (
 
   $sql = "CREATE TABLE paymentMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50)
+    name VARCHAR(100)
   )";
   if($conn->query($sql)){
     echo '<br>Payment Methods';
@@ -778,7 +777,7 @@ $sql = "CREATE TABLE $policyTable (
 
   $sql = "CREATE TABLE shippingMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50)
+    name VARCHAR(100)
   )";
   if($conn->query($sql)){
     echo '<br>Shipping Methods';
