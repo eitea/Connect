@@ -359,7 +359,7 @@ $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bi
 $lang_eng['ERROR_INVALID_DATA'] = 'Entered Information was invalid. Please try again with valid data.';
 $lang_ger['ERROR_INVALID_DATA'] = 'Eingegebene Information war ungültig. Bitte mit gültigen Daten nochmals versuchen.';
 
-$lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in your settings.';
+$lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in the settings.';
 $lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten unter den Einstellung nachtragen.';
 
 $lang_eng['ERROR_MISSING_FIELDS'] = 'Fields are missing. Please fill out every required field.';

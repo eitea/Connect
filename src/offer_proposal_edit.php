@@ -86,26 +86,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $row_tax = $result_tax->fetch_assoc();
       $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxPercentage, cash, unit, purchase)
       VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase')");
-
-      if(mysqli_error($conn)){
-        echo $conn->error;
-      } else {
-        echo '<div class="alert alert-success fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
-        echo '</div>';
-      }
+      if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';}
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   } elseif(isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
-    echo '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
   }
   if(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
@@ -122,19 +108,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $product_tax_id = intval($_POST['update_tax_'.$x]);
       $product_unit = test_input($_POST['update_unit_'.$x]);
       $conn->query("UPDATE products SET name='$product_name', description='$product_description', quantity='$product_quantity', price='$product_price', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
-      if(mysqli_error($conn)){
-        echo $conn->error;
-      } else {
-        echo '<div class="alert alert-success fade in">';
-        echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
-        echo '</div>';
-      }
+      if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     } else {
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   }
   if(isset($_POST['meta_save'])){
@@ -151,20 +127,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
       $filterProposal = mysqli_insert_id($conn);
     }
-    if(mysqli_error($conn)){
-      echo $conn->error;
-    } else {
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>O.K.: </strong>'.$lang['OK_SAVE'];
-      echo '</div>';
-    }
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   }
-  if(isset($_POST['translate']) && !empty($_POST['transit'])){
+  if(!empty($_POST['translate']) && !empty($_POST['transit'])){
     $filterProposal = intval($_POST['translate']);
     $transitionID = getNextERP(test_input($_POST['transit']));
     $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $filterProposal");
     redirect('offer_proposal_edit.php?num='.$proposalID);
+  } elseif(isset($_POST['translate'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
   }
 } // END IF POST
 if(isset($_GET['num'])){
