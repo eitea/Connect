@@ -25,17 +25,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 ?>
+<form method="POST">
 <div class="page-header">
   <h3>
     <?php echo $lang['UNITS']; ?>
     <div class="page-header-button-group">
-      <button type="button" class="btn btn-default" title="<?php echo $lang['ADD']; ?>" name="delete" data-toggle="modal" data-target=".add_unit" ><i class="fa fa-plus"></i></button>
-      <button type="submit" class="btn btn-default" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
+      <button type="button" class="btn btn-default" title="<?php echo $lang['ADD']; ?>" data-toggle="modal" data-target=".add_unit" ><i class="fa fa-plus"></i></button>
+      <button type="submit" class="btn btn-default" title="<?php echo $lang['DELETE']; ?>" name="delete"><i class="fa fa-trash-o"></i></button>
       <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="save"><i class="fa fa-floppy-o"></i></button><br>
     </div>
   </h3>
 </div>
-<form method="POST">
   <div class="container-fluid">
     <div class="col-md-6">
       <table class="table table-hover">

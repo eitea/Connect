@@ -1293,6 +1293,13 @@ if($row['version'] < 93){
     echo '<br>'.$conn->error;
   }
 
+  //insert payment method
+  $sql = "INSERT INTO paymentMethods (name) VALUES ('Überweisung')";
+  $conn->query($sql);
+  //insert shippign method
+  $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
+  $conn->query($sql);
+
 }
 //if($row['version'] < 93){}
 //if($row['version'] < 94){}
