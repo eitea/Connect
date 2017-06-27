@@ -31,7 +31,7 @@ class PDF extends FPDF {
     $this->MultiCell(100, 4, $this->glob["headerAddress"], 0, 'R');
     //2cm Line break
     $this->Line(10, 38, 210-10, 38); //1cm from each edge
-    $this->Ln(3);
+    $this->Ln(5);
   }
   function Footer(){
     $this->SetFont('Helvetica','', 8);
@@ -134,7 +134,7 @@ $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 
 //PRODUCT TABLE
 $pdf->SetFontSize(10);
-$prod_res = $conn->query("SELECT products.*,taxRates.percentage, taxRates.description AS taxName, (quantity * price) AS total FROM products, taxRates WHERE proposalID = ".$row['proposalID'].' AND taxID = taxRates.id');
+$prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID']);
 if($prod_res && $prod_res->num_rows > 0){
   $pdf->Ln(10);
   $pdf->SetFillColor(200,200,200);
@@ -173,13 +173,12 @@ if($prod_res && $prod_res->num_rows > 0){
       $pdf->Cell($w[4],6,'BAR','',0,'R');
       $cash_value += $prod_row['total'];
     } else {
-      $pdf->Cell($w[4],6,$prod_row['percentage']. '%','',0,'R');
-      $vat_value += $prod_row['total'] * $prod_row['percentage'] / 100;
+      $pdf->Cell($w[4],6,$prod_row['taxPercentage']. '%','',0,'R');
+      $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
       $netto_value += $prod_row['total'];
     }
     $pdf->Cell($w[5],6,sprintf('%.2f', $prod_row['total']). ' EUR','',1,'R');
     $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
-
     $i++;
   }
 }
@@ -195,11 +194,9 @@ $pdf->MultiColCell(30, 4, $netto_value." EUR\n  ".$row['porto']." EUR", 0, 'R');
 $pdf->SetFontSize(10);
 
 //porto is just another product
-$result = $conn->query("SELECT percentage from taxRates WHERE id = ".$row['portoRate']);
-if($result && $result->num_rows > 0){
-  $porto_row = $result->fetch_assoc();
-  $porto_vat = $row['porto'] * $porto_row['percentage'] / 100;
-}
+
+$porto_vat = $row['porto'] * $row['portoRate'] / 100;
+
 $netto_value += $row['porto'];
 $vat_value += $porto_vat;
 $pdf->MultiColCell(30, 5, $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT']."\n".$lang['CASH_EXPENSE'], 'B', 1, 0, 70);

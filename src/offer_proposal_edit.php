@@ -160,6 +160,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '</div>';
     }
   }
+  if(isset($_POST['translate']) && !empty($_POST['transit'])){
+    $filterProposal = intval($_POST['translate']);
+    $transitionID = getNextERP(test_input($_POST['transit']));
+    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $filterProposal");
+    redirect('offer_proposal_edit.php?num='.$proposalID);
+  }
 } // END IF POST
 if(isset($_GET['num'])){
   $filterProposal = intval($_GET['num']);
@@ -184,6 +190,7 @@ if($filterProposal){
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
       <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
       <a href="editCustomer_detail?custID=<?php echo $filterClient; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
     </div>
   </h3>
 </div>
@@ -575,6 +582,47 @@ $x = $prod_row['id'];
     </div>
   </div>
 </div>
+</form>
+
+<?php
+$current_transition = preg_replace('/\d/', '', $id_num);
+//Backward transitions are not possible, as are transitions into same state
+$transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
+$pos = array_search($current_transition, $transitions);
+$bad = array_slice($transitions, 0, $pos);
+$bad[] = $transitions[$pos];
+?>
+<form method="POST" action="offer_proposals.php">
+  <div class="modal fade choose-transition">
+    <div class="modal-dialog modal-sm modal-content">
+      <div class="modal-header">
+        <h3><?php echo $lang['TRANSITION']; ?></h3>
+      </div>
+      <div class="modal-body">
+        <div class="radio">
+          <?php
+          $checked = '';
+          foreach($transitions as $t){
+            $disabled = '';
+            if(in_array($t, $bad)){
+              $disabled = 'disabled';
+            }
+            echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
+            if($current_transition == $t){
+              $checked = 'checked'; //enable the next transition
+            } else {
+              $checked = '';
+            }
+          }
+          ?>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $filterProposal; ?>">OK</button>
+      </div>
+    </div>
+  </div>
 </form>
 
 <script>

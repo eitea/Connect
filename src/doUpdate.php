@@ -1300,10 +1300,6 @@ if($row['version'] < 93){
   $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
   $conn->query($sql);
 
-
-
-
-
 }
 //if($row['version'] < 93){}
 //if($row['version'] < 94){}
