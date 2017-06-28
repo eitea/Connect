@@ -92,7 +92,6 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
       $filterings['procedures'][2] = '';
     }
   }
-
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
   } else {

@@ -171,7 +171,6 @@ if($filterProposal){
     <input type="hidden" value="<?php echo $filterClient; //proposal doesnt exist ?>" name="filterClient" />
     <input type="hidden" value="<?php echo $filterProposal; ?>" name="filterProposal" />
   </div>
-  <br>
   <table class="table">
     <thead>
       <th>Name</th>
@@ -596,7 +595,8 @@ $bad[] = $transitions[$pos];
   </div>
 </form>
 
-<script>
+<script type="text/javascript">
+
 function displayArticle(i){
   if(i != ""){
     $.ajax({

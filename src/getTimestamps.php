@@ -45,7 +45,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
     } else { //update old
       $addBreakVal = floatval($_POST['addBreakValues']);
-      if($addBreakVal){//add a break
+      if($addBreakVal){ //add a break
         $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
         $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
       }
@@ -582,7 +582,6 @@ if($filterings['user']):
                   </thead>
                   <tbody>
                     <?php
-                    echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
                     do {
                       $x = $row['bookingTableID'];
                       $date = carryOverAdder_Hours($row['start'], $timeToUTC);
@@ -632,7 +631,7 @@ if($filterings['user']):
                 </table>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn btn-warning" name="delete_bookings"><?php echo $lang['DELETE_SELECTION']; ?></button>
               </div>
             </div>
@@ -655,10 +654,10 @@ if($filterings['user']):
                   <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
                 </div>
                 <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
+                  <div class="row">
                   <?php
-                  echo "<input type='hidden' name='set_all_filters' style='display:none' value='$filterDateFrom,$filterID,$filterStatus' />";
                   if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-                    echo "<select style='width:200px' class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+                    echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
                     $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
                     $clientResult = $conn->query($sql);
                     while($clientRow = $clientResult->fetch_assoc()){
@@ -668,7 +667,7 @@ if($filterings['user']):
                       }
                       echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
                     }
-                    echo "</select> <select style='width:200px' id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+                    echo "</select></div><div class='col-md-4'><label>".$lang['PROJECT']."</label><select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
                     $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
                     $clientResult = $conn->query($sql);
                     while($clientRow = $clientResult->fetch_assoc()){
@@ -678,7 +677,7 @@ if($filterings['user']):
                       }
                       echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
                     }
-                    echo "</select> <br><br>";
+                    echo "</select></div> <br><br>";
                   } //end if(break)
 
                   $A = carryOverAdder_Hours($row['start'],$timeToUTC);
@@ -695,6 +694,7 @@ if($filterings['user']):
                     $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$timeToUTC);
                   }
                   ?>
+                </div>
                   <label><?php echo $lang['DATE']; ?>:</label>
                   <div class="row">
                     <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
