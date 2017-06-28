@@ -630,7 +630,7 @@ if($filterings['user']):
                         <input type="datetime-local" style="display:inline;max-width:180px;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
                       </label>
                       <br><br>
-                      <label><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><?php echo $lang['OPEN']; ?></label>
+                      <label><input type="radio" name="is_open" value="1" /><?php echo $lang['OPEN']; ?></label>
                     </div>
                   </div>
                 </div>

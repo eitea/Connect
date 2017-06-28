@@ -71,7 +71,7 @@ if(!$result || $result->num_rows <= 0){
   <table class="table table-hover">
     <thead>
       <th><?php echo $lang['DELETE']; ?></th>
-      <th>Halo</th>
+      <th></th>
       <th><?php echo $lang['COMPANY']; ?></th>
       <th><?php echo $lang['CLIENT']; ?></th>
       <th>Name</th>
@@ -196,6 +196,7 @@ while($row = $result->fetch_assoc()):
   </form>
 <?php endwhile; ?>
 
+<!-- ADD PROJECT -->
 <form method="POST">
   <div class="modal fade add-project">
     <div class="modal-dialog modal-content modal-md">
