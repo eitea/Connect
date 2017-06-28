@@ -251,8 +251,6 @@ AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $use
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
 $editingResult = $conn->query($sql); //f*ck you php
-$addTimeStart = 0;
-
 if(!$result || $result->num_rows <= 0){
   echo '<script>document.getElementById("set_filter_search").click();</script>';
 }
@@ -284,7 +282,6 @@ if(!$result || $result->num_rows <= 0){
       $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
 
       $sum_min = 0;
-      $addTimeStart = 0;
       $numRows = $result->num_rows;
       for($i = 0; $i < $numRows; $i++) {
         $row = $result->fetch_assoc();
@@ -381,7 +378,6 @@ if(!$result || $result->num_rows <= 0){
 
         $csv->addLine($csv_Add);
         $sum_min += timeDiff_Hours($row['start'], $row['end']);
-        $addTimeStart = $B;
       } //end while fetch_assoc
 
       echo "<tr>";
@@ -597,7 +593,13 @@ $(function () {
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo substr($addTimeStart,11,5); ?>" >
+              <?php
+              if(!empty($filterings['user'])){
+                $result_bkh = $conn->query("SELECT end, timeToUTC FROM projectBookingData, logs WHERE logs.indexIM = projectBookingData.timestampID AND logs.userID = ".$filterings['user'].' ORDER BY end DESC');
+                if($result_bkh && ($row_bkh = $result_bkh->fetch_assoc())){$lastBooking = substr(carryOverAdder_Hours($row_bkh['end'], $row_bkh['timeToUTC']), 11, 5);} else {$lastBooking = ''; echo $conn->error;}
+              }
+              ?>
+              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo $lastBooking; ?>" >
               <span class="input-group-addon"> - </span>
               <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
             </div>
