@@ -45,7 +45,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
     } else { //update old
       $addBreakVal = floatval($_POST['addBreakValues']);
-      if($addBreakVal){//add a break
+      if($addBreakVal){ //add a break
         $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
         $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
       }

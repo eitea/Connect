@@ -196,4 +196,17 @@ while($result && ($row = $result->fetch_assoc())):
   </div>
 </form>
 
+<script type="text/javascript">
+$('.table').DataTable({
+  ordering: false,
+  responsive: true,
+  autoWidth: false,
+  dom: 'f',
+  paginate: false,
+  language: {
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+  }
+});
+</script>
+
 <?php include 'footer.php'; ?>

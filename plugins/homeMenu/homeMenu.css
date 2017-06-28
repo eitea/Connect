@@ -248,6 +248,9 @@ input[type="radio"]:checked {
 .row{
   padding-bottom:5px;
 }
+.table{
+  word-wrap: break-word;
+}
 i{
   margin-right:5px;
   margin-left:5px;
