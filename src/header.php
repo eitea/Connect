@@ -168,7 +168,7 @@ if($_SESSION['color'] == 'light'){
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+  <link href="../plugins/homeMenu/homeMenu.css?v=<?time();?>" rel="stylesheet" />
   <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
   <script>
