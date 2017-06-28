@@ -15,7 +15,6 @@ AND $projectTable.id = $p";
 
 $result = mysqli_query($conn,$sql);
 while($result && ($row = $result->fetch_assoc())){ //this should probably return 3 rows.
-
   if($row['field_1'] == 'TRUE' && $row['id'] == ($row['companyID'] * 3 - 2)){
     if($row['isRequired'] == 'TRUE'){
       echo '<div class="col-sm-4"><label>'.$row['name'].'</label><input type="text" class="form-control required-field" onkeypress="return event.keyCode != 13;" name="required_1" placeholder="'.$row['description'].'" maxlength="50" /></div>';
