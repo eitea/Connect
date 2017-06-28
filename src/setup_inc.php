@@ -759,30 +759,24 @@ $sql = "CREATE TABLE $policyTable (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100)
   )";
-  if($conn->query($sql)){
-    echo '<br>Payment Methods';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
   $sql = "CREATE TABLE representatives (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50)
   )";
-  if($conn->query($sql)){
-    echo '<br>Representatives';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
   $sql = "CREATE TABLE shippingMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100)
   )";
-  if($conn->query($sql)){
-    echo '<br>Shipping Methods';
-  } else {
-    echo '<br>'.$conn->error;
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
   }
 
 ?>

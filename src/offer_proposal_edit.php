@@ -295,10 +295,10 @@ $x = $prod_row['id'];
     </div>
     <div class="modal-body">
       <label>Name</label>
-      <input type="text" class="form-control required-field" name="add_product_name" placeholder="Product Name" maxlength="48"/>
+      <input type="text" class="form-control required-field" name="add_product_name" maxlength="48"/>
       <br>
       <label><?php echo $lang['DESCRIPTION']; ?></label>
-      <input type="text" class="form-control" name="add_product_description" placeholder="Product Description" maxlength="190"/>
+      <input type="text" class="form-control" name="add_product_description" maxlength="190"/>
       <br>
       <div class="row">
         <div class="col-md-4">
