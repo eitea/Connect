@@ -47,7 +47,7 @@ function isHoliday($ts){
 }
 
 /*
-function isHoliday($ts){
+function isHoliday($ts){|
   require "connection.php";
   $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%'";
   $result = mysqli_query($conn, $sql);
@@ -56,7 +56,7 @@ function isHoliday($ts){
 */
 
 function test_input($data) {
-  $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß ]~", "", $data);
+  $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß_ ]~", "", $data);
   $data = trim($data);
   return $data;
 }

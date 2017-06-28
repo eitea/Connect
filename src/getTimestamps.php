@@ -151,10 +151,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
     echo mysqli_error($conn);
-  } elseif(isset($_POST['delete_bookings']) && !empty($_POST['delete_bookings_ids'])){
-    foreach ($_POST['delete_bookings_ids'] as $x) {
-      $conn->query("DELETE FROM projectBookingData WHERE id = $x;");
-    }
+  } elseif(isset($_POST['delete_bookings'])){
+    $conn->query("DELETE FROM projectBookingData WHERE id = ". intval($_POST['delete_bookings']));
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['add_multiple']) && !empty($_POST['add_multiple_user'])){
     $filterID = intval($_POST['add_multiple_user']);
@@ -184,6 +182,99 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
   } elseif(isset($_POST['add_multiple'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+  }
+  if(isset($_POST["addBooking"]) && $filterings['user'] && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+      $filterUserID = $filterings['user'];
+      //get the timestamp. always(!) compare UTC to UTC
+      $sql = "SELECT * FROM $logTable WHERE status = '0' AND indexIM = ".intval($_POST['add_date']);
+      $result = mysqli_query($conn, $sql);
+      if($result && $result->num_rows > 0){
+        $row = $result->fetch_assoc();
+        $indexIM = $row['indexIM'];
+        $timeToUTC = $row['timeToUTC'];
+        $date = substr($row['time'],0, 11);
+        $startDate = $date.$_POST['start'];
+        $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+
+        $endDate = $date.$_POST['end'];
+        $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+
+        $insertInfoText = test_input($_POST['infoText']);
+        $insertInternInfoText = test_input($_POST['internInfoText']);
+
+        if(timeDiff_Hours($startDate, $endDate) > 0){
+          if(isset($_POST['addBreak'])){ //checkbox
+            $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
+            $conn->query($sql);
+            $duration = timeDiff_Hours($startDate, $endDate);
+            $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+            if($conn->query($sql)){
+              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            } else {
+              echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            }
+          } else {
+            if(isset($_POST['addExpenses'])){
+              $expenses_price = test_input($_POST['expenses_price']);
+              $expenses_info = test_input($_POST['expenses_info']);
+              $expenses_unit = test_input($_POST['expenses_unit']);
+            } else {
+              $expenses_price = $expenses_unit = 0;
+              $expenses_info = '';
+            }
+            if(isset($_POST['project'])){
+              $projectID = test_input($_POST['project']);
+              $accept = 'TRUE';
+              if(isset($_POST['required_1'])){
+                $field_1 = "'".test_input($_POST['required_1'])."'";
+                if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_1'])){
+                $field_1 = "'".test_input($_POST['optional_1'])."'";
+              } else {
+                $field_1 = 'NULL';
+              }
+              if(isset($_POST['required_2'])){
+                $field_2 = "'".test_input($_POST['required_2'])."'";
+                if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_2'])){
+                $field_2 = "'".test_input($_POST['optional_2'])."'";
+              } else {
+                $field_2 = 'NULL';
+              }
+              if(isset($_POST['required_3'])){
+                $field_3 = "'".test_input($_POST['required_3'])."'";
+                if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
+              } elseif(!empty($_POST['optional_3'])){
+                $field_3 = "'".test_input($_POST['optional_3'])."'";
+              } else {
+                $field_3 = 'NULL';
+              }
+              if($accept){
+                if(isset($_POST['addDrive'])){ //add as driving time
+                  $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                  VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                } else { //normal booking
+                  $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                  VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                }
+                $conn->query($sql);
+                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+                $insertInfoText = $insertInternInfoText = '';
+              } else {
+                echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+              }
+            } else {
+              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+            }
+          }
+        } else {
+          echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+        }
+    } else {
+      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
+    }
+  } elseif(isset($_POST['add'])) {
+    echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //endif post
 ?>
@@ -539,7 +630,7 @@ if($filterings['user']):
                         <input type="datetime-local" style="display:inline;max-width:180px;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
                       </label>
                       <br><br>
-                      <label><input type="radio" name="is_open" value="1" style="margin-left:13px;" /><?php echo $lang['OPEN']; ?></label>
+                      <label><input type="radio" name="is_open" value="1" /><?php echo $lang['OPEN']; ?></label>
                     </div>
                   </div>
                 </div>
@@ -560,9 +651,10 @@ if($filterings['user']):
       $timeToUTC = $bookingResultsResults['timeToUTC'][$i];
       $bookingResult = $bookingResultsResults[$i]; //uncloneable object
       $row = $bookingResult->fetch_assoc(); //we need this in here for the timestampID in modal class.
+      $currentTsID = $row['timestampID'];
       ?>
       <form method="post">
-        <div class="modal fade bookingModal-<?php echo $row['timestampID']; ?>" tabindex="-1">
+        <div class="modal fade bookingModal-<?php echo $currentTsID; ?>" tabindex="-1">
           <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -606,8 +698,8 @@ if($filterings['user']):
                       echo "<td>$B</td>";
                       echo "<td style='text-align:left'>$C</td>";
                       echo '<td>';
-                      echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingProjectsModal-'.$x.'" ><i class="fa fa-pencil"></i></button> ';
-                      echo '<input type="checkbox" name="delete_bookings_ids[]" value="'.$x.'" /> ';
+                      echo '<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target=".editingProjectsModal-'.$x.'" ><i class="fa fa-pencil"></i></button>';
+                      echo '<button type="submit" class="btn btn-default" name="delete_bookings" value="'.$x.'"><i class="fa fa-trash-o"></i></button>';
                       echo '</td>';
                       echo '</tr>';
                       if($row['bookingType'] == 'break'){
@@ -616,7 +708,7 @@ if($filterings['user']):
                         echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_from_'.$x.'" />'.'</td>';
                         echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_to_'.$x.'" />'.'</td>';
                         echo '<td>';
-                        echo "<select name='splits_activity_".$x."' class='js-example-basic-single' style='width:150px'>";
+                        echo "<select name='splits_activity_".$x."' class='js-example-basic-single'>";
                         for($j = 0; $j < 5; $j++){ //can't do mixed split
                           echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                         }
@@ -632,7 +724,7 @@ if($filterings['user']):
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-warning" name="delete_bookings"><?php echo $lang['DELETE_SELECTION']; ?></button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal" data-toggle="modal" data-target=".addBooking" onclick="$('#addBooking_timestamp').val('<?php echo $currentTsID ?>')"><?php echo $lang['ADD']; ?></button>
               </div>
             </div>
           </div>
@@ -657,7 +749,7 @@ if($filterings['user']):
                   <div class="row">
                   <?php
                   if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-                    echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showNewProjects(\" #newProjectName$x \", this.value, 0);' >";
+                    echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
                     $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
                     $clientResult = $conn->query($sql);
                     while($clientRow = $clientResult->fetch_assoc()){
@@ -727,6 +819,111 @@ if($filterings['user']):
         </form>
       <?php endwhile; ?>
     <?php endfor; ?>
+
+    <!-- ADD BOOKINGS -->
+    <form method="POST">
+      <div class="modal fade addBooking">
+        <div class="modal-dialog modal-lg modal-content" role="document">
+          <div class="modal-header"><h4 class="modal-title"><?php echo $lang['ADD']; ?></h4></div>
+          <div class="modal-body">
+            <div class="row checkbox">
+              <div class="col-sm-3">
+                <label><input type="checkbox" onchange="hideMyDiv(this, 'mySelections');" name="addBreak" title="Das ist eine Pause"><a style="color:black;"><i class="fa fa-cutlery" aria-hidden="true"></i></a>Pause</label>
+              </div>
+              <div class="col-sm-3">
+                <label><input type="checkbox" name="addDrive" title="Fahrzeit"><a style="color:black;"><i class="fa fa-car" aria-hidden="true"></i></a>Fahrzeit</label>
+              </div>
+              <div class="col-sm-3">
+                <label><input type="checkbox" name="addExpenses" onchange="showMyDiv(this, 'hide_expenses')" /><?php echo $lang['EXPENSES']; ?></label>
+              </div>
+            </div>
+            <div class="row">
+              <div id="mySelections" style="display:inline">
+                <?php
+                $result = $conn->query("SELECT * FROM companyData WHERE id IN(".implode(', ', $available_companies).")");
+                if($result && $result->num_rows > 1):
+                  ?>
+                  <div class="col-xs-3">
+                    <label><?php echo $lang['COMPANY']; ?></label>
+                    <select name="company" class="js-example-basic-single" onchange="showClients('#addSelectClient', this.value, 0, 0, '#addSelectProject');">
+                      <option value="0">...</option>
+                      <?php
+                      while ($row = $result->fetch_assoc()) {
+                        $selected = '';
+                        if($filterings['company'] == $row['id']) {
+                          $selected = 'selected';
+                        }
+                        echo "<option $selected value='".$row['id']."'>".$row['name']."</option>";
+                      }
+                      ?>
+                    </select>
+                  </div>
+                <?php endif; ?>
+                <div class="col-xs-3">
+                  <label><?php echo $lang['CLIENT']; ?></label>
+                  <select class="js-example-basic-single" id="addSelectClient" name="client" onchange="showProjects('#addSelectProject', this.value, 0);">
+                    <option value="0">...</option>
+                    <?php
+                    $row = $result->fetch_assoc();
+                    $query = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")";
+                    $result = mysqli_query($conn, $query);
+                    if ($result && $result->num_rows > 1) {
+                      while ($row = $result->fetch_assoc()) {
+                        echo "<option value='".$row['id']."'>".$row['name']."</option>";
+                      }
+                    }
+                    ?>
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                  <label><?php echo $lang['PROJECT']; ?></label>
+                  <select id="addSelectProject" class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="hide_expenses" class="row" style="display:none">
+              <br>
+              <div class="col-md-3">
+                <input type="number" step="0.01" name="expenses_unit" class="form-control" placeholder="<?php echo $lang['QUANTITY']; ?>" />
+              </div>
+              <div class="col-md-3">
+                <input type="number" step="0.01" name="expenses_price" class="form-control" placeholder="<?php echo $lang['PRICE_STK']; ?>" />
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-8">
+                <br><textarea class="form-control" rows="3" name="infoText" placeholder="Info..."></textarea><br>
+              </div>
+              <div class="col-xs-4">
+                <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
+              </div>
+            </div>
+            <div id="project_fields" class="row">
+            </div>
+            <div class="row">
+              <input id="addBooking_timestamp" type="hidden" class="form-control" name="add_date"/>
+              <div class="col-xs-6">
+                <label><?php echo $lang['TIME']; ?></label>
+                <div class="input-group">
+                  <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" >
+                  <span class="input-group-addon"> - </span>
+                  <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name="addBooking"><?php echo $lang['ADD']; ?></button>
+          </div>
+        </div>
+      </div>
+    </form>
+
     <?php
   else:
     echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>';
@@ -734,33 +931,68 @@ if($filterings['user']):
   endif;
   ?>
 
-
-    <script>
-    $('.modal').on('hidden.bs.modal', function (e) {
-      if($('.modal').hasClass('in')) {
-        $('body').addClass('modal-open');
-      }
-    });
-    function showNewProjects(selectID, client, project){
-      $.ajax({
-        url:'ajaxQuery/AJAX_project.php',
-        data:{clientID:client, projectID:project},
-        type: 'post',
-        success : function(resp){
-          $(selectID).html(resp);
-        },
-        error : function(resp){}
-      });
-    };
-    function toggle2(uncheckID){
-      uncheckBox = document.getElementById(uncheckID);
-      uncheckBox.checked = false;
+  <script>
+  $('.modal').on('hidden.bs.modal', function (e) {
+    if($('.modal').hasClass('in')) {
+      $('body').addClass('modal-open');
     }
-
-    var myCalendar = new dhtmlXCalendarObject(["multiple_calendar","multiple_calendar2"]);
-    myCalendar.setSkin("material");
-    myCalendar.setDateFormat("%Y-%m-%d");
-    dhx.zim.first = function(){ return 2000 };
-    </script>
-    <!-- /BODY -->
-    <?php include 'footer.php'; ?>
+  });
+  function showClients(place, company, client, project, projectPlace){
+    $.ajax({
+      url:'ajaxQuery/AJAX_getClient.php',
+      data:{companyID:company, clientID:client},
+      type: 'get',
+      success : function(resp){
+        $(place).html(resp);
+      },
+      error : function(resp){}
+    });
+    showProjects(projectPlace, client, project);
+  };
+  function showProjects(selectID, client, project){
+    $.ajax({
+      url:'ajaxQuery/AJAX_getProjects.php',
+      data:{clientID:client, projectID:project},
+      type: 'get',
+      success : function(resp){
+        $(selectID).html(resp);
+      },
+      error : function(resp){}
+    });
+  };
+  function showProjectfields(project){
+    $.ajax({
+      url:'ajaxQuery/AJAX_getProjectFields.php',
+      data:{projectID:project},
+      type: 'get',
+      success : function(resp){
+        $("#project_fields").html(resp);
+      },
+      error : function(resp){}
+    });
+  }
+  function toggle2(uncheckID){
+    uncheckBox = document.getElementById(uncheckID);
+    uncheckBox.checked = false;
+  }
+  function showMyDiv(o, toShow){
+    if(o.checked){
+      document.getElementById(toShow).style.display='block';
+    } else {
+      document.getElementById(toShow).style.display='none';
+    }
+  }
+  function hideMyDiv(o, toShow){
+    if(o.checked){
+      document.getElementById(toShow).style.display='none';
+    } else {
+      document.getElementById(toShow).style.display='block';
+    }
+  }
+  var myCalendar = new dhtmlXCalendarObject(["multiple_calendar","multiple_calendar2"]);
+  myCalendar.setSkin("material");
+  myCalendar.setDateFormat("%Y-%m-%d");
+  dhx.zim.first = function(){ return 2000 };
+  </script>
+  <!-- /BODY -->
+  <?php include 'footer.php'; ?>
