@@ -724,7 +724,7 @@ if($filterings['user']):
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" data-dismiss="modal" data-toggle="modal" data-target=".addBooking" onclick="$('#addBooking_timestamp').val('<?php echo $currentTsID ?>')"><?php echo $lang['ADD']; ?></button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal" data-toggle="modal" data-target=".addBooking" onclick="$('#addBooking_timestamp').val('<?php echo $currentTsID ?>');$('#addBooking_last').val('<?php echo $B ?>');  "><?php echo $lang['ADD']; ?></button>
               </div>
             </div>
           </div>
@@ -909,9 +909,9 @@ if($filterings['user']):
               <div class="col-xs-6">
                 <label><?php echo $lang['TIME']; ?></label>
                 <div class="input-group">
-                  <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" >
+                  <input id="addBooking_last" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" />
                   <span class="input-group-addon"> - </span>
-                  <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
+                  <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end" />
                 </div>
               </div>
             </div>
@@ -937,6 +937,7 @@ if($filterings['user']):
       $('body').addClass('modal-open');
     }
   });
+
   function showClients(place, company, client, project, projectPlace){
     $.ajax({
       url:'ajaxQuery/AJAX_getClient.php',
