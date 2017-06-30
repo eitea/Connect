@@ -2,39 +2,31 @@
 <?php enableToStamps($userID);?>
 <!-- BODY -->
 
-<div class="page-header">
-  <h3><?php echo $lang['MONTHLY_REPORT']; ?></h3>
-</div>
-
 <?php
+$filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
+
 require 'Calculators/IntervalCalculator.php';
-$currentTimeStamp = substr(getCurrentTimestamp(),0,7). '-01 05:00:00';
-if(isset($_POST['newMonth'])){
-  $currentTimeStamp = $_POST['newMonth']. '-01 05:00:00';
-}
-if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty($_POST['request_end'])){
+if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
   $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
-  $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+  if($_POST['request_open']){
+    $endTime = '0000-00-00 00:00:00';
+  } else {
+    if(empty($_POST['request_end'])){
+      $endTime = '0000-00-00 00:00:00';
+    }
+    $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+  }
   $requestText = test_input($_POST['request_text']);
-  if(timeDiff_Hours($startTime, $endTime) > 0){
+  if(test_Date($startTime)){
     $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."' )";
     if($conn->query($sql)){
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo $lang['OK_REQUEST'];
-      echo '</div>';
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo $conn->error;
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     }
   } else {
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID']." $startTime, $endTime";
-    echo '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
   }
 } elseif(!empty($_POST['splits_save'])) {
   $x = intval($_POST['splits_save']);
@@ -64,18 +56,9 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
 }
 ?>
 
-<form method="POST" id="form1">
-  <div class="row form-group">
-    <div class="col-xs-6">
-      <div class="input-group">
-        <input id="calendar" readonly type="text" class="form-control from" name="newMonth" value= <?php echo substr($currentTimeStamp,0,7); ?> >
-        <span class="input-group-btn">
-          <button class="btn btn-warning" type="submit">Filter</button>
-        </span>
-      </div>
-    </div>
-  </div>
-</form>
+<div class="page-header">
+  <h3><?php echo $lang['MONTHLY_REPORT']; ?><div class="page-header-button-group"><?php include 'misc/set_filter.php'; ?></div></h3>
+</div>
 
 <table class="table table-striped">
   <thead>
@@ -93,7 +76,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
   </thead>
   <tbody>
     <?php
-    $now = $currentTimeStamp;
+    $now = str_replace('__', '01', $filterings['date']).' 05:00:00';
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);
@@ -107,6 +90,9 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
     }
     $accumulatedSaldo = $corrections;
     for($i = 0; $i < $calculator->days; $i++){
+      if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
+      if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
+
       if($calculator->start[$i]){
         $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
       } else {
@@ -169,14 +155,18 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
           <div class="row">
             <div class="col-md-6">
               <label>Neuer Anfang</label>
+              <br>
               <input type="time" name="request_start" class="form-control" />
             </div>
             <div class="col-md-6">
               <label>Neues Ende</label>
-              <input type="time" name="request_end" class="form-control" />
+              <div class="radio">
+                <label><input type="radio" name="request_open" value="0" checked /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" /></label>
+                <br><br>
+                <label><input type="radio" name="request_open" value="1" /> <?php echo $lang['OPEN']; ?></label>
+              </div>
             </div>
           </div>
-          <br>
           <div class="row">
             <div class="col-md-12">
               <label>Infotext</label>
@@ -191,6 +181,8 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
       </div>
     </div>
   </form>
+
+  <!-- BOOKINGS -->
   <?php
   $bookingResult = false;
   if($calculator->indecesIM[$i]){
@@ -282,6 +274,16 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start']) && !empty(
     viewMode: "months",
     minViewMode: "months"
   });
+
+  $('.table').DataTable({
+  order: [[ 1, "desc" ]],
+  responsive: true,
+  autoWidth: false,
+  paginate: false,
+  language: {
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+  }
+});
   </script>
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

@@ -78,7 +78,7 @@ $sql = "CREATE TABLE $companyTable (
   name VARCHAR(60) NOT NULL,
   cmpDescription VARCHAR(50),
   companyType ENUM('GmbH', 'AG', 'OG', 'KG', 'EU', '-') DEFAULT '-',
-  logo VARCHAR(40),
+  logo MEDIUMBLOB,
   address VARCHAR(100),
   companyPostal VARCHAR(20),
   companyCity VARCHAR(20),

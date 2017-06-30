@@ -1,25 +1,22 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <?php
-$filterClient = $filterProposal = 0;
 $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
-//new proposal
-if(!empty($_GET['nERP']) && array_key_exists($_GET['nERP'], $lang['PROPOSAL_TOSTRING'])){
-  $id_num = getNextERP($_GET['nERP']);
-} elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING'])) {
-  $id_num = getNextERP($_POST['nERP']);
-} else {
-  $id_num = getNextERP('ANG');
+$filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));
+if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
+  $_SESSION['filterings'] = array(); //clear filterings if they come from another page
+}
+
+//RECONSTRUCT THIS 
+if(!empty($_POST['proposalID']) && array_key_exists($_POST['proposalID'], $lang['PROPOSAL_TOSTRING'])){
+  $filterings['proposal'] = $_POST['proposalID']);
+} elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
+  $filterings['number'] = getNextERP($_POST['nERP']);
+  $filterings['client'] = intval($_POST['filterClient']);
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['filterClient'])){
-    $filterClient = $_POST['filterClient'];
-  }
-  if(!empty($_POST['filterProposal'])){
-    $filterProposal = $_POST['filterProposal'];
-  }
   if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'].' 12:00:00')){
     $meta_curDate = test_input($_POST['meta_curDate'].' 12:00:00');
   }
@@ -75,7 +72,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if(!empty($_POST['add_product_as_bar'])){
         $product_is_cash = 'TRUE';
       }
-      if(!$filterProposal){ //new proposal: create proposal first
+      if(!$filterings['proposal']){ //new proposal: create proposal first
         $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
         VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
@@ -137,15 +134,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } elseif(isset($_POST['translate'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
   }
-} // END IF POST
-if(isset($_GET['num'])){
-  $filterProposal = intval($_GET['num']);
+
+  $_SESSION['filterings'] = $filterings; //save your filterings
+} //END POST
+
+
+if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $this_page){
+  $filterings = $_SESSION['filterings'];
 }
-if($filterProposal){
-  $result = $conn->query("SELECT * FROM proposals WHERE id = $filterProposal");
+
+if($filterings['proposal']){
+  $result = $conn->query("SELECT * FROM proposals WHERE id = ".$filterings['proposal']);
   $row = $result->fetch_assoc();
-  $id_num = $row['id_number'];
-} elseif($filterClient) {
+  $filterings['number'] = $row['id_number'];
+  $filterings['client'] = $row['clientID'];
+} else($filterings['client'] && $filterings['number']) {
   $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = $filterClient");
   $row = $result->fetch_assoc();
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
@@ -153,6 +156,8 @@ if($filterProposal){
 } else {
   redirect('offer_proposals.php?err=1');
 }
+
+
 ?>
 
 <div class="page-header">

@@ -420,11 +420,9 @@ if($_SESSION['color'] == 'light'){
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                        <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
                         <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
-                        <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
+                        <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="download_sql.php" target="_blank"><span> DB Backup</span></a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                       </ul>
                     </div>
@@ -441,7 +439,7 @@ if($_SESSION['color'] == 'light'){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" ) {
+          } elseif($this_page == "download_sql.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" ) {
             echo "<script>document.getElementById('adminOption_CORE').click();</script>";
           }
           ?>

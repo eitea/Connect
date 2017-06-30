@@ -55,7 +55,7 @@ class PDF extends FPDF {
 require "connection.php";
 require "language.php";
 
-$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName,
+$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City
   FROM proposals
@@ -77,7 +77,18 @@ if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription']
 }
 
 $pdf = new PDF();
-$pdf->glob['logo'] = $row['logo'];
+
+//create the image and destroy it once we're done. For damacia.
+$logo_path = '../images/ups/'.$row['companyName'].'.jpg';
+file_put_contents($logo_path, $row['logo']);
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+if(finfo_file($finfo, $logo_path) == 'image/png'){
+  $logo_path = '../images/ups/'.$row['companyName'].'.png';
+  file_put_contents($logo_path, $row['logo']);
+}
+
+$pdf->glob['logo'] = $logo_path;
+
 $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
 $pdf->glob['footer_left'] = $row['detailLeft'];
 $pdf->glob['footer_middle'] = $row['detailMiddle'];
@@ -231,4 +242,6 @@ MultiCell(float w, float h, string txt [, mixed border [, string align [, boolea
 Line(left margin, x, right margin, y)
 */
 $pdf->Output(0, $proposal_number.'.pdf');
+
+unlink($logo_path);
 ?>

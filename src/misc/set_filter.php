@@ -106,7 +106,7 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 
 $scale = 0;
 if(isset($filterings['date'])){$scale++;}
-if(isset($filterings['user'])){$scale++;}
+if(isset($filterings['user']) || isset($filterings['logs'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);

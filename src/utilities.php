@@ -67,14 +67,12 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
         $timeEnd_Cell = '<td style="color:gold;">00:00</td>';
         $diff = ' - ';
       }
-
       //if a user did not check in at all, mark him as absent.
       if(empty($row['time'])){
         $row['status'] = '-1';
       } else {
         $time_Cell = '<td>'.substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']),11,5).'</td>';
       }
-
       //if a user did not >work< dont display times (no correct core times available)
       if($row['status'] != 0){
         $time_Cell = '<td> - </td>';
@@ -171,7 +169,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 function uploadFile($file_field = null, $check_image = true, $random_name = false) {
   //Config
   $path = '../images/ups/'; //with trailing slash
-  $max_size = 500000; //in bytes
+  $max_size = 5000000; //in bytes
   //Set default file extension whitelist
   $whitelist_ext = array('jpeg','jpg','png');
   //Set default file type whitelist
@@ -222,35 +220,10 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
     } else {
       imagepng($im, $_FILES[$file_field]['tmp_name']);
     }
-
-    //Create full filename including path
-    if ($random_name) {
-      // Generate random filename
-      $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      $tmp = '';
-      for ($i = 0; $i < 10; $i++) {
-        $tmp .= $characters[rand(0, strlen($characters) - 1)];
-      }
-      $newname = $tmp.'.'.$ext;
-    } else {
-      $newname = $name.'.'.$ext;
-    }
-
-    //Check if file already exists on server
-    if (file_exists($path.$newname)) {
-      $out['error'][] = "A file with this name already exists";
-    }
-
-    if (count($out['error'])>0) {
-      //The file has not correctly validated
+    if (count($out['error']) > 0) {
       return $out;
-    }
-
-    if (move_uploaded_file($_FILES[$file_field]['tmp_name'], $path.$newname)) {
-      //Success
-      return $path.$newname;
     } else {
-      $out['error'][] = "Server Error!";
+      return file_get_contents($_FILES[$file_field]['tmp_name']);
     }
 
   } else {

@@ -1301,8 +1301,36 @@ if($row['version'] < 93){
   $conn->query($sql);
 
 }
-//if($row['version'] < 93){}
-//if($row['version'] < 94){}
+
+if($row['version'] < 94){
+  $result = $conn->query("SELECT logo, id FROM companyData");
+
+  $sql = "ALTER TABLE companyData MODIFY COLUMN logo MEDIUMBLOB";
+  if($conn->query($sql)){
+    echo '<br>Company Logo store replace reference by BLOB';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = ?");
+  $null = NULL;
+  $stmt->bind_param("bi", $null, $cmpID);
+  while($row = $result->fetch_assoc()){
+    if($row['logo']){
+      $cmpID = $row['id'];
+      $fp = fopen($row['logo'], "r");
+      while (!feof($fp)) {
+        $stmt->send_long_data(0, fread($fp, 8192));
+      }
+      fclose($fp);
+      $stmt->execute();
+      if($stmt->errno){ echo $stmt->error;}
+
+      unlink($row['logo']);
+    }
+  }
+  $stmt->close();
+}
 //if($row['version'] < 95){}
 //if($row['version'] < 96){}
 //if($row['version'] < 97){}

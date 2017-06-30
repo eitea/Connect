@@ -29,11 +29,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     fwrite($myfile, $txt);
     fclose($myfile);
 
-    if(!file_exists('connection_config.php')){
-      die('Permission denied. Please grant PHP permission to create files.');
+    $out = '';
+    if(match_passwordpolicy(test_input($_POST['pass'])), $out){
+      if(!file_exists('connection_config.php')){
+        die('Permission denied. Please grant PHP permission to create files.');
+      } else {
+        $accept = true;
+        $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
+      }
     } else {
-      $accept = true;
-      $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
     }
   } else {
     echo 'Missing Fields. <br><br>';
@@ -45,6 +50,17 @@ function test_input($data) {
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
   return $data;
+}
+function match_passwordpolicy($p, &$out = ''){
+  if(strlen($p) < 6){
+    $out = "Password must be at least 6 Characters long.";
+    return false;
+  }
+  if(!preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
+    $out = "Password must contain at least one captial letter and one number";
+    return false;
+  }
+  return true;
 }
 ?>
 
