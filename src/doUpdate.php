@@ -1316,7 +1316,7 @@ if($row['version'] < 94){
   $null = NULL;
   $stmt->bind_param("bi", $null, $cmpID);
   while($row = $result->fetch_assoc()){
-    if($row['logo']){
+    if($row['logo'] && file_exists($row['logo'])){
       $cmpID = $row['id'];
       $fp = fopen($row['logo'], "r");
       while (!feof($fp)) {

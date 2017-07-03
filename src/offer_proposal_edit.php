@@ -4,13 +4,13 @@ $meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ou
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));
+
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array(); //clear filterings if they come from another page
 }
 
-//RECONSTRUCT THIS
-if(!empty($_POST['proposalID']) && array_key_exists($_POST['proposalID'], $lang['PROPOSAL_TOSTRING'])){
-  $filterings['proposal'] = $_POST['proposalID'];
+if(!empty($_POST['proposalID'])){
+  $filterings['proposal'] = intval($_POST['proposalID']);
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['number'] = getNextERP($_POST['nERP']);
   $filterings['client'] = intval($_POST['filterClient']);
@@ -61,7 +61,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
-  if(isset($_POST['add_product']) && ($filterClient || $filterProposal)){
+  if(isset($_POST['add_product']) && ($filterings['proposal'] || $filterings['client'])){
     if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity']) && !empty($_POST['add_product_price'])){
       $product_name = test_input($_POST['add_product_name']);
       $product_description = test_input($_POST['add_product_description']);
@@ -76,21 +76,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       if(!$filterings['proposal']){ //new proposal: create proposal first
         $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
-        VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
+        VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
-        $filterProposal = mysqli_insert_id($conn);
+        $filterings['proposal'] = mysqli_insert_id($conn);
         echo $conn->error;
       }
       $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
       $row_tax = $result_tax->fetch_assoc();
       $conn->query("INSERT INTO products (proposalID, name, price, quantity, description, taxPercentage, cash, unit, purchase)
-      VALUES($filterProposal, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase')");
+      VALUES(".$filterings['proposal'].", '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase')");
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';}
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   } elseif(isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
   }
   if(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
@@ -114,36 +114,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['meta_save'])){
     if($_POST['meta_save']){ //existing
-      $filterProposal = intval($_POST['meta_save']);
       $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
         ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
         paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
-        WHERE id = $filterProposal");
+        WHERE id =".$filterings['proposal']);
     } else { //new proposal
       $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign,
         ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
-      VALUES ('$id_num', $filterClient, '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
+      VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
         '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
-      $filterProposal = mysqli_insert_id($conn);
+      $filterings['proposal'] = mysqli_insert_id($conn);
     }
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   }
   if(!empty($_POST['translate']) && !empty($_POST['transit'])){
-    $filterProposal = intval($_POST['translate']);
     $transitionID = getNextERP(test_input($_POST['transit']));
-    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $filterProposal");
+    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = ".$filterings['proposal']);
     redirect('offer_proposal_edit.php?num='.$proposalID);
   } elseif(isset($_POST['translate'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
   }
-
-  $_SESSION['filterings'] = $filterings; //save your filterings
 } //END POST
-
-
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $this_page){
-  $filterings = $_SESSION['filterings'];
-}
 
 if($filterings['proposal']){
   $result = $conn->query("SELECT * FROM proposals WHERE id = ".$filterings['proposal']);
@@ -151,7 +142,7 @@ if($filterings['proposal']){
   $filterings['number'] = $row['id_number'];
   $filterings['client'] = $row['clientID'];
 } elseif ($filterings['client'] && $filterings['number']) {
-  $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = $filterClient");
+  $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = ".$filterings['client']);
   $row = $result->fetch_assoc();
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
   $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
@@ -159,25 +150,21 @@ if($filterings['proposal']){
   redirect('offer_proposals.php?err=1');
 }
 
-
+$_SESSION['filterings'] = $filterings; //save your filterings
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT']." <small>$id_num</small>"; ?>
+  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$filterings['number'].'</small>'; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
-      <a href="download_proposal.php?propID=<?php echo $filterProposal; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
-      <a href="editCustomer_detail?custID=<?php echo $filterClient; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+      <a href="download_proposal.php?propID=<?php echo $filterings['proposal']; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a href="editCustomer_detail?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
       <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
     </div>
   </h3>
 </div>
 
 <form method="POST">
-  <div style="display:none;">
-    <input type="hidden" value="<?php echo $filterClient; //proposal doesnt exist ?>" name="filterClient" />
-    <input type="hidden" value="<?php echo $filterProposal; ?>" name="filterProposal" />
-  </div>
   <table class="table">
     <thead>
       <th>Name</th>
@@ -189,7 +176,7 @@ if($filterings['proposal']){
     </thead>
     <tbody>
       <?php
-      $result = $conn->query("SELECT * FROM products WHERE proposalID = $filterProposal");
+      $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal']);
       while($result && ($prod_row = $result->fetch_assoc())){
         echo '<tr>';
         echo '<td>'.$prod_row['name'].'</td>';
@@ -555,14 +542,14 @@ $x = $prod_row['id'];
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterProposal;?>"><?php echo $lang['SAVE'];?></button>
+      <button type="submit" class="btn btn-warning" name="meta_save" value="<?php echo $filterings['proposal'];?>"><?php echo $lang['SAVE'];?></button>
     </div>
   </div>
 </div>
 </form>
 
 <?php
-$current_transition = preg_replace('/\d/', '', $id_num);
+$current_transition = preg_replace('/\d/', '', $filterings['number']);
 //Backward transitions are not possible, as are transitions into same state
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $pos = array_search($current_transition, $transitions);
@@ -596,7 +583,7 @@ $bad[] = $transitions[$pos];
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $filterProposal; ?>">OK</button>
+        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $filterings['proposal']; ?>">OK</button>
       </div>
     </div>
   </div>
