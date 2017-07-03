@@ -931,17 +931,20 @@ $lang_ger['THIS_IS_A_BREAK'] = 'Das ist eine Pause';
 $lang_eng['TIME'] = 'From - To';
 $lang_ger['TIME'] = 'Von - Bis';
 
-$lang_eng['TIMES'] = 'Time';
-$lang_ger['TIMES'] = 'Zeit';
-
 $lang_eng['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
 $lang_ger['TIME_CALCULATION_TABLE'] = 'Stundenplan';
+
+$lang_eng['TIMES'] = 'Time';
+$lang_ger['TIMES'] = 'Zeit';
 
 $lang_eng['TIMETABLE'] = 'Timetable';
 $lang_ger['TIMETABLE'] = 'Stundenplan';
 
 $lang_eng['TIMESTAMPS'] = 'Timestamps';
 $lang_ger['TIMESTAMPS'] = 'Zeitstempel';
+
+$lang_eng['TIMEZONE'] = 'Timezone';
+$lang_ger['TIMEZONE'] = 'Zeitzone';
 
 $lang_eng['TO'] = 'To';
 $lang_ger['TO'] = 'Bis';

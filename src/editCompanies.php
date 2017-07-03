@@ -694,23 +694,5 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
 </form>
 <?php endif;?>
 </div>
-
-<script>
-$(document).ready(function () {
-  var isDirty = false;
-  $(":input").change(function(){ //triggers change in all input fields including text type
-    isDirty = true;
-  });
-  $(':submit').click(function() {
-      isDirty = false;
-  });
-  function unloadPage(){
-    if(isDirty){
-      return "Unsaved changes. Leave this page and discard changes?";
-    }
-  }
-  window.onbeforeunload = unloadPage;
-});
-</script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

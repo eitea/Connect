@@ -708,22 +708,4 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
     </div>
   </div><br><br>
 </form>
-
-<script>
-$(document).ready(function () {
-  var isDirty = false;
-  $(":input").change(function(){ //triggers change in all input fields including text type
-    isDirty = true;
-  });
-  $(':submit').click(function() {
-      isDirty = false;
-  });
-  function unloadPage(){
-    if(isDirty){
-      return "You have unsaved changes on this page. Discard your changes?";
-    }
-  }
-  window.onbeforeunload = unloadPage;
-});
-</script>
 <?php require "footer.php"; ?>

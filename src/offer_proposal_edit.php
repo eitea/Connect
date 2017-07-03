@@ -8,12 +8,14 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
   $_SESSION['filterings'] = array(); //clear filterings if they come from another page
 }
 
-//RECONSTRUCT THIS 
+//RECONSTRUCT THIS
 if(!empty($_POST['proposalID']) && array_key_exists($_POST['proposalID'], $lang['PROPOSAL_TOSTRING'])){
-  $filterings['proposal'] = $_POST['proposalID']);
+  $filterings['proposal'] = $_POST['proposalID'];
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['number'] = getNextERP($_POST['nERP']);
   $filterings['client'] = intval($_POST['filterClient']);
+} else {
+  $filterings = $_SESSION['filterings'];
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -148,7 +150,7 @@ if($filterings['proposal']){
   $row = $result->fetch_assoc();
   $filterings['number'] = $row['id_number'];
   $filterings['client'] = $row['clientID'];
-} else($filterings['client'] && $filterings['number']) {
+} elseif ($filterings['client'] && $filterings['number']) {
   $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = $filterClient");
   $row = $result->fetch_assoc();
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
