@@ -128,9 +128,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   }
   if(!empty($_POST['translate']) && !empty($_POST['transit'])){
-    $transitionID = getNextERP(test_input($_POST['transit']));
-    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = ".$filterings['proposal']);
-    redirect('offer_proposal_edit.php?num='.$proposalID);
+    $filterings['proposal'] = intval($_POST['translate']);
+    $filterings['number'] = getNextERP(test_input($_POST['transit']));
+    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '".$filterings['number']."' WHERE id = ".$filterings['proposal']);
   } elseif(isset($_POST['translate'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
   }

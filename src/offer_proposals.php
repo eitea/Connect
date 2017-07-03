@@ -4,13 +4,7 @@ $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), -1, 'checked'), 'company' => 0, 'client' => 0);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['translate']) && !empty($_POST['transit'])){
-    $proposalID = intval($_POST['translate']);
-    $transition = test_input($_POST['transit']);
-    $transitionID = getNextERP($transition);
-    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $proposalID");
-    redirect('offer_proposal_edit.php?num='.$proposalID);
-  } elseif(isset($_POST['delete_proposal'])){
+  if(isset($_POST['delete_proposal'])){
     $conn->query("DELETE FROM proposals WHERE id = ".intval($_POST['delete_proposal']));
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_wait'])){
@@ -139,7 +133,7 @@ while($result && ($row = $result->fetch_assoc())):
   $bad = array_slice($transitions, 0, $pos);
   $bad[] = $transitions[$pos];
   ?>
-  <form method="POST" action="offer_proposals.php">
+  <form method="POST" action="offer_proposal_edit.php">
     <div class="modal fade choose-transition-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header">
