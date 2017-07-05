@@ -267,7 +267,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
     <?php endif; ?>
   <?php endfor; ?>
 
-
   <script>
   $("#calendar").datepicker({
     format: "yyyy-mm",
@@ -277,6 +276,8 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
 
   $('.table').DataTable({
   order: [[ 1, "desc" ]],
+  columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}],
+  deferRender: true,
   responsive: true,
   autoWidth: false,
   paginate: false,
@@ -284,6 +285,5 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
     <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
   }
 });
-  </script>
-  <!-- /BODY -->
-  <?php include 'footer.php'; ?>
+</script>
+<?php include 'footer.php'; ?>

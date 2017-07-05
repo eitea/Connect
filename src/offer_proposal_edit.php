@@ -274,7 +274,7 @@ $x = $prod_row['id'];
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" name="update_product" value="<?php echo $x ?>"><?php echo $lang['SAVE'] ?></button>
       </div>
     </div>
@@ -294,22 +294,19 @@ $x = $prod_row['id'];
       <input type="text" class="form-control" name="add_product_description" maxlength="190"/>
       <br>
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
           <input id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
         </div>
-        <div class="col-md-4">
-          <label><?php echo $lang['PRICE_STK'] .' - '. $lang['CALCULATE']; ?></label>
-          <div class="input-group">
-            <span class="input-group-btn">
-              <button id="doSale" class="btn btn-default" type="button">OK</button>
-            </span>
-            <input id="salePercent" type="text" class="form-control" placeholder=" zzgl %">
-          </div>
+        <div class="col-md-1"><label>+</label></div>
+        <div class="col-md-3">
+          <label><?php echo $lang['ADDITION']; ?> %</label>
+          <input id="salePercent" type="number" step='1' class="form-control" placeholder="zzgl %">
         </div>
+        <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
           <label><?php echo $lang['PRICE_STK']; ?></label>
-          <input id="product_price" type="number" step="any" class="form-control required-field" name="add_product_price" placeholder="EUR" />
+          <input id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
         </div>
       </div>
       <br>
@@ -616,10 +613,39 @@ function displayArticle(i){
   }
 }
 
-$("#doSale").on("click", function(){
-  var purchase = parseFloat($("#product_purchase").val());
-  $("#product_price").val(purchase + purchase * parseFloat($("#salePercent").val()) / 100 )
+$("#product_price").on("keyup", function(){
+  var v = parseInt($("#product_price").val());
+  var p = parseFloat($("#salePercent").val());
+  var e = parseInt($("#product_purchase").val());
+  if(e){ //v and e yield p
+    $("#salePercent").val(Math.round((-1 + v/e) * 10000) / 100);
+  } else if(p){ //v and b yield e
+    $("#product_purchase").val(Math.round(10000 * v / (p + 100)) / 100);
+  }
 });
+
+$("#salePercent").on("keyup", function(){
+  var v = parseInt($("#product_price").val());
+  var p = parseFloat($("#salePercent").val());
+  var e = parseInt($("#product_purchase").val());
+  if(e){ //yields v
+    $("#product_price").val(Math.round(100 * e + e*p) / 100);
+  } else if(v){
+    $("#product_purchase").val(Math.round(10000 * v / (p + 100)) / 100);
+  }
+});
+
+$("#product_purchase").on("keyup", function(){
+  var v = parseInt($("#product_price").val());
+  var p = parseFloat($("#salePercent").val());
+  var e = parseInt($("#product_purchase").val());
+  if(p){
+    $("#product_price").val(Math.round(100 * e + e*p) / 100);
+  }else if(v){
+    $("#salePercent").val(Math.round((-1 + v/e) * 10000) / 100);
+  }
+});
+
 </script>
 
 <?php require 'footer.php';?>

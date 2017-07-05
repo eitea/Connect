@@ -42,13 +42,15 @@ $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$
 $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
 
-$result = $conn->query("SELECT proposals.*, clientData.name as clientName FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id
+$result = $conn->query("SELECT proposals.*, clientData.name as clientName, companyData.name as companyName
+FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
 
 <table class="table table-hover">
   <thead>
     <th>ID</th>
+    <?php if(count($available_companies) > 1){ echo '<th>'.$lang['COMPANY'].'</th>';} ?>
     <th><?php echo $lang['CLIENT']; ?></th>
     <th>Status</th>
     <th><?php echo $lang['PREVIOUS']; ?></th>
@@ -94,6 +96,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         $i = $row['id'];
         echo "<tr style='color:$lineColor'>";
         echo '<td>'.$id_name.'</td>';
+        if(count($available_companies) > 1){ echo '<td>'.$row['companyName'].'</td>';}
         echo '<td>'.$row['clientName'].'</td>';
         if($transitable){
           echo '<td><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
