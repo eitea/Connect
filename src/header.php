@@ -223,9 +223,9 @@ if($_SESSION['color'] == 'light'){
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
               <form method="POST" class="navbar-form navbar-left">
-                <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
+                <li><button type="submit" style="background:none;border:none" name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
                 <li class="divider"></li>
-                <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
+                <li><button type="submit" style="background:none;border:none"  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
               </form>
             </ul>
           </li>
@@ -432,7 +432,7 @@ if($_SESSION['color'] == 'light'){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "download_sql.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" ) {
+          } elseif($this_page == "download_sql.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
             echo "<script>document.getElementById('adminOption_CORE').click();</script>";
           }
           ?>

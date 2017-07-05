@@ -22,18 +22,7 @@ if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient
   if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
   $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($client_id, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
   if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
-}
-if(isset($_POST['delete']) && isset($_POST['index'])) {
-  $index = $_POST["index"];
-  foreach ($index as $x) {
-    $sql = "DELETE FROM $projectTable WHERE id = $x;";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
-  }
-  if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
-}
-if(isset($_POST['save'])){
+} elseif(isset($_POST['save'])){
   $projectID = intval($_POST['save']);
   $hours = floatval(test_input($_POST['boughtHours']));
   $hourlyPrice = floatval(test_input($_POST['pricedHours']));
@@ -46,6 +35,16 @@ if(isset($_POST['save'])){
   $conn->query("UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
   if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
 }
+if(isset($_POST['delete']) && isset($_POST['index'])) {
+  $index = $_POST["index"];
+  foreach ($index as $x) {
+    $sql = "DELETE FROM $projectTable WHERE id = $x;";
+    if (!$conn->query($sql)) {
+      echo mysqli_error($conn);
+    }
+  }
+  if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+}
 ?>
 <div class="page-header">
   <h3>
@@ -53,7 +52,7 @@ if(isset($_POST['save'])){
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-      <button type="submit" class="btn btn-default" name='delete' title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
+      <button type="submit" class="btn btn-default" name='delete' title="<?php echo $lang['DELETE']; ?>" form="mainForm"><i class="fa fa-trash-o"></i></button>
       <a href="editCustomers.php?<?php echo 'cmp='.$filterings['company'].'&custID='.$filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT']; ?>"><i class="fa fa-briefcase"></i></a>
     </div>
   </h3>
