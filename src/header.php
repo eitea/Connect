@@ -205,8 +205,8 @@ if($_SESSION['color'] == 'light'){
       <div class="navbar-header hidden-xs">
         <a class="navbar-brand" href="home.php">Connect</a>
       </div>
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav" style="margin: 10px">
+      <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
+        <ul class="nav navbar-nav" style="margin:10px">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -218,7 +218,7 @@ if($_SESSION['color'] == 'light'){
             </ul>
           </li>
         </ul>
-        <ul class="nav navbar-nav" style="margin: 10px">
+        <ul class="nav navbar-nav" style="margin:10px">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -230,14 +230,14 @@ if($_SESSION['color'] == 'light'){
             </ul>
           </li>
         </ul>
-        <div class="navbar-right" style="margin-right:10px">
-          <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
-          <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-          <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-          <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-          <a class="btn navbar-btn navbar-link" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
-        </div>
+      </div>
+      <div class="navbar-right" style="margin-right:10px;">
+        <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
+        <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+        <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
+        <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+        <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+        <a class="btn navbar-btn navbar-link" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
       </div>
     </div>
   </nav>
