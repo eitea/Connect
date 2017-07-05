@@ -1304,6 +1304,7 @@ if($row['version'] < 93){
 
 if($row['version'] < 94){
   $result = $conn->query("SELECT logo, id FROM companyData");
+  $conn->query("UPDATE companyData SET logo = NULL");
 
   $sql = "ALTER TABLE companyData MODIFY COLUMN logo MEDIUMBLOB";
   if($conn->query($sql)){
@@ -1325,7 +1326,6 @@ if($row['version'] < 94){
       fclose($fp);
       $stmt->execute();
       if($stmt->errno){ echo $stmt->error;}
-
       unlink($row['logo']);
     }
   }

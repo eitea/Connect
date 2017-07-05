@@ -47,9 +47,11 @@
   color:white;
   background-color: #f0ad4e;
 }
-
 .navbar-default .navbar-nav>li>a {
   color: #ddd;
+}
+.nav.navbar-nav > li, .sidebar-nav .navbar > li {
+  color: white;
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>li>a:hover{

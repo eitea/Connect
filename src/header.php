@@ -174,16 +174,16 @@ if($_SESSION['color'] == 'light'){
   <script>
   document.onreadystatechange = function() {
     var state = document.readyState
-    if (state == 'complete') {
+    if(state == 'complete') {
       document.getElementById("loader").style.display = "none";
       document.getElementById("bodyContent").style.display = "block";
     }
   }
   $(document).ready(function() {
-    if ($(".js-example-basic-single")[0]){
+    if($(".js-example-basic-single")[0]){
       $(".js-example-basic-single").select2();
     }
-    if ($('#seconds').length) { //something like a if(exists(..))
+    if($('#seconds').length) {
       var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
       function pad(val) {
         return val > 9 ? val : "0" + val;
@@ -287,41 +287,34 @@ if($_SESSION['color'] == 'light'){
   <!-- /modal -->
   <?php
   $showProjectBookingLink = $cd = $diff = 0;
+  $disabled = '';
+
   $result = mysqli_query($conn, "SELECT * FROM $configTable");
-  if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+  if ($result && ($row = $result->fetch_assoc())) {
     $cd = $row['cooldownTimer'];
     $bookingTimeBuffer = $row['bookingTimeBuffer'];
   } else {
-    $cd = 0;
     $bookingTimeBuffer = 5;
   }
   //display checkin or checkout + disabled
-  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID";
-  $result = mysqli_query($conn, $query);
-  if ($result && $result->num_rows > 0) { //open timestamps must be closed
+  $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+  if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonVal = $lang['CHECK_OUT'];
-    $checkInButton =  "<button type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
+    $buttonNam = 'stampOut';
     $showProjectBookingLink = TRUE;
+    $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
+    if($diff < $cd / 60) { $disabled = 'disabled'; }
   } else {
-    $today = getCurrentTimestamp();
-    $timeIsLikeToday = substr($today, 0, 10) ." %";
-    $disabled = '';
-
-    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday' AND status = '0'";
-    $result = mysqli_query($conn, $sql);
-    if($result && $result->num_rows > 0){
-      $row = $result->fetch_assoc();
-      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
-      if($diff > $cd/60){ //he has waited long enough to check in
-        $disabled = '';
-      } else {
-        $disabled = 'disabled';
-      }
-    }
     $buttonVal = $lang['CHECK_IN'];
-    $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button>";
+    $buttonNam = 'stampIn';
+    $today = getCurrentTimestamp();
+    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr($today, 0, 10)." %' AND status = '0'");
+    if($result && ($row = $result->fetch_assoc())){
+      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
+      if($diff < $cd/60){ $disabled = 'disabled'; }
+    }
   }
+  $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='$buttonNam'>$buttonVal</button>";
   ?>
 
   <!-- side menu -->

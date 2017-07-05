@@ -344,7 +344,7 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
-$lang_eng['}}DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
+$lang_eng['ERROR_DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
 $lang_ger['ERROR_DELETE_COMPANY'] = 'Die erste Firma darf nicht gelöscht werden.';
 
 $lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';

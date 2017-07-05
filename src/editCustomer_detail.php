@@ -1,12 +1,10 @@
-<?php include "header.php"; ?>
-<?php require_once 'utilities.php'; ?>
+<?php include "header.php"; require_once 'utilities.php'; ?>
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = test_input($_GET['custID']);
 } else {
   redirect("editCustomer.php");
 }
-
 //get corresponding id from detailTable
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
 if($result && ($row = $result->fetch_assoc())){
@@ -31,52 +29,42 @@ if(isset($_POST['saveAll'])){
     $val = $_POST['gender'];
     $conn->query("UPDATE $clientDetailTable SET gender = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['title'])){
     $val = test_input($_POST['title']);
     $conn->query("UPDATE $clientDetailTable SET title = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['name'])){
     $val = test_input($_POST['name']);
     $conn->query("UPDATE $clientDetailTable SET name = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['firstname'])){
     $val = test_input($_POST['firstname']);
     $conn->query("UPDATE $clientDetailTable SET firstname = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['nameAddition'])){
     $val = test_input($_POST['nameAddition']);
     $conn->query("UPDATE $clientDetailTable SET nameAddition = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['address_Street'])){
     $val = test_input($_POST['address_Street']);
     $conn->query("UPDATE $clientDetailTable SET address_Street = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['address_Country'])){
     $val = test_input($_POST['address_Country']);
     $conn->query("UPDATE $clientDetailTable SET address_Country = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['address_Country_City'])){
     $val = test_input($_POST['address_Country_City']);
     $conn->query("UPDATE $clientDetailTable SET address_Country_City = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['address_Country_Postal'])){
     $val = test_input($_POST['address_Country_Postal']);
     $conn->query("UPDATE $clientDetailTable SET address_Country_Postal = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['phone'])){
     $val = test_input($_POST['phone']);
     $conn->query("UPDATE $clientDetailTable SET phone = '$val' WHERE id = $detailID");
   }
-
   if(isset($_POST['fax_number'])){
     $val = test_input($_POST['fax_number']);
     $conn->query("UPDATE $clientDetailTable SET fax_number = '$val' WHERE id = $detailID");
@@ -260,6 +248,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 
+$result = $conn->query("SELECT name FROM $clientTable WHERE id = $detailID");
+$rowClient = $result->fetch_assoc();
+
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE id = $detailID");
 $row = $result->fetch_assoc();
 
@@ -267,11 +258,16 @@ $resultNotes = $conn->query("SELECT * FROM $clientDetailNotesTable WHERE parentI
 $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID = $detailID");
 ?>
 
+<style>
+.tab-pane{
+  padding:10px 20px 0 30px;
+}
+</style>
 <div class="page-header">
-  <h3><?php echo $lang['CLIENT'] .' - Details'; ?>
+  <h3><?php echo $lang['CLIENT'] .' - '.$rowClient['name']; ?>
     <div class="page-header-button-group">
-      <button id="sav" type="submit" class="btn btn-default" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
-      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" class="btn btn-default"><i class="fa fa-briefcase"></i></a><br>
+      <button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
+      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" title="<?php echo $lang['CLIENT']; ?>" class="btn btn-default"><i class="fa fa-briefcase"></i></a><br>
     </div>
   </h3>
 </div>
@@ -288,100 +284,56 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
 <form id="mainForm" method="post">
   <div class="tab-content">
     <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
-      <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
+      <br><h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
       <hr>
       <div class="row">
-        <div class="col-sm-3">
-          <?php echo $lang['ADDRESS_FORM']; ?>
+        <div class="col-sm-12">Anrede</div>
+        <div class="col-sm-3 checkbox">
+          <label><input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?></label>
+          <label><input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?></label>
         </div>
-        <div class="col-sm-2">
-          <input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?>
-        </div>
-        <div class="col-sm-2">
-          <input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?>
-        </div>
-        <div class="col-sm-2">
-          <input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?>
+        <div class="col-sm-3 checkbox">
+          <label><input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?></label>
         </div>
       </div>
       <br>
       <div class="row form-group">
-        <div class="col-sm-3">
-          Title
+        <div class="col-md-12">Name</div>
+        <div class="col-md-2">
+          <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" placeholder="Title"/>
         </div>
-        <div class="col-sm-3">
-          <input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" />
+        <div class="col-md-4">
+          <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" placeholder="<?php echo $lang['FIRSTNAME']; ?>" />
         </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['LASTNAME']; ?>
+        <div class="col-md-4">
+          <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" placeholder="<?php echo $lang['LASTNAME']; ?>" />
         </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['FIRSTNAME']; ?>
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" />
+        <div class="col-md-2">
+          <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" placeholder="Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>"/>
         </div>
       </div>
       <div class="row form-group">
+        <div class="col-sm-12">Anschrift</div>
         <div class="col-sm-3">
-          Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>
+        <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" placeholder="<?php echo $lang['STREET']; ?>"/>
         </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" />
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" placeholder="<?php echo $lang['CITY']; ?>" />
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" placeholder="<?php echo $lang['PLZ']; ?>" />
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" placeholder="<?php echo $lang['COUNTRY']; ?>"/>
         </div>
       </div>
       <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['STREET']; ?>
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['COUNTRY']; ?>
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['PLZ']; ?>
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
-          <?php echo $lang['CITY']; ?>
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
+        <div class="col-sm-6">
           <?php echo $lang['PHONE_NUMBER']; ?>
-        </div>
-        <div class="col-sm-9">
           <input type="text" class="form-control" name="phone" value="<?php echo $row['phone']; ?>" />
         </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-sm-3">
+        <div class="col-sm-6">
           Fax
-        </div>
-        <div class="col-sm-9">
           <input type="text" class="form-control" name="fax_number" value="<?php echo $row['fax_number']; ?>" />
         </div>
       </div>

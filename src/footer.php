@@ -35,8 +35,14 @@
 <script>
 $(document).ready(function () {
   var isDirty = false;
-  $(":input").change(function(){ //triggers change in all input fields including text type
+
+  $(":input").keyup(function(){ //triggers change in all input fields including text type
     isDirty = true;
+    setInterval(function() {
+      $(".blinking").fadeOut(500, function() {
+           $(".blinking").fadeIn(500);
+        });
+    }, 1000);
   });
   $(':submit').click(function() {
       isDirty = false;

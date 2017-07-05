@@ -33,6 +33,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $logTable (
   indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   time DATETIME NOT NULL,
@@ -48,6 +49,7 @@ if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
+
 $sql = "CREATE TABLE $adminLDAPTable (
   ldapConnect VARCHAR(30),
   ldapPassword VARCHAR(30),
@@ -61,6 +63,7 @@ $sql = "CREATE TABLE $adminLDAPTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
+
 
 $sql = "CREATE TABLE $holidayTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -94,7 +97,6 @@ $sql = "CREATE TABLE $companyTable (
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
-
 
 $sql = "CREATE TABLE $clientTable(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
