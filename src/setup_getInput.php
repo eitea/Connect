@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     fclose($myfile);
 
     $out = '';
-    if(match_passwordpolicy(test_input($_POST['pass'])), $out){
+    if(match_passwordpolicy(test_input($_POST['pass']), $out)){
       if(!file_exists('connection_config.php')){
         die('Permission denied. Please grant PHP permission to create files.');
       } else {

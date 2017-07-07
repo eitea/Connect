@@ -240,7 +240,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     <div class="row">
       <h4>
         <?php echo $lang['GENERAL_SETTINGS']; ?>
-        <div class="page-header-button-group"><button type="submit" name="general_save" class="btn btn-default" value="<?php echo $cmpID;?>" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button></div>
+        <div class="page-header-button-group"><button type="submit" name="general_save" class="btn btn-default blinking" value="<?php echo $cmpID;?>" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button></div>
       </h4>
     </div>
     <br>

@@ -1,7 +1,4 @@
-<?php include 'header.php';?>
-<?php enableToStamps($userID);?>
-<!-- BODY -->
-
+<?php include 'header.php'; enableToStamps($userID);?>
 <?php
 $filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
 
@@ -76,7 +73,8 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   </thead>
   <tbody>
     <?php
-    $now = str_replace('__', '01', $filterings['date']).' 05:00:00';
+    $filterings['date'] = str_replace('__', '01', $filterings['date']);
+    $now = $filterings['date'].' 05:00:00';
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);
