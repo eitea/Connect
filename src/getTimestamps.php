@@ -209,9 +209,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $duration = timeDiff_Hours($startDate, $endDate);
             $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
             if($conn->query($sql)){
-              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+              echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             } else {
-              echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+              echo '<div class="alert alert-success "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
             }
           } else {
             if(isset($_POST['addExpenses'])){
@@ -258,23 +258,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
                 }
                 $conn->query($sql);
-                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
                 $insertInfoText = $insertInternInfoText = '';
               } else {
-                echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+                echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
               }
             } else {
-              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+              echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
             }
           }
         } else {
-          echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
         }
     } else {
-      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
+      echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
     }
   } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //endif post
 ?>

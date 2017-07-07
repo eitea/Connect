@@ -75,7 +75,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-body">
         <label>Name</label>
-        <input type="text" name="add_name" class="form-control" maxlength="50" placeholder="Name" /><br>
+        <input type="text" name="add_name" class="form-control" maxlength="30" placeholder="Name" /><br>
       </div>
       <div class="modal-footer">
         <button type="button"  class="btn btn-default" data-dismiss="modal" ><?php echo $lang['CANCEL']; ?></button>

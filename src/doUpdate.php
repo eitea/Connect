@@ -1330,7 +1330,34 @@ if($row['version'] < 94){
     }
   }
   $stmt->close();
+
+  $sql = "ALTER TABLE products ADD COLUMN position INT(4)";
+  if($conn->query($sql)){
+    echo '<br>product position';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE products ADD UNIQUE INDEX(position, proposalID)";
+  if($conn->query($sql)){
+    echo '<br>Company Logo store replace reference by BLOB';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $proposal = $i = 0;
+  $result = $conn->query("SELECT id, proposalID FROM products ORDER BY proposalID ASC");
+  while($row = $result->fetch_assoc()){
+    if($proposal != $row['proposalID']){
+      $i = 1;
+      $proposal = $row['proposalID'];
+    }
+    $conn->query("UPDATE products SET position = $i WHERE id = ".$row['id']);
+    $i++;
+  }
 }
+
+
 //if($row['version'] < 95){}
 //if($row['version'] < 96){}
 //if($row['version'] < 97){}

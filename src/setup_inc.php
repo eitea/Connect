@@ -702,14 +702,16 @@ $sql = "CREATE TABLE $policyTable (
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     proposalID INT(6) UNSIGNED,
-    name VARCHAR(50),
+    position INT(4),
+    name VARCHAR(50) NOT NULL,
     description VARCHAR(600),
     price DECIMAL(10,2),
     unit VARCHAR(20),
     quantity DECIMAL(8,2),
+    purchase DECIMAL(10,2),
     taxPercentage INT(3),
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    purchase DECIMAL(10,2),
+    UNIQUE KEY (proposalID, position)
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -746,7 +748,6 @@ $sql = "CREATE TABLE $policyTable (
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-
 
   $sql = "CREATE TABLE units (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

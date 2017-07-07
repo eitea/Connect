@@ -35,9 +35,9 @@
 <script>
 $(document).ready(function () {
   var isDirty = false;
-
   $(":input").keyup(function(){ //triggers change in all input fields including text type
     isDirty = true;
+    $(".blinking").attr('class', 'btn btn-warning blinking');
     setInterval(function() {
       $(".blinking").fadeOut(500, function() {
            $(".blinking").fadeIn(500);

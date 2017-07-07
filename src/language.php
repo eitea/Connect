@@ -614,6 +614,9 @@ $lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 
+$lang_eng['NEW_PAGE'] = 'New Page';
+$lang_ger['NEW_PAGE'] = 'Neue Seite';
+
 $lang_eng['NEW_PASSWORD'] = 'New Password';
 $lang_ger['NEW_PASSWORD'] = 'Neues Passwort';
 
@@ -691,6 +694,9 @@ $lang_ger['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
 
 $lang_eng['OVERVIEW'] = 'Overview';
 $lang_ger['OVERVIEW'] = 'Übersicht';
+
+$lang_eng['PARTIAL_SUM'] = 'Partial Sum';
+$lang_ger['PARTIAL_SUM'] = 'Zwischensumme';
 
 $lang_eng['PASSWORD'] = 'Password';
 $lang_ger['PASSWORD'] = 'Passwort';
@@ -1006,7 +1012,7 @@ $lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter
 $lang_ger['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
 Dabei sind die folgenden Regeln zu beachten: <ul>
 <li>Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.</li>
-<li>Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
+<li>Liegt zwischen, nach oder vor einer Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
 <li>Die Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.</li>
 </ul>
 <a href="makeRequest.php">Mittagspause vergessen?</a>';
