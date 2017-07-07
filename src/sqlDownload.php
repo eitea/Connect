@@ -14,13 +14,22 @@ $mysqlUserName      = $username;
 $mysqlPassword      = $password;
 $mysqlHostName      = $servername;
 $DbName             = $dbName;
-$backup_name        = $dbName."_".date('dmY_Hi', time()).".sql";
+$backup_name        = $dbName."_".date('dmY_Hi', time());
 $tables             = array("mytable1","mytable2","mytable3"); //for specific tables
 
 
-Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,  $tables=false, $backup_name);
 
-function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=false){
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if(isset($_POST['start_Download'])){
+    if(isset($_POST['setPassword']) && !empty($_POST['password'])){
+      Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,$tables=false,$backup_name,$_POST['password']);
+    } else {
+      Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,$tables=false,$backup_name);
+    }
+  }
+}
+
+function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name='backup',$password=false){
   $mysqli = new mysqli($host,$user,$pass,$name);
   $mysqli->select_db($name);
   $mysqli->query("SET NAMES 'utf8'");
@@ -37,8 +46,7 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
     $rows_num       =   $mysqli->affected_rows;
     $res            =   $mysqli->query('SHOW CREATE TABLE '.$table);
     $TableMLine     =   $res->fetch_row();
-    $content        = (!isset($content) ?  '' : $content) . "\n\n".$TableMLine[1].";\n\n";
-
+    $content        = (!isset($content) ?  '' : $content) . "\n".$TableMLine[1].";\n";
     for ($i = 0, $st_counter = 0; $i < $fields_amount;   $i++, $st_counter=0){
       while($row = $result->fetch_row()){
         //when started (and every after 100 command cycle):
@@ -66,22 +74,45 @@ function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name=fals
         }
         $st_counter=$st_counter+1;
       }
-    } $content .="\n\n\n";
+    } $content .="\n\n";
   }
-
-/*
+  /*
   $events = $mysqli->query("SHOW EVENTS");
   while($events && ($row = $events->fetch_row())){
-    $res = $mysqli->query("SHOW CREATE EVENT ".$row[0].'.'.$row[1]);
-    $TableMLine = $res->fetch_row();
-    $content .= "\n\n".$TableMLine[3].";\n\n";
-  }
+  $res = $mysqli->query("SHOW CREATE EVENT ".$row[0].'.'.$row[1]);
+  $TableMLine = $res->fetch_row();
+  $content .= "\n\n".$TableMLine[3].";\n\n";
+}
 */
 
-  $backup_name = $backup_name ? $backup_name : $name.".sql";
-  header('Content-Type: application/octet-stream');
-  header("Content-Transfer-Encoding: Binary");
-  header("Content-disposition: attachment; filename=\"".$backup_name."\"");
-  echo $content;  exit;
+$zip_name = $backup_name.".zip";
+$backup_name = $backup_name. ".sql";
+
+/*
+$tempnam = tempnam(sys_get_temp_dir(), $backup_name);
+$temp = fopen($tempnam, 'w');
+fwrite($temp, $content);
+*/
+
+$zip = new ZipArchive();
+if ($zip->open($zip_name, ZIPARCHIVE::CREATE)!==TRUE) {
+  exit("cannot open <$zip_name>\n");
+}
+$zip->addFromString($backup_name, $content);
+$zip->close();
+
+if($password){
+  //$zip->setEncryptionName($backup_name, ZipArchive::EM_AES_256); //php 7.2. update
+  system("zip -P $password $zip_name $zip_name");
+}
+
+header('Content-Type: application/octet-stream');
+header("Content-Transfer-Encoding: Binary");
+header("Content-Disposition: attachment; filename=\"".$zip_name."\"");
+clearstatcache();
+header("Content-Length: ".filesize($zip_name));
+readfile($zip_name);
+unlink($zip_name);
+exit;
 }
 ?>

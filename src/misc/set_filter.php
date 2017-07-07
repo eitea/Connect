@@ -106,7 +106,7 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 
 $scale = 0;
 if(isset($filterings['date'])){$scale++;}
-if(isset($filterings['user'])){$scale++;}
+if(isset($filterings['user']) || isset($filterings['logs'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);
@@ -344,12 +344,22 @@ $('#filterings_dropdown .dropdown-menu').on({
 </script>
 
 <?php
-if(!empty($filterings['client'])){
-  echo '<script>';
-  echo 'set_filter.showProjects('.$filterings['client'].', 0);';
-  if(!empty($filterings['project'][0])){
-    echo 'set_filter.showProjects('.$filterings['client'].', '.$filterings['project'][0].');';
+echo '<script>';
+if(!empty($filterings['company'])){
+  if(!empty($filterings['client'])){
+    $nextID = $filterings['client'];
+  } else {
+    $nextID = 0;
   }
-  echo '</script>';
+  echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.')';
 }
+if(!empty($filterings['client'])){
+  if(!empty($filterings['project'][0])){
+    $nextID = $filterings['project'][0];
+  } else {
+    $nextID = 0;
+  }
+  echo 'set_filter.showProjects('.$filterings['client'].', '.$nextID.');';
+}
+echo '</script>';
 ?>

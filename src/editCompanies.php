@@ -15,34 +15,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   }
   if(isset($_POST['delete_logo'])){
-    $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
-    if($result && ($row = $result->fetch_assoc())){
-      if(file_exists($row['logo'])){
-        unlink($row['logo']);
-      }
-    }
     if(!mysqli_error($conn)){
       $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
     }
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
     require "utilities.php";
-    $filename = uploadFile("fileToUpload", 1, 1);
-    if(!is_array($filename)){
-      //delete old Logo if exists
-      $result = $conn->query("SELECT logo from companyData WHERE id = $cmpID");
-      if($result && ($row = $result->fetch_assoc())){
-        if(file_exists($row['logo'])){
-          unlink($row['logo']);
-        }
-      }
-      //set new logo
-      $conn->query("UPDATE companyData SET logo = '$filename' WHERE id = $cmpID");
-      echo mysqli_error($conn);
+    $logo = uploadFile("fileToUpload", 1, 1);
+    if(!is_array($logo)){
+      $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID");
+      $null = NULL;
+      $stmt->bind_param("b", $null);
+      $stmt->send_long_data(0, $logo);
+      $stmt->execute();
+      if($stmt->errno){ echo $stmt->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
+      $stmt->close();
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo print_r($filename);
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($filename).'</div>';
     }
   }
   if(isset($_POST['general_save'])){
@@ -236,7 +225,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
   </div>
   <div class="container-fluid">
     <div class="col-sm-4">
-      <img style="max-width:350px;max-height:200px;" src="<?php echo $row['logo'];?>"></img>
+      <?php if($row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $row['logo'] ).'"/>';} ?>
     </div>
     <div class="col-sm-8">
       <input type="file" name="fileToUpload" id="fileToUpload" />
@@ -705,23 +694,5 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
 </form>
 <?php endif;?>
 </div>
-
-<script>
-$(document).ready(function () {
-  var isDirty = false;
-  $(":input").change(function(){ //triggers change in all input fields including text type
-    isDirty = true;
-  });
-  $(':submit').click(function() {
-      isDirty = false;
-  });
-  function unloadPage(){
-    if(isDirty){
-      return "Unsaved changes. Leave this page and discard changes?";
-    }
-  }
-  window.onbeforeunload = unloadPage;
-});
-</script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

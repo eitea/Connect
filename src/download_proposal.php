@@ -55,7 +55,7 @@ class PDF extends FPDF {
 require "connection.php";
 require "language.php";
 
-$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName,
+$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City
   FROM proposals
@@ -77,7 +77,18 @@ if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription']
 }
 
 $pdf = new PDF();
-$pdf->glob['logo'] = $row['logo'];
+
+//create the image and destroy it once we're done. For demacia.
+$logo_path = '../images/ups/'.$row['companyName'].'.jpg';
+file_put_contents($logo_path, $row['logo']);
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+if(finfo_file($finfo, $logo_path) == 'image/png'){
+  $logo_path = '../images/ups/'.$row['companyName'].'.png';
+  file_put_contents($logo_path, $row['logo']);
+}
+
+$pdf->glob['logo'] = $logo_path;
+
 $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
 $pdf->glob['footer_left'] = $row['detailLeft'];
 $pdf->glob['footer_middle'] = $row['detailMiddle'];
@@ -112,19 +123,20 @@ $pdf->SetFontSize(14);
 if($proposal_number == 'empty'){
   $proposal_number = $row['id_number'];
 }
+
+$col = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n".$lang['VAT']." ID: ");
+$col2 = iconv('UTF-8', 'windows-1252', date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']);
 if($row['representative']){
-  $txt = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n".$lang['VAT']." ID: \n".$lang['REPRESENTATIVE'].':');
-  $txt2 = iconv('UTF-8', 'windows-1252',date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']."\n".$row['representative']);
-} else {
-  $txt = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].' '.$lang['NUMBER'].": \n".$lang['VAT']." ID: ");
-  $txt2 = iconv('UTF-8', 'windows-1252', date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']);
+  $col .= iconv('UTF-8', 'windows-1252',"\n".$lang['REPRESENTATIVE'].':');
+  $col2 .= iconv('UTF-8', 'windows-1252',"\n".$row['representative']);
 }
+
 $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
 $pdf->SetFontSize(8);
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
 
-$pdf->MultiColCell(30, 4, $txt, 0, 'L', 0, 25);
-$pdf->MultiColCell(0, 4, $txt2, 0, 'R');
+$pdf->MultiColCell(25, 4, $col, 0, 'L', 0, 30);
+$pdf->MultiColCell(0, 4, $col2, 0, 'R');
 $pdf->SetY($pdf->GetY() + 5, false);
 $pdf->Ln(20);
 $pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
@@ -134,7 +146,7 @@ $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 
 //PRODUCT TABLE
 $pdf->SetFontSize(10);
-$prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID']);
+$prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
 if($prod_res && $prod_res->num_rows > 0){
   $pdf->Ln(10);
   $pdf->SetFillColor(200,200,200);
@@ -150,37 +162,67 @@ if($prod_res && $prod_res->num_rows > 0){
 
   $i = 1;
   $netto_value = $vat_value = $cash_value = 0;
+  $part_sum_netto = $part_sum_vat = 0;
   while($prod_row = $prod_res->fetch_assoc()){
-    //Position
-    $pdf->Cell($w[0],6,sprintf('#%03d', $i), '');
-    //Name
-    $pdf->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$prod_row['name']),'',2);
-    //Description
-    $pdf->SetFont('Arial','',8);
-    $x = $pdf->GetX();
-    $y = $pdf->GetY();
-    $pdf->MultiCell($w[1],4,iconv('UTF-8', 'windows-1252',$prod_row['description']),'');
-    $pdf->SetFont('Helvetica','',10);
-    if($prod_row['description']){
-      $pdf->SetXY($x + $w[1], $pdf->GetY() - 6);
-    } else {
-      $pdf->SetXY($x + $w[1], $y - 1);
+    if($prod_row['name'] == 'NEW_PAGE'){
+      $pdf->AddPage();
+    } elseif($prod_row['name'] == 'PARTIAL_SUM'){
+      $pdf->Cell($w[0],6);
+      $pdf->SetFont('Helvetica','B');
+      $pdf->Cell($w[1] + $w[2] + $w[3],6,$lang['PARTIAL_SUM']);
+      $pdf->Cell($w[4],6, $vat_value - $part_sum_vat .' EUR',0,0,'R');
+      $pdf->Cell($w[5],6,sprintf('%.2f', $netto_value - $part_sum_netto). ' EUR',0,1,'R');
+      $pdf->SetFont('Helvetica');
+      $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
+      $part_sum_vat += $vat_value - $part_sum_vat;
+      $part_sum_netto += $netto_value - $part_sum_netto;
+    } elseif($prod_row['name'] == 'CLEAR_TEXT'){
+      $pdf->Cell($w[0],6);
+      //$pdf->SetFont('Arial','',8);
+      $x = $pdf->GetX();
+      $y = $pdf->GetY();
+      $pdf->MultiCell($w[1]+$w[2]+$w[3],5,iconv('UTF-8', 'windows-1252',$prod_row['description']));
+      //$pdf->SetFont('Helvetica','',10);
+      if($prod_row['description']){
+        $pdf->SetXY($x + $w[1], $pdf->GetY() - 6);
+      } else {
+        $pdf->SetXY($x + $w[1], $y - 1);
+      }
+      $pdf->Cell($w[5],6,'',0,1);
+      $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
+    } else { //Position
+      $pdf->Cell($w[0],6,sprintf('#%03d', $i));
+      //Name
+      $pdf->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$prod_row['name']),0,2);
+      //Description
+      $pdf->SetFont('Arial','',8);
+      $x = $pdf->GetX();
+      $y = $pdf->GetY();
+      $pdf->MultiCell($w[1],4,iconv('UTF-8', 'windows-1252',$prod_row['description']));
+      $pdf->SetFont('Helvetica','',10);
+      if($prod_row['description']){
+        $pdf->SetXY($x + $w[1], $pdf->GetY() - 6);
+      } else {
+        $pdf->SetXY($x + $w[1], $y - 1);
+      }
+      //Quantity
+      $pdf->Cell($w[2],6,$prod_row['quantity'].' '.iconv('UTF-8', 'windows-1252', $prod_row['unit']),0,0,'R');
+      //Price
+      $pdf->Cell($w[3],6,sprintf('%.2f', $prod_row['price']). ' EUR',0,0,'R');
+      //Taxes
+      if($prod_row['cash'] == 'TRUE'){
+        $pdf->Cell($w[4],6,'BAR','',0,'R');
+        $cash_value += $prod_row['total'];
+      } else {
+        $pdf->Cell($w[4],6,intval($prod_row['taxPercentage']). '%',0,0,'R');
+        $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
+        $netto_value += $prod_row['total'];
+      }
+      $pdf->Cell($w[5],6,sprintf('%.2f', $prod_row['total']). ' EUR',0,1,'R');
+      $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
+      $i++;
     }
-    //Quantity, Price, Taxes
-    $pdf->Cell($w[2],6,$prod_row['quantity'].' '.iconv('UTF-8', 'windows-1252',$prod_row['unit']),'',0,'R');
-    $pdf->Cell($w[3],6,sprintf('%.2f', $prod_row['price']). ' EUR','',0,'R');
-    if($prod_row['cash'] == 'TRUE'){
-      $pdf->Cell($w[4],6,'BAR','',0,'R');
-      $cash_value += $prod_row['total'];
-    } else {
-      $pdf->Cell($w[4],6,$prod_row['taxPercentage']. '%','',0,'R');
-      $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
-      $netto_value += $prod_row['total'];
-    }
-    $pdf->Cell($w[5],6,sprintf('%.2f', $prod_row['total']). ' EUR','',1,'R');
-    $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
-    $i++;
-  }
+  } //endwhile
 }
 
 $pdf->Line(10, $pdf->GetY() + 1, 200, $pdf->GetY() + 1);
@@ -189,19 +231,33 @@ $pdf->Ln(2);
 if(280 - $pdf->GetY() < 30){ $pdf->AddPage(); } //if writable space is less than 3cm: new page
 //Summary
 $pdf->SetFontSize(8);
-$pdf->MultiColCell(30, 4, "Warenwert \nPorto");
-$pdf->MultiColCell(30, 4, $netto_value." EUR\n  ".$row['porto']." EUR", 0, 'R');
+$col1 = "Warenwert";
+$col2 = $netto_value." EUR";
+if($row['porto']){
+  $col1 .= "\nPorto";
+  $col2 .= "\n".$row['porto']." EUR";
+}
+$pdf->MultiColCell(30, 4, $col1);
+$pdf->MultiColCell(30, 4, $col2 , 0, 'R');
 $pdf->SetFontSize(10);
 
-//porto is just another product
+//porto is basically just another product
 $porto_vat = $row['porto'] * $row['portoRate'] / 100;
 
 $netto_value += $row['porto'];
 $vat_value += $porto_vat;
-$pdf->MultiColCell(30, 5, $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT']."\n".$lang['CASH_EXPENSE'], 'B', 1, 0, 70);
-$pdf->MultiColCell(30, 5, sprintf('%.2f', $netto_value)." EUR\n".sprintf('%.2f', $vat_value)." EUR\n".sprintf('%.2f', $cash_value)." EUR", 'B', 'R');
+$col1 =  $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT'];
+$col2 = sprintf('%.2f', $netto_value)." EUR\n".sprintf('%.2f', $vat_value)." EUR";
+$dist = 10;
+if($cash_value){
+  $col1 .= "\n".$lang['CASH_EXPENSE'];
+  $col2 .= "\n".sprintf('%.2f', $cash_value)." EUR";
+  $dist = 15;
+}
+$pdf->MultiColCell(30, 5, $col1, 'B', 1, 0, 70);
+$pdf->MultiColCell(30, 5, $col2, 'B', 'R');
 $pdf->SetFont('Helvetica', 'B');
-$pdf->Ln(15);
+$pdf->Ln($dist);
 $pdf->Cell(130);
 $pdf->Cell(30, 6, $lang['SUM']);
 $pdf->Cell(30, 6, sprintf('%.2f', $netto_value + $vat_value + $cash_value).' EUR', 0 , 1, 'R');
@@ -231,4 +287,6 @@ MultiCell(float w, float h, string txt [, mixed border [, string align [, boolea
 Line(left margin, x, right margin, y)
 */
 $pdf->Output(0, $proposal_number.'.pdf');
+
+unlink($logo_path);
 ?>

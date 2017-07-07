@@ -174,16 +174,16 @@ if($_SESSION['color'] == 'light'){
   <script>
   document.onreadystatechange = function() {
     var state = document.readyState
-    if (state == 'complete') {
+    if(state == 'complete') {
       document.getElementById("loader").style.display = "none";
       document.getElementById("bodyContent").style.display = "block";
     }
   }
   $(document).ready(function() {
-    if ($(".js-example-basic-single")[0]){
+    if($(".js-example-basic-single")[0]){
       $(".js-example-basic-single").select2();
     }
-    if ($('#seconds').length) { //something like a if(exists(..))
+    if($('#seconds').length) {
       var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
       function pad(val) {
         return val > 9 ? val : "0" + val;
@@ -205,8 +205,8 @@ if($_SESSION['color'] == 'light'){
       <div class="navbar-header hidden-xs">
         <a class="navbar-brand" href="home.php">Connect</a>
       </div>
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav" style="margin: 10px">
+      <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
+        <ul class="nav navbar-nav" style="margin:10px">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -218,26 +218,26 @@ if($_SESSION['color'] == 'light'){
             </ul>
           </li>
         </ul>
-        <ul class="nav navbar-nav" style="margin: 10px">
+        <ul class="nav navbar-nav" style="margin:10px">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
             <ul class="dropdown-menu">
               <form method="POST" class="navbar-form navbar-left">
-                <li><button type="submit" style=background:none;border:none name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
+                <li><button type="submit" style="background:none;border:none" name="ENGLISH"><img width="30px" height="20px" src="../images/eng.png"></button> English</li>
                 <li class="divider"></li>
-                <li><button type="submit" style=background:none;border:none  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
+                <li><button type="submit" style="background:none;border:none"  name="GERMAN"><img width="30px" height="20px" src="../images/ger.png"></button> Deutsch</li>
               </form>
             </ul>
           </li>
         </ul>
-        <div class="navbar-right" style="margin-right:10px">
-          <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
-          <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-          <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-          <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-          <a class="btn navbar-btn navbar-link" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
-        </div>
+      </div>
+      <div class="navbar-right" style="margin-right:10px;">
+        <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
+        <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge hidden-xs" style="margin:0 15px 0 30px;background-color:#ed9c21;"><a href="adminTodos.php" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+        <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
+        <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+        <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+        <a class="btn navbar-btn navbar-link" href="logout.php" title="Logout"><i class="fa fa-sign-out"></i></a>
       </div>
     </div>
   </nav>
@@ -287,41 +287,34 @@ if($_SESSION['color'] == 'light'){
   <!-- /modal -->
   <?php
   $showProjectBookingLink = $cd = $diff = 0;
+  $disabled = '';
+
   $result = mysqli_query($conn, "SELECT * FROM $configTable");
-  if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+  if ($result && ($row = $result->fetch_assoc())) {
     $cd = $row['cooldownTimer'];
     $bookingTimeBuffer = $row['bookingTimeBuffer'];
   } else {
-    $cd = 0;
     $bookingTimeBuffer = 5;
   }
   //display checkin or checkout + disabled
-  $query = "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID";
-  $result = mysqli_query($conn, $query);
-  if ($result && $result->num_rows > 0) { //open timestamps must be closed
+  $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+  if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonVal = $lang['CHECK_OUT'];
-    $checkInButton =  "<button type='submit' class='btn btn-warning' name='stampOut'>$buttonVal</button>";
+    $buttonNam = 'stampOut';
     $showProjectBookingLink = TRUE;
+    $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
+    if($diff < $cd / 60) { $disabled = 'disabled'; }
   } else {
-    $today = getCurrentTimestamp();
-    $timeIsLikeToday = substr($today, 0, 10) ." %";
-    $disabled = '';
-
-    $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '$timeIsLikeToday' AND status = '0'";
-    $result = mysqli_query($conn, $sql);
-    if($result && $result->num_rows > 0){
-      $row = $result->fetch_assoc();
-      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
-      if($diff > $cd/60){ //he has waited long enough to check in
-        $disabled = '';
-      } else {
-        $disabled = 'disabled';
-      }
-    }
     $buttonVal = $lang['CHECK_IN'];
-    $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='stampIn'>$buttonVal</button>";
+    $buttonNam = 'stampIn';
+    $today = getCurrentTimestamp();
+    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr($today, 0, 10)." %' AND status = '0'");
+    if($result && ($row = $result->fetch_assoc())){
+      $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
+      if($diff < $cd/60){ $disabled = 'disabled'; }
+    }
   }
+  $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='$buttonNam'>$buttonVal</button>";
   ?>
 
   <!-- side menu -->
@@ -420,11 +413,9 @@ if($_SESSION['color'] == 'light'){
                         <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="advancedOptions.php"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="passwordOptions.php"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                        <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
                         <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
-                        <li><a <?php if($this_page =='sqlDownload.php'){echo $setActiveLink;}?> href="sqlDownload.php" target="_blank"><span> DB Backup</span> <i class="fa fa-download"></i> </a></li>
+                        <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="download_sql.php" target="_blank"><span> DB Backup</span></a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                       </ul>
                     </div>
@@ -441,7 +432,7 @@ if($_SESSION['color'] == 'light'){
             echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
           } elseif($this_page == "editCompanies.php" || $this_page == "editCompanies_fields.php"){
             echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-          } elseif($this_page == "sqlDownload.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" ) {
+          } elseif($this_page == "download_sql.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
             echo "<script>document.getElementById('adminOption_CORE').click();</script>";
           }
           ?>

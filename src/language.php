@@ -344,7 +344,7 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
-$lang_eng['}}DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
+$lang_eng['ERROR_DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
 $lang_ger['ERROR_DELETE_COMPANY'] = 'Die erste Firma darf nicht gelöscht werden.';
 
 $lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';
@@ -614,6 +614,9 @@ $lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 
+$lang_eng['NEW_PAGE'] = 'New Page';
+$lang_ger['NEW_PAGE'] = 'Neue Seite';
+
 $lang_eng['NEW_PASSWORD'] = 'New Password';
 $lang_ger['NEW_PASSWORD'] = 'Neues Passwort';
 
@@ -691,6 +694,9 @@ $lang_ger['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
 
 $lang_eng['OVERVIEW'] = 'Overview';
 $lang_ger['OVERVIEW'] = 'Übersicht';
+
+$lang_eng['PARTIAL_SUM'] = 'Partial Sum';
+$lang_ger['PARTIAL_SUM'] = 'Zwischensumme';
 
 $lang_eng['PASSWORD'] = 'Password';
 $lang_ger['PASSWORD'] = 'Passwort';
@@ -931,17 +937,20 @@ $lang_ger['THIS_IS_A_BREAK'] = 'Das ist eine Pause';
 $lang_eng['TIME'] = 'From - To';
 $lang_ger['TIME'] = 'Von - Bis';
 
-$lang_eng['TIMES'] = 'Time';
-$lang_ger['TIMES'] = 'Zeit';
-
 $lang_eng['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
 $lang_ger['TIME_CALCULATION_TABLE'] = 'Stundenplan';
+
+$lang_eng['TIMES'] = 'Time';
+$lang_ger['TIMES'] = 'Zeit';
 
 $lang_eng['TIMETABLE'] = 'Timetable';
 $lang_ger['TIMETABLE'] = 'Stundenplan';
 
 $lang_eng['TIMESTAMPS'] = 'Timestamps';
 $lang_ger['TIMESTAMPS'] = 'Zeitstempel';
+
+$lang_eng['TIMEZONE'] = 'Timezone';
+$lang_ger['TIMEZONE'] = 'Zeitzone';
 
 $lang_eng['TO'] = 'To';
 $lang_ger['TO'] = 'Bis';
@@ -1003,7 +1012,7 @@ $lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter
 $lang_ger['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
 Dabei sind die folgenden Regeln zu beachten: <ul>
 <li>Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.</li>
-<li>Liegt zwischen einer Pause und der letzten vorrangegangenen Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
+<li>Liegt zwischen, nach oder vor einer Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
 <li>Die Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.</li>
 </ul>
 <a href="makeRequest.php">Mittagspause vergessen?</a>';

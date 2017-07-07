@@ -63,7 +63,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             </select>
           </div>
           <div class="col-md-6">
-            <input type="text" class="form-control" name="clientNumber" placeholder="#" >
+            <input type="text" class="form-control" name="clientNumber" placeholder="#" maxlength="12" >
             <small> &nbsp Kundennummer - Optional</small>
           </div>
         </div>

@@ -4,13 +4,7 @@ $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), -1, 'checked'), 'company' => 0, 'client' => 0);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(isset($_POST['translate']) && !empty($_POST['transit'])){
-    $proposalID = intval($_POST['translate']);
-    $transition = test_input($_POST['transit']);
-    $transitionID = getNextERP($transition);
-    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$transitionID' WHERE id = $proposalID");
-    redirect('offer_proposal_edit.php?num='.$proposalID);
-  } elseif(isset($_POST['delete_proposal'])){
+  if(isset($_POST['delete_proposal'])){
     $conn->query("DELETE FROM proposals WHERE id = ".intval($_POST['delete_proposal']));
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_wait'])){
@@ -48,87 +42,89 @@ $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$
 $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
 
-$result = $conn->query("SELECT proposals.*, clientData.name as clientName FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id
+$result = $conn->query("SELECT proposals.*, clientData.name as clientName, companyData.name as companyName
+FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
-<form method="POST" action="offer_proposals.php">
-  <table class="table table-hover">
-    <thead>
-      <th>ID</th>
-      <th><?php echo $lang['CLIENT']; ?></th>
-      <th>Status</th>
-      <th><?php echo $lang['PREVIOUS']; ?></th>
-      <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
-      <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
-      <th>Option</th>
-    </thead>
-    <tbody>
-      <?php //my gosh what is this
-      while($result && ($row = $result->fetch_assoc())){
-        foreach($CURRENT_TRANSITIONS as $currentProcess){
-          $transitable = false;
-          $transited_from = $transited_into = '';
-          $current_transition = preg_replace('/\d/', '', $row['id_number']);
-          $lineColor = '';
-          if($current_transition == $currentProcess){
-            $id_name = $row['id_number'];
-            $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
-            $transitable = true;
-            $transited_from = substr($row['history'],-10);
-            if($row['status'] == 2){
-              $lineColor = '#c7c6c6';
-            }
-          } else {
-            $p = strpos($row['history'], $currentProcess);
-            if($p !== false){ //it may also! have used to be it
-              $id_name = substr($row['history'], $p, 10);
-              $status = $lang['FORWARDED'].': '.$row['id_number'];
-              if($p > 8){
-                $transited_from = substr($row['history'], $p-11, 10);
-              }
-              if(strlen($row['history']) > $p + 15){
-                $status = $lang['FORWARDED'].': '.substr($row['history'], $p+11, 10);
-              }
-              $lineColor = '#6fcf2c';
-            } else {
-              continue;
-            }
-          }
 
-          if(!$transitable && $filterings['procedures'][2]){ continue; }
-
-          $i = $row['id'];
-          echo "<tr style='color:$lineColor'>";
-          echo '<td>'.$id_name.'</td>';
-          echo '<td>'.$row['clientName'].'</td>';
-          if($transitable){
-            echo '<td><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
-            echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
-            echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
-            echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
-            echo '</ul></div></td>';
+<table class="table table-hover">
+  <thead>
+    <th>ID</th>
+    <?php if(count($available_companies) > 1){ echo '<th>'.$lang['COMPANY'].'</th>';} ?>
+    <th><?php echo $lang['CLIENT']; ?></th>
+    <th>Status</th>
+    <th><?php echo $lang['PREVIOUS']; ?></th>
+    <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
+    <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
+    <th>Option</th>
+  </thead>
+  <tbody>
+    <?php //my gosh what is this
+    while($result && ($row = $result->fetch_assoc())){
+      foreach($CURRENT_TRANSITIONS as $currentProcess){
+        $transitable = false;
+        $transited_from = $transited_into = '';
+        $current_transition = preg_replace('/\d/', '', $row['id_number']);
+        $lineColor = '';
+        if($current_transition == $currentProcess){
+          $id_name = $row['id_number'];
+          $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
+          $transitable = true;
+          $transited_from = substr($row['history'],-10);
+          if($row['status'] == 2){
+            $lineColor = '#c7c6c6';
+          }
+        } else {
+          $p = strpos($row['history'], $currentProcess);
+          if($p !== false){ //it may also! have used to be it
+            $id_name = substr($row['history'], $p, 10);
+            $status = $lang['FORWARDED'].': '.$row['id_number'];
+            if($p > 8){
+              $transited_from = substr($row['history'], $p-11, 10);
+            }
+            if(strlen($row['history']) > $p + 15){
+              $status = $lang['FORWARDED'].': '.substr($row['history'], $p+11, 10);
+            }
+            $lineColor = '#6fcf2c';
           } else {
-            echo "<td>$status</td>";
+            continue;
           }
-          echo '<td>'.$transited_from.'</td>';
-          echo '<td>'.$row['ourSign'].'</td>';
-          echo '<td>'.$row['ourMessage'].'</td>';
-          echo '<td>';
-          echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
-          if($transitable){
-            echo '<a href="offer_proposal_edit.php?num='.$row['id'].'" class="btn btn-default" title="'.$lang['EDIT'].'" name="filterProposal" value="'.$row['id'].'"><i class="fa fa-pencil"></i></a> ';
-            if($currentProcess != 'RE') echo '<button type="submit" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" name="delete_proposal" value="'.$row['id'].'" "><i class="fa fa-trash-o"></i></button> ';
-            echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
-          }
-          echo '</td>';
-          echo '</tr>';
         }
+
+        if(!$transitable && $filterings['procedures'][2]){ continue; }
+
+        $i = $row['id'];
+        echo "<tr style='color:$lineColor'>";
+        echo '<td>'.$id_name.'</td>';
+        if(count($available_companies) > 1){ echo '<td>'.$row['companyName'].'</td>';}
+        echo '<td>'.$row['clientName'].'</td>';
+        if($transitable){
+          echo '<td><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
+          echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
+          echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
+          echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
+          echo '</ul></div></td>';
+        } else {
+          echo "<td>$status</td>";
+        }
+        echo '<td>'.$transited_from.'</td>';
+        echo '<td>'.$row['ourSign'].'</td>';
+        echo '<td>'.$row['ourMessage'].'</td>';
+        echo '<td>';
+        echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
+        if($transitable){
+          echo '<form method="POST" action="offer_proposal_edit.php" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
+          if($currentProcess != 'RE') echo '<form method="POST" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" name="delete_proposal" value="'.$row['id'].'" "><i class="fa fa-trash-o"></i></button></form> ';
+          echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+        }
+        echo '</td>';
+        echo '</tr>';
       }
-      echo mysqli_error($conn);
-      ?>
-    </tbody>
-  </table>
-</form>
+    }
+    echo mysqli_error($conn);
+    ?>
+  </tbody>
+</table>
 
 <?php
 mysqli_data_seek($result,0);
@@ -140,7 +136,7 @@ while($result && ($row = $result->fetch_assoc())):
   $bad = array_slice($transitions, 0, $pos);
   $bad[] = $transitions[$pos];
   ?>
-  <form method="POST" action="offer_proposals.php">
+  <form method="POST" action="offer_proposal_edit.php">
     <div class="modal fade choose-transition-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header">

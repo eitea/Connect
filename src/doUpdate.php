@@ -1301,8 +1301,63 @@ if($row['version'] < 93){
   $conn->query($sql);
 
 }
-//if($row['version'] < 93){}
-//if($row['version'] < 94){}
+
+if($row['version'] < 94){
+  $result = $conn->query("SELECT logo, id FROM companyData");
+  $conn->query("UPDATE companyData SET logo = NULL");
+
+  $sql = "ALTER TABLE companyData MODIFY COLUMN logo MEDIUMBLOB";
+  if($conn->query($sql)){
+    echo '<br>Company Logo store replace reference by BLOB';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = ?");
+  $null = NULL;
+  $stmt->bind_param("bi", $null, $cmpID);
+  while($row = $result->fetch_assoc()){
+    if($row['logo'] && file_exists($row['logo'])){
+      $cmpID = $row['id'];
+      $fp = fopen($row['logo'], "r");
+      while (!feof($fp)) {
+        $stmt->send_long_data(0, fread($fp, 8192));
+      }
+      fclose($fp);
+      $stmt->execute();
+      if($stmt->errno){ echo $stmt->error;}
+      unlink($row['logo']);
+    }
+  }
+  $stmt->close();
+
+  $sql = "ALTER TABLE products ADD COLUMN position INT(4)";
+  if($conn->query($sql)){
+    echo '<br>product position';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "ALTER TABLE products ADD UNIQUE INDEX(position, proposalID)";
+  if($conn->query($sql)){
+    echo '<br>Company Logo store replace reference by BLOB';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $proposal = $i = 0;
+  $result = $conn->query("SELECT id, proposalID FROM products ORDER BY proposalID ASC");
+  while($row = $result->fetch_assoc()){
+    if($proposal != $row['proposalID']){
+      $i = 1;
+      $proposal = $row['proposalID'];
+    }
+    $conn->query("UPDATE products SET position = $i WHERE id = ".$row['id']);
+    $i++;
+  }
+}
+
+
 //if($row['version'] < 95){}
 //if($row['version'] < 96){}
 //if($row['version'] < 97){}

@@ -209,9 +209,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $duration = timeDiff_Hours($startDate, $endDate);
             $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
             if($conn->query($sql)){
-              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+              echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             } else {
-              echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+              echo '<div class="alert alert-success "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
             }
           } else {
             if(isset($_POST['addExpenses'])){
@@ -258,23 +258,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                   VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
                 }
                 $conn->query($sql);
-                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+                if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
                 $insertInfoText = $insertInternInfoText = '';
               } else {
-                echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+                echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
               }
             } else {
-              echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+              echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
             }
           }
         } else {
-          echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
         }
     } else {
-      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
+      echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
     }
   } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    echo '<div class="alert alert-danger "><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //endif post
 ?>
@@ -314,9 +314,10 @@ if($filterings['user']):
         $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $accumulatedSaldo = 0;
         for($i = 0; $i < $calculator->days; $i++){
-          //filterStatus, let's just skip all those that dont fit
+          //filterStatus, let's just skip all those that dont fit (sync with modal creation)
           if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
           if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){continue;}
+
           $style = "";
           $tinyEndTime = '-';
 
@@ -561,7 +562,12 @@ if($filterings['user']):
     </form>
 
     <!-- edit timestamps modall -->
-    <?php for($i = 0; $i < $calculator->days; $i++): ?>
+    <?php
+    for($i = 0; $i < $calculator->days; $i++):
+      //sync with table rows
+      if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
+      if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){continue;}
+      ?>
       <form method="POST">
         <div class="modal fade editingModal-<?php echo $i; ?>" tabindex="-1" role="dialog">
           <div class="modal-dialog modal-md">
@@ -582,7 +588,7 @@ if($filterings['user']):
                   } else {
                     $B = $calculator->end[$i];
                   }
-                  echo '<div class="col-md-3"><br>';
+                  echo '<div class="col-md-3"><label>'.$lang['ACTIVITY'].'</label>';
                   echo "<select name='newActivity' class='js-example-basic-single'>";
                   for($j = 0; $j < 7; $j++){
                     if($calculator->activity[$i] == $j){
@@ -591,11 +597,11 @@ if($filterings['user']):
                       echo "<option value='$j'>". $lang['ACTIVITY_TOSTRING'][$j] ."</option>";
                     }
                   }
-                  echo '</select></div><div class="col-md-3"><br>';
+                  echo '</select></div><div class="col-md-3">';
                   if(!$calculator->indecesIM[$i]){ //timestamp doesnt exist
                     $A = $B = $calculator->date[$i].' 12:00:00';
                     //existing timestamps cant have timeToUTC edited
-                    echo ' <select name="creatTimeZone" class="js-example-basic-single">';
+                    echo '<label>'.$lang['TIMEZONE'].'</label><select name="creatTimeZone" class="js-example-basic-single">';
                     for($i_utc = -12; $i_utc <= 12; $i_utc++){
                       if($i_utc == $timeToUTC){
                         echo "<option name='ttz' value='$i_utc' selected>UTC " . sprintf("%+03d", $i_utc) . "</option>";
@@ -627,9 +633,9 @@ if($filterings['user']):
                     <div class="checkbox">
                       <label>
                         <input type="radio" name="is_open" value="0" checked="checked" />
-                        <input type="datetime-local" style="display:inline;max-width:180px;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
+                        <input type="datetime-local" style="display:inline;max-width:80%;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
                       </label>
-                      <br><br>
+                      <br>
                       <label><input type="radio" name="is_open" value="1" /><?php echo $lang['OPEN']; ?></label>
                     </div>
                   </div>
@@ -732,7 +738,7 @@ if($filterings['user']):
       </form>
 
       <?php
-      //loop through this shit again
+      //loop through this again
       mysqli_data_seek($bookingResult,0);
       while($row = $bookingResult->fetch_assoc()):
         $x = $row['bookingTableID'];

@@ -51,32 +51,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <form method="post">
   <div class="row">
-    <div class="col-xs-6">
+    <div class="col-md-6">
       <div class="input-group input-daterange">
         <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
         <span class="input-group-addon"> - </span>
         <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
-      </div>
+      </div><br>
     </div>
-    <div class="col-xs-6">
-      <select name="requestType" class="js-example-basic-single" style="width:150px;">
+    <div class="col-md-4">
+      <select name="requestType" class="js-example-basic-single">
         <option value="vac"><?php echo $lang['VACATION']; ?></option>
         <option value="scl"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
         <option value="spl"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
         <option value="cto"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
-      </select>
-      <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button>
+      </select><br>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button><br>
     </div>
   </div>
-  <br>
   <div class="row">
     <div class="col-xs-6">
       <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
     </div>
   </div>
-  <br>
 </form>
-<br><br><br><br>
+<br><br><br>
 <script>
 var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
 myCalendar.setSkin("material");

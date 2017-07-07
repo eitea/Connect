@@ -56,10 +56,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //user Requests
   if(isset($_POST['okay'])){ //vacation, special leave, compensatory time or school
     $requestID = $_POST['okay'];
-    $result = $conn->query("SELECT requestType FROM userRequestsData WHERE id = $requestID");
-    $row = $result->fetch_assoc();
-    $type = $row['requestType'];
-
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
@@ -72,13 +68,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $expectedMinutes = ($expected * 60) % 60;
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
-          if($type == 'vac'){
+          if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
-          } elseif($type == 'scl'){
+          } elseif($row['requestType'] == 'scl'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '4')";
-          } elseif($type == 'spl'){
+          } elseif($row['requestType'] == 'spl'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '2')";
-          } elseif($type == 'cto'){
+          } elseif($row['requestType'] == 'cto'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '6')";
           }
           $conn->query($sql);
@@ -115,10 +111,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $indexIM = $row['requestID'];
     $user = $row['userID'];
     if($indexIM != 0){
-      $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
+      if($timeFin != '0000-00-00 00:00:00'){
+        $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR) WHERE indexIM = $indexIM");
+      } else {
+        $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = '$timeFin' WHERE indexIM = $indexIM");
+      }
     } else { //timestamp doesnt exist
       $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, status) VALUES('$timeStart', '$timeFin', $user, 0, '0')");
     }
+    if($conn->error){ echo $conn->error; } else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     $answerText = $_POST['answerText'. $requestID];
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_log'])){
