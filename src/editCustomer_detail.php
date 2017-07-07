@@ -15,7 +15,7 @@ if($result && ($row = $result->fetch_assoc())){
   echo mysqli_error($conn);
 }
 
-$activeTab = 'project';
+$activeTab = 'home';
 
 if(!empty($_POST['saveAll'])){
   $activeTab = $_POST['saveAll'];
