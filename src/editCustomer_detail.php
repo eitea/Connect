@@ -313,19 +313,19 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = ".$rowClient['companyID']." ORDER BY id ASC");
             if($resF->num_rows > 0){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_1'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_1'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }
             if($resF->num_rows > 1){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_2'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_2'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }
             if($resF->num_rows > 2){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_3'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_3'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }
