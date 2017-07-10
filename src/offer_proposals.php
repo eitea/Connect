@@ -114,7 +114,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){
           echo '<form method="POST" action="offer_proposal_edit.php" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
-          if($currentProcess != 'RE') echo '<form method="POST" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" name="delete_proposal" value="'.$row['id'].'" "><i class="fa fa-trash-o"></i></button></form> ';
+          if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
           echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
         }
         echo '</td>';
@@ -125,7 +125,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
     ?>
   </tbody>
 </table>
-
+<!-- TRANSITIONS -->
 <?php
 mysqli_data_seek($result,0);
 while($result && ($row = $result->fetch_assoc())):
@@ -164,6 +164,21 @@ while($result && ($row = $result->fetch_assoc())):
         <div class="modal-footer">
           <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
           <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>">OK</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <form method="POST">
+    <div class="modal fade confirm-delete-<?php echo $i; ?>">
+      <div class="modal-dialog modal-sm modal-content">
+        <div class="modal-header"><h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $row['id_number']); ?></h4></div>
+        <div class="modal-body">
+          <?php echo $lang['WARNING_DELETE_TRANSITION']; ?>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
+          <button type="submit" name='delete_proposal' class="btn btn-warning" value="<?php echo $i; ?>"><?php echo $lang['CONFIRM']; ?></button>
         </div>
       </div>
     </div>

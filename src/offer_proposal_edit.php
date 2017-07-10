@@ -70,16 +70,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $filterings['proposal'] = mysqli_insert_id($conn);
     echo $conn->error;
   }
-  if(!empty($_POST['add_position_sum'])){
+  if(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
     $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'PARTIAL_SUM')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  } elseif(!empty($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
+  } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
     $conn->query("INSERT INTO products (proposalID, position, name, description) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'CLEAR_TEXT', '$txt')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  } elseif(!empty($_POST['add_position_page'])){
+  } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
     $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'NEW_PAGE')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
@@ -177,7 +177,6 @@ if($filterings['proposal']){
 }
 
 $_SESSION['filterings'] = $filterings; //save your filterings
-$LAST_POSITION = 1;
 ?>
 
 <div class="page-header">
@@ -205,6 +204,7 @@ $LAST_POSITION = 1;
     </thead>
     <tbody>
       <?php
+      $LAST_POSITION = 0;
       $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal'] .' ORDER BY position ASC');
       while($result && ($prod_row = $result->fetch_assoc())){
         echo '<tr>';
