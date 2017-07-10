@@ -262,12 +262,15 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
     <div class="row">
       <div class="col-sm-3">
-        <label><?php echo $lang['PLZ'].' / '.$lang['CITY']; ?></label>
+        <label><?php echo $lang['PLZ']; ?></label>
       </div>
       <div class="col-sm-4">
         <input type="text" class="form-control" name="general_postal" value="<?php echo $row['companyPostal'];?>" />
       </div>
-      <div class="col-sm-4 col-sm-offset-1">
+      <div class="col-sm-1 text-center">
+        <label><?php echo $lang['CITY']; ?></label>
+      </div>
+      <div class="col-sm-4">
         <input type="text" class="form-control" name="general_city" value="<?php echo $row['companyCity'];?>" />
       </div>
     </div>

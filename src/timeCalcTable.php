@@ -90,7 +90,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
     for($i = 0; $i < $calculator->days; $i++){
       if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
       if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
-
       if($calculator->start[$i]){
         $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
       } else {
@@ -101,7 +100,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
       } else {
         $B = $calculator->end[$i];
       }
-
       $theSaldo = round($calculator->absolvedTime[$i] - $calculator->lunchTime[$i] - $calculator->shouldTime[$i], 2);
       $saldoStyle = '';
       if($theSaldo < 0){
@@ -113,9 +111,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
       if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
         $neutralStyle = "style=color:#c7c6c6;";
       }
-
       $accumulatedSaldo += $theSaldo;
-
       echo "<tr $neutralStyle>";
       echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
       echo "<td>" . $calculator->date[$i] . "</td>";
