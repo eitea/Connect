@@ -2,8 +2,8 @@
 <script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <?php
 $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
-$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
-$meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
+$meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
+$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));
 
@@ -63,7 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
-  if(!$filterings['proposal']){ //new proposal
+  if(!$filterings['proposal'] && $filterings['client']){ //new proposal
     $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
     VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
     '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
