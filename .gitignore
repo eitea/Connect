@@ -2,4 +2,5 @@ src/connection_config.php
 template.php
 test.php
 aws
-images/ups
+images/ups/*
+!images/ups/.gitkeep

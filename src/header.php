@@ -156,7 +156,7 @@ if($_SESSION['color'] == 'light'){
   <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../bootstrap/js/bootstrap.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.css"/>
+  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
   <script src='../plugins/select2/js/select2.js'></script>
 
   <link rel="stylesheet" type="text/css" href="../plugins/dataTables/datatables.min.css"/>
@@ -168,7 +168,7 @@ if($_SESSION['color'] == 'light'){
   <link rel="stylesheet" type="text/css" href="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
   <script src="../plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-  <link href="../plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
+  <link href="../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
   <script>

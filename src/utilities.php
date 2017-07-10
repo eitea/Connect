@@ -186,28 +186,28 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
     $ext = strtolower($file_info['extension']);
 
     //Check file has the right extension
-    if (!in_array($ext, $whitelist_ext)) {
+    if(!in_array($ext, $whitelist_ext)) {
       $out['error'][] = "Invalid file Extension";
     }
 
     //Check that the file is of the right type
-    if (!in_array($_FILES[$file_field]["type"], $whitelist_type)) {
+    if(!in_array($_FILES[$file_field]["type"], $whitelist_type)) {
       $out['error'][] = "Invalid file Type";
     }
 
     //Check that the file is not too big
-    if ($_FILES[$file_field]["size"] > $max_size) {
+    if($_FILES[$file_field]["size"] > $max_size) {
       $out['error'][] = "File is too big";
     }
 
     //If $check image is set as true
-    if ($check_image) {
+    if($check_image) {
       if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
         $out['error'][] = "Uploaded file is not a valid image";
       }
     }
 
-    if (count($out['error'])>0) {
+    if(count($out['error'])>0) {
       return $out;
     }
 
@@ -220,7 +220,7 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
     } else {
       imagepng($im, $_FILES[$file_field]['tmp_name']);
     }
-    if (count($out['error']) > 0) {
+    if(count($out['error']) > 0) {
       return $out;
     } else {
       return file_get_contents($_FILES[$file_field]['tmp_name']);

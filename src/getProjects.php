@@ -193,7 +193,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //end if POST
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, 'checked', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, '', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
 ?>
 
 <div class="container-fluid" style="position:fixed;background:white;width:100%;z-index:1">

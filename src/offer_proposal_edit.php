@@ -1,8 +1,9 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <?php
-$meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
-$meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
+$meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
+$meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
+$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));
 
@@ -62,23 +63,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
-  if(!$filterings['proposal']){ //new proposal
+  if(!$filterings['proposal'] && $filterings['client']){ //new proposal
     $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
     VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
     '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
     $filterings['proposal'] = mysqli_insert_id($conn);
     echo $conn->error;
   }
-  if(!empty($_POST['add_position_sum'])){
+  if(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
     $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'PARTIAL_SUM')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  } elseif(!empty($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
+  } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
     $conn->query("INSERT INTO products (proposalID, position, name, description) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'CLEAR_TEXT', '$txt')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  } elseif(!empty($_POST['add_position_page'])){
+  } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
     $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'NEW_PAGE')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
@@ -176,7 +177,6 @@ if($filterings['proposal']){
 }
 
 $_SESSION['filterings'] = $filterings; //save your filterings
-$LAST_POSITION = 1;
 ?>
 
 <div class="page-header">
@@ -204,6 +204,7 @@ $LAST_POSITION = 1;
     </thead>
     <tbody>
       <?php
+      $LAST_POSITION = 0;
       $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal'] .' ORDER BY position ASC');
       while($result && ($prod_row = $result->fetch_assoc())){
         echo '<tr>';
@@ -252,7 +253,7 @@ $("#sort tbody").sortable({
     <div class="modal-body">
       <table class="table table-hover">
         <thead>
-          <th>Position</th>
+          <th>Position #</th>
           <th>Einkauf</th>
           <th>Verkauf</th>
           <th>Bilanz</th>
@@ -260,15 +261,15 @@ $("#sort tbody").sortable({
         <tbody>
           <?php
           if($result){  $result->data_seek(0); }
-          $sum_purchase = $sum_sell = 0;
+          $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
             if($prod_row['name'] != 'CLEAR_TEXT' && $prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'){
               $purchase = $prod_row['purchase']*$prod_row['quantity'];
               $sell = $prod_row['price']*$prod_row['quantity'];
               if($sell > $purchase){$style = 'color:#65c948';} else {$style = 'color:#e08e21';}
-              if($purchase > 0){$percentage = round($sell / $purchase -1, 4)*100;} else {$percentage = 'xx';}
+              if($purchase > 0){$percentage = sprintf('%+.2f', ($sell / $purchase -1)*100);} else {$percentage = 'xx';}
               echo '<tr>';
-              echo '<td></td>';
+              echo '<td>#'.$prod_row['position'].'</td>';
               echo '<td>'.$purchase.' EUR</td>';
               echo '<td>'.$sell.' EUR</td>';
               echo "<td style='$style'>".sprintf('%+.2f',$sell - $purchase)." EUR ($percentage %)</td>";
@@ -276,11 +277,13 @@ $("#sort tbody").sortable({
               $sum_purchase += $purchase;
               $sum_sell += $sell;
             } elseif($prod_row['name'] == 'PARTIAL_SUM'){
-              if($sum_purchase > 0){$percentage = round($sum_sell / $sum_purchase, 4)*100;} else {$percentage = 'xx';}
-              echo "<tr><td><strong>".$lang['PARTIAL_SUM'].":</strong></td><td>$sum_purchase EUR</td><td>$sum_sell EUR</td><td>".sprintf('%+.2f',$sum_sell - $sum_purchase)." EUR ($percentage %)</td></tr>";
+              $partial_sum_purchase = $sum_purchase - $partial_sum_purchase;
+              $partial_sum_sell = $sum_sell - $partial_sum_sell;
+              if($partial_sum_purchase > 0){$percentage = sprintf('%+.2f', ($partial_sum_sell / $partial_sum_purchase - 1)*100);} else {$percentage = 'xx';}
+              echo "<tr><td><strong>".$lang['PARTIAL_SUM'].":</strong></td><td>$partial_sum_purchase EUR</td><td>$partial_sum_sell EUR</td><td>".sprintf('%+.2f',$partial_sum_sell - $partial_sum_purchase)." EUR ($percentage %)</td></tr>";
             }
           }
-          if($sum_purchase > 0){$percentage = round($sum_sell / $sum_purchase, 4)*100;} else {$percentage = 'xx';}
+          if($sum_purchase > 0){$percentage = sprintf('%+.2f', ($sum_sell / $sum_purchase -1)*100);} else {$percentage = 'xx';}
           echo "<tr><td><strong>Endsumme:</strong></td><td>$sum_purchase EUR</td><td>$sum_sell EUR</td><td>".sprintf('%+.2f',$sum_sell - $sum_purchase)." EUR ($percentage %)</td></tr>";
           ?>
         </tbody>

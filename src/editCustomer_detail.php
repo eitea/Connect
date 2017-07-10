@@ -15,7 +15,7 @@ if($result && ($row = $result->fetch_assoc())){
   echo mysqli_error($conn);
 }
 
-$activeTab = 'project';
+$activeTab = 'home';
 
 if(!empty($_POST['saveAll'])){
   $activeTab = $_POST['saveAll'];
@@ -194,6 +194,7 @@ if(!empty($_POST['saveAll'])){
     }
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
+    $activeTab = 'banking';
     $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
     $keyValue = bin2hex($keyValue);
 
@@ -206,8 +207,6 @@ if(!empty($_POST['saveAll'])){
 
     $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $_SESSION['unlock'], 0, $ivValue); //doesnt really need an iv value
     $conn->query("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES ('$bankName', '$ibanVal', '$bicVal', '$keyValue', '$ivValue', $detailID)");
-
-    $activeTab = 'banking';
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
   } elseif(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){
     $activeTab = 'banking';
@@ -219,12 +218,14 @@ if(!empty($_POST['saveAll'])){
       unset($_SESSION['unlock']);
     }
   } elseif(isset($_POST['delete_projects']) && !empty($_POST['delete_projects_index'])){
+    $activeTab = 'project';
     foreach($_POST['delete_projects_index'] as $x){
       $x = intval($x);
       $conn->query("DELETE FROM $projectTable WHERE id = $x;");
     }
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['add']) && !empty($_POST['name'])){
+    $activeTab = 'project';
     $name = test_input($_POST['name']);
     $status = "";
     if(isset($_POST['status'])){
@@ -238,6 +239,7 @@ if(!empty($_POST['saveAll'])){
     $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($detailID, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
   } elseif(isset($_POST['save'])){
+    $activeTab = 'project';
     $projectID = intval($_POST['save']);
     $hours = floatval(test_input($_POST['boughtHours']));
     $hourlyPrice = floatval(test_input($_POST['pricedHours']));
@@ -313,19 +315,19 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = ".$rowClient['companyID']." ORDER BY id ASC");
             if($resF->num_rows > 0){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_1'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_1'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }
             if($resF->num_rows > 1){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_2'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_2'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }
             if($resF->num_rows > 2){
               $rowF = $resF->fetch_assoc();
-              if($rowF['isActive'] == 'TRUE' && $row['field_3'] == 'TRUE'){
+              if($rowF['isActive'] == 'TRUE' && $row_p['field_3'] == 'TRUE'){
                 echo $rowF['name'];
               }
             }

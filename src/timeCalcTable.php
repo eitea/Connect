@@ -1,7 +1,4 @@
-<?php include 'header.php';?>
-<?php enableToStamps($userID);?>
-<!-- BODY -->
-
+<?php include 'header.php'; enableToStamps($userID);?>
 <?php
 $filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
 
@@ -76,7 +73,8 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   </thead>
   <tbody>
     <?php
-    $now = str_replace('__', '01', $filterings['date']).' 05:00:00';
+    $filterings['date'] = str_replace('__', '01', $filterings['date']);
+    $now = $filterings['date'].' 05:00:00';
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);
@@ -92,7 +90,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
     for($i = 0; $i < $calculator->days; $i++){
       if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
       if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
-
       if($calculator->start[$i]){
         $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
       } else {
@@ -103,7 +100,6 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
       } else {
         $B = $calculator->end[$i];
       }
-
       $theSaldo = round($calculator->absolvedTime[$i] - $calculator->lunchTime[$i] - $calculator->shouldTime[$i], 2);
       $saldoStyle = '';
       if($theSaldo < 0){
@@ -115,9 +111,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
       if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
         $neutralStyle = "style=color:#c7c6c6;";
       }
-
       $accumulatedSaldo += $theSaldo;
-
       echo "<tr $neutralStyle>";
       echo "<td>" . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . "</td>";
       echo "<td>" . $calculator->date[$i] . "</td>";

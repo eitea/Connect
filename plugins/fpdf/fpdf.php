@@ -570,12 +570,10 @@ function AcceptPageBreak()
 	return $this->AutoPageBreak;
 }
 
-function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
-{
+function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link=''){
 	// Output a cell
 	$k = $this->k;
-	if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak())
-	{
+	if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak()){
 		// Automatic page break
 		$x = $this->x;
 		$ws = $this->ws;
@@ -857,16 +855,13 @@ function Ln($h=null)
 		$this->y += $h;
 }
 
-function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='')
-{
+function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link=''){
 	// Put an image on the page
 	if($file=='')
 		$this->Error('Image file name is empty');
-	if(!isset($this->images[$file]))
-	{
+	if(!isset($this->images[$file])){
 		// First use of this image, get info
-		if($type=='')
-		{
+		if($type==''){
 			$pos = strrpos($file,'.');
 			if(!$pos)
 				$this->Error('Image file has no extension and no type was specified: '.$file);
@@ -881,13 +876,11 @@ function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='')
 		$info = $this->$mtd($file);
 		$info['i'] = count($this->images)+1;
 		$this->images[$file] = $info;
-	}
-	else
+	}	else
 		$info = $this->images[$file];
 
 	// Automatic width and height calculation if needed
-	if($w==0 && $h==0)
-	{
+	if($w==0 && $h==0){
 		// Put image at 96 dpi
 		$w = -96;
 		$h = -96;
@@ -902,10 +895,8 @@ function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='')
 		$h = $w*$info['h']/$info['w'];
 
 	// Flowing mode
-	if($y===null)
-	{
-		if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak())
-		{
+	if($y===null){
+		if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak()){
 			// Automatic page break
 			$x2 = $this->x;
 			$this->AddPage($this->CurOrientation,$this->CurPageSize,$this->CurRotation);
@@ -1220,8 +1211,7 @@ protected function _textstring($s)
 	return '('.$this->_escape($s).')';
 }
 
-protected function _dounderline($x, $y, $txt)
-{
+protected function _dounderline($x, $y, $txt){
 	// Underline text
 	$up = $this->CurrentFont['up'];
 	$ut = $this->CurrentFont['ut'];
@@ -1229,8 +1219,7 @@ protected function _dounderline($x, $y, $txt)
 	return sprintf('%.2F %.2F %.2F %.2F re f',$x*$this->k,($this->h-($y-$up/1000*$this->FontSize))*$this->k,$w*$this->k,-$ut/1000*$this->FontSizePt);
 }
 
-protected function _parsejpg($file)
-{
+protected function _parsejpg($file){
 	// Extract info from a JPEG file
 	$a = getimagesize($file);
 	if(!$a)
@@ -1248,8 +1237,7 @@ protected function _parsejpg($file)
 	return array('w'=>$a[0], 'h'=>$a[1], 'cs'=>$colspace, 'bpc'=>$bpc, 'f'=>'DCTDecode', 'data'=>$data);
 }
 
-protected function _parsepng($file)
-{
+protected function _parsepng($file){
 	// Extract info from a PNG file
 	$f = fopen($file,'rb');
 	if(!$f)
@@ -1259,8 +1247,7 @@ protected function _parsepng($file)
 	return $info;
 }
 
-protected function _parsepngstream($f, $file)
-{
+protected function _parsepngstream($f, $file){
 	// Check signature
 	if($this->_readstream($f,8)!=chr(137).'PNG'.chr(13).chr(10).chr(26).chr(10))
 		$this->Error('Not a PNG file: '.$file);
@@ -1338,20 +1325,17 @@ protected function _parsepngstream($f, $file)
 	if($colspace=='Indexed' && empty($pal))
 		$this->Error('Missing palette in '.$file);
 	$info = array('w'=>$w, 'h'=>$h, 'cs'=>$colspace, 'bpc'=>$bpc, 'f'=>'FlateDecode', 'dp'=>$dp, 'pal'=>$pal, 'trns'=>$trns);
-	if($ct>=4)
-	{
+	if($ct>=4){
 		// Extract alpha channel
 		if(!function_exists('gzuncompress'))
 			$this->Error('Zlib not available, can\'t handle alpha channel: '.$file);
 		$data = gzuncompress($data);
 		$color = '';
 		$alpha = '';
-		if($ct==4)
-		{
+		if($ct==4){
 			// Gray image
 			$len = 2*$w;
-			for($i=0;$i<$h;$i++)
-			{
+			for($i=0;$i<$h;$i++){
 				$pos = (1+$len)*$i;
 				$color .= $data[$pos];
 				$alpha .= $data[$pos];
@@ -1359,13 +1343,10 @@ protected function _parsepngstream($f, $file)
 				$color .= preg_replace('/(.)./s','$1',$line);
 				$alpha .= preg_replace('/.(.)/s','$1',$line);
 			}
-		}
-		else
-		{
+		}	else {
 			// RGB image
 			$len = 4*$w;
-			for($i=0;$i<$h;$i++)
-			{
+			for($i=0;$i<$h;$i++){
 				$pos = (1+$len)*$i;
 				$color .= $data[$pos];
 				$alpha .= $data[$pos];
@@ -1434,8 +1415,7 @@ protected function _parsegif($file)
 	return $info;
 }
 
-protected function _out($s)
-{
+protected function _out($s){
 	// Add a line to the document
 	if($this->state==2)
 		$this->pages[$this->page] .= $s."\n";
@@ -1447,18 +1427,15 @@ protected function _out($s)
 		$this->Error('The document is closed');
 }
 
-protected function _put($s)
-{
+protected function _put($s){
 	$this->buffer .= $s."\n";
 }
 
-protected function _getoffset()
-{
+protected function _getoffset(){
 	return strlen($this->buffer);
 }
 
-protected function _newobj($n=null)
-{
+protected function _newobj($n=null){
 	// Begin a new object
 	if($n===null)
 		$n = ++$this->n;
@@ -1466,21 +1443,17 @@ protected function _newobj($n=null)
 	$this->_put($n.' 0 obj');
 }
 
-protected function _putstream($data)
-{
+protected function _putstream($data){
 	$this->_put('stream');
 	$this->_put($data);
 	$this->_put('endstream');
 }
 
-protected function _putstreamobject($data)
-{
-	if($this->compress)
-	{
+protected function _putstreamobject($data){
+	if($this->compress)	{
 		$entries = '/Filter /FlateDecode ';
 		$data = gzcompress($data);
-	}
-	else
+	}	else
 		$entries = '';
 	$entries .= '/Length '.strlen($data);
 	$this->_newobj();
@@ -1489,8 +1462,7 @@ protected function _putstreamobject($data)
 	$this->_put('endobj');
 }
 
-protected function _putpage($n)
-{
+protected function _putpage($n){
 	$this->_newobj();
 	$this->_put('<</Type /Page');
 	$this->_put('/Parent 1 0 R');
@@ -1802,8 +1774,7 @@ protected function _putresourcedict()
 	$this->_put('>>');
 }
 
-protected function _putresources()
-{
+protected function _putresources(){
 	$this->_putfonts();
 	$this->_putimages();
 	// Resource dictionary
@@ -1814,16 +1785,14 @@ protected function _putresources()
 	$this->_put('endobj');
 }
 
-protected function _putinfo()
-{
+protected function _putinfo(){
 	$this->metadata['Producer'] = 'FPDF '.FPDF_VERSION;
 	$this->metadata['CreationDate'] = 'D:'.@date('YmdHis');
 	foreach($this->metadata as $key=>$value)
 		$this->_put('/'.$key.' '.$this->_textstring($value));
 }
 
-protected function _putcatalog()
-{
+protected function _putcatalog(){
 	$n = $this->PageInfo[1]['n'];
 	$this->_put('/Type /Catalog');
 	$this->_put('/Pages 1 0 R');
@@ -1843,20 +1812,17 @@ protected function _putcatalog()
 		$this->_put('/PageLayout /TwoColumnLeft');
 }
 
-protected function _putheader()
-{
+protected function _putheader(){
 	$this->_put('%PDF-'.$this->PDFVersion);
 }
 
-protected function _puttrailer()
-{
+protected function _puttrailer(){
 	$this->_put('/Size '.($this->n+1));
 	$this->_put('/Root '.$this->n.' 0 R');
 	$this->_put('/Info '.($this->n-1).' 0 R');
 }
 
-protected function _enddoc()
-{
+protected function _enddoc(){
 	$this->_putheader();
 	$this->_putpages();
 	$this->_putresources();
