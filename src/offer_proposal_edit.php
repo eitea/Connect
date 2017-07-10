@@ -1,7 +1,8 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <?php
-$meta_curDate = $meta_deliveryDate = $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
+$meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
+$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_daysNetto = '';
 $meta_skonto1 = $meta_skonto1Days = $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_porto = $meta_porto_percentage = '';
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));

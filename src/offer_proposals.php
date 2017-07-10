@@ -22,7 +22,7 @@ if(isset($_GET['err']) && $_GET['err'] == 1){echo '<div class="alert alert-dange
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
-  include "new_client.php";
+  include "misc/new_client.php";
   echo '</div>';
 }
 ?>
