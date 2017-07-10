@@ -252,7 +252,7 @@ $("#sort tbody").sortable({
     <div class="modal-body">
       <table class="table table-hover">
         <thead>
-          <th>Position</th>
+          <th>Position #</th>
           <th>Einkauf</th>
           <th>Verkauf</th>
           <th>Bilanz</th>
@@ -260,15 +260,15 @@ $("#sort tbody").sortable({
         <tbody>
           <?php
           if($result){  $result->data_seek(0); }
-          $sum_purchase = $sum_sell = 0;
+          $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
             if($prod_row['name'] != 'CLEAR_TEXT' && $prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'){
               $purchase = $prod_row['purchase']*$prod_row['quantity'];
               $sell = $prod_row['price']*$prod_row['quantity'];
               if($sell > $purchase){$style = 'color:#65c948';} else {$style = 'color:#e08e21';}
-              if($purchase > 0){$percentage = round($sell / $purchase -1, 4)*100;} else {$percentage = 'xx';}
+              if($purchase > 0){$percentage = sprintf('%+.2f', ($sell / $purchase -1)*100);} else {$percentage = 'xx';}
               echo '<tr>';
-              echo '<td></td>';
+              echo '<td>#'.$prod_row['position'].'</td>';
               echo '<td>'.$purchase.' EUR</td>';
               echo '<td>'.$sell.' EUR</td>';
               echo "<td style='$style'>".sprintf('%+.2f',$sell - $purchase)." EUR ($percentage %)</td>";
@@ -276,11 +276,13 @@ $("#sort tbody").sortable({
               $sum_purchase += $purchase;
               $sum_sell += $sell;
             } elseif($prod_row['name'] == 'PARTIAL_SUM'){
-              if($sum_purchase > 0){$percentage = round($sum_sell / $sum_purchase, 4)*100;} else {$percentage = 'xx';}
-              echo "<tr><td><strong>".$lang['PARTIAL_SUM'].":</strong></td><td>$sum_purchase EUR</td><td>$sum_sell EUR</td><td>".sprintf('%+.2f',$sum_sell - $sum_purchase)." EUR ($percentage %)</td></tr>";
+              $partial_sum_purchase = $sum_purchase - $partial_sum_purchase;
+              $partial_sum_sell = $sum_sell - $partial_sum_sell;
+              if($partial_sum_purchase > 0){$percentage = sprintf('%+.2f', ($partial_sum_sell / $partial_sum_purchase - 1)*100);} else {$percentage = 'xx';}
+              echo "<tr><td><strong>".$lang['PARTIAL_SUM'].":</strong></td><td>$partial_sum_purchase EUR</td><td>$partial_sum_sell EUR</td><td>".sprintf('%+.2f',$partial_sum_sell - $partial_sum_purchase)." EUR ($percentage %)</td></tr>";
             }
           }
-          if($sum_purchase > 0){$percentage = round($sum_sell / $sum_purchase, 4)*100;} else {$percentage = 'xx';}
+          if($sum_purchase > 0){$percentage = sprintf('%+.2f', ($sum_sell / $sum_purchase -1)*100);} else {$percentage = 'xx';}
           echo "<tr><td><strong>Endsumme:</strong></td><td>$sum_purchase EUR</td><td>$sum_sell EUR</td><td>".sprintf('%+.2f',$sum_sell - $sum_purchase)." EUR ($percentage %)</td></tr>";
           ?>
         </tbody>
