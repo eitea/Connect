@@ -504,7 +504,7 @@ $(function () {
         <div class="row">
           <div class="col-xs-3">
             <label><?php echo $lang['USERS']; ?></label>
-            <select class="js-example-basic-single" name="user">
+            <select class="js-example-basic-single" name="user" onchange="showLastBooking(this.value);">
               <?php
               $result = $conn->query("SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
               while ($result && ($row = $result->fetch_assoc())) {
@@ -560,7 +560,6 @@ $(function () {
               </select>
             </div>
           </div>
-
         </div>
         <div id="hide_expenses" class="row" style="display:none">
           <br>
@@ -593,15 +592,9 @@ $(function () {
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <?php
-              if(!empty($filterings['user'])){
-                $result_bkh = $conn->query("SELECT end, timeToUTC FROM projectBookingData, logs WHERE logs.indexIM = projectBookingData.timestampID AND logs.userID = ".$filterings['user'].' ORDER BY end DESC');
-                if($result_bkh && ($row_bkh = $result_bkh->fetch_assoc())){$lastBooking = substr(carryOverAdder_Hours($row_bkh['end'], $row_bkh['timeToUTC']), 11, 5);} else {$lastBooking = ''; echo $conn->error;}
-              }
-              ?>
-              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo $lastBooking; ?>" >
+              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo $lastBooking; ?>"/>
               <span class="input-group-addon"> - </span>
-              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end">
+              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end"/>
             </div>
           </div>
         </div>
@@ -646,6 +639,17 @@ function showProjectfields(project){
     type: 'get',
     success : function(resp){
       $("#project_fields").html(resp);
+    },
+    error : function(resp){}
+  });
+}
+function showLastBooking(id){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getLastBooking.php',
+    type:'get',
+    data:{userID:id},
+    success: function(resp){
+      $("#time_field").val(resp);
     },
     error : function(resp){}
   });
@@ -704,6 +708,9 @@ if(!empty($filterings['company'])){
   echo '<script>';
   echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'][0].', "#addSelectProject");';
   echo '</script>';
+}
+if(!empty($filterings['user'])){
+  echo '<script>showLastBooking('.$filterings['user'].');</script>';
 }
 ?>
 <?php include 'footer.php'; ?>
