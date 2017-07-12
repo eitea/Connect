@@ -234,7 +234,7 @@ function icsToArray($paramUrl) {
 }
 
 //------------------------------------------------------------------------------
-echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="login.php">Next</a>';
+echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login.php">Next</a>';
 ?>
 
 <?php include 'footer.php'; ?>
