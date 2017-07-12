@@ -1,5 +1,18 @@
 <?php require "header.php"; ?>
 <?php
+
+$myfile = fopen('../connection_config.php', 'w');
+$txt = '<?php
+$servername = "'.test_input($_POST['serverName']).'";
+$username = "'.test_input($_POST['mysqlUsername']).'";
+$password = "'.test_input($_POST['pass']).'";
+$dbName = "'.test_input($_POST['dbName']).'";';
+fwrite($myfile, $txt);
+fclose($myfile);
+
+if(!file_exists('../connection_config.php')){
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="setup_getInput.php">Next</a></div>';
+}
 require '../connection_config.php';
 
 $conn = new mysqli($servername, $username, $password);

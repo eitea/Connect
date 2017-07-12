@@ -3,23 +3,10 @@
 $accept = false;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
-    $myfile = fopen('connection_config.php', 'w');
-    $txt = '<?php
-    $servername = "'.test_input($_POST['serverName']).'";
-    $username = "'.test_input($_POST['mysqlUsername']).'";
-    $password = "'.test_input($_POST['pass']).'";
-    $dbName = "'.test_input($_POST['dbName']).'";';
-    fwrite($myfile, $txt);
-    fclose($myfile);
-
     $out = '';
     if(match_passwordpolicy(test_input($_POST['pass']), $out)){
-      if(!file_exists('connection_config.php')){
-        die('Permission denied. Please grant PHP permission to create files.');
-      } else {
-        $accept = true;
-        $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
-      }
+      $accept = true;
+      $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
     }
@@ -40,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon" style="min-width:150px">
               Firstname
             </span>
-            <input type="text" class="form-control" name="firstname" placeholder="Firstname.." value="<?php if($accept) echo $_POST['firstname']; ?>" />
+            <input type="text" class="form-control" name="firstname" placeholder="Firstname.." value="<?php if($_POST['firstname']) echo $_POST['firstname']; ?>" />
           </div>
         </div>
       </div>
@@ -50,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon" style="min-width:150px">
               Lastname
             </span>
-            <input type="text" class="form-control" name="lastname" placeholder="Lastname.." value="<?php if($accept) echo $_POST['lastname']; ?>" />
+            <input type="text" class="form-control" name="lastname" placeholder="Lastname.." value="<?php if($_POST['lastname']) echo $_POST['lastname']; ?>" />
           </div>
         </div>
       </div>
@@ -75,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon text-warning" style=min-width:150px>
               Company Name
             </span>
-            <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php if($accept) echo $_POST['companyName']; ?>">
+            <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php if($_POST['companyName']) echo $_POST['companyName']; ?>">
           </div>
         </div>
       </div>
@@ -103,7 +90,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <span class="input-group-addon text-warning">
               @
             </span>
-            <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php if($accept) echo $_POST['domainPart']; ?>">
+            <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php if($_POST['domainPart']) echo $_POST['domainPart']; ?>">
           </div>
         </div>
         <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
