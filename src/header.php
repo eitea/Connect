@@ -415,7 +415,7 @@ if($_SESSION['color'] == 'light'){
                         <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="reportOptions.php"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
                         <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="taskScheduler.php"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                         <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="pullGitRepo.php"><span>Update</span></a></li>
-                        <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="download_sql.php" target="_blank"><span> DB Backup</span></a></li>
+                        <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="download_sql.php"><span> DB Backup</span></a></li>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="upload_database.php"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                       </ul>
                     </div>

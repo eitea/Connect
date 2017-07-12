@@ -1,9 +1,9 @@
 <?php
 //check if this is the first time this app runs
-if(!file_exists('connection_config.php')){
-  header("Location: setup_getInput.php");
-} else {
+if(file_exists('connection_config.php')){
   session_start();
+} else {
+  header("Location: setup/setup_getInput.php");
 }
 
 //TODO: put a brute-force stopper somewhere in here too
