@@ -1,76 +1,108 @@
+<?php require "header.php"; ?>
 <?php
-/*
-NECESSARY VARIABLES BEFORE INCLUDING THIS:
-$firstname
-$lastname
-$loginname
-$psw
+require '../connection_config.php';
 
-include version_number.php
+$conn = new mysqli($servername, $username, $password);
+if ($conn->connect_error) {
+  echo mysqli_error($conn);
+  echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
+  die();
+}
+if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
+  echo "Database was created. <br>";
+} else {
+  echo mysqli_error($conn);
+  echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
+  die();
+}
 
-$companyName
-$companyType
-$holidayFile
-$travellingFile
+//reconnect to database
+$conn->close();
+$conn = new mysqli($servername, $username, $password, $dbName);
 
-** SEE SETUP.PHP FOR MORE INFORMATION **
-*/
+$conn->query("SET NAMES 'utf8';");
+$conn->query("SET CHARACTER SET 'utf8';");
 
-//dev note: .. it would be a bit prettier if we put all of this (setup_ins and setup_inc into a  function... TODO for later.)
+if(isset($_POST['adminPass'])){
+  $psw = $_POST['adminPass'];
+  $companyName = test_input($_POST['companyName']);
+  $companyType = test_input($_POST['type']);
+  $firstname = test_input($_POST['firstname']);
+  $lastname = test_input($_POST['lastname']);
+  $domainname = clean($_POST['domainPart']); //needed for admin account
+  $loginname = clean($_POST['localPart']) .'@'.$domainname;
+}
+echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
+
+//create all tables
+require "setup_inc.php";
+create_tables($conn);
+
+require_once "../version_number.php";
+//------------------------------ INSERTS ---------------------------------------
+
 //insert main company
-$sql = "INSERT INTO $companyTable (name, companyType) VALUES ('$companyName', '$companyType')";
+$sql = "INSERT INTO companyData (name, companyType) VALUES ('$companyName', '$companyType')";
 $conn->query($sql);
 //insert password policy
-$conn->query("INSERT INTO $policyTable (passwordLength) VALUES (6)");
+$conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
 //insert module en/disable
-$conn->query("INSERT INTO $moduleTable (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
+$conn->query("INSERT INTO modules (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
 
 //insert ADMIN
-$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
+$sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
 $conn->query($sql);
 //interval
-$sql = "INSERT INTO $intervalTable (userID) VALUES (1);";
+$sql = "INSERT INTO intervalData (userID) VALUES (1);";
 $conn->query($sql);
 //role
-$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, canStamp, canBook) VALUES(1, 'TRUE', 'TRUE', 'TRUE');";
+$sql = "INSERT INTO roles (userID, isCoreAdmin, canStamp, canBook) VALUES(1, 'TRUE', 'TRUE', 'TRUE');";
 $conn->query($sql);
 //insert company-client relationship
-$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,1)";
+$sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,1)";
 $conn->query($sql);
 
-//insert Core User
-$sql = "INSERT INTO $userTable (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
+//insert core user
+$sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
 $conn->query($sql);
 //insert intervaltable
-$sql = "INSERT INTO $intervalTable (userID) VALUES (2);";
+$sql = "INSERT INTO intervalData (userID) VALUES (2);";
 $conn->query($sql);
 //insert roletable
-$sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE');";
+$sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE');";
 $conn->query($sql);
 //insert company-client relationship
-$sql = "INSERT INTO $companyToUserRelationshipTable(companyID, userID) VALUES(1,2)";
+$sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
 $conn->query($sql);
 
+//insert configs
+$sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
+$conn->query($sql);
 //insert ldap config
-$sql = "INSERT INTO $adminLDAPTable (adminID, version) VALUES (1, $VERSION_NUMBER)";
+$sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
 $conn->query($sql);
-
 
 //insert holidays
+$holidayFile = 'Feiertage.txt';
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
   if($holidayFile[$i]['BEGIN'] == 'VEVENT'){
     $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
     $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
     $n = $holidayFile[$i]['SUMMARY'];
-    $conn->query("INSERT INTO $holidayTable(begin, end, name) VALUES ('$start', '$end', '$n');");
+    $conn->query("INSERT INTO holidays(begin, end, name) VALUES ('$start', '$end', '$n');");
   }
 }
+echo mysqli_error($conn);
+
+//insert github options
+$sql = "INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')";
 if (!$conn->query($sql)) {
   echo mysqli_error($conn);
 }
 
 //insert travelling expenses
+$travellingFile = fopen("Laender.txt", "r");
 if ($travellingFile) {
     while (($line = fgets($travellingFile)) !== false) {
       $line = iconv('UTF-8', 'windows-1252', $line);
@@ -83,15 +115,12 @@ if ($travellingFile) {
           $name = test_input($data[1]);
           $dayPay = floatval($data[2]);
           $nightPay = floatval($data[3]);
-          $sql = "INSERT INTO $travelCountryTable(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
-          if (!$conn->query($sql)) {
-            echo mysqli_error($conn);
-          }
+          $sql = "INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
           $thisLineIsNotOK = false;
         } elseif(count($data) > 4) {
           $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
         } else {
-          echo 'Nope. <br>';
+          echo 'Ups! Something went wrong with that file. <br>';
           print_r ($data);
           die();
         }
@@ -99,12 +128,11 @@ if ($travellingFile) {
     }
   fclose($travellingFile);
 }
+echo mysqli_error($conn);
 
 //insert main report
-$exampleTemplate = "<h1>Main Report</h1>
-[TIMESTAMPS] <br>
-[BOOKINGS] ";
-$conn->query("INSERT INTO $pdfTemplateTable(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
+$exampleTemplate = "<h1>Main Report</h1> \n [TIMESTAMPS] \n <br> [BOOKINGS] ";
+$conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
 
 //insert taxRates
 $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
@@ -145,6 +173,30 @@ $conn->query($sql);
 //insert shippign method
 $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
 $conn->query($sql);
+
+
+//-------------------------------- GIT -----------------------------------------
+
+$repositoryPath = dirname(dirname(realpath("setup.php")));
+
+//git init
+$command = 'git -C ' .$repositoryPath. ' init 2>&1';
+exec($command, $output, $returnValue);
+
+//sslyverify false
+$command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
+exec($command, $output, $returnValue);
+
+//remote add
+$command = "git -C $repositoryPath remote add -t master origin https://github.com/eitea/T-Time.git 2>&1";
+exec($command, $output, $returnValue);
+
+$command = "git -C $repositoryPath fetch --force 2>&1";
+exec($command, $output, $returnValue);
+
+$command = "git -C $repositoryPath reset --hard origin/master 2>&1";
+exec($command, $output, $returnValue);
+
 //------------------------------------------------------------------------------
 
 function icsToArray($paramUrl) {
@@ -167,4 +219,9 @@ function icsToArray($paramUrl) {
   }
   return $icsDates;
 }
+
+//------------------------------------------------------------------------------
+echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="login.php">Next</a>';
 ?>
+
+<?php include 'footer.php'; ?>

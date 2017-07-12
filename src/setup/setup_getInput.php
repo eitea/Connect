@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-  <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="../plugins/select2/css/select2.min.css">
-  <script src='../plugins/select2/js/select2.js'></script>
-</head>
-<script>
-$(document).ready(function() {
-  $(".js-example-basic-single").select2();
-});
-</script>
-
+<?php require "header.php"; ?>
 <?php
 $accept = false;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -44,45 +27,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo 'Missing Fields. <br><br>';
   }
 }
-
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-function match_passwordpolicy($p, &$out = ''){
-  if(strlen($p) < 6){
-    $out = "Password must be at least 6 Characters long.";
-    return false;
-  }
-  if(!preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
-    $out = "Password must contain at least one captial letter and one number";
-    return false;
-  }
-  return true;
-}
 ?>
 
-<body class="text-center">
+<div class="">
   <form id="setup_form" method='post'>
     <h1>Login Data</h1><br><br>
 
     <div class="row">
-      <div class="col-md-3 col-md-offset-3">
+      <div class="col-sm-8 col-lg-4">
         <div class="form-group">
           <div class="input-group">
-            <span class="input-group-addon" style=min-width:150px>
+            <span class="input-group-addon" style="min-width:150px">
               Firstname
             </span>
             <input type="text" class="form-control" name="firstname" placeholder="Firstname.." value="<?php if($accept) echo $_POST['firstname']; ?>" />
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-sm-8 col-lg-4">
         <div class="form-group">
           <div class="input-group">
-            <span class="input-group-addon" style=min-width:150px>
+            <span class="input-group-addon" style="min-width:150px">
               Lastname
             </span>
             <input type="text" class="form-control" name="lastname" placeholder="Lastname.." value="<?php if($accept) echo $_POST['lastname']; ?>" />
@@ -92,7 +57,7 @@ function match_passwordpolicy($p, &$out = ''){
     </div>
 
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-sm-8">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -104,7 +69,7 @@ function match_passwordpolicy($p, &$out = ''){
       </div>
     </div>
     <div class="row">
-      <div class="col-md-4 col-md-offset-3">
+      <div class="col-sm-6">
         <div class="form-group">
           <div class="input-group">
             <span class="input-group-addon text-warning" style=min-width:150px>
@@ -114,7 +79,7 @@ function match_passwordpolicy($p, &$out = ''){
           </div>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-sm-2">
         <div class="form-group">
           <select name="type" class="js-example-basic-single btn-block">
             <option selected>...</option>
@@ -129,10 +94,9 @@ function match_passwordpolicy($p, &$out = ''){
       </div>
     </div>
     <br><br>
-
-    <p>Your Login E-Mail</p>
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-sm-8">
+        <label>Your Login E-Mail</label>
         <div class="form-group">
           <div class="input-group">
             <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php if($accept) echo $_POST['localPart']; ?>">
@@ -151,7 +115,7 @@ function match_passwordpolicy($p, &$out = ''){
       <h1>MySQL Database Connection</h1><br><br>
 
       <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-sm-8">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -163,7 +127,7 @@ function match_passwordpolicy($p, &$out = ''){
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-sm-8">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -175,7 +139,7 @@ function match_passwordpolicy($p, &$out = ''){
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-sm-8">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -187,7 +151,7 @@ function match_passwordpolicy($p, &$out = ''){
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-sm-8">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon" style=min-width:150px>
@@ -209,10 +173,8 @@ function match_passwordpolicy($p, &$out = ''){
       </div>
     <?php endif; ?>
 
-    <div class="container">
-      <div class="col-md-3 col-md-offset-9">
+    <div class="container-fluid text-right">
         <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
-      </div>
     </div>
   </form>
 
@@ -223,4 +185,5 @@ function match_passwordpolicy($p, &$out = ''){
     myForm.submit();
     </script>
   <?php endif; ?>
-</body>
+</div>
+<?php include 'footer.php'; ?>
