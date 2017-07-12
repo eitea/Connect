@@ -362,7 +362,7 @@ function create_tables($conn){
     FOREIGN KEY (projectID) REFERENCES projectData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
-    FOREIGN KEY (timestampID) REFERENCES DeactivatedUserData(indexIM)
+    FOREIGN KEY (timestampID) REFERENCES DeactivatedUserLogData(indexIM)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
