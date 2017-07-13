@@ -127,9 +127,10 @@ function match_passwordpolicy($p, &$out = ''){
   return true;
 }
 
-function getNextERP($identifier){
+function getNextERP($identifier, $companyID = 0){
   require "connection.php";
-  $result = $conn->query("SELECT id_number, history FROM proposals WHERE id_number LIKE '$identifier%' OR history LIKE '%$identifier%'");
+  //get all the little shits which contain my shit
+  $result = $conn->query("SELECT id_number, history FROM proposals, clientData WHERE id_number LIKE '$identifier%' OR history LIKE '%$identifier%' AND clientID = clientData.id AND companyID = $companyID");
   $vals = array(0);
   while($result && ($row = $result->fetch_assoc())){
     $history = explode(' ', $row['history']);
@@ -140,8 +141,7 @@ function getNextERP($identifier){
       }
     }
   }
-  $max = max($vals);
-  return $identifier . sprintf('%0'.(10-strlen($identifier)).'d', $max +1);
+  return $identifier . sprintf('%0'.(10-strlen($identifier)).'d', max($vals) +1);
 }
 
 /*
