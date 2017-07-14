@@ -1,4 +1,4 @@
-<?php require 'header.php'; ?>
+<?php require 'header.php'; enableToERP($userID); ?>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['save'])){

@@ -190,14 +190,24 @@ while($result && ($row = $result->fetch_assoc())):
     <div class="modal-dialog modal-md modal-content">
       <div class="modal-header"><h4><?php echo $lang['NEW_PROCESS']; ?></h4></div>
       <div class="modal-body">
-        <?php include 'misc/select_client.php'; ?>
-        <br>
-        <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
-        <select class="js-example-basic-single" name="nERP">
-          <option value="ANG"><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></option>
-          <option value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
-          <option value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
-        </select>
+        <div class="container-fluid">
+          <div class="col-sm-12">
+            <?php include 'misc/select_client.php'; ?>
+          </div>
+          <div class="col-sm-6"><br>
+            <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
+            <select class="js-example-basic-single" name="nERP">
+              <option value="ANG"><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></option>
+              <option value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
+              <option value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
+            </select>
+          </div>
+          <div class="col-sm-6"><br>
+            <label>Offset</label>
+            <input type="number" name="erp_offset" class="form-control" value="1" />
+            <small>Kleinster Zahlenwert der nächsten Nummer. Im Zweifelsfall bei 1 lassen.</small>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
