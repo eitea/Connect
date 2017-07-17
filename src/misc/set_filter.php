@@ -209,7 +209,7 @@ if($scale > 2){ //3 columns
           <?php if(isset($filterings['logs'])): ?>
             <label><?php echo $lang['ACTIVITY']; ?></label>
               <select name="searchActivity" class="js-example-basic-single">
-                <option value="0">...</option>
+                <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
                 <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
                 <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
                 <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
@@ -285,7 +285,7 @@ if($scale > 2){ //3 columns
                 if($i == $filterings['procedures'][1]){
                   $selected = 'selected';
                 }
-                echo '<option value="2" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
+                echo '<option value="'.$i.'" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
               }
               ?>
             </select>

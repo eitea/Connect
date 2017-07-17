@@ -1,7 +1,7 @@
 <?php require 'header.php'; enableToERP($userID); ?>
 <?php
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$filterings = array('savePage' => $this_page, 'procedures' => array(array(), -1, 'checked'), 'company' => 0, 'client' => 0);
+$filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['delete_proposal'])){
@@ -56,6 +56,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
     <th><?php echo $lang['PREVIOUS']; ?></th>
     <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
     <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
+    <th>Bilanz</th>
     <th>Option</th>
   </thead>
   <tbody>
@@ -63,9 +64,8 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
     while($result && ($row = $result->fetch_assoc())){
       foreach($CURRENT_TRANSITIONS as $currentProcess){
         $transitable = false;
-        $transited_from = $transited_into = '';
-        $current_transition = preg_replace('/\d/', '', $row['id_number']);
-        $lineColor = '';
+        $transited_from = $transited_into = $lineColor = '';
+        $current_transition = preg_replace('/\d/', '', $row['id_number']); //remove all numbers
         if($current_transition == $currentProcess){
           $id_name = $row['id_number'];
           $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
@@ -98,18 +98,24 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         echo '<td>'.$id_name.'</td>';
         if(count($available_companies) > 1){ echo '<td>'.$row['companyName'].'</td>';}
         echo '<td>'.$row['clientName'].'</td>';
+        $balance = 0;
         if($transitable){
           echo '<td><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
           echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
           echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
           echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
           echo '</ul></div></td>';
+          $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
+          while($rowB = $result_b->fetch_assoc()){
+            $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+          }
         } else {
           echo "<td>$status</td>";
         }
         echo '<td>'.$transited_from.'</td>';
         echo '<td>'.$row['ourSign'].'</td>';
         echo '<td>'.$row['ourMessage'].'</td>';
+        echo '<td>'.sprintf('%+.2f',$balance).' EUR</td>';
         echo '<td>';
         echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){

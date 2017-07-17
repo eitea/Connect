@@ -217,7 +217,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
           <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
-          AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
+          AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
             <ul class="dropdown-menu">
@@ -233,6 +233,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
   </div>
 </div>
 <?php
+//filtering a project means excluding all breaks and drives. we dont want that, which explains the query below.
 $sql = "SELECT $projectTable.id AS projectID,
 $clientTable.id AS clientID, $companyTable.id AS companyID,
 $companyTable.name AS companyName, $clientTable.name AS clientName, $projectTable.name AS projectName,
@@ -247,7 +248,7 @@ LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
 WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
-AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery))
+AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
 $editingResult = $conn->query($sql); //f*ck you php

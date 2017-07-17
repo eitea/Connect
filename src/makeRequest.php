@@ -84,6 +84,7 @@ myCalendar.setDateFormat("%Y-%m-%d");
 </script>
 
 <?php
+//TODO: add filter to display all requests/ declined/ accepted/ current
 $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType NOT IN ('acc', 'brk')";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>

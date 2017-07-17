@@ -413,8 +413,8 @@ $lang_ger['FIRSTNAME'] = 'Vorname';
 $lang_eng['FUNCTIONS'] = 'Functions';
 $lang_ger['FUNCTIONS'] = 'Funktionen';
 
-$lang_eng['FREE_TEXT'] = 'Free text';
-$lang_ger['FREE_TEXT'] = 'Freier Text';
+$lang_eng['FREE_TEXT'] = 'Product';
+$lang_ger['FREE_TEXT'] = 'Produkt';
 
 $lang_eng['FROM'] = 'From';
 $lang_ger['FROM'] = 'Von';
