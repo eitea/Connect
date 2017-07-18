@@ -16,6 +16,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } elseif(isset($_POST['save_cancel'])){
     $conn->query("UPDATE proposals SET status = 2 WHERE id = ".intval($_POST['save_cancel']));
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
+  } elseif(isset($_POST['turnBalanceOff'])) {
+    $conn->query("UPDATE UserData SET erpOption = 'FALSE' WHERE id = $userID");
+  } elseif(isset($_POST['turnBalanceOn'])) {
+    $conn->query("UPDATE UserData SET erpOption = 'TRUE' WHERE id = $userID");
   }
 }
 if(isset($_GET['err']) && $_GET['err'] == 1){echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';}
@@ -25,6 +29,9 @@ if(!$result || $result->num_rows <= 0){
   include "misc/new_client.php";
   echo '</div>';
 }
+$result = $conn->query("SELECT erpOption FROM UserData WHERE id = $userID");
+$row = $result->fetch_assoc();
+$showBalance = $row['erpOption'];
 ?>
 
 <div class="page-header">
@@ -32,6 +39,15 @@ if(!$result || $result->num_rows <= 0){
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add_process" title="<?php echo $lang['NEW_PROCESS']; ?>"><i class="fa fa-plus"></i></button>
+      <form method="post" style="display:inline-block">
+      <?php
+      if($showBalance == 'TRUE'){
+        echo '<button type="submit" name="turnBalanceOff" class="btn btn-warning" title="Bilanz deaktivieren"><i class="fa fa-check"></i> Bilanz</button>';
+      } else {
+        echo '<button type="submit" name="turnBalanceOn" class="btn btn-default" title="Bilanz aktivieren"><i class="fa fa-times"></i> Bilanz</button>';
+      }
+      ?>
+    </form>
     </div>
   </h3>
 </div>
@@ -56,7 +72,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
     <th><?php echo $lang['PREVIOUS']; ?></th>
     <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
     <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
-    <th>Bilanz</th>
+    <?php if($showBalance == 'TRUE') echo '<th>Bilanz</th>'; ?>
     <th>Option</th>
   </thead>
   <tbody>
@@ -105,17 +121,18 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
           echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
           echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
           echo '</ul></div></td>';
-          $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
-          while($rowB = $result_b->fetch_assoc()){
-            $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
-          }
+            $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
+            while($rowB = $result_b->fetch_assoc()){
+              $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+            }
         } else {
           echo "<td>$status</td>";
         }
         echo '<td>'.$transited_from.'</td>';
         echo '<td>'.$row['ourSign'].'</td>';
         echo '<td>'.$row['ourMessage'].'</td>';
-        echo '<td>'.sprintf('%+.2f',$balance).' EUR</td>';
+        $style = $balance > 0 ? "style='color:#6fcf2c'" : "style='color:#facf1e'";
+        if($showBalance == 'TRUE') echo "<td $style>".sprintf('%+.2f',$balance).' EUR</td>';
         echo '<td>';
         echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){
