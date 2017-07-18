@@ -143,7 +143,7 @@ if($_SESSION['color'] == 'light'){
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -353,7 +353,6 @@ if($_SESSION['color'] == 'light'){
 
           <!-- User-Section: EDITING -->
           <?php if($canEditTemplates == 'TRUE'):?>
-            <hr>
             <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="templateSelect.php"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
           <?php endif; ?>
         </ul>
@@ -532,11 +531,12 @@ if($_SESSION['color'] == 'light'){
                     </a>
                     <div class="collapse" id="toggleERPSettings" style="height: 0px;">
                       <ul class="nav nav-list">
-                        <li><a <?php if($this_page =='editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editPaymentMethods.php'){echo $setActiveLink;}?> href="editPaymentMethods.php"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editShippingMethods.php'){echo $setActiveLink;}?> href="editShippingMethods.php"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
-                        <li><a <?php if($this_page =='editRepresentative.php'){echo $setActiveLink;}?> href="editRepresentative.php"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
+                        <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="editTaxes.php"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                        <li><a <?php if($this_page == 'editUnits.php'){echo $setActiveLink;}?> href="editUnits.php"><span><?php echo $lang['UNITS']; ?></span></a></li>
+                        <li><a <?php if($this_page == 'editPaymentMethods.php'){echo $setActiveLink;}?> href="editPaymentMethods.php"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page == 'editShippingMethods.php'){echo $setActiveLink;}?> href="editShippingMethods.php"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
+                        <li><a <?php if($this_page == 'editRepresentative.php'){echo $setActiveLink;}?> href="editRepresentative.php"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
+                        <?php if($isCoreAdmin == 'FALSE'): ?><li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="editCustomers.php"><span><?php echo $lang['CLIENTS']; ?></span></a></li><?php endif; ?>
                       </ul>
                     </div>
                   </li>
@@ -545,6 +545,9 @@ if($_SESSION['color'] == 'light'){
             </div>
           </div>
           <?php
+          if($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php")){
+            echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+          }
           if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepresentative.php"){
             echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
           } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){

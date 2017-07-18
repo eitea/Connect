@@ -1358,9 +1358,20 @@ if($row['version'] < 94){
 }
 
 
-//if($row['version'] < 95){}
+if($row['version'] < 95){
+  $sql = "ALTER TABLE UserData ADD COLUMN erpOption VARCHAR(10) DEFAULT 'TRUE'";
+  if($conn->query($sql)){
+    echo '<br>Added option to display overall balance in ERP';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+}
+
+
 //if($row['version'] < 96){}
 //if($row['version'] < 97){}
+//if($row['version'] < 98){}
+//if($row['version'] < 99){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

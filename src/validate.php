@@ -80,6 +80,15 @@ function enableToERP($userID){
   }
 }
 
+function enableToClients($userID){
+  require 'connection.php';
+  $sql = "SELECT isERPAdmin, isCoreAdmin FROM $roleTable WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE')";
+  $result = $conn->query($sql);
+  if($userID != 1 && (!$result || $result->num_rows <= 0)){
+    die('Access denied. <a href="logout.php"> return</a>');
+  }
+}
+
 function denyToContainer(){
   if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
     die("Feature not accessible in current environment.");

@@ -1,4 +1,4 @@
-<?php include "header.php"; require_once 'utilities.php'; ?>
+<?php include "header.php"; require_once 'utilities.php'; enableToClients($userID); ?>
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = test_input($_GET['custID']);

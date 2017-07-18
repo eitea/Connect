@@ -1,12 +1,7 @@
-<?php include 'header.php'; ?>
-<?php enableToStamps($userID); ?>
-<!-- BODY -->
-
-<div class="page-header">
-  <h3><?php echo $lang['MY_REQUESTS']?></h3>
-</div>
-
+<?php include 'header.php'; enableToStamps($userID); ?>
 <?php
+$filterRequest_text = 'Alte ausblenden';
+$filterRequest = 0;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
@@ -44,63 +39,71 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     echo mysqli_error($conn);
   }
+  if(isset($_POST['filterRequest_all'])){
+    $filterRequest_text = $lang['DISPLAY_ALL'];
+    $filterRequest = 1;
+  }
 }
 ?>
 
+<div class="page-header">
+  <h3><?php echo $lang['MY_REQUESTS']?></h3>
+</div>
 <br><br>
-
 <form method="post">
   <div class="row">
-    <div class="col-md-6">
-      <div class="input-group input-daterange">
-        <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
-        <span class="input-group-addon"> - </span>
-        <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
-      </div><br>
-    </div>
-    <div class="col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <select name="requestType" class="js-example-basic-single">
         <option value="vac"><?php echo $lang['VACATION']; ?></option>
         <option value="scl"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
         <option value="spl"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
         <option value="cto"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
-      </select><br>
+      </select>
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button><br>
+    <div class="col-sm-6 col-lg-4">
+      <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-6">
-      <input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText">
+    <div class="col-sm-6 col-lg-4">
+      <div class="input-group input-daterange">
+        <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span>
+        <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <div class="input-group input-daterange">
+        <span class="input-group-addon"> <?php echo $lang['TO'];?> </span>
+        <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-lg-8 text-right">
+      <button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['REQUESTS']; ?></button><br>
     </div>
   </div>
 </form>
 <br><br><br>
-<script>
-var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d");
-</script>
-
 <?php
 $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType NOT IN ('acc', 'brk')";
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>
-<form method="post">
-  <table class="table table-hover">
-    <tr>
-      <th><?php echo $lang['TYPE']; ?></th>
-      <th><?php echo $lang['FROM']; ?></th>
-      <th><?php echo $lang['TO']; ?></th>
-      <th>Status</th>
-      <th><?php echo $lang['REPLY_TEXT']; ?> </th>
-      <th class="text-center"><?php echo $lang['REQUESTS']. ' '. $lang['DELETE']; ?></th>
-    </tr>
-    <tbody>
+<form method="POST">
+  <?php if($filterRequest) echo '<input type="hidden" name="filterRequest_all" value="1" />;' ?>
+<table class="table table-hover">
+  <tr>
+    <th><?php echo $lang['TYPE']; ?></th>
+    <th><?php echo $lang['FROM']; ?></th>
+    <th><?php echo $lang['TO']; ?></th>
+    <th>Status</th>
+    <th><?php echo $lang['REPLY_TEXT']; ?> </th>
+    <th class="text-center"><?php echo $lang['REQUESTS']. ' '. $lang['DELETE']; ?></th>
+  </tr>
+  <tbody>
       <?php
       while($row = $result->fetch_assoc()){
-        if(timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
+        if(!$filterRequest && timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
           continue;
         }
         $style = "";
@@ -111,27 +114,36 @@ if($result && $result->num_rows > 0): ?>
         } elseif ($row['status'] == 2) {
           $style="#13b436";
         }
-
         echo "<tr>";
         echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
         echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
         echo '<td>' . substr($row['toDate'],0,10) .'</td>';
         echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
         echo '<td>' . $row['answerText'] . '</td>';
-        echo '<td class="text-center"> <button type="submit" name="deleteRequest" value="'.$row['id'].'" class="btn btn-warning" title="'.$lang['MESSAGE_DELETE_REQUEST'].'">
-        <i class="fa fa-trash-o ></i>"</button> </td>';
+        echo '<td class="text-center"><button type="submit" name="deleteRequest" value="'.$row['id'].'" class="btn btn-warning" title="'.$lang['MESSAGE_DELETE_REQUEST'].'">
+        <i class="fa fa-trash-o ></i>"</button></td>';
         echo '</tr>';
       }
       ?>
-    </tbody>
-  </table>
+  </tbody>
+</table>
 </form>
+<div class="row">
+  <div class="col-sm-2">
+    <form method="post">
+      <?php
+      echo '<div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$filterRequest_text.'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
+      echo '<li><button type="submit" name="filterRequest_default" class="btn btn-link" >Alte ausblenden</button></li>';
+      echo '<li><button type="submit" name="filterRequest_all" class="btn btn-link" >'.$lang['DISPLAY_ALL'].'</button></li>';
+      echo '</ul></div>';
+      ?>
+    </form>
+  </div>
+</div>
 <?php endif; ?>
 
-<?php
-$result = $conn->query("SELECT indexIM FROM logs WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
-if($result && ($row = $result->fetch_assoc())):
- ?>
+<?php $result = $conn->query("SELECT indexIM FROM logs WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
+if($result && ($row = $result->fetch_assoc())): ?>
 <br><hr><br>
 <h4><?php echo $lang['TODAY']; ?></h4>
 <br>
@@ -142,5 +154,10 @@ if($result && ($row = $result->fetch_assoc())):
   <div class="col-sm-3"><button type="submit" class="btn btn-warning" name="request_lunchbreak" value="<?php echo $row['indexIM']; ?>"><?php echo $lang['REQUESTS']; ?></button></div>
 </form>
 <?php endif; ?>
-<!-- /BODY -->
+
+<script>
+var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+myCalendar.setSkin("material");
+myCalendar.setDateFormat("%Y-%m-%d");
+</script>
 <?php include 'footer.php'; ?>

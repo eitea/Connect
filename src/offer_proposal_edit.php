@@ -5,17 +5,21 @@ $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
 $meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
 $meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
 
-$filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => getNextERP('ANG'));
-
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array(); //clear filterings if they come from another page
 }
 
-if(!empty($_POST['proposalID'])){
+$filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => '');
+
+if(!empty($_POST['proposalID'])){ //first visit of page
   $filterings['proposal'] = intval($_POST['proposalID']);
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
-  $filterings['number'] = getNextERP($_POST['nERP']);
   $filterings['client'] = intval($_POST['filterClient']);
+  $offset = isset($_POST['erp_offset']) ? intval($_POST['erp_offset']) : 2;
+  $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
+  if($row = $result->fetch_assoc()){
+    $filterings['number'] = getNextERP($_POST['nERP'], $row['companyID'], $offset-1);
+  }
 } else {
   $filterings = $_SESSION['filterings'];
 }
@@ -155,6 +159,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(!empty($_POST['translate']) && !empty($_POST['transit'])){
     $filterings['proposal'] = intval($_POST['translate']);
+    $result = $conn->query("SELECT companyID FROM proposals, clientData WHERE proposals.clientID = clientData.id AND proposals.id = ".$filterings['proposal']);
+    if($row = $result->fetch_assoc()){
+      $filterings['number'] = getNextERP($_POST['nERP'], $row['companyID']);
+    }
     $filterings['number'] = getNextERP(test_input($_POST['transit']));
     $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '".$filterings['number']."' WHERE id = ".$filterings['proposal']);
   } elseif(isset($_POST['translate'])){

@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'header.php'; enableToClients($userID); ?>
 <?php
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }

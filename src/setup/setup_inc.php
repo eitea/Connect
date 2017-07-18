@@ -678,7 +678,7 @@ function create_tables($conn){
       purchase DECIMAL(10,2),
       taxPercentage INT(3),
       cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      UNIQUE KEY (proposalID, position),
+      UNIQUE KEY (proposalID, position)
       FOREIGN KEY (proposalID) REFERENCES proposals(id)
       ON UPDATE CASCADE
       ON DELETE CASCADE
