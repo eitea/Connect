@@ -16,7 +16,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   }
   $requestText = test_input($_POST['request_text']);
   if(test_Date($startTime)){
-    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."' )";
+    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeTOUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
     if($conn->query($sql)){
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     } else {

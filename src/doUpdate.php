@@ -1365,6 +1365,13 @@ if($row['version'] < 95){
   } else {
     echo '<br>'.$conn->error;
   }
+
+  $sql = "ALTER TABLE userRequestsData ADD COLUMN timeToUTC INT(2) DEFAULT 0";
+  if($conn->query($sql)){
+    echo '<br>Added UTC value to requests';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 

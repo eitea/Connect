@@ -117,7 +117,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("UPDATE $logTable SET time = DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd = '$timeFin' WHERE indexIM = $indexIM");
       }
     } else { //timestamp doesnt exist
-      $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, status) VALUES('$timeStart', '$timeFin', $user, 0, '0')");
+      $utcTime = $row['timeToUTC'];
+      $timeStart = carryOverAdder_Hours($timeStart, $utcTime * -1);
+      if($timeFin != '0000-00-00 00:00:00') $timeFin = carryOverAdder_Hours($timeFin, $utcTime * -1);
+      $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, status) VALUES('$timeStart', '$timeFin', $user, $utcTime , '0')");
     }
     if($conn->error){ echo $conn->error; } else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     $answerText = $_POST['answerText'. $requestID];
@@ -386,7 +389,7 @@ if($result && $result->num_rows > 0):
         $rowDP = $result->fetch_assoc();
         $rowDP2 = $result->fetch_assoc();
         $uneven = $rowDP;
-        //not sure how this works anymore. do not touch.
+        //not sure how this works
         while(true) {
           $row = $rowDP;
           if($rowDP['userID'] != $rowDP2['userID']){
@@ -434,9 +437,9 @@ if($result && $result->num_rows > 0):
 <script>
 function toggle(source, target) {
   if(source.checked){
-    $("[name='"+target+"']").iCheck('check');
+    $("[name='"+target+"']").prop('checked', true);
   } else {
-    $("[name='"+target+"']").iCheck('uncheck');
+    $("[name='"+target+"']").prop('checked', false);
   }
 }
 </script>
