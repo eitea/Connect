@@ -10,8 +10,8 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 }
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => '');
-
-if(!empty($_POST['proposalID'])){ //first visit of page
+//first visit of page
+if(!empty($_POST['proposalID'])){
   $filterings['proposal'] = intval($_POST['proposalID']);
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['client'] = intval($_POST['filterClient']);
@@ -20,7 +20,7 @@ if(!empty($_POST['proposalID'])){ //first visit of page
   if($row = $result->fetch_assoc()){
     $filterings['number'] = getNextERP($_POST['nERP'], $row['companyID'], $offset-1);
   }
-} else {
+} else { //other visits
   $filterings = $_SESSION['filterings'];
 }
 
@@ -111,8 +111,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['add_product'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
-  }
-  if(!empty($_POST['delete_product'])){
+  } elseif(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
     $conn->query("DELETE FROM products WHERE id = $i");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
@@ -149,15 +148,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     }
-  }
-  if(isset($_POST['meta_save'])){
-    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
-      ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
-      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
-      WHERE id =".$filterings['proposal']);
-    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  }
-  if(!empty($_POST['translate']) && !empty($_POST['transit'])){
+  } elseif(!empty($_POST['translate']) && !empty($_POST['transit'])){
     $filterings['proposal'] = intval($_POST['translate']);
     $result = $conn->query("SELECT companyID FROM proposals, clientData WHERE proposals.clientID = clientData.id AND proposals.id = ".$filterings['proposal']);
     if($row = $result->fetch_assoc()){
@@ -167,6 +158,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '".$filterings['number']."' WHERE id = ".$filterings['proposal']);
   } elseif(isset($_POST['translate'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
+  } elseif(isset($_POST['update_articles']) && $filterings['proposal']){
+    $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxPercentage = a.taxPercentage, p.purchase = a.purchase, p.cash = a.cash
+    WHERE a.name = p.name AND p.proposalID = ".$filterings['proposal']);
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
+  } elseif(isset($_POST['update_clientData']) && $filterings['client']){
+    $conn->query("UPDATE proposals p, clientInfoData c 
+      SET p.daysNetto = c.daysNetto, p.skonto1 = c.skonto1, p.skonto1Days = c.skonto1Days, p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
+      WHERE p.clientID = c.clientID AND p.id = ".$filterings['proposal']);
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
+  }
+  if(isset($_POST['meta_save'])){
+    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
+      ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
+      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
+      WHERE id =".$filterings['proposal']);
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   }
 } //END POST
 
@@ -192,9 +199,16 @@ $_SESSION['filterings'] = $filterings; //save your filterings
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
       <a href="editCustomer_detail.php?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
-      <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+      <div class="btn-group">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Daten erneuern"><i class="fa fa-refresh"></i></a>
+        <ul class="dropdown-menu">
+          <li><form method="POST"><button type="submit" class="btn btn-link" name="update_clientData"><?php echo $lang['CLIENTS']; ?> Info</button></form></li>
+          <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
+        </ul>
+      </div>
       <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
       <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
+      <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
       <a href="download_proposal.php?propID=<?php echo $filterings['proposal']; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
     </div>
   </h3>
@@ -702,9 +716,9 @@ function displayArticle(i){
         $("[name='add_product_unit']").val(res[4]).trigger('change');
         $("[name='add_product_taxes']").val(res[5]).trigger('change');
         if(res[6] == 'TRUE'){
-          $("[name='add_product_as_bar']").iCheck('check');
+          $("[name='add_product_as_bar']").prop('checked', true);
         } else {
-          $("[name='add_product_as_bar']").iCheck('uncheck');
+          $("[name='add_product_as_bar']").prop('checked', false);
         }
         $("[name='add_product_purchase']").val(res[7]);
       },
@@ -714,9 +728,9 @@ function displayArticle(i){
 }
 
 $("#product_price").on("keyup", function(){
-  var v = parseInt($("#product_price").val());
-  var p = parseFloat($("#salePercent").val());
-  var e = parseInt($("#product_purchase").val());
+  var v = parseFloat($("#product_price").val());
+  var p = parseInt($("#salePercent").val());
+  var e = parseFloat($("#product_purchase").val());
   if(e){ //v and e yield p
     $("#salePercent").val(Math.round((-1 + v/e) * 10000) / 100);
   } else if(p){ //v and b yield e
@@ -725,9 +739,9 @@ $("#product_price").on("keyup", function(){
 });
 
 $("#salePercent").on("keyup", function(){
-  var v = parseInt($("#product_price").val());
-  var p = parseFloat($("#salePercent").val());
-  var e = parseInt($("#product_purchase").val());
+  var v = parseFloat($("#product_price").val());
+  var p = parseInt($("#salePercent").val());
+  var e = parseFloat($("#product_purchase").val());
   if(e){ //yields v
     $("#product_price").val(Math.round(100 * e + e*p) / 100);
   } else if(v){
@@ -736,9 +750,9 @@ $("#salePercent").on("keyup", function(){
 });
 
 $("#product_purchase").on("keyup", function(){
-  var v = parseInt($("#product_price").val());
-  var p = parseFloat($("#salePercent").val());
-  var e = parseInt($("#product_purchase").val());
+  var v = parseFloat($("#product_price").val());
+  var p = parseInt($("#salePercent").val());
+  var e = parseFloat($("#product_purchase").val());
   if(p){
     $("#product_price").val(Math.round(100 * e + e*p) / 100);
   }else if(v){
