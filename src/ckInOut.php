@@ -30,14 +30,14 @@ function checkIn($userID) {
 
 function checkOut($userID) {
   require 'connection.php';
-  $query = "SELECT time, timeEnd, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
+  $query = "SELECT time, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
   $result= mysqli_query($conn, $query);
   $row = $result->fetch_assoc();
 
   $indexIM = $row['indexIM'];
   $start = $row['time'];
 
-  $sql = "UPDATE $logTable SET timeEND = UTC_TIMESTAMP WHERE indexIM = $indexIM;";
+  $sql = "UPDATE $logTable SET timeEnd = UTC_TIMESTAMP WHERE indexIM = $indexIM;";
   $conn->query($sql);
 
   $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $userID AND endDate IS NULL");
@@ -46,7 +46,7 @@ function checkOut($userID) {
   $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = $userID");
   $row_canBook = $result->fetch_assoc();
   //add break if user cannot book, and was here long enough
-  if($row_canBook['canBook'] == 'FALSE' && timeDiff_Hours($row['time'], $row['timeEnd']) > $interval_row['pauseAfterHours'] && $interval_row['hoursOfRest'] > 0){
+  if($row_canBook['canBook'] == 'FALSE' && timeDiff_Hours($row['time'], getCurrentTimestamp()) > $interval_row['pauseAfterHours'] && $interval_row['hoursOfRest'] > 0){
     $minutesOfRest = $row['hoursOfRest'] * 60;
     $result = $conn->query("SELECT $projectBookingTable.id FROM $projectBookingTable WHERE bookingType = 'break' AND timestampID = $indexIM AND TIMESTAMPDIFF(MINUTE, start, end) >= $minutesOfRest ");
     //no existing lunchbreak found

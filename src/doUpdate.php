@@ -1372,6 +1372,13 @@ if($row['version'] < 95){
   } else {
     echo '<br>'.$conn->error;
   }
+
+  $sql = "ALTER TABLE companyData ADD COLUMN erpStart INT(5)";
+  if($conn->query($sql)){
+    echo '<br>Save beginning of next ERP number';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 

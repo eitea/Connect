@@ -63,6 +63,7 @@ FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER
 WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
 
+
 <table class="table table-hover">
   <thead>
     <th>ID</th>
@@ -116,11 +117,11 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         echo '<td>'.$row['clientName'].'</td>';
         $balance = 0;
         if($transitable){
-          echo '<td><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
+          echo '<td><form method="POST"><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
           echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
           echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
           echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
-          echo '</ul></div></td>';
+          echo '</ul></div></form></td>';
             $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
             while($rowB = $result_b->fetch_assoc()){
               $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);

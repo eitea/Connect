@@ -13,8 +13,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $conn->query($sql);
       echo mysqli_error($conn);
     }
-  }
-  if(isset($_POST['delete_logo'])){
+  } elseif(isset($_POST['delete_logo'])){
     if(!mysqli_error($conn)){
       $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
     }
@@ -33,8 +32,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($filename).'</div>';
     }
-  }
-  if(isset($_POST['general_save'])){
+  } elseif(isset($_POST['general_save'])){
     function max4Lines($str){
       $str = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $str);
       while(substr_count($str, "\n") > 3){
@@ -57,8 +55,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
       detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city' WHERE id = $cmpID");
     echo mysqli_error($conn);
-  }
-  if(isset($_POST['createNewProject']) && !empty($_POST['name'])){
+  } elseif(isset($_POST['createNewProject']) && !empty($_POST['name'])){
    $name = test_input($_POST['name']);
    if(isset($_POST['status'])){
      $status = "checked";
