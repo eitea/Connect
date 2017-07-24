@@ -110,8 +110,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      }
    }
    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+ } elseif(isset($_POST['save_erp_numbers'])){
+   $erp_ang = abs(intval($_POST['erp_ang']));
+   $erp_aub = abs(intval($_POST['erp_aub']));
+   $erp_re = abs(intval($_POST['erp_re']));
+   $erp_lfs = abs(intval($_POST['erp_lfs']));
+   $erp_gut = abs(intval($_POST['erp_gut']));
+   $erp_stn = abs(intval($_POST['erp_stn']));
+   $conn->query("UPDATE erpNumbers SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn WHERE companyID = $cmpID");
+   if($conn->error){ echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; } else {
+     echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+   }
  }
-
  if(isset($_POST['hire']) && isset($_POST['hiring_userIDs'])){
    foreach($_POST['hiring_userIDs'] as $i){
      $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES ($cmpID, $i)");
@@ -124,8 +134,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    }
    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
  }
-
-
  if(isset($_POST['save_additional_fields'])){
    for($i = 1; $i < 4; $i++){
      //linear mapping of f(x) = x*3 -2; f1(x) = f(x) + 1; f2(x) = f1(x)+1;
@@ -175,6 +183,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
    }
  }
+
 }
 $result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
@@ -691,8 +700,59 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       </div>
     </div>
   </div>
+</form><br>
+
+<!-- ERP NUMBERS -->
+<?php
+$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$row = $result->fetch_assoc();
+?>
+<form method="POST" class="page-seperated-section">
+  <h4>ERP <?php echo $lang['SETTINGS']; ?><a role="button" data-toggle="collapse" href="#erp_number_info"><i class="fa fa-info-circle"></i></a>
+    <div class="page-header-button-group">
+      <button type="submit" class="btn btn-default" name="save_erp_numbers"><i class="fa fa-floppy-o"></i></button>
+    </div>
+  </h4>
+  <div class="container-fluid">
+    <br>
+    <div class="collapse" id="erp_number_info">
+      <div class="well">
+        Festsetzen der kleinsten Nummer des nächsten Auftrags. <br>
+        Aufträge werden fortlaufend nummeriert, beginnend von der höchsten, bereits vorhandenen Zahl, welche zum ausgewählten Vorgang und jeweiligen Mandanten passt. <br>
+        Dieser sog. mindest-Offset kann hier zustäzlich eingestellt werden.
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></label>
+        <input type="number" class="form-control" name="erp_ang" value="<?php echo $row['erp_ang']; ?>" min="1"/>
+    </div>
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></label>
+        <input type="number" class="form-control" name="erp_aub" value="<?php echo $row['erp_aub']; ?>" min="1"/>
+    </div>
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></label>
+        <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></label>
+        <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
+    </div>
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['GUT']; ?></label>
+        <input type="number" class="form-control" name="erp_gut" value="<?php echo $row['erp_gut']; ?>" min="1"/>
+    </div>
+    <div class="col-md-4">
+      <label><?php echo $lang['PROPOSAL_TOSTRING']['STN']; ?></label>
+        <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
+    </div>
+  </div>
+  <br>
 </form>
+
 <?php endif;?>
-</div>
-<!-- /BODY -->
+</div> <!-- /page-seperated-body -->
 <?php include 'footer.php'; ?>

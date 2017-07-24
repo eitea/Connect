@@ -94,6 +94,8 @@ $conn->query($sql);
 //insert ldap config
 $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
 $conn->query($sql);
+//insert ERP numbers
+$conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
 
 //insert holidays
 $holidayFile = 'Feiertage.txt';
