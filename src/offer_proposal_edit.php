@@ -21,7 +21,7 @@ if(!empty($_POST['proposalID'])){
   $row = $result->fetch_assoc();
 
   $offset = $row['erp_'.strtolower($process)];
-  if($offset == 0) $offset++;
+  if($offset < 1) $offset = 1;
   $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
   if($row = $result->fetch_assoc()){
     $filterings['number'] = getNextERP($process, $row['companyID'], $offset-1);
