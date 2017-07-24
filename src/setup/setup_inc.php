@@ -486,269 +486,284 @@ function create_tables($conn){
     expiration ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     expirationDuration INT(3) DEFAULT 3,
     expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE mailingOptions(
-      host VARCHAR(50),
-      username VARCHAR(50),
-      password VARCHAR(50),
-      port VARCHAR(50),
-      smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
-      sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
-      enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE mailingOptions(
+    host VARCHAR(50),
+    username VARCHAR(50),
+    password VARCHAR(50),
+    port VARCHAR(50),
+    smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
+    sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
+    enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE templateData(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100),
-      repeatCount VARCHAR(50),
-      htmlCode TEXT,
-      userIDs VARCHAR(200)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE templateData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    repeatCount VARCHAR(50),
+    htmlCode TEXT,
+    userIDs VARCHAR(200)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE mailReports(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      reportID INT(6) UNSIGNED,
-      email VARCHAR(50) NOT NULL,
-      FOREIGN KEY (reportID) REFERENCES templateData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)){
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE mailReports(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reportID INT(6) UNSIGNED,
+    email VARCHAR(50) NOT NULL,
+    FOREIGN KEY (reportID) REFERENCES templateData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
 
-    /*
-    * cOnDate is Date this correction was created On
-    * createdOn defines Month this corrections accounts for
-    * (used names were swapped by mistake.)
-    */
-    $sql = "CREATE TABLE correctionData(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      userID INT(6) UNSIGNED,
-      hours DECIMAL(6,2),
-      infoText VARCHAR(350),
-      addOrSub ENUM('1', '-1') NOT NULL,
-      cOnDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-      createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      cType VARCHAR(10) NOT NULL DEFAULT 'log',
-      FOREIGN KEY (userID) REFERENCES UserData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)){
-      echo mysqli_error($conn);
-    }
+  /*
+  * cOnDate is Date this correction was created On
+  * createdOn defines Month this corrections accounts for
+  * (used names were swapped by mistake.)
+  */
+  $sql = "CREATE TABLE correctionData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    hours DECIMAL(6,2),
+    infoText VARCHAR(350),
+    addOrSub ENUM('1', '-1') NOT NULL,
+    cOnDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    createdOn DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cType VARCHAR(10) NOT NULL DEFAULT 'log',
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE intervalData(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      endDate DATETIME DEFAULT NULL,
-      mon DECIMAL(4,2) DEFAULT 8.5,
-      tue DECIMAL(4,2) DEFAULT 8.5,
-      wed DECIMAL(4,2) DEFAULT 8.5,
-      thu DECIMAL(4,2) DEFAULT 8.5,
-      fri DECIMAL(4,2) DEFAULT 4.5,
-      sat DECIMAL(4,2) DEFAULT 0,
-      sun DECIMAL(4,2) DEFAULT 0,
-      vacPerYear INT(2) DEFAULT 25,
-      overTimeLump DECIMAL(5,2) DEFAULT 0.0,
-      pauseAfterHours DECIMAL(4,2) DEFAULT 6,
-      hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
-      userID INT(6) UNSIGNED,
-      FOREIGN KEY (userID) REFERENCES UserData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)){
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE intervalData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    endDate DATETIME DEFAULT NULL,
+    mon DECIMAL(4,2) DEFAULT 8.5,
+    tue DECIMAL(4,2) DEFAULT 8.5,
+    wed DECIMAL(4,2) DEFAULT 8.5,
+    thu DECIMAL(4,2) DEFAULT 8.5,
+    fri DECIMAL(4,2) DEFAULT 4.5,
+    sat DECIMAL(4,2) DEFAULT 0,
+    sun DECIMAL(4,2) DEFAULT 0,
+    vacPerYear INT(2) DEFAULT 25,
+    overTimeLump DECIMAL(5,2) DEFAULT 0.0,
+    pauseAfterHours DECIMAL(4,2) DEFAULT 6,
+    hoursOfRest DECIMAL(4,2) DEFAULT 0.5,
+    userID INT(6) UNSIGNED,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE teamData (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(60),
-      companyID INT(6) UNSIGNED,
-      FOREIGN KEY (companyID) REFERENCES companyData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)){
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE teamData (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(60),
+    companyID INT(6) UNSIGNED,
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE teamRelationshipData (
-      teamID INT(6) UNSIGNED,
-      userID INT(6) UNSIGNED,
-      FOREIGN KEY (teamID) REFERENCES teamData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE,
-      FOREIGN KEY (userID) REFERENCES UserData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE teamRelationshipData (
+    teamID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    FOREIGN KEY (teamID) REFERENCES teamData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE additionalFields (
-      id INT(6) UNSIGNED PRIMARY KEY,
-      companyID INT(6) UNSIGNED,
-      name VARCHAR(25) NOT NULL,
-      isActive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      isRequired ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      isForAllProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      description VARCHAR(50),
-      FOREIGN KEY (companyID) REFERENCES companyData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE additionalFields (
+    id INT(6) UNSIGNED PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    name VARCHAR(25) NOT NULL,
+    isActive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isRequired ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isForAllProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    description VARCHAR(50),
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE taskData(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
-      runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
-      description VARCHAR(200),
-      lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
-      callee VARCHAR(50) NOT NULL
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE taskData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
+    runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    description VARCHAR(200),
+    lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    callee VARCHAR(50) NOT NULL
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE proposals(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      id_number VARCHAR(10) NOT NULL,
-      clientID INT(6) UNSIGNED,
-      status ENUM('0', '1', '2'),
-      curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-      deliveryDate DATETIME,
-      yourSign VARCHAR(50),
-      yourOrder VARCHAR(50),
-      ourSign VARCHAR(50),
-      ourMessage VARCHAR(50),
-      daysNetto INT(4),
-      skonto1 DECIMAL(8,2),
-      skonto2 DECIMAL(8,2),
-      skonto1Days INT(4),
-      skonto2Days INT(4),
-      paymentMethod VARCHAR(100),
-      shipmentType VARCHAR(100),
-      representative VARCHAR(50),
-      porto DECIMAL(8,2),
-      portoRate INT(3),
-      history VARCHAR(100),
-      FOREIGN KEY (clientID) REFERENCES clientData(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE proposals(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_number VARCHAR(10) NOT NULL,
+    clientID INT(6) UNSIGNED,
+    status ENUM('0', '1', '2'),
+    curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deliveryDate DATETIME,
+    yourSign VARCHAR(50),
+    yourOrder VARCHAR(50),
+    ourSign VARCHAR(50),
+    ourMessage VARCHAR(50),
+    daysNetto INT(4),
+    skonto1 DECIMAL(8,2),
+    skonto2 DECIMAL(8,2),
+    skonto1Days INT(4),
+    skonto2Days INT(4),
+    paymentMethod VARCHAR(100),
+    shipmentType VARCHAR(100),
+    representative VARCHAR(50),
+    porto DECIMAL(8,2),
+    portoRate INT(3),
+    history VARCHAR(100),
+    FOREIGN KEY (clientID) REFERENCES clientData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE taxRates (
-      id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      description VARCHAR(200),
-      percentage INT(3)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE taxRates (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(200),
+    percentage INT(3)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE products(
-      id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      proposalID INT(6) UNSIGNED,
-      position INT(4),
-      name VARCHAR(50) NOT NULL,
-      description VARCHAR(600),
-      price DECIMAL(10,2),
-      unit VARCHAR(20),
-      quantity DECIMAL(8,2),
-      purchase DECIMAL(10,2),
-      taxPercentage INT(3),
-      cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      UNIQUE KEY (proposalID, position),
-      FOREIGN KEY (proposalID) REFERENCES proposals(id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE products(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    proposalID INT(6) UNSIGNED,
+    position INT(4),
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(600),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
+    quantity DECIMAL(8,2),
+    purchase DECIMAL(10,2),
+    taxPercentage INT(3),
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    UNIQUE KEY (proposalID, position),
+    FOREIGN KEY (proposalID) REFERENCES proposals(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE mixedInfoData(
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      timestampID INT(10) UNSIGNED,
-      status INT(3),
-      timeStart DATETIME,
-      timeEnd DATETIME,
-      isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-      FOREIGN KEY (timestampID) REFERENCES logs(indexIM)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE mixedInfoData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    status INT(3),
+    timeStart DATETIME,
+    timeEnd DATETIME,
+    isFillable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    FOREIGN KEY (timestampID) REFERENCES logs(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE articles (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(50),
-      description VARCHAR(600),
-      price DECIMAL(10,2),
-      unit VARCHAR(20),
-      taxPercentage INT(3),
-      cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-      purchase DECIMAL(10,2)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE articles (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    description VARCHAR(600),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
+    taxPercentage INT(3),
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    purchase DECIMAL(10,2)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE units (
-      id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(20) NOT NULL,
-      unit VARCHAR(10) NOT NULL
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE units (
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
+    unit VARCHAR(10) NOT NULL
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE paymentMethods (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE paymentMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE representatives (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(50)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE representatives (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
-    $sql = "CREATE TABLE shippingMethods (
-      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100)
-    )";
-    if (!$conn->query($sql)) {
-      echo mysqli_error($conn);
-    }
+  $sql = "CREATE TABLE shippingMethods (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
+  $sql = "CREATE TABLE erpNumbers(
+    companyID INT(6) UNSIGNED,
+    erp_ang INT(5) DEFAULT 1,
+    erp_aub INT(5) DEFAULT 1,
+    erp_re INT(5) DEFAULT 1,
+    erp_lfs INT(5) DEFAULT 1,
+    erp_gut INT(5) DEFAULT 1,
+    erp_stn INT(5) DEFAULT 1,
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 }
 
 ?>

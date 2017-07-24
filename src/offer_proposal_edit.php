@@ -15,10 +15,16 @@ if(!empty($_POST['proposalID'])){
   $filterings['proposal'] = intval($_POST['proposalID']);
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['client'] = intval($_POST['filterClient']);
-  $offset = isset($_POST['erp_offset']) ? intval($_POST['erp_offset']) : 2;
+  $process = $_POST['nERP'];
+
+  $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = ". intval($_POST['filterCompany']));
+  $row = $result->fetch_assoc();
+
+  $offset = $row['erp_'.strtolower($process)];
+  if($offset == 0) $offset++;
   $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
   if($row = $result->fetch_assoc()){
-    $filterings['number'] = getNextERP($_POST['nERP'], $row['companyID'], $offset-1);
+    $filterings['number'] = getNextERP($process, $row['companyID'], $offset-1);
   }
 } else { //other visits
   $filterings = $_SESSION['filterings'];
@@ -163,7 +169,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     WHERE a.name = p.name AND p.proposalID = ".$filterings['proposal']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   } elseif(isset($_POST['update_clientData']) && $filterings['client']){
-    $conn->query("UPDATE proposals p, clientInfoData c 
+    $conn->query("UPDATE proposals p, clientInfoData c
       SET p.daysNetto = c.daysNetto, p.skonto1 = c.skonto1, p.skonto1Days = c.skonto1Days, p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
       WHERE p.clientID = c.clientID AND p.id = ".$filterings['proposal']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}

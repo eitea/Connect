@@ -226,11 +226,6 @@ while($result && ($row = $result->fetch_assoc())):
               <option value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
             </select>
           </div>
-          <div class="col-sm-6"><br>
-            <label>Offset</label>
-            <input type="number" name="erp_offset" class="form-control" value="1" />
-            <small>Kleinster Zahlenwert der nächsten Nummer. Im Zweifelsfall bei 1 lassen.</small>
-          </div>
         </div>
       </div>
       <div class="modal-footer">

@@ -1373,12 +1373,25 @@ if($row['version'] < 95){
     echo '<br>'.$conn->error;
   }
 
-  $sql = "ALTER TABLE companyData ADD COLUMN erpStart INT(5)";
+  $sql = "CREATE TABLE erpNumbers(
+    companyID INT(6) UNSIGNED,
+    erp_ang INT(5) DEFAULT 1,
+    erp_aub INT(5) DEFAULT 1,
+    erp_re INT(5) DEFAULT 1,
+    erp_lfs INT(5) DEFAULT 1,
+    erp_gut INT(5) DEFAULT 1,
+    erp_stn INT(5) DEFAULT 1,
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
   if($conn->query($sql)){
-    echo '<br>Save beginning of next ERP number';
+    echo '<br>Create ERP numbers';
   } else {
     echo '<br>'.$conn->error;
   }
+
+  $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) SELECT 1, 1, 1, 1, 1, 1, id FROM companyData");
 }
 
 
@@ -1393,9 +1406,9 @@ $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
 ?>
 <script type="text/javascript">
-window.setInterval(function(){
-  window.location.href="home.php";
-}, 6000);
+  window.setInterval(function(){
+    window.location.href="home.php";
+  }, 6000);
 </script>
 <noscript>
   <meta http-equiv="refresh" content="0;url='.$url.'" />';
