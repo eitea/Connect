@@ -1,3 +1,6 @@
 Options +FollowSymLinks
 RewriteEngine On
+RewriteRule ^bootstrap - [L,NC] 
+RewriteRule ^plugins - [L,NC] 
+RewriteRule ^images - [L,NC] 
 RewriteRule ^(.*)$ index.php [QSA]
