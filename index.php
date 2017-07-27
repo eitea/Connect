@@ -1,4 +1,5 @@
 <?php
+
 $routes = array(
   'setup/run' => 'setup/setup_getInput.php',       'setup/create' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
@@ -38,10 +39,12 @@ if($l > 1){
     include 'src/'.$this_page;
   } elseif($params[$l -1] == 'ajaxQuery'){
     include 'src/'.$route;
+  } elseif(in_array($params[$l - 1], array('plugins', 'images', 'bootstrap')){
+    include $route;
   } else {
     header('HTTP/1.0 404 Not Found');
     include '404.html';
   }
 } else {
-  header('Location: /');
+  header('Location: /login/auth');
 }
