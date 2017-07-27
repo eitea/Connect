@@ -1,6 +1,6 @@
 <?php
-if(file_exists('../connection_config.php')){
-  header("Location: ../login.php");
+if(file_exists(dirname(__DIR__) . '/connection_config.php')){
+  //header("Location: ../login/auth");
 }
 ?>
 <!DOCTYPE html>
@@ -11,17 +11,16 @@ if(file_exists('../connection_config.php')){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-  <script src="../../plugins/jQuery/jquery-3.2.1.min.js"></script>
-  <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css"/>
+  <script src="/plugins/jQuery/jquery-3.2.1.min.js"></script>
+  <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css"/>
 
-  <link href="../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <script src="../../bootstrap/js/bootstrap.min.js"></script>
+  <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="/bootstrap/js/bootstrap.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../../plugins/select2/css/select2.min.css">
-  <script src='../../plugins/select2/js/select2.js'></script>
+  <link rel="stylesheet" type="text/css" href="/plugins/select2/css/select2.min.css">
+  <script src='/plugins/select2/js/select2.js'></script>
 
-  <link href="../../plugins/homeMenu/homeMenu.css" rel="stylesheet" />
-  <link href="<?php echo $css_file; ?>" rel="stylesheet" />
+  <link href="/plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <title>Connect</title>
   <script>
   document.onreadystatechange = function() {
@@ -53,7 +52,7 @@ if(file_exists('../connection_config.php')){
   </nav>
   <div class="collapse" id="infoDiv_collapse">
     <div class="well">
-      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include '../version_number.php'; echo $VERSION_TEXT; ?><br>
+      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include dirname(__DIR__).'/version_number.php'; echo $VERSION_TEXT; ?><br>
       The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
       the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
     </div>

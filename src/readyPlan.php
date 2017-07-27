@@ -20,7 +20,7 @@ if(!$row['enableReadyCheck'] && !$isAdmin){
   <tbody>
     <?php
     $today = substr(getCurrentTimestamp(),0,10);
-    $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY firstname ASC";
+    $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
     $result = $conn->query($sql);
     if($result && $result->num_rows > 0){
       while($row = $result->fetch_assoc()){
