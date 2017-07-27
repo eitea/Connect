@@ -29,17 +29,17 @@ $routes = array(
   'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php'
 );
 
-//url must end like this:  [root/] ACCESS / PAGE
+//url must end like this:  root/ ACCESS / PAGE
 $params = explode('/', $_SERVER['REQUEST_URI']);
 $l = count($params) -1 ;
-if($l > 1){
+if($l > 2){
   $route = strtok($params[$l - 1].'/'.$params[$l], '?');
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
   } elseif($params[$l -1] == 'ajaxQuery'){
     include 'src/'.$route;
-  } elseif(in_array($params[$l - 1], array('plugins', 'images', 'bootstrap'))){
+  } elseif(in_array($params[1], array('plugins', 'images', 'bootstrap'))){
     include $route;
   } else {
     header('HTTP/1.0 404 Not Found');
