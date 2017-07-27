@@ -167,7 +167,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <?php if($accept): ?>
   <script>
   var myForm = document.getElementById("setup_form");
-  myForm.action = "setup.php";
+  myForm.action = "create";
   myForm.submit();
   </script>
 <?php endif; ?>

@@ -1,6 +1,6 @@
 <?php
 if(file_exists(dirname(__DIR__) . '/connection_config.php')){
-  //header("Location: ../login/auth");
+  header("Location: ../login/auth");
 }
 ?>
 <!DOCTYPE html>
@@ -43,7 +43,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header hidden-xs">
-        <a class="navbar-brand" href="home.php">Connect</a>
+        <a class="navbar-brand" >Connect</a>
       </div>
       <div class="navbar-right">
         <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><strong>info</strong></a>
