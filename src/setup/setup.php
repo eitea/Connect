@@ -48,10 +48,10 @@ if(isset($_POST['adminPass'])){
 echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
 //create all tables
-require "setup_inc.php";
+require __DIR__ . "/setup_inc.php";
 create_tables($conn);
 
-require_once "../version_number.php";
+require_once dirname(__DIR__) . "/version_number.php";
 //------------------------------ INSERTS ---------------------------------------
 
 //insert main company
@@ -236,7 +236,7 @@ function icsToArray($paramUrl) {
 }
 
 //------------------------------------------------------------------------------
-echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login.php">Next</a>';
+echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="/login/auth">Next</a>';
 ?>
 
 <?php include 'footer.php'; ?>
