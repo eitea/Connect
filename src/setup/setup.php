@@ -10,22 +10,22 @@ $dbName = "'.test_input($_POST['dbName']).'";';
 fwrite($myfile, $txt);
 fclose($myfile);
 
-if(!file_exists('../connection_config.php')){
-  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="setup_getInput.php">Next</a></div>';
+if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="/setup/run">Next</a></div>';
 }
 require dirname(__DIR__) .'/connection_config.php';
 
 $conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {
   echo mysqli_error($conn);
-  echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
+  echo "<br>Connection Error: Could not Connect.<a href='/setup/runp'>Click here to return to previous page.</a><br>";
   die();
 }
 if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
   echo "Database was created. <br>";
 } else {
   echo mysqli_error($conn);
-  echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
+  echo "<br>Invalid Database name: Could not instantiate a database.<a href='/setup/run'>Return</a><br>";
   die();
 }
 
