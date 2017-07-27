@@ -56,11 +56,11 @@ $rowPiConnTable = $result->fetch_assoc();
 
 <form method=post>
   <div class="page-header">
-    <h3><?php echo $lang['ADVANCED_OPTIONS']; ?>  <div class="page-header-button-group"><button type="submit" class="btn btn-default" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3><?php echo $lang['ADVANCED_OPTIONS']; ?>  <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
   </div>
 
   <h4>GitHub</h4>
-  <div class="container">
+  <div class="container-fluid">
     <br>
     <div class="checkbox col-md-12">
       <input <?php if($rowGitHubTable['sslVerify'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='ssl' value='TRUE'>
@@ -71,7 +71,7 @@ $rowPiConnTable = $result->fetch_assoc();
   <br><hr><br>
 
   <h4>Terminal</h4>
-  <div class="container">
+  <div class="container-fluid">
     <br>
     <div class="input-group">
       <span class="input-group-addon"> User-Agent </span>
@@ -81,7 +81,7 @@ $rowPiConnTable = $result->fetch_assoc();
   <br><hr><br>
 
   <h4>Buffers</h4>
-  <div class="container">
+  <div class="container-fluid">
     <div class="container-fluid">
       <div class=col-md-6>
         Disable-time for In/Out Buttons:
@@ -97,7 +97,7 @@ $rowPiConnTable = $result->fetch_assoc();
   <br><hr><br>
 
   <h4>Display</h4>
-  <div class="container">
+  <div class="container-fluid">
     <br>
     <div class="checkbox col-md-12">
       <input <?php if($rowConfigTable['enableReadyCheck'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableReadyCheck' value='TRUE'>
@@ -108,7 +108,7 @@ $rowPiConnTable = $result->fetch_assoc();
   <br><hr><br>
 
   <h4>Self Registration</h4>
-  <div class="container">
+  <div class="container-fluid">
     <br>
     <div class="checkbox col-md-12">
       <input <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableReg' value='TRUE'>

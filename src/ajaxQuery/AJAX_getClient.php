@@ -1,5 +1,5 @@
 <?php
-require "../connection.php";
+require dirname(__DIR__)."/connection.php";
 
 $cmpID = intval($_GET['companyID']);
 

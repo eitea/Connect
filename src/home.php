@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<script src="../plugins/chartsjs/Chart.min.js"></script>
+<script src="/plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 <style>
 #statisticChart, #analysisChart{

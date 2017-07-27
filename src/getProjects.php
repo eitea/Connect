@@ -412,8 +412,8 @@ $(function () {
           if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
             echo "<div class='col-md-6'><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
-            if($filterCompany){
-              $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
+            if($filterings['company']){
+              $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
             }
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){
@@ -593,7 +593,7 @@ $(function () {
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo $lastBooking; ?>"/>
+              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value=""/>
               <span class="input-group-addon"> - </span>
               <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end"/>
             </div>

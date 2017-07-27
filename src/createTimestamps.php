@@ -144,6 +144,16 @@ function getNextERP($identifier, $companyID, $offset = 0){
   return $identifier . sprintf('%0'.(10-strlen($identifier)).'d', max($vals) +1);
 }
 
+function randomPassword($length = 8){
+  $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  $alphaLength = strlen($alphabet) - 1;
+  $psw = array();
+  for ($i = 0; $i < $length; $i++) {
+    $psw[] = $alphabet[rand(0, $alphaLength)];
+  }
+  return implode($psw);
+}
+
 /*
 echo $test=strtotime('2016-02-3 05:44:21');
 echo date('Y-m-d H:i:s', $test);

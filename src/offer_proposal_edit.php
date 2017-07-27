@@ -194,7 +194,7 @@ if($filterings['proposal']){
   $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
   $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
 } else {
-  redirect('offer_proposals.php?err=1');
+  redirect('view?err=1');
 }
 
 $_SESSION['filterings'] = $filterings; //save your filterings
@@ -204,7 +204,7 @@ $_SESSION['filterings'] = $filterings; //save your filterings
   <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$filterings['number'].'</small>'; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
-      <a href="editCustomer_detail.php?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+      <a href="../system/clientDetail?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
       <div class="btn-group">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Daten erneuern"><i class="fa fa-refresh"></i></a>
         <ul class="dropdown-menu">
@@ -215,7 +215,7 @@ $_SESSION['filterings'] = $filterings; //save your filterings
       <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
       <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
       <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
-      <a href="download_proposal.php?propID=<?php echo $filterings['proposal']; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a href="download?propID=<?php echo $filterings['proposal']; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
     </div>
   </h3>
 </div>
@@ -673,7 +673,7 @@ $pos = array_search($current_transition, $transitions);
 $bad = array_slice($transitions, 0, $pos);
 $bad[] = $transitions[$pos];
 ?>
-<form method="POST" action="offer_proposals.php">
+<form method="POST" action="view">
   <div class="modal fade choose-transition">
     <div class="modal-dialog modal-sm modal-content">
       <div class="modal-header">

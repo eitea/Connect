@@ -1,6 +1,6 @@
 <?php
 
-require "../connection.php";
+require dirname(__DIR__)."/connection.php";
 $p = 0;
 if(!empty($_GET['projectID'])){
   $p = $_GET['projectID'];

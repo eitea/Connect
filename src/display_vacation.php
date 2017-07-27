@@ -26,7 +26,7 @@ if(!$result || $result->num_rows <= 0){
   $curID = $userID; //do not let him change this via url
 }
 ?>
-<form method="post" id="form1" action="display_vacation.php">
+<form method="post" id="form1">
   <div class="row form-group">
     <?php if($display_all): ?>
     <div class="col-xs-3">

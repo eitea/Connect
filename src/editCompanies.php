@@ -19,7 +19,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
-    require "utilities.php";
+    require __DIR__ . "/utilities.php";
     $logo = uploadFile("fileToUpload", 1, 1);
     if(!is_array($logo)){
       $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID");
@@ -27,7 +27,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $stmt->bind_param("b", $null);
       $stmt->send_long_data(0, $logo);
       $stmt->execute();
-      if($stmt->errno){ echo $stmt->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
+      if($stmt->errno){ echo $stmt->error;} else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
       $stmt->close();
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($filename).'</div>';

@@ -63,7 +63,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo "<td>".$row['clientNumber']."</td>";
           echo '<td>';
           echo "<a class='btn btn-default' title='Edit' data-toggle='modal' data-target='.edit-client-$i'><i class='fa fa-pencil'></i></a> ";
-          echo "<a class='btn btn-default' title='Details' href='editCustomer_detail.php?custID=$i'><i class='fa fa-arrow-right'></i></a>";
+          echo "<a class='btn btn-default' title='Details' href='../system/clientDetail?custID=$i'><i class='fa fa-arrow-right'></i></a>";
           echo '</td>';
           echo '</tr>';
         }

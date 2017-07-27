@@ -93,7 +93,7 @@ $row = $result->fetch_assoc();
   <div class="page-header">
     <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
       <div class="page-header-button-group">
-        <button type="submit" class="btn btn-default" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button>
+        <button type="submit" class="btn btn-default blinking" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button>
       </div>
     </h3>
   </div>

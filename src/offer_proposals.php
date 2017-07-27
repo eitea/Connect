@@ -63,7 +63,6 @@ FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER
 WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
 
-
 <table class="table table-hover">
   <thead>
     <th>ID</th>
@@ -135,9 +134,9 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         $style = $balance > 0 ? "style='color:#6fcf2c'" : "style='color:#facf1e'";
         if($showBalance == 'TRUE') echo "<td $style>".sprintf('%+.2f',$balance).' EUR</td>';
         echo '<td>';
-        echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
+        echo "<a href='download?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){
-          echo '<form method="POST" action="offer_proposal_edit.php" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
+          echo '<form method="POST" action="edit" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
           if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
           echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
         }
@@ -160,7 +159,7 @@ while($result && ($row = $result->fetch_assoc())):
   $bad = array_slice($transitions, 0, $pos);
   $bad[] = $transitions[$pos];
   ?>
-  <form method="POST" action="offer_proposal_edit.php">
+  <form method="POST" action="edit">
     <div class="modal fade choose-transition-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header">
@@ -209,7 +208,7 @@ while($result && ($row = $result->fetch_assoc())):
   </form>
 <?php endwhile; ?>
 
-<form method="POST" action="offer_proposal_edit.php">
+<form method="POST" action="edit">
   <div class="modal fade add_process">
     <div class="modal-dialog modal-md modal-content">
       <div class="modal-header"><h4><?php echo $lang['NEW_PROCESS']; ?></h4></div>

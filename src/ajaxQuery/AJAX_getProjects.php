@@ -1,5 +1,5 @@
 <?php
-require "../connection.php";
+require dirname(__DIR__)."/connection.php";
 $q = intval($_GET['clientID']);
 
 if(isset($_GET['projectID'])){

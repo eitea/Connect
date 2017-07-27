@@ -5,7 +5,7 @@ if(isset($_GET['articleID'])){
   die('Invalid Request');
 }
 
-require "../connection.php";
+require dirname(__DIR__)."/connection.php";
 $result = $conn->query("SELECT * FROM articles WHERE id = $articleID");
 $row = $result->fetch_assoc();
 echo implode('; ', $row);

@@ -1196,10 +1196,6 @@ if($row['version'] < 88){
 }
 
 if($row['version'] < 89){
-  $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
-  $conn->query("UPDATE deactivatedUserData vacPerYear = daysPerYear");
-  $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
-
   $sql = "ALTER TABLE products ADD COLUMN cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
   if($conn->query($sql)){
     echo '<br> Added expenses in cash checkbox';
@@ -1390,12 +1386,15 @@ if($row['version'] < 95){
   } else {
     echo '<br>'.$conn->error;
   }
-
   $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) SELECT 1, 1, 1, 1, 1, 1, id FROM companyData");
 }
 
 
-//if($row['version'] < 96){}
+if($row['version'] < 96){
+  $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
+  $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
+  $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
+}
 //if($row['version'] < 97){}
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}

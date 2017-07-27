@@ -168,7 +168,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 
 function uploadFile($file_field = null, $check_image = true, $random_name = false) {
   //Config
-  $path = '../images/ups/'; //with trailing slash
+  $path = '/images/ups/'; //with trailing slash
   $max_size = 5000000; //in bytes
   //Set default file extension whitelist
   $whitelist_ext = array('jpeg','jpg','png');

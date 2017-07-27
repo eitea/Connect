@@ -1,5 +1,5 @@
 <?php
-require "../connection.php";
+require dirname(__DIR__)."/connection.php";
 $q = intval($_GET['q']);
 $sql="SELECT * FROM $bookingTable WHERE userID = $q";
 $result = mysqli_query($conn,$sql);

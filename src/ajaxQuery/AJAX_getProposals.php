@@ -1,6 +1,6 @@
 <?php
-require "../connection.php";
-require_once "../language.php";
+require dirname(__DIR__)."/connection.php";
+require_once dirname(__DIR__)."/language.php";
 $clientID = intval($_GET['client']);
 
 if(isset($_GET['p'])){
