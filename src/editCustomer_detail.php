@@ -304,7 +304,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </thead>
         <tbody>
           <?php
-          $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $detailID");
+          $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $filterClient");
           while($row_p = $result_p->fetch_assoc()){
             $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
             echo '<tr>';
