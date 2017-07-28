@@ -98,7 +98,7 @@ $conn->query($sql);
 $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
 
 //insert holidays
-$holidayFile = 'Feiertage.txt';
+$holidayFile = __DIR__ . '/Feiertage.txt';
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
   if($holidayFile[$i]['BEGIN'] == 'VEVENT'){
@@ -117,7 +117,7 @@ if (!$conn->query($sql)) {
 }
 
 //insert travelling expenses
-$travellingFile = fopen("Laender.txt", "r");
+$travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
 if ($travellingFile) {
     while (($line = fgets($travellingFile)) !== false) {
       $line = iconv('UTF-8', 'windows-1252', $line);

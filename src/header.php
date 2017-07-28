@@ -314,7 +314,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post'><br>
+              <form method='post' action="../user/home"><br>
                 <?php
                 echo $checkInButton;
                 if($diff > 0)
