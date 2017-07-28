@@ -547,7 +547,7 @@ $(function () {
                 $row = $result->fetch_assoc();
                 $query = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")";
                 $result = mysqli_query($conn, $query);
-                if ($result && $result->num_rows > 1) {
+                if ($result && $result->num_rows > 0) {
                   while ($row = $result->fetch_assoc()) {
                     echo "<option value='".$row['id']."'>".$row['name']."</option>";
                   }

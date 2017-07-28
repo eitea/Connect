@@ -67,7 +67,7 @@ if($isTimeAdmin){
   }
   $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
   $available_companies = array('-1'); //care
-  while($result && ($row= $result->fetch_assoc())){
+  while($result && ($row = $result->fetch_assoc())){
     $available_companies[] = $row['companyID'];
   }
   $result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(".implode(', ', $available_companies).") OR $userID = 1");
@@ -537,7 +537,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         if($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php")){
           echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         }
-        if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepresentative.php"){
+        if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
           echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
           echo "<script>$('#adminOption_ERP').click();</script>";
