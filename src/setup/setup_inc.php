@@ -633,7 +633,7 @@ function create_tables($conn){
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_number VARCHAR(10) NOT NULL,
     clientID INT(6) UNSIGNED,
-    status ENUM('0', '1', '2'),
+    status INT(2),
     curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     deliveryDate DATETIME,
     yourSign VARCHAR(50),
