@@ -26,7 +26,8 @@ function create_tables($conn){
     kmMoney DECIMAL(4,2) DEFAULT 0.42,
     emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
     color VARCHAR(10) DEFAULT 'default',
-    real_email VARCHAR(50)
+    real_email VARCHAR(50),
+    erpOption VARCHAR(10) DEFAULT 'TRUE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -211,6 +212,7 @@ function create_tables($conn){
     requestText VARCHAR(150),
     answerText VARCHAR(150),
     requestID INT(10) DEFAULT 0,
+    timeToUTC INT(2) DEFAULT 0,
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

@@ -30,8 +30,7 @@ if(!$result || $result->num_rows <= 0){
   echo '</div>';
 }
 $result = $conn->query("SELECT erpOption FROM UserData WHERE id = $userID");
-$row = $result->fetch_assoc();
-$showBalance = $row['erpOption'];
+if($row = $result->fetch_assoc()){ $showBalance = $row['erpOption'];} else { $showBalance = 'FALSE'; }
 ?>
 
 <div class="page-header">
