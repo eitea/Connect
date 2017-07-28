@@ -34,7 +34,7 @@
 
     echo implode('<br>', $output);
     session_destroy();
-    echo "<br><br><a href='login.php' class='btn btn-warning'>O.K & Continue</a></form>";
+    echo "<br><br><a href='../login/auth' class='btn btn-warning'>O.K & Continue</a></form>";
 
     die($lang['LOGOUT_MESSAGE']);
   }

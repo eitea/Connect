@@ -177,8 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $conn->query($sql);
             }
           }
-          echo mysqli_error($conn);
-          //redirect('users');
+          if($conn->error){ echo $conn->error; } else {redirect('users');}
         }
       }
     }

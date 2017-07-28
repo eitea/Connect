@@ -96,6 +96,8 @@ $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)
 $conn->query($sql);
 //insert ERP numbers
 $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+//insert mail options
+$conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
 
 //insert holidays
 $holidayFile = __DIR__ . '/Feiertage.txt';

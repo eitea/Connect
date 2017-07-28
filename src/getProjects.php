@@ -1,5 +1,5 @@
 <?php include 'header.php'; enableToProject($userID); ?>
-<?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
+<?php include __DIR__ . "/plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
 <style>
 .popover{
   max-width: 40%; /* Max Width of the popover (depending on the container!) */

@@ -9,12 +9,6 @@ if(isset($_POST['saveButton'])){
   $sql = "UPDATE $adminGitHubTable SET sslVerify = '$status'";
   $conn->query($sql);
 
-  if(isset($_POST['userAgent'])){
-    $status = $_POST['userAgent'];
-    $sql = "UPDATE $piConnTable SET header = '$status'";
-    $conn->query($sql);
-  }
-
   if(isset($_POST['cd'])){
     $cd = $_POST['cd'];
     $sql = "UPDATE $configTable SET cooldownTimer = '$cd';";
@@ -49,9 +43,6 @@ $rowGitHubTable = $result->fetch_assoc();
 
 $result = $conn->query("SELECT * FROM $configTable");
 $rowConfigTable = $result->fetch_assoc();
-
-$result = $conn->query( "SELECT * FROM $piConnTable");
-$rowPiConnTable = $result->fetch_assoc();
 ?>
 
 <form method=post>
@@ -67,16 +58,6 @@ $rowPiConnTable = $result->fetch_assoc();
       SSL Certificate Validation
     </div>
     <br>
-  </div>
-  <br><hr><br>
-
-  <h4>Terminal</h4>
-  <div class="container-fluid">
-    <br>
-    <div class="input-group">
-      <span class="input-group-addon"> User-Agent </span>
-      <input type=text class="form-control" name="userAgent" value="<?php echo $rowPiConnTable['header']; ?>" >
-    </div>
   </div>
   <br><hr><br>
 
