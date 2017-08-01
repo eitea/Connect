@@ -51,7 +51,7 @@ while($result && ($row = $result->fetch_assoc())){
 }
 
 $showUndoButton = $showEmergencyUndoButton = 0;
-$missing_highlights = $insertInfoText = $insertInternInfoText = '';
+$missing_highlights = $insertInfoText = $insertInternInfoText = $field_1 = $field_2 = $field_3 = '';
 $keepFields = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -59,14 +59,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     die("Bot detected. Aborting all Operations.");
   }
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+  if(isset($_POST["add"]) && isset($_POST['end'])){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
     $endDate = $date." ".$_POST['end'];
     $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-    $insertInfoText = test_input($_POST['infoText']);
+    $insertInfoText = test_input(trim($_POST['infoText']));
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           } else {
             $field_3 = 'NULL';
           }
-          if($accept){
+          if($accept && $insertInfoText){
             if(isset($_POST['addDrive'])){
               $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
@@ -433,12 +433,16 @@ function showMyDiv(o, toShow){
 }
 </script>
 
-<?php if($keepFields && isset($_POST['filterClient'])){ //unsuccessfull event
-  echo '<script> showProjects('.$_POST['filterClient'].', '.$projectID.'); showProjectfields('.$projectID.');';
-  echo '$("#pro_field_1").val("'.$field_1.'");';
-  echo '$("#pro_field_2").val("'.$field_2.'");';
-  echo '$("#pro_field_3").val("'.$field_3.'");';
-  echo '</script>';
+<?php if($keepFields && isset($_POST['filterClient']) && isset($_POST['filterProject'])){ //unsuccessfull event
+  echo '<script>
+        showProjects('.$_POST['filterClient'].', '.$_POST['filterProject'].');
+        showProjectfields('.$_POST['filterProject'].');
+        setTimeout(function() {
+          $("#pro_field_1").val("'.$field_1.'");
+          $("#pro_field_2").val("'.$field_2.'");
+          $("#pro_field_3").val("'.$field_3.'");
+        }, 1500);
+        </script>';
 }
 ?>
 
