@@ -205,7 +205,7 @@ if($isTimeAdmin){
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header hidden-xs">
-          <a class="navbar-brand" href="../user/home" style="width: 220px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="/images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
+          <a class="navbar-brand" href="../user/home" style="width: 230px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="/images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
         </div>
         <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
           <ul class="nav navbar-nav" style="margin:10px">
