@@ -25,7 +25,7 @@ class LogCalculator{
   }
 
   public function calculateValues(){
-    require "connection.php";
+    require dirname(__DIR__)."/connection.php";
     $curID = $this->id;
     $is_corrected = 0;
     $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate, $userTable.beginningDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id  WHERE userID = $curID");

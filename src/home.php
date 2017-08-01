@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<script src="../plugins/chartsjs/Chart.min.js"></script>
+<script src="/plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 <style>
 #statisticChart, #analysisChart{
@@ -110,11 +110,13 @@ $(function(){
       datasets: [{
         label: "Mittel",
         backgroundColor: [
-          'rgba(251, 231, 54, 0.5)',
-          'rgba(189, 209, 71, 0.5)',
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(90, 163, 231, 0.5)',
-          'rgba(154, 125, 210, 0.5)'
+          <?php
+          if($_SESSION['color'] == 'dark'){
+            echo "'#6D6D6D', '#A3F375', '#6D6D6D', '#A3F375', '#6D6D6D', '#A3F375', '#6D6D6D'";
+          } else {
+            echo "'rgba(251, 231, 54, 0.5)', 'rgba(189, 209, 71, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(90, 163, 231, 0.5)', 'rgba(154, 125, 210, 0.5)'";
+          }
+          ?>
         ],
         data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
       }
@@ -135,10 +137,13 @@ $(function(){
       datasets: [{
         data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],
         backgroundColor: [
-          "#fba636",
-          "#75bdee",
-          "#828282",
-          "#7fcb51"
+          <?php
+          if($_SESSION['color'] == 'dark'){
+            echo "'#A3F375', '#75bdee', '#DDDDDD', '#6D6D6D'";
+          } else {
+            echo "'#fba636', '#75bdee', '#828282', '#7fcb51' ";
+          }
+          ?>
         ]
       }]
     },

@@ -20,7 +20,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 <form method="POST">
   <div class="page-header">
-    <h3><?php echo $lang['TAX_RATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3><?php echo $lang['TAX_RATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3>
   </div>
   <table class="table table-hover">
     <thead>

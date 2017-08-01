@@ -48,17 +48,47 @@ echo mysqli_error($conn);
           <?php
           $userResult = $conn->query("SELECT id, firstname, lastname FROM $userTable JOIN $teamRelationshipTable ON userID = id WHERE teamID = $teamID");
           while($userResult && ($userRow = $userResult->fetch_assoc())){
-            echo '<div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeMember" value="'.$teamID.' '.$userRow['id'].'"><img width="10px" height="10px" src="../images/minus_circle.png"></button>';
+            echo '<div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeMember" value="'.$teamID.' '.$userRow['id'].'"><img width="10px" height="10px" src="/images/minus_circle.png"></button>';
             echo $userRow['firstname'].' '.$userRow['lastname'] . '</div>';
           }
           echo mysqli_error($conn);
           ?>
-          <div class="col-md-12 text-right"><a class="btn btn-default" href="teamConfig_addMembers.php?tm=<?php echo $teamID; ?>">+</a></div>
+          <div class="col-md-12 text-right"><a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">+</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade addTeamMember_<?php echo $teamID; ?>">
+      <div class="modal-dialog modal-content modal-md">
+        <div class="modal-header"></div>
+        <div class="modal-body">
+          <table class="table table-hover">
+            <thead>
+              <th>Select</th>
+              <th>Name</th>
+            </thead>
+            <tbody>
+              <?php
+              $sql = "SELECT id, firstname, lastname FROM $userTable WHERE id NOT IN (SELECT DISTINCT userID FROM $teamRelationshipTable WHERE teamID = $teamID)";
+              $res_addmem = mysqli_query($conn, $sql);
+              while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
+                echo '<tr>';
+                echo '<td><input type="checkbox" name="userIDs[]" value="'.$row_addmem['id'].'" ></td>';
+                echo '<td>'.$row_addmem['firstname'].' '. $row_addmem['lastname'] .'</td>';
+                echo '</tr>';
+              }
+              ?>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="hire" value="<?php echo $teamID; ?>">Benutzer einstellen</button>
         </div>
       </div>
     </div>
   <?php endwhile; ?>
-  </form>
+</form>
 </div>
 
 <form method="post">

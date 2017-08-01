@@ -13,7 +13,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn->query("INSERT INTO $companyTable (name, companyType) VALUES('$compaName', '$type')");
     $ins_id = mysqli_insert_id($conn);
     $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
-    if($conn->error){ echo $conn->error; } else { redirect("editCompanies.php?cmp=$ins_id"); }
+    if($conn->error){ echo $conn->error; } else { redirect("company?cmp=$ins_id"); }
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

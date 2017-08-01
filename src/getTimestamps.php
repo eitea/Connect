@@ -855,11 +855,7 @@ if($filterings['user']):
                       <option value="0">...</option>
                       <?php
                       while ($row = $result->fetch_assoc()) {
-                        $selected = '';
-                        if($filterings['company'] == $row['id']) {
-                          $selected = 'selected';
-                        }
-                        echo "<option $selected value='".$row['id']."'>".$row['name']."</option>";
+                        echo "<option value='".$row['id']."'>".$row['name']."</option>";
                       }
                       ?>
                     </select>

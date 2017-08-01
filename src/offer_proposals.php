@@ -30,8 +30,7 @@ if(!$result || $result->num_rows <= 0){
   echo '</div>';
 }
 $result = $conn->query("SELECT erpOption FROM UserData WHERE id = $userID");
-$row = $result->fetch_assoc();
-$showBalance = $row['erpOption'];
+if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption'];} else { $showBalance = 'FALSE'; }
 ?>
 
 <div class="page-header">
@@ -40,14 +39,14 @@ $showBalance = $row['erpOption'];
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add_process" title="<?php echo $lang['NEW_PROCESS']; ?>"><i class="fa fa-plus"></i></button>
       <form method="post" style="display:inline-block">
-      <?php
-      if($showBalance == 'TRUE'){
-        echo '<button type="submit" name="turnBalanceOff" class="btn btn-warning" title="Bilanz deaktivieren"><i class="fa fa-check"></i> Bilanz</button>';
-      } else {
-        echo '<button type="submit" name="turnBalanceOn" class="btn btn-default" title="Bilanz aktivieren"><i class="fa fa-times"></i> Bilanz</button>';
-      }
-      ?>
-    </form>
+        <?php
+        if($showBalance == 'TRUE'){
+          echo '<button type="submit" name="turnBalanceOff" class="btn btn-warning" title="Bilanz deaktivieren"><i class="fa fa-check"></i> Bilanz</button>';
+        } else {
+          echo '<button type="submit" name="turnBalanceOn" class="btn btn-default" title="Bilanz aktivieren"><i class="fa fa-times"></i> Bilanz</button>';
+        }
+        ?>
+      </form>
     </div>
   </h3>
 </div>
@@ -62,7 +61,6 @@ $result = $conn->query("SELECT proposals.*, clientData.name as clientName, compa
 FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
-
 
 <table class="table table-hover">
   <thead>
@@ -122,10 +120,10 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
           echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
           echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
           echo '</ul></div></form></td>';
-            $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
-            while($rowB = $result_b->fetch_assoc()){
-              $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
-            }
+          $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
+          while($rowB = $result_b->fetch_assoc()){
+            $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+          }
         } else {
           echo "<td>$status</td>";
         }
@@ -135,9 +133,9 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         $style = $balance > 0 ? "style='color:#6fcf2c'" : "style='color:#facf1e'";
         if($showBalance == 'TRUE') echo "<td $style>".sprintf('%+.2f',$balance).' EUR</td>';
         echo '<td>';
-        echo "<a href='download_proposal.php?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
+        echo "<a href='download?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){
-          echo '<form method="POST" action="offer_proposal_edit.php" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
+          echo '<form method="POST" action="edit" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
           if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
           echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
         }
@@ -160,7 +158,7 @@ while($result && ($row = $result->fetch_assoc())):
   $bad = array_slice($transitions, 0, $pos);
   $bad[] = $transitions[$pos];
   ?>
-  <form method="POST" action="offer_proposal_edit.php">
+  <form method="POST" action="edit">
     <div class="modal fade choose-transition-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header">
@@ -209,7 +207,7 @@ while($result && ($row = $result->fetch_assoc())):
   </form>
 <?php endwhile; ?>
 
-<form method="POST" action="offer_proposal_edit.php">
+<form method="POST" action="edit">
   <div class="modal fade add_process">
     <div class="modal-dialog modal-md modal-content">
       <div class="modal-header"><h4><?php echo $lang['NEW_PROCESS']; ?></h4></div>

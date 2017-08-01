@@ -1,7 +1,7 @@
 <?php require "header.php"; ?>
 <?php
 
-$myfile = fopen('../connection_config.php', 'w');
+$myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
 $txt = '<?php
 $servername = "'.test_input($_POST['serverName']).'";
 $username = "'.test_input($_POST['mysqlUsername']).'";
@@ -10,22 +10,22 @@ $dbName = "'.test_input($_POST['dbName']).'";';
 fwrite($myfile, $txt);
 fclose($myfile);
 
-if(!file_exists('../connection_config.php')){
-  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="setup_getInput.php">Next</a></div>';
+if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="/setup/run">Next</a></div>';
 }
-require '../connection_config.php';
+require dirname(__DIR__) .'/connection_config.php';
 
 $conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {
   echo mysqli_error($conn);
-  echo "<br>Connection Error: Could not Connect.<a href='setup_getInput.php'>Click here to return to previous page.</a><br>";
+  echo "<br>Connection Error: Could not Connect.<a href='/setup/runp'>Click here to return to previous page.</a><br>";
   die();
 }
 if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
   echo "Database was created. <br>";
 } else {
   echo mysqli_error($conn);
-  echo "<br>Invalid Database name: Could not instantiate a database.<a href='setup_getInput.php'>Return</a><br>";
+  echo "<br>Invalid Database name: Could not instantiate a database.<a href='/setup/run'>Return</a><br>";
   die();
 }
 
@@ -48,10 +48,10 @@ if(isset($_POST['adminPass'])){
 echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
 //create all tables
-require "setup_inc.php";
+require __DIR__ . "/setup_inc.php";
 create_tables($conn);
 
-require_once "../version_number.php";
+require_once dirname(__DIR__) . "/version_number.php";
 //------------------------------ INSERTS ---------------------------------------
 
 //insert main company
@@ -96,9 +96,11 @@ $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)
 $conn->query($sql);
 //insert ERP numbers
 $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+//insert mail options
+$conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
 
 //insert holidays
-$holidayFile = 'Feiertage.txt';
+$holidayFile = __DIR__ . '/Feiertage.txt';
 $holidayFile = icsToArray($holidayFile);
 for($i = 1; $i < count($holidayFile); $i++){
   if($holidayFile[$i]['BEGIN'] == 'VEVENT'){
@@ -117,7 +119,7 @@ if (!$conn->query($sql)) {
 }
 
 //insert travelling expenses
-$travellingFile = fopen("Laender.txt", "r");
+$travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
 if ($travellingFile) {
     while (($line = fgets($travellingFile)) !== false) {
       $line = iconv('UTF-8', 'windows-1252', $line);
@@ -236,7 +238,7 @@ function icsToArray($paramUrl) {
 }
 
 //------------------------------------------------------------------------------
-echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login.php">Next</a>';
+echo '<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="/login/auth">Next</a>';
 ?>
 
 <?php include 'footer.php'; ?>

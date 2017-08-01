@@ -79,7 +79,7 @@ if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription']
 $pdf = new PDF();
 
 //create the image and destroy it once we're done. For demacia.
-$logo_path = dirname(dirname(realpath("download_proposal.php")))."/images/ups/".str_replace(' ', '-',$row['companyName']).'.jpg';
+$logo_path = dirname(__DIR__)."/images/ups/".str_replace(' ', '-',$row['companyName']).'.jpg';
 file_put_contents($logo_path, $row['logo']) or die("Unable to create file");
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 if(finfo_file($finfo, $logo_path) == 'image/png'){

@@ -80,7 +80,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td><a href="display_vacation.php?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
+        echo '<tr><td><a href="../time/vacations?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
         echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>

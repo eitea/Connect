@@ -1,7 +1,9 @@
 /*  HEADER AND CONTENT  */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
 body{
   padding-top: 50px;
-  font: 13px/1.4 Geneva, 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+  font-family: 'Open Sans', 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
   margin-bottom:50px;
   overflow-x: hidden;
 }
@@ -16,6 +18,9 @@ body{
 }
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
+}
+.navbar-default .navbar-brand:hover {
+  color:#f0ad4e;
 }
 /* SIDEBAR */
 .panel-body .nav.navbar-nav {

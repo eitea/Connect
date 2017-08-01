@@ -1,19 +1,19 @@
 <?php
 //check if this is the first time this app runs
-if(file_exists('connection_config.php')){
+if(file_exists(__DIR__.'/connection_config.php')){
   session_start();
 } else {
-  header("Location: setup/setup_getInput.php");
+  header("Location: ../setup/run");
 }
 
-//TODO: put a brute-force stopper somewhere in here too
+//TODO: put a brute-force stopper somwhere here too
 if(!empty($_POST['captcha'])){
   die("");
 }
 
-require 'connection.php';
-require 'createTimestamps.php';
-include 'version_number.php';
+require __DIR__ .'/connection.php';
+require __DIR__ .'/createTimestamps.php';
+include __DIR__ .'/version_number.php';
 
 $invalidLogin = "";
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
@@ -32,7 +32,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     $_SESSION['color'] = $row['color'];
 
     //check for updates, if core admin
-    require "language.php";
+    require __DIR__ ."/language.php";
     $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
     $result = $conn->query($sql);
     if($result && $result->num_rows > 0){
@@ -40,11 +40,11 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();
       if($row['version'] < $VERSION_NUMBER){
-        redirect("doUpdate.php");
-        die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="doUpdate.php">update</a>');
+        redirect("../system/update");
+        die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="../system/update">update</a>');
       }
     }
-    redirect('home.php');
+    redirect('../user/home');
   } else {
     $invalidLogin = "Invalid Username/ Password!";
   }
@@ -61,13 +61,13 @@ if($result && $result->num_rows > 0){
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
-<link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet">
+<link href="/plugins/homeMenu/loginMenu.css" rel="stylesheet">
 <head>
   <title>Login</title>
 </head>
 <body>
   <div id="footer">
-    <form method="POST" action="login.php">
+    <form method="POST">
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus></input><br>
 
       <label for="pw">Password: </label> <input id="pw" type="password" name="password" value=""></input><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel"><br><br>

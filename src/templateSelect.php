@@ -9,7 +9,7 @@
 $templatePreview = "Click on a template above to preview it, or create a new one.";
 if(isset($_POST['prevTemplate'])){
   $tempelID = intval($_POST['prevTemplate']);
-  $templatePreview = "<iframe src='templatePreview.php?prevTemplate=$tempelID' style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>";
+  $templatePreview = "<iframe src='previewTem?prevTemplate=$tempelID' style='width:100%; border:none;' scrolling='no' onload='resizeIframe(this)'></iframe>";
 }
 if(isset($_POST['removeTemplate'])){
   $tempelID = $_POST['removeTemplate'];
@@ -60,14 +60,14 @@ if(isset($_POST['addRecipient'])){
         $result2 = $conn->query("SELECT * FROM $mailReportsRecipientsTable WHERE reportID = $templID");
         $recipients = "";
         while($result2 && ($row2 = $result2->fetch_assoc())){
-          $recipients .= '<button type="submit" style="background:none;border:none" name="removeRecipient" value="'.$row2['id'].'"><img width="10px" height="10px" src="../images/minus_circle.png"></button>'.$row2['email'] . '<br>';
+          $recipients .= '<button type="submit" style="background:none;border:none" name="removeRecipient" value="'.$row2['id'].'"><img width="10px" height="10px" src="/images/minus_circle.png"></button>'.$row2['email'] . '<br>';
         }
 
         echo '<tr>';
         echo '<td>';
         echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='#deleteUserModal$templID' title='Delete'> <i class='fa fa-trash-o'></i></button> ";
-        echo "<a href='templateDownload.php?id=$templID' target='_blank' class='btn btn-default' title='Export'> <i class='fa fa-download'></i></a> ";
-        echo "<a href='templateEdit.php?id=$templID' class='btn btn-default' title='Edit'> <i class='fa fa-pencil'></i></a> ";
+        echo "<a href='downloadTem?id=$templID' target='_blank' class='btn btn-default' title='Export'> <i class='fa fa-download'></i></a> ";
+        echo "<a href='editTemp?id=$templID' class='btn btn-default' title='Edit'> <i class='fa fa-pencil'></i></a> ";
         echo "<button type='submit' value='$templID' name='prevTemplate' class='btn btn-default' title='Preview'> <i class='fa fa-search'></i></button> ";
         echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='#addUserModal$templID' title='Select Userdata'> <i class='fa fa-user-plus'></i></button>";
         echo '</td>';

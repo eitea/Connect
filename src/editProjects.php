@@ -53,7 +53,7 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
       <button type="submit" class="btn btn-default" name='delete' title="<?php echo $lang['DELETE']; ?>" form="mainForm"><i class="fa fa-trash-o"></i></button>
-      <a href="editCustomers.php?<?php echo 'cmp='.$filterings['company'].'&custID='.$filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT']; ?>"><i class="fa fa-briefcase"></i></a>
+      <a href="../system/clients?<?php echo 'cmp='.$filterings['company'].'&custID='.$filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT']; ?>"><i class="fa fa-briefcase"></i></a>
     </div>
   </h3>
 </div>

@@ -90,7 +90,7 @@ $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType NOT I
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>
 <form method="POST">
-  <?php if($filterRequest) echo '<input type="hidden" name="filterRequest_all" value="1" />;' ?>
+  <?php if($filterRequest) echo '<input type="hidden" name="filterRequest_all" value="1" />' ?>
 <table class="table table-hover">
   <tr>
     <th><?php echo $lang['TYPE']; ?></th>

@@ -1,5 +1,5 @@
 <?php include 'header.php'; enableToProject($userID); ?>
-<?php include "../plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
+<?php include dirname(__DIR__) . "/plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
 <style>
 .popover{
   max-width: 40%; /* Max Width of the popover (depending on the container!) */
@@ -412,8 +412,8 @@ $(function () {
           if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
             echo "<div class='col-md-6'><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
-            if($filterCompany){
-              $sql = "SELECT * FROM $clientTable WHERE companyID = $filterCompany ORDER BY NAME ASC";
+            if($filterings['company']){
+              $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
             }
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){
@@ -547,7 +547,7 @@ $(function () {
                 $row = $result->fetch_assoc();
                 $query = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")";
                 $result = mysqli_query($conn, $query);
-                if ($result && $result->num_rows > 1) {
+                if ($result && $result->num_rows > 0) {
                   while ($row = $result->fetch_assoc()) {
                     echo "<option value='".$row['id']."'>".$row['name']."</option>";
                   }
@@ -593,7 +593,7 @@ $(function () {
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value="<?php echo $lastBooking; ?>"/>
+              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value=""/>
               <span class="input-group-addon"> - </span>
               <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end"/>
             </div>

@@ -24,7 +24,7 @@ if($result && ($row = $result->fetch_assoc())){
 
 <form method="POST">
   <div class="page-header">
-    <h3><?php echo $lang['TASK_SCHEDULER']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default" name="save_tasks"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3><?php echo $lang['TASK_SCHEDULER']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="save_tasks"><i class="fa fa-floppy-o"></i></button></div></h3>
   </div>
   <h4>E-Mail Report</h4><br>
   <div class="container-fluid">

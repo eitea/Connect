@@ -69,14 +69,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
-      if(isset($_POST['addBreak'])){ //break
+      if(isset($_POST['addBreak'])){
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
         $conn->query($sql);
         $insertInfoText = $insertInternInfoText = '';
         $showUndoButton = TRUE;
-      } else {
+      } else { //add drive or booking
         if(isset($_POST['addExpenses'])){
           $expenses_price = test_input($_POST['expenses_price']);
           $expenses_info = test_input($_POST['expenses_info']);
@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         if(!empty($_POST['filterProject'])){
           $projectID = test_input($_POST['filterProject']);
-          $accept = 'TRUE';
+          $accept = TRUE;
           if(isset($_POST['required_1'])){
             $field_1 = "'".test_input($_POST['required_1'])."'";
             if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
@@ -113,42 +113,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $field_3 = 'NULL';
           }
           if($accept){
-            if(isset($_POST['addDrive'])){ //add as driving time
+            if(isset($_POST['addDrive'])){
               $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             } else { //normal booking
               $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
             }
-            $conn->query($sql);
-            $insertInfoText = $insertInternInfoText = '';
-            $showUndoButton = TRUE;
-            if($request_addendum) redirect('userProjecting.php');
+            if($conn->query($sql)){
+              $insertInfoText = $insertInternInfoText = '';
+              $showUndoButton = TRUE;
+              if($request_addendum) redirect('book');
+            } else {
+              echo $conn->error;
+            }
           } else {
-            echo '<div class="alert alert-danger fade in">';
-            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-            echo '</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             $missing_highlights = 'required-field';
           }
         } else {
-          echo '<div class="alert alert-danger fade in">';
-          echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-          echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_SELECTION'];
-          echo '</div>';
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
         }
       }
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Error: </strong>'.$lang['ERROR_TIMES_INVALID'];
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
   } elseif(isset($_POST['add'])){
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-    echo '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     $missing_highlights = 'required-field';
   }
 }
@@ -335,8 +326,8 @@ endif;
       </div>
     </div>
   </div>
-  <!-- /SELECTS -->
 
+  <!-- EXPENSES -->
   <div id="hide_expenses" class="row" style="display:none">
     <br>
     <div class="col-md-2">
@@ -349,7 +340,7 @@ endif;
       <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
     </div>
   </div>
-
+<!-- TEXTAREAS -->
   <div class="row">
     <div class="col-md-8">
       <br><textarea class="form-control <?php echo $missing_highlights; ?> required-field-subtle" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInfoText; ?></textarea><br>
@@ -362,6 +353,7 @@ endif;
   <div id="project_fields" class="row">
   </div><br>
 
+<!-- HOURS -->
   <div class="row">
     <div class="col-md-6">
       <div class="input-group">

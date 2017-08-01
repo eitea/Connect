@@ -9,22 +9,14 @@ enableToCore($userID);
 
 require 'connection_config.php';
 
-//ENTER THE RELEVANT INFO BELOW
-$mysqlUserName      = $username;
-$mysqlPassword      = $password;
-$mysqlHostName      = $servername;
-$DbName             = $dbName;
-$backup_name        = $dbName."_".date('dmY_Hi', time());
-$tables             = array("mytable1","mytable2","mytable3"); //for specific tables
-
-
+$backup_name = $dbName."_".date('dmY_Hi', time());
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['start_Download'])){
     if(isset($_POST['setPassword']) && !empty($_POST['password'])){
-      Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,$tables=false,$backup_name,$_POST['password']);
+      Export_Database($servername,$username,$password,$dbName,$tables=false,$backup_name,$_POST['password']);
     } else {
-      Export_Database($mysqlHostName,$mysqlUserName,$mysqlPassword,$DbName,$tables=false,$backup_name);
+      Export_Database($servername,$username,$password,$dbName,$tables=false,$backup_name);
     }
   }
 }
@@ -96,7 +88,7 @@ fwrite($temp, $content);
 
 $zip = new ZipArchive();
 if ($zip->open($zip_name, ZIPARCHIVE::CREATE)!==TRUE) {
-  exit("cannot open <$zip_name>\n");
+  exit("cannot open $zip_name \n");
 }
 $zip->addFromString($backup_name, $content);
 $zip->close();

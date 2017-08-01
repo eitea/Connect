@@ -35,7 +35,7 @@ $row = $result->fetch_assoc();
 
 <form method=post>
   <div class="page-header">
-    <h3>E-mail <?php echo $lang['OPTIONS']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3>E-mail <?php echo $lang['OPTIONS']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
   </div>
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">

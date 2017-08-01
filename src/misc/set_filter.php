@@ -351,7 +351,7 @@ if(!empty($filterings['company'])){
   } else {
     $nextID = 0;
   }
-  echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.')';
+  echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
 }
 if(!empty($filterings['client'])){
   if(!empty($filterings['project'][0])){

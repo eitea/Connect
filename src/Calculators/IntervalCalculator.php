@@ -45,7 +45,7 @@ class Interval_Calculator{
     $i = $this->from;
     $id = $this->id;
 
-    require "connection.php";
+    require dirname(__DIR__). "/connection.php";
     $result = $conn->query("SELECT beginningDate, exitDate FROM $userTable WHERE id = $id");
     if($result && ($row = $result->fetch_assoc())){
       $this->beginDate = $beginDate = substr($row['beginningDate'],0,11).'00:00:00';

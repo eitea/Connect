@@ -16,7 +16,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   }
   $requestText = test_input($_POST['request_text']);
   if(test_Date($startTime)){
-    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeTOUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
+    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
     if($conn->query($sql)){
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     } else {
@@ -57,7 +57,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   <h3><?php echo $lang['MONTHLY_REPORT']; ?><div class="page-header-button-group"><?php include 'misc/set_filter.php'; ?></div></h3>
 </div>
 
-<table class="table table-striped">
+<table class="table table-hover datatable">
   <thead>
     <th><?php echo $lang['WEEKLY_DAY']?></th>
     <th><?php echo $lang['DATE']?></th>
@@ -128,7 +128,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
       if($calculator->indecesIM[$i]){
         $bookingResult = $conn->query("SELECT id FROM projectBookingData WHERE timestampID = ".$calculator->indecesIM[$i]);
         if($bookingResult && $bookingResult->num_rows > 0){
-          echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='.my-bookings-".$calculator->indecesIM[$i]."' ><i class='fa fa-file-text-o'></i></button>";
+          echo " <button type='button' class='btn btn-default' data-toggle='modal' data-target='.my-bookings-".$calculator->indecesIM[$i]."' ><i class='fa fa-file-text-o'></i></button>";
         }
       }
       echo '</td>';
@@ -268,7 +268,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
     minViewMode: "months"
   });
 
-  $('.table').DataTable({
+  $('.datatable').DataTable({
   order: [[ 1, "desc" ]],
   columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}],
   deferRender: true,

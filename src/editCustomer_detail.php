@@ -1,7 +1,7 @@
 <?php include "header.php"; require_once 'utilities.php'; enableToClients($userID); ?>
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
-  $filterClient = test_input($_GET['custID']);
+  $filterClient = intval($_GET['custID']);
 } else {
   redirect("editCustomer.php");
 }
@@ -236,7 +236,7 @@ if(!empty($_POST['saveAll'])){
     if(isset($_POST['createField_1'])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
     if(isset($_POST['createField_2'])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
     if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
-    $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($detailID, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
+    $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
   } elseif(isset($_POST['save'])){
     $activeTab = 'project';
@@ -254,7 +254,7 @@ if(!empty($_POST['saveAll'])){
   }
 }
 
-$result = $conn->query("SELECT name, companyID FROM $clientTable WHERE id = $detailID");
+$result = $conn->query("SELECT name, companyID FROM $clientTable WHERE id = $filterClient");
 $rowClient = $result->fetch_assoc();
 
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE id = $detailID");
@@ -304,7 +304,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         </thead>
         <tbody>
           <?php
-          $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $detailID");
+          $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $filterClient");
           while($row_p = $result_p->fetch_assoc()){
             $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
             echo '<tr>';

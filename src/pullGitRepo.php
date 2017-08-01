@@ -13,7 +13,7 @@
     $sql = "SELECT * FROM $adminGitHubTable WHERE sslVerify = 'TRUE'";
     $result = $conn->query($sql);
 
-    $repositoryPath = dirname(dirname(realpath("pullGitRepo.php")));
+    $repositoryPath =  dirname(__DIR__);
 
     if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable, else do nothing
       $command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
@@ -34,7 +34,7 @@
 
     echo implode('<br>', $output);
     session_destroy();
-    echo "<br><br><a href='login.php' class='btn btn-warning'>O.K & Continue</a></form>";
+    echo "<br><br><a href='../login/auth' class='btn btn-warning'>O.K & Continue</a></form>";
 
     die($lang['LOGOUT_MESSAGE']);
   }
