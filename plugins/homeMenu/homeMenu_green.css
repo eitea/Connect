@@ -3,7 +3,7 @@
 .btn-warning{
   background-color: #A3F375;
   color: #6D6D6D;
-  border:none;
+  border-color:#a5d688;
 }
 .btn-warning:hover, .btn-warning:disabled{
   background-color: #ace062;
@@ -79,14 +79,33 @@ a{
   border: 1px solid #A3F375;
   box-shadow: 0 0 2px #A3F375;
 }
-.required-field-subtle:focus{
-  border: 1px solid #A3F375;
-  box-shadow: 0 0 2px #A3F375;
-}
 
 .page-header{
-  color:#A3F375;
   padding:15px;
   margin: 0px -20px 20px;
   background-color:#a6a6a6;
+}
+
+.page-header > h3{
+  color:#A3F375;
+}
+
+.page-header > h3 > *{
+  color:#333;
+}
+
+#loader {
+  border-top: 16px solid #A3F375;
+}
+
+.active-link{
+  color: #A3F375 !important;
+}
+.active-link:hover{
+  color: #6d6d6d !important;
+}
+
+.input:focus{
+  border: 1px solid #A3F375;
+  box-shadow: 0 0 2px #A3F375;
 }

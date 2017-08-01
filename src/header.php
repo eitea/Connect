@@ -6,7 +6,7 @@ if(empty($_SESSION['userid'])){
 
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-$setActiveLink = 'class="color:#A3F375;"';
+$setActiveLink = 'class="active-link"';
 
 require __DIR__."/connection.php";
 require __DIR__."/createTimestamps.php";
@@ -136,14 +136,13 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = '/plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = '/plugins/homeMenu/homeMenu_green.css';
+    $css_file = '/plugins/homeMenu/homeMenu_green.css?v='.time();
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = '/plugins/homeMenu/homeMenu_dark.css';
   } else {
-
-     $css_file = '';
-   }
-  ?>
+    $css_file = '';
+  }
+?>
   <!DOCTYPE html>
   <html>
   <head>

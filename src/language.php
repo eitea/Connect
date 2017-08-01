@@ -677,6 +677,9 @@ $lang_ger['PAYMENT_METHODS'] = 'Zahlungsarten';
 $lang_eng['PDF_TEMPLATES'] = 'Pdf Templates';
 $lang_ger['PDF_TEMPLATES'] = 'Pdf Vorlagen';
 
+$lang_eng['PER_YEAR'] = ' per Year';
+$lang_ger['PER_YEAR'] = ' pro Jahr';
+
 $lang_eng['PHONE_NUMBER'] = 'Telephone Number';
 $lang_ger['PHONE_NUMBER'] = 'Telefonnummer';
 
@@ -861,7 +864,7 @@ $lang_eng['TIMES'] = 'Time';
 $lang_ger['TIMES'] = 'Zeit';
 
 $lang_eng['TIMETABLE'] = 'Timetable';
-$lang_ger['TIMETABLE'] = 'Stundenplan';
+$lang_ger['TIMETABLE'] = 'Wochenarbeitszeit';
 
 $lang_eng['TIMESTAMPS'] = 'Timestamps';
 $lang_ger['TIMESTAMPS'] = 'Zeitstempel';
@@ -937,17 +940,14 @@ Dabei sind die folgenden Regeln zu beachten: <ul>
 $lang_eng['VACATION'] = 'Vacation';
 $lang_ger['VACATION'] = 'Urlaub';
 
-$lang_eng['VACATION_DAYS_PER_YEAR'] = 'Vacation Days per Year';
-$lang_ger['VACATION_DAYS_PER_YEAR'] = 'Tage Urlaub im Jahr';
+$lang_eng['VACATION_DAYS'] = 'Vacation Days';
+$lang_ger['VACATION_DAYS'] = 'Urlaubstage';
 
 $lang_eng['VACATION_REPAIR'] = 'Repair Vacations';
 $lang_ger['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
 
 $lang_eng['VACATION_REQUESTS'] = 'Vacation Requests';
 $lang_ger['VACATION_REQUESTS'] = 'Urlaubsanfragen';
-
-$lang_eng['VACATION_WEEKS_PER_YEAR'] = 'Vacation Weeks per Year';
-$lang_ger['VACATION_WEEKS_PER_YEAR'] = 'Wochen Urlaub im Jahr';
 
 $lang_eng['VALID_PERIOD'] = 'Validity Period';
 $lang_ger['VALID_PERIOD'] = 'Gültigkeitszeitraum';
@@ -998,6 +998,9 @@ $lang_ger['WEEKLY_HOURS'] = 'Wochenstunden';
 
 $lang_eng['WITHIN'] = 'within';
 $lang_ger['WITHIN'] = 'innerhalb';
+
+$lang_eng['WORKING_HOURS'] = 'Working Hours';
+$lang_ger['WORKING_HOURS'] = 'Arbeitszeit';
 
 $lang_eng['YEAR'] = 'Year';
 $lang_ger['YEAR'] = 'Jahr';

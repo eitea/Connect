@@ -51,7 +51,8 @@ while($result && ($row = $result->fetch_assoc())){
 }
 
 $showUndoButton = $showEmergencyUndoButton = 0;
-$insertInfoText = $insertInternInfoText = $missing_highlights = '';
+$missing_highlights = $insertInfoText = $insertInternInfoText = '';
+$keepFields = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
@@ -73,9 +74,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
-        $conn->query($sql);
-        $insertInfoText = $insertInternInfoText = '';
-        $showUndoButton = TRUE;
+        if($conn->query($sql)){
+          $insertInfoText = $insertInternInfoText = '';
+          $showUndoButton = TRUE;
+        } else {
+          echo $conn->error;
+        }
       } else { //add drive or booking
         if(isset($_POST['addExpenses'])){
           $expenses_price = test_input($_POST['expenses_price']);
@@ -130,17 +134,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           } else {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             $missing_highlights = 'required-field';
+            $keepFields = TRUE;
           }
         } else {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+          $keepFields = TRUE;
         }
       }
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+      $keepFields = TRUE;
     }
   } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     $missing_highlights = 'required-field';
+    $keepFields = TRUE;
   }
 }
 
@@ -424,5 +432,14 @@ function showMyDiv(o, toShow){
   }
 }
 </script>
+
+<?php if($keepFields && isset($_POST['filterClient'])){ //unsuccessfull event
+  echo '<script> showProjects('.$_POST['filterClient'].', '.$projectID.'); showProjectfields('.$projectID.');';
+  echo '$("#pro_field_1").val("'.$field_1.'");';
+  echo '$("#pro_field_2").val("'.$field_2.'");';
+  echo '$("#pro_field_3").val("'.$field_3.'");';
+  echo '</script>';
+}
+?>
 
 <?php require_once 'footer.php'; ?>
