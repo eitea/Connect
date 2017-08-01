@@ -531,7 +531,7 @@ $(document).ready(function(){
                     <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/>
                   </div>
                   <div class="col-md-3">
-                    <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
+                    <?php echo $lang['VACATION_DAYS']. $lang['PER_YEAR']; ?>
                     <input type="number" class="form-control" name="daysPerYear<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
                   </div>
                 </div>
