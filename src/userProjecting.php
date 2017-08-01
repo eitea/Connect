@@ -326,8 +326,8 @@ endif;
       </div>
     </div>
   </div>
-  <!-- /SELECTS -->
 
+  <!-- EXPENSES -->
   <div id="hide_expenses" class="row" style="display:none">
     <br>
     <div class="col-md-2">
@@ -340,7 +340,7 @@ endif;
       <input type="text" name="expenses_info" class="form-control" placeholder="<?php echo $lang['DESCRIPTION']; ?>" />
     </div>
   </div>
-
+<!-- TEXTAREAS -->
   <div class="row">
     <div class="col-md-8">
       <br><textarea class="form-control <?php echo $missing_highlights; ?> required-field-subtle" style='resize:none;overflow:hidden' rows="3" name="infoText" placeholder="Info..."  onkeyup='textAreaAdjust(this);' maxlength="500"><?php echo $insertInfoText; ?></textarea><br>
@@ -353,6 +353,7 @@ endif;
   <div id="project_fields" class="row">
   </div><br>
 
+<!-- HOURS -->
   <div class="row">
     <div class="col-md-6">
       <div class="input-group">

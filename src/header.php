@@ -6,7 +6,7 @@ if(empty($_SESSION['userid'])){
 
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-$setActiveLink = 'style="color:#ed9c21;"';
+$setActiveLink = 'class="color:#A3F375;"';
 
 require __DIR__."/connection.php";
 require __DIR__."/createTimestamps.php";
@@ -136,10 +136,13 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = '/plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
+    $css_file = '/plugins/homeMenu/homeMenu_green.css';
+  } elseif($_SESSION['color'] == 'stellar') {
     $css_file = '/plugins/homeMenu/homeMenu_dark.css';
   } else {
-    $css_file = '';
-  }
+
+     $css_file = '';
+   }
   ?>
   <!DOCTYPE html>
   <html>
@@ -202,7 +205,7 @@ if($isTimeAdmin){
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header hidden-xs">
-          <a class="navbar-brand" href="../user/home">Connect</a>
+          <a class="navbar-brand" href="../user/home" style="width: 220px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="/images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
         </div>
         <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
           <ul class="nav navbar-nav" style="margin:10px">
@@ -213,6 +216,7 @@ if($isTimeAdmin){
                   <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Default</button></li>
                   <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Dark</button></li>
                   <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Stellar</button></li>
                 </form>
               </ul>
             </li>

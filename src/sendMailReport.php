@@ -1,19 +1,19 @@
-<?php require_once "../plugins/phpMailer/class.phpmailer.php"; ?>
-<?php require_once "../plugins/phpMailer/class.smtp.php"; ?>
+<?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.phpmailer.php"; ?>
+<?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.smtp.php"; ?>
 <?php require_once "connection.php"; require_once "createTimestamps.php"; ?>
-<?php require_once "../plugins/cssToInlineStyles/autoload.php"; ?>
+<?php require_once dirname(__DIR__) ."/plugins/cssToInlineStyles/autoload.php"; ?>
 <?php require_once 'utilities.php'; ?>
 <?php require_once "Calculators/LogCalculator.php"; ?>
 <?php
 //for css
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 $cssToInlineStyles = new CssToInlineStyles();
-$css = file_get_contents('../plugins/homeMenu/compactMail.css');
+$css = file_get_contents('/plugins/homeMenu/compactMail.css');
 
 //get all mails
-$resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //<> == !=
+$resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //i think the repeatCount stands for active or inactive..
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
-  //for each report, send a NEW mail
+  //for each active report, send a NEW mail
   $mail = new PHPMailer();
   $mail->CharSet = 'UTF-8';
   $mail->Encoding = "base64";
@@ -68,6 +68,5 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
     $errorInfo = $mail->ErrorInfo;
   }
   $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
-
 }
 ?>

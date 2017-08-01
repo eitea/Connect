@@ -35,7 +35,9 @@ $(document).ready(function(){
       right: "month, agendaWeek, listMonth"
     },
     defaultView: "month",
-    events: [<?php echo $vacs; ?>]
+    events: [<?php echo $vacs; ?>],
+    eventColor: '#A3F375',
+    eventTextColor: '#6D6D6D'
   });
 });
 </script>

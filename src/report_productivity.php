@@ -134,10 +134,8 @@ echo "<br>Nicht Produktiv: $nonproductives";
   <div class="container-fluid">
     <canvas id="analysisChart" width="1000" height="<?php echo $height; ?>"></canvas>
   </div>
-  <br><br>
-
-  <div class="container">
-    <br><br><br>
+  <div class="container-fluid" style="padding-top:50px">
+  <div class="col-sm-3">
     <select name='addUserID' style="width:200px" class="js-example-basic-single" form="FILTER_FORM">
       <?php
       $result = mysqli_query($conn, "SELECT $userTable.* FROM $userTable, $roleTable WHERE userID = id AND canBook = 'TRUE';");
@@ -148,7 +146,10 @@ echo "<br>Nicht Produktiv: $nonproductives";
       }
       ?>
     </select>
+  </div>
+  <div class="col-sm-1">
     <button class="btn btn-warning " type="submit" name="filterUserIDs" value="<?php echo $filterIDs; ?>" form="FILTER_FORM"> + </button>
+  </div>
   </div>
 
   <script>
