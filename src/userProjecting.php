@@ -51,21 +51,22 @@ while($result && ($row = $result->fetch_assoc())){
 }
 
 $showUndoButton = $showEmergencyUndoButton = 0;
-$insertInfoText = $insertInternInfoText = $missing_highlights = '';
+$missing_highlights = $insertInfoText = $insertInternInfoText = $field_1 = $field_2 = $field_3 = '';
+$keepFields = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all Operations.");
   }
 
-  if(isset($_POST["add"]) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+  if(isset($_POST["add"]) && isset($_POST['end'])){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 
     $endDate = $date." ".$_POST['end'];
     $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-    $insertInfoText = test_input($_POST['infoText']);
+    $insertInfoText = test_input(trim($_POST['infoText']));
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if(timeDiff_Hours($startDate, $endDate) > 0){
@@ -73,9 +74,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);
         $sql = "INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText' , 'break')";
-        $conn->query($sql);
-        $insertInfoText = $insertInternInfoText = '';
-        $showUndoButton = TRUE;
+        if($conn->query($sql)){
+          $insertInfoText = $insertInternInfoText = '';
+          $showUndoButton = TRUE;
+        } else {
+          echo $conn->error;
+        }
       } else { //add drive or booking
         if(isset($_POST['addExpenses'])){
           $expenses_price = test_input($_POST['expenses_price']);
@@ -112,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           } else {
             $field_3 = 'NULL';
           }
-          if($accept){
+          if($accept && $insertInfoText){
             if(isset($_POST['addDrive'])){
               $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
               VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
@@ -130,17 +134,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           } else {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             $missing_highlights = 'required-field';
+            $keepFields = TRUE;
           }
         } else {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+          $keepFields = TRUE;
         }
       }
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+      $keepFields = TRUE;
     }
   } elseif(isset($_POST['add'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     $missing_highlights = 'required-field';
+    $keepFields = TRUE;
   }
 }
 
@@ -424,5 +432,18 @@ function showMyDiv(o, toShow){
   }
 }
 </script>
+
+<?php if($keepFields && isset($_POST['filterClient']) && isset($_POST['filterProject'])){ //unsuccessfull event
+  echo '<script>
+        showProjects('.$_POST['filterClient'].', '.$_POST['filterProject'].');
+        showProjectfields('.$_POST['filterProject'].');
+        setTimeout(function() {
+          $("#pro_field_1").val("'.$field_1.'");
+          $("#pro_field_2").val("'.$field_2.'");
+          $("#pro_field_3").val("'.$field_3.'");
+        }, 1500);
+        </script>';
+}
+?>
 
 <?php require_once 'footer.php'; ?>

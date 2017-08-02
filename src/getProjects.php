@@ -196,7 +196,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, '', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
 ?>
 
-<div class="container-fluid" style="position:fixed;background:white;width:100%;z-index:1">
+<div style="position:fixed;background:white;width:100%;z-index:1">
   <div class="page-header">
     <h3><?php echo $lang['VIEW_PROJECTS']; ?>
       <div class="page-header-button-group">

@@ -22,7 +22,7 @@ $routes = array(
 
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',
 
-  'report/send' => 'sendMailReport.php',           'report/productivity' => 'report_productivity.php',
+  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 
   'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',

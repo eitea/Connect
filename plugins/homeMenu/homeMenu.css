@@ -206,7 +206,7 @@ input[type="checkbox"]:checked:after {
   border-width: 0 2px 2px 0;
   border-color:white;
   transform: rotate(45deg);
-  margin-left:6px;
+  margin: 0 0 2px 6px;
 }
 input[type="radio"]{
   -webkit-appearance: none;
@@ -286,4 +286,11 @@ span.select2.select2-container.select2-container--default {
 .page-header-button-group{
   display:inline;
   padding-left:15px;
+}
+
+.active-link{
+  color:#f0ad4e !important;
+}
+.active-link:hover{
+  color:white !important;
 }

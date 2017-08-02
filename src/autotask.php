@@ -13,7 +13,7 @@ require 'createTimestamps.php';
 '4' => 'Yearly'
 */
 
-$result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //0. grab all active tasks
+$result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
   $task_id = $row['id'];
   $pattern = $row['repeatPattern']; //1. grab schedule of task

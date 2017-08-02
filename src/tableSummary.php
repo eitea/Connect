@@ -34,14 +34,14 @@ if($result_Sum && $result_Sum->num_rows > 0){
       </thead>
       <tbody>
         <?php
-        echo '<tr><td>'.$lang['EXPECTED_HOURS'].': </td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].': </td><td>+'. number_format($logSums->absolvedHours + $logSums->vacationHours , 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['LUNCHBREAK'].': </td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].': </td><td>+'.number_format($logSums->specialLeaveHours,2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['SICK_LEAVE'].': </td><td>+'.number_format($logSums->sickHours,2,'.','').'</td></tr>';
-        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . ': </td> <td> -' . number_format($logSums->overTimeAdditive,2,'.','') . ' </td></tr>';
-        echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a>: </td><td>'.sprintf('%+.2f',$logSums->correctionHours).'</td></tr>';
-        echo "<tr><td style='font-weight:bold;'>".$lang['SUM'].": </td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
+        echo '<tr><td>'.$lang['EXPECTED_HOURS'].'</td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format($logSums->absolvedHours + $logSums->vacationHours , 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['LUNCHBREAK'].'</td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
+        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].'</td><td>+'.number_format($logSums->specialLeaveHours,2, '.', '').'</td></tr>';
+        echo '<tr><td>'.$lang['SICK_LEAVE'].'</td><td>+'.number_format($logSums->sickHours,2,'.','').'</td></tr>';
+        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . '</td> <td> -' . number_format($logSums->overTimeAdditive,2,'.','') . ' </td></tr>';
+        echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a></td><td>'.sprintf('%+.2f',$logSums->correctionHours).'</td></tr>';
+        echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
         ?>
       </tbody>
     </table>
@@ -57,13 +57,13 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         $theBigSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu'] + $userRow['fri'] + $userRow['sat'] + $userRow['sun'];
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['mon'].': </td><td>'. $userRow['mon'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['tue'].': </td><td>'. $userRow['tue'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['wed'].': </td><td>'. $userRow['wed'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['thu'].': </td><td>'. $userRow['thu'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['fri'].': </td><td>'. $userRow['fri'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sat'].': </td><td>'. $userRow['sat'] .'</td></tr>';
-        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sun'].': </td><td>'. $userRow['sun'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['mon'].'</td><td>'. $userRow['mon'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['tue'].'</td><td>'. $userRow['tue'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['wed'].'</td><td>'. $userRow['wed'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['thu'].'</td><td>'. $userRow['thu'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['fri'].'</td><td>'. $userRow['fri'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sat'].'</td><td>'. $userRow['sat'] .'</td></tr>';
+        echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sun'].'</td><td>'. $userRow['sun'] .'</td></tr>';
         echo "<tr><td style='font-weight:bold;'>".$lang['SUM'].": </td><td>". $theBigSum .'</td></tr>';
         ?>
       </tbody>
@@ -80,8 +80,8 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td><a href="../time/vacations?curID='.$curID.'" >'. $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']. '</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
-        echo '<tr><td>'. $lang['VACATION_DAYS_PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
+        echo '<tr><td><a href="../time/vacations?curID='.$curID.'" >'. $lang['VACATION_DAYS'].' '.$lang['AVAILABLE'].'</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
+        echo '<tr><td>'. $lang['VACATION_DAYS'].$lang['PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>
       </tbody>

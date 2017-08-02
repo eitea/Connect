@@ -1,13 +1,17 @@
 /* dark grey #6D6D6D   green #A3F375 light grey #a6a6a6 */
-/* General colors */
+/* General menu colors */
 .btn-warning{
   background-color: #A3F375;
   color: #6D6D6D;
-  border:none;
+  border-color:#a5d688;
 }
-.btn-warning:hover, .btn-warning:disabled{
+
+/* because f*ck anyone trying to SIMPLY change the default color of a button*/
+.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus, .btn-warning:active:focus, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
   background-color: #ace062;
+  border-color: #a5d688;
 }
+
 .panel-default>.panel-heading{
   background-color:#a6a6a6;
   border-radius: 0;
@@ -27,9 +31,7 @@
   background-color:#a6a6a6;
   color:white;
 }
-a{
-  color: #A3F375;
-}
+
 .panel > .panel-heading a:link {
   color: #6D6D6D;
 }
@@ -41,7 +43,7 @@ a{
   background-color:#A3F375;
 }
 .sidebar-nav .navbar li a:focus, .panel-borderless .panel-collapse .nav li a:focus{
-  color: white;
+  color: #A3F375;
   background-color:transparent;
 }
 
@@ -84,9 +86,71 @@ a{
   box-shadow: 0 0 2px #A3F375;
 }
 
+/* PAGE HEADERS */
 .page-header{
-  color:#A3F375;
   padding:15px;
   margin: 0px -20px 20px;
   background-color:#a6a6a6;
+}
+
+.page-header > h3{
+  color:#A3F375;
+}
+
+.page-header > h3 > *{
+  color:#333;
+}
+
+/* HELPERLINGS */
+a{
+  color: #A3F375;
+}
+
+#loader {
+  border-top: 16px solid #A3F375;
+}
+
+.active-link{
+  color: #A3F375 !important;
+}
+.active-link:hover{
+  color: #6d6d6d !important;
+}
+
+.form-control:focus{
+  border: 1px solid #A3F375;
+  box-shadow: 0 0 2px #A3F375;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected]{
+  background-color: #A3F375;
+  color: #6d6d6d;
+}
+
+/* radios and checkboxes */
+input[type="checkbox"]:checked {
+  background-color:#A3F375;
+  border-color:#A3F375;
+}
+
+input[type="radio"]:checked {
+  border: 1px solid #A3F375;
+  box-shadow: inset 0px 0px 0 3px #A3F375;
+}
+
+/*info alerts */
+.alert.alert-info{
+  background-color: #A3F375;
+  color: #6d6d6d;
+
+}
+
+/* Datatables pagination */
+.pagination > .active > a {
+  background-color: #A3F375;
+  border-color:#a5d688;
+}
+.pagination > .active > a:hover {
+  background-color: #ace062;
+  border-color:#a5d688;
 }

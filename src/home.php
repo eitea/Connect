@@ -102,7 +102,7 @@ $(function(){
       },
       title:{
         display:true,
-        text: '<?php echo $lang['AVERAGE'].' '. $lang['HOURS']; ?>'
+        text: '<?php echo $lang['AVERAGE'].' '. $lang['WORKING_HOURS']; ?>'
       }
     },
     data: {
@@ -161,7 +161,7 @@ $(function(){
       },
       title: {
         display: true,
-        text: '<?php echo $lang['TODAY']; ?>'
+        text: '<?php echo $lang['TODAY'] .' '. date('d.M', strtotime($today)); ?>'
       }
     }
   });
