@@ -1,9 +1,9 @@
 <?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.phpmailer.php"; ?>
 <?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.smtp.php"; ?>
-<?php require_once "connection.php"; require_once "createTimestamps.php"; ?>
+<?php require_once __DIR__ . "/connection.php"; require_once __DIR__ ."/createTimestamps.php"; ?>
 <?php require_once dirname(__DIR__) ."/plugins/cssToInlineStyles/autoload.php"; ?>
-<?php require_once 'utilities.php'; ?>
-<?php require_once "Calculators/LogCalculator.php"; ?>
+<?php require_once __DIR__ .'/utilities.php'; ?>
+<?php require_once __DIR__ ."/Calculators/LogCalculator.php"; ?>
 <?php
 //for css
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
