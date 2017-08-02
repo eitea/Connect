@@ -105,18 +105,15 @@
 a{
   color: #A3F375;
 }
-
 #loader {
   border-top: 16px solid #A3F375;
 }
-
 .active-link{
   color: #A3F375 !important;
 }
 .active-link:hover{
   color: #6d6d6d !important;
 }
-
 .form-control:focus{
   border: 1px solid #A3F375;
   box-shadow: 0 0 2px #A3F375;
@@ -126,6 +123,10 @@ a{
   background-color: #A3F375;
   color: #6d6d6d;
 }
+.bage.alert-badge{
+  background-color:#A3F375;
+}
+
 
 /* radios and checkboxes */
 input[type="checkbox"]:checked {
@@ -142,7 +143,6 @@ input[type="radio"]:checked {
 .alert.alert-info{
   background-color: #A3F375;
   color: #6d6d6d;
-
 }
 
 /* Datatables pagination */

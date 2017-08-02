@@ -6,10 +6,10 @@
 <?php require_once __DIR__ ."/Calculators/LogCalculator.php"; ?>
 <?php
 //for css
+set_time_limit(120);
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 $cssToInlineStyles = new CssToInlineStyles();
-$css = file_get_contents('/plugins/homeMenu/compactMail.css');
-
+$css = file_get_contents('../plugins/homeMenu/compactMail.css');
 //get all mails
 $resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //i think the repeatCount stands for active or inactive..
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
@@ -63,10 +63,9 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail->Subject = $rowContent['name'];
   $mail->Body    = $content;
   $mail->AltBody = "If you can read this, your e-mail provider does not support HTML." . $content;
-  $errorInfo = "";
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;
+    $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
   }
-  $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
 }
 ?>
