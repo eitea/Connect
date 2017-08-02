@@ -29,7 +29,7 @@ $routes = array(
   'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php'
 );
 
-//url must end like this:  root/ ACCESS / PAGE
+//url must end like this:  / ACCESS / PAGE
 $params = explode('/', $_SERVER['REQUEST_URI']);
 $l = count($params) -1 ;
 if($l > 1){

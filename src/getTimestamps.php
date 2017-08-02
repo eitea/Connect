@@ -599,7 +599,8 @@ if($filterings['user']):
                   }
                   echo '</select></div><div class="col-md-3">';
                   if(!$calculator->indecesIM[$i]){ //timestamp doesnt exist
-                    $A = $B = $calculator->date[$i].' 12:00:00';
+                    $A = $calculator->date[$i].' 08:00:00';
+                    $B = carryOverAdder_Minutes($A, intval($calculator->shouldTime[$i] * 60));
                     //existing timestamps cant have timeToUTC edited
                     echo '<label>'.$lang['TIMEZONE'].'</label><select name="creatTimeZone" class="js-example-basic-single">';
                     for($i_utc = -12; $i_utc <= 12; $i_utc++){
