@@ -136,7 +136,7 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = '/plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = '/plugins/homeMenu/homeMenu_green.css?v='.time();
+    $css_file = '/plugins/homeMenu/homeMenu_green.css';
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = '/plugins/homeMenu/homeMenu_dark.css';
   } else {
@@ -169,7 +169,7 @@ if($isTimeAdmin){
     <link rel="stylesheet" type="text/css" href="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
     <script src="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-    <link href="/plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
+    <link href="/plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
@@ -212,10 +212,10 @@ if($isTimeAdmin){
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <form method="POST" class="navbar-form navbar-left">
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Default</button></li>
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Dark</button></li>
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Stellar</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Light</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Default</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="light">White</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Dark</button></li>
                 </form>
               </ul>
             </li>

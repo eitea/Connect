@@ -34,7 +34,6 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail = new PHPMailer();
   $mail->CharSet = 'UTF-8';
   $mail->Encoding = "base64";
-  $mail->SMTPDebug = 2;
   $mail->IsSMTP();
 
   $reportID = $rowContent['id'];
@@ -77,13 +76,13 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail->isHTML(true);                       // Set email format to HTML
   $mail->Subject = $rowContent['name'];
   $mail->Body    = $content;
-  $mail->AltBody = "If you can read this, your e-mail provider does not support HTML." . $content;
+  $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;
     $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
     echo $errorInfo;
   } else {
-    //echo "<script>window.close();</script>";
+    echo "<script>window.close();</script>";
   }
 }
 ?>

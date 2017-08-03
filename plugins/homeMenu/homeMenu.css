@@ -248,7 +248,7 @@ input[type="radio"]:checked {
   opacity: 0;
 }
 
-/* alerts */ 
+/* alerts */
 .alert{
   margin: 0 -20px 0;
 }
@@ -301,7 +301,7 @@ span.select2.select2-container.select2-container--default {
 }
 .badge.alert-badge{
   margin:0 15px 0 30px;
-  background-color: #fbc871;
+  background-color: #f0ad4e;
 }
 .badge.alert-badge > a {
 	color:white;
