@@ -64,6 +64,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;
     $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+    echo $errorInfo;
   } else {
     //echo "<script>window.close();</script>";
   }
