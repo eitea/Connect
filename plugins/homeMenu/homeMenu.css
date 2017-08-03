@@ -248,6 +248,16 @@ input[type="radio"]:checked {
   opacity: 0;
 }
 
+/* alerts */ 
+.alert{
+  margin: 0 -20px 0;
+}
+.alert-over{
+  position:fixed;
+  z-index: 50;
+  margin-left: 50%;
+}
+
 /* little helperlings */
 .row{
   padding-bottom:5px;
@@ -275,11 +285,7 @@ i{
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
 }
-.alert-over{
-  position:fixed;
-  z-index: 50;
-  margin-left: 50%;
-}
+
 span.select2.select2-container.select2-container--default {
   width: 100% !important;
 }
@@ -293,7 +299,10 @@ span.select2.select2-container.select2-container--default {
 .active-link:hover{
   color:white !important;
 }
-.bage.alert-badge{
+.badge.alert-badge{
   margin:0 15px 0 30px;
-  background-color:#ed9c21;
+  background-color: #fbc871;
+}
+.badge.alert-badge > a {
+	color:white;
 }

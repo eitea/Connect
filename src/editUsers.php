@@ -585,7 +585,7 @@ $(document).ready(function(){
               </div>
 
               <div class="container">
-                <a class="btn btn-link" data-toggle="collapse" href="#intervalCollapse<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseExample">Show all intervals</a>
+                <a data-toggle="collapse" href="#intervalCollapse<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseExample">Show all intervals</a>
               </div>
               <!-- Corrections table -->
               <div class="container-fluid collapse" id="intervalCollapse<?php echo $x; ?>">

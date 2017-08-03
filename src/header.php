@@ -136,7 +136,7 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = '/plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = '/plugins/homeMenu/homeMenu_green.css';
+    $css_file = '/plugins/homeMenu/homeMenu_green.css?v='.time();
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = '/plugins/homeMenu/homeMenu_dark.css';
   } else {
@@ -169,7 +169,7 @@ if($isTimeAdmin){
     <link rel="stylesheet" type="text/css" href="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
     <script src="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-    <link href="/plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+    <link href="/plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
@@ -235,7 +235,7 @@ if($isTimeAdmin){
         </div>
         <div class="navbar-right" style="margin-right:10px;">
           <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge alert-badge hidden-xs"><a href="../time/check" style="color:white;" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge alert-badge hidden-xs"><a href="../time/check" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
           <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
           <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>

@@ -1,7 +1,7 @@
 <?php include 'header.php'; enableToStamps($userID); ?>
 <?php
 $filterRequest_text = 'Alte ausblenden';
-$filterRequest = 0;
+$filterRequest = $unlock = 0;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
@@ -15,10 +15,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query($sql);
       echo mysqli_error($conn);
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Failed! </strong>Invalid Dates.';
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    }
+  } elseif(isset($_POST['makeRequest'])){
+    if($_POST['requestText'] == 'I demand an easteregg'){
+      $unlock = TRUE;
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
   } elseif(isset($_POST['deleteRequest'])){
     $sql = "DELETE FROM $userRequests WHERE id =". $_POST['deleteRequest'];
@@ -155,6 +158,24 @@ if($result && ($row = $result->fetch_assoc())): ?>
 </form>
 <?php endif; ?>
 
+<?php if($unlock): ?>
+<br><br><br>
+
+<link rel=stylesheet type=text/css href=/plugins/jsPlugin/css/main-snake.css />
+<div style="display:none">
+<div id="mode-wrapper"><button id="Easy">Easy</button><br /><button id="Medium">Medium</button><br /><button id="Difficult">Difficult</button></div>
+<button id="high-score">High Score</button>
+</div>
+<div id="game-area" tabindex="0"></div>
+<script type="text/javascript" src="/plugins/jsPlugin/js/snake.js"></script>
+<script type="text/javascript">
+var mySnakeBoard = new SNAKE.Board(  {
+  boardContainer: "game-area",
+  fullScreen: false
+});
+</script>
+
+<?php endif; ?>
 <script>
 var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
 myCalendar.setSkin("material");

@@ -9,7 +9,7 @@
   <thead>
     <th>Name</th>
     <th>Saldo</th>
-    <th><?php echo $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']; ?></th>
+    <th><?php echo $lang['VACATION_DAYS'].$lang['PER_YEAR']; ?></th>
   </thead>
   <tbody>
     <?php

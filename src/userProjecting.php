@@ -172,7 +172,7 @@ echo mysqli_error($conn);
 </style>
 
 <div class="page-header">
-  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small>: &nbsp ' . $date .'</small>'; ?></h3>
+  <h3><?php echo $lang['BOOK_PROJECTS'] .'<small> &nbsp ' . $date .'</small>'; ?></h3>
 </div>
 
 <form method="post">

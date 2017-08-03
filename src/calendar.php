@@ -9,6 +9,11 @@
 <script src='/plugins/fullcalendar/lib/moment.min.js'></script>
 <script src='/plugins/fullcalendar/fullcalendar.js'></script>
 
+<style>
+.fc-today{
+   background-color: #dffbce !important;
+}
+</style>
 <?php
 //prefer the request, since user can delete his requests by himself for a 'cleanup'. This way the calendar won't get bigger and bigger as long as the system goes on
 $sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE $userRequests.status = '2' AND $userRequests.requestType = 'vac'";

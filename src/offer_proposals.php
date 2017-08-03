@@ -137,7 +137,7 @@ WHERE 1 $filterCompany_query $filterClient_query $filterStatus_query");
         if($transitable){
           echo '<form method="POST" action="edit" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
           if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
-          echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-info" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+          echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
         }
         echo '</td>';
         echo '</tr>';
