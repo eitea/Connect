@@ -203,7 +203,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
         <?php include "misc/set_filter.php"; //this is where the magic happens ?>
         <button type='submit' class="btn btn-default" name='saveChanges' form="project_table"><i class="fa fa-floppy-o"></i></button>
         <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-booking" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
-        <form id="csvDownPlace" action="csvDownload.php" method="POST" target='_blank' style="display:inline"></form>
+        <form id="csvDownPlace" action="csvDownload" method="POST" target='_blank' style="display:inline"></form>
         <form action="pdfDownload.php" method="POST" target='_blank' style="display:inline-block">
           <?php //quess who needs queries.
           $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
