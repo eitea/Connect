@@ -9,7 +9,7 @@
 set_time_limit(120);
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 $cssToInlineStyles = new CssToInlineStyles();
-$css = file_get_contents('../plugins/homeMenu/compactMail.css');
+$css = file_get_contents(dirname(__DIR__) . '/plugins/homeMenu/compactMail.css');
 //get all mails
 $resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //i think the repeatCount stands for active or inactive..
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
@@ -50,8 +50,6 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $result = $conn->query("SELECT * FROM $mailReportsRecipientsTable WHERE reportID = $reportID");
   if(!$result || $result->num_rows <= 0){
     die("Please Define Recipients! ");
-  } else {
-    echo "<script>window.close();</script>";
   }
   $recipients = "";
   while($result && ($row = $result->fetch_assoc())){
@@ -66,6 +64,8 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;
     $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+  } else {
+    //echo "<script>window.close();</script>";
   }
 }
 ?>

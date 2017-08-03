@@ -35,10 +35,9 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         echo '<tr><td>'.$lang['EXPECTED_HOURS'].'</td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format($logSums->absolvedHours + $logSums->vacationHours , 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format($logSums->absolvedHours, 2, '.', '') .'</td></tr>';
         echo '<tr><td>'.$lang['LUNCHBREAK'].'</td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['SPECIAL_LEAVE'].'</td><td>+'.number_format($logSums->specialLeaveHours,2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['SICK_LEAVE'].'</td><td>+'.number_format($logSums->sickHours,2,'.','').'</td></tr>';
+        echo '<tr><td>'.$lang['OTHER'].'</td><td>+'.number_format($logSums->vacationHours + $logSums->specialLeaveHours + $logSums->sickHours + $logSums->educationHours, 2, '.', '').'</td></tr>';
         echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . '</td> <td> -' . number_format($logSums->overTimeAdditive,2,'.','') . ' </td></tr>';
         echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a></td><td>'.sprintf('%+.2f',$logSums->correctionHours).'</td></tr>';
         echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
@@ -64,7 +63,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
         echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['fri'].'</td><td>'. $userRow['fri'] .'</td></tr>';
         echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sat'].'</td><td>'. $userRow['sat'] .'</td></tr>';
         echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sun'].'</td><td>'. $userRow['sun'] .'</td></tr>';
-        echo "<tr><td style='font-weight:bold;'>".$lang['SUM'].": </td><td>". $theBigSum .'</td></tr>';
+        echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td>". $theBigSum .'</td></tr>';
         ?>
       </tbody>
     </table>

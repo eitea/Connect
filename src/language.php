@@ -647,6 +647,9 @@ $lang_ger['ORDER_CONFIRMATION'] = 'Auftragsbestätigung';
 $lang_eng['ORDER_CONFIRMATIONS'] = 'Order Confirmations';
 $lang_ger['ORDER_CONFIRMATIONS'] = 'Auftragsbestätigungen';
 
+$lang_eng['OTHER'] = 'Other';
+$lang_ger['OTHER'] = 'Andere';
+
 $lang_eng['OVERTIME'] = 'Overtime';
 $lang_ger['OVERTIME'] = 'Überstunden';
 
