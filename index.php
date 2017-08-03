@@ -21,6 +21,7 @@ $routes = array(
   'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',
 
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
+  'project/pdfDownload' => 'pdfDownload.php',
 
   'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 
