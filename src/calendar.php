@@ -4,10 +4,10 @@
   <h3><?php echo $lang['VACATION'].' '.'Calendar' ?></h3>
 </div>
 
-<link rel='stylesheet' href='/plugins/fullcalendar/fullcalendar.css' />
-<script src='/plugins/fullcalendar/lib/jquery.min.js'></script>
-<script src='/plugins/fullcalendar/lib/moment.min.js'></script>
-<script src='/plugins/fullcalendar/fullcalendar.js'></script>
+<link rel='stylesheet' href='plugins/fullcalendar/fullcalendar.css' />
+<script src='plugins/fullcalendar/lib/jquery.min.js'></script>
+<script src='plugins/fullcalendar/lib/moment.min.js'></script>
+<script src='plugins/fullcalendar/fullcalendar.js'></script>
 
 <style>
 .fc-today{

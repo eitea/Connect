@@ -60,7 +60,7 @@ if(isset($_POST['addRecipient'])){
         $result2 = $conn->query("SELECT * FROM $mailReportsRecipientsTable WHERE reportID = $templID");
         $recipients = "";
         while($result2 && ($row2 = $result2->fetch_assoc())){
-          $recipients .= '<button type="submit" style="background:none;border:none" name="removeRecipient" value="'.$row2['id'].'"><img width="10px" height="10px" src="/images/minus_circle.png"></button>'.$row2['email'] . '<br>';
+          $recipients .= '<button type="submit" style="background:none;border:none" name="removeRecipient" value="'.$row2['id'].'"><img width="10px" height="10px" src="images/minus_circle.png"></button>'.$row2['email'] . '<br>';
         }
 
         echo '<tr>';

@@ -35,7 +35,7 @@ foreach ($tags as $tag) {
 $html = $doc->saveHTML();
 
 //display the pdf
-require_once "../plugins/dompdf/autoload.php";
+require_once dirname(__DIR__) ."/plugins/dompdf/autoload.php";
 use Dompdf\Dompdf;
 use Dompdf\Options;
 

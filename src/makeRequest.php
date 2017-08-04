@@ -161,13 +161,13 @@ if($result && ($row = $result->fetch_assoc())): ?>
 <?php if($unlock): ?>
 <br><br><br>
 
-<link rel=stylesheet type=text/css href=/plugins/jsPlugin/css/main-snake.css />
+<link rel="stylesheet" type="text/css" href="plugins/jsPlugin/css/main-snake.css" />
 <div style="display:none">
 <div id="mode-wrapper"><button id="Easy">Easy</button><br /><button id="Medium">Medium</button><br /><button id="Difficult">Difficult</button></div>
 <button id="high-score">High Score</button>
 </div>
 <div id="game-area" tabindex="0"></div>
-<script type="text/javascript" src="/plugins/jsPlugin/js/snake.js"></script>
+<script type="text/javascript" src="plugins/jsPlugin/js/snake.js"></script>
 <script type="text/javascript">
 var mySnakeBoard = new SNAKE.Board(  {
   boardContainer: "game-area",

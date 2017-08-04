@@ -1,5 +1,4 @@
 <?php
-
 $routes = array(
   'setup/run' => 'setup/setup_getInput.php',       'setup/create' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
@@ -27,11 +26,12 @@ $routes = array(
 
   'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
-  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php'
+  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
 );
 
 //url must end like this:  / ACCESS / PAGE
-$params = explode('/', $_SERVER['REQUEST_URI']);
+$url = strtok($_SERVER['REQUEST_URI'], '?');
+$params = explode('/', $url);
 $l = count($params) -1 ;
 if($l > 1){
   $route = strtok($params[$l - 1].'/'.$params[$l], '?');
@@ -40,10 +40,17 @@ if($l > 1){
     include 'src/'.$this_page;
   } elseif($params[$l -1] == 'ajaxQuery'){
     include 'src/'.$route;
+  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
+    $content = array_pop($matches);
+    if($content == '.css'){ header("Content-Type: text/css"); }
+    elseif($content == '.js'){ header("Content-Type: text/javascript"); }
+    elseif($content == '.png') { header("Content-Type: image/png"); }
+    elseif($content == '.jpg' || $content == '.jpeg') { header("Content-Type: image/jpeg"); }
+    include $matches[0];
   } else {
     header('HTTP/1.0 404 Not Found');
     include '404.html';
   }
 } else {
-  header('Location: /login/auth');
+  header('Location: login/auth');
 }

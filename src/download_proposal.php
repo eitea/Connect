@@ -19,7 +19,7 @@ if(!$proposalID && !$proposal_number){
   die("Access denied.");
 }
 
-require "../plugins/fpdf/fpdf.php";
+require dirname(__DIR__)."/plugins/fpdf/fpdf.php";
 
 class PDF extends FPDF {
   public $glob = array();
@@ -83,7 +83,7 @@ $logo_path = dirname(__DIR__)."/images/ups/".str_replace(' ', '-',$row['companyN
 file_put_contents($logo_path, $row['logo']) or die("Unable to create file");
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 if(finfo_file($finfo, $logo_path) == 'image/png'){
-  $logo_path = '../images/ups/'.$row['companyName'].'.png';
+  $logo_path = 'images/ups/'.$row['companyName'].'.png';
   file_put_contents($logo_path, $row['logo']);
 }
 

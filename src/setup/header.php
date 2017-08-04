@@ -11,16 +11,16 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-  <script src="/plugins/jQuery/jquery-3.2.1.min.js"></script>
+  <script src="./plugins/jQuery/jquery-3.2.1.min.js"></script>
   <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css"/>
 
-  <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <script src="/bootstrap/js/bootstrap.min.js"></script>
+  <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="/plugins/select2/css/select2.min.css">
-  <script src='/plugins/select2/js/select2.js'></script>
+  <script src='./plugins/select2/js/select2.js'></script>
 
-  <link href="/plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+  <link href="./plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <title>Connect</title>
   <script>
   document.onreadystatechange = function() {

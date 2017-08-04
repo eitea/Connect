@@ -82,7 +82,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
     $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
     echo $errorInfo;
   } else {
-    echo "<script>window.close();</script>";
+    //echo "<script>window.close();</script>";
   }
 }
 ?>

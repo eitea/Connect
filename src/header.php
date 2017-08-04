@@ -134,11 +134,11 @@ if($isTimeAdmin){
   }
 
   if($_SESSION['color'] == 'light'){
-    $css_file = '/plugins/homeMenu/homeMenu_light.css';
+    $css_file = 'plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = '/plugins/homeMenu/homeMenu_green.css';
+    $css_file = 'plugins/homeMenu/homeMenu_green.css';
   } elseif($_SESSION['color'] == 'stellar') {
-    $css_file = '/plugins/homeMenu/homeMenu_dark.css';
+    $css_file = 'plugins/homeMenu/homeMenu_dark.css';
   } else {
     $css_file = '';
   }
@@ -151,25 +151,25 @@ if($isTimeAdmin){
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css"/>
+    <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
-    <script src="/plugins/jQuery/jquery-3.2.1.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="plugins/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/plugins/select2/css/select2.min.css">
-    <script src='/plugins/select2/js/select2.js'></script>
+    <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
+    <script src='plugins/select2/js/select2.js'></script>
 
-    <link rel="stylesheet" type="text/css" href="/plugins/dataTables/datatables.min.css"/>
-    <script type="text/javascript" src="/plugins/dataTables/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
+    <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/plugins/datepicker/css/datepicker.css"/>
-    <script src="/plugins/datepicker/js/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/datepicker/css/datepicker.css"/>
+    <script src="plugins/datepicker/js/bootstrap-datepicker.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
-    <script src="/plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
+    <script src="plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
 
-    <link href="/plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+    <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
@@ -204,7 +204,7 @@ if($isTimeAdmin){
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header hidden-xs">
-          <a class="navbar-brand" href="../user/home" style="width: 230px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="/images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
+          <a class="navbar-brand" href="../user/home" style="width: 230px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
         </div>
         <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
           <ul class="nav navbar-nav" style="margin:10px">
@@ -225,9 +225,9 @@ if($isTimeAdmin){
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <form method="POST" class="navbar-form navbar-left">
-                  <li><button type="submit" style="background:none;border:none" name="ENGLISH"><img width="30px" height="20px" src="/images/eng.png"></button> English</li>
+                  <li><button type="submit" style="background:none;border:none" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
                   <li class="divider"></li>
-                  <li><button type="submit" style="background:none;border:none"  name="GERMAN"><img width="30px" height="20px" src="/images/ger.png"></button> Deutsch</li>
+                  <li><button type="submit" style="background:none;border:none"  name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
                 </form>
               </ul>
             </li>

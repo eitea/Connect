@@ -48,7 +48,7 @@ echo mysqli_error($conn);
           <?php
           $userResult = $conn->query("SELECT id, firstname, lastname FROM $userTable JOIN $teamRelationshipTable ON userID = id WHERE teamID = $teamID");
           while($userResult && ($userRow = $userResult->fetch_assoc())){
-            echo '<div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeMember" value="'.$teamID.' '.$userRow['id'].'"><img width="10px" height="10px" src="/images/minus_circle.png"></button>';
+            echo '<div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeMember" value="'.$teamID.' '.$userRow['id'].'"><img width="10px" height="10px" src="images/minus_circle.png"></button>';
             echo $userRow['firstname'].' '.$userRow['lastname'] . '</div>';
           }
           echo mysqli_error($conn);

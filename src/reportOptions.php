@@ -55,23 +55,23 @@ $row = $result->fetch_assoc();
     <br><br>
     <div class="checkbox col-md-4">
       Absender-Adresse
-    </div>
+    </div>s
     <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>"/>
+      <input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" />
     </div>
     <br><br><br>
     <div class="checkbox col-md-4">
       Host
     </div>
     <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>"/>
+      <input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" />
     </div>
     <br><br>
     <div class="checkbox col-md-4">
       Port
     </div>
     <div class="checkbox col-md-8">
-      <input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>"/>
+      <input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" />
     </div>
     <br><br><br>
     <div class="checkbox col-md-4">
