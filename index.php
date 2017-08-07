@@ -1,5 +1,6 @@
 <?php
 $routes = array(
+  'php/info' => 'phpinfo.php',
   'setup/run' => 'setup/setup_getInput.php',       'setup/create' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
 
