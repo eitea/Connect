@@ -16,11 +16,11 @@ if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
 require dirname(__DIR__) .'/connection_config.php';
 
 if (!function_exists('mysqli_init') && !extension_loaded('mysqli')) {
-    die 'Mysqli not available.';
+    die('Mysqli not available.');
 } else {
     $conn = new mysqli($servername, $username, $password);
 }
-$conn = new mysqli($servername, $username, $password);
+
 if ($conn->connect_error) {
   echo mysqli_error($conn);
   echo "<br>Connection Error: Could not Connect.<a href='/setup/runp'>Click here to return to previous page.</a><br>";
