@@ -8,7 +8,7 @@ $routes = array(
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
   'user/ready' => 'readyPlan.php',                 'user/book' => 'userProjecting.php',
 
-  'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register_basic.php',
+  'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
   'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',
   'system/teams' => 'teamConfig.php',              'system/holidays' => 'editHolidays.php',           'system/advanced' => 'advancedOptions.php',
   'system/password' => 'passwordOptions.php',      'system/email' => 'reportOptions.php',             'system/tasks' => 'taskScheduler.php',
@@ -29,24 +29,27 @@ $routes = array(
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
   'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
 );
+$mime_types = array(
+  '.css' => "text/css",           '.js' => "text/javascript",         '.png' => "image/png",
+  '.jpeg' => "image/jpeg",        '.jpg' => "image/jpg",              '.woff2' => "font/woff",
+  '.woff' => 'application/font-woff'
+ );
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
 $params = explode('/', $url);
 $l = count($params) -1 ;
 if($l > 1){
-  $route = strtok($params[$l - 1].'/'.$params[$l], '?');
+  $route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
   } elseif($params[$l -1] == 'ajaxQuery'){
     include 'src/'.$route;
-  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
-    $content = array_pop($matches);
-    if($content == '.css'){ header("Content-Type: text/css"); }
-    elseif($content == '.js'){ header("Content-Type: text/javascript"); }
-    elseif($content == '.png') { header("Content-Type: image/png"); }
-    elseif($content == '.jpg' || $content == '.jpeg') { header("Content-Type: image/jpeg"); }
+  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff)$/", $url, $matches)){
+    if(array_key_exists($matches[4], $mime_types)){
+      header('Content-Type: '. $mime_types[$matches[4]]);
+    }
     include $matches[0];
   } else {
     header('HTTP/1.0 404 Not Found');

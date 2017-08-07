@@ -233,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <br><br>
     <div class=container-fluid>
       <div class=col-md-3>
-        <?php echo $lang['VACATION_DAYS_PER_YEAR']; ?>
+        <?php echo $lang['VACATION_DAYS'].$lang['PER_YEAR']; ?>
         <input type="number" class="form-control" name="vacDaysPerYear" value="25">
       </div>
       <div class=col-md-3>

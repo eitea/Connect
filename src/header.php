@@ -369,7 +369,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                     <ul class="nav nav-list">
                       <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
                       <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                      <li><a <?php if($this_page =='register_basic.php'){echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
+                      <li><a <?php if($this_page =='register.php'){echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
                       <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
                     </ul>
                   </div>
@@ -417,7 +417,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           </div>
         </div>
         <?php
-        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register_basic.php" || $this_page == "deactivatedUsers.php"){
+        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php"){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";

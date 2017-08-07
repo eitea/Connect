@@ -61,7 +61,7 @@ if($result && $result->num_rows > 0){
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
-<link href="plugins/homeMenu/loginMenu.css" rel="stylesheet">
+<link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet">
 <head>
   <title>Login</title>
 </head>
@@ -77,7 +77,7 @@ if($result && $result->num_rows > 0){
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
       <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>
     </form>
-    <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a href="selfregistration.php">Register</a>';} ?>
+    <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a href="register">Register</a>';} ?>
   </div>
   <script>
   var today = new Date();
