@@ -55,7 +55,6 @@ $result = $conn->query("SELECT enableReg FROM $configTable");
 if($result && $result->num_rows > 0){
   $rowConfigTable = $result->fetch_assoc();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -67,7 +66,8 @@ if($result && $result->num_rows > 0){
 </head>
 <body>
   <div id="footer">
-    <form method="POST">
+    <form method="POST" style="display:inline-block">
+      <div style="margin-right:20px;"><img alt="Connect" src="images/logo.png"  height="45px" ></div> <br>
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus></input><br>
 
       <label for="pw">Password: </label> <input id="pw" type="password" name="password" value=""></input><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel"><br><br>
@@ -77,7 +77,7 @@ if($result && $result->num_rows > 0){
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>">
       <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>
     </form>
-    <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a href="register">Register</a>';} ?>
+    <?php if($rowConfigTable['enableReg'] == 'TRUE'){echo '<a class="register-link" href="register">Register</a>';} ?>
   </div>
   <script>
   var today = new Date();

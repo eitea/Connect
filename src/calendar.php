@@ -22,8 +22,9 @@ $vacs = '';
 if($result && $result->num_rows > 0){
   while($row = $result->fetch_assoc()){
     $title = $lang['VACATION'] . ': ' . $row['firstname'] . ' ' . $row['lastname'];
-    $start = substr($row['fromDate'], 0, 10).' 04:00';
-    $end = substr($row['toDate'], 0, 10).' 23:00';
+    //adding hours would display '5a' for 5am.
+    $start = substr($row['fromDate'], 0, 10);
+    $end = substr(carryOverAdder_Hours($row['toDate'], 24), 0, 10);
     $vacs .= "{ title: '$title', start: '$start', end: '$end'},";
   }
 }

@@ -25,7 +25,7 @@ function create_tables($conn){
     preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
     kmMoney DECIMAL(4,2) DEFAULT 0.42,
     emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
-    color VARCHAR(10) DEFAULT 'default',
+    color VARCHAR(10) DEFAULT 'dark',
     real_email VARCHAR(50),
     erpOption VARCHAR(10) DEFAULT 'TRUE'
   )";

@@ -16,8 +16,7 @@ body{
   position:fixed;
   left:0px;
   bottom:20%;
-  right;
-  padding:20px 10% 20px 0px;
+  padding:20px 10% 0px 0px;
   width:90%;
   text-align: right;
   background-color: rgba(74, 70, 138, 0.35);
@@ -60,4 +59,10 @@ input[type=submit]{
 input[type=text], input[type=password]{
   margin-bottom:5px;
   width:240px;
+}
+
+a.register-link{
+  float:right;
+  margin-left:20px;
+  padding-top:150px;
 }

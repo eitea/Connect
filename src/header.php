@@ -212,9 +212,9 @@ if($isTimeAdmin){
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <form method="POST" class="navbar-form navbar-left">
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Light</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Neutral</button></li>
                   <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Default</button></li>
-                  <li><button type="submit" class="btn btn-link" name="set_skin" value="light">White</button></li>
+                  <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
                   <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Dark</button></li>
                 </form>
               </ul>
