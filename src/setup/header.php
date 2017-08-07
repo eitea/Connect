@@ -1,6 +1,6 @@
 <?php
 if(file_exists(dirname(__DIR__) . '/connection_config.php')){
-  //header("Location: ../login/auth");
+  header("Location: ../login/auth");
 }
 ?>
 <!DOCTYPE html>
