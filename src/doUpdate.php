@@ -75,7 +75,6 @@ $sql = "SELECT * FROM $adminLDAPTable;";
 $result = mysqli_query($conn, $sql);
 $row = $result->fetch_assoc();
 
-
 if($row['version'] < 50){
   $sql = "CREATE TABLE $mailOptionsTable(
     host VARCHAR(50),
