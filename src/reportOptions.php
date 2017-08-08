@@ -55,7 +55,7 @@ $row = $result->fetch_assoc();
     <br><br>
     <div class="checkbox col-md-4">
       Absender-Adresse
-    </div>s
+    </div>
     <div class="checkbox col-md-8">
       <input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" />
     </div>

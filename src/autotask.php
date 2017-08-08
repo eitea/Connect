@@ -39,7 +39,7 @@ while($result && ($row = $result->fetch_assoc())){
     $expiryDate = $expiryDate->format('Y-m-d H:i:s');
     if($pattern && timeDiff_Hours($now, $expiryDate) < 0){ //execute if schedule has expired
       //4. execute task
-      include $row['callee'];
+      require $row['callee'];
       //5. update last runtime
       $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
     }

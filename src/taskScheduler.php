@@ -15,7 +15,7 @@ if(isset($_POST['save_tasks'])){
 $pattern = '-1';
 $runtime = getCurrentTimestamp();
 
-$result = $conn->query("SELECT * FROM $taskTable");
+$result = $conn->query("SELECT * FROM taskData");
 if($result && ($row = $result->fetch_assoc())){
   $pattern = $row['repeatPattern'];
   $runtime = $row['runtime'];

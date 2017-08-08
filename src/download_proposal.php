@@ -145,6 +145,9 @@ $pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
 $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
 
 //PRODUCT TABLE
+$i = 1;
+$netto_value = $vat_value = $cash_value = 0;
+$part_sum_netto = $part_sum_vat = 0;
 $pdf->SetFontSize(10);
 $prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
 if($prod_res && $prod_res->num_rows > 0){
@@ -160,9 +163,6 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Cell($w[4],7,$lang['TAXES'], '', 0, 'R', 1);
   $pdf->Cell($w[5],7,$lang['TOTAL_PRICE'], '', 1, 'R', 1);
 
-  $i = 1;
-  $netto_value = $vat_value = $cash_value = 0;
-  $part_sum_netto = $part_sum_vat = 0;
   while($prod_row = $prod_res->fetch_assoc()){
     if($prod_row['name'] == 'NEW_PAGE'){
       $pdf->AddPage();
