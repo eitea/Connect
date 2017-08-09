@@ -19,8 +19,8 @@ if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
 require dirname(__DIR__) .'/connection_config.php';
 $conn = new mysqli($servername, $username, $password);
 if($conn->connect_error) {
-  echo mysqli_error($conn);
-  echo "<br>Connection Error: Could not Connect.<a href='/setup/runp'>Click here to return to previous page.</a><br>";
+  echo $conn->connect_error;
+  echo "<br>Connection Error: Could not Connect.<a href='/setup/run'>Click here to return to previous page.</a><br>";
   die();
 }
 if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
