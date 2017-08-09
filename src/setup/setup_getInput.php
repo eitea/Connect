@@ -97,7 +97,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </div>
 <br><hr><br>
 
-<?php if(!getenv('IS_Container') && !isset($_SERVER['IS_Container'])): ?>
+<?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
   <h1>MySQL Database Connection</h1><br><br>
 
   <div class="row">
@@ -152,7 +152,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <?php else: ?>
   <div style="display:none" />
-  <input type="text" readonly  name='serverName' value = "c-db">
+  <input type="text" readonly  name='serverName' value = "<?php echo $_SERVER['MYSQL_SERVICE']; ?>">
   <input type="text" readonly name='mysqlUsername' value = 'connect'>
   <input type="text" readonly name='pass' value = 'Uforonudi499'>
   <input type="text" readonly name='dbName' value = 'connect'>
