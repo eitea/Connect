@@ -355,12 +355,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </div>
   <br><hr><br>
 <?php else: ?>
-  <div>
-  <input type="text" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
-  <input type="text" name='mysqlUsername' value = 'connect'>
-  <input type="text" name='pass' value = 'Uforonudi499'>
-  <input type="text" name='dbName' value = 'connect'>
-</div>
+  <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVER', true); ?>">
+  <input type="hidden" name='mysqlUsername' value = 'connect'>
+  <input type="hidden" name='pass' value = 'Uforonudi499'>
+  <input type="hidden" name='dbName' value = 'connect'>
 <?php endif; ?>
 
 <div class="container-fluid text-right">
