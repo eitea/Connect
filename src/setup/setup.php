@@ -31,12 +31,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       require dirname(__DIR__) .'/connection_config.php';
       //establish connection
-      try {
-        $conn = new mysqli($servername, $username, $password);
-      } catch(Exception $e){
+      if(!($conn = new mysqli($servername, $username, $password))){
         echo $conn->connect_error;
-        die("<br>Connection Error: Could not Connect.<a href='run'>Click here to return to previous page.</a><br>");
+        die("<br>Connection Error: Could not Connect.<br>");
       }
+
       if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
         echo "Database was created. <br>";
       } else {
@@ -212,7 +211,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       exec($command, $output, $returnValue);
 
       //remote add
-      $command = "git -C $repositoryPath remote add -t master origin https://github.com/eitea/T-Time.git 2>&1";
+      $command = "git -C $repositoryPath remote add -t master origin https://github.com/eitea/Connect.git 2>&1";
       exec($command, $output, $returnValue);
 
       $command = "git -C $repositoryPath fetch --force 2>&1";
@@ -220,29 +219,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
       exec($command, $output, $returnValue);
-
-      //------------------------------------------------------------------------------
-
-      function icsToArray($paramUrl) {
-        $icsFile = file_get_contents($paramUrl);
-        $icsData = explode("BEGIN:", $icsFile);
-        foreach ($icsData as $key => $value) {
-          $icsDatesMeta[$key] = explode("\n", $value);
-        }
-        foreach ($icsDatesMeta as $key => $value) {
-          foreach ($value as $subKey => $subValue) {
-            if ($subValue != "") {
-              if ($key != 0 && $subKey == 0) {
-                $icsDates[$key]["BEGIN"] = $subValue;
-              } else {
-                $subValueArr = explode(":", $subValue, 2);
-                $icsDates[$key][$subValueArr[0]] = $subValueArr[1];
-              }
-            }
-          }
-        }
-        return $icsDates;
-      }
 
       //------------------------------------------------------------------------------
       die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="/login/auth">Next</a>');
@@ -379,11 +355,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   </div>
   <br><hr><br>
 <?php else: ?>
-  <div style="display:none" />
-  <input type="text" readonly name='serverName' value = "<?php echo $_SERVER['MYSQL_SERVICE']; ?>">
-  <input type="text" readonly name='mysqlUsername' value = 'connect'>
-  <input type="text" readonly name='pass' value = 'Uforonudi499'>
-  <input type="text" readonly name='dbName' value = 'connect'>
+  <div>
+  <input type="text" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE'); ?>">
+  <input type="text" name='mysqlUsername' value = 'connect'>
+  <input type="text" name='pass' value = 'Uforonudi499'>
+  <input type="text" name='dbName' value = 'connect'>
 </div>
 <?php endif; ?>
 
