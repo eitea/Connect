@@ -1,7 +1,6 @@
 <?php
 $routes = array(
-  'php/info' => 'phpinfo.php',
-  'setup/run' => 'setup/setup_getInput.php',       'setup/create' => 'setup/setup.php',
+  'php/info' => 'phpinfo.php',                     'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
