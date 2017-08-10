@@ -1,7 +1,7 @@
 <?php
 $routes = array(
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
-  'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
+  'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
@@ -20,7 +20,7 @@ $routes = array(
   'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',
 
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
-  'project/pdfDownload' => 'pdfDownload.php',       
+  'project/pdfDownload' => 'pdfDownload.php',
 
   'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 

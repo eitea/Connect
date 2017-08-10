@@ -40,8 +40,8 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();
       if($row['version'] < $VERSION_NUMBER){
-        redirect("../system/update");
-        die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="../system/update">update</a>');
+        redirect("update");
+        die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
       }
     }
     redirect('../user/home');
