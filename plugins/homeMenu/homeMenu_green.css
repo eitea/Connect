@@ -109,7 +109,7 @@ a, .btn.btn-link{
   font-style: italic;
 }
 a:hover, .btn.btn-link:hover{
-	color: #A3F375; 
+	color: #A3F375;
 }
 
 #loader {
@@ -177,4 +177,9 @@ input[type="radio"]:checked {
 .pagination > .active > a:hover {
   background-color: #ace062;
   border-color:#a5d688;
+}
+
+/* calendar */
+.fc-today{
+   background-color: #dffbce !important;
 }

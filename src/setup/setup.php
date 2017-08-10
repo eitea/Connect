@@ -221,7 +221,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       exec($command, $output, $returnValue);
 
       //------------------------------------------------------------------------------
-      die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="/login/auth">Next</a>');
+      die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login/auth">Next</a>');
 
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
