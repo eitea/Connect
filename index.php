@@ -5,7 +5,7 @@ $routes = array(
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
-  'user/ready' => 'readyPlan.php',                 'user/book' => 'userProjecting.php',
+  'user/ready' => 'readyPlan.php',                 'user/book' => 'userProjecting.php',               'user/social' => 'socialMedia.php',
 
   'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
   'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',

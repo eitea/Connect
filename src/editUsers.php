@@ -250,6 +250,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
+    if(isset($_POST['canUseSocialMedia'.$x])){
+      $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
 
     $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
 
@@ -323,12 +329,14 @@ $(document).ready(function(){
   //enable/disable modules
   $result = $conn->query("SELECT * FROM $moduleTable");
   $moduleEnableRow = $result->fetch_assoc();
-  $moduleTime =  $moduleProject =  '';
+  $moduleTime =  $moduleProject = $moduleSocialMedia = '';
   //timemodule will momentarily always be active, since projectM requires timeM
   if($moduleEnableRow['enableProject'] == 'FALSE'){
     $moduleProject = 'disabled';
   }
-
+  if($moduleEnableRow['enableSocialMedia'] == 'FALSE'){
+    $moduleSocialMedia = 'disabled';
+  }
   $query = "SELECT *, $userTable.id AS user_id FROM $userTable
   INNER JOIN $roleTable ON $roleTable.userID = $userTable.id
   INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE endDate IS NULL
@@ -369,6 +377,7 @@ $(document).ready(function(){
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
+      $canUseSocialMedia = $row['canUseSocialMedia'];
 
       $eOut = "$firstname $lastname";
       ?>
@@ -492,6 +501,10 @@ $(document).ready(function(){
                     <br>
                     <label>
                       <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
+                    </label>
+                    <br>
+                    <label>
+                      <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE' && $moduleEnableRow['enableSocialMedia'] == 'TRUE'){echo 'checked';} echo $moduleSocialMedia; ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
                     </label>
                   </div>
                 </div>

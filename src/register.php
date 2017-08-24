@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'FALSE';
-    $canBook = $canStamp = $canEdit = 'FALSE';
+    $canBook = $canStamp = $canEdit = $canUseSocialMedia = 'FALSE';
     if(isset($_POST['isCoreAdmin'])){
       $isCoreAdmin = 'TRUE';
     }
@@ -111,7 +111,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['canEditTemplates'])){
       $canEdit = 'TRUE';
     }
-
+    if(isset($_POST['canUseSocialMedia'])){
+      $canUseSocialMedia = 'TRUE';
+    }
     if(isset($_POST['create'])){
       if($accept){
         //send accessdata if user gets created
@@ -166,8 +168,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
           echo mysqli_error($conn);
           //create roletable
-          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canEditTemplates)
-          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit');";
+          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
+          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //add relationships
@@ -280,6 +282,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <label><input type="checkbox" checked name="canStamp"><?php echo $lang['CAN_CHECKIN']; ?></label><br>
           <label><input type="checkbox" name="canBook"><?php echo $lang['CAN_BOOK']; ?></label><br>
           <label><input type="checkbox" name="canEditTemplates"><?php echo $lang['CAN_EDIT_TEMPLATES']; ?></label><br>
+          <label><input type="checkbox" name="canUseSocialMedia "><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?></label><br>
         </div>
       </div>
       <div class="col-md-3">

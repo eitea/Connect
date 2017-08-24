@@ -30,9 +30,10 @@ if($result && $result->num_rows > 0){
   $canBook = $row['canBook'];
   $canStamp = $row['canStamp'];
   $canEditTemplates = $row['canEditTemplates'];
+  $canUseSocialMedia = $row['canUseSocialMedia'];
 } else {
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = FALSE;
-  $canBook = $canStamp = $canEditTemplates = FALSE;
+  $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
 }
 
 if($userID == 1){ //superuser
@@ -47,6 +48,8 @@ $lastPswChange = $row['lastPswChange'];
 $result = $conn->query("SELECT enableReadyCheck FROM configurationData");
 $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
+
+$enableSocialMedia = $conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'];
 
 if($isTimeAdmin){
   $numberOfAlerts = 0;
@@ -335,6 +338,10 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
 
           <?php if($showReadyPlan == 'TRUE'): ?>
             <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="../user/ready"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
+          <?php endif; ?>
+
+          <?php if($enableSocialMedia == 'TRUE'): ?>
+            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../user/social"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MEDIA_MENU_ITEM']; ?></a></li>
           <?php endif; ?>
 
           <!-- User-Section: BOOKING -->

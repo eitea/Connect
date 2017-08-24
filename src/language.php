@@ -137,6 +137,9 @@ $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 $lang_eng['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
 $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 
+$lang_eng['CAN_USE_SOCIAL_MEDIA'] = 'Can use Social Media';
+$lang_ger['CAN_USE_SOCIAL_MEDIA'] = 'Kann soziale Medien benutzen';
+
 $lang_eng['CASH_EXPENSE'] = 'Cash Expense';
 $lang_ger['CASH_EXPENSE'] = 'Barauslage';
 
@@ -826,6 +829,13 @@ $lang_ger['SHOULD_TIME'] = 'Soll';
 
 $lang_eng['SICK_LEAVE'] = 'Sick Leave';
 $lang_ger['SICK_LEAVE'] = 'Krankenstand';
+
+$lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
+$lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
+
+$lang_eng['SOCIAL_MEDIA_MENU_ITEM'] = 'Social Media';
+$lang_ger['SOCIAL_MEDIA_MENU_ITEM'] = 'Soziales Medium';
+
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
 $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';

@@ -66,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //insert password policy
       $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
       //insert module en/disable
-      $conn->query("INSERT INTO modules (enableTime, enableProject) VALUES('TRUE', 'TRUE')");
+      $conn->query("INSERT INTO modules (enableTime, enableProject, enableSocialMedia) VALUES('TRUE', 'TRUE', 'TRUE')");
 
       //insert ADMIN
       $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
@@ -75,7 +75,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $sql = "INSERT INTO intervalData (userID) VALUES (1);";
       $conn->query($sql);
       //role
-      $sql = "INSERT INTO roles (userID, isCoreAdmin, canStamp, canBook) VALUES(1, 'TRUE', 'TRUE', 'TRUE');";
+      $sql = "INSERT INTO roles (userID, isCoreAdmin, canStamp, canBook, canUseSocialMedia) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
       $conn->query($sql);
       //insert company-client relationship
       $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,1)";
@@ -88,7 +88,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $sql = "INSERT INTO intervalData (userID) VALUES (2);";
       $conn->query($sql);
       //insert roletable
-      $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE');";
+      $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canUseSocialMedia) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE');";
       $conn->query($sql);
       //insert company-client relationship
       $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";

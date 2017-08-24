@@ -94,4 +94,14 @@ function denyToContainer(){
     die("Feature not accessible in current environment.");
   }
 }
+
+function enableToSocialMedia($userID){
+  require 'connection.php';
+  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
+  $result = $conn->query($sql);
+  if($userID != 1 && (!$result || $result->num_rows <= 0)){
+    die('Access denied. <a href="logout.php"> return</a>');
+  }
+}
+
 ?>

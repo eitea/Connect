@@ -237,6 +237,7 @@ function create_tables($conn){
     isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
@@ -476,7 +477,8 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
