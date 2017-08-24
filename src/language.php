@@ -833,9 +833,25 @@ $lang_ger['SICK_LEAVE'] = 'Krankenstand';
 $lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
 $lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
 
-$lang_eng['SOCIAL_MEDIA_MENU_ITEM'] = 'Social Media';
-$lang_ger['SOCIAL_MEDIA_MENU_ITEM'] = 'Soziales Medium';
+/*------------------Social Media------------------*/
 
+$lang_eng['SOCIAL_MENU_ITEM'] = 'Social Media';
+$lang_ger['SOCIAL_MENU_ITEM'] = 'Soziale Medien';
+
+$lang_eng['SOCIAL_PROFILE_SETTINGS'] = 'My Profile';
+$lang_ger['SOCIAL_PROFILE_SETTINGS'] = 'Mein Profil';
+
+$lang_eng['SOCIAL_STATUS'] = 'Status';
+$lang_ger['SOCIAL_STATUS'] = 'Status';
+
+$lang_eng['SOCIAL_STATUS_EXAMPLE'] = 'Working on my project';
+$lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
+
+
+
+
+
+/*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
 $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';

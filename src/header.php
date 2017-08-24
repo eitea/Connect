@@ -341,7 +341,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           <?php endif; ?>
 
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
-            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../user/social"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MEDIA_MENU_ITEM']; ?></a></li>
+            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?></a></li>
           <?php endif; ?>
 
           <!-- User-Section: BOOKING -->
