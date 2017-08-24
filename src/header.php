@@ -340,13 +340,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
             <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="../user/ready"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
           <?php endif; ?>
 
-          <?php if($enableSocialMedia == 'TRUE'): ?>
+          <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
             <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../user/social"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MEDIA_MENU_ITEM']; ?></a></li>
           <?php endif; ?>
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
 

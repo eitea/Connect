@@ -310,7 +310,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo mysqli_error($conn);
     if($userID == $x){
-      redirect("editUsers.php?ACT=$x");
+      redirect("../system/users?ACT=$x");
     }
   }//end if isset submitX
 }
