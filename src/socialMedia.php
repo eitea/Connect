@@ -1,64 +1,83 @@
 <?php include 'header.php';
-enableToSocialMedia($userID);?>
+enableToSocialMedia($userID); ?>
 <!-- BODY -->
 <?php
-// $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
-// $row = $result->fetch_assoc();
-// $isAdmin = $conn->query("SELECT * FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
-// if(!$row['enableReadyCheck'] && !$isAdmin){
-//   die("Access restricted, only a CORE Admin can view this page and enable it for others.");
-// }
+function displayError(string $msg = "")
+{
+    if ($msg == "") {
+        $msg = $lang['ERROR_UNEXPECTED'];
+    }
+    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
+}
+function displaySuccess(string $msg = "")
+{
+    if ($msg == "") {
+        $msg = $lang['OK_SAVE'];
+    }
+    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
+}
 
 
+$imagePath = 'modules/social/images/'; //trailing slash
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
+    // picture upload
+    if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
+        if (preg_match("/.*(\.png|\.jpg|\.gif)$/", basename($_FILES["profilePictureUpload"]["name"]), $matches)) {
+            $target_file = "${imagePath}$userID/profilePicture${matches[1]}";
+            $check = getimagesize($_FILES["profilePictureUpload"]["tmp_name"]);
+            if ($check !== false) {
+                if ($_FILES["profilePictureUpload"]["size"] <= 500000) {
+                    if(!file_exists("${imagePath}$userID")){
+                        mkdir("${imagePath}$userID");
+                    }
+                    array_map('unlink', glob("${imagePath}$userID/profilePicture.*"));
+                    if (move_uploaded_file($_FILES["profilePictureUpload"]["tmp_name"], $target_file)) {
+                        displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
+                    }
+                    else {
+                        displayError($lang['SOCIAL_ERR_IMAGE_UPLOAD']);
+                    }
+                }
+                else {
+                    displayError($lang['SOCIAL_ERR_IMAGE_TOO_BIG']);
+                }
+            }
+            else {
+                displayError($lang['SOCIAL_ERR_WRONG_IMAGE_TYPE']);
+            }
+        }
+        else {
+            displayError($lang['SOCIAL_ERR_WRONG_IMAGE_TYPE']);
+        }
+    }
+    // other settings
+    if(isset($_POST['status'])){
+        $status = test_input($_POST['status']);
+        $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
+    }
+    if(isset($_POST['isAvailable'])){
+        $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
+      } else {
+        $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
+      }
+      $conn->query($sql);
+}
 
-
-// $target_dir = "uploads/";
-// $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-// $uploadOk = 1;
-// $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-// // Check if image file is a actual image or fake image
-// if(isset($_POST["submit"])) {
-//     $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-//     if($check !== false) {
-//         echo "File is an image - " . $check["mime"] . ".";
-//         $uploadOk = 1;
-//     } else {
-//         echo "File is not an image.";
-//         $uploadOk = 0;
-//     }
-// }
-// // Check if file already exists
-// if (file_exists($target_file)) {
-//     echo "Sorry, file already exists.";
-//     $uploadOk = 0;
-// }
-// // Check file size
-// if ($_FILES["fileToUpload"]["size"] > 500000) {
-//     echo "Sorry, your file is too large.";
-//     $uploadOk = 0;
-// }
-// // Allow certain file formats
-// if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) {
-//     echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-//     $uploadOk = 0;
-// }
-// // Check if $uploadOk is set to 0 by an error
-// if ($uploadOk == 0) {
-//     echo "Sorry, your file was not uploaded.";
-// // if everything is ok, try to upload file
-// } else {
-//     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-//         echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
-//     } else {
-//         echo "Sorry, there was an error uploading your file.";
-//     }
-// }
-
-
-
-
-
-
+$result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
+$row = $result->fetch_assoc();
+$status = $row["status"];
+$isAvailable = $row["isAvailable"];
+$defaultPicture = "${imagePath}default.png";
+$profilePicture = $defaultPicture;
+if (file_exists("${imagePath}$userID/profilePicture.png")) {
+    $profilePicture = "${imagePath}$userID/profilePicture.png";
+}
+if (file_exists("${imagePath}$userID/profilePicture.jpg")) {
+    $profilePicture = "${imagePath}$userID/profilePicture.jpg";
+}
+if (file_exists("${imagePath}$userID/profilePicture.gif")) {
+    $profilePicture = "${imagePath}$userID/profilePicture.gif";
+}
 
 ?>
     <div class="page-header">
@@ -67,49 +86,8 @@ enableToSocialMedia($userID);?>
         </h3>
     </div>
 
-    <table class="table table-hover">
-        <thead>
-            <th>Name</th>
-            <th>Checkin</th>
-        </thead>
-        <tbody>
-            <?php
-    $today = substr(getCurrentTimestamp(), 0, 10);
-    $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
-    $result = $conn->query($sql);
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
-            echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
-        }
-    } else {
-        echo mysqli_error($conn);
-    }
-    if (isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
-        if (test_input($_POST['password']) != $_POST['password']) {
-            die("Malicious Code Injection Detected, please do not use any HTML, SQL or Javascript specific characters.");
-        }
-        $password = $_POST['password'];
-        $passwordConfirm = $_POST['passwordConfirm'];
-        $output = '';
-        if (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)) {
-            $psw = password_hash($password, PASSWORD_BCRYPT);
-            $sql = "UPDATE $userTable SET psw = '$psw', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';";
-            $conn->query($sql);
-            $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
-        } else {
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-            $validation_output .= "<strong>Failed! </strong>Passwords did not match or were invalid. $output".'</div>';
-        }
-    }
-    ?>
-
-        </tbody>
-    </table>
-
-
     <a class="btn btn-warning" data-toggle="modal" data-target="#socialSettings"><i class="fa fa-gears"></i> Social Settings</a>
-    <!-- modal -->
+    <!-- social settings modal -->
     <form method="post" enctype="multipart/form-data">
         <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog" aria-labelledby="socialSettingsLabel">
             <div class="modal-dialog" role="form">
@@ -121,25 +99,107 @@ enableToSocialMedia($userID);?>
                         </h4>
                     </div>
                     <br>
-                    <img src='https://www.w3schools.com/howto/img_avatar.png' style='width:30%;height:30%;' class='img-responsive img-circle center-block'>
-                        Select image to upload:
-                        <input type="file" name="profilePicture">
-                    
                     <div class="modal-body">
-                        <label for="status"> <?php echo $lang['SOCIAL_STATUS']?> </label>
-                            <input type="text" class="form-control" name="status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE']?>">
+                        <!-- modal body -->
+
+
+
+                        <img src='<?php echo $profilePicture; ?>' style='width:30%;height:30%;' class='img-circle center-block' alt='Profile Picture'>
+
+                        <label>
+                            <input type="file" name="profilePictureUpload">
+                        </label>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="isAvailable" <?php if ($isAvailable == 'TRUE') { echo 'checked'; } ?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                            </label>
+                            <br>
+                        </div>
+
+                        <label for="status"> <?php echo $lang['SOCIAL_STATUS'] ?> </label>
+                        <input type="text" class="form-control" name="status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $status; ?>">
+
+
+
+                        <!-- /modal body -->
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                        <button type="submit" class="btn btn-warning" name="saveSocial"><?php echo $lang['SAVE']; ?></button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    <!-- /modal -->
+    <!-- /social settings modal -->
 
+    <table class="table table-hover">
+        <thead>
+            <th style="white-space: nowrap;width: 1%;"></th>
+            <th style="white-space: nowrap;width: 1%;">Name</th>
+            <th>Status</th>
+        </thead>
+        <tbody>
+            <?php
+            $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
+            $result = $conn->query($sql);
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $x = $row['userID'];
+                    $profilePicture = $defaultPicture;
+                    if (file_exists("${imagePath}$x/profilePicture.png")) {
+                        $profilePicture = "${imagePath}$x/profilePicture.png";
+                    }
+                    if (file_exists("${imagePath}$x/profilePicture.jpg")) {
+                        $profilePicture = "${imagePath}$x/profilePicture.jpg";
+                    }
+                    if (file_exists("${imagePath}$x/profilePicture.gif")) {
+                        $profilePicture = "${imagePath}$x/profilePicture.gif";
+                    }
+                    $name = "${row['firstname']} ${row['lastname']}";
+                    $status = $row['status'];
+                    $class = $row['isAvailable'] == 'TRUE' ? "success" : "danger";
 
+                    echo "<tr class='$class'>";
+                    echo "<td><img src='$profilePicture' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;'></td>";
+                    echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
+                    echo "<td>$status</td>";
+                    echo "<td><a data-toggle='modal' class='btn btn-warning' data-target='#chat$x'>".$lang['SOCIAL_PERSONAL_MESSAGE']."</a></td>";
+                    echo '</tr>';
+                    ?>
+                        <form method="post">
+                            <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $x; ?>">
+                                <div class="modal-dialog" role="form">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="chatLabel<?php echo $x; ?>">
+                                                <?php echo $name ?>
+                                            </h4>
+                                        </div>
+                                        <br>
+                                        <div class="modal-body">
+                                            <!-- modal body -->
+                                            TODO: messages
+                                            <!-- /modal body -->
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['RETURN']; ?></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    <?php
+                }
+            } else {
+                echo mysqli_error($conn);
+            }
+            ?>
+
+        </tbody>
+    </table>
 
 
 

@@ -844,8 +844,8 @@ $lang_ger['SOCIAL_PROFILE_SETTINGS'] = 'Mein Profil';
 $lang_eng['SOCIAL_STATUS'] = 'Status';
 $lang_ger['SOCIAL_STATUS'] = 'Status';
 
-$lang_eng['SOCIAL_STATUS_DEFAULT'] = 'Working on my project';
-$lang_ger['SOCIAL_STATUS_DEFAULT'] = 'Arbeite gerade an meinem Projekt';
+$lang_eng['SOCIAL_STATUS_EXAMPLE'] = 'Working on my project';
+$lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
 
 $lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
 $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
@@ -853,6 +853,23 @@ $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 $lang_eng['SOCIAL_DELETE_PICTURE'] = 'Delete Picture';
 $lang_ger['SOCIAL_DELETE_PICTURE'] = 'Bild löschen';
 
+$lang_eng['SOCIAL_AVAILABLE'] = 'Available';
+$lang_ger['SOCIAL_AVAILABLE'] = 'Verfügbar';
+
+$lang_eng['SOCIAL_ERR_WRONG_IMAGE_TYPE'] = 'Wrong type. Must be png or jpg.';
+$lang_ger['SOCIAL_ERR_WRONG_IMAGE_TYPE'] = 'Falscher Dateityp. Erlaubt sind png oder jpg';
+
+$lang_eng['SOCIAL_ERR_IMAGE_TOO_BIG'] = 'The image is too big. Try a picture smaller than 500 kb';
+$lang_ger['SOCIAL_ERR_IMAGE_TOO_BIG'] = 'Das Bild ist zu groß. Versuchen Sie ein Bild kleiner als 500 kb';
+
+$lang_eng['SOCIAL_ERR_IMAGE_UPLOAD'] = 'An error occured while uploading your image';
+$lang_ger['SOCIAL_ERR_IMAGE_UPLOAD'] = 'Ein Fehler passierte während Ihr Bild hochgeladen wurde';
+
+$lang_eng['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Your image has been uploaded';
+$lang_ger['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Ihr Bild wurde hochgeladen';
+
+$lang_eng['SOCIAL_PERSONAL_MESSAGE'] = 'Personal Message';
+$lang_ger['SOCIAL_PERSONAL_MESSAGE'] = 'Privatnachricht';
 
 /*------------------End Social Media------------------*/
 
