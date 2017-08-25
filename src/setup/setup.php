@@ -80,6 +80,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //insert company-client relationship
       $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,1)";
       $conn->query($sql);
+      //socialprofile
+      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
+      $conn->query($sql);
 
       //insert core user
       $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
@@ -92,6 +95,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query($sql);
       //insert company-client relationship
       $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
+      $conn->query($sql);
+      //socialprofile
+      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
       $conn->query($sql);
 
       //insert configs

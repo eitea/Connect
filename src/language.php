@@ -844,11 +844,14 @@ $lang_ger['SOCIAL_PROFILE_SETTINGS'] = 'Mein Profil';
 $lang_eng['SOCIAL_STATUS'] = 'Status';
 $lang_ger['SOCIAL_STATUS'] = 'Status';
 
-$lang_eng['SOCIAL_STATUS_EXAMPLE'] = 'Working on my project';
-$lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
+$lang_eng['SOCIAL_STATUS_DEFAULT'] = 'Working on my project';
+$lang_ger['SOCIAL_STATUS_DEFAULT'] = 'Arbeite gerade an meinem Projekt';
 
+$lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
+$lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 
-
+$lang_eng['SOCIAL_DELETE_PICTURE'] = 'Delete Picture';
+$lang_ger['SOCIAL_DELETE_PICTURE'] = 'Bild löschen';
 
 
 /*------------------End Social Media------------------*/

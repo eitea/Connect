@@ -247,6 +247,18 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE socialprofile(
+    userID INT(6) UNSIGNED,
+    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    status varchar(150) DEFAULT '-',
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
   $sql = "CREATE TABLE travelCountryData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     identifier VARCHAR(10) NOT NULL,

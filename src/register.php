@@ -172,6 +172,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
           $conn->query($sql);
           echo mysqli_error($conn);
+          //create socialprofile
+          $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES($curID, 'TRUE', '-');";
+          $conn->query($sql);
+          echo mysqli_error($conn);
           //add relationships
           if(isset($_POST['company'])){
             foreach($_POST['company'] as $cmp){
