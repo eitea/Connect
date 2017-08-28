@@ -166,13 +166,10 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 }
 
 
-function uploadFile($file_field = null, $check_image = true, $random_name = false) {
-  //Config
-  $path = '/images/ups/'; //with trailing slash
-  $max_size = 5000000; //in bytes
-  //Set default file extension whitelist
+function uploadFile($file_field = null, $check_image = true) {
+  $max_size = 5000000; //bytes
+  //whitelist
   $whitelist_ext = array('jpeg','jpg','png');
-  //Set default file type whitelist
   $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
 
   //Validation
@@ -200,7 +197,6 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
       $out['error'][] = "File is too big";
     }
 
-    //If $check image is set as true
     if($check_image) {
       if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
         $out['error'][] = "Uploaded file is not a valid image";
@@ -211,7 +207,7 @@ function uploadFile($file_field = null, $check_image = true, $random_name = fals
       return $out;
     }
 
-    //turn interlacing off
+    //remove interlacing bit
     $im = file_get_contents($_FILES[$file_field]['tmp_name']);
     $im = imagecreatefromstring($im);
     imageinterlace($im, 0);
