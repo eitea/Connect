@@ -38,9 +38,17 @@ if(isset($_POST['delete'])  && isset($_POST['indeces'])){
     SELECT userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate FROM $deactivatedUserDataTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>vacErr: '.mysqli_error($conn);}
 
+    //insert roles if not present
+    if($conn->query("SELECT userID from $roleTable WHERE userID = $x")->num_rows == 0){
+      $sql = "INSERT INTO $roleTable (userID) VALUES($x);";
+      if(!$conn->query($sql)){$acc = false; echo '<br>roleErr: '.mysqli_error($conn);}
+    }
 
-    $sql = "INSERT INTO $roleTable (userID) VALUES($x);";
-    if(!$conn->query($sql)){$acc = false; echo '<br>roleErr: '.mysqli_error($conn);}
+    //insert socialprofile if not present
+    if($conn->query("SELECT userID from socialprofile WHERE userID = $x")->num_rows == 0){
+      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-');";
+      if(!$conn->query($sql)){$acc = false; echo '<br>socialErr: '.mysqli_error($conn);}
+    }
 
     if($acc){
       $conn->query("DELETE FROM $deactivatedUserTable WHERE id = $x");

@@ -251,6 +251,7 @@ function create_tables($conn){
     userID INT(6) UNSIGNED,
     isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     status varchar(150) DEFAULT '-',
+    picture MEDIUMBLOB,
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

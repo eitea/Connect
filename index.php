@@ -33,7 +33,6 @@ $routes = array(
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
   '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif"
  );
 
 //url must end like this:  / ACCESS / PAGE
@@ -45,7 +44,7 @@ if($l > 1){
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
-  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.gif)$/", $url, $matches)){
+  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
     }

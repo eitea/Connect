@@ -7,7 +7,7 @@ function displayError(string $msg = "")
     if ($msg == "") {
         $msg = $lang['ERROR_UNEXPECTED'];
     }
-    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
 }
 function displaySuccess(string $msg = "")
 {
@@ -17,37 +17,28 @@ function displaySuccess(string $msg = "")
     echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
 }
 
-
-$imagePath = 'modules/social/images/'; //trailing slash
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
     // picture upload
     if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-        if (preg_match("/.*(\.png|\.jpg|\.gif)$/", basename($_FILES["profilePictureUpload"]["name"]), $matches)) {
-            $target_file = "${imagePath}$userID/profilePicture${matches[1]}";
-            $check = getimagesize($_FILES["profilePictureUpload"]["tmp_name"]);
-            if ($check !== false) {
-                if ($_FILES["profilePictureUpload"]["size"] <= 500000) {
-                    if (!file_exists("${imagePath}$userID")) {
-                        mkdir("${imagePath}$userID");
-                    }
-                    array_map('unlink', glob("${imagePath}$userID/profilePicture.*"));
-                    if (move_uploaded_file($_FILES["profilePictureUpload"]["tmp_name"], $target_file)) {
-                        displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
-                    }
-                    else {
-                        displayError($lang['SOCIAL_ERR_IMAGE_UPLOAD']);
-                    }
-                }
-                else {
-                    displayError($lang['SOCIAL_ERR_IMAGE_TOO_BIG']);
-                }
+        require __DIR__ . "/utilities.php";
+        $pp = uploadFile("profilePictureUpload", 1, 1);
+        if (!is_array($pp)) {
+            $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
+            echo $conn->error;
+            $null = NULL;
+            $stmt->bind_param("b", $null);
+            $stmt->send_long_data(0, $pp);
+            $stmt->execute();
+            if ($stmt->errno) {
+                displayError($stmt->error);
             }
             else {
-                displayError($lang['SOCIAL_ERR_WRONG_IMAGE_TYPE']);
+                displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
             }
+            $stmt->close();
         }
         else {
-            displayError($lang['SOCIAL_ERR_WRONG_IMAGE_TYPE']);
+            displayError(print_r($filename));
         }
     }
     // other settings
@@ -68,17 +59,8 @@ $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
 $row = $result->fetch_assoc();
 $status = $row["status"];
 $isAvailable = $row["isAvailable"];
-$defaultPicture = "${imagePath}default.png";
-$profilePicture = $defaultPicture;
-if (file_exists("${imagePath}$userID/profilePicture.png")) {
-    $profilePicture = "${imagePath}$userID/profilePicture.png";
-}
-if (file_exists("${imagePath}$userID/profilePicture.jpg")) {
-    $profilePicture = "${imagePath}$userID/profilePicture.jpg";
-}
-if (file_exists("${imagePath}$userID/profilePicture.gif")) {
-    $profilePicture = "${imagePath}$userID/profilePicture.gif";
-}
+$defaultPicture = "images/defaultProfilePicture.png";
+$profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
 
 ?>
     <div class="page-header">
@@ -149,24 +131,25 @@ if (file_exists("${imagePath}$userID/profilePicture.gif")) {
         </thead>
         <tbody>
             <?php
+            $today = substr(getCurrentTimestamp(), 0, 10);
             $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $x = $row['userID'];
-                    $profilePicture = $defaultPicture;
-                    if (file_exists("${imagePath}$x/profilePicture.png")) {
-                        $profilePicture = "${imagePath}$x/profilePicture.png";
-                    }
-                    if (file_exists("${imagePath}$x/profilePicture.jpg")) {
-                        $profilePicture = "${imagePath}$x/profilePicture.jpg";
-                    }
-                    if (file_exists("${imagePath}$x/profilePicture.gif")) {
-                        $profilePicture = "${imagePath}$x/profilePicture.gif";
-                    }
+                    $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
+                    $booked = $conn->query("SELECT userID FROM $logTable WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00'")->num_rows > 0;
                     $name = "${row['firstname']} ${row['lastname']}";
                     $status = $row['status'];
-                    $class = $row['isAvailable'] == 'TRUE' ? "success" : "danger";
+                    $class = "danger";
+                    if ($row['isAvailable'] == 'TRUE') { //available + booked = green; available + !booked = yellow; !available = red
+                        if ($booked) {
+                            $class = "success";
+                        }
+                        else {
+                            $class = "warning";
+                        }
+                    }
                     $alerts = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID AND userID = $x")->num_rows;
                     $alertsvisible = $alerts == 0 ? "style='display:none;'" : "";
                     echo "<tr class='$class' data-toggle='modal' data-target='#chat$x'>";

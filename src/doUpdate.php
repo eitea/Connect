@@ -1394,7 +1394,10 @@ if($row['version'] < 96){
   $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
-//if($row['version'] < 97){}
+if($row['version'] < 97){
+
+  
+}
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}
 
