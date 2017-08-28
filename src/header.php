@@ -50,6 +50,9 @@ $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
 
 $enableSocialMedia = $conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'];
+if($enableSocialMedia = 'TRUE'){
+  $numberOfSocialAlerts = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;  
+}
 
 if($isTimeAdmin){
   $numberOfAlerts = 0;
@@ -341,8 +344,25 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           <?php endif; ?>
 
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
-            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?></a></li>
-          <?php endif; ?>
+            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?><span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
+            <script>
+              function updateSocialBadge() {
+                $.ajax({
+                    url: 'ajaxQuery/AJAX_socialGetAlerts.php',
+                    type: 'GET',
+                    success: function (response) {
+                        $("#numberOfSocialAlerts").html(response)
+                        if(response == "0"){
+                          $("#numberOfSocialAlerts").hide()
+                        }else{
+                          $("#numberOfSocialAlerts").show()
+                        }
+                    },
+                })
+              }
+              setInterval(updateSocialBadge,10000) // 10 seconds
+            </script>
+            <?php endif; ?>
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>

@@ -850,8 +850,11 @@ $lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
 $lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
 $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 
-$lang_eng['SOCIAL_DELETE_PICTURE'] = 'Delete Picture';
-$lang_ger['SOCIAL_DELETE_PICTURE'] = 'Bild löschen';
+// $lang_eng['SOCIAL_DELETE_PICTURE'] = 'Delete Picture';
+// $lang_ger['SOCIAL_DELETE_PICTURE'] = 'Bild löschen';
+
+$lang_eng['SOCIAL_NAME'] = 'Name';
+$lang_ger['SOCIAL_NAME'] = 'Name';
 
 $lang_eng['SOCIAL_AVAILABLE'] = 'Available';
 $lang_ger['SOCIAL_AVAILABLE'] = 'Verfügbar';
