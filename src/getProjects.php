@@ -193,7 +193,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //end if POST
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, '', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
+
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, "user" => 0, "bookings" => array(1, '', 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ); //init: display all
 ?>
 
 <div style="position:fixed;background:white;width:100%;z-index:1">
@@ -209,14 +210,14 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
           if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
           if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
-          if($filterings['project'][0]){$projectQuery = "AND $projectTable.id = ".$filterings['project'][0]; }
-          if($filterings['project'][1]){$productiveQuery = "AND $projectTable.status = 'checked'"; }
+          if($filterings['project']){$projectQuery = "AND $projectTable.id = ".$filterings['project']; }
           if($filterings['user']){$userQuery = "AND $userTable.id = ".$filterings['user']; }
           if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
           if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
           if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
+          AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
           AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
@@ -247,7 +248,8 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
+AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
 AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
@@ -588,7 +590,7 @@ $(function () {
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date']; ?>"/>
+            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
@@ -707,7 +709,7 @@ $(document).ready(function(){
 <?php
 if(!empty($filterings['company'])){
   echo '<script>';
-  echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'][0].', "#addSelectProject");';
+  echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'].', "#addSelectProject");';
   echo '</script>';
 }
 if(!empty($filterings['user'])){

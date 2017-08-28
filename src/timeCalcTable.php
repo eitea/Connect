@@ -3,27 +3,31 @@
 $filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
 
 require 'Calculators/IntervalCalculator.php';
-if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
-  $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
-  $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
-  if($_POST['request_open']){
-    $endTime = '0000-00-00 00:00:00';
-  } else {
-    if(empty($_POST['request_end'])){
+if(isset($_POST['request_submit'])){
+  if(!empty($_POST['request_start'])){
+    $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
+    $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
+    if($_POST['request_open']){
       $endTime = '0000-00-00 00:00:00';
-    }
-    $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
-  }
-  $requestText = test_input($_POST['request_text']);
-  if(test_Date($startTime)){
-    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
-    if($conn->query($sql)){
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      if(empty($_POST['request_end'])){
+        $endTime = '0000-00-00 00:00:00';
+      }
+      $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+    }
+    $requestText = test_input($_POST['request_text']);
+    if(test_Date($startTime)){
+      $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
+      if($conn->query($sql)){
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+      } else {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
   } else {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+    echo '<div class="alert alter-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } elseif(!empty($_POST['splits_save'])) {
   $x = intval($_POST['splits_save']);
