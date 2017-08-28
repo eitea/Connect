@@ -1395,8 +1395,25 @@ if($row['version'] < 96){
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
 if($row['version'] < 97){
-
-  
+  $conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("CREATE TABLE socialprofile(
+    userID INT(6) UNSIGNED,
+    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    status varchar(150) DEFAULT '-',
+    picture MEDIUMBLOB,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )");
+  $conn->query("CREATE TABLE socialmessages(
+    userID INT(6) UNSIGNED,
+    partner INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )");
+  $conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
 }
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}

@@ -247,29 +247,6 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE socialprofile(
-    userID INT(6) UNSIGNED,
-    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    status varchar(150) DEFAULT '-',
-    picture MEDIUMBLOB,
-    FOREIGN KEY (userID) REFERENCES UserData(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-  $sql = "CREATE TABLE socialmessages(
-    userID INT(6) UNSIGNED,
-    partner INT(6) UNSIGNED,
-    message TEXT NOT NULL,
-    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-
   $sql = "CREATE TABLE travelCountryData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     identifier VARCHAR(10) NOT NULL,
@@ -787,6 +764,31 @@ function create_tables($conn){
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialprofile(
+    userID INT(6) UNSIGNED,
+    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    status varchar(150) DEFAULT '-',
+    picture MEDIUMBLOB,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  
+  $sql = "CREATE TABLE socialmessages(
+    userID INT(6) UNSIGNED,
+    partner INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
