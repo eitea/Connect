@@ -54,12 +54,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
     }
     $conn->query($sql);
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newGroup'])) {
+    if(isset($_POST["name"],$_POST["members"])){
+        var_dump($_POST);
+        //TODO: foreach member insert into table
+    }
+}
 
 $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
 $row = $result->fetch_assoc();
 $status = $row["status"];
 $isAvailable = $row["isAvailable"];
 $defaultPicture = "images/defaultProfilePicture.png";
+$defaultGroupPicture = "images/group.png";
 $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
 
 ?>
@@ -123,6 +130,8 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
     </form>
     <!-- /social settings modal -->
 
+        <h4><?php echo $lang['SOCIAL_CONTACTS']; ?></h4>
+
     <table class="table table-hover">
         <thead>
             <th style="white-space: nowrap;width: 1%;"></th>
@@ -138,7 +147,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                 while ($row = $result->fetch_assoc()) {
                     $x = $row['userID'];
                     $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
-                    $booked = $conn->query("SELECT userID FROM $logTable WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00'")->num_rows > 0;
+                    $booked = $conn->query("SELECT * FROM $logTable WHERE userID = $x AND time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00'")->num_rows > 0;
                     $name = "${row['firstname']} ${row['lastname']}";
                     $status = $row['status'];
                     $class = "danger";
@@ -219,6 +228,82 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
 
         </tbody>
     </table>
+    
+    <hr>
+    <h4><?php echo $lang['SOCIAL_GROUPS']; ?>
+        <button class="btn btn-default" data-toggle="modal" data-target="#newGroup" type="button"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
+    </h4>
+        <!-- new group modal -->
+        <form method="post" enctype="multipart/form-data">
+        <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
+            <div class="modal-dialog" role="form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="newGroupLabel">
+                            <?php echo $lang['SOCIAL_CREATE_GROUP']; ?>
+                        </h4>
+                    </div>
+                    <br>
+                    <div class="modal-body">
+                        <!-- modal body -->
+                        <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
+                        <br>
+                        <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
+                        <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
+                        <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
+                        <div class="checkbox">
+                            <?php 
+                            $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE'  ORDER BY lastname ASC");
+                            while($row = $result->fetch_assoc()){
+                                $name = "${row['firstname']} ${row['lastname']}";
+                                $x = $row["id"];
+                            ?>
+                            <label>
+                                <input type="checkbox" name="members" value="<?php echo $x; ?>" <?php if($x == $userID){echo "checked disabled";}?>><?php echo $name ?><br>
+                            </label>
+                            <br>
+                            <?php } ?>
+                        </div>
+                        <!-- /modal body -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                        <button type="submit" class="btn btn-warning" name="newGroup"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+        <!-- /new group modal -->
+
+
+    <table class="table table-hover">
+        <thead>
+            <th style="white-space: nowrap;width: 1%;"></th>
+            <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SOCIAL_NAME']; ?></th>
+            <th><?php echo $lang['SOCIAL_GROUP_MEMBERS']; ?></th>
+        </thead>
+        <tbody>
+            <?php
+            
+            // $conn->query("CREATE TABLE socialgroups(
+            //     groupID INT(6) UNSIGNED,
+            //     userID INT(6) UNSIGNED,
+            //     name VARCHAR(30),
+            //     admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+            //   )");
+            //   $conn->query("CREATE TABLE socialgroupmessages(
+            //     userID INT(6) UNSIGNED,
+            //     groupID INT(6) UNSIGNED,
+            //     message TEXT,
+            //     picture MEDIUMBLOB,
+            //     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+            //     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+            //   )");
+            echo "<td><img src='$defaultGroupPicture' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;'><div id='badge$x' $alertsvisible class='badge row'>$alerts</div></td>";
+              ?>
+        </tbody>
 
     <script>
     function getMessages(partner, target, scroll = false) {

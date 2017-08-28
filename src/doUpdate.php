@@ -1414,6 +1414,20 @@ if($row['version'] < 97){
     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )");
   $conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+  $conn->query("CREATE TABLE socialgroups(
+    groupID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    name VARCHAR(30),
+    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  )");
+  $conn->query("CREATE TABLE socialgroupmessages(
+    userID INT(6) UNSIGNED,
+    groupID INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )");
 }
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}

@@ -874,6 +874,17 @@ $lang_ger['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Ihr Bild wurde hochgeladen';
 $lang_eng['SOCIAL_PERSONAL_MESSAGE'] = 'Personal Message';
 $lang_ger['SOCIAL_PERSONAL_MESSAGE'] = 'Privatnachricht';
 
+$lang_eng['SOCIAL_CONTACTS'] = 'Contacts';
+$lang_ger['SOCIAL_CONTACTS'] = 'Kontakte';
+
+$lang_eng['SOCIAL_GROUPS'] = 'Groups';
+$lang_ger['SOCIAL_GROUPS'] = 'Gruppen';
+
+$lang_eng['SOCIAL_GROUP_MEMBERS'] = 'Group members';
+$lang_ger['SOCIAL_GROUP_MEMBERS'] = 'Gruppenmitglieder';
+
+$lang_eng['SOCIAL_CREATE_GROUP'] = 'Create group';
+$lang_ger['SOCIAL_CREATE_GROUP'] = 'Gruppe erstellen';
 /*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';

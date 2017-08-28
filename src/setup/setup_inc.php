@@ -781,10 +781,32 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-  
+
   $sql = "CREATE TABLE socialmessages(
     userID INT(6) UNSIGNED,
     partner INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroups(
+    groupID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    name VARCHAR(30),
+    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroupmessages(
+    userID INT(6) UNSIGNED,
+    groupID INT(6) UNSIGNED,
     message TEXT,
     picture MEDIUMBLOB,
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
