@@ -1,6 +1,6 @@
 <?php include 'header.php'; enableToStamps($userID);?>
 <?php
-$filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
+$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,8).'01'));
 
 require 'Calculators/IntervalCalculator.php';
 if(isset($_POST['request_submit'])){
@@ -77,8 +77,7 @@ if(isset($_POST['request_submit'])){
   </thead>
   <tbody>
     <?php
-    $filterings['date'] = str_replace('__', '01', $filterings['date']);
-    $now = $filterings['date'].' 05:00:00';
+    $now = $filterings['date'][0];
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);

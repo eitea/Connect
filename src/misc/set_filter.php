@@ -1,13 +1,13 @@
 <?php
 /**
-* Company => id
-* Client  => id
-* Project  => id
-* Users => id
-* Bookings => [charged, break, drive]
-* Logs => [activity, hideAll]
-* Dates => [fromDate, toDate]
-* Procedures => [transitions[id], status, hideAll]
+* company => id
+* client  => id
+* project  => id
+* users => id
+* bookings => [charged, break, drive]
+* logs => [activity, hideAll]
+* date => [fromDate, toDate]
+* procedures => [transitions[id], status, hideAll]
 **/
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
@@ -206,10 +206,11 @@ if($scale > 2){ //3 columns
               <label><?php echo $lang['FROM']; ?></label>
               <input type="date" class="form-control" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
               <br><label><?php echo $lang['TO']; ?></label>
+              <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
             <?php else: ?>
-              <br><label><?php echo $lang['DATE']; ?></label>
+              <label><?php echo $lang['DATE']; ?></label>
+              <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
             <?php endif; ?>
-            <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
           </div>
         <?php endif; ?>
 
