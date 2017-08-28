@@ -279,10 +279,9 @@ if(!$result || $result->num_rows <= 0){
     <tbody>
       <?php
       $csv = new Csv();
-      $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
-      $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
-      $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
-      $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
+      $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info', $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
+      $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'], $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'],
+      $lang['ADDITIONAL_FIELDS'], $lang['EXPENSES']));
 
       $sum_min = 0;
       $numRows = $result->num_rows;
@@ -350,7 +349,7 @@ if(!$result || $result->num_rows <= 0){
         $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
         $detailInfo = $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
         $interninfo = $row['internInfo'];
-        $optionalinfo = $csv_optionalinfo = $expensesinfo = '';
+        $optionalinfo = $csv_optionalinfo = $expensesinfo = $csv_expensesinfo = '';
         $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
         if($extraFldRes && $extraFldRes->num_rows > 0){
           $extraFldRow = $extraFldRes->fetch_assoc();
@@ -364,10 +363,11 @@ if(!$result || $result->num_rows <= 0){
           $extraFldRow = $extraFldRes->fetch_assoc();
           if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
         }
-        if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
-        if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
-        if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
         $csv_Add[] = $csv_optionalinfo;
+        if($row['exp_unit'] > 0){ $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>'; $csv_expensesinfo .= "{$lang['QUANTITY']}: {$row['exp_unit']},"; }
+        if($row['exp_price'] > 0){ $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>'; $csv_expensesinfo .= "{$lang['PRICE_STK']}: {$row['exp_price']}"; }
+        if($row['exp_info']){ $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>'; $csv_expensesinfo .= ", {$lang['DESCRIPTION']}: {$row['exp_info']}"; }
+        $csv_Add[] = $csv_expensesinfo;
         echo "<td>";
         if($row['booked'] == 'FALSE'){ echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
         if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}

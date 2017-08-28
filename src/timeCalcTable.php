@@ -152,14 +152,16 @@ if(isset($_POST['request_submit'])){
         <div class="modal-body">
           <div class="row">
             <div class="col-md-6">
-              <label>Neuer Anfang</label>
+              <label><?php echo $lang['FROM']; ?></label>
               <br>
-              <input type="time" name="request_start" class="form-control" />
+              <div class="radio"> <!-- beauty purposes -->
+                <input type="time" name="request_start" class="form-control" value="<?php echo substr(carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]), 11, 5); ?>" />
+              </div>
             </div>
             <div class="col-md-6">
-              <label>Neues Ende</label>
+              <label><?php echo $lang['TO']; ?></label>
               <div class="radio">
-                <label><input type="radio" name="request_open" value="0" checked /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" /></label>
+                <label><input type="radio" name="request_open" value="0" checked /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;"  value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
                 <br><br>
                 <label><input type="radio" name="request_open" value="1" /> <?php echo $lang['OPEN']; ?></label>
               </div>
