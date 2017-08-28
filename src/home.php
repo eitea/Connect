@@ -45,7 +45,11 @@ if($result && $result->num_rows > 0){$mean_sun = sprintf('%.2f',array_sum(array_
 $today = getCurrentTimestamp();
 $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $userID AND endDate IS NULL");
 $row = $result->fetch_assoc();
-$expected_today = floatval($row[strtolower(date('D', strtotime($today)))]);
+if(isHoliday($today)){
+  $expected_today = 0;
+} else {
+  $expected_today = floatval($row[strtolower(date('D', strtotime($today)))]);
+}
 $result = $conn->query("SELECT * FROM $logTable WHERE userID = $userID AND (time LIKE '".substr($today, 0, 10)." %' OR timeEnd = '0000-00-00 00:00:00')");
 if($result && ($row = $result->fetch_assoc())){
   $break_hours = 0;

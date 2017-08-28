@@ -1,33 +1,42 @@
 <?php include 'header.php'; ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['VACATION'].' '.'Calendar' ?></h3>
+  <h3><?php echo $lang['CALENDAR']; ?></h3>
 </div>
 
 <link rel='stylesheet' href='plugins/fullcalendar/fullcalendar.css' />
 <script src='plugins/fullcalendar/lib/jquery.min.js'></script>
 <script src='plugins/fullcalendar/lib/moment.min.js'></script>
 <script src='plugins/fullcalendar/fullcalendar.js'></script>
-
-<style>
-.fc-today{
-   background-color: #dffbce !important;
-}
-</style>
 <?php
-//prefer the request, since user can delete his requests by himself for a 'cleanup'. This way the calendar won't get bigger and bigger as long as the system goes on
-$sql = "SELECT * FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE $userRequests.status = '2' AND $userRequests.requestType = 'vac'";
-$result = $conn->query($sql);
-$vacs = '';
-if($result && $result->num_rows > 0){
-  while($row = $result->fetch_assoc()){
-    $title = $lang['VACATION'] . ': ' . $row['firstname'] . ' ' . $row['lastname'];
-    //adding hours would display '5a' for 5am.
-    $start = substr($row['fromDate'], 0, 10);
-    $end = substr(carryOverAdder_Hours($row['toDate'], 24), 0, 10);
-    $vacs .= "{ title: '$title', start: '$start', end: '$end'},";
+$dates = '';
+$start = getCurrentTimestamp(); //normal users can only see future dates
+if($isCoreAdmin) { $start = date('Y-m-d', strtotime('-1 year')); }
+$result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID WHERE status != 0 AND DATE(time) > DATE('$start') ORDER BY userID, time, status");
+if($result && ($row = $result->fetch_assoc())){
+  $start = substr($row['time'], 0, 10);
+  $prev_row = $row;
+  if($result && ($row = $result->fetch_assoc())){
+    $colors = array('', '#A3F375', '#d4b6ff', '#ffa24b', '#8dd5fe', '', '#ffa4a4');
+    do {
+      if($prev_row['status'] != 5){
+        $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+        $color = $colors[$prev_row['status']];
+      } else {
+        continue;
+      }
+      if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //chain
+        $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+        $dates .= "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'},";
+        $start = substr($row['time'], 0, 10);
+      }
+      $prev_row = $row;
+    } while($row = $result->fetch_assoc());
   }
+} else {
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
 }
+
 ?>
 <div id='calendar' style='height: 900px;'></div>
 <script>
@@ -41,16 +50,16 @@ $(document).ready(function(){
       right: "month, agendaWeek, listMonth"
     },
     defaultView: "month",
-    events: [<?php echo $vacs; ?>],
-    eventColor: '#A3F375',
-    eventTextColor: '#6D6D6D'
+    events: [<?php echo $dates; ?>],
+    eventTextColor: '#6D6D6D',
+    eventBorderColor: '#FFFFFF'
   });
 });
 </script>
 
 <?php
-if ($_SESSION['userid'] == 1) {
-  echo "<a href='allowVacations.php'>" .$lang['VACATION_REQUESTS']. "</a>";
+if($isCoreAdmin) {
+  echo "<a href='../time/check' class='btn btn-warning'>" .$lang['VACATION_REQUESTS']. "</a>";
 }
 ?>
 <?php include 'footer.php'; ?>

@@ -1,8 +1,7 @@
 <?php
 $routes = array(
-  'php/info' => 'phpinfo.php',
-  'setup/run' => 'setup/setup_getInput.php',       'setup/create' => 'setup/setup.php',
-  'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',
+  'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
+  'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
@@ -14,7 +13,7 @@ $routes = array(
   'system/password' => 'passwordOptions.php',      'system/email' => 'reportOptions.php',             'system/tasks' => 'taskScheduler.php',
   'system/update' => 'pullGitRepo.php',            'system/backup' => 'download_sql.php',             'system/restore' => 'upload_database.php',
   'system/designer' => 'templateSelect.php',       'system/clients' => 'editCustomers.php',           'system/clientDetail' => 'editCustomer_detail.php',
-  'system/previewTem' => 'templatePreview.php',    'system/downloadTem', 'templateDownload.php',      'system/editTem' => 'templateEdit.php',
+  'system/previewTem' => 'templatePreview.php',    'system/downloadTem' => 'templateDownload.php',    'system/editTemp' => 'templateEdit.php',
   'system/downloadSql' => 'sqlDownload.php',
 
   'time/view' => 'getTimestamps.php',              'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
@@ -27,12 +26,11 @@ $routes = array(
 
   'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
-  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
+  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php'
 );
 $mime_types = array(
-  '.css' => "text/css",           '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",        '.jpg' => "image/jpg",              '.woff2' => "font/woff",
-  '.woff' => 'application/font-woff'
+  '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2"
  );
 
 //url must end like this:  / ACCESS / PAGE
@@ -44,13 +42,13 @@ if($l > 1){
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
-  } elseif($params[$l -1] == 'ajaxQuery'){
-    include 'src/'.$route;
-  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff)$/", $url, $matches)){
+  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
     }
-    include $matches[0];
+    echo file_get_contents($matches[0]);
+  } elseif($params[$l -1] == 'ajaxQuery'){
+    include 'src/'.$route;
   } else {
     header('HTTP/1.0 404 Not Found');
     include '404.html';

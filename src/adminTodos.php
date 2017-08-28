@@ -218,7 +218,7 @@ if($result && $result->num_rows > 0):
             if($row['requestType'] == 'acc'){
               echo '<td>'. substr($row['fromDate'],0,10). '</td>';
               echo '<td> --- </td>';
-              echo '<td class="text-center"><button type="submit" class="btn btn-default" name="okay_acc" value="'.$row['id'].'" > <img width=18px height=18px src="/images/okay.png"> </button> ';
+              echo '<td class="text-center"><button type="submit" class="btn btn-default" name="okay_acc" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_acc" value="'.$row['userID'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button></td>';
             } elseif($row['requestType'] == 'vac' || $row['requestType'] == 'spl' || $row['requestType'] == 'scl' || $row['requestType'] == 'cto') {
               echo '<td>'. substr($row['fromDate'],0,10) . ' - ' . substr($row['toDate'],0,10) . '</td>';
@@ -226,8 +226,8 @@ if($result && $result->num_rows > 0):
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width="18px" height="18px" src="/images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="/images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'log') {
               echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
@@ -235,8 +235,8 @@ if($result && $result->num_rows > 0):
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay_log" value="'.$row['id'].'" > <img width=18px height=18px src="/images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay_log" value="'.$row['id'].'"> <img width=18px height=18px src="/images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay_log" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_log" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'brk') {
               echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
@@ -244,8 +244,8 @@ if($result && $result->num_rows > 0):
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay_brk" value="'.$row['id'].'" > <img width=18px height=18px src="/images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay_brk" value="'.$row['id'].'"> <img width=18px height=18px src="/images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay_brk" value="'.$row['id'].'" > <img width=18px height=18px src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_brk" value="'.$row['id'].'"> <img width=18px height=18px src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'div'){
               echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).' (utc)</td>';
@@ -253,8 +253,8 @@ if($result && $result->num_rows > 0):
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay_div" value="'.$row['id'].'" > <img width="18px" height="18px" src="/images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay_div" value="'.$row['id'].'"> <img width="18px" height="18px" src="/images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay_div" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_div" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             }
             echo '</tr>';

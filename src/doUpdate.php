@@ -1401,11 +1401,11 @@ if($row['version'] < 96){
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
-echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="home.php">redirect</a>';
+echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
 ?>
 <script type="text/javascript">
   window.setInterval(function(){
-    window.location.href="home.php";
+    window.location.href="../user/home";
   }, 6000);
 </script>
 <noscript>
