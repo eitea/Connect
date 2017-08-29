@@ -12,8 +12,13 @@ if(isset($_POST['request_submit'])){
     } else {
       if(empty($_POST['request_end'])){
         $endTime = '0000-00-00 00:00:00';
+      } else {
+        $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+        if(timeTiff_Hours($startTime, $endTime) < 0){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">$times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          die(); //still better than a goto.
+        }
       }
-      $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
     }
     $requestText = test_input($_POST['request_text']);
     if(test_Date($startTime)){
@@ -49,7 +54,7 @@ if(isset($_POST['request_submit'])){
         echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
       }
     } else {
-      die("Please do not try this again. It will not work."); //for later: we should create a strike system.
+      die("Please do not try this again. It will not work."); //TODO for later: we should create a strike system.
     }
   } else {
     echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -160,9 +165,9 @@ if(isset($_POST['request_submit'])){
             <div class="col-md-6">
               <label><?php echo $lang['TO']; ?></label>
               <div class="radio">
-                <label><input type="radio" name="request_open" value="0" checked /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;"  value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
+                <label><input type="radio" name="request_open" value="0" /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" min="01:00" value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
                 <br><br>
-                <label><input type="radio" name="request_open" value="1" /> <?php echo $lang['OPEN']; ?></label>
+                <label><input type="radio" name="request_open" value="1" checked /> <?php echo $lang['OPEN']; ?></label>
               </div>
             </div>
           </div>

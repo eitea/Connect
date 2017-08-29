@@ -411,8 +411,20 @@ $(function () {
         <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
           <div class="row">
           <?php
-          if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-            echo "<div class='col-md-6'><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
+          if(!empty($row['projectID'])){ //if this is no break, display client/project selection
+            if(count($available_companies) > 1){
+              echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+              $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+              while($companyRow = $companyResult->fetch_assoc()){
+                $selected = '';
+                if($companyRow['id'] == $row['companyID']){
+                  $selected = 'selected';
+                }
+                echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
+              }
+              echo '</select></div>';
+            }
+            echo "<div class='col-md-4'><select id='newClient$x' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterings['company']){
               $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
@@ -425,7 +437,7 @@ $(function () {
               }
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
-            echo "</select></div><div class='col-md-6'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+            echo "</select></div><div class='col-md-4'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
             $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){
@@ -436,7 +448,7 @@ $(function () {
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
             echo "</select></div> <br><br>";
-          } //end if(break)
+          } //end if(!break)
 
           $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
           $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
@@ -476,8 +488,8 @@ $(function () {
           ?>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
         </div>
       </div>
     </div>
