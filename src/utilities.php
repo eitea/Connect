@@ -166,8 +166,9 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 }
 
 
-function uploadFile($file_field = null, $check_image = true) {
-  $max_size = 5000000; //bytes
+function uploadFile($file_field = null, $check_image = true) { //should be named uploadImage
+  //bytes
+  $max_size = 5000000;
   //whitelist
   $whitelist_ext = array('jpeg','jpg','png');
   $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
@@ -203,7 +204,7 @@ function uploadFile($file_field = null, $check_image = true) {
       }
     }
 
-    if(count($out['error'])>0) {
+    if(count($out['error']) > 0) {
       return $out;
     }
 

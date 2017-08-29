@@ -1,5 +1,4 @@
-<?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.phpmailer.php"; ?>
-<?php require_once dirname(__DIR__) ."/plugins/phpMailer/class.smtp.php"; ?>
+<?php use PHPMailer\PHPMailer\PHPMailer; require_once dirname(__DIR__) ."/plugins/phpMailer/autoload.php"; ?>
 <?php require_once __DIR__ . "/connection.php"; require_once __DIR__ ."/createTimestamps.php"; ?>
 <?php require_once dirname(__DIR__) ."/plugins/cssToInlineStyles/autoload.php"; ?>
 <?php require_once __DIR__ .'/utilities.php'; ?>
@@ -27,6 +26,7 @@ try {
     padding: 5px;
   }';
 }
+
 //get all mails
 $resultContent = $conn->query("SELECT id, name FROM $pdfTemplateTable WHERE repeatCount != '' AND repeatCount IS NOT NULL "); //i think the repeatCount stands for active or inactive..
 while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
