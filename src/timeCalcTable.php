@@ -14,8 +14,8 @@ if(isset($_POST['request_submit'])){
         $endTime = '0000-00-00 00:00:00';
       } else {
         $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
-        if(timeTiff_Hours($startTime, $endTime) < 0){
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">$times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+        if(timeDiff_Hours($startTime, $endTime) < 0){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
           die(); //still better than a goto.
         }
       }
@@ -32,7 +32,7 @@ if(isset($_POST['request_submit'])){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
   } else {
-    echo '<div class="alert alter-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].' '.$lang['BEGIN'].' '.$lang['MISSING'].'.</div>';
   }
 } elseif(!empty($_POST['splits_save'])) {
   $x = intval($_POST['splits_save']);
@@ -175,6 +175,7 @@ if(isset($_POST['request_submit'])){
             <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
+              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Sonderzeichen werden immer entfernt.</small>
             </div>
           </div>
         </div>
