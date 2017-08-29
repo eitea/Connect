@@ -286,7 +286,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <label><input type="checkbox" checked name="canStamp"><?php echo $lang['CAN_CHECKIN']; ?></label><br>
           <label><input type="checkbox" name="canBook"><?php echo $lang['CAN_BOOK']; ?></label><br>
           <label><input type="checkbox" name="canEditTemplates"><?php echo $lang['CAN_EDIT_TEMPLATES']; ?></label><br>
-          <label><input type="checkbox" name="canUseSocialMedia "><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?></label><br>
+          <label><input type="checkbox" name="canUseSocialMedia"><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?></label><br>
         </div>
       </div>
       <div class="col-md-3">

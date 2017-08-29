@@ -859,20 +859,20 @@ $lang_ger['SOCIAL_NAME'] = 'Name';
 $lang_eng['SOCIAL_AVAILABLE'] = 'Available';
 $lang_ger['SOCIAL_AVAILABLE'] = 'Verfügbar';
 
-$lang_eng['SOCIAL_ERR_WRONG_IMAGE_TYPE'] = 'Wrong type. Must be png or jpg.';
-$lang_ger['SOCIAL_ERR_WRONG_IMAGE_TYPE'] = 'Falscher Dateityp. Erlaubt sind png oder jpg';
-
-$lang_eng['SOCIAL_ERR_IMAGE_TOO_BIG'] = 'The image is too big. Try a picture smaller than 500 kb';
-$lang_ger['SOCIAL_ERR_IMAGE_TOO_BIG'] = 'Das Bild ist zu groß. Versuchen Sie ein Bild kleiner als 500 kb';
-
-$lang_eng['SOCIAL_ERR_IMAGE_UPLOAD'] = 'An error occured while uploading your image';
-$lang_ger['SOCIAL_ERR_IMAGE_UPLOAD'] = 'Ein Fehler passierte während Ihr Bild hochgeladen wurde';
+$lang_eng['SOCIAL_ERR_NO_MEMBERS'] = 'You have to add at least one member to your group';
+$lang_ger['SOCIAL_ERR_NO_MEMBERS'] = 'Sie müssen mindestens ein Mitglied zu Ihrer Gruppe hinzufügen';
 
 $lang_eng['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Your image has been uploaded';
 $lang_ger['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Ihr Bild wurde hochgeladen';
 
-$lang_eng['SOCIAL_PERSONAL_MESSAGE'] = 'Personal Message';
+$lang_eng['SOCIAL_ERR_NO_NAME'] = 'You have to name your group';
+$lang_ger['SOCIAL_ERR_NO_NAME'] = 'Sie müssen der Gruppe einen Namen geben';
+
+$lang_eng['SOCIAL_PERSONAL_MESSAGE'] = 'Personal message';
 $lang_ger['SOCIAL_PERSONAL_MESSAGE'] = 'Privatnachricht';
+
+$lang_eng['SOCIAL_GROUP_MESSAGE'] = 'Group message';
+$lang_ger['SOCIAL_GROUP_MESSAGE'] = 'Gruppennachricht';
 
 $lang_eng['SOCIAL_CONTACTS'] = 'Contacts';
 $lang_ger['SOCIAL_CONTACTS'] = 'Kontakte';

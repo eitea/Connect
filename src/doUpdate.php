@@ -1426,7 +1426,7 @@ if($row['version'] < 97){
     message TEXT,
     picture MEDIUMBLOB,
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    seen TEXT
   )");
 }
 //if($row['version'] < 98){}

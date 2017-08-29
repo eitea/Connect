@@ -810,7 +810,7 @@ function create_tables($conn){
     message TEXT,
     picture MEDIUMBLOB,
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    seen TEXT
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
