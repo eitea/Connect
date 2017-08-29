@@ -11,7 +11,7 @@ if($result && $result->num_rows > 0){
   $indexIM = $row['indexIM']; //this value must not change
   $timeToUTC = $row['timeToUTC']; //just in case.
 } else {
-  redirect("home.php");
+  redirect("../user/home");
 }
 
 //ADDENDUMS
@@ -37,6 +37,7 @@ while($result && ($row = $result->fetch_assoc())){
     }
     $A = $row_b['end'];
   }
+
   if($request_addendum) break;
   $B = $row['timeEnd'];
   if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
@@ -69,6 +70,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInfoText = test_input(trim($_POST['infoText']));
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
+    //does the user know that he is adding and not sending a submit from a normal booking because the admin edited something in the background in the mean time?
+    if($request_addendum && empty($_POST['confirm_addendum'])){ //every if has a story
+      redirect("../user/home");
+    }
     if(timeDiff_Hours($startDate, $endDate) > 0){
       if(isset($_POST['addBreak'])){
         $startDate = substr($startDate, 0, 17). rand(10,59);

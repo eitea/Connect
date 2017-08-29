@@ -622,6 +622,7 @@ $(function () {
   </div>
 </form>
 
+<script src="plugins/jsCookie/src/js.cookie.js"></script>
 <script>
 function showClients(place, company, client, project, projectPlace){
   $.ajax({
@@ -683,17 +684,41 @@ function hideMyDiv(o, toShow){
     document.getElementById(toShow).style.display='block';
   }
 }
+
+if(Cookies.get('checkboxValues') !== undefined){
+  var checkboxValues = Cookies.getJSON('checkboxValues');
+  if(checkboxValues){
+    $.each(checkboxValues, function(key, value) {
+      var elem = document.getElementById(key)
+      if(elem){
+        elem.checked = value;
+      }
+    });
+  }
+} else {
+  var checkboxValues = {};
+}
+$(":checkbox").on("change", function(){
+  if(this.id){
+    checkboxValues[this.id] = this.checked;
+  }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
+});
+
 function toggle(checkId, uncheckId) {
   checkboxes = document.getElementsByName(checkId + '[]');
   checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
   for(var i = 0; i<checkboxes.length; i++) {
     checkboxes[i].checked = true;
     checkboxesUncheck[i].checked = false;
+    checkboxValues[checkboxes[i].id] = true;
   }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
 }
 function toggle2(uncheckID){
   uncheckBox = document.getElementById(uncheckID);
   uncheckBox.checked = false;
+  checkboxValues[uncheckBox.id] = false;
 }
 
 $(document).ready(function(){
@@ -715,7 +740,6 @@ $(document).ready(function(){
     }
   });
 });
-
 </script>
 
 <?php

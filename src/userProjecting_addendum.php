@@ -53,7 +53,8 @@
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     }
-
     ?>
   </tbody>
 </table>
+
+<input type="hidden" name="confirm_addendum" value="true" />
