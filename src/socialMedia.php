@@ -80,6 +80,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newGroup'])) {
         }
     }
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editGroup'])) {
+    if(isset($_POST["name"],$_POST["members"],$_POST["id"]) && $_POST["name"] != ""){
+        $name = test_input($_POST["name"]);
+        $groupID = $_POST["id"];
+        $conn->query("DELETE FROM socialgroups WHERE $groupID = groupID");
+        $conn->query("INSERT INTO socialgroups (groupID, userID, admin,name) VALUES ($groupID, $userID, 'TRUE','$name')");
+        foreach ($_POST["members"] as $key => $member) {
+            $conn->query("INSERT INTO socialgroups (groupID, userID, admin,name) VALUES ($groupID, $member, 'FALSE','$name')");
+        }
+        redirect("../social/home");
+    }else{
+        if(!isset($_POST["members"])){
+            displayError($lang["SOCIAL_ERR_NO_MEMBERS"]);
+        }
+        if(!isset($_POST["name"]) || $_POST["name"] == ""){
+            displayError($lang["SOCIAL_ERR_NO_NAME"]);
+        }
+    }
+}
 
 $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
 $row = $result->fetch_assoc();
@@ -151,7 +170,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
     <!-- /social settings modal -->
 
         <h4><?php echo $lang['SOCIAL_CONTACTS']; ?></h4>
-
+    <!-- contacts -->
     <table class="table table-hover">
         <thead>
             <th style="white-space: nowrap;width: 1%;"></th>
@@ -248,56 +267,57 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
 
         </tbody>
     </table>
-    
+    <!-- /contacts -->
+
     <hr>
     <h4><?php echo $lang['SOCIAL_GROUPS']; ?>
         <button class="btn btn-default" data-toggle="modal" data-target="#newGroup" type="button"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
     </h4>
-        <!-- new group modal -->
-        <form method="post" enctype="multipart/form-data">
-        <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
-            <div class="modal-dialog" role="form">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="newGroupLabel">
-                            <?php echo $lang['SOCIAL_CREATE_GROUP']; ?>
-                        </h4>
-                    </div>
+    <!-- new group modal -->
+    <form method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
+        <div class="modal-dialog" role="form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="newGroupLabel">
+                        <?php echo $lang['SOCIAL_CREATE_GROUP']; ?>
+                    </h4>
+                </div>
+                <br>
+                <div class="modal-body">
+                    <!-- modal body -->
+                    <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
                     <br>
-                    <div class="modal-body">
-                        <!-- modal body -->
-                        <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
+                    <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
+                    <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
+                    <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
+                    <div class="checkbox">
+                        <?php 
+                        $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+                        while($row = $result->fetch_assoc()){
+                            $name = "${row['firstname']} ${row['lastname']}";
+                            $x = $row["id"];
+                        ?>
+                        <label>
+                            <input type="checkbox" value="<?php echo $x; ?>" <?php if($x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';}?>><?php echo $name ?><br>
+                        </label>
                         <br>
-                        <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
-                        <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
-                        <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
-                        <div class="checkbox">
-                            <?php 
-                            $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
-                            while($row = $result->fetch_assoc()){
-                                $name = "${row['firstname']} ${row['lastname']}";
-                                $x = $row["id"];
-                            ?>
-                            <label>
-                                <input type="checkbox" value="<?php echo $x; ?>" <?php if($x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';}?>><?php echo $name ?><br>
-                            </label>
-                            <br>
-                            <?php } ?>
-                        </div>
-                        <!-- /modal body -->
+                        <?php } ?>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                        <button type="submit" class="btn btn-warning" name="newGroup"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
-                    </div>
+                    <!-- /modal body -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="newGroup"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
                 </div>
             </div>
         </div>
-        </form>
-        <!-- /new group modal -->
+    </div>
+    </form>
+    <!-- /new group modal -->
 
-
+    <!-- /groups -->
     <table class="table table-hover">
         <thead>
             <th style="white-space: nowrap;width: 1%;"></th>
@@ -306,20 +326,26 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID";
+            $sql = "SELECT groupID,name FROM socialgroups WHERE userID = $userID";
+            if($userID == 1) //superuser
+                $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $x = $row["groupID"];
                     $name = $row["name"];
                     $result_members = $conn->query("SELECT * FROM socialgroups INNER JOIN userdata ON userdata.id = socialgroups.userID  WHERE groupID = $x");
-                    $alerts = $conn->query("SELECT * FROM socialgroupmessages WHERE NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
+                    $alerts = $conn->query("SELECT * FROM socialgroupmessages WHERE groupID = $x AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
                     $alertsvisible = $alerts == 0 ? "style='display:none;'" : "";
-                    echo "<tr title='Click the picture to edit settings as admin'>";
-                    echo "<td><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
+                    echo "<tr>";
+                    echo "<td data-toggle='modal' data-target='#editGroup$x'><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>$name</td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>";
+                    $userIsGroupAdmin = false;
                     while($row = $result_members->fetch_assoc()){
+                        if($row["admin"] == 'TRUE' && $row["userID"] == $userID){
+                            $userIsGroupAdmin = true;
+                        }
                         $class = ($row["admin"] == 'TRUE')?"label label-warning":"label label-default";
                         echo "<span class='$class'>${row['firstname']} ${row['lastname']}</span> ";
                     }
@@ -328,6 +354,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     ?>
                      <script>setInterval(function(){updateGroupSocialBadge("#groupbadge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
                                 <div class="modal fade" id="groupchat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="groupchatLabel<?php echo $x; ?>">
+                     <!-- group chat modal -->       
                     <div class="modal-dialog" role="form">
                         <div class="modal-content">
                             <div class="modal-header" style="padding-bottom:5px;">
@@ -350,55 +377,91 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                         </span>
                                     </div>
 
-                                </form>
-                                <script>
-                                    groupinterval<?php echo $x; ?> = 0
-                                    $("#groupchat<?php echo $x; ?>").on('show.bs.modal', function (e) {
-                                        getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true)
-                                        groupinterval<?php echo $x; ?> = setInterval(function () {
-                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>")
-                                            },1000)
-                                        })
-                                        $("#groupchat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
-                                            $("#groupmessages<?php echo $x; ?>").parent().scrollTop($("#groupmessages<?php echo $x; ?>")[0].scrollHeight);
-                                        })
-                                        $("#groupchat<?php echo $x; ?>").on('hide.bs.modal', function (e) {
-                                            clearInterval(groupinterval<?php echo $x; ?>)
-                                        })
-                                    $("#groupchatinput<?php echo $x; ?>").submit(function (e) {
-                                        e.preventDefault()
-                                        sendGroupMessage(<?php echo $x; ?>,$("#groupmessage<?php echo $x; ?>").val(),"#groupmessages<?php echo $x; ?>")
-                                    $("#groupmessage<?php echo $x; ?>").val("")
-                                    return false
-                                        })
-                                </script>
+                                    </form>
+                                    <script>
+                                        groupinterval<?php echo $x; ?> = 0
+                                        $("#groupchat<?php echo $x; ?>").on('show.bs.modal', function (e) {
+                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true)
+                                            groupinterval<?php echo $x; ?> = setInterval(function () {
+                                                getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>")
+                                                },1000)
+                                            })
+                                            $("#groupchat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
+                                                $("#groupmessages<?php echo $x; ?>").parent().scrollTop($("#groupmessages<?php echo $x; ?>")[0].scrollHeight);
+                                            })
+                                            $("#groupchat<?php echo $x; ?>").on('hide.bs.modal', function (e) {
+                                                clearInterval(groupinterval<?php echo $x; ?>)
+                                            })
+                                        $("#groupchatinput<?php echo $x; ?>").submit(function (e) {
+                                            e.preventDefault()
+                                            sendGroupMessage(<?php echo $x; ?>,$("#groupmessage<?php echo $x; ?>").val(),"#groupmessages<?php echo $x; ?>")
+                                        $("#groupmessage<?php echo $x; ?>").val("")
+                                        return false
+                                            })
+                                    </script>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
+                    <!-- /group chat modal --> 
+                    <!-- group settings modal -->
+                    <?php if($userIsGroupAdmin){ ?>
+                        <form method="post" enctype="multipart/form-data">
+                        <div class="modal fade" id="editGroup<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="editGroupLabel<?php echo $x; ?>">
+                            <div class="modal-dialog" role="form">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="editGroupLabel<?php echo $x; ?>">
+                                            <?php echo $lang['SOCIAL_EDIT_GROUP']; ?>
+                                        </h4>
+                                    </div>
+                                    <br>
+                                    <div class="modal-body">
+                                        <!-- modal body -->
+                                        <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
+                                        <br>
+                                        <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
+                                        <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>" value="<?php echo $name; ?>"><br>
+                                        <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
+                                        <div class="checkbox">
+                                            <?php 
+                                            $user_result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+                                            
+                                            while($row = $user_result->fetch_assoc()){
+                                                $name = "${row['firstname']} ${row['lastname']}";
+                                                $_x = $row["id"];
+                                                $isMember = $conn->query("SELECT * FROM socialgroups INNER JOIN userdata ON userdata.id = socialgroups.userID WHERE groupID = $x AND userID = $_x")->num_rows > 0;
+                                            ?>
+                                            <label>
+                                                <input type="checkbox" value="<?php echo $_x; ?>" <?php if($_x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';} if($isMember){echo "checked";}?>><?php echo $name ?><br>
+                                            </label>
+                                            <br>
+                                            <?php } ?>
+                                        </div>
+                                        <input type="hidden" name="id" value="<?php echo $x;?>">
+                                        <!-- /modal body -->
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                                        <button type="submit" class="btn btn-warning" name="editGroup"><?php echo $lang['SAVE']; ?></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </form>
+                    <?php }?>
+                    <!-- /group settings modal -->
                 <?php
-            // $conn->query("CREATE TABLE socialgroups(
-            //     groupID INT(6) UNSIGNED,
-            //     userID INT(6) UNSIGNED,
-            //     name VARCHAR(30),
-            //     admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-            //   )");
-            //   $conn->query("CREATE TABLE socialgroupmessages(
-            //     userID INT(6) UNSIGNED,
-            //     groupID INT(6) UNSIGNED,
-            //     message TEXT,
-            //     picture MEDIUMBLOB,
-            //     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-            //     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-            //   )");
                 }
             }else{
                 echo "No groups";
             }
               ?>
         </tbody>
-        </table>
+    </table>
+    <!-- /groups -->
+    
     <script>
     function getMessages(partner, target, scroll = false) {
         $.ajax({

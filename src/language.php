@@ -885,6 +885,9 @@ $lang_ger['SOCIAL_GROUP_MEMBERS'] = 'Gruppenmitglieder';
 
 $lang_eng['SOCIAL_CREATE_GROUP'] = 'Create group';
 $lang_ger['SOCIAL_CREATE_GROUP'] = 'Gruppe erstellen';
+
+$lang_eng['SOCIAL_EDIT_GROUP'] = 'Edit group';
+$lang_ger['SOCIAL_EDIT_GROUP'] = 'Gruppe bearbeiten';
 /*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';

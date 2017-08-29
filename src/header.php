@@ -52,7 +52,7 @@ $showReadyPlan = $row['enableReadyCheck'];
 $enableSocialMedia = $conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'];
 if($enableSocialMedia = 'TRUE'){
   $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
-  $group = $conn->query("SELECT * FROM socialgroupmessages WHERE NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
+  $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
   $numberOfSocialAlerts = $private+$group;
 }
 
