@@ -99,6 +99,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['editGroup'])) {
         }
     }
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
+    if(isset($_POST["id"])){
+        $name = test_input($_POST["name"]);
+        $groupID = $_POST["id"];
+        $conn->query("DELETE FROM socialgroups WHERE $groupID = groupID");
+        $conn->query("DELETE FROM socialgroupmessages WHERE $groupID = groupID");
+        redirect("../social/home");
+    }else{
+            displayError($lang["SOCIAL_ERR_NO_MEMBERS"]);
+    }
+}
 
 $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
 $row = $result->fetch_assoc();
@@ -207,55 +218,92 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     echo '</tr>';
                     ?>
                     <script>setInterval(function(){updateSocialBadge("#badge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
-                <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $x; ?>">
-                    <div class="modal-dialog" role="form">
-                        <div class="modal-content">
-                            <div class="modal-header" style="padding-bottom:5px;">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="chatLabel<?php echo $x; ?>">
-                                    <img src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:25px;display:inline-block;'> <?php echo $name ?>
-                                </h4>
-                            </div>
-                            <br>
-                            <div class="modal-body">
-                                <div id="messages<?php echo $x; ?>"></div>
-                            </div>
-                            <div class="modal-footer">
-                                <form id="chatinput<?php echo $x; ?>" class="form" autocomplete="off">
-                                    <div class="input-group">
-                                        <input type="text" id="message<?php echo $x; ?>" class="form-control not-dirty" placeholder="<?php echo $lang['SOCIAL_PERSONAL_MESSAGE']; ?>">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-warning" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
-                                            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['RETURN']; ?></button>
-                                        </span>
-                                    </div>
+                    <!-- chat modal -->
+                    <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $x; ?>">
+                        <div class="modal-dialog" role="form">
+                            <div class="modal-content">
+                                <div class="modal-header" style="padding-bottom:5px;">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="chatLabel<?php echo $x; ?>">
+                                        <img src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:25px;display:inline-block;'> <?php echo $name ?>
+                                    </h4>
+                                </div>
+                                <br>
+                                <div class="modal-body">
+                                    <div id="messages<?php echo $x; ?>"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <form id="chatinput<?php echo $x; ?>" class="form" autocomplete="off">
+                                        <div class="input-group">
+                                            <input type="text" id="message<?php echo $x; ?>" class="form-control not-dirty" placeholder="<?php echo $lang['SOCIAL_PERSONAL_MESSAGE']; ?>">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-warning" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                                                <label class="btn btn-default" title="<?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>">
+                                                    <i class="fa fa-upload" aria-hidden="true"></i>
+                                                        <input type="file" id="messagePictureUpload<?php echo $x; ?>" name="picture" style="display:none">
+                                                </label>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['RETURN']; ?></button>
+                                            </span>
+                                        </div>
 
-                                </form>
-                                <script>
-                                    interval<?php echo $x; ?> = 0
-                                    $("#chat<?php echo $x; ?>").on('show.bs.modal', function (e) {
-                                        getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true)
-                                        interval<?php echo $x; ?> = setInterval(function () {
-                                        getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>")
-                                            },1000)
-                                        })
-                                        $("#chat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
-                                            $("#messages<?php echo $x; ?>").parent().scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight);
-                                        })
-                                        $("#chat<?php echo $x; ?>").on('hide.bs.modal', function (e) {
-                                            clearInterval(interval<?php echo $x; ?>)
-                                        })
-                                    $("#chatinput<?php echo $x; ?>").submit(function (e) {
-                                        e.preventDefault()
-                                        sendMessage(<?php echo $x; ?>,$("#message<?php echo $x; ?>").val(),"#messages<?php echo $x; ?>")
-                                    $("#message<?php echo $x; ?>").val("")
-                                    return false
-                                        })
-                                </script>
+                                    </form>
+                                    <script>
+                                        interval<?php echo $x; ?> = 0
+                                        $("#chat<?php echo $x; ?>").on('show.bs.modal', function (e) {
+                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true)
+                                            interval<?php echo $x; ?> = setInterval(function () {
+                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>")
+                                                },1000)
+                                            })
+                                            $("#chat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
+                                                $("#messages<?php echo $x; ?>").parent().scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight);
+                                            })
+                                            $("#chat<?php echo $x; ?>").on('hide.bs.modal', function (e) {
+                                                clearInterval(interval<?php echo $x; ?>)
+                                            })
+                                        $("#chatinput<?php echo $x; ?>").submit(function (e) {
+                                            e.preventDefault()
+                                            sendMessage(<?php echo $x; ?>,$("#message<?php echo $x; ?>").val(),"#messages<?php echo $x; ?>")
+                                            alert()
+                                        $("#message<?php echo $x; ?>").val("")
+                                        return false
+                                            })
+                                            $("#messagePictureUpload<?php echo $x; ?>").change(function(e){
+                                                e.stopPropagation()
+                                                e.preventDefault()
+                                                file = e.target.files[0]
+                                                var data = new FormData()
+                                                if(!file.type.match('image.*')){
+                                                    alert("Not an image")
+                                                }else if (file.size > 1048576){
+                                                    alert("File too large")
+                                                }else{
+                                                    data.append('picture', file)
+                                                    data.append('partner',<?php echo $x; ?>)
+                                                    $.ajax({
+                                                        url: 'ajaxQuery/AJAX_socialSendMessage.php',
+                                                        dataType: 'json',
+                                                        data: data,
+                                                        cache: false,
+                                                        type: 'POST',
+                                                        processData: false,
+                                                        contentType: false,
+                                                        success: function (response) {
+                                                            getMessages(partner,target, true)
+                                                            console.info(response.responseText)
+                                                        },
+                                                        error: function(response){
+                                                            console.warn(response.responseText)
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                    </script>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <!-- /chat modal -->
                 <?php
 
             }
@@ -326,9 +374,9 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT groupID,name FROM socialgroups WHERE userID = $userID";
+            $sql = "SELECT groupID,name FROM socialgroups WHERE userID = $userID ORDER BY name ASC";
             if($userID == 1) //superuser
-                $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID";
+                $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID ORDER BY name ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -373,6 +421,10 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                         <input type="text" id="groupmessage<?php echo $x; ?>" class="form-control not-dirty" placeholder="<?php echo $lang['SOCIAL_GROUP_MESSAGE']; ?>">
                                         <span class="input-group-btn">
                                             <button class="btn btn-warning" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                                            <label class="btn btn-default" title="<?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>">
+                                                    <i class="fa fa-upload" aria-hidden="true"></i>
+                                                        <input type="file" id="groupMessagePictureUpload<?php echo $x; ?>" name="picture" style="display:none">
+                                            </label>
                                             <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['RETURN']; ?></button>
                                         </span>
                                     </div>
@@ -397,6 +449,36 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                             sendGroupMessage(<?php echo $x; ?>,$("#groupmessage<?php echo $x; ?>").val(),"#groupmessages<?php echo $x; ?>")
                                         $("#groupmessage<?php echo $x; ?>").val("")
                                         return false
+                                            })
+                                            $("#groupMessagePictureUpload<?php echo $x; ?>").change(function(e){
+                                                e.stopPropagation()
+                                                e.preventDefault()
+                                                file = e.target.files[0]
+                                                var data = new FormData()
+                                                if(!file.type.match('image.*')){
+                                                    alert("Not an image")
+                                                }else if (file.size > 1048576){
+                                                    alert("File too large")
+                                                }else{
+                                                    data.append('picture', file)
+                                                    data.append('group',<?php echo $x; ?>)
+                                                    $.ajax({
+                                                        url: 'ajaxQuery/AJAX_socialSendMessage.php',
+                                                        dataType: 'json',
+                                                        data: data,
+                                                        cache: false,
+                                                        type: 'POST',
+                                                        processData: false,
+                                                        contentType: false,
+                                                        success: function (response) {
+                                                            getGroupMessages(<?php echo $x; ?>,target, true)
+                                                            console.info(response.responseText)
+                                                        },
+                                                        error: function(response){
+                                                            console.warn(response.responseText)
+                                                        }
+                                                    })
+                                                }
                                             })
                                     </script>
                                 </div>
@@ -444,6 +526,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                                        <button type="submit" class="btn btn-danger" name="deleteGroup"><?php echo $lang['DELETE']; ?></button>
                                         <button type="submit" class="btn btn-warning" name="editGroup"><?php echo $lang['SAVE']; ?></button>
                                     </div>
                                 </div>
@@ -455,7 +538,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                 <?php
                 }
             }else{
-                echo "No groups";
+                echo $lang['SOCIAL_NO_GROUPS'];
             }
               ?>
         </tbody>

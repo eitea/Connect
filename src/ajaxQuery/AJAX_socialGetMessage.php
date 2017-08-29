@@ -23,6 +23,8 @@ if (!$result || $result->num_rows == 0) {
 else {
     while ($row = $result->fetch_assoc()) {
         $message = $row["message"];
+        if(strlen($message) == 0)
+            $message = "<img src='data:image/jpeg;base64,".base64_encode($row["picture"])."' alt='Picture type not supported' style='max-width:100%;' >";
         $pull = $row["userID"] == $userID ? "pull-right":"pull-left";
         $seen = $row["seen"] == 'TRUE' ? "fa-eye":"fa-eye-slash";
         $showseen = ($row["userID"] == $userID);

@@ -850,8 +850,8 @@ $lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
 $lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
 $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 
-// $lang_eng['SOCIAL_DELETE_PICTURE'] = 'Delete Picture';
-// $lang_ger['SOCIAL_DELETE_PICTURE'] = 'Bild löschen';
+$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Can\' delete group';
+$lang_ger['SOCIAL_CANNOT_DELETE_GROUP'] = 'Gruppe kann nicht gelöscht werden';
 
 $lang_eng['SOCIAL_NAME'] = 'Name';
 $lang_ger['SOCIAL_NAME'] = 'Name';
@@ -888,6 +888,9 @@ $lang_ger['SOCIAL_CREATE_GROUP'] = 'Gruppe erstellen';
 
 $lang_eng['SOCIAL_EDIT_GROUP'] = 'Edit group';
 $lang_ger['SOCIAL_EDIT_GROUP'] = 'Gruppe bearbeiten';
+
+$lang_eng['SOCIAL_NO_GROUPS'] = 'You are not member in any group';
+$lang_ger['SOCIAL_NO_GROUPS'] = 'Sie gehören keinen Gruppen an';
 /*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
