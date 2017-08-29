@@ -1,11 +1,19 @@
 <?php
 /* SETTING UP A NEW TABLE:
-1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php
-2. Append your information to the specs. Can be found in your shared network drive.
+1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
+2. Append your information to the specs or add them here.
 3. Put your CREATE TABLE statement in here, similar to already existing code.
-4. increment the version number in version_number.php by 1.
+4. increment the version numbers in version_number.php.
 5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
-6. relog with a core admin account. you should see an update.
+6. relog inside program with a core admin account. you should see an update.
+
+MAKING CHANGES TO EXISTING TABLE:
+1. make your changes in here
+3. increment the numbers in version_number.php
+2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
+4. relog inisde program with an account with core priviliges.
+
+Test the setup regularly
 */
 
 function create_tables($conn){

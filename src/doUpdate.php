@@ -1388,12 +1388,12 @@ if($row['version'] < 95){
   $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) SELECT 1, 1, 1, 1, 1, 1, id FROM companyData");
 }
 
-
 if($row['version'] < 96){
   $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
   $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
+
 //if($row['version'] < 97){}
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}

@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['okay_acc'])){
     $requestID = $_POST['okay_acc'];
     $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
-    redirect("editUsers.php");
+    redirect("../system/users");
   } elseif(isset($_POST['nokay_acc'])){
     $requestID = $_POST['nokay_acc'];
     $conn->query("DELETE FROM $userTable WHERE id = $requestID"); //FK dependency will delete all requests etc.

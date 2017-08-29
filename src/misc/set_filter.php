@@ -1,13 +1,13 @@
 <?php
 /**
-* Company => id
-* Client  => id
-* Project  => id
-* Users => id
-* Bookings => [charged, break, drive]
-* Logs => [activity, hideAll]
-* Dates => [fromDate, toDate]
-* Procedures => [transitions[id], status, hideAll]
+* company => id
+* client  => id
+* project  => id
+* users => id
+* bookings => [charged, break, drive]
+* logs => [activity, hideAll]
+* date => [fromDate, toDate]
+* procedures => [transitions[id], status, hideAll]
 **/
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
@@ -204,12 +204,23 @@ if($scale > 2){ //3 columns
           <div class="filter_column">
             <?php if(isset($filterings['date'][1])): ?>
               <label><?php echo $lang['FROM']; ?></label>
-              <input type="date" class="form-control" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+              <div class="input-group">
+                <input id="searchDateFrom" type="date" class="form-control" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+                <span class="input-group-btn">
+                  <button id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
+                </span>
+              </div>
               <br><label><?php echo $lang['TO']; ?></label>
+              <div class="input-group">
+                <input type="date" id="searchDateTo" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
+                <span class="input-group-btn">
+                  <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
+                </span>
+              </div>
             <?php else: ?>
-              <br><label><?php echo $lang['DATE']; ?></label>
+              <label><?php echo $lang['DATE']; ?></label>
+              <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
             <?php endif; ?>
-            <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
           </div>
         <?php endif; ?>
 
@@ -253,6 +264,18 @@ if($scale > 2){ //3 columns
 </div>
 
 <script>
+$("#putDate").click( function() {
+  var d = new Date( $("#searchDateFrom").val());
+  d = new Date(d.getFullYear(), d.getMonth()+1, 0);
+  d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+  $("#searchDateTo").val(d.toISOString().substring(0, 10));
+});
+$("#putDateUp").click( function() {
+  var d = new Date( $("#searchDateTo").val());
+  d = new Date(d.getFullYear(), d.getMonth(), 1);
+  d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+  $("#searchDateFrom").val(d.toISOString().substring(0, 10));
+});
 $('#filterings_dropdown .dropdown-menu').on({
   "click":function(e){
     e.stopPropagation();

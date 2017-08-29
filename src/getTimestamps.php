@@ -753,6 +753,18 @@ if($filterings['user']):
                   <div class="row">
                   <?php
                   if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+                    if(count($available_companies) > 1){
+                      echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+                      $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+                      while($companyRow = $companyResult->fetch_assoc()){
+                        $selected = '';
+                        if($companyRow['id'] == $row['companyID']){
+                          $selected = 'selected';
+                        }
+                        echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
+                      }
+                      echo '</select></div>';
+                    }
                     echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
                     $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
                     $clientResult = $conn->query($sql);

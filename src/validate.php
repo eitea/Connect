@@ -13,7 +13,7 @@ function enableToCore($userID){
   $sql = "SELECT isCoreAdmin FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -22,7 +22,7 @@ function enableToTime($userID){
   $sql = "SELECT isTimeAdmin FROM $roleTable WHERE userID = $userID AND isTimeAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -31,7 +31,7 @@ function enableToProject($userID){
   $sql = "SELECT isProjectAdmin FROM $roleTable WHERE userID = $userID AND isProjectAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -40,7 +40,7 @@ function enableToStamps($userID){
   $sql = "SELECT canStamp FROM $roleTable WHERE userID = $userID AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -49,7 +49,7 @@ function enableToBookings($userID){
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canBook = 'TRUE' AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -58,7 +58,7 @@ function enableToTemplate($userID){
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND (isCoreAdmin = 'TRUE' OR canEditTemplates = 'TRUE')";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -67,7 +67,7 @@ function enableToReport($userID){
   $sql = "SELECT isReportAdmin FROM $roleTable WHERE userID = $userID AND isReportAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -76,7 +76,7 @@ function enableToERP($userID){
   $sql = "SELECT isERPAdmin FROM $roleTable WHERE userID = $userID AND isERPAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
@@ -85,7 +85,7 @@ function enableToClients($userID){
   $sql = "SELECT isERPAdmin, isCoreAdmin FROM $roleTable WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE')";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    die('Access denied. <a href="logout.php"> return</a>');
+    die('Access denied. <a href="../user/logout"> return</a>');
   }
 }
 
