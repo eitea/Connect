@@ -210,7 +210,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                         }
                     }
                     $alerts = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID AND userID = $x")->num_rows;
-                    $alertsvisible = $alerts == 0 ? "style='display:none;'" : "";
+                    $alertsvisible = $alerts == 0 ? "style='display:none;position:absolute'" : "style='position:absolute'";
                     echo "<tr class='$class' data-toggle='modal' data-target='#chat$x'>";
                     echo "<td><img src='$profilePicture' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;'><div id='badge$x' $alertsvisible class='badge row'>$alerts</div></td>";
                     echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
@@ -249,11 +249,19 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                     </form>
                                     <script>
                                         interval<?php echo $x; ?> = 0
+                                        limit<?php echo $x; ?> = 10
                                         $("#chat<?php echo $x; ?>").on('show.bs.modal', function (e) {
-                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true)
+                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true, limit<?php echo $x; ?>)
                                             interval<?php echo $x; ?> = setInterval(function () {
-                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>")
+                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>",false, limit<?php echo $x; ?>)
                                                 },1000)
+                                            })
+                                            $("#messages<?php echo $x; ?>").parent().scroll(function(){
+                                                if($("#messages<?php echo $x; ?>").parent().scrollTop() == 0){
+                                                    limit<?php echo $x; ?> += 1
+                                                    $("#messages<?php echo $x; ?>").parent().scrollTop(1);
+                                                    getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>",false, limit<?php echo $x; ?>)
+                                                }
                                             })
                                             $("#chat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
                                                 $("#messages<?php echo $x; ?>").parent().scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight);
@@ -263,8 +271,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                             })
                                         $("#chatinput<?php echo $x; ?>").submit(function (e) {
                                             e.preventDefault()
-                                            sendMessage(<?php echo $x; ?>,$("#message<?php echo $x; ?>").val(),"#messages<?php echo $x; ?>")
-                                            alert()
+                                            sendMessage(<?php echo $x; ?>,$("#message<?php echo $x; ?>").val(),"#messages<?php echo $x; ?>",limit<?php echo $x; ?>)
                                         $("#message<?php echo $x; ?>").val("")
                                         return false
                                             })
@@ -289,11 +296,10 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                                         processData: false,
                                                         contentType: false,
                                                         success: function (response) {
-                                                            getMessages(partner,target, true)
-                                                            console.info(response.responseText)
+                                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true, limit<?php echo $x; ?>)
                                                         },
                                                         error: function(response){
-                                                            console.warn(response.responseText)
+                                                            getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true, limit<?php echo $x; ?>)
                                                         }
                                                     })
                                                 }
@@ -321,49 +327,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
     <h4><?php echo $lang['SOCIAL_GROUPS']; ?>
         <button class="btn btn-default" data-toggle="modal" data-target="#newGroup" type="button"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
     </h4>
-    <!-- new group modal -->
-    <form method="post" enctype="multipart/form-data">
-    <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
-        <div class="modal-dialog" role="form">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="newGroupLabel">
-                        <?php echo $lang['SOCIAL_CREATE_GROUP']; ?>
-                    </h4>
-                </div>
-                <br>
-                <div class="modal-body">
-                    <!-- modal body -->
-                    <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
-                    <br>
-                    <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
-                    <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
-                    <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
-                    <div class="checkbox">
-                        <?php 
-                        $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
-                        while($row = $result->fetch_assoc()){
-                            $name = "${row['firstname']} ${row['lastname']}";
-                            $x = $row["id"];
-                        ?>
-                        <label>
-                            <input type="checkbox" value="<?php echo $x; ?>" <?php if($x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';}?>><?php echo $name ?><br>
-                        </label>
-                        <br>
-                        <?php } ?>
-                    </div>
-                    <!-- /modal body -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                    <button type="submit" class="btn btn-warning" name="newGroup"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
-                </div>
-            </div>
-        </div>
-    </div>
-    </form>
-    <!-- /new group modal -->
+
 
     <!-- /groups -->
     <table class="table table-hover">
@@ -374,9 +338,10 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT groupID,name FROM socialgroups WHERE userID = $userID ORDER BY name ASC";
+            $hue_rotate = 0;
+            $sql = "SELECT groupID,name FROM socialgroups WHERE userID = $userID ORDER BY name ASC, groupID ASC";
             if($userID == 1) //superuser
-                $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID ORDER BY name ASC";
+                $sql = "SELECT groupID,name FROM socialgroups GROUP BY groupID ORDER BY name ASC, groupID ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -384,12 +349,12 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     $name = $row["name"];
                     $result_members = $conn->query("SELECT * FROM socialgroups INNER JOIN userdata ON userdata.id = socialgroups.userID  WHERE groupID = $x");
                     $alerts = $conn->query("SELECT * FROM socialgroupmessages WHERE groupID = $x AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
-                    $alertsvisible = $alerts == 0 ? "style='display:none;'" : "";
+                    $alertsvisible = $alerts == 0 ? "style='display:none;position:absolute'" : "style='position:absolute'";
                     echo "<tr>";
-                    echo "<td data-toggle='modal' data-target='#editGroup$x'><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
+                    echo "<td data-toggle='modal' data-target='#editGroup$x'><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block; -webkit-filter: hue-rotate(${hue_rotate}deg); filter: hue-rotate(${hue_rotate}deg);position:relative;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>$name</td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>";
-                    $userIsGroupAdmin = false;
+                    $userIsGroupAdmin = $userID == 1; //superuser
                     while($row = $result_members->fetch_assoc()){
                         if($row["admin"] == 'TRUE' && $row["userID"] == $userID){
                             $userIsGroupAdmin = true;
@@ -401,14 +366,14 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     echo '</tr>';
                     ?>
                      <script>setInterval(function(){updateGroupSocialBadge("#groupbadge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
-                                <div class="modal fade" id="groupchat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="groupchatLabel<?php echo $x; ?>">
-                     <!-- group chat modal -->       
+                      <!-- group chat modal -->  
+                                <div class="modal fade" id="groupchat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="groupchatLabel<?php echo $x; ?>">  
                     <div class="modal-dialog" role="form">
                         <div class="modal-content">
                             <div class="modal-header" style="padding-bottom:5px;">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title" id="groupchatLabel<?php echo $x; ?>">
-                                    <img src='<?php echo $defaultGroupPicture; ?>' alt='Group picture' class='img-circle' style='width:25px;display:inline-block;'> <?php echo $name ?>
+                                    <img src='<?php echo $defaultGroupPicture; ?>' alt='Group picture' class='img-circle' style='width:25px;display:inline-block; -webkit-filter: hue-rotate(<?php echo $hue_rotate; ?>deg); filter: hue-rotate(<?php echo $hue_rotate; ?>deg);'> <?php echo $name ?>
                                 </h4>
                             </div>
                             <br>
@@ -432,11 +397,19 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                     </form>
                                     <script>
                                         groupinterval<?php echo $x; ?> = 0
+                                        grouplimit<?php echo $x; ?> = 10
                                         $("#groupchat<?php echo $x; ?>").on('show.bs.modal', function (e) {
-                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true)
+                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true, grouplimit<?php echo $x; ?>)
                                             groupinterval<?php echo $x; ?> = setInterval(function () {
-                                                getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>")
+                                                getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>",false, grouplimit<?php echo $x; ?>)
                                                 },1000)
+                                            })
+                                            $("#groupmessages<?php echo $x; ?>").parent().scroll(function(){
+                                                if($("#groupmessages<?php echo $x; ?>").parent().scrollTop() == 0){
+                                                    grouplimit<?php echo $x; ?> += 1
+                                                    $("#groupmessages<?php echo $x; ?>").parent().scrollTop(1);
+                                                    getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>",false, grouplimit<?php echo $x; ?>)
+                                                }
                                             })
                                             $("#groupchat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
                                                 $("#groupmessages<?php echo $x; ?>").parent().scrollTop($("#groupmessages<?php echo $x; ?>")[0].scrollHeight);
@@ -446,7 +419,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                             })
                                         $("#groupchatinput<?php echo $x; ?>").submit(function (e) {
                                             e.preventDefault()
-                                            sendGroupMessage(<?php echo $x; ?>,$("#groupmessage<?php echo $x; ?>").val(),"#groupmessages<?php echo $x; ?>")
+                                            sendGroupMessage(<?php echo $x; ?>,$("#groupmessage<?php echo $x; ?>").val(),"#groupmessages<?php echo $x; ?>", grouplimit<?php echo $x; ?>)
                                         $("#groupmessage<?php echo $x; ?>").val("")
                                         return false
                                             })
@@ -471,11 +444,10 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                                         processData: false,
                                                         contentType: false,
                                                         success: function (response) {
-                                                            getGroupMessages(<?php echo $x; ?>,target, true)
-                                                            console.info(response.responseText)
+                                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true, grouplimit<?php echo $x; ?>)
                                                         },
                                                         error: function(response){
-                                                            console.warn(response.responseText)
+                                                            getGroupMessages(<?php echo $x; ?>, "#groupmessages<?php echo $x; ?>", true, grouplimit<?php echo $x; ?>)
                                                         }
                                                     })
                                                 }
@@ -501,7 +473,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                     <br>
                                     <div class="modal-body">
                                         <!-- modal body -->
-                                        <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%;' class='img-circle center-block' alt='Group Picture'>
+                                        <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%; -webkit-filter: hue-rotate(<?php echo $hue_rotate; ?>deg); filter: hue-rotate(<?php echo $hue_rotate; ?>deg);' class='img-circle center-block' alt='Group Picture'>
                                         <br>
                                         <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
                                         <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>" value="<?php echo $name; ?>"><br>
@@ -536,6 +508,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     <?php }?>
                     <!-- /group settings modal -->
                 <?php
+                $hue_rotate = ( $hue_rotate + 50 )%360;
                 }
             }else{
                 echo $lang['SOCIAL_NO_GROUPS'];
@@ -545,12 +518,57 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
     </table>
     <!-- /groups -->
     
+    <!-- new group modal -->
+    <form method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
+        <div class="modal-dialog" role="form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="newGroupLabel">
+                        <?php echo $lang['SOCIAL_CREATE_GROUP']; ?>
+                    </h4>
+                </div>
+                <br>
+                <div class="modal-body">
+                    <!-- modal body -->
+                    <img src='<?php echo $defaultGroupPicture; ?>' style='width:20%;height:20%; -webkit-filter: hue-rotate(<?php echo $hue_rotate; ?>deg); filter: hue-rotate(<?php echo $hue_rotate; ?>deg);' class='img-circle center-block' alt='Group Picture'>
+                    <br>
+                    <label for="name"> <?php echo $lang['SOCIAL_NAME'] ?> </label>
+                    <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
+                    <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
+                    <div class="checkbox">
+                        <?php 
+                        $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+                        while($row = $result->fetch_assoc()){
+                            $name = "${row['firstname']} ${row['lastname']}";
+                            $x = $row["id"];
+                        ?>
+                        <label>
+                            <input type="checkbox" value="<?php echo $x; ?>" <?php if($x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';}?>><?php echo $name ?><br>
+                        </label>
+                        <br>
+                        <?php } ?>
+                    </div>
+                    <!-- /modal body -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="newGroup"><?php echo $lang['SOCIAL_CREATE_GROUP']; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!-- /new group modal -->
+
     <script>
-    function getMessages(partner, target, scroll = false) {
+    function getMessages(partner, target, scroll = false, limit = 50) {
         $.ajax({
             url: 'ajaxQuery/AJAX_socialGetMessage.php',
             data: {
-                partner: partner
+                partner: partner,
+                limit: limit,
             },
             type: 'GET',
             success: function (response) {
@@ -563,7 +581,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
             },
         })
     }
-    function sendMessage(partner, message, target) {
+    function sendMessage(partner, message, target, limit = 50) {
         if(message.length==0){
             return
         }
@@ -575,7 +593,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
             },
             type: 'GET',
             success: function (response) {
-                getMessages(partner,target, true)
+                getMessages(partner,target, true, limit)
             },
         })
     }
@@ -598,11 +616,12 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
     }
     </script>
     <script>
-    function getGroupMessages(group, target, scroll = false) {
+    function getGroupMessages(group, target, scroll = false, limit = 50) {
         $.ajax({
             url: 'ajaxQuery/AJAX_socialGetMessage.php',
             data: {
-                group: group
+                group: group,
+                limit: limit,
             },
             type: 'GET',
             success: function (response) {
@@ -615,7 +634,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
             },
         })
     }
-    function sendGroupMessage(group, message, target) {
+    function sendGroupMessage(group, message, target, limit = 50) {
         if(message.length==0){
             return
         }
@@ -627,7 +646,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
             },
             type: 'GET',
             success: function (response) {
-                getGroupMessages(group,target, true)
+                getGroupMessages(group,target, true, limit)
             },
         })
     }

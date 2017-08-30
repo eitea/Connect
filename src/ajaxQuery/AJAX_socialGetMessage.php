@@ -2,16 +2,17 @@
 session_start();
 require dirname(__DIR__) . "/connection.php";
 $userID = $_SESSION["userid"] ?? -1;
+$limit = $_REQUEST["limit"] ?? 50;
 if (isset($_GET["partner"]) && !empty($_SESSION["userid"])) {
     $partner = intval($_GET["partner"]);
     $conn->query("UPDATE socialmessages SET seen = 'TRUE' WHERE ( userID = $partner AND partner = $userID )");
-    $result = $conn->query("SELECT * FROM socialmessages WHERE ( userID = $userID AND partner = $partner ) OR ( userID = $partner AND partner = $userID )");
+    $result = $conn->query("SELECT * FROM (SELECT * FROM socialmessages WHERE ( userID = $userID AND partner = $partner ) OR ( userID = $partner AND partner = $userID ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
     $groupView = false;
 } elseif (isset($_GET["group"]) && !empty($_SESSION["userid"])){
     $groupView = true;
     $group = intval($_GET["group"]);
     $conn->query("UPDATE socialgroupmessages SET seen = CONCAT(seen, ',$userID') WHERE NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID' )");
-    $result = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN userdata ON userdata.id = socialgroupmessages.userID WHERE ( groupID = $group )");
+    $result = $conn->query("SELECT * FROM (SELECT * FROM socialgroupmessages INNER JOIN userdata ON userdata.id = socialgroupmessages.userID WHERE ( groupID = $group ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
 } else {
     die('Invalid Request');
 }

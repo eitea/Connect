@@ -43,27 +43,6 @@ if (isset($_GET["partner"], $_GET["message"]) && !empty($_SESSION["userid"])) {
 } else {
     die('Invalid Request');
 }
-// if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-//     require __DIR__ . "/utilities.php";
-//     $pp = uploadFile("profilePictureUpload", 1, 1);
-//     if (!is_array($pp)) {
-//         $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
-//         echo $conn->error;
-//         $null = NULL;
-//         $stmt->bind_param("b", $null);
-//         $stmt->send_long_data(0, $pp);
-//         $stmt->execute();
-//         if ($stmt->errno) {
-//             displayError($stmt->error);
-//         }
-//         else {
-//             displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
-//         }
-//         $stmt->close();
-//     }
-//     else {
-//         displayError(print_r($filename));
-// }
 
 function test_input($data)
 {
