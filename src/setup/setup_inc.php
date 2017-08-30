@@ -245,6 +245,7 @@ function create_tables($conn){
     isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
@@ -484,7 +485,8 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -770,6 +772,53 @@ function create_tables($conn){
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialprofile(
+    userID INT(6) UNSIGNED,
+    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    status varchar(150) DEFAULT '-',
+    picture MEDIUMBLOB,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialmessages(
+    userID INT(6) UNSIGNED,
+    partner INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroups(
+    groupID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    name VARCHAR(30),
+    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroupmessages(
+    userID INT(6) UNSIGNED,
+    groupID INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen TEXT
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

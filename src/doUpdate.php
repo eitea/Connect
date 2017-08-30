@@ -1388,13 +1388,47 @@ if($row['version'] < 95){
   $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) SELECT 1, 1, 1, 1, 1, 1, id FROM companyData");
 }
 
+
 if($row['version'] < 96){
   $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
   $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
-
-//if($row['version'] < 97){}
+if($row['version'] < 97){
+  $conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("CREATE TABLE socialprofile(
+    userID INT(6) UNSIGNED,
+    isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    status varchar(150) DEFAULT '-',
+    picture MEDIUMBLOB,
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )");
+  $conn->query("CREATE TABLE socialmessages(
+    userID INT(6) UNSIGNED,
+    partner INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )");
+  $conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+  $conn->query("CREATE TABLE socialgroups(
+    groupID INT(6) UNSIGNED,
+    userID INT(6) UNSIGNED,
+    name VARCHAR(30),
+    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+  )");
+  $conn->query("CREATE TABLE socialgroupmessages(
+    userID INT(6) UNSIGNED,
+    groupID INT(6) UNSIGNED,
+    message TEXT,
+    picture MEDIUMBLOB,
+    sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    seen TEXT
+  )");
+}
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}
 

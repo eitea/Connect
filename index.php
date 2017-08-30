@@ -7,6 +7,8 @@ $routes = array(
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
   'user/ready' => 'readyPlan.php',                 'user/book' => 'userProjecting.php',
 
+  'social/home' => 'socialMedia.php',
+
   'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
   'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',
   'system/teams' => 'teamConfig.php',              'system/holidays' => 'editHolidays.php',           'system/advanced' => 'advancedOptions.php',
@@ -30,8 +32,7 @@ $routes = array(
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.woff' => "application/font-woff",   '.ttf' => "application/x-font-opentype"
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2"
  );
 
 //kill internet explorer
@@ -50,7 +51,7 @@ if($l > 1){
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
-  } elseif(preg_match("/(images|plugins)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
+  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
     }

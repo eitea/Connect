@@ -86,6 +86,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
         $conn->query($sql);
         echo mysqli_error($conn);
+        //create socialprofile
+        $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES($curID, 'TRUE', '-');";
+        $conn->query($sql);
+        echo mysqli_error($conn);
         //add relationships
         if(isset($_POST['company'])){
           foreach($_POST['company'] as $cmp){

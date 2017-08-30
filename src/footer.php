@@ -35,7 +35,7 @@
 <script>
 $(document).ready(function () {
   var isDirty = false;
-  $(":input:not([type=search])").keyup(function(){ //triggers change in all input fields including text type
+  $(":input:not([type=search]):not(.not-dirty)").keyup(function(){ //triggers change in all input fields including text type
     isDirty = true;
     $(".blinking").attr('class', 'btn btn-warning blinking');
     setInterval(function() {

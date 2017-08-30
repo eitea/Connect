@@ -30,9 +30,10 @@ if($result && $result->num_rows > 0){
   $canBook = $row['canBook'];
   $canStamp = $row['canStamp'];
   $canEditTemplates = $row['canEditTemplates'];
+  $canUseSocialMedia = $row['canUseSocialMedia'];
 } else {
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = FALSE;
-  $canBook = $canStamp = $canEditTemplates = FALSE;
+  $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
 }
 
 if($userID == 1){ //superuser
@@ -47,6 +48,13 @@ $lastPswChange = $row['lastPswChange'];
 $result = $conn->query("SELECT enableReadyCheck FROM configurationData");
 $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
+
+$enableSocialMedia = $conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'];
+if($enableSocialMedia = 'TRUE'){
+  $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
+  $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
+  $numberOfSocialAlerts = $private+$group;
+}
 
 if($isTimeAdmin){
   $numberOfAlerts = 0;
@@ -337,9 +345,30 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
             <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="../user/ready"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
           <?php endif; ?>
 
+          <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
+            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?><span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
+            <script>
+              function updateSocialBadge() {
+                $.ajax({
+                    url: 'ajaxQuery/AJAX_socialGetAlerts.php',
+                    type: 'GET',
+                    success: function (response) {
+                        $("#numberOfSocialAlerts").html(response)
+                        if(response == "0"){
+                          $("#numberOfSocialAlerts").hide()
+                        }else{
+                          $("#numberOfSocialAlerts").show()
+                        }
+                    },
+                })
+              }
+              setInterval(updateSocialBadge,10000) // 10 seconds
+            </script>
+            <?php endif; ?>
+
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span><?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
 

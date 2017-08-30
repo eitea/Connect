@@ -137,6 +137,9 @@ $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 $lang_eng['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
 $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 
+$lang_eng['CAN_USE_SOCIAL_MEDIA'] = 'Can use Social Media';
+$lang_ger['CAN_USE_SOCIAL_MEDIA'] = 'Kann soziale Medien benutzen';
+
 $lang_eng['CASH_EXPENSE'] = 'Cash Expense';
 $lang_ger['CASH_EXPENSE'] = 'Barauslage';
 
@@ -829,6 +832,69 @@ $lang_ger['SHOULD_TIME'] = 'Soll';
 
 $lang_eng['SICK_LEAVE'] = 'Sick Leave';
 $lang_ger['SICK_LEAVE'] = 'Krankenstand';
+
+$lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
+$lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
+
+/*------------------Social Media------------------*/
+
+$lang_eng['SOCIAL_MENU_ITEM'] = 'Social Media';
+$lang_ger['SOCIAL_MENU_ITEM'] = 'Soziale Medien';
+
+$lang_eng['SOCIAL_PROFILE_SETTINGS'] = 'My Profile';
+$lang_ger['SOCIAL_PROFILE_SETTINGS'] = 'Mein Profil';
+
+$lang_eng['SOCIAL_STATUS'] = 'Status';
+$lang_ger['SOCIAL_STATUS'] = 'Status';
+
+$lang_eng['SOCIAL_STATUS_EXAMPLE'] = 'Working on my project';
+$lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
+
+$lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
+$lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
+
+$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Can\' delete group';
+$lang_ger['SOCIAL_CANNOT_DELETE_GROUP'] = 'Gruppe kann nicht gelöscht werden';
+
+$lang_eng['SOCIAL_NAME'] = 'Name';
+$lang_ger['SOCIAL_NAME'] = 'Name';
+
+$lang_eng['SOCIAL_AVAILABLE'] = 'Available';
+$lang_ger['SOCIAL_AVAILABLE'] = 'Verfügbar';
+
+$lang_eng['SOCIAL_ERR_NO_MEMBERS'] = 'You have to add at least one member to your group';
+$lang_ger['SOCIAL_ERR_NO_MEMBERS'] = 'Sie müssen mindestens ein Mitglied zu Ihrer Gruppe hinzufügen';
+
+$lang_eng['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Your image has been uploaded';
+$lang_ger['SOCIAL_SUCCESS_IMAGE_UPLOAD'] = 'Ihr Bild wurde hochgeladen';
+
+$lang_eng['SOCIAL_ERR_NO_NAME'] = 'You have to name your group';
+$lang_ger['SOCIAL_ERR_NO_NAME'] = 'Sie müssen der Gruppe einen Namen geben';
+
+$lang_eng['SOCIAL_PERSONAL_MESSAGE'] = 'Personal message';
+$lang_ger['SOCIAL_PERSONAL_MESSAGE'] = 'Privatnachricht';
+
+$lang_eng['SOCIAL_GROUP_MESSAGE'] = 'Group message';
+$lang_ger['SOCIAL_GROUP_MESSAGE'] = 'Gruppennachricht';
+
+$lang_eng['SOCIAL_CONTACTS'] = 'Contacts';
+$lang_ger['SOCIAL_CONTACTS'] = 'Kontakte';
+
+$lang_eng['SOCIAL_GROUPS'] = 'Groups';
+$lang_ger['SOCIAL_GROUPS'] = 'Gruppen';
+
+$lang_eng['SOCIAL_GROUP_MEMBERS'] = 'Group members';
+$lang_ger['SOCIAL_GROUP_MEMBERS'] = 'Gruppenmitglieder';
+
+$lang_eng['SOCIAL_CREATE_GROUP'] = 'Create group';
+$lang_ger['SOCIAL_CREATE_GROUP'] = 'Gruppe erstellen';
+
+$lang_eng['SOCIAL_EDIT_GROUP'] = 'Edit group';
+$lang_ger['SOCIAL_EDIT_GROUP'] = 'Gruppe bearbeiten';
+
+$lang_eng['SOCIAL_NO_GROUPS'] = 'You are not member in any group';
+$lang_ger['SOCIAL_NO_GROUPS'] = 'Sie gehören keinen Gruppen an';
+/*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
 $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
