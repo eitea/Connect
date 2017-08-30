@@ -237,17 +237,6 @@ input[type="radio"]:checked {
   padding: 10px;
 }
 
-/* html calendar date-picker */
-[type="datetime-local"] {
-  background:#fff url('../../images/calendar_2.png') 97% 50% no-repeat ;
-}
-[type="datetime-local"]::-webkit-inner-spin-button {
-  display: none;
-}
-[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  opacity: 0;
-}
-
 /* alerts */
 .alert{
   margin: 0 -20px 0;
@@ -305,4 +294,7 @@ span.select2.select2-container.select2-container--default {
 }
 .badge.alert-badge > a {
 	color:white;
+}
+.datepicker{
+  z-index:1151 !important;
 }

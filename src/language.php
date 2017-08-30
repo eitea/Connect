@@ -490,6 +490,9 @@ $lang_ger['INFO_GEMINI'] = "Es existiert mehr als nur ein Zeitstempel für einen
                             Ein Benutzer darf allerdings pro Tag nur eine Art von Zeitstempel besitzen. <br>
                             Bitte entscheiden Sie, welcher der beiden Zeitstempel gelöscht werden soll. Sie können auch beide Stempel löschen.";
 
+$lang_eng['INFO_HOLIDAY'] = 'National Holidays have to end with (§).';
+$lang_ger['INFO_HOLIDAY'] = 'Gesetzliche Feiertage müssen mit einem (§) Enden.';
+
 $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
                                         Autocorrecting them adds an complete lunchbreak in the middle of the day. (This break will be added)';
 $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>

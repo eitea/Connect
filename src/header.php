@@ -149,7 +149,6 @@ if($isTimeAdmin){
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
@@ -166,8 +165,9 @@ if($isTimeAdmin){
     <link rel="stylesheet" type="text/css" href="plugins/datepicker/css/datepicker.css"/>
     <script src="plugins/datepicker/js/bootstrap-datepicker.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.css"/>
-    <script src="plugins/dhtmlxCalendar/codebase/dhtmlxcalendar.js"></script>
+    <script src="plugins/datetimepicker/moment/moment-with-locales.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/datetimepicker/bootstrap-datetimepicker.min.css"/>
+    <script src="plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
@@ -317,11 +317,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home"><br>
+              <form method='post' action="../user/home" style="color:white"><br>
                 <?php
                 echo $checkInButton;
                 if($diff > 0)
-                  echo "&nbsp <span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
+                  echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
                 ?>
               </form><br>
             </div>

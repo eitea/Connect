@@ -467,15 +467,17 @@ $(function () {
         </div>
           <label><?php echo $lang['DATE']; ?>:</label>
           <div class="row">
-            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
-            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
+            <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
+            <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
           </div>
           <br>
-          <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
-          <div class="row">
-            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
-            <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
-          </div>
+          <?php if($row['bookingType'] != 'break'): ?>
+            <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
+            <div class="row">
+              <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
+              <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
+            </div>
+          <?php endif; ?>
           <br>
           <label>Infotext</label>
           <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
@@ -602,14 +604,14 @@ $(function () {
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
+            <input type="date" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <input id="time_field" type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="start" value=""/>
+              <input id="time_field" type="time" class="form-control timepicker" onkeydown='if (event.keyCode == 13) return false;' name="start" value="" placeholder="00:00"/>
               <span class="input-group-addon"> - </span>
-              <input type="time" class="form-control" onkeydown='if (event.keyCode == 13) return false;' name="end"/>
+              <input type="time" class="form-control timepicker" onkeydown='if (event.keyCode == 13) return false;' name="end" placeholder="00:00"/>
             </div>
           </div>
         </div>
@@ -740,6 +742,8 @@ $(document).ready(function(){
     }
   });
 });
+
+
 </script>
 
 <?php

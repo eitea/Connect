@@ -230,7 +230,10 @@ if($result && $result->num_rows > 0):
               echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             } elseif($row['requestType'] == 'log') {
-              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5) . '</td>';
+              $result = $conn->query("SELECT * FROM logs WHERE indexIM = ".$row['requestID']);
+              $oldRow = $result->fetch_assoc();
+              echo '<td>'. $lang['PREVIOUS'].': '.substr(carryOverAdder_Hours($oldRow['time'], $oldRow['timeToUTC']), 0, 16).' - '.substr(carryOverAdder_Hours($oldRow['timeEnd'], $oldRow['timeToUTC']), 11,5).'<br>'.
+               $lang['NEW'].': '.substr($row['fromDate'],0,16).' - ' .substr($row['toDate'],11,5). '</td>';
               echo '<td>'. $row['requestText'].'</td>';
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
@@ -264,6 +267,7 @@ if($result && $result->num_rows > 0):
      </tbody>
     </table>
   </form>
+  <div class="container-fluid"><div class="text-right"><a href="requests"><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?></a></div></div>
 <br><hr><br>
 <?php endif; ?>
 

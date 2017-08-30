@@ -519,9 +519,9 @@ if($filterings['user']):
           <div class="modal-header"><h4><?php echo $lang['ADD_TIMESTAMPS']; ?></h4></div>
           <div class="modal-body">
             <div class="input-group input-daterange">
-              <input id='multiple_calendar' type="date" class="form-control" value="" placeholder="Von" name="add_multiple_start">
+              <input type="date" class="form-control datepicker" value="" placeholder="Von" name="add_multiple_start">
               <span class="input-group-addon"> - </span>
-              <input id='multiple_calendar2' type="date" class="form-control" value="" placeholder="Bis" name="add_multiple_end">
+              <input type="date" class="form-control datepicker" value="" placeholder="Bis" name="add_multiple_end">
             </div>
             <br>
             <div class="row">
@@ -624,14 +624,14 @@ if($filterings['user']):
                 <div class="row">
                   <div class="col-md-6">
                     <label><?php echo $lang['BEGIN']; ?></label>
-                    <input type="datetime-local" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,10).'T'. substr($A,11,5) ?>"/>
+                    <input class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,16); ?>"/>
                   </div>
                   <div class="col-md-6">
                     <label><?php echo $lang['END']; ?></label>
                     <div class="checkbox">
                       <label>
                         <input type="radio" name="is_open" value="0" checked="checked" />
-                        <input type="datetime-local" style="display:inline;max-width:80%;" class='form-control input-sm' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,10).'T'. substr($B,11,5) ?>"/>
+                        <input style="display:inline;max-width:80%;" class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesTo" value="<?php echo substr($B,0,16) ?>"/>
                       </label>
                       <br>
                       <label><input type="radio" name="is_open" value="1" /><?php echo $lang['OPEN']; ?></label>
@@ -754,7 +754,7 @@ if($filterings['user']):
                   <?php
                   if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
                     if(count($available_companies) > 1){
-                      echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+                      echo "<div class='col-md-4'><label>".$lang['COMPANY']."</label><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
                       $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
                       while($companyRow = $companyResult->fetch_assoc()){
                         $selected = '';
@@ -765,7 +765,7 @@ if($filterings['user']):
                       }
                       echo '</select></div>';
                     }
-                    echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
+                    echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select id='newClient$x' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
                     $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
                     $clientResult = $conn->query($sql);
                     while($clientRow = $clientResult->fetch_assoc()){
@@ -805,16 +805,18 @@ if($filterings['user']):
                 </div>
                   <label><?php echo $lang['DATE']; ?>:</label>
                   <div class="row">
-                    <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
-                    <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
+                    <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
+                    <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
                   </div>
                   <br>
-                  <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
-                  <div class="row">
-                    <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
-                    <div class="col-xs-6"><input type='text' class='form-control' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
-                  </div>
-                  <br>
+                  <?php if($row['bookingType'] != 'break'): ?>
+                    <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
+                    <div class="row">
+                      <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
+                      <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
+                    </div>
+                    <br>
+                  <?php endif; ?>
                   <label>Infotext</label>
                   <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
                   <br>
@@ -1002,10 +1004,6 @@ if($filterings['user']):
       document.getElementById(toShow).style.display='block';
     }
   }
-  var myCalendar = new dhtmlXCalendarObject(["multiple_calendar","multiple_calendar2"]);
-  myCalendar.setSkin("material");
-  myCalendar.setDateFormat("%Y-%m-%d");
-  dhx.zim.first = function(){ return 2000 };
   </script>
   <!-- /BODY -->
   <?php include 'footer.php'; ?>

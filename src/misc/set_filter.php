@@ -3,12 +3,13 @@
 * company => id
 * client  => id
 * project  => id
-* users => id
+* user => id
 * bookings => [charged, break, drive]
 * logs => [activity, hideAll]
 * date => [fromDate, toDate]
 * procedures => [transitions[id], status, hideAll]
 **/
+
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
 }
@@ -43,7 +44,6 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     }
   }
   if(isset($_POST['searchActivity'])){
-
     $filterings['logs'][0] = intval($_POST['searchActivity']);
   }
   if(isset($filterings['logs'][1])){
@@ -205,21 +205,21 @@ if($scale > 2){ //3 columns
             <?php if(isset($filterings['date'][1])): ?>
               <label><?php echo $lang['FROM']; ?></label>
               <div class="input-group">
-                <input id="searchDateFrom" type="date" class="form-control" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+                <input id="searchDateFrom" type="date" class="form-control datepicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
                 <span class="input-group-btn">
-                  <button id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
+                  <button style="margin-top:1px" id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
                 </span>
               </div>
               <br><label><?php echo $lang['TO']; ?></label>
               <div class="input-group">
-                <input type="date" id="searchDateTo" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
+                <input type="date" id="searchDateTo" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
                 <span class="input-group-btn">
-                  <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
+                  <button style="margin-top:1px" id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
                 </span>
               </div>
             <?php else: ?>
               <label><?php echo $lang['DATE']; ?></label>
-              <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
+              <input type="date" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
             <?php endif; ?>
           </div>
         <?php endif; ?>

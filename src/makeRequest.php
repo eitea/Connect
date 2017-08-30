@@ -23,9 +23,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
-  } elseif(isset($_POST['deleteRequest'])){
-    $sql = "DELETE FROM $userRequests WHERE id =". $_POST['deleteRequest'];
-    $conn->query($sql);
   } elseif(isset($_POST['request_lunchbreak']) && !empty($_POST['lunch_FROM']) && !empty($_POST['lunch_TO'])){
     $timestampID = $_POST['request_lunchbreak'];
     $from = carryOverAdder_Hours(substr(getCurrentTimestamp(), 0, 11).$_POST['lunch_FROM'].':00', $timeToUTC * -1);
@@ -50,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['MY_REQUESTS']?></h3>
+  <h3><?php echo $lang['REQUESTS']?></h3>
 </div>
 <br><br>
 <form method="post">
@@ -71,13 +68,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-6 col-lg-4">
       <div class="input-group input-daterange">
         <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span>
-        <input id='calendar' type="date" class="form-control" value="" placeholder="Von" name="start">
+        <input id='calendar' type="text" class="form-control datepicker" value="" name="start">
       </div>
     </div>
     <div class="col-sm-6 col-lg-4">
       <div class="input-group input-daterange">
         <span class="input-group-addon"> <?php echo $lang['TO'];?> </span>
-        <input id='calendar2' type="date" class="form-control" value="" placeholder="Bis" name="end">
+        <input id='calendar2' type="text" class="form-control datepicker" value="" name="end">
       </div>
     </div>
   </div>
@@ -87,7 +84,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </div>
 </form>
-<br><br><br>
+<br><hr><br>
+<h4><?php echo $lang['MY_REQUESTS']; ?></h4><br>
 <?php
 $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType NOT IN ('acc', 'brk')";
 $result = $conn->query($sql);
@@ -101,13 +99,14 @@ if($result && $result->num_rows > 0): ?>
     <th><?php echo $lang['TO']; ?></th>
     <th>Status</th>
     <th><?php echo $lang['REPLY_TEXT']; ?> </th>
-    <th class="text-center"><?php echo $lang['REQUESTS']. ' '. $lang['DELETE']; ?></th>
   </tr>
   <tbody>
       <?php
       while($row = $result->fetch_assoc()){
-        if(!$filterRequest && timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] == 2){
+        //hide: old requests, accepted/ denied requests,
+        if(!$filterRequest && timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] != 0){
           continue;
+          //always display: future dates, open requests
         }
         $style = "";
         if($row['status'] == 0) {
@@ -119,12 +118,15 @@ if($result && $result->num_rows > 0): ?>
         }
         echo "<tr>";
         echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
-        echo '<td>' . substr($row['fromDate'],0,10) .'</td>';
-        echo '<td>' . substr($row['toDate'],0,10) .'</td>';
+        if($row['requestType'] == 'log'){
+          echo '<td>'.substr($row['fromDate'],0,16).'</td>';
+          echo '<td>'.substr($row['toDate'],0,16).'</td>';
+        } else {
+          echo '<td>'.substr($row['fromDate'],0,10) .'</td>';
+          echo '<td>'.substr($row['toDate'],0,10) .'</td>';
+        }
         echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
         echo '<td>' . $row['answerText'] . '</td>';
-        echo '<td class="text-center"><button type="submit" name="deleteRequest" value="'.$row['id'].'" class="btn btn-warning" title="'.$lang['MESSAGE_DELETE_REQUEST'].'">
-        <i class="fa fa-trash-o ></i>"</button></td>';
         echo '</tr>';
       }
       ?>
@@ -169,7 +171,7 @@ if($result && ($row = $result->fetch_assoc())): ?>
 <div id="game-area" tabindex="0"></div>
 <script type="text/javascript" src="plugins/jsPlugin/js/snake.js"></script>
 <script type="text/javascript">
-var mySnakeBoard = new SNAKE.Board(  {
+var myBoard = new SNAKE.Board(  {
   boardContainer: "game-area",
   fullScreen: false
 });

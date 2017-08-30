@@ -17,7 +17,7 @@ $routes = array(
   'system/downloadSql' => 'sqlDownload.php',
 
   'time/view' => 'getTimestamps.php',              'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
-  'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',
+  'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',                  'time/requests' => 'requestOverview.php',
 
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
   'project/pdfDownload' => 'pdfDownload.php',
@@ -30,8 +30,16 @@ $routes = array(
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2"
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
+  '.woff' => "application/font-woff",   '.ttf' => "application/x-font-opentype"
  );
+
+//kill internet explorer
+if (strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64') || strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64')) {
+  include 'msie.html';
+  die();
+}
+
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');

@@ -61,10 +61,11 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
       </div>
       <div class="modal-body">
         <label>Date</label>
-        <input id="calendar" type="date" class="form-control" name="holidayDate" >
+        <input type="text" class="form-control datepicker" name="holidayDate" placeholder="YYYY-MM-DD"/>
         <br>
         <label>Name</label>
-        <input type="text" class="form-control" name="holidayName" >
+        <input type="text" class="form-control" name="holidayName" />
+        <small><?php echo $lang['INFO_HOLIDAY']; ?></small>
       </div>
       <div class="modal-footer">
         <button type="button"  class="btn btn-default" data-dismiss="modal" ><?php echo $lang['CANCEL']; ?></button>
@@ -75,11 +76,6 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
 </form>
 
 <script>
-var myCalendar = new dhtmlXCalendarObject(["calendar"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d");
-dhx.zim.first = function(){ return 2000 };
-
 $('.table').DataTable({
   order: [[ 2, "asc" ]],
   columns: [{orderable: false}, null, null],

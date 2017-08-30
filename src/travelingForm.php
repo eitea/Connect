@@ -169,13 +169,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <form method="POST" autocomplete="off">
   <div class="row">
     <div class="col-md-3">
-      <input type="date" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
+      <input type="text" class="form-control required-field datepicker" placeholder="YYYY-MM-DD" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
     </div>
     <div class="col-md-3">
       <div class="input-group">
-        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" />
+        <input type="time"  class="form-control required-field" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" />
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control required-field" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd" />
+        <input type="time" class="form-control required-field" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd" />
       </div>
     </div>
     <div class="col-md-5">

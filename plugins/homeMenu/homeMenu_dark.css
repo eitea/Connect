@@ -50,8 +50,9 @@
 .navbar-default .navbar-nav>li>a {
   color: #ddd;
 }
-.nav.navbar-nav > li, .sidebar-nav .navbar > li {
-  color: white;
+
+.nav.navbar-nav .dropdown .dropdown-menu {
+  color: black;
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>li>a:hover{

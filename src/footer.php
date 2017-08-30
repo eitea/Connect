@@ -54,6 +54,18 @@ $(document).ready(function () {
   }
   window.onbeforeunload = unloadPage;
 });
+$(function () {
+  $('.datepicker').datepicker({
+    format: 'yyyy-mm-dd'
+  });
+  $('.datetimepicker').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm'
+  });
+  $('.timepicker').datetimepicker({
+    format: 'HH:mm'
+  });
+});
 </script>
+
 </body>
 </html>
