@@ -201,7 +201,7 @@ if($result && $result->num_rows > 0):
 ?>
   <form method="POST">
     <table class="table table-hover">
-      <th>Request Type</th>
+      <th><?php echo $lang['REQUEST_TYPE']; ?></th>
       <th>Name</th>
       <th><?php echo $lang['TIMES']; ?></th>
       <th><?php echo $lang['REASON']; ?></th>

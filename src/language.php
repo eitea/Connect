@@ -800,6 +800,9 @@ $lang_ger['RETURN'] = 'Zurück';
 $lang_eng['REQUESTS'] = "Request";
 $lang_ger['REQUESTS'] = "Anfragen";
 
+$lang_eng['REQUEST_TYPE'] = "Request Type";
+$lang_ger['REQUEST_TYPE'] = "Art der Anfrage";
+
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 

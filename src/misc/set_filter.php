@@ -8,6 +8,8 @@
 * logs => [activity, hideAll]
 * date => [fromDate, toDate]
 * procedures => [transitions[id], status, hideAll]
+* acceptance => status
+* requestType => type
 **/
 
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
@@ -73,6 +75,12 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     } else {
       $filterings['procedures'][2] = '';
     }
+  }
+  if(isset($_POST['searchRequestType'])){
+    $filterings['requestType'] = test_input($_POST['searchRequestType']);
+  }
+  if(isset($_POST['searchAcceptance'])){
+    $filterings['acceptance'] = intval($_POST['searchAcceptance']);
   }
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
@@ -197,6 +205,29 @@ if($scale > 2){ //3 columns
                 <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
               </select>
               <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
+          <?php endif; ?>
+          <?php if(isset($filterings['requestType'])): ?>
+            <label><?php echo $lang['REQUEST_TYPE']; ?></label>
+            <select name="searchRequestType" class="js-example-basic-single">
+              <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
+              <?php
+              foreach($lang['REQUEST_TOSTRING'] as $key => $value){
+                $selected = '';
+                if($key == $filterings['requestType']) $selected = 'selected';
+                echo '<option '.$selected.' value="'.$key.'">'.$value.'</option>';
+              }
+              ?>
+            </select>
+            <br><br>
+          <?php endif; ?>
+          <?php if(isset($filterings['acceptance'])): ?>
+            <label>Status</label>
+            <select name="searchAcceptance" class="js-example-basic-single">
+              <option value="-1"><?php echo $lang['DISPLAY_ALL']; ?></option>
+              <option value="0" <?php if($filterings['acceptance'] == '0'){echo 'selected';} ?>><?php echo $lang['REQUESTSTATUS_TOSTRING'][0]; ?></option>
+              <option value="1" <?php if($filterings['acceptance'] == '1'){echo 'selected';} ?>><?php echo $lang['REQUESTSTATUS_TOSTRING'][1]; ?></option>
+              <option value="2" <?php if($filterings['acceptance'] == '2'){echo 'selected';} ?>><?php echo $lang['REQUESTSTATUS_TOSTRING'][2]; ?></option>
+            </select>
           <?php endif; ?>
         </div>
 
