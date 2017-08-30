@@ -1,29 +1,38 @@
 <?php include 'header.php'; enableToStamps($userID);?>
 <?php
-$filterings = array('logs' => array(0, 'checked'), 'date' => substr(getCurrentTimestamp(),0,7).'-__');
+$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,8).'01'));
 
 require 'Calculators/IntervalCalculator.php';
-if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
-  $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
-  $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
-  if($_POST['request_open']){
-    $endTime = '0000-00-00 00:00:00';
-  } else {
-    if(empty($_POST['request_end'])){
+if(isset($_POST['request_submit'])){
+  if(!empty($_POST['request_start'])){
+    $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
+    $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
+    if($_POST['request_open']){
       $endTime = '0000-00-00 00:00:00';
-    }
-    $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
-  }
-  $requestText = test_input($_POST['request_text']);
-  if(test_Date($startTime)){
-    $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
-    if($conn->query($sql)){
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      if(empty($_POST['request_end'])){
+        $endTime = '0000-00-00 00:00:00';
+      } else {
+        $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
+        if(timeDiff_Hours($startTime, $endTime) < 0){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          die(); //still better than a goto.
+        }
+      }
+    }
+    $requestText = test_input($_POST['request_text']);
+    if(test_Date($startTime)){
+      $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
+      if($conn->query($sql)){
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+      } else {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
     }
   } else {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].' '.$lang['BEGIN'].' '.$lang['MISSING'].'.</div>';
   }
 } elseif(!empty($_POST['splits_save'])) {
   $x = intval($_POST['splits_save']);
@@ -45,7 +54,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
         echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
       }
     } else {
-      die("Please do not try this again. It will not work."); //for later: we should create a strike system.
+      die("Please do not try this again. It will not work."); //TODO for later: we should create a strike system.
     }
   } else {
     echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -73,8 +82,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
   </thead>
   <tbody>
     <?php
-    $filterings['date'] = str_replace('__', '01', $filterings['date']);
-    $now = $filterings['date'].' 05:00:00';
+    $now = $filterings['date'][0];
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);
@@ -148,16 +156,18 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
         <div class="modal-body">
           <div class="row">
             <div class="col-md-6">
-              <label>Neuer Anfang</label>
+              <label><?php echo $lang['FROM']; ?></label>
               <br>
-              <input type="time" name="request_start" class="form-control" />
+              <div class="radio"> <!-- beauty purposes -->
+                <input type="time" name="request_start" class="form-control" value="<?php echo substr(carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]), 11, 5); ?>" />
+              </div>
             </div>
             <div class="col-md-6">
-              <label>Neues Ende</label>
+              <label><?php echo $lang['TO']; ?></label>
               <div class="radio">
-                <label><input type="radio" name="request_open" value="0" checked /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" /></label>
+                <label><input type="radio" name="request_open" value="0" /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" min="01:00" value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
                 <br><br>
-                <label><input type="radio" name="request_open" value="1" /> <?php echo $lang['OPEN']; ?></label>
+                <label><input type="radio" name="request_open" value="1" checked /> <?php echo $lang['OPEN']; ?></label>
               </div>
             </div>
           </div>
@@ -165,6 +175,7 @@ if(isset($_POST['request_submit']) && !empty($_POST['request_start'])){
             <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
+              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Sonderzeichen werden immer entfernt.</small>
             </div>
           </div>
         </div>

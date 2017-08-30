@@ -193,7 +193,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 } //end if POST
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, ''), "user" => 0, "bookings" => array(1, '', 'checked'), "date" =>  substr(getCurrentTimestamp(), 0, 10)); //init: display all
+
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, "user" => 0, "bookings" => array(1, '', 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ); //init: display all
 ?>
 
 <div style="position:fixed;background:white;width:100%;z-index:1">
@@ -209,14 +210,14 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
           if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
           if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
-          if($filterings['project'][0]){$projectQuery = "AND $projectTable.id = ".$filterings['project'][0]; }
-          if($filterings['project'][1]){$productiveQuery = "AND $projectTable.status = 'checked'"; }
+          if($filterings['project']){$projectQuery = "AND $projectTable.id = ".$filterings['project']; }
           if($filterings['user']){$userQuery = "AND $userTable.id = ".$filterings['user']; }
           if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
           if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
           if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
+          AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
           AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
@@ -247,7 +248,8 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) LIKE '".$filterings['date']." %'
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
+AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
 AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
@@ -277,10 +279,9 @@ if(!$result || $result->num_rows <= 0){
     <tbody>
       <?php
       $csv = new Csv();
-      $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info',
-      $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
-      $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'],
-      $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'], $lang['ADDITIONAL_FIELDS']));
+      $csv->setLegend(array($lang['CLIENT'], $lang['PROJECT'], 'Info', $lang['DATE'].' - '. $lang['FROM'], $lang['DATE'].' - '. $lang['TO'],
+      $lang['TIMES'].' - '. $lang['FROM'], $lang['TIMES'].' - '. $lang['TO'], $lang['SUM'].' (min)', $lang['HOURS_CREDIT'], 'Person', $lang['HOURLY_RATE'],
+      $lang['ADDITIONAL_FIELDS'], $lang['EXPENSES']));
 
       $sum_min = 0;
       $numRows = $result->num_rows;
@@ -348,7 +349,7 @@ if(!$result || $result->num_rows <= 0){
         $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
         $detailInfo = $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
         $interninfo = $row['internInfo'];
-        $optionalinfo = $csv_optionalinfo = $expensesinfo = '';
+        $optionalinfo = $csv_optionalinfo = $expensesinfo = $csv_expensesinfo = '';
         $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
         if($extraFldRes && $extraFldRes->num_rows > 0){
           $extraFldRow = $extraFldRes->fetch_assoc();
@@ -362,10 +363,11 @@ if(!$result || $result->num_rows <= 0){
           $extraFldRow = $extraFldRes->fetch_assoc();
           if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
         }
-        if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
-        if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
-        if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
         $csv_Add[] = $csv_optionalinfo;
+        if($row['exp_unit'] > 0){ $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>'; $csv_expensesinfo .= "{$lang['QUANTITY']}: {$row['exp_unit']},"; }
+        if($row['exp_price'] > 0){ $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>'; $csv_expensesinfo .= "{$lang['PRICE_STK']}: {$row['exp_price']}"; }
+        if($row['exp_info']){ $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>'; $csv_expensesinfo .= ", {$lang['DESCRIPTION']}: {$row['exp_info']}"; }
+        $csv_Add[] = $csv_expensesinfo;
         echo "<td>";
         if($row['booked'] == 'FALSE'){ echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
         if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}
@@ -409,8 +411,20 @@ $(function () {
         <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
           <div class="row">
           <?php
-          if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
-            echo "<div class='col-md-6'><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
+          if(!empty($row['projectID'])){ //if this is no break, display client/project selection
+            if(count($available_companies) > 1){
+              echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+              $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+              while($companyRow = $companyResult->fetch_assoc()){
+                $selected = '';
+                if($companyRow['id'] == $row['companyID']){
+                  $selected = 'selected';
+                }
+                echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
+              }
+              echo '</select></div>';
+            }
+            echo "<div class='col-md-4'><select id='newClient$x' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterings['company']){
               $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
@@ -423,7 +437,7 @@ $(function () {
               }
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
-            echo "</select></div><div class='col-md-6'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
+            echo "</select></div><div class='col-md-4'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
             $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){
@@ -434,7 +448,7 @@ $(function () {
               echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
             echo "</select></div> <br><br>";
-          } //end if(break)
+          } //end if(!break)
 
           $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
           $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
@@ -474,8 +488,8 @@ $(function () {
           ?>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
         </div>
       </div>
     </div>
@@ -588,7 +602,7 @@ $(function () {
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date']; ?>"/>
+            <input type="date" class="form-control" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
@@ -608,6 +622,7 @@ $(function () {
   </div>
 </form>
 
+<script src="plugins/jsCookie/src/js.cookie.js"></script>
 <script>
 function showClients(place, company, client, project, projectPlace){
   $.ajax({
@@ -669,17 +684,41 @@ function hideMyDiv(o, toShow){
     document.getElementById(toShow).style.display='block';
   }
 }
+
+if(Cookies.get('checkboxValues') !== undefined){
+  var checkboxValues = Cookies.getJSON('checkboxValues');
+  if(checkboxValues){
+    $.each(checkboxValues, function(key, value) {
+      var elem = document.getElementById(key)
+      if(elem){
+        elem.checked = value;
+      }
+    });
+  }
+} else {
+  var checkboxValues = {};
+}
+$(":checkbox").on("change", function(){
+  if(this.id){
+    checkboxValues[this.id] = this.checked;
+  }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
+});
+
 function toggle(checkId, uncheckId) {
   checkboxes = document.getElementsByName(checkId + '[]');
   checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
   for(var i = 0; i<checkboxes.length; i++) {
     checkboxes[i].checked = true;
     checkboxesUncheck[i].checked = false;
+    checkboxValues[checkboxes[i].id] = true;
   }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
 }
 function toggle2(uncheckID){
   uncheckBox = document.getElementById(uncheckID);
   uncheckBox.checked = false;
+  checkboxValues[uncheckBox.id] = false;
 }
 
 $(document).ready(function(){
@@ -701,13 +740,12 @@ $(document).ready(function(){
     }
   });
 });
-
 </script>
 
 <?php
 if(!empty($filterings['company'])){
   echo '<script>';
-  echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'][0].', "#addSelectProject");';
+  echo 'showClients("#addSelectClient", '.$filterings['company'].', '.$filterings['client'].', '.$filterings['project'].', "#addSelectProject");';
   echo '</script>';
 }
 if(!empty($filterings['user'])){

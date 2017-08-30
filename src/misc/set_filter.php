@@ -1,13 +1,13 @@
 <?php
 /**
-* Company [id]
-* Client [id]
-* Project [id, productive]
-* Users [id]
-* Bookings [charged, break, drive]
-* Logs [activity, hideAll]
-* Dates [date]
-* Procedures [transitions[id], status, hideAll]
+* company => id
+* client  => id
+* project  => id
+* users => id
+* bookings => [charged, break, drive]
+* logs => [activity, hideAll]
+* date => [fromDate, toDate]
+* procedures => [transitions[id], status, hideAll]
 **/
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array();
@@ -20,17 +20,7 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     $filterings['client'] = intval($_POST['searchClient']);
   }
   if(isset($_POST['searchProject'])){
-    $filterings['project'][0] = intval($_POST['searchProject']);
-  }
-  if(isset($filterings['project'][1])){
-    if(isset($_POST['searchProductive'])){
-      $filterings['project'][1] = 'checked';
-    } else {
-      $filterings['project'][1] = '';
-    }
-  }
-  if(isset($_POST['searchProductive'])){
-    $filterings['project'][1] = 'checked';
+    $filterings['project'] = intval($_POST['searchProject']);
   }
   if(isset($_POST['searchUser'])){
     $filterings['user'] = intval($_POST['searchUser']);
@@ -53,6 +43,7 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     }
   }
   if(isset($_POST['searchActivity'])){
+
     $filterings['logs'][0] = intval($_POST['searchActivity']);
   }
   if(isset($filterings['logs'][1])){
@@ -62,23 +53,14 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
       $filterings['logs'][1] = '';
     }
   }
-  if(!empty($_POST['searchYear'])){
-    $filterings['date'] = intval($_POST['searchYear']);
+
+  if(!empty($_POST['searchDateFrom'])){
+    $filterings['date'][0] = test_input($_POST['searchDateFrom']);
   }
-  if(isset($_POST['searchMonth'])){
-    if(!empty($_POST['searchMonth'])){
-      $filterings['date'] .= '-' . sprintf('%02d', intval($_POST['searchMonth']));
-    } else {
-      $filterings['date'] .= '-' . '__';
-    }
+  if(!empty($_POST['searchDateTo'])){
+    $filterings['date'][1] = test_input($_POST['searchDateTo']);
   }
-  if(isset($_POST['searchDay'])){
-    if(!empty($_POST['searchDay'])){
-      $filterings['date'] .= '-' . sprintf('%02d', intval($_POST['searchDay']));
-    } else {
-      $filterings['date'] .= '-' . '__';
-    }
-  }
+
   if(isset($_POST['searchTransitions'])){
     $filterings['procedures'][0] = array_map("test_input", $_POST['searchTransitions']);
   }
@@ -155,7 +137,7 @@ if($scale > 2){ //3 columns
           if(isset($filterings['client'])){
             echo '<label>'.$lang['CLIENT'].'</label>';
             if(isset($filterings['project'])){
-              echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient" onchange="set_filter.showProjects(this.value, \''.$filterings['project'][0].'\');" >';
+              echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient" onchange="set_filter.showProjects(this.value, \''.$filterings['project'].'\');" >';
             } else {
               echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient">';
             }
@@ -174,7 +156,6 @@ if($scale > 2){ //3 columns
             <label><?php echo $lang['PROJECT']; ?></label>
             <select id="searchProjectHint" class="js-example-basic-single" name="searchProject" >
             </select>
-            <div class="checkbox"><label><input <?php echo $filterings['project'][1]; ?> type="checkbox" name="searchProductive" /><?php echo $lang['PRODUCTIVE']; ?></label></div>
           <?php endif; ?>
         </div>
 
@@ -220,45 +201,27 @@ if($scale > 2){ //3 columns
         </div>
 
         <?php if(isset($filterings['date'])): ?>
-        <div class="filter_column">
-          <label><?php echo $lang['YEAR']; ?></label>
-          <select class="js-example-basic-single" name="searchYear">
-            <?php
-            for($i = 2015; $i < 2025; $i++){
-              $selected = ($i == substr($filterings['date'],0,4))?'selected':'';
-              echo "<option $selected value='$i'>$i</option>";
-            }
-            ?>
-          </select>
-          <br><br>
-          <label><?php echo $lang['MONTH']; ?></label>
-          <select class="js-example-basic-single"  onchange="set_filter.changeValue(this.value, 'searchDay', '');" name="searchMonth" id="searchMonth">
-            <option value="">...</option>
-            <?php
-            for($i = 1; $i < 13; $i++) {
-              $selected= '';
-              if ($i == substr($filterings['date'],5,2)) {
-                $selected = 'selected';
-              }
-              echo '<option '.$selected.' value="'.sprintf("%02d",$i).'">'.$lang['MONTH_TOSTRING'][$i].'</option>';
-            }
-            ?>
-          </select>
-          <br><br>
-          <label><?php echo $lang['DAY']; ?></label>
-          <select class="js-example-basic-single" name="searchDay" id="searchDay">
-            <option value="">...</option>
-            <?php
-            for($i = 1; $i < 32; $i++){
-              $selected= '';
-              if($i == substr($filterings['date'],8,2)) {
-                $selected = 'selected';
-              }
-              echo "<option $selected value=".sprintf("%02d",$i).">$i</option>";
-            }
-            ?>
-          </select>
-        </div>
+          <div class="filter_column">
+            <?php if(isset($filterings['date'][1])): ?>
+              <label><?php echo $lang['FROM']; ?></label>
+              <div class="input-group">
+                <input id="searchDateFrom" type="date" class="form-control" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+                <span class="input-group-btn">
+                  <button id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
+                </span>
+              </div>
+              <br><label><?php echo $lang['TO']; ?></label>
+              <div class="input-group">
+                <input type="date" id="searchDateTo" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
+                <span class="input-group-btn">
+                  <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
+                </span>
+              </div>
+            <?php else: ?>
+              <label><?php echo $lang['DATE']; ?></label>
+              <input type="date" class="form-control" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
+            <?php endif; ?>
+          </div>
         <?php endif; ?>
 
         <?php if(isset($filterings['procedures'])): ?>
@@ -301,6 +264,18 @@ if($scale > 2){ //3 columns
 </div>
 
 <script>
+$("#putDate").click( function() {
+  var d = new Date( $("#searchDateFrom").val());
+  d = new Date(d.getFullYear(), d.getMonth()+1, 0);
+  d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+  $("#searchDateTo").val(d.toISOString().substring(0, 10));
+});
+$("#putDateUp").click( function() {
+  var d = new Date( $("#searchDateTo").val());
+  d = new Date(d.getFullYear(), d.getMonth(), 1);
+  d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+  $("#searchDateFrom").val(d.toISOString().substring(0, 10));
+});
 $('#filterings_dropdown .dropdown-menu').on({
   "click":function(e){
     e.stopPropagation();
@@ -328,10 +303,7 @@ $('#filterings_dropdown .dropdown-menu').on({
       success : function(resp){
         $("#searchClientHint").html(resp);
       },
-      error : function(resp){},
-      complete: function(resp){
-        set_filter.showProjects(0, 0);
-      }
+      error : function(resp){}
     });
   };
   set_filter.changeValue = function(cVal, id, val){
@@ -354,8 +326,8 @@ if(!empty($filterings['company'])){
   echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
 }
 if(!empty($filterings['client'])){
-  if(!empty($filterings['project'][0])){
-    $nextID = $filterings['project'][0];
+  if(!empty($filterings['project'])){
+    $nextID = $filterings['project'];
   } else {
     $nextID = 0;
   }

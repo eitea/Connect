@@ -2,7 +2,7 @@
 
 <?php
 require_once 'Calculators/IntervalCalculator.php';
-$filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'checked'), "date" => substr(getCurrentTimestamp(), 0, 8).'__');
+$filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ) ;
 ?>
 
 <div class="page-header">
@@ -308,10 +308,7 @@ if($filterings['user']):
       </thead>
       <tbody>
         <?php
-        $filterDateFrom = str_replace('__', '01', $filterings['date']);
-        $filterDateTo = date('Y-m-t H:i:s', strtotime($filterDateFrom)); // t returns the number of days in the month
-
-        $calculator = new Interval_Calculator($filterDateFrom, $filterDateTo, $x);
+        $calculator = new Interval_Calculator($filterings['date'][0].' 05:00:00', $filterings['date'][1].' 23:00:00', $x);
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $accumulatedSaldo = 0;
         for($i = 0; $i < $calculator->days; $i++){
           //filterStatus, let's just skip all those that dont fit (sync with modal creation)
@@ -442,7 +439,7 @@ if($filterings['user']):
           echo "<td></td></tr>";
 
           //get all the previous days
-          $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterDateFrom, -48), $x);
+          $calculator_P = new Interval_Calculator($calculator->beginDate, carryOverAdder_Hours($filterings['date'][0], -48), $x);
           $saldo_from_zero = $overTimeLump = 0;
           for($i = 0; $i < count($calculator_P->monthly_saldo); $i++){
             $saldo_from_zero += $calculator_P->monthly_saldo[$i] + $calculator_P->monthly_correctionHours[$i];
@@ -756,6 +753,18 @@ if($filterings['user']):
                   <div class="row">
                   <?php
                   if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+                    if(count($available_companies) > 1){
+                      echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+                      $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+                      while($companyRow = $companyResult->fetch_assoc()){
+                        $selected = '';
+                        if($companyRow['id'] == $row['companyID']){
+                          $selected = 'selected';
+                        }
+                        echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
+                      }
+                      echo '</select></div>';
+                    }
                     echo "<div class='col-md-4'><label>".$lang['CLIENT']."</label><select class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
                     $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
                     $clientResult = $conn->query($sql);

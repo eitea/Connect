@@ -1,6 +1,6 @@
 <?php include 'header.php'; enableToProject($userID);  ?>
 <?php
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => array(0, '')); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterings['client'] = test_input($_GET['custID']);
@@ -84,8 +84,7 @@ if(!$result || $result->num_rows <= 0){
       $companyQuery = $clientQuery = $projectQuery = $productiveQuery = "";
       if($filterings['company']){$companyQuery = " AND $companyTable.id = ".$filterings['company']; }
       if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
-      if($filterings['project'][0]){$projectQuery = " AND $projectTable.id = ".$filterings['project'][0]; }
-      if($filterings['project'][1]){$productiveQuery = " AND $projectTable.status = 'checked'"; }
+      if($filterings['project']){$projectQuery = " AND $projectTable.id = ".$filterings['project']; }
 
       $result = $conn->query("SELECT $projectTable.*, $clientTable.companyID, $clientTable.name AS clientName, $companyTable.name AS companyName
       FROM $projectTable INNER JOIN $clientTable ON $clientTable.id = $projectTable.clientID INNER JOIN $companyTable ON $companyTable.id = $clientTable.companyID

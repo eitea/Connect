@@ -29,6 +29,7 @@
         echo '<tr style="background-color:#fffced;"><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>';
         $A = $B;
       }
+
       do {
         $B = $row_b['start'];
         if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){
@@ -52,7 +53,8 @@
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     }
-
     ?>
   </tbody>
 </table>
+
+<input type="hidden" name="confirm_addendum" value="true" />
