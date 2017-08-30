@@ -1394,9 +1394,13 @@ if($row['version'] < 96){
   $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
-if($row['version'] < 97){
-  $conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
-  $conn->query("CREATE TABLE socialprofile(
+if ($row['version'] < 97) {
+  if ($conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'")) {
+    echo '<br>Added role "canUseSocialMedia" with default "FALSE"';
+  } else {
+    echo '<br>' . $conn->error;
+  }
+  if ($conn->query("CREATE TABLE socialprofile(
     userID INT(6) UNSIGNED,
     isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     status varchar(150) DEFAULT '-',
@@ -1404,30 +1408,61 @@ if($row['version'] < 97){
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  )");
-  $conn->query("CREATE TABLE socialmessages(
+  )")) {
+    echo '<br>Added table socialprofile';
+  } else {
+    echo '<br>' . $conn->error;
+  }
+  if ($conn->query("CREATE TABLE socialmessages(
     userID INT(6) UNSIGNED,
     partner INT(6) UNSIGNED,
     message TEXT,
     picture MEDIUMBLOB,
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-  )");
-  $conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
-  $conn->query("CREATE TABLE socialgroups(
+  )")) {
+    echo '<br>Added table socialmessage';
+  }
+  else {
+    echo '<br>' . $conn->error;
+  }
+  if ($conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'")){
+    echo '<br>Added role "enableSocialMedia" with default "TRUE"';
+  } else {
+    echo '<br>' . $conn->error;
+  }
+  
+  if ($conn->query("CREATE TABLE socialgroups(
     groupID INT(6) UNSIGNED,
     userID INT(6) UNSIGNED,
     name VARCHAR(30),
-    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-  )");
-  $conn->query("CREATE TABLE socialgroupmessages(
+    admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+  )")) {
+    echo '<br>Added table socialgroups';
+  }
+  else {
+    echo '<br>' . $conn->error;
+  }
+  if ($conn->query("CREATE TABLE socialgroupmessages(
     userID INT(6) UNSIGNED,
     groupID INT(6) UNSIGNED,
     message TEXT,
     picture MEDIUMBLOB,
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen TEXT
-  )");
+  )")) {
+    echo '<br>Added table socialgroupmessages';
+  }
+  else {
+    echo '<br>' . $conn->error;
+  }
+  $result = $conn->query("SELECT * FROM userdata");
+  while ($row = $result->fetch_assoc()) {
+    $x = $row["id"];
+    if(!$conn->query("INSERT INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-')")){
+      echo '<br>' . $conn->error;
+    }
+  }
 }
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}
