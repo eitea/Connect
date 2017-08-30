@@ -3,9 +3,10 @@
 
 body{
   padding-top: 50px;
-  font-family: 'Open Sans', 'Lucida Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+  font-family: 'Open Sans', sans-serif;
+  font-size:14px;
+
   margin-bottom:50px;
-  overflow-x: hidden;
 }
 .panel > .panel-heading a:link {
   color: #6f6f6f;
@@ -19,9 +20,7 @@ body{
 ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
 }
-.navbar-default .navbar-brand:hover {
-  color:#f0ad4e;
-}
+
 /* SIDEBAR */
 .panel-body .nav.navbar-nav {
   width:100%;
@@ -40,7 +39,6 @@ ul.nav.navbar-nav .nav.nav-list {
   width:100%;
 }
 .affix-sidebar{
-  font-size:small;
   padding-left: 0;
   width: 250px;
   position:fixed;
@@ -233,7 +231,6 @@ input[type="radio"]:checked {
 }
 .page-seperated-section{
   background-color: white;
-  border-radius: 8px;
   padding: 10px;
 }
 

@@ -144,7 +144,7 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = 'plugins/homeMenu/homeMenu_green.css';
+    $css_file = 'plugins/homeMenu/homeMenu_metro.css?v='.time();
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = 'plugins/homeMenu/homeMenu_dark.css';
   } else {
@@ -177,7 +177,7 @@ if($isTimeAdmin){
     <link rel="stylesheet" type="text/css" href="plugins/datetimepicker/bootstrap-datetimepicker.min.css"/>
     <script src="plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 
-    <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+    <link href="plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
@@ -212,7 +212,7 @@ if($isTimeAdmin){
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header hidden-xs">
-          <a class="navbar-brand" href="../user/home" style="width: 230px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
+          <a class="navbar-brand" href="../user/home" style="width: 230px;">Connect</a>
         </div>
         <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
           <ul class="nav navbar-nav" style="margin:10px">
@@ -243,7 +243,7 @@ if($isTimeAdmin){
         </div>
         <div class="navbar-right" style="margin-right:10px;">
           <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge alert-badge hidden-xs"><a href="../time/check" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <a href="../time/check" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "><i class="fa fa-bell"></i><span class="badge alert-badge hidden-xs"> <?php echo $numberOfAlerts; ?></span></a> <?php endif; ?>
           <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
           <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
