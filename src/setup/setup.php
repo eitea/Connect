@@ -318,7 +318,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <span class="input-group-addon" style=min-width:150px>
             Server Address
           </span>
-          <input type="text" class="form-control" name='serverName' value = "127.0.0.1">
+          <input type="text" class="form-control" name="serverName" value = "localhost" />
         </div>
       </div>
     </div>
@@ -330,7 +330,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <span class="input-group-addon" style=min-width:150px>
             Username
           </span>
-          <input type="text" class="form-control" name='mysqlUsername' value = 'root'>
+          <input type="text" class="form-control" name='mysqlUsername' value = 'root' />
         </div>
       </div>
     </div>
@@ -342,7 +342,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <span class="input-group-addon" style=min-width:150px>
             Password
           </span>
-          <input type="text" class="form-control" name='pass' value = ''>
+          <input type="text" class="form-control" name='pass' value = '' />
         </div>
       </div>
     </div>
@@ -354,14 +354,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <span class="input-group-addon" style=min-width:150px>
             DB Name
           </span>
-          <input type="text" class="form-control" name='dbName' value = 'Zeit1'>
+          <input type="text" class="form-control" name='dbName' value = 'Zeit1' />
         </div>
       </div>
     </div>
   </div>
   <br><hr><br>
 <?php else: ?>
-  <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVER', true); ?>">
+  <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
   <input type="hidden" name='mysqlUsername' value = 'connect'>
   <input type="hidden" name='pass' value = 'Uforonudi499'>
   <input type="hidden" name='dbName' value = 'connect'>
