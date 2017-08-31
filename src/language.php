@@ -314,6 +314,12 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 
+$lang_eng['ENCRYPTION_ACTIVE'] = 'Encryption active';
+$lang_ger['ENCRYPTION_ACTIVE'] = 'Verschlüsselung aktiviert';
+
+$lang_eng['ENCRYPTION_DEACTIVATED'] = 'Encryption deactivated';
+$lang_ger['ENCRYPTION_DEACTIVATED'] = 'Verschlüsselung deaktiviert';
+
 $lang_eng['END'] = 'End';
 $lang_ger['END'] = 'Ende';
 
@@ -837,7 +843,6 @@ $lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
 $lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
 
 /*------------------Social Media------------------*/
-
 $lang_eng['SOCIAL_MENU_ITEM'] = 'Social Media';
 $lang_ger['SOCIAL_MENU_ITEM'] = 'Soziale Medien';
 

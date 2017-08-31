@@ -1464,12 +1464,20 @@ if ($row['version'] < 97) {
     }
   }
 }
-//if($row['version'] < 98){}
+
+if($row['version'] < 98){
+  $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
+  $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
+  $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)");
+  $conn->query("ALTER TABLE articles CHANGE description VARCHAR(1200)");
+  
+}
+
 //if($row['version'] < 99){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
-$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
+//$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
 ?>
 <script type="text/javascript">

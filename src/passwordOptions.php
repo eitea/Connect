@@ -1,4 +1,4 @@
-<?php require 'header.php'; require_once 'utilities.php'; enableToCore($userID);?>
+<?php require 'header.php'; require_once 'utilities.php';require_once 'createTimestamps.php'; enableToCore($userID);?>
 <?php
 if(isset($_POST['saveButton'])){
   //allgemein
@@ -23,6 +23,20 @@ if(isset($_POST['saveButton'])){
   echo mysqli_error($conn);
 
   //master
+  $masterPasswordResult = $conn->query("SELECT masterPassword FROM $configTable");
+  $masterPasswordSet = strlen($masterPasswordResult->fetch_assoc()["masterPassword"]) != 0;
+  if($masterPasswordSet && isset($_POST['masterPass_deactivate'])){
+    $conn->query("UPDATE $configTable SET masterPassword = ''");
+
+    //delete all sessions
+    ini_set('session.gc_max_lifetime', 0);
+    ini_set('session.gc_probability', 1);
+    ini_set('session.gc_divisor', 1);
+    session_unset();
+    session_destroy();
+    redirect('../login/auth');
+    die();
+  }
   if(isset($_POST['masterPass_current']) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
     $passwordCurrent = test_input($_POST['masterPass_current']);
     $password = $_POST['masterPass_new'];
@@ -70,9 +84,32 @@ if(isset($_POST['saveButton'])){
         $conn->query("UPDATE $clientDetailBankTable SET iban='$ibanVal', bic='$bicVal', iv='$keyValue', iv2='$ivValue' WHERE id = $curID");
         echo mysqli_error($conn);
       }
+
+      //articles table
+      $result = $conn->query("SELECT * FROM articles");
+      while($row = $result->fetch_assoc()){
+        $old = mc($row["iv"],$row["iv2"]);
+        $new = mc()->from($old,$password);
+        $iv = $new->iv;
+        $iv2 = $new->iv2;
+        $name = $new->change($row["name"]);
+        $desc = $new->change($row["description"]);
+        $id = $row["id"];
+        $conn->query("UPDATE articles SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id");
+      }
+
       //save new passwordhash
       $password = password_hash($password, PASSWORD_BCRYPT);
       $conn->query("UPDATE $configTable SET masterPassword = '$password'");
+
+      //delete all sessions
+      ini_set('session.gc_max_lifetime', 0);
+      ini_set('session.gc_probability', 1);
+      ini_set('session.gc_divisor', 1);
+      session_unset();
+      session_destroy();
+      redirect('../login/auth');
+      die();
     } else {
       echo '<br><div class="alert alert-danger fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -83,6 +120,7 @@ if(isset($_POST['saveButton'])){
 }
 
 $masterPasswordResult = $conn->query("SELECT masterPassword FROM $configTable");
+$masterPasswordSet = strlen($masterPasswordResult->fetch_assoc()["masterPassword"]) != 0;
 
 $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
@@ -162,7 +200,7 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
 
-  <h4>Master Passwort <a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4>Master Passwort <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
@@ -190,6 +228,13 @@ $row = $result->fetch_assoc();
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
+    </div>
+    <br><br>
+    <div class="col-md-4">
+      Verschlüsselung deaktivieren
+    </div>
+    <div class="col-md-8">
+      <input type="checkbox" class="" name="masterPass_deactivate" value="true"/>
     </div>
     <br><br><br>
   </div>

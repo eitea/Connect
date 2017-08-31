@@ -14,15 +14,18 @@ if(!empty($_POST['captcha'])){
 require __DIR__ .'/connection.php';
 require __DIR__ .'/createTimestamps.php';
 include __DIR__ .'/version_number.php';
+require __DIR__ .'/encryption_functions.php';
 
 $invalidLogin = "";
-if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton'])) {
+$masterpw = $conn->query("SELECT masterPassword FROM $configTable")->fetch_assoc()["masterPassword"];
+$masterpwset = strlen($masterpw) != 0;
+if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton']) && (!empty($_POST['masterpassword']) || !$masterpwset)) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);
   if($result){
     $row = $result->fetch_assoc();
   }
-  if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
+  if(crypt($_POST['password'], $row['psw']) == $row['psw'] && ( !$masterpwset || crypt($_POST['masterpassword'], $masterpw) == $masterpw)) {
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];
@@ -30,6 +33,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     $_SESSION['timeToUTC'] = $timeZone;
     $_SESSION['filterings'] = array();
     $_SESSION['color'] = $row['color'];
+    $_SESSION['masterpassword'] = $_POST['masterpassword'];
 
     //check for updates, if core admin
     require __DIR__ ."/language.php";
@@ -46,7 +50,11 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     }
     redirect('../user/home');
   } else {
-    $invalidLogin = "Invalid Username/ Password!";
+    if($masterpwset){
+      $invalidLogin = "Invalid Username/Password/Master Key";
+    }else{
+      $invalidLogin = "Invalid Username/ Password!";
+    }
   }
 }
 
@@ -69,7 +77,8 @@ if($result && $result->num_rows > 0){
     <form method="POST" style="display:inline-block">
       <div style="margin-right:20px;"><img alt="Connect" src="images/logo.png"  height="45px" ></div> <br>
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
-      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel" /><br><br>
+      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel" /><br>
+      <?php if($masterpwset): ?><label for="masterpw">Master Password: </label> <input id="masterpw" type="password" name="masterpassword" value="" /><br><?php endif; ?>
       <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="login" value="Submit" /><br>
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>" />
       <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>

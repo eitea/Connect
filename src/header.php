@@ -12,6 +12,7 @@ require __DIR__."/connection.php";
 require __DIR__."/createTimestamps.php";
 require __DIR__."/validate.php";
 require __DIR__."/language.php";
+require_once __DIR__."/encryption_functions.php";
 
 $random_hash = '';
 if($this_page != "editCustomer_detail.php"){
