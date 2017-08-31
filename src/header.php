@@ -70,7 +70,7 @@ if($isTimeAdmin){
   //lunchbreaks
   $result = $conn->query("SELECT indexIM FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
     WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
-    !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)");
+    !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60)-1 AND timestampID = l1.indexIM AND bookingType = 'break')");
     if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   }
   $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
@@ -325,7 +325,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home" style="color:white"><br>
+              <form method='post' action="../user/home"><br>
                 <?php
                 echo $checkInButton;
                 if($diff > 0)

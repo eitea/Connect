@@ -16,7 +16,7 @@ if($result && $result->num_rows > 0){
 
 //ADDENDUMS
 $request_addendum = false;
-$result = $conn->query("SELECT indexIM, timeToUTC, time, timeEnd FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
+$result = $conn->query("SELECT indexIM, timeToUTC, time, timeEnd FROM logs WHERE userID = $userID AND infoText != 'Admin Autocorrected Lunchbreak' AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
 while($result && ($row = $result->fetch_assoc())){
   $has_bookings = false;
   $i = $row['indexIM'];

@@ -277,8 +277,8 @@ if($result && $result->num_rows > 0):
   <?php //select all timestamps that do not have enough break
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
   INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
-  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)";
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) AND
+  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60)-1 AND timestampID = l1.indexIM AND bookingType = 'break')";
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
   ?>

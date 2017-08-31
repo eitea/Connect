@@ -1,109 +1,98 @@
-/* General menu colors */
-
-.btn-warning{
-  background-color: #33C7D5;
-  color: #FFFFFF;
-  border-color:#33C7D5;
-}
-
-/* because f*ck anyone trying to SIMPLY change the default color of a button*/
-.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus, .btn-warning:active:focus, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
-  background-color: #12ACBA;
-  border-color: #12ACBA;
-}
-
-.panel-default>.panel-heading{
-  background-color:#2b3643;
-  border-radius: 0;
-}
 .navbar-fixed-top{
   border-width: 0;
-  background-color: #2b3643;
+  background-color: #2B3643;
 }
 .affix-sidebar{
-  background-color:#2b3643;
+  background-color:#364150;
   border: 0;
 }
 .sidebar-nav .navbar{
-  background-color:#2b3643;
+  background-color:#364150;
 }
 .panel-borderless{
-  background-color:#2b3643;
-  color:white;
+  background-color:#364150;
+  color:#B4BCC8;
 }
-.panel-group > .panel > .panel-heading a:link {
-  color: #b4bcc8;
+.panel-default>.panel-heading{
+  background-color:#364150;
+  border-radius: 0;
+}
+.panel > .panel-heading a:link {
+  color: #B4BCC8;
 }
 .panel-group > .panel > .panel-collapse > .panel-body{
-  border-top: 1px solid #2b3643;
+  border-top: 1px solid #364150;
 }
-
 .sidebar-nav .navbar li a, .panel-borderless .panel-collapse .nav li a{
-  color: #6D6D6D;
+  color: #B4BCC8;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
-  color: #b4bcc8;
-  background-color:#2E3238;
+  background-color: #3E4B5C;
 }
-
-.active-link{
-  margin: 0 -40px;
-  padding-left:55px !important;
-  color: white !important;
-  background-color: #36c6d3;
-}
-.active-link:hover, .active-link:focus{
-  background-color: #36c6d3 !important;
+.sidebar-nav .navbar li a:focus, .panel-borderless .panel-collapse .nav li a:focus{
+  color: white;
+  background-color:transparent;
 }
 
 .navbar-default .navbar-brand{
-  color:white;
+  color: #B4BCC8;
 }
 .navbar-default .navbar-link{
-  color: #b4bcc8;
+  color:#B4BCC8;
 }
 .navbar-default .navbar-text {
-  color: #b4bcc8;
+  color: #B4BCC8;
 }
 .navbar-default .navbar-link:hover{
-  background-color: #3f4f62;
+  color:white;
+  background-color: #2C3542;
 }
 .navbar-default .navbar-nav>li>a {
-  color: #b4bcc8;
+  color: #B4BCC8;
 }
-.nav.navbar-nav > li, .sidebar-nav .navbar > li {
-  color: #b4bcc8;
+
+.nav.navbar-nav .dropdown .dropdown-menu {
+  color: black;
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>li>a:hover{
-  background-color: #3f4f62;
+  background-color: #2C3542;
 }
 
+
+
+/* components */
+#loader {
+  border-top: 16px solid #33C7D5;
+}
 .page-seperated-body{
-  background-color:#eef1f5;
+  background-color:#EEF1F5;
 }
-
 .page-header{
   padding:15px;
   margin: 0px -20px 20px;
   background:transparent;
 }
-
-
-#loader {
-  border-top: 16px solid #33C7D5;
-}
-
-.badge.alert-badge{
+.active-link{
+  color: white;
   background-color: #33C7D5;
-  position:absolute;
-  top:5px;
-  right:175px;
-  font-weight: 300;
-  padding: 3px 6px;
+}
+.active-link:hover{
+  color: #6d6d6d;
+  background-color: #33C7D5;
 }
 
-/*alerts */
+
+/* Bootstrap */
+.btn-warning{
+  background-color: #33C7D5;
+  color: #FFFFFF;
+  border-color:#33C7D5;
+}
+.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus, .btn-warning:active:focus, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
+  background-color: #12ACBA;
+  border-color: #12ACBA;
+}
 .alert.alert-info{
   border-radius:0;
   border-color: #32c5d2;
@@ -117,4 +106,12 @@
   border-left-width: 6px;
 	background-color: transparent;
 	color: #2E2E2E;
+}
+.badge.alert-badge{
+  background-color: #33C7D5;
+  position:absolute;
+  top:5px;
+  right:175px;
+  font-weight: 300;
+  padding: 3px 6px;
 }

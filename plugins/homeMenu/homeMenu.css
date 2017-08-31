@@ -21,7 +21,6 @@ ul.nav.navbar-nav .nav.nav-list {
     padding-left: 25px;
 }
 
-/* SIDEBAR */
 .panel-body .nav.navbar-nav {
   width:100%;
 }
@@ -280,10 +279,10 @@ span.select2.select2-container.select2-container--default {
   padding-left:15px;
 }
 .active-link{
-  color:#f0ad4e !important;
+  color:#f0ad4e;
 }
 .active-link:hover{
-  color:white !important;
+  color:white;
 }
 .badge.alert-badge{
   margin:0 15px 0 30px;
