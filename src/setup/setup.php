@@ -318,7 +318,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <span class="input-group-addon" style=min-width:150px>
             Server Address
           </span>
-          <input type="text" class="form-control" name='serverName' value = "localhost">
+          <input type="text" class="form-control" name='serverName' value = "127.0.0.1">
         </div>
       </div>
     </div>
