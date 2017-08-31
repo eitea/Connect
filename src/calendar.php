@@ -5,7 +5,6 @@
 </div>
 
 <link rel='stylesheet' href='plugins/fullcalendar/fullcalendar.css' />
-<script src='plugins/fullcalendar/lib/jquery.min.js'></script>
 <script src='plugins/fullcalendar/lib/moment.min.js'></script>
 <script src='plugins/fullcalendar/fullcalendar.js'></script>
 <?php
@@ -17,7 +16,7 @@ if($result && ($row = $result->fetch_assoc())){
   $start = substr($row['time'], 0, 10);
   $prev_row = $row;
   if($result && ($row = $result->fetch_assoc())){
-    $colors = array('', '#A3F375', '#d4b6ff', '#ffa24b', '#8dd5fe', '', '#ffa4a4');
+    $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffa4a4');
     do {
       if($prev_row['status'] != 5){
         $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];

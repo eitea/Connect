@@ -461,11 +461,11 @@ $(document).ready(function(){
                 </div>
                 <div class="col-md-2">
                   <?php echo $lang['CORE_TIME']; ?>
-                  <p><input type="text" class="form-control" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
+                  <p><input type="text" class="form-control timepicker" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
                 </div>
                 <div class="col-md-5">
                   <?php echo $lang['EXIT_DATE']; ?>
-                  <input type="text" class="form-control" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
+                  <input type="text" class="form-control datepicker" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
                 </div>
               </div>
               <br>
@@ -589,7 +589,7 @@ $(document).ready(function(){
                     <input type="text" readonly class="form-control" value="<?php echo substr($intervalStart,0,10); ?>" />
                   </div>
                   <div class="col-xs-3">
-                    <input type="text" class="form-control" name="intervalEnd" placeholder="yyyy-mm-dd" />
+                    <input type="text" class="form-control datepicker" name="intervalEnd" placeholder="yyyy-mm-dd" />
                   </div>
                   <div class="col-xs-2">
                     <button type="submit" class="btn btn-default" name="addNewInterval" value="<?php echo $x; ?>"> <?php echo $lang['CLOSE_INTERVAL']; ?></button>

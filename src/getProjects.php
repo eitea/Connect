@@ -604,7 +604,7 @@ $(function () {
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="date" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
+            <input type="text" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>

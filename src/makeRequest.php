@@ -154,8 +154,8 @@ if($result && ($row = $result->fetch_assoc())): ?>
 <br>
 <div class="col-sm-3"><label><?php echo $lang['FORGOTTEN_LUNCHBREAK']; ?>: </label></div>
 <form method="POST">
-  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['FROM']; ?></span><input type="time" class="form-control" name="lunch_FROM" /></div></div>
-  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['TO']; ?></span><input type="time" class="form-control" name="lunch_TO" /></div></div>
+  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['FROM']; ?></span><input type="text" class="form-control timepicker" name="lunch_FROM" /></div></div>
+  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['TO']; ?></span><input type="text" class="form-control timepicker" name="lunch_TO" /></div></div>
   <div class="col-sm-3"><button type="submit" class="btn btn-warning" name="request_lunchbreak" value="<?php echo $row['indexIM']; ?>"><?php echo $lang['REQUESTS']; ?></button></div>
 </form>
 <?php endif; ?>
@@ -176,11 +176,5 @@ var myBoard = new SNAKE.Board(  {
   fullScreen: false
 });
 </script>
-
 <?php endif; ?>
-<script>
-var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d");
-</script>
 <?php include 'footer.php'; ?>

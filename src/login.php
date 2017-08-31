@@ -67,7 +67,6 @@ if($result && $result->num_rows > 0){
 <body>
   <div id="footer">
     <form method="POST" style="display:inline-block">
-      <div style="margin-right:20px;"><img alt="Connect" src="images/logo.png"  height="45px" ></div> <br>
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
       <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel" /><br><br>
       <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="login" value="Submit" /><br>

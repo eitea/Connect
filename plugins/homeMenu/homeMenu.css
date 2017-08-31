@@ -1,11 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
 /*  HEADER AND CONTENT  */
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
-
+/* latin */
 body{
   padding-top: 50px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", "Lucida Sans", Verdana, sans-serif;
   font-size:14px;
-
   margin-bottom:50px;
 }
 .panel > .panel-heading a:link {
@@ -18,7 +17,7 @@ body{
   margin-top: 10px;
 }
 ul.nav.navbar-nav .nav.nav-list {
-    padding-left: 25px;
+  padding-left: 25px;
 }
 
 .panel-body .nav.navbar-nav {
@@ -50,10 +49,6 @@ ul.nav.navbar-nav .nav.nav-list {
 .nav>li>a{
   padding-top:5px;
   padding-bottom:5px;
-}
-.sidebar-nav .navbar li a,  .navbar-nav > li > a{
-  padding-top: 5px;
-  padding-bottom: 5px;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
   background-color: #428bca;
@@ -234,9 +229,6 @@ input[type="radio"]:checked {
 }
 
 /* alerts */
-.alert{
-  margin: 0 -20px 0;
-}
 .alert-over{
   position:fixed;
   z-index: 50;
@@ -274,6 +266,7 @@ i{
 span.select2.select2-container.select2-container--default {
   width: 100% !important;
 }
+
 .page-header-button-group{
   display:inline;
   padding-left:15px;
@@ -285,12 +278,19 @@ span.select2.select2-container.select2-container--default {
   color:white;
 }
 .badge.alert-badge{
+  position:absolute;
+  top:5px;
+  right:185px;
+  font-weight: 300;
+  padding: 3px 6px;
   margin:0 15px 0 30px;
   background-color: #f0ad4e;
 }
 .badge.alert-badge > a {
 	color:white;
 }
-.datepicker{
-  z-index:1151 !important;
+
+.datetimepicker .active {
+  background-color: #4b8df8!important;
+  color:white!important;
 }

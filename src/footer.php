@@ -55,14 +55,33 @@ $(document).ready(function () {
   window.onbeforeunload = unloadPage;
 });
 $(function () {
-  $('.datepicker').datepicker({
+  $('.datetimepicker').datetimepicker({
+    weekStart: 1,
+    todayBtn:  1,
+    autoclose: 1,
+    forceParse: 0,
+    startDate: '2000-01-01',
+    format: 'yyyy-mm-dd hh:ii'
+  });
+  $('.datepicker').datetimepicker({
+    weekStart: 1,
+    todayBtn:  1,
+    autoclose: 1,
+    minView: 2,
+    forceParse: 0,
+    startDate: '2000-01-01',
     format: 'yyyy-mm-dd'
   });
-  $('.datetimepicker').datetimepicker({
-    format: 'YYYY-MM-DD HH:mm'
-  });
   $('.timepicker').datetimepicker({
-    format: 'HH:mm'
+    weekStart: 1,
+    todayBtn:  1,
+    autoclose: 1,
+    todayHighlight: 1,
+    startView: 1,
+    minView: 0,
+    maxView: 1,
+    forceParse: 0,
+    format: 'hh:ii'
   });
 });
 </script>

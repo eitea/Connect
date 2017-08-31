@@ -333,7 +333,7 @@ $("#sort tbody").sortable({
           <li><button type="submit" class="btn btn-link" value="<?php echo $LAST_POSITION; ?>" name="add_position_page" ><?php echo $lang['NEW_PAGE']; ?></button></li>
           <?php
           $article_res = $conn->query("SELECT id FROM articles");
-          if($article_res && $article_res->num_rows > 0){ echo '<li><a href="#" data-toggle="modal" data-target=".add_article">'.$lang['ARTICLE'].'</a></li>'; }
+          if($article_res && $article_res->num_rows > 0){ echo '<li><button type="button" class="btn btn-link" data-toggle="modal" data-target=".add_article">'.$lang['ARTICLE'].'</button></li>'; }
           ?>
         </ul>
       </div>
@@ -536,11 +536,11 @@ $x = $prod_row['id'];
       <div class="container-fluid">
         <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
         <div class="col-md-4">
-          <input type="date" class="form-control" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
+          <input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
         </div>
         <div class="col-md-2 text-center"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
         <div class="col-md-4">
-          <input type="date" class="form-control" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
+          <input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
         </div>
       </div>
       <br>

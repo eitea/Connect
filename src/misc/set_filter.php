@@ -236,21 +236,21 @@ if($scale > 2){ //3 columns
             <?php if(isset($filterings['date'][1])): ?>
               <label><?php echo $lang['FROM']; ?></label>
               <div class="input-group">
-                <input id="searchDateFrom" type="date" class="form-control datepicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+                <input id="searchDateFrom" type="text" class="form-control datepicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
                 <span class="input-group-btn">
-                  <button style="margin-top:1px" id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
+                  <button id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
                 </span>
               </div>
               <br><label><?php echo $lang['TO']; ?></label>
               <div class="input-group">
-                <input type="date" id="searchDateTo" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
+                <input type="text" id="searchDateTo" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
                 <span class="input-group-btn">
-                  <button style="margin-top:1px" id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
+                  <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
                 </span>
               </div>
             <?php else: ?>
               <label><?php echo $lang['DATE']; ?></label>
-              <input type="date" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
+              <input type="text" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
             <?php endif; ?>
           </div>
         <?php endif; ?>

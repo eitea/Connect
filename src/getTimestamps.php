@@ -519,9 +519,9 @@ if($filterings['user']):
           <div class="modal-header"><h4><?php echo $lang['ADD_TIMESTAMPS']; ?></h4></div>
           <div class="modal-body">
             <div class="input-group input-daterange">
-              <input type="date" class="form-control datepicker" value="" placeholder="Von" name="add_multiple_start">
+              <input type="text" class="form-control datepicker" value="" placeholder="Von" name="add_multiple_start">
               <span class="input-group-addon"> - </span>
-              <input type="date" class="form-control datepicker" value="" placeholder="Bis" name="add_multiple_end">
+              <input type="text" class="form-control datepicker" value="" placeholder="Bis" name="add_multiple_end">
             </div>
             <br>
             <div class="row">

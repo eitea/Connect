@@ -64,5 +64,6 @@ input[type=text], input[type=password]{
 a.register-link{
   float:right;
   margin-left:20px;
-  padding-top:150px;
+  padding-top:80px;
+  padding-bottom:10px;
 }

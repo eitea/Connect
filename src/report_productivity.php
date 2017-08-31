@@ -29,9 +29,9 @@ if(!empty($_POST['filterUserIDs']) && !empty($_POST['addUserID'])){
   <div class="container-fluid form-group">
     <div class="col-xs-6">
       <div class="input-group">
-        <input id="calendar" type="text" class="form-control from" name="filterMonth_from" value=<?php echo substr($filter_begin,0,10); ?> >
+        <input type="text" class="form-control datepicker" name="filterMonth_from" value=<?php echo substr($filter_begin,0,10); ?> >
         <span class="input-group-addon"> - </span>
-        <input id="calendar2" type="text" class="form-control"  name="filterMonth_to" value="<?php echo substr($filter_end,0,10); ?>">
+        <input type="text" class="form-control datepicker"  name="filterMonth_to" value="<?php echo substr($filter_end,0,10); ?>">
       </div>
     </div>
     <div class="col-sm-3">
@@ -55,19 +55,6 @@ if(!empty($_POST['filterUserIDs']) && !empty($_POST['addUserID'])){
     </div>
   </div>
 </form>
-
-<script>
-$("#calendar").datepicker({
-  format: "yyyy-mm-dd",
-  viewMode: "days",
-  minViewMode: "days"
-});
-$("#calendar2").datepicker({
-  format: "yyyy-mm-dd",
-  viewMode: "days",
-  minViewMode: "days"
-});
-</script>
 
 <?php
 $arr_IDs = explode(' ', $filterIDs);

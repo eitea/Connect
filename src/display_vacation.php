@@ -49,7 +49,7 @@ if(!$result || $result->num_rows <= 0){
     <div class="col-xs-3">
       <div class="input-group">
         <span class="input-group-addon"><?php echo $lang['TO']; ?></span>
-        <input id="calendar" type="text" class="form-control from" name="newDate" value= <?php echo $currentDate; ?> >
+        <input type="text" class="form-control datepicker" name="newDate" value= <?php echo $currentDate; ?> >
         <span class="input-group-btn">
           <button class="btn btn-warning" type="submit">Filter</button>
         </span>
@@ -122,14 +122,6 @@ if(!$result || $result->num_rows <= 0){
     </ul>
   </div>
 </div>
-
-<script>
-$("#calendar").datepicker({
-  format: "yyyy-mm-dd",
-  viewMode: "days",
-  minViewMode: "days"
-});
-</script>
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

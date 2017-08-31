@@ -370,9 +370,9 @@ endif;
   <div class="row">
     <div class="col-md-6">
       <div class="input-group">
-        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
+        <input type="text" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />
+        <input type="text" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />
         <div class="input-group-btn">
           <button class="btn btn-warning" type="submit"  name="add"> + </button>
         </div>

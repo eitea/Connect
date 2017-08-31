@@ -37,17 +37,13 @@
 .navbar-default .navbar-brand{
   color:white;
 }
-.navbar-default .navbar-link{
-  color:#ddd;
-}
-.navbar-default .navbar-text {
+.navbar-default .navbar-link, .navbar-default .navbar-text {
   color: #ddd;
 }
 .navbar-default .navbar-link:hover{
-  color:white;
-  background-color: #f0ad4e;
+  color: #f0ad4e;
 }
-.navbar-default .navbar-nav>li>a {
+.navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a{
   color: #ddd;
 }
 
@@ -56,8 +52,7 @@
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>li>a:hover{
-  color: white;
-  background-color: #f0ad4e;
+  color: #f0ad4e;
   border-radius:6px;
 }
 
