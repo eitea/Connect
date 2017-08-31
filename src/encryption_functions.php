@@ -155,3 +155,25 @@ function mc($iv = false, $iv2 = false){
 // $new = mc()->from($old,"new password");
 // $newencrypted = $new->change($encrypted);
 // INSERT INTO table1 (var1,iv,iv2) VALUES ('$newencrypted','$iv','$iv2');
+
+/**
+ * Changes all values in all tables to use the new master password. If newpassword is false, don't apply encryption.
+ *
+ * @param string|boolean $newpassword
+ * @return void
+ */
+function mc_master_password_changed(string $newpassword){
+    require __DIR__."/connection.php";
+    //articles table
+    $result = $conn->query("SELECT * FROM articles");
+    while($row = $result->fetch_assoc()){
+        $old = mc($row["iv"],$row["iv2"]);
+        $new = mc()->from($old,$newpassword);
+        $iv = $new->iv;
+        $iv2 = $new->iv2;
+        $name = $new->change($row["name"]);
+        $desc = $new->change($row["description"]);
+        $id = $row["id"];
+        $conn->query("UPDATE articles SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id");
+    }
+}

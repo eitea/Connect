@@ -27,7 +27,7 @@ if(isset($_POST['saveButton'])){
   $masterPasswordSet = strlen($masterPasswordResult->fetch_assoc()["masterPassword"]) != 0;
   if($masterPasswordSet && isset($_POST['masterPass_deactivate'])){
     $conn->query("UPDATE $configTable SET masterPassword = ''");
-
+    mc_master_password_changed(false);
     //delete all sessions
     ini_set('session.gc_max_lifetime', 0);
     ini_set('session.gc_probability', 1);
@@ -85,18 +85,7 @@ if(isset($_POST['saveButton'])){
         echo mysqli_error($conn);
       }
 
-      //articles table
-      $result = $conn->query("SELECT * FROM articles");
-      while($row = $result->fetch_assoc()){
-        $old = mc($row["iv"],$row["iv2"]);
-        $new = mc()->from($old,$password);
-        $iv = $new->iv;
-        $iv2 = $new->iv2;
-        $name = $new->change($row["name"]);
-        $desc = $new->change($row["description"]);
-        $id = $row["id"];
-        $conn->query("UPDATE articles SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id");
-      }
+      mc_master_password_changed($password);
 
       //save new passwordhash
       $password = password_hash($password, PASSWORD_BCRYPT);
