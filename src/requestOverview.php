@@ -14,11 +14,12 @@
   </tr></thead>
   <tbody>
     <?php
-    $statusQuery = $typeQuery = '';
+    $statusQuery = $typeQuery = $userQuery = '';
     if($filterings['acceptance'] > -1){ $statusQuery = "AND userRequestsData.status = '".$filterings['acceptance']."'"; }
     if($filterings['requestType']){ $typeQuery = "AND requestType = '".$filterings['requestType'] ."'" ; }
+    if($filterings['user']){ $userQuery = "AND userID = ".$filterings['user']; }
     $result = $conn->query("SELECT * FROM userRequestsData INNER JOIN UserData ON userRequestsData.userID = UserData.id
-    WHERE DATE(fromDate) > DATE('{$filterings['date'][0]}') AND DATE(fromDate) < DATE('{$filterings['date'][1]}') $statusQuery $typeQuery");
+    WHERE DATE(fromDate) > DATE('{$filterings['date'][0]}') AND DATE(fromDate) < DATE('{$filterings['date'][1]}') $statusQuery $typeQuery $userQuery");
     echo $conn->error;
     while($row = $result->fetch_assoc()){
       echo '<tr>';

@@ -221,7 +221,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
 <form method="post" enctype="multipart/form-data" class="page-seperated-section">
   <div class="container-fluid">
     <div class="row">
-      <h4>
+      <h4> Logo
         <div class="page-header-button-group">
           <button type="submit" name="delete_logo" class="btn btn-default"><i class="fa fa-trash-o"></i></button>
           <button type="submit" name="save_logo" class="btn btn-default" value="<?php echo $cmpID;?>"><i class="fa fa-floppy-o"></i></button>
@@ -234,7 +234,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       <?php if($row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $row['logo'] ).'"/>';} ?>
     </div>
     <div class="col-sm-8">
-      <input type="file" name="fileToUpload" id="fileToUpload" />
+      <input type="file" name="fileToUpload" id="fileToUpload"/>
     </div>
   </div>
 </form>

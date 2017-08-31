@@ -144,7 +144,7 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = 'plugins/homeMenu/homeMenu_metro.css?v='.time();
+    $css_file = 'plugins/homeMenu/homeMenu_metro.css';
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = 'plugins/homeMenu/homeMenu_dark.css';
   } else {
@@ -174,7 +174,7 @@ if($isTimeAdmin){
     <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
     <script type="text/javascript" src="plugins/datetimepicker/js/locales/bootstrap-datetimepicker.fr.js" ></script>
 
-    <link href="plugins/homeMenu/homeMenu.css?v=<?=time();?>" rel="stylesheet" />
+    <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
@@ -326,7 +326,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home"><br>
+              <form method='post' action="../user/home" class="clock-counter"><br>
                 <?php
                 echo $checkInButton;
                 if($diff > 0)
