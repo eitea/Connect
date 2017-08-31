@@ -565,7 +565,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Letzte Faktura Buchung
         </div>
         <div class="col-sm-3">
-          <input type="datetime-local" class="form-control" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
+          <input type="text" class="form-control datetimepicker" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
         </div>
       </div>
       <div class="row form-group">
@@ -670,7 +670,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           Letzte Mahnung am
         </div>
         <div class="col-sm-3">
-          <input type="datetime-local" class="form-control" name="lastWarning" value="<?php echo $row['lastWarning']; ?>" />
+          <input type="text" class="form-control datetimepicker" name="lastWarning" value="<?php echo $row['lastWarning']; ?>" />
         </div>
       </div>
       <div class="row form-group">
