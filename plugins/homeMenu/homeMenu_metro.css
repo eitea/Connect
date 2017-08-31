@@ -64,6 +64,25 @@
   color:white;
 }
 
+input[type="checkbox"]:checked {
+  background-color:#33C7D5;
+  border-color:#33C7D5;
+}
+input[type="radio"]:checked {
+  border: 1px solid #33C7D5;
+  background-color: white;
+  box-shadow: inset 0px 0px 0 3px #33C7D5;
+}
+
+/* Datatables pagination */
+.pagination > .active > a {
+  background-color: #33C7D5;
+  border-color:#aaa;
+}
+.pagination > .active > a:hover {
+  background-color: #33C7D5;
+  border-color:#aaa;
+}
 
 /* components */
 #loader {
@@ -90,6 +109,7 @@
   border: 1px solid #33C7D5;
   box-shadow: 0 0 2px #33C7D5;
 }
+
 
 /* Bootstrap */
 .btn-warning{
