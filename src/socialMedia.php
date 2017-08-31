@@ -2,15 +2,13 @@
 enableToSocialMedia($userID); ?>
 <!-- BODY -->
 <?php
-function displayError(string $msg = "")
-{
+function displayError($msg = ""){
     if ($msg == "") {
         $msg = $lang['ERROR_UNEXPECTED'];
     }
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $msg . '</div>';
 }
-function displaySuccess(string $msg = "")
-{
+function displaySuccess($msg = ""){
     if ($msg == "") {
         $msg = $lang['OK_SAVE'];
     }
@@ -191,7 +189,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         <tbody>
             <?php
             $today = substr(getCurrentTimestamp(), 0, 10);
-            $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
+            $sql = "SELECT * FROM socialprofile INNER JOIN UserData ON UserData.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -347,7 +345,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                 while ($row = $result->fetch_assoc()) {
                     $x = $row["groupID"];
                     $name = $row["name"];
-                    $result_members = $conn->query("SELECT * FROM socialgroups INNER JOIN userdata ON userdata.id = socialgroups.userID  WHERE groupID = $x");
+                    $result_members = $conn->query("SELECT * FROM socialgroups INNER JOIN UserData ON UserData.id = socialgroups.userID  WHERE groupID = $x");
                     $alerts = $conn->query("SELECT * FROM socialgroupmessages WHERE groupID = $x AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
                     $alertsvisible = $alerts == 0 ? "style='display:none;position:absolute'" : "style='position:absolute'";
                     echo "<tr>";
@@ -485,7 +483,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                             while($row = $user_result->fetch_assoc()){
                                                 $name = "${row['firstname']} ${row['lastname']}";
                                                 $_x = $row["id"];
-                                                $isMember = $conn->query("SELECT * FROM socialgroups INNER JOIN userdata ON userdata.id = socialgroups.userID WHERE groupID = $x AND userID = $_x")->num_rows > 0;
+                                                $isMember = $conn->query("SELECT * FROM socialgroups INNER JOIN UserData ON UserData.id = socialgroups.userID WHERE groupID = $x AND userID = $_x")->num_rows > 0;
                                             ?>
                                             <label>
                                                 <input type="checkbox" value="<?php echo $_x; ?>" <?php if($_x == $userID){echo "checked disabled";}else{echo ' name="members[]" ';} if($isMember){echo "checked";}?>><?php echo $name ?><br>

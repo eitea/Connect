@@ -24,6 +24,10 @@
 .panel.panel-borderless > .panel-heading a:link {
   color: #B4BCC8;
 }
+.panel-group > .panel.panel-borderless > .panel-collapse > .panel-body{
+  border-top: 1px solid #364150;
+}
+
 .sidemenu > .inner > .panel-group > .panel > .panel-collapse > .panel-body{
   border-top: 1px solid #364150;
 }
@@ -121,6 +125,7 @@ input[type="radio"]:checked {
   background-color: #12ACBA;
   border-color: #12ACBA;
 }
+
 .alert{
   border-radius:0;
   border-left-width: 6px;
@@ -131,7 +136,7 @@ input[type="radio"]:checked {
   border-color: #32c5d2;
 }
 .alert.alert-success{
-  border-color: #0DA04C;
+  border-color: #4ece04;
 }
 .alert.alert-danger{
   border-color: #e7505a;

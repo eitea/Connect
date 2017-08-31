@@ -33,6 +33,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //establish connection
       if(!($conn = new mysqli($servername, $username, $password))){
         echo $conn->connect_error;
+        unlink(dirname(__DIR__) .'/connection_config.php');
         die("<br>Connection Error: Could not Connect.<br>");
       }
 
@@ -40,8 +41,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo "Database was created. <br>";
       } else {
         echo mysqli_error($conn);
-        echo "<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>";
-        die();
+        unlink(dirname(__DIR__) .'/connection_config.php');
+        die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
       }
 
       //reconnect to database
@@ -156,6 +157,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
           }
         fclose($travellingFile);
+      } else {
+        echo "File with Country Data not found!";
       }
       echo mysqli_error($conn);
 
