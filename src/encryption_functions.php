@@ -24,7 +24,7 @@
 
 // TODO if you want to encrypt additional files:
 //   Add the above code after/before select/update/insert statements
-//   Add an entry to mc_total_row_count()
+//   Add an entry to mc_total_row_count() and mc_list_changes()
 //   Add an entry to mc_master_password_changed()
 // Optional:
 //   Add the mc_status() to the html code
@@ -272,4 +272,12 @@ function mc_status(){
     }else{
         return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="'.$lang['ENCRYPTION_DEACTIVATED'].'"></i>';
     }
+}
+function mc_list_changes(){
+    require __DIR__."/connection.php";
+    $out = "Changes following data: \\n";
+    $out .= ($conn->query("SELECT * FROM articles")->num_rows ?? "0")               . " Changes in articles\\n";
+    $out .= ($conn->query("SELECT * FROM products")->num_rows ?? "0")               . " Changes in products\\n";
+    $out .= ($conn->query("SELECT * FROM $clientDetailBankTable")->num_rows ?? "0") . " Changes in banking data\\n";
+    return $out;
 }

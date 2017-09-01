@@ -30,7 +30,7 @@ if(isset($_POST['saveButton'])){
     mc_master_password_changed(false);
   }
   if((isset($_POST['masterPass_current'])||!$masterPasswordSet) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
-    $passwordCurrent = test_input($_POST['masterPass_current']);
+    $passwordCurrent = test_input($_POST['masterPass_current'] ?? false);
     $password = $_POST['masterPass_new'];
     $passwordConfirm = $_POST['masterPass_newConfirm'];
     $output = '';
@@ -201,13 +201,15 @@ $row = $result->fetch_assoc();
 <script>
   $("#formPasswordOptions").submit(function(event){
     if($("input[name='masterPass_deactivate']").is(":checked")){
+      alert("<?php echo mc_list_changes(); ?>")
       if (confirm("<?php echo $lang['PASSWORD_REMOVE_PROMPT'];?>") == true) {
         return true
       } else {
         event.preventDefault()
         return false
       }
-    }else if ($("input[name='masterPass_new']").val().length > 0){
+    }else if ($("input[name='masterPass_new']").val() == $("input[name='masterPass_newConfirm']").val()){
+      alert("<?php echo mc_list_changes(); ?>")
       if (confirm("<?php echo $lang['PASSWORD_CHANGE_PROMPT'];?>") == true) {
         return true
       } else {
