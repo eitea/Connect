@@ -134,38 +134,57 @@ function mc($iv = false, $iv2 = false){
     return new MasterCrypt($iv,$iv2);
 }
 
-// Encrypt
-// $c = mc();
-// $encrypted = $c->encrypt("this is a test");
-// $encrypted2 = $c->encrypt("this is a test");
-// INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$iv','$iv2');
 
-// Decrypt
-// SELECT var1,var2,iv,iv2 FROM table1;
-// $c = mc($iv,$iv2);
-// echo $c->decrypt($var1);
-// echo $c->decrypt($var2);
+//Examples
+        // Encrypt
+        // $c = mc();
+        // $encrypted = $c->encrypt("this is a test");
+        // $encrypted2 = $c->encrypt("this is a test");
+        // INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$iv','$iv2');
 
-// Password Change
-// $_SESSION["masterpassword"] = "test password";
-// $iv = "zNO5qG8wmDyPBx+mFl8qIfpogFJejvsvd7WN4QeVT7tognIMCK4YIva+QZ1y3XMVv3qxhNwTNb9fNhp74HTz4SIQGAriZA0IniH4xRJu4zo=";
-// $iv2 = "27a119dc5cd9e338";
-// $encrypted = "3qozv1QeuwsN8WhvfedJf9DhPmrsb2e4aUwp7BfQRad/LDsY9/nn1WbIfvfTBmnd0l5Ut+tcDe/3aagy5JdJfB1r1Ep4WpHgP2hvxE/ob9oyD5vGYzjp/9VUWGLPmLWj|ESDuK9Jk9CPS2QjQ6SRE7y7C9UVe7hxPgVAoqN58HLM=";
-// $old = mc($iv,$iv2);
-// $new = mc()->from($old,"new password");
-// $newencrypted = $new->change($encrypted);
-// INSERT INTO table1 (var1,iv,iv2) VALUES ('$newencrypted','$iv','$iv2');
+        // Decrypt
+        // SELECT var1,var2,iv,iv2 FROM table1;
+        // $c = mc($iv,$iv2);
+        // echo $c->decrypt($var1);
+        // echo $c->decrypt($var2);
 
+        // Password Change
+        // $_SESSION["masterpassword"] = "test password";
+        // $iv = "zNO5qG8wmDyPBx+mFl8qIfpogFJejvsvd7WN4QeVT7tognIMCK4YIva+QZ1y3XMVv3qxhNwTNb9fNhp74HTz4SIQGAriZA0IniH4xRJu4zo=";
+        // $iv2 = "27a119dc5cd9e338";
+        // $encrypted = "3qozv1QeuwsN8WhvfedJf9DhPmrsb2e4aUwp7BfQRad/LDsY9/nn1WbIfvfTBmnd0l5Ut+tcDe/3aagy5JdJfB1r1Ep4WpHgP2hvxE/ob9oyD5vGYzjp/9VUWGLPmLWj|ESDuK9Jk9CPS2QjQ6SRE7y7C9UVe7hxPgVAoqN58HLM=";
+        // $old = mc($iv,$iv2);
+        // $new = mc()->from($old,"new password");
+        // $newencrypted = $new->change($encrypted);
+        // INSERT INTO table1 (var1,iv,iv2) VALUES ('$newencrypted','$iv','$iv2');
 /**
- * Changes all values in all tables to use the new master password. If newpassword is false, don't apply encryption.
+ * Returns rows affected by master password change
+ *
+ * @return int
+ */
+function mc_total_row_count(){
+    require __DIR__."/connection.php";
+    $total_count = 0;
+    $total_count += $conn->query("SELECT * FROM articles")->num_rows ?? 0;
+    $total_count += $conn->query("SELECT * FROM products")->num_rows ?? 0;
+    return $total_count;
+}
+/**
+ * Changes all values in all tables to use the new master password. If newpassword is false, don't apply encryption. Does not return to caller.
  *
  * @param string|boolean $newpassword
  * @return void
  */
 function mc_master_password_changed(string $newpassword){
     require __DIR__."/connection.php";
+    set_time_limit("600"); // max 10 minutes before error
+    $logFile = fopen("./cryptlog.txt","a");
+    $text = $newpassword ? ($_SESSION["masterpassword"] ? "changed": "added") :"removed";
+    fwrite($logFile, "\r\n".date("y-m-d h:i:s").": Master password $text\r\n");
+    $result = $conn->query("SELECT * FROM articles,products");
     //articles table
     $result = $conn->query("SELECT * FROM articles");
+    fwrite($logFile, "\t".date("y-m-d h:i:s").": altering articles\r\n");
     while($row = $result->fetch_assoc()){
         $old = mc($row["iv"],$row["iv2"]);
         $new = mc()->from($old,$newpassword);
@@ -174,6 +193,29 @@ function mc_master_password_changed(string $newpassword){
         $name = $new->change($row["name"]);
         $desc = $new->change($row["description"]);
         $id = $row["id"];
-        $conn->query("UPDATE articles SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id");
+        if(!$conn->query("UPDATE articles SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id")){
+            $error = $conn->error;
+            fwrite($logFile, "\t\t".date("y-m-d h:i:s").": Error in row with id $id: $error\r\n");
+        }
     }
+    //products table
+    fwrite($logFile, "\t".date("y-m-d h:i:s").": altering products\r\n");
+    $result = $conn->query("SELECT * FROM products");
+    while($row = $result->fetch_assoc()){
+        $old = mc($row["iv"],$row["iv2"]);
+        $new = mc()->from($old,$newpassword);
+        $iv = $new->iv;
+        $iv2 = $new->iv2;
+        $name = $new->change($row["name"]);
+        $desc = $new->change($row["description"]);
+        $id = $row["id"];
+        if(!$conn->query("UPDATE products SET name = '$name', description = '$desc', iv = '$iv', iv2 = '$iv2' WHERE id = $id")){
+            $error = $conn->error;
+            fwrite($logFile, "\t\t".date("y-m-d h:i:s").": Error in row with id $id: $error\r\n");
+        }
+    }
+    fwrite($logFile,date("y-m-d h:i:s").": Finished\r\n");
+    fwrite($logFile,date("y-m-d h:i:s").": ".mc_total_row_count()." rows affected\r\n");
+    fclose($logFile);
+    redirect("../system/cryptlog");
 }

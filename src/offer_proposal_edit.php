@@ -82,16 +82,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
-    $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'PARTIAL_SUM')");
+    $mc = mc();
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
-    $conn->query("INSERT INTO products (proposalID, position, name, description) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'CLEAR_TEXT', '$txt')");
+    $mc = mc();
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $txt = $mc->encrypt($txt);
+    $conn->query("INSERT INTO products (proposalID, position, name, description, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("CLEAR_TEXT")."', '$txt', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
-    $conn->query("INSERT INTO products (proposalID, position, name) VALUES(".$filterings['proposal'].", $LAST_POSITION, 'NEW_PAGE')");
+    $mc = mc();
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_product']) && ($filterings['proposal'] || $filterings['client'])){
     $LAST_POSITION = intval($_POST['add_product']) +1;
@@ -109,8 +119,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
       $row_tax = $result_tax->fetch_assoc();
-      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxPercentage, cash, unit, purchase)
-      VALUES(".$filterings['proposal'].", $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase')");
+      $mc = mc();
+      $iv = $mc->iv;
+      $iv2 = $mc->iv2;
+      $product_name = $mc->encrypt($product_name);
+      $product_description = $mc->encrypt($product_description);
+      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxPercentage, cash, unit, purchase, iv, iv2)
+      VALUES(".$filterings['proposal'].", $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -123,10 +138,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['update_product'])){
     $x = intval($_POST['update_product']);
-    $check_result = $conn->query("SELECT name FROM products WHERE id = $x");
+    $check_result = $conn->query("SELECT name,iv,iv2 FROM products WHERE id = $x");
     if($check_row = $check_result->fetch_assoc()){
-      if($check_row['name'] == 'CLEAR_TEXT'){
+      $mc = mc($check_row["iv"],$check_row["iv2"]);
+      if($mc->decrypt($check_row['name']) == 'CLEAR_TEXT'){
         $product_description = test_input($_POST['update_description_'.$x]);
+        $product_description = $mc->encrypt($product_description);
         $conn->query("UPDATE products SET description='$product_description' WHERE id = $x");
         if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
       } elseif(!empty($_POST['update_name_'.$x]) && !empty($_POST['update_price_'.$x]) && !empty($_POST['update_quantity_'.$x])){
@@ -136,6 +153,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $product_price = floatval($_POST['update_price_'.$x]);
         $product_tax_id = intval($_POST['update_tax_'.$x]);
         $product_unit = test_input($_POST['update_unit_'.$x]);
+        $product_name = $mc->encrypt($product_name);
+        $product_description = $mc->encrypt($product_description);
         $conn->query("UPDATE products SET name='$product_name', description='$product_description', quantity='$product_quantity', price='$product_price', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
         if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
       } else {
@@ -235,6 +254,9 @@ $_SESSION['filterings'] = $filterings; //save your filterings
       $LAST_POSITION = 0;
       $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal'] .' ORDER BY position ASC');
       while($result && ($prod_row = $result->fetch_assoc())){
+        $mc = mc($prod_row['iv'],$prod_row['iv2']);
+        $prod_row["name"] = $mc->decrypt($prod_row["name"]);
+        $prod_row["description"] = $mc->decrypt($prod_row["description"]);
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
         echo '<td>'.$prod_row['name'].'</td>';
@@ -499,7 +521,8 @@ $x = $prod_row['id'];
         <?php
         $result = $conn->query("SELECT * FROM articles");
         while($result && ($prod_row = $result->fetch_assoc())){
-          echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
+          $mc = mc($prod_row['iv'],$prod_row['iv2']);
+          echo "<option value='".$prod_row['id']."'>".$mc->decrypt($prod_row['name'])."</option>";
         }
         ?>
       </select>

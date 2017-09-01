@@ -1468,16 +1468,19 @@ if ($row['version'] < 97) {
 if($row['version'] < 98){
   $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
   $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
-  $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)");
-  $conn->query("ALTER TABLE articles CHANGE description VARCHAR(1200)");
-  
+  $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)"); //50 -> 255
+  $conn->query("ALTER TABLE articles CHANGE description description VARCHAR(1200)"); //600 -> 1200
+  $conn->query("ALTER TABLE products ADD COLUMN iv VARCHAR(255)");
+  $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
+  $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
+  $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
 }
 
 //if($row['version'] < 99){}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
-//$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
+$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
 ?>
 <script type="text/javascript">

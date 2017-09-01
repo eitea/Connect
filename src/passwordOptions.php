@@ -28,16 +28,8 @@ if(isset($_POST['saveButton'])){
   if($masterPasswordSet && isset($_POST['masterPass_deactivate'])){
     $conn->query("UPDATE $configTable SET masterPassword = ''");
     mc_master_password_changed(false);
-    //delete all sessions
-    ini_set('session.gc_max_lifetime', 0);
-    ini_set('session.gc_probability', 1);
-    ini_set('session.gc_divisor', 1);
-    session_unset();
-    session_destroy();
-    redirect('../login/auth');
-    die();
   }
-  if(isset($_POST['masterPass_current']) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
+  if((isset($_POST['masterPass_current'])||!$masterPasswordSet) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
     $passwordCurrent = test_input($_POST['masterPass_current']);
     $password = $_POST['masterPass_new'];
     $passwordConfirm = $_POST['masterPass_newConfirm'];
@@ -84,21 +76,11 @@ if(isset($_POST['saveButton'])){
         $conn->query("UPDATE $clientDetailBankTable SET iban='$ibanVal', bic='$bicVal', iv='$keyValue', iv2='$ivValue' WHERE id = $curID");
         echo mysqli_error($conn);
       }
+      //save new passwordhash
+      $passwordhash = password_hash($password, PASSWORD_BCRYPT);
+      $conn->query("UPDATE $configTable SET masterPassword = '$passwordhash'");
 
       mc_master_password_changed($password);
-
-      //save new passwordhash
-      $password = password_hash($password, PASSWORD_BCRYPT);
-      $conn->query("UPDATE $configTable SET masterPassword = '$password'");
-
-      //delete all sessions
-      ini_set('session.gc_max_lifetime', 0);
-      ini_set('session.gc_probability', 1);
-      ini_set('session.gc_divisor', 1);
-      session_unset();
-      session_destroy();
-      redirect('../login/auth');
-      die();
     } else {
       echo '<br><div class="alert alert-danger fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -116,7 +98,7 @@ $row = $result->fetch_assoc();
 ?>
 
 
-<form method="POST">
+<form method="POST" id="formPasswordOptions">
   <div class="page-header">
     <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
       <div class="page-header-button-group">
@@ -193,11 +175,12 @@ $row = $result->fetch_assoc();
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
-      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
+      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können. Es sind insgesamt <b><?php echo mc_total_row_count(); ?></b> Einträge betroffen.
     </div>
   </div>
   <br>
   <div class="container-fluid">
+    <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
       Aktuelles Passwort:
     </div>
@@ -205,6 +188,7 @@ $row = $result->fetch_assoc();
       <input type="password" class="form-control" name="masterPass_current" value=""/>
     </div>
     <br><br>
+    <?php endif; ?>
     <div class="col-md-4">
       Neues Passwort:
     </div>
@@ -219,6 +203,7 @@ $row = $result->fetch_assoc();
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
     </div>
     <br><br>
+    <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
       Verschlüsselung deaktivieren
     </div>
@@ -226,6 +211,27 @@ $row = $result->fetch_assoc();
       <input type="checkbox" class="" name="masterPass_deactivate" value="true"/>
     </div>
     <br><br><br>
+    <?php endif; ?>
   </div>
 </form>
+<script>
+  $("#formPasswordOptions").submit(function(event){
+    if($("input[name='masterPass_deactivate']").is(":checked")){
+      if (confirm("<?php echo $lang['PASSWORD_REMOVE_PROMPT'];?>") == true) {
+        return true
+      } else {
+        event.preventDefault()
+        return false
+      }
+    }else if ($("input[name='masterPass_new']").val().length > 0){
+      if (confirm("<?php echo $lang['PASSWORD_CHANGE_PROMPT'];?>") == true) {
+        return true
+      } else {
+        event.preventDefault()
+        return false
+      }
+    }
+  })
+</script>
+
 <?php require 'footer.php'; ?>

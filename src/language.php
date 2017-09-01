@@ -680,6 +680,12 @@ $lang_ger['PASSWORD'] = 'Passwort';
 $lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
 $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
 
+$lang_eng['PASSWORD_REMOVE_PROMPT'] = 'Do you really want to delete the master password? This may take a while. \nDO NOT INTERRUPT!';
+$lang_ger['PASSWORD_REMOVE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort löschen? Das könnte eine Weile dauern. \nBITTE NICHT UNTERBRECHEN!';
+
+$lang_eng['PASSWORD_CHANGE_PROMPT'] = 'Do you really want to change the master password? \nDO NOT INTERRUPT!';
+$lang_ger['PASSWORD_CHANGE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort ändern? \nBITTE NICHT UNTERBRECHEN!';
+
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';
 

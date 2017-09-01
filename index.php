@@ -2,7 +2,6 @@
 $routes = array(
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
-  'php/encryptiontest' => 'encryption_functions.php',
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
@@ -17,7 +16,7 @@ $routes = array(
   'system/update' => 'pullGitRepo.php',            'system/backup' => 'download_sql.php',             'system/restore' => 'upload_database.php',
   'system/designer' => 'templateSelect.php',       'system/clients' => 'editCustomers.php',           'system/clientDetail' => 'editCustomer_detail.php',
   'system/previewTem' => 'templatePreview.php',    'system/downloadTem' => 'templateDownload.php',    'system/editTemp' => 'templateEdit.php',
-  'system/downloadSql' => 'sqlDownload.php',
+  'system/downloadSql' => 'sqlDownload.php',       'system/cryptlog'=> 'viewCryptLog.php',
 
   'time/view' => 'getTimestamps.php',              'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
   'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',                  'time/requests' => 'requestOverview.php',
