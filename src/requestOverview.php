@@ -1,7 +1,7 @@
 <?php require 'header.php'; enableToTime($userID); ?>
 
 <div class="page-header">
-  <?php $filterings = array('user' => 0, 'date' => array('2016-06-01', substr(getCurrentTimestamp(), 0, 10)), 'acceptance' => -1, 'requestType' => ''); ?>
+  <?php $filterings = array("savePage" => $this_page, 'user' => 0, 'date' => array('2016-06-01', substr(getCurrentTimestamp(), 0, 10)), 'acceptance' => -1, 'requestType' => ''); ?>
   <h3><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?> <div class="page-header-button-group"><?php include 'misc/set_filter.php'; ?></div></h3>
 </div>
 

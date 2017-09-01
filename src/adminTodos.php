@@ -267,9 +267,9 @@ if($result && $result->num_rows > 0):
      </tbody>
     </table>
   </form>
+<?php endif; ?>
   <div class="container-fluid"><div class="text-right"><a href="requests"><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?></a></div></div>
 <br><hr><br>
-<?php endif; ?>
 
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
 
