@@ -23,10 +23,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       $chargedTimeStart= '0000-00-00 00:00:00';
       $chargedTimeFin = '0000-00-00 00:00:00';
-      if($_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
         $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
       }
-      if($_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
         $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
       }
       $new_text = test_input($_POST['editing_infoText_'.$x]);

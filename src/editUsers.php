@@ -3,7 +3,7 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register_basic.php' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
 </div>
 <?php
 $activeTab = 0;

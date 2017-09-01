@@ -16,15 +16,9 @@ if(!empty($_POST['proposalID'])){
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['client'] = intval($_POST['filterClient']);
   $process = $_POST['nERP'];
-
-  $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = ". intval($_POST['filterCompany']));
-  $row = $result->fetch_assoc();
-
-  $offset = $row['erp_'.strtolower($process)];
-  if($offset < 1) $offset = 1;
   $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
   if($row = $result->fetch_assoc()){
-    $filterings['number'] = getNextERP($process, $row['companyID'], $offset-1);
+    $filterings['number'] = getNextERP($process, $row['companyID']);
   }
 } else { //other visits
   $filterings = $_SESSION['filterings'];
@@ -466,7 +460,7 @@ $x = $prod_row['id'];
       <br>
       <div class="row">
         <div class="col-md-6">
-          <?php echo $lang['TAXES']; ?>
+          <label><?php echo $lang['TAXES']; ?></label>
           <select class="js-example-basic-single btn-block" name="add_product_taxes">
             <?php
             $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");

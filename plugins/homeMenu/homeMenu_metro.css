@@ -26,6 +26,7 @@
 }
 .panel-group > .panel.panel-borderless > .panel-collapse > .panel-body{
   border-top: 1px solid #364150;
+  padding: 0 15px;
 }
 
 .sidemenu > .inner > .panel-group > .panel > .panel-collapse > .panel-body{
@@ -114,7 +115,12 @@ input[type="radio"]:checked {
   border: 1px solid #33C7D5;
   box-shadow: 0 0 2px #33C7D5;
 }
-
+.page-header{
+  background-color:transparent;
+}
+.clock-counter{
+  color:#B4BCC8;
+}
 
 /* Bootstrap */
 .btn-warning{
@@ -126,7 +132,6 @@ input[type="radio"]:checked {
   background-color: #12ACBA;
   border-color: #12ACBA;
 }
-
 .alert{
   border-radius:0;
   border-left-width: 6px;
@@ -137,7 +142,7 @@ input[type="radio"]:checked {
   border-color: #32c5d2;
 }
 .alert.alert-success{
-  border-color: #4ece04;
+  border-color: #7fcb51;
 }
 .alert.alert-danger{
   border-color: #e7505a;
@@ -149,11 +154,4 @@ a, button, code, div, img, input, label, li, p, pre, select, span, svg, table, t
   -webkit-border-radius: 0!important;
   -moz-border-radius: 0!important;
   border-radius: 0!important;
-}
-.page-header{
-  background-color:transparent;
-}
-
-.clock-counter{
-  color:#B4BCC8;
 }
