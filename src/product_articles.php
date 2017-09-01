@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       while($result && ($row = $result->fetch_assoc())){
         $mc = mc($row['iv'],$row['iv2']);
         echo '<tr>';
-        echo '<td>'.$mc->decrypt($row['name']).'</td>';
+        echo '<td>'.mc_status().$mc->decrypt($row['name']).'</td>';
         echo '<td>'.$mc->decrypt($row['description']).'</td>';
         echo '<td>'.$row['price'].'</td>';
         echo '<td>'.$row['purchase'].'</td>';

@@ -219,3 +219,24 @@ function mc_master_password_changed(string $newpassword){
     fclose($logFile);
     redirect("../system/cryptlog");
 }
+function mc_validate_master_password(string $password){
+    require __DIR__."/connection.php";
+    $result = $conn->query("SELECT masterPassword FROM $configTable");
+    $row = $result->fetch_assoc();
+    if(strlen($row["masterPassword"])>0){
+        return crypt($password, $row['masterPassword']) == $row['masterPassword'];
+    }else{
+        return $password == false;
+    }
+}
+function mc_status(){
+    require __DIR__."/connection.php";
+    require __DIR__."/language.php";
+    $result = $conn->query("SELECT masterPassword FROM $configTable");
+    $row = $result->fetch_assoc();
+    if(strlen($row["masterPassword"])>0){
+        return '<i class="fa fa-lock text-success" aria-hidden="true" title="'.$lang['ENCRYPTION_ACTIVE'].'"></i>';
+    }else{
+        return '<i class="fa fa-unlock text-warning" aria-hidden="true" title="'.$lang['ENCRYPTION_DEACTIVATED'].'"></i>';
+    }
+}
