@@ -182,13 +182,21 @@ $row = $result->fetch_assoc();
     <br><br>
     <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
-      Verschlüsselung deaktivieren
+      Verschlüsselung deaktivieren: 
     </div>
     <div class="col-md-8">
       <input type="checkbox" class="" name="masterPass_deactivate" value="true"/>
     </div>
     <br><br><br>
     <?php endif; ?>
+    <div class="col-md-4">
+      Ereignisse Ansehen: 
+    </div>
+    <div class="col-md-8">
+    <a class="btn btn-warning" href="../system/cryptlog">Logs</a>
+    </div>
+    <br><br><br>
+    
   </div>
 </form>
 <script>
