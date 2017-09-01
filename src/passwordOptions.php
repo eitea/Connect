@@ -52,30 +52,7 @@ if(isset($_POST['saveButton'])){
     }
     //if everything was okay:
     if($acceptMasterPassword){
-      $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable");
-      while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
-        $curID = $rowBank['id'];
-        //decrypt all that has been encrypted with old password
-        $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $passwordCurrent, 0, $rowBank['iv2']);
-        $ibanVal = mc_decrypt($rowBank['iban'], $keyValue);
-        $bicVal = mc_decrypt($rowBank['bic'], $keyValue);
-
-        //encrypt with new password
-        $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
-        $keyValue = bin2hex($keyValue);
-
-        $ibanVal = mc_encrypt($ibanVal, $keyValue);
-        $bicVal = mc_encrypt($bicVal, $keyValue);
-
-        $ivValue = openssl_random_pseudo_bytes(8);
-        $ivValue = bin2hex($ivValue);
-
-        //this did not need an iv since keyValue was random anyway, but silly php thinks its smarter than me.
-        $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $password, 0, $ivValue);
-
-        $conn->query("UPDATE $clientDetailBankTable SET iban='$ibanVal', bic='$bicVal', iv='$keyValue', iv2='$ivValue' WHERE id = $curID");
-        echo mysqli_error($conn);
-      }
+      
       //save new passwordhash
       $passwordhash = password_hash($password, PASSWORD_BCRYPT);
       $conn->query("UPDATE $configTable SET masterPassword = '$passwordhash'");
@@ -171,7 +148,7 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
 
-  <h4>Master Passwort <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4><?php echo mc_status(); ?>Master Passwort <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">

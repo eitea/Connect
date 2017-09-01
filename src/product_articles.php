@@ -56,7 +56,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $mc = mc($row['iv'],$row['iv2']);
         echo '<tr>';
         echo '<td>'.mc_status().$mc->decrypt($row['name']).'</td>';
-        echo '<td>'.$mc->decrypt($row['description']).'</td>';
+        echo '<td>'.mc_status().$mc->decrypt($row['description']).'</td>';
         echo '<td>'.$row['price'].'</td>';
         echo '<td>'.$row['purchase'].'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
@@ -79,10 +79,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
       </div>
       <div class="modal-body">
-        <label>Name</label>
+        <label>Name<?php echo mc_status(); ?></label>
         <input type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
         <br>
-        <label><?php echo $lang['DESCRIPTION']; ?></label>
+        <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
         <input type="text" class="form-control" name="add_product_description" placeholder="<?php echo $lang['DESCRIPTION']; ?>" maxlength="190"/>
         <br>
         <div class="row">

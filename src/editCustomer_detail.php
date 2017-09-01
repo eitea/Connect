@@ -509,11 +509,11 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             echo '<td>' . $rowBank['bankName'] . '</td>';
             if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
               $mc = mc($rowBank["iv"],$rowBank["iv2"]);
-              echo '<td>'.$mc->decrypt($rowBank['iban']). '</td>';
-              echo '<td>'.$mc->decrypt($rowBank['bic']). '</td>';
+              echo '<td>'.mc_status().$mc->decrypt($rowBank['iban']). '</td>';
+              echo '<td>'.mc_status().$mc->decrypt($rowBank['bic']). '</td>';
             } else { // **** it.
-              echo '<td>**** **** **** ****</td>';
-              echo '<td>******** ***</td>';
+              echo '<td>'.mc_status().'**** **** **** ****</td>';
+              echo '<td>'.mc_status().'******** ***</td>';
             }
             echo '</tr>';
           }

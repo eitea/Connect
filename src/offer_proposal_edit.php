@@ -259,8 +259,8 @@ $_SESSION['filterings'] = $filterings; //save your filterings
         $prod_row["description"] = $mc->decrypt($prod_row["description"]);
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
-        echo '<td>'.$prod_row['name'].'</td>';
-        echo '<td style="max-width:500px;">'.$prod_row['description'].'</td>';
+        echo '<td>'.mc_status().$prod_row['name'].'</td>';
+        echo '<td style="max-width:500px;">'.mc_status().$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.intval($prod_row['taxPercentage']).'%</td>';
@@ -313,6 +313,9 @@ $("#sort tbody").sortable({
           if($result){  $result->data_seek(0); }
           $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
+            $mc = mc($prod_row['iv'],$prod_row['iv2']);
+            $prod_row["name"] = $mc->decrypt($prod_row["name"]);
+            $prod_row["description"] = $mc->decrypt($prod_row["description"]);
             if($prod_row['name'] != 'CLEAR_TEXT' && $prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'){
               $purchase = $prod_row['purchase']*$prod_row['quantity'];
               $sell = $prod_row['price']*$prod_row['quantity'];
@@ -364,6 +367,9 @@ $("#sort tbody").sortable({
 <?php
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
+  $mc = mc($prod_row['iv'],$prod_row['iv2']);
+  $prod_row["name"] = $mc->decrypt($prod_row["name"]);
+  $prod_row["description"] = $mc->decrypt($prod_row["description"]);
   if($prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'):
 $x = $prod_row['id'];
  ?>
@@ -376,14 +382,14 @@ $x = $prod_row['id'];
         <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>
           <div class="container-fluid">
             <div class="col-md-12">
-              <label>Text</label>
+              <label>Text<?php echo mc_status(); ?></label>
               <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
             </div>
           </div>
         <?php else: ?>
         <div class="container-fluid">
           <div class="col-md-6">
-            <label>Name</label>
+            <label>Name<?php echo mc_status(); ?></label>
             <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
           </div>
           <div class="col-md-6">
@@ -425,7 +431,7 @@ $x = $prod_row['id'];
         <br>
         <div class="container-fluid">
           <div class="col-md-12">
-            <label><?php echo $lang['DESCRIPTION']; ?></label>
+            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
             <input type="text" class="form-control" name="update_description_<?php echo $x ?>" value="<?php echo $prod_row['description']; ?>"/>
           </div>
         </div>
@@ -445,10 +451,10 @@ $x = $prod_row['id'];
       <h4 class="modal-title"><?php echo $lang['ADD']; ?>: Position</h4>
     </div>
     <div class="modal-body">
-      <label>Name</label>
+      <label>Name<?php echo mc_status(); ?></label>
       <input type="text" class="form-control required-field" name="add_product_name" maxlength="48"/>
       <br>
-      <label><?php echo $lang['DESCRIPTION']; ?></label>
+      <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
       <input type="text" class="form-control" name="add_product_description" maxlength="190"/>
       <br>
       <div class="row">
@@ -513,7 +519,7 @@ $x = $prod_row['id'];
 <div class="modal fade add_article">
   <div class="modal-dialog modal-sm modal-content">
     <div class="modal-header">
-      <h4 class="modal-title"><?php echo $lang['CHOOSE_ARTICLE']; ?></h4>
+      <h4 class="modal-title"><?php echo $lang['CHOOSE_ARTICLE']; ?><?php echo mc_status(); ?></h4>
     </div>
     <div class="modal-body">
       <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">

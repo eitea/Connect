@@ -167,6 +167,7 @@ function mc_total_row_count(){
     $total_count = 0;
     $total_count += $conn->query("SELECT * FROM articles")->num_rows ?? 0;
     $total_count += $conn->query("SELECT * FROM products")->num_rows ?? 0;
+    $total_count += $conn->query("SELECT * FROM $clientDetailBankTable")->num_rows ?? 0;
     return $total_count;
 }
 /**
@@ -214,6 +215,22 @@ function mc_master_password_changed(string $newpassword){
             fwrite($logFile, "\t\t".date("y-m-d h:i:s").": Error in row with id $id: $error\r\n");
         }
     }
+    //$clientDetailBankTable
+    fwrite($logFile, "\t".date("y-m-d h:i:s").": altering bank data\r\n");
+    $result = $conn->query("SELECT * FROM $clientDetailBankTable");
+    while($row = $result->fetch_assoc()){
+        $old = mc($row["iv"],$row["iv2"]);
+        $new = mc()->from($old,$newpassword);
+        $iv = $new->iv;
+        $iv2 = $new->iv2;
+        $iban = $new->change($row["iban"]);
+        $bic = $new->change($row["bic"]);
+        $id = $row["id"];
+        if(!$conn->query("UPDATE $clientDetailBankTable SET iban = '$iban', bic = '$bic', iv = '$iv', iv2 = '$iv2' WHERE id = $id")){
+            $error = $conn->error;
+            fwrite($logFile, "\t\t".date("y-m-d h:i:s").": Error in row with id $id: $error\r\n");
+        }
+    }
     fwrite($logFile,date("y-m-d h:i:s").": Finished\r\n");
     fwrite($logFile,date("y-m-d h:i:s").": ".mc_total_row_count()." rows affected\r\n");
     fclose($logFile);
@@ -237,6 +254,6 @@ function mc_status(){
     if(strlen($row["masterPassword"])>0){
         return '<i class="fa fa-lock text-success" aria-hidden="true" title="'.$lang['ENCRYPTION_ACTIVE'].'"></i>';
     }else{
-        return '<i class="fa fa-unlock text-warning" aria-hidden="true" title="'.$lang['ENCRYPTION_DEACTIVATED'].'"></i>';
+        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="'.$lang['ENCRYPTION_DEACTIVATED'].'"></i>';
     }
 }
