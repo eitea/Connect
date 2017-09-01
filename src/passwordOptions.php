@@ -196,7 +196,6 @@ $row = $result->fetch_assoc();
     <a class="btn btn-warning" href="../system/cryptlog">Logs</a>
     </div>
     <br><br><br>
-    
   </div>
 </form>
 <script>

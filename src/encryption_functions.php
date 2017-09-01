@@ -1,4 +1,33 @@
 <?php
+// Usage
+// Encrypt
+// $c = mc();
+// $encrypted = $c->encrypt("this is a test");
+// $encrypted2 = $c->encrypt("this is a test");
+// INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$iv','$iv2');
+
+// Decrypt
+// SELECT var1,var2,iv,iv2 FROM table1;
+// $c = mc($iv,$iv2);
+// echo $c->decrypt($var1);
+// echo $c->decrypt($var2);
+
+// Password Change
+// $_SESSION["masterpassword"] = "test password";
+// $iv = "zNO5qG8wmDyPBx+mFl8qIfpogFJejvsvd7WN4QeVT7tognIMCK4YIva+QZ1y3XMVv3qxhNwTNb9fNhp74HTz4SIQGAriZA0IniH4xRJu4zo=";
+// $iv2 = "27a119dc5cd9e338";
+// $encrypted = "3qozv1QeuwsN8WhvfedJf9DhPmrsb2e4aUwp7BfQRad/LDsY9/nn1WbIfvfTBmnd0l5Ut+tcDe/3aagy5JdJfB1r1Ep4WpHgP2hvxE/ob9oyD5vGYzjp/9VUWGLPmLWj|ESDuK9Jk9CPS2QjQ6SRE7y7C9UVe7hxPgVAoqN58HLM=";
+// $old = mc($iv,$iv2);
+// $new = mc()->from($old,"new password");
+// $newencrypted = $new->change($encrypted);
+// INSERT INTO table1 (var1,iv,iv2) VALUES ('$newencrypted','$iv','$iv2');
+
+// TODO if you want to encrypt additional files:
+//   Add the above code after/before select/update/insert statements
+//   Add an entry to mc_total_row_count()
+//   Add an entry to mc_master_password_changed()
+// Optional:
+//   Add the mc_status() to the html code
 require_once __DIR__ . "/utilities.php";
 
 //test if password has changed
@@ -133,30 +162,6 @@ class MasterCrypt{
 function mc($iv = false, $iv2 = false){
     return new MasterCrypt($iv,$iv2);
 }
-
-
-//Examples
-        // Encrypt
-        // $c = mc();
-        // $encrypted = $c->encrypt("this is a test");
-        // $encrypted2 = $c->encrypt("this is a test");
-        // INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$iv','$iv2');
-
-        // Decrypt
-        // SELECT var1,var2,iv,iv2 FROM table1;
-        // $c = mc($iv,$iv2);
-        // echo $c->decrypt($var1);
-        // echo $c->decrypt($var2);
-
-        // Password Change
-        // $_SESSION["masterpassword"] = "test password";
-        // $iv = "zNO5qG8wmDyPBx+mFl8qIfpogFJejvsvd7WN4QeVT7tognIMCK4YIva+QZ1y3XMVv3qxhNwTNb9fNhp74HTz4SIQGAriZA0IniH4xRJu4zo=";
-        // $iv2 = "27a119dc5cd9e338";
-        // $encrypted = "3qozv1QeuwsN8WhvfedJf9DhPmrsb2e4aUwp7BfQRad/LDsY9/nn1WbIfvfTBmnd0l5Ut+tcDe/3aagy5JdJfB1r1Ep4WpHgP2hvxE/ob9oyD5vGYzjp/9VUWGLPmLWj|ESDuK9Jk9CPS2QjQ6SRE7y7C9UVe7hxPgVAoqN58HLM=";
-        // $old = mc($iv,$iv2);
-        // $new = mc()->from($old,"new password");
-        // $newencrypted = $new->change($encrypted);
-        // INSERT INTO table1 (var1,iv,iv2) VALUES ('$newencrypted','$iv','$iv2');
 /**
  * Returns rows affected by master password change
  *
@@ -236,6 +241,12 @@ function mc_master_password_changed(string $newpassword){
     fclose($logFile);
     redirect("../system/cryptlog");
 }
+/**
+ * Tests if $password matches the master password in $configTable
+ *
+ * @param string|boolean $password
+ * @return boolean
+ */
 function mc_validate_master_password(string $password){
     require __DIR__."/connection.php";
     $result = $conn->query("SELECT masterPassword FROM $configTable");
@@ -246,6 +257,11 @@ function mc_validate_master_password(string $password){
         return $password == false;
     }
 }
+/**
+ * Returns the html code for either a green lock or red unlock symbol.
+ *
+ * @return string
+ */
 function mc_status(){
     require __DIR__."/connection.php";
     require __DIR__."/language.php";
