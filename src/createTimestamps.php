@@ -154,11 +154,14 @@ function getNextERP($identifier, $companyID, $offset = 0){
 }
 
 function randomPassword($length = 8){
-  $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  $alphaLength = strlen($alphabet) - 1;
+  $pool = array('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '1234567890', '!@#$*+?');
+  shuffle($pool);
   $psw = array();
-  for ($i = 0; $i < $length; $i++) {
-    $psw[] = $alphabet[rand(0, $alphaLength)];
+  for($i = 0; $i < $length; $i++){
+    $psw[] = $pool[$i % 4][rand(0, strlen($pool[$i % 4]) -1)];
+    if($i > 3){
+      shuffle($pool);
+    }
   }
   return implode($psw);
 }

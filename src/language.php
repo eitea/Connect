@@ -44,8 +44,8 @@ $lang_ger['ADDRESS'] = 'Adresse';
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
 
-$lang_eng['ADMIN_DELETE'] = 'Please do not delete the Admin';
-$lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin löschen. ';
+$lang_eng['ADMIN_DELETE'] = 'Please do not delete the Admin or your own Account';
+$lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin oder den eigenen Account löschen.';
 
 $lang_eng['ADMIN_CORE_OPTIONS'] = 'General';
 $lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
