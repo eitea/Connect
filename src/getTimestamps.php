@@ -201,7 +201,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         $insertInfoText = test_input($_POST['infoText']);
         $insertInternInfoText = test_input($_POST['internInfoText']);
-
+        
+        if(timeDiff_Hours($startDate, $endDate) < 0){
+          $endDate = carryOverAdder_Hours($endDate, 24);
+        }
         if(timeDiff_Hours($startDate, $endDate) > 0){
           if(isset($_POST['addBreak'])){ //checkbox
             $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";

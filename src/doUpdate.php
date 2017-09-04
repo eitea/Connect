@@ -1388,14 +1388,6 @@ if($row['version'] < 95){
   $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) SELECT 1, 1, 1, 1, 1, 1, id FROM companyData");
 }
 
-
-if($row['version'] < 96){
-  $conn->query("ALTER TABLE deactivatedUserData ADD COLUMN vacPerYear INT(2)");
-  $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
-  $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
-}
-
-
 if ($row['version'] < 97) {
   if ($conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'")) {
     echo '<br>Added role "canUseSocialMedia" with default "FALSE"';
@@ -1462,6 +1454,12 @@ if ($row['version'] < 97) {
       echo '<br>' . $conn->error;
     }
   }
+}
+
+if($row['version'] < 98){
+  $conn->query("ALTER TABLE DeactivatedUserData ADD COLUMN vacPerYear INT(2)");
+  $conn->query("UPDATE DeactivatedUserData SET vacPerYear = daysPerYear");
+  $conn->query("ALTER TABLE DeactivatedUserData DROP COLUMN daysPerYear");
 }
 
 

@@ -13,34 +13,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
-    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
+    $sql = "INSERT IGNORE INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
     SELECT id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
     //copy logs
-    $sql = "INSERT INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, indexIM)
+    $sql = "INSERT IGNORE INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, indexIM)
     SELECT userID, time, timeEnd, status, timeToUTC, indexIM FROM $logTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo 'logErr: '.mysqli_error($conn);}
     //copy intervalTable
-    $sql = "INSERT INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate)
+    $sql = "INSERT IGNORE INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate)
     SELECT userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate FROM $intervalTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>dataErr: '.mysqli_error($conn);}
     //copy projectbookings
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID IS NOT NULL AND projectID != 0";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy projectbookings - foreign key null gets cast to 0... idky.
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID != 0 AND projectID IS NOT NULL";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy projectbookings - null for every null, which is 0 #why
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, NULL, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND (projectID = 0 OR projectID IS NULL)";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy taveldata
-    $sql = "INSERT INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
+    $sql = "INSERT IGNORE INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $travelTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>travelErr: '.mysqli_error($conn);}
     //if successful, delete the user, On Cascade Delete does the rest.
