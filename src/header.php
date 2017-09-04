@@ -438,6 +438,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                       <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="../system/update"><span>Update</span></a></li>
                       <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                       <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
+                      <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
                     </ul>
                   </div>
                 </li>

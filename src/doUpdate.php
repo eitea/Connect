@@ -1479,10 +1479,11 @@ if($row['version'] < 98){
   $conn->query("CREATE TABLE resticconfiguration(
     path VARCHAR(255),
     password VARCHAR(255),
-    key VARCHAR(255),
-    secret VARCHAR(255),
+    awskey VARCHAR(255),
+    awssecret VARCHAR(255),
     location VARCHAR(255)
   )");
+  $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 }
 
 //if($row['version'] < 99){}
