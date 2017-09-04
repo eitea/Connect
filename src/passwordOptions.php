@@ -148,7 +148,7 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
 
-  <h4><?php echo mc_status(); ?>Master Passwort <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4><?php echo mc_status(); ?><?php echo $lang["MASTER_PASSWORD"]; ?> <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
@@ -159,7 +159,7 @@ $row = $result->fetch_assoc();
   <div class="container-fluid">
     <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
-      Aktuelles Passwort:
+    <?php echo $lang["MASTER_PASSWORD_CURRENT"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_current" value=""/>
@@ -167,14 +167,14 @@ $row = $result->fetch_assoc();
     <br><br>
     <?php endif; ?>
     <div class="col-md-4">
-      Neues Passwort:
+    <?php echo $lang["MASTER_PASSWORD_NEW"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_new" value=""/>
     </div>
     <br><br>
     <div class="col-md-4">
-      Neues Passwort Wiederholen:
+    <?php echo $lang["MASTER_PASSWORD_CONFIRM"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
@@ -182,7 +182,7 @@ $row = $result->fetch_assoc();
     <br><br>
     <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
-      Verschlüsselung deaktivieren: 
+    <?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="checkbox" class="" name="masterPass_deactivate" value="true"/>
@@ -190,7 +190,7 @@ $row = $result->fetch_assoc();
     <br><br><br>
     <?php endif; ?>
     <div class="col-md-4">
-      Ereignisse Ansehen: 
+      <?php echo $lang["ENCRYPTION_LOG"]; ?>:
     </div>
     <div class="col-md-8">
     <a class="btn btn-warning" href="../system/cryptlog">Logs</a>

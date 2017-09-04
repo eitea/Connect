@@ -273,6 +273,11 @@ function mc_status(){
         return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="'.$lang['ENCRYPTION_DEACTIVATED'].'"></i>';
     }
 }
+/**
+ * List all changes before user confirms or cancels master password change
+ *
+ * @return string
+ */
 function mc_list_changes(){
     require __DIR__."/connection.php";
     $out = "Changes following data: \\n";

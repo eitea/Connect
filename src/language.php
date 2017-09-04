@@ -317,8 +317,14 @@ $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 $lang_eng['ENCRYPTION_ACTIVE'] = 'Encryption active';
 $lang_ger['ENCRYPTION_ACTIVE'] = 'Verschlüsselung aktiviert';
 
+$lang_eng['ENCRYPTION_DEACTIVATE'] = 'Deactivate Encryption';
+$lang_ger['ENCRYPTION_DEACTIVATE'] = 'Verschlüsselung deaktivieren';
+
 $lang_eng['ENCRYPTION_DEACTIVATED'] = 'Encryption deactivated';
 $lang_ger['ENCRYPTION_DEACTIVATED'] = 'Verschlüsselung deaktiviert';
+
+$lang_eng['ENCRYPTION_LOG'] = 'View Events';
+$lang_ger['ENCRYPTION_LOG'] = 'Ereignisse anzeigen';
 
 $lang_eng['END'] = 'End';
 $lang_ger['END'] = 'Ende';
@@ -559,6 +565,18 @@ $lang_ger['MARK_AS_ABSENT'] = 'Als Abwesend eintragen';
 
 $lang_eng['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
 $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
+
+$lang_eng['MASTER_PASSWORD'] = 'Master Password';
+$lang_ger['MASTER_PASSWORD'] = 'Master Passwort';
+
+$lang_eng['MASTER_PASSWORD_CURRENT'] = 'Current Password';
+$lang_ger['MASTER_PASSWORD_CURRENT'] = 'Aktuelles Passwort';
+
+$lang_eng['MASTER_PASSWORD_CONFIRM'] = 'Confirm Password';
+$lang_ger['MASTER_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
+
+$lang_eng['MASTER_PASSWORD_NEW'] = 'New Password';
+$lang_ger['MASTER_PASSWORD_NEW'] = 'Neues Passwort';
 
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
 $lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur die Anfrage, NICHT die eigentlichen Stunden!';
