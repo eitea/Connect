@@ -220,9 +220,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
         chdir(__DIR__);
     }
-    if(isset($_POST["restore"])){
+    if(isset($_POST["restore"],$_POST["snapshot"])){
         $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
-        
+        $snapshot = $_POST["snapshot"] ?? "latest";
+        $snapshot = preg_replace("[^A-Za-z0-9]", "", $snapshot);
+        $snapshot = escapeshellarg($snapshot);
+        if($_POST["snapshot"] != $snapshot){
+            echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>Filtered snapshot id not the same as posted</div>';
+        }
+
         $location = "s3:".$row["location"];
         $password = $row["password"];
         $awskey = $row["awskey"];
@@ -234,7 +240,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_REPOSITORY=$location");
         putenv("RESTIC_PASSWORD=$password");
         chdir($resticDir);
-        exec("$path restore latest -t . 2>&1",$output,$status);
+        exec("$path restore $snapshot -t . 2>&1",$output,$status);
         set_database("backup.sql");
         unlink("backup.sql");
         chdir(__DIR__);
@@ -252,11 +258,11 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
 
 
 <div class="page-header">
-  <h3>Restic Einstellungen<?php echo $validSymbol; ?></h3>
+  <h3>Restic Backup<?php echo $validSymbol; ?></h3>
 </div>
-
 <form method="POST" autocomplete="off">
   <div class="container-fluid">
+  <div class="row"><h4 class="col-xs-12">Einstellungen</h4></div>
     <div class="row">
         <div class="col-md-4">
             <label>Restic Version:</label>
@@ -316,10 +322,21 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
             tags: true
         })})
         </script>
+              <div class="col-xs-12">
+        <button type="submit" class="btn btn-warning">Ãœbernehmen</button>
+        <button type="submit" class="btn btn-warning" name="init" value="true">Init</button>
+      </div>
     </div>
+    <br><hr><br><div class="row"><h4 class="col-xs-12">Backup</h4></div>
+    <div class="row">
+        <div class="col-xs-12">
+            <button type="submit" class="btn btn-warning" name="backup" value="true">Backup</button>
+        </div>
+    </div>
+    <br><hr><br><div class="row"><h4 class="col-xs-12">Wiederherstellung</h4></div>
     <div class="row">
         <div class="col-md-4">
-            <label>Wiederherstellen:</label>
+            <label>Snapshot:</label>
         </div>
         <div class="col-md-6">
             <select class="btn-block js-example-basic-single" name="snapshot">
@@ -335,16 +352,9 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
                 ?>
             </select>
         </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <button type="submit" class="btn btn-warning">Ãœbernehmen</button>
-        <button type="submit" class="btn btn-warning" name="init" value="true">Init</button>
-        <?php if($repositoryValid):?>
-        <button type="submit" class="btn btn-warning" name="backup" value="true">Backup</button>
-        <button type="submit" class="btn btn-warning" name="restore" value="true">Restore</button>
-        <?php endif; ?>
-      </div>
+        <div class="col-xs-12">
+        <button type="submit" class="btn btn-warning" name="restore" value="true">Wiederherstellen</button>
+            </div>
     </div>
     <div class="<?php echo !$status ? 'has-success' : 'has-error'; ?>">
         <?php if($output ?? false): ?>
