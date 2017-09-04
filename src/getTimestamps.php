@@ -617,14 +617,16 @@ if($filterings['user']):
                   } else {
                     echo ': '.$lang['ADDITION']."<input type='number' step='0.01' name='addBreakValues' value='0.0' class='form-control' style='width:100px' />";
                   }
-                  echo '</div>';
+                  echo '<small>0,5h = 30min</small></div>';
                   ?>
                 </div>
                 <br><br>
                 <div class="row">
                   <div class="col-md-6">
                     <label><?php echo $lang['BEGIN']; ?></label>
-                    <input class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,16); ?>"/>
+                    <div class="checkbox">
+                      <input class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,16); ?>"/>
+                    </div>
                   </div>
                   <div class="col-md-6">
                     <label><?php echo $lang['END']; ?></label>

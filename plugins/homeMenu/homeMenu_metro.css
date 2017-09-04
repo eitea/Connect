@@ -122,11 +122,11 @@ input[type="radio"]:checked {
   color: #FFFFFF;
   border-color:#33C7D5;
 }
-.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus, .btn-warning:active:focus, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
+.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus,
+.btn-warning:active:focus,.btn-warning[disabled]:hover, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
   background-color: #12ACBA;
   border-color: #12ACBA;
 }
-
 .alert{
   border-radius:0;
   border-left-width: 6px;

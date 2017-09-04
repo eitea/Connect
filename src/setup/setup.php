@@ -267,7 +267,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="form-group">
         <div class="input-group">
           <span class="input-group-addon text-warning" style=min-width:150px>Login Password</span>
-          <input type='password' class="form-control" name='adminPass' value="" placeholder="****">
+          <input type='password' class="form-control" name='adminPass' value="" placeholder="****" />
         </div>
       </div>
     </div>
@@ -277,7 +277,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="form-group">
         <div class="input-group">
           <span class="input-group-addon text-warning" style="min-width:150px">Company Name</span>
-          <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php echo $companyName ?>">
+          <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php echo $companyName ?>" />
         </div>
       </div>
     </div>
@@ -301,11 +301,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <label>Your Login E-Mail</label>
     <div class="form-group">
       <div class="input-group">
-          <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>">
-          <span class="input-group-addon text-warning"> @ </span>
-          <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
-        </div>
+        <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>" />
+        <span class="input-group-addon text-warning"> @ </span>
+        <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
       </div>
+    </div>
     <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
   </div>
 </div>
@@ -330,7 +330,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Username
           </span>
           <input type="text" class="form-control" name='mysqlUsername' value = 'root' />
@@ -342,7 +342,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Password
           </span>
           <input type="text" class="form-control" name='pass' value = '' />
@@ -354,7 +354,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             DB Name
           </span>
           <input type="text" class="form-control" name='dbName' value = 'Zeit1' />
