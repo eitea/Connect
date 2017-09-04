@@ -2,11 +2,11 @@
 
 <?php 
 $resticDir =dirname(__DIR__)."/plugins/restic/";
-function get_database(){
+function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
     require 'connection_config.php';
     $mysqli = new mysqli($servername,$username,$password,$dbName);
-    $mysqli->select_db($name);
+    $mysqli->select_db($dbName);
     $mysqli->query("SET NAMES 'utf8'");
     $queryTables    = $mysqli->query("SHOW TABLES");
     while($row = $queryTables->fetch_row()){
@@ -54,8 +54,10 @@ function get_database(){
     }
     return $content;
 }
-function set_database($content){
+function set_database($filename){
     require 'connection_config.php';
+    global $conn;
+    $file = fopen($filename, 'rb');
     if($conn->query("DROP DATABASE $dbName")){
         $conn->query("CREATE DATABASE $dbName");
     } else {
@@ -66,7 +68,7 @@ function set_database($content){
 
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
-    while(($line = fgets($content)) !== false){
+    while(($line = fgets($file)) !== false){
         $line = utf8_decode($line);
         //Skip comments
         if (substr($line, 0, 2) == '--' || $line == '') continue;
@@ -100,10 +102,37 @@ function check_repo(){
     putenv("RESTIC_REPOSITORY=$location");
     putenv("RESTIC_PASSWORD=$password");
     chdir($resticDir);
+    $check_status = 1;
     exec("$path check 2>&1",$check_output,$check_status);
     chdir(__DIR__);
-    return $check_status == 0;
+    return $check_status == 0 && count($check_output)>0;
 }
+function list_snapshots(){
+    global $conn,$resticDir;
+    $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
+    
+    $location = "s3:".$row["location"];
+    $password = $row["password"];
+    $awskey = $row["awskey"];
+    $awssecret = $row["awssecret"];
+    $path = basename($row["path"]);
+
+    putenv("AWS_ACCESS_KEY_ID=$awskey");
+    putenv("AWS_SECRET_ACCESS_KEY=$awssecret");
+    putenv("RESTIC_REPOSITORY=$location");
+    putenv("RESTIC_PASSWORD=$password");
+
+    chdir($resticDir);
+    exec("$path snapshots --json",$snapshot_output,$snapshot_status);
+    chdir(__DIR__);
+    $str = "";
+    foreach ($snapshot_output as $line) {
+        $str.=$line;
+    }
+    $snapshot_output = json_decode($str,true);
+    return $snapshot_output;
+}
+
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST["path"])){
@@ -172,7 +201,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-            2 => null,
         );
         $process = proc_open($cmd, $descriptorspec, $pipes);
         if (is_resource($process)) {
@@ -206,7 +234,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_REPOSITORY=$location");
         putenv("RESTIC_PASSWORD=$password");
         chdir($resticDir);
-        //exec("$path restore latest . 2>&1",$output,$status);
+        exec("$path restore latest -t . 2>&1",$output,$status);
+        set_database("backup.sql");
+        unlink("backup.sql");
         chdir(__DIR__);
     }
 }
@@ -236,10 +266,10 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
                 <?php
                 $entries = scandir($resticDir,SCANDIR_SORT_DESCENDING);
                 foreach($entries as $entry){
-                    if($entry == "." || $entry == "..")
+                    if($entry == "." || $entry == ".." || $entry == "LICENSE")
                         continue;
                     $selected = (basename($currentPath) == $entry) ? "selected":"";
-                    echo "<option $selected value='$resticDir/$entry'>$entry</option>";
+                    echo "<option $selected value='$resticDir/$entry'>".str_replace(".exe","",str_replace("_"," ",$entry))."</option>";
                 }
                 ?>
             </select>
@@ -269,7 +299,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
             <input type="text" class="form-control" name="awssecret" value="<?php echo $currentAwssecret;?>">
         </div>
     </div>
-        <div class="row">
+    <div class="row">
         <div class="col-md-4">
             <label>Host:</label>
         </div>
@@ -281,10 +311,30 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
             </select>
         </div>
         <script>
+        $(function(){
         $(".select2-tagging").select2({
             tags: true
-        })
+        })})
         </script>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <label>Wiederherstellen:</label>
+        </div>
+        <div class="col-md-6">
+            <select class="btn-block js-example-basic-single" name="snapshot">
+                <option selected value="latest">Letztes Backup</option>
+                <?php $snapshots = array_reverse(list_snapshots());
+                foreach($snapshots as $snapshot){
+                    if(!in_array("connect",$snapshot["tags"]))
+                        continue;
+                    $id = $snapshot["id"];
+                    $date = date("Y-m-d h:i:s",strtotime($snapshot["time"]));
+                    echo "<option value='$id'>$date</option>";
+                }
+                ?>
+            </select>
+        </div>
     </div>
     <div class="row">
       <div class="col-xs-12">
@@ -292,6 +342,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
         <button type="submit" class="btn btn-warning" name="init" value="true">Init</button>
         <?php if($repositoryValid):?>
         <button type="submit" class="btn btn-warning" name="backup" value="true">Backup</button>
+        <button type="submit" class="btn btn-warning" name="restore" value="true">Restore</button>
         <?php endif; ?>
       </div>
     </div>
