@@ -1456,7 +1456,7 @@ if ($row['version'] < 97) {
   else {
     echo '<br>' . $conn->error;
   }
-  $result = $conn->query("SELECT * FROM userdata");
+  $result = $conn->query("SELECT * FROM UserData");
   while ($row = $result->fetch_assoc()) {
     $x = $row["id"];
     if(!$conn->query("INSERT INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-')")){
