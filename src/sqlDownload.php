@@ -22,6 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 
 function Export_Database($host,$user,$pass,$name,$tables=false,$backup_name='backup',$password=false){
+  // changes here have to be copied to resticBackup.php
   $mysqli = new mysqli($host,$user,$pass,$name);
   $mysqli->select_db($name);
   $mysqli->query("SET NAMES 'utf8'");
