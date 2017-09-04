@@ -1,35 +1,45 @@
-<?php require_once 'header.php'; ?>
-<?php enableToBookings($userID);?>
+<?php require_once 'header.php'; enableToBookings($userID); ?>
 <?php
-$sql = "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'";
-$result = mysqli_query($conn, $sql);
+//first of the day
+$result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
   $start = substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5);
   $end = substr(carryOverAdder_Hours(getCurrentTimestamp(), $row['timeToUTC']), 11, 5);
-  $date = substr($row['time'], 0, 10);
+  $date = substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 0, 10);
   $indexIM = $row['indexIM']; //this value must not change
   $timeToUTC = $row['timeToUTC']; //just in case.
 } else {
   redirect("../user/home");
 }
 
-//ADDENDUMS
+//last booking
+$result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
+LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
+WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end DESC;");
+if($result && $result->num_rows > 0){
+  $row = $result->fetch_assoc();
+  $date = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10);
+  $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5);
+}
+
+//addendums
 $request_addendum = false;
-$result = $conn->query("SELECT indexIM, timeToUTC, time, timeEnd FROM logs WHERE userID = $userID AND infoText != 'Admin Autocorrected Lunchbreak' AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //182h = 8 days
+$result = $conn->query("SELECT * FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //192h = 8 days
 while($result && ($row = $result->fetch_assoc())){
   $has_bookings = false;
   $i = $row['indexIM'];
-  $A = $row['time']; //also check beginning
+  $A = $row['time'];
   $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
   while($row_b = $res_b->fetch_assoc()){
     $has_bookings = true;
     $B = $row_b['start'];
-    if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //buffer comes from header
+    if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){
       $request_addendum = $i;
-      //to process the next ADD, we need to know what he is editing
+      //to process the next ADD
+      $date = substr(carryOverAdder_Hours($A, $timeToUTC),0,10);
       $indexIM = $i;
-      $date = substr($B,0,10);
       $timeToUTC = $row['timeToUTC'];
       $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
       $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
@@ -37,19 +47,19 @@ while($result && ($row = $result->fetch_assoc())){
     }
     $A = $row_b['end'];
   }
-
   if($request_addendum) break;
   $B = $row['timeEnd'];
   if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
     $request_addendum = $i;
+    $date = substr($A,0,10);
     $indexIM = $i;
-    $date = substr($B,0,10);
     $timeToUTC = $row['timeToUTC'];
     $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
     $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
     break;
   }
 }
+echo $conn->error;
 
 $showUndoButton = $showEmergencyUndoButton = 0;
 $missing_highlights = $insertInfoText = $insertInternInfoText = $field_1 = $field_2 = $field_3 = '';
@@ -70,9 +80,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insertInfoText = test_input(trim($_POST['infoText']));
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
-    //does the user know that he is adding and not sending a submit from a normal booking because the admin edited something in the background in the mean time?
     if($request_addendum && empty($_POST['confirm_addendum'])){ //every if has a story
       redirect("../user/home");
+    }
+    if(timeDiff_Hours($startDate, $endDate) < 0){
+      $endDate = carryOverAdder_Hours($endDate, 24);
+      $date = substr($endDate, 0, 10);
     }
     if(timeDiff_Hours($startDate, $endDate) > 0){
       if(isset($_POST['addBreak'])){
@@ -213,8 +226,7 @@ echo mysqli_error($conn);
           $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
           LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
           LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-          WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )
-          OR ($projectBookingTable.projectID IS NULL AND $projectBookingTable.start LIKE '$date %' AND $projectBookingTable.timestampID = $indexIM) ORDER BY end ASC;";
+          WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end ASC;";
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows > 0){
             $numRows = $result->num_rows;
@@ -266,7 +278,6 @@ echo mysqli_error($conn);
               echo "</tr>";
 
               $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
-              $date = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10);
             }
             if(isset($_POST['undo'])){
               $row = $result->fetch_assoc();
@@ -370,9 +381,9 @@ endif;
   <div class="row">
     <div class="col-md-6">
       <div class="input-group">
-        <input type="text" class="form-control" onkeypress="return event.keyCode != 13;" readonly name="start" value="<?php echo substr($start,0,5); ?>" >
+        <input type="text" class="form-control" readonly onkeypress="return event.keyCode != 13;" name="start" value="<?php echo substr($start,0,5); ?>" >
         <span class="input-group-addon"> - </span>
-        <input type="text" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  min="<?php echo substr($start,0,5); ?>"  name="end" value="<?php echo $end; ?>" />
+        <input type="text" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  name="end" value="<?php echo $end; ?>" />
         <div class="input-group-btn">
           <button class="btn btn-warning" type="submit"  name="add"> + </button>
         </div>

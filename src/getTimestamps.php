@@ -738,7 +738,6 @@ if($filterings['user']):
       </form>
 
       <?php
-      //loop through this again
       mysqli_data_seek($bookingResult,0);
       while($row = $bookingResult->fetch_assoc()):
         $x = $row['bookingTableID'];
@@ -754,7 +753,7 @@ if($filterings['user']):
                 <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
                   <div class="row">
                   <?php
-                  if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+                  if(!empty($row['projectID'])){
                     if(count($available_companies) > 1){
                       echo "<div class='col-md-4'><label>".$lang['COMPANY']."</label><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
                       $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");

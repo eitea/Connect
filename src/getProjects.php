@@ -115,6 +115,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $insertInfoText = test_input($_POST['infoText']);
         $insertInternInfoText = test_input($_POST['internInfoText']);
 
+        if(timeDiff_Hours($startDate, $endDate) < 0){
+          $endDate = carryOverAdder_Hours($endDate, 24);
+        }
         if(timeDiff_Hours($startDate, $endDate) > 0){
           if(isset($_POST['addBreak'])){ //checkbox
             $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
@@ -378,7 +381,7 @@ if(!$result || $result->num_rows <= 0){
         echo '</td>';
         echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged
         echo "</tr>";
-
+        
         $csv->addLine($csv_Add);
         $sum_min += timeDiff_Hours($row['start'], $row['end']);
       } //end while fetch_assoc
