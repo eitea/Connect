@@ -191,7 +191,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         <tbody>
             <?php
             $today = substr(getCurrentTimestamp(), 0, 10);
-            $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
+            $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' GROUP BY userdata.id ORDER BY isAvailable ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {

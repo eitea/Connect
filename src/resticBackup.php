@@ -192,6 +192,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
         chdir(__DIR__);
     }
+    if(isset($_POST["restore"])){
+        $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
+        
+        $location = "s3:".$row["location"];
+        $password = $row["password"];
+        $awskey = $row["awskey"];
+        $awssecret = $row["awssecret"];
+        $path = basename($row["path"]);
+
+        putenv("AWS_ACCESS_KEY_ID=$awskey");
+        putenv("AWS_SECRET_ACCESS_KEY=$awssecret");
+        putenv("RESTIC_REPOSITORY=$location");
+        putenv("RESTIC_PASSWORD=$password");
+        chdir($resticDir);
+        //exec("$path restore latest . 2>&1",$output,$status);
+        chdir(__DIR__);
+    }
 }
 $currentPath = $conn->query("SELECT path FROM resticconfiguration")->fetch_assoc()["path"];
 $currentPassword = $conn->query("SELECT password FROM resticconfiguration")->fetch_assoc()["password"];
