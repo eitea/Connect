@@ -200,7 +200,7 @@ $currentAwssecret = $conn->query("SELECT awssecret FROM resticconfiguration")->f
 $currentLocation = $conn->query("SELECT location FROM resticconfiguration")->fetch_assoc()["location"];
 
 $repositoryValid = check_repo();
-$validSymbol = $repositoryValid ? "<i class='fa fa-check text-success'></i>" : "<i class='fa fa-warning text-danger'></i>";
+$validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='Gültige Konfiguration'></i>" : "<i class='fa fa-warning text-danger' title='Ungültige Konfiguration'></i>";
 ?>
 
 
@@ -238,7 +238,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success'></i>" : "
     </div>
     <div class="row">
         <div class="col-md-4">
-            <label>awskey:</label>
+            <label>AWS Schlüssel:</label>
         </div>
         <div class="col-md-6">
             <input type="text" class="form-control" name="awskey" value="<?php echo $currentAwskey;?>">
@@ -246,7 +246,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success'></i>" : "
     </div>
     <div class="row">
         <div class="col-md-4">
-            <label>awssecret:</label>
+            <label>AWS geheimer Schlüssel:</label>
         </div>
         <div class="col-md-6">
             <input type="text" class="form-control" name="awssecret" value="<?php echo $currentAwssecret;?>">
@@ -272,8 +272,8 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success'></i>" : "
     <div class="row">
       <div class="col-xs-12">
         <button type="submit" class="btn btn-warning">Übernehmen</button>
-        <?php if($repositoryValid):?>
         <button type="submit" class="btn btn-warning" name="init" value="true">Init</button>
+        <?php if($repositoryValid):?>
         <button type="submit" class="btn btn-warning" name="backup" value="true">Backup</button>
         <?php endif; ?>
       </div>
