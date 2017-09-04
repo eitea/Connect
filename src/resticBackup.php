@@ -197,7 +197,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_PASSWORD=$password");
 
         chdir($resticDir);
-        $cmd = "$path backup --stdin --stdin-filename backup.sql --tag connect 2>&1";
+        $cmd = "$path backup --stdin --stdin-filename backup.sql --tag database 2>&1";
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -240,9 +240,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_REPOSITORY=$location");
         putenv("RESTIC_PASSWORD=$password");
         chdir($resticDir);
-        exec("$path restore $snapshot -t . 2>&1",$output,$status);
-        set_database("backup.sql");
-        unlink("backup.sql");
+        if(in_array("database",$snapshot["tags"])){ //Database backup
+            exec("$path restore $snapshot -t . 2>&1",$output,$status);
+            set_database("backup.sql");
+            unlink("backup.sql");
+        }else{ //Full backup
+            echo "full";
+        }
         chdir(__DIR__);
     }
 }
@@ -327,6 +331,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
         <button type="submit" class="btn btn-warning" name="init" value="true">Init</button>
       </div>
     </div>
+    <?php if($repositoryValid): ?>
     <br><hr><br><div class="row"><h4 class="col-xs-12">Backup</h4></div>
     <div class="row">
         <div class="col-xs-12">
@@ -343,11 +348,18 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
                 <option selected value="latest">Letztes Backup</option>
                 <?php $snapshots = array_reverse(list_snapshots());
                 foreach($snapshots as $snapshot){
-                    if(!in_array("connect",$snapshot["tags"]))
-                        continue;
+                    if(in_array("database",$snapshot["tags"])){
+                        $type = "Database Backup";
+                    }else{
+                        $type = "Full Backup";
+                    }
                     $id = $snapshot["id"];
-                    $date = date("Y-m-d h:i:s",strtotime($snapshot["time"]));
-                    echo "<option value='$id'>$date</option>";
+                    $date = $snapshot["time"];
+                    $time = explode("T",$date)[1];
+                    $time = explode(".",$time)[0];
+                    $date = explode("T",$date)[0];
+                    
+                    echo "<option value='$id'>$type $date $time</option>";
                 }
                 ?>
             </select>
@@ -356,6 +368,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
         <button type="submit" class="btn btn-warning" name="restore" value="true">Wiederherstellen</button>
             </div>
     </div>
+    <?php endif;?>
     <div class="<?php echo !$status ? 'has-success' : 'has-error'; ?>">
         <?php if($output ?? false): ?>
         <label for="output">Restic Ausgabe:</label>
