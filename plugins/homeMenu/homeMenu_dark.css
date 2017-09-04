@@ -33,7 +33,9 @@
   color: white;
   background-color:transparent;
 }
-
+.clock-counter{
+  color:#ddd;
+}
 .navbar-default .navbar-brand{
   color:white;
 }

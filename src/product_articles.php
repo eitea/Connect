@@ -100,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <br><br>
         <div class="row">
           <div class="col-md-4">
-            <?php echo $lang['TAXES']; ?>
+            <label><?php echo $lang['TAXES']; ?></label>
             <select class="js-example-basic-single btn-block" name="add_product_taxes">
               <?php
               $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");

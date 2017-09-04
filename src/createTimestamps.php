@@ -129,9 +129,18 @@ function match_passwordpolicy($p, &$out = ''){
 
 function getNextERP($identifier, $companyID, $offset = 0){
   require "connection.php";
+  $offset = 0;
+  if(!$companyID){$companyID = $available_companies[1]; }
+  $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $companyID");
+  if($row = $result->fetch_assoc()){
+    $offset = $row['erp_'.strtolower($identifier)];
+    $offset--;
+    if($offset < 0) $offset = 0;
+  }
+  $vals = array($offset);
+
   //get all the little shits which contain my shit
   $result = $conn->query("SELECT id_number, history FROM proposals, clientData WHERE clientID = clientData.id AND companyID = $companyID AND (id_number LIKE '$identifier%' OR history LIKE '%$identifier%')");
-  $vals = array($offset);
   while($result && ($row = $result->fetch_assoc())){
     $history = explode(' ', $row['history']);
     $history[] = $row['id_number'];
@@ -145,11 +154,14 @@ function getNextERP($identifier, $companyID, $offset = 0){
 }
 
 function randomPassword($length = 8){
-  $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  $alphaLength = strlen($alphabet) - 1;
+  $pool = array('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '1234567890', '!@#$*+?');
+  shuffle($pool);
   $psw = array();
-  for ($i = 0; $i < $length; $i++) {
-    $psw[] = $alphabet[rand(0, $alphaLength)];
+  for($i = 0; $i < $length; $i++){
+    $psw[] = $pool[$i % 4][rand(0, strlen($pool[$i % 4]) -1)];
+    if($i > 3){
+      shuffle($pool);
+    }
   }
   return implode($psw);
 }

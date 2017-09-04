@@ -42,7 +42,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
         $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
       }
-      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
     } else { //update old
       $addBreakVal = floatval($_POST['addBreakValues']);
       if($addBreakVal){ //add a break
@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), status='$status' WHERE indexIM = $imm";
       }
       if($conn->query($sql)){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
       } else {
         echo mysqli_error($conn);
       }
@@ -121,10 +121,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       $chargedTimeStart= '0000-00-00 00:00:00';
       $chargedTimeFin = '0000-00-00 00:00:00';
-      if($_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
         $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
       }
-      if($_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
         $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
       }
       $new_text = test_input($_POST['editing_infoText_'.$x]);
@@ -611,7 +611,7 @@ if($filterings['user']):
                   }
                   echo '</div>';
                   echo '<div class="col-md-6">';
-                  echo '<label>'.$lang['LUNCHBREAK'].'</label>';
+                  echo '<label>'.$lang['LUNCHBREAK'].' ('.$lang['HOURS'].')</label>';
                   if(!$calculator->indecesIM[$i]){
                     echo '<input type="number" step="0.01" class="form-control" name="newBreakValues" value="0.0" style="width:100px" />';
                   } else {

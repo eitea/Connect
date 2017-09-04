@@ -33,7 +33,7 @@ if($result && ($row = $result->fetch_assoc())){
     } while($row = $result->fetch_assoc());
   }
 } else {
-  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+  $conn->error;
 }
 
 ?>

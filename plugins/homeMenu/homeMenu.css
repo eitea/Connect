@@ -66,6 +66,9 @@ ul.nav.navbar-nav .nav.nav-list {
 .panel-group .panel+.panel{
   margin-top:0px;
 }
+.clock-counter{
+  padding-left:25px;
+}
 
 /* RESPONSIVE SIDEMENU */
 #sidemenu.in,

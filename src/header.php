@@ -326,11 +326,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home" class="clock-counter"><br>
+              <form method='post' action="../user/home"><br>              
                 <?php
                 echo $checkInButton;
-                if($diff > 0)
+                if($diff > 0){
+                  echo '<div class="clock-counter" style="display:inline">';
                   echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
+                  echo '</div>';
+                }
                 ?>
               </form><br>
             </div>

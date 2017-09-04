@@ -3,13 +3,13 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register_basic.php' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
 </div>
 <?php
 $activeTab = 0;
 if(isset($_GET['ACT'])){$activeTab = $_GET['ACT']; }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1){
+  if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1 && $_POST['deactivate'] != $userID){
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
@@ -48,15 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql  = "DELETE FROM $userTable WHERE id = $x";
       if(!$conn->query($sql)){echo mysqli_error($conn);}
     }
+  } elseif(isset($_POST['deactivate'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ADMIN_DELETE'].'</div>';
   }
 
   if (isset($_POST['deleteUser'])) {
     $x = $_POST['deleteUser'];
-    if ($x != 1) {
-      $sql = "DELETE FROM $userTable WHERE id = $x;";
-      $conn->query($sql);
+    if ($x != 1 && $x != $userID)  {
+      $conn->query("DELETE FROM $userTable WHERE id = $x;");
     } else {
-      echo $lang['ADMIN_DELETE'] ."<br>";
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ADMIN_DELETE'].'</div>';
     }
   }
 
