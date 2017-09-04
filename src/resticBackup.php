@@ -182,7 +182,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         exec("$path init 2>&1",$output,$status);
         chdir(__DIR__);
     }
-    if(isset($_POST["backup"])){
+    if(isset($_POST["backup-database"])){
         $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
 
         $location = "s3:".$row["location"];
@@ -220,13 +220,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
         chdir(__DIR__);
     }
+    if(isset($_POST["backup-files"])){
+        $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
+
+        $location = "s3:".$row["location"];
+        $password = $row["password"];
+        $awskey = $row["awskey"];
+        $awssecret = $row["awssecret"];
+        $path = basename($row["path"]);
+
+        putenv("AWS_ACCESS_KEY_ID=$awskey");
+        putenv("AWS_SECRET_ACCESS_KEY=$awssecret");
+        putenv("RESTIC_REPOSITORY=$location");
+        putenv("RESTIC_PASSWORD=$password");
+        chdir($resticDir);
+        $connectFolder = dirname(__DIR__);
+        set_time_limit(600);
+        $connectFolder = escapeshellarg($connectFolder);
+        exec("$path backup $connectFolder 2>&1",$output,$status);
+        chdir(__DIR__);
+    }
     if(isset($_POST["restore"],$_POST["snapshot"])){
         $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
         $snapshot = $_POST["snapshot"] ?? "latest";
         $snapshot = preg_replace("[^A-Za-z0-9]", "", $snapshot);
         $snapshot = escapeshellarg($snapshot);
         if($_POST["snapshot"] != $snapshot){
-            echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>Filtered snapshot id not the same as posted</div>';
+            echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>Filtered snapshot id not the same as posted id</div>';
         }
 
         $location = "s3:".$row["location"];
@@ -245,7 +265,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             set_database("backup.sql");
             unlink("backup.sql");
         }else{ //Full backup
-            echo "full";
+            $connectFolder = dirname(__DIR__);
+            set_time_limit(600);
+            $connectFolder = escapeshellarg($connectFolder);
+            exec("$path restore $snapshot -t $connectFolder 2>&1",$output,$status);
         }
         chdir(__DIR__);
     }
@@ -335,7 +358,8 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
     <br><hr><br><div class="row"><h4 class="col-xs-12">Backup</h4></div>
     <div class="row">
         <div class="col-xs-12">
-            <button type="submit" class="btn btn-warning" name="backup" value="true">Backup</button>
+            <button type="submit" class="btn btn-warning" name="backup-database" value="true">Backup Database</button>
+            <button type="submit" class="btn btn-warning" name="backup-files" value="true">Backup Files(no Database)</button>
         </div>
     </div>
     <br><hr><br><div class="row"><h4 class="col-xs-12">Wiederherstellung</h4></div>
@@ -351,7 +375,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
                     if(in_array("database",$snapshot["tags"])){
                         $type = "Database Backup";
                     }else{
-                        $type = "Full Backup";
+                        $type = "File Backup";
                     }
                     $id = $snapshot["id"];
                     $date = $snapshot["time"];
