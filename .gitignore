@@ -5,3 +5,5 @@ aws
 images/ups/*
 !images/ups/.gitkeep
 .vscode
+cryptlog.txt
+plugins/restic/backup.sql

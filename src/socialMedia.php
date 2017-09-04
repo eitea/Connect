@@ -478,7 +478,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                                         <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
                                         <div class="checkbox">
                                             <?php 
-                                            $user_result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+                                            $user_result = $conn->query("SELECT id,firstname,lastname FROM UserData INNER JOIN roles ON roles.userID = UserData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
                                             
                                             while($row = $user_result->fetch_assoc()){
                                                 $name = "${row['firstname']} ${row['lastname']}";
@@ -537,7 +537,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
                     <div class="checkbox">
                         <?php 
-                        $result = $conn->query("SELECT id,firstname,lastname FROM userData INNER JOIN roles ON roles.userID = userData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+                        $result = $conn->query("SELECT id,firstname,lastname FROM UserData INNER JOIN roles ON roles.userID = UserData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
                         while($row = $result->fetch_assoc()){
                             $name = "${row['firstname']} ${row['lastname']}";
                             $x = $row["id"];
