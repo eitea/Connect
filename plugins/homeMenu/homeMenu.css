@@ -277,12 +277,6 @@ span.select2.select2-container.select2-container--default {
   display:inline;
   padding-left:15px;
 }
-.active-link{
-  color:#f0ad4e;
-}
-.active-link:hover{
-  color:white;
-}
 .badge.alert-badge{
   position:absolute;
   top:5px;
@@ -299,4 +293,10 @@ span.select2.select2-container.select2-container--default {
 .datetimepicker .active {
   background-color: #4b8df8!important;
   color:white!important;
+}
+.active-link{
+  color:#f0ad4e;
+}
+.active-link:hover{
+  color:white;
 }

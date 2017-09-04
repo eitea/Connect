@@ -46,7 +46,7 @@ class LogCalculator{
 
       $diff = timeDiff_Hours($i, $j);
       $this->vacationDays += ($iRow['vacPerYear']/365) * ($diff / 24);
-      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)){ //days
+      while(substr($i,0, 10) != substr($j,0,10) && substr($i,0, 4) <= substr($j,0, 4)){
         $expectedHours = $iRow[strtolower(date('D', strtotime($i)))];
         if(isHoliday($i)){
           $expectedHours = 0;
@@ -131,7 +131,7 @@ class LogCalculator{
             $this->absolvedHours += $mixed_absolvedHours;
             $this->breakCreditHours += $break_hours;
             break;
-            case 6: //ZA do nothin
+            case 6:
           } //END SWITCH
         } else {
           $this->expectedHours += $expectedHours;
@@ -151,8 +151,7 @@ class LogCalculator{
           $this->correctionHours += $monthly_corrections;
           $is_corrected = true;
         }
-
-        //EOM Calculations
+        //EOM
         if(substr($i, 0, 7) != substr(carryOverAdder_Hours($i, 24), 0, 7)){
           $this->saldo = $this->absolvedHours - $this->expectedHours - $this->breakCreditHours + $this->vacationHours + $this->educationHours + $this->specialLeaveHours + $this->sickHours + $this->correctionHours - $this->overTimeAdditive;
           if($this->saldo > 0){

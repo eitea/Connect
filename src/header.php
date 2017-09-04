@@ -38,7 +38,7 @@ if($result && $result->num_rows > 0){
 
 if($userID == 1){ //superuser
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'TRUE';
-  $canStamp = 'TRUE';
+  $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
 }
 
 $result = $conn->query("SELECT lastPswChange FROM UserData WHERE id = $userID");

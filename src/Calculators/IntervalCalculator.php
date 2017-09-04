@@ -56,7 +56,7 @@ class Interval_Calculator{
     }
 
     $count = $current_saldo_month = 0;
-    for($j = 0; $j < $this->days; $j++){ //for each day of the month
+    for($j = 0; $j < $this->days; $j++){
       $this->dayOfWeek[] = strtolower(date('D', strtotime($i)));
       $this->date[] = substr($i, 0, 10);
       //get the expectedHours
@@ -133,7 +133,7 @@ class Interval_Calculator{
         //clean values
         $this->monthly_saldo[] = $current_saldo_month;
         $this->overTimeLump_single[] = $interval_row['overTimeLump'];
-        //correctionHours
+
         $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $id AND cType = 'log' AND DATE(createdOn) >= DATE('".substr($i,0,7)."-01') AND DATE('$i') > DATE(createdOn)");
         $current_corrections = 0;
         while($result && ($row = $result->fetch_assoc())){
@@ -154,7 +154,6 @@ class Interval_Calculator{
     return $timeEnd - $timeBegin;
   }
 
-  //$a = timestamp in form of Y-m-d H:i:s, $b = amount of hours;
   private function carryOverAdder_Hours($a, $b) {
     if($a == '0000-00-00 00:00:00'){
       return $a;

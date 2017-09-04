@@ -67,6 +67,7 @@ if($error_output){
       <input type="file" name="fileToUpload" id="fileToUpload" />
       <br><br>
       <button class="btn btn-warning" type="submit" name="accept"><i class='fa fa-upload'></i> Upload</button>
+      <small>.sql Format</small>
     </div>
   </form>
 <?php else: ?>

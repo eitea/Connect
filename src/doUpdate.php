@@ -1394,6 +1394,8 @@ if($row['version'] < 96){
   $conn->query("UPDATE deactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE deactivatedUserData DROP COLUMN daysPerYear");
 }
+
+
 if ($row['version'] < 97) {
   if ($conn->query("ALTER TABLE roles ADD COLUMN canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'")) {
     echo '<br>Added role "canUseSocialMedia" with default "FALSE"';
@@ -1422,8 +1424,7 @@ if ($row['version'] < 97) {
     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )")) {
     echo '<br>Added table socialmessage';
-  }
-  else {
+  } else {
     echo '<br>' . $conn->error;
   }
   if ($conn->query("ALTER TABLE modules ADD COLUMN enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'")){
@@ -1439,8 +1440,7 @@ if ($row['version'] < 97) {
     admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )")) {
     echo '<br>Added table socialgroups';
-  }
-  else {
+  } else {
     echo '<br>' . $conn->error;
   }
   if ($conn->query("CREATE TABLE socialgroupmessages(
@@ -1452,18 +1452,19 @@ if ($row['version'] < 97) {
     seen TEXT
   )")) {
     echo '<br>Added table socialgroupmessages';
-  }
-  else {
+  } else {
     echo '<br>' . $conn->error;
   }
-  $result = $conn->query("SELECT * FROM userdata");
-  while ($row = $result->fetch_assoc()) {
+  $result = $conn->query("SELECT * FROM UserData");
+  while ($result && ($row = $result->fetch_assoc())) {
     $x = $row["id"];
     if(!$conn->query("INSERT INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-')")){
       echo '<br>' . $conn->error;
     }
   }
 }
+
+
 //if($row['version'] < 98){}
 //if($row['version'] < 99){}
 

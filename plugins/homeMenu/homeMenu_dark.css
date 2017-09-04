@@ -19,10 +19,7 @@
   background-color:#5f5f5f;
   color:#ddd;
 }
-.panel > .panel-heading a:link {
-  color: #ddd;
-}
-.sidebar-nav .navbar li a, .panel-borderless .panel-collapse .nav li a{
+.panel > .panel-heading a:link, .sidebar-nav .navbar li a, .panel-borderless .panel-collapse .nav li a, .navbar-default .navbar-link, .navbar-default .navbar-text, .navbar-default .navbar-nav>li>a{
   color: #ddd;
 }
 .sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
@@ -33,20 +30,18 @@
   color: white;
   background-color:transparent;
 }
-.clock-counter{
-  color:#ddd;
+.active-link{
+  color:#f0ad4e !important;
 }
+.active-link:hover{
+  color:white !important;
+}
+
 .navbar-default .navbar-brand{
   color:white;
 }
-.navbar-default .navbar-link, .navbar-default .navbar-text {
-  color: #ddd;
-}
 .navbar-default .navbar-link:hover{
   color: #f0ad4e;
-}
-.navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a{
-  color: #ddd;
 }
 
 .nav.navbar-nav .dropdown .dropdown-menu {
@@ -54,7 +49,7 @@
 }
 
 .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>li>a:hover{
-  color: #f0ad4e;
+  color: white;
   border-radius:6px;
 }
 
@@ -62,5 +57,5 @@
   background-color:#6d6d6d;
 }
 .clock-counter{
-  color:#DDD;
+  color:#ddd;
 }
