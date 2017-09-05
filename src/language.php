@@ -497,7 +497,7 @@ $lang_eng['INFO_HOLIDAY'] = 'National Holidays have to end with (§).';
 $lang_ger['INFO_HOLIDAY'] = 'Gesetzliche Feiertage müssen mit einem (§) Enden.';
 
 $lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
-                                        Autocorrecting them adds an complete lunchbreak in the middle of the day. (This break will be added)';
+                                        Autocorrecting them appends the rest of the lunchbreak to the end of the day. (This break will be added)';
 $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
                                         Die Korrektur trägt eine vollständige Mittagspause zur Mitte des Tages nach. (Diese Pause wird dazugerechnet)';
 

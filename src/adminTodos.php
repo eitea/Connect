@@ -10,13 +10,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
-      $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, indexIM, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
+      $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
       if($result && ($row = $result->fetch_assoc())){
-        //add a new break in the middle of the day, we don't care about overlappings
-        $break_begin = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
-        $break_end = carryOverAdder_Minutes($break_begin, $row['hoursOfRest'] * 60);
-        $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', ".$row['indexIM'].")");
-        echo mysqli_error($conn);
+
+        $result_book = $conn->query("SELECT end FROM projectBookingData WHERE timestampID = $indexIM ORDER BY start DESC");
+        if($result_book && ($row_book = $result_book->fetch_assoc())){
+          $row_break['breakCredit'] = 0;
+          $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = $indexIM");
+          if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
+          $missingBreak = intval($row['hoursOfRest'] * 60 - $row_break['breakCredit']);
+          if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) {echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].": $missingBreak $indexIM </div>"; break;}
+          $break_begin = $row_book['end'];
+          $break_end = carryOverAdder_Minutes($break_begin, $missingBreak);
+          $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', $indexIM)");
+          echo mysqli_error($conn);
+        } else {
+          $break_begin = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
+          $break_end = carryOverAdder_Minutes($break_begin, $row['hoursOfRest'] * 60);
+          $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', $indexIM)");
+          echo mysqli_error($conn);
+        }
       }
     }
   }
@@ -274,11 +287,13 @@ if($result && $result->num_rows > 0):
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
 
 <form method="POST">
-  <?php //select all timestamps that do not have enough break
-  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM $logTable l1
-  INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) AND
-  !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60)-1 AND timestampID = l1.indexIM AND bookingType = 'break')";
+  <?php
+  //select all timestamps that do not have enough break
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
+
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
   ?>

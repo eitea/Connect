@@ -68,9 +68,10 @@ if($isTimeAdmin){
   $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
   if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   //lunchbreaks
-  $result = $conn->query("SELECT indexIM FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-    WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
-    !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60)-1 AND timestampID = l1.indexIM AND bookingType = 'break')");
+  $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
     if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   }
   $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
@@ -165,14 +166,13 @@ if($isTimeAdmin){
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
-    <script src='plugins/select2/js/select2.js'></script>
+    <script src='plugins/select2/js/select2.min.js'></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
     <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
 
     <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
     <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
-    <script type="text/javascript" src="plugins/datetimepicker/js/locales/bootstrap-datetimepicker.fr.js" ></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
@@ -326,7 +326,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home"><br>              
+              <form method='post' action="../user/home"><br>
                 <?php
                 echo $checkInButton;
                 if($diff > 0){

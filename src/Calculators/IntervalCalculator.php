@@ -81,9 +81,9 @@ class Interval_Calculator{
         $this->indecesIM[] = $row['indexIM'];
         $this->absolvedTime[] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? timeDiff_Hours($row['time'], getCurrentTimestamp()) : timeDiff_Hours($row['time'], $row['timeEnd']);
         $break_hours = 0;
-        $result_break = $conn->query("SELECT TIMESTAMPDIFF(MINUTE, start, end) as breakCredit FROM projectBookingData where bookingType = 'break' AND timestampID = ".$row['indexIM']);
-        while($result_break && ($row_break = $result_break->fetch_assoc())) $break_hours += $row_break['breakCredit'] / 60;
-        $this->lunchTime[] = $break_hours;
+        $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = ".$row['indexIM']);
+        if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
+        $this->lunchTime[] = $row_break['breakCredit'] / 60;
       } else {
         $this->start[] = false;
         $this->end[] = false;

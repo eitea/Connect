@@ -66,6 +66,10 @@ function test_Date($date){
   return $dt && $dt->format("Y-m-d H:i:s") === $date;
 }
 
+function test_Time($time){
+  return preg_match("/^([01][0-9]|2[0-3]):([0-5][0-9])$/", $time);
+}
+
 //$hours is a float
 function displayAsHoursMins($hour){
   $hours = round($hour, 2); //i know params are passed by value if not specified otherwise, but still.. I got trust issues with this language

@@ -318,7 +318,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Server Address
           </span>
           <input type="text" class="form-control" name="serverName" value = "localhost" />
@@ -365,9 +365,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <br><hr><br>
 <?php else: ?>
   <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
-  <input type="hidden" name='mysqlUsername' value = 'connect'>
-  <input type="hidden" name='pass' value = 'Uforonudi499'>
-  <input type="hidden" name='dbName' value = 'connect'>
+  <input type="hidden" name='mysqlUsername' value = 'connect' />
+  <input type="hidden" name='pass' value = 'Uforonudi499' />
+  <input type="hidden" name='dbName' value = 'connect' />
 <?php endif; ?>
 
 <div class="container-fluid text-right">
