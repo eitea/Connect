@@ -368,7 +368,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
     <div class="row">
         <div class="col-xs-12">
             <button type="submit" class="btn btn-warning" name="backup-database" value="true">Backup Database</button>
-            <button type="submit" class="btn btn-warning" name="backup-files" value="true">Backup Files(no Database)</button>
+            <button type="submit" class="btn btn-warning" name="backup-files" value="true">Backup Files (no Database)</button>
         </div>
     </div>
     <br><hr><br><div class="row"><h4 class="col-xs-12">Wiederherstellung</h4></div>
@@ -377,14 +377,14 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
             <label>Snapshot:</label>
         </div>
         <div class="col-md-6">
-            <select class="btn-block js-example-basic-single" name="snapshot">
+            <select class="btn-block js-example-basic-single select2-file-database" name="snapshot">
                 <?php 
                 $snapshots = array_reverse(list_snapshots());
                 foreach($snapshots as $snapshot){
                     if(in_array("database",$snapshot["tags"])){
-                        $type = "Database Backup";
+                        $type = "database";
                     }else{
-                        $type = "File Backup";
+                        $type = "folder-open";
                     }
                     $id = $snapshot["id"];
                     $date = $snapshot["time"];
@@ -392,10 +392,26 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
                     $time = explode(".",$time)[0];
                     $date = explode("T",$date)[0];
                     
-                    echo "<option value='$id'>$type $date $time</option>";
+                    echo "<option data-icon='$type' value='$id'> $date $time</option>";
                 }
                 ?>
             </select>
+            <script>
+            function formatState (state) {
+                if (!state.id) { return state.text; }
+                var $state = $(
+                    '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+                );
+                return $state;
+            };
+            $(function(){
+                $(".select2-file-database").select2({
+                templateResult: formatState,
+                templateSelection: formatState
+                });
+            })      
+            
+            </script>
         </div>
         <div class="col-xs-12">
         <button type="submit" class="btn btn-warning" name="restore" value="true">Wiederherstellen</button>
