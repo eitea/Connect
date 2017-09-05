@@ -2,6 +2,8 @@
 
 <?php 
 $resticDir =dirname(__DIR__)."/plugins/restic/";
+$snapshots = array_reverse(list_snapshots());
+
 function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
     require 'connection_config.php';
@@ -86,6 +88,7 @@ function set_database($filename){
     } else {
         $error_output = mysqli_error($conn);
     }
+    fclose($file);
 }
 function check_repo(){
     global $conn, $resticDir;
@@ -237,17 +240,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $connectFolder = dirname(__DIR__);
         set_time_limit(600);
         $connectFolder = escapeshellarg($connectFolder);
-        exec("$path backup $connectFolder 2>&1",$output,$status);
+        exec("$path backup $connectFolder --tag files 2>&1",$output,$status);
         chdir(__DIR__);
     }
     if(isset($_POST["restore"],$_POST["snapshot"])){
         $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
-        $snapshot = $_POST["snapshot"] ?? "latest";
+        $snapshot = $_POST["snapshot"];
         $snapshot = preg_replace("[^A-Za-z0-9]", "", $snapshot);
-        $snapshot = escapeshellarg($snapshot);
-        if($_POST["snapshot"] != $snapshot){
-            echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>Filtered snapshot id not the same as posted id</div>';
-        }
 
         $location = "s3:".$row["location"];
         $password = $row["password"];
@@ -259,8 +258,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("AWS_SECRET_ACCESS_KEY=$awssecret");
         putenv("RESTIC_REPOSITORY=$location");
         putenv("RESTIC_PASSWORD=$password");
+
+        $tags = array();
+        global $snapshots;
+        foreach ($snapshots as $snapshotInfo) {
+            if($snapshotInfo["id"] == $snapshot){
+                $tags = $snapshotInfo["tags"];
+            }
+        }
+        $snapshot = escapeshellarg($snapshot);
+
         chdir($resticDir);
-        if(in_array("database",$snapshot["tags"])){ //Database backup
+        if(in_array("database",$tags)){ //Database backup
             exec("$path restore $snapshot -t . 2>&1",$output,$status);
             set_database("backup.sql");
             unlink("backup.sql");
@@ -268,7 +277,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $connectFolder = dirname(__DIR__);
             set_time_limit(600);
             $connectFolder = escapeshellarg($connectFolder);
-            exec("$path restore $snapshot -t $connectFolder 2>&1",$output,$status);
+            exec("$path restore -t $connectFolder $snapshot 2>&1",$output,$status);
         }
         chdir(__DIR__);
     }
@@ -369,8 +378,8 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
         </div>
         <div class="col-md-6">
             <select class="btn-block js-example-basic-single" name="snapshot">
-                <option selected value="latest">Letztes Backup</option>
-                <?php $snapshots = array_reverse(list_snapshots());
+                <?php 
+                $snapshots = array_reverse(list_snapshots());
                 foreach($snapshots as $snapshot){
                     if(in_array("database",$snapshot["tags"])){
                         $type = "Database Backup";
