@@ -37,9 +37,10 @@ if(isset($_POST['accept'])){
         $templine = '';
       }
     }
-    $conn->query("SET FOREIGN_KEY_CHECKS=1;");
     if(!mysqli_error($conn)){
-      redirect("../user/logout");
+      $conn->query("SET FOREIGN_KEY_CHECKS=1;");
+      //redirect("../user/logout");
+      die('<a href="..user/logout">Logout to finish the process</a>');
     } else {
       $error_output = mysqli_error($conn);
     }

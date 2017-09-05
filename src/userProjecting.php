@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     die("Bot detected. Aborting all Operations.");
   }
 
-  if(isset($_POST["add"]) && isset($_POST['end'])){
+  if(isset($_POST["add"]) && isset($_POST['end']) && test_Time($_POST['end']) && test_Time($_POST['start'])){
     $startDate = $date." ".$_POST['start'];
     $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
 

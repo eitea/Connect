@@ -55,34 +55,45 @@ $(document).ready(function () {
   window.onbeforeunload = unloadPage;
 });
 $(function () {
-  $('.datetimepicker').datetimepicker({
-    weekStart: 1,
-    todayBtn:  1,
-    autoclose: 1,
-    forceParse: 0,
-    startDate: '2000-01-01',
-    format: 'yyyy-mm-dd hh:ii'
+  //initalize them when the user needs them
+  $('.datetimepicker').click(function() {
+    $(this).datetimepicker({
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        forceParse: 0,
+        startDate: '2000-01-01',
+        format: 'yyyy-mm-dd hh:ii'
+      });
+      $(this).datetimepicker('show');
   });
-  $('.datepicker').datetimepicker({
-    weekStart: 1,
-    todayBtn:  1,
-    autoclose: 1,
-    minView: 2,
-    forceParse: 0,
-    startDate: '2000-01-01',
-    format: 'yyyy-mm-dd'
+  $('.datepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      minView: 2,
+      forceParse: 0,
+      startDate: '2000-01-01',
+      format: 'yyyy-mm-dd'
+    });
+      $(this).datetimepicker('show');
   });
-  $('.timepicker').datetimepicker({
-    weekStart: 1,
-    todayBtn:  1,
-    autoclose: 1,
-    todayHighlight: 1,
-    startView: 1,
-    minView: 0,
-    maxView: 1,
-    forceParse: 0,
-    format: 'hh:ii'
+  $('.timepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      todayHighlight: 1,
+      startView: 1,
+      minView: 0,
+      maxView: 1,
+      forceParse: 0,
+      format: 'hh:ii'
+    });
+      $(this).datetimepicker('show');
   });
+
 });
 </script>
 
