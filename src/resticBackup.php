@@ -405,7 +405,7 @@ $validSymbol = $repositoryValid ? "<i class='fa fa-check text-success' title='GÃ
     <div class="<?php echo !$status ? 'has-success' : 'has-error'; ?>">
         <?php if($output ?? false): ?>
         <label for="output">Restic Ausgabe:</label>
-        <textarea class="form-control" readonly rows="<?php echo sizeof($output); ?>" id="output"><?php foreach ($output as $num => $row) {echo "$row"; if(sizeof($output)-1!=$num) echo "\n";}?></textarea>
+        <textarea class="form-control" readonly rows="<?php echo sizeof($output)<10?sizeof($output):10; ?>" id="output"><?php foreach ($output as $num => $row) {echo "$row"; if(sizeof($output)-1!=$num) echo "\n";}?></textarea>
         <?php endif; ?>
     </div>
   </div>
