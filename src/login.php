@@ -17,8 +17,14 @@ include __DIR__ .'/version_number.php';
 require __DIR__ .'/encryption_functions.php';
 
 $invalidLogin = "";
-$masterpw = $conn->query("SELECT masterPassword FROM $configTable")->fetch_assoc()["masterPassword"];
-$masterpwset = strlen($masterpw) != 0;
+$masterpw_result = $conn->query("SELECT masterPassword FROM $configTable");
+$masterpw = false;
+$masterpwset = false;
+if($masterpw_result){
+  $masterpw = $masterpw_result->fetch_assoc()["masterPassword"];
+  $masterpwset = strlen($masterpw) != 0;
+}
+
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton']) && (!empty($_POST['masterpassword']) || !$masterpwset)) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);

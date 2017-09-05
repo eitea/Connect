@@ -101,7 +101,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query($sql);
 
       //insert configs
-      $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
+      $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
       $conn->query($sql);
       //insert ldap config
       $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
