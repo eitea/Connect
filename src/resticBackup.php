@@ -2,7 +2,7 @@
 
 <?php 
 $resticDir =dirname(__DIR__)."/plugins/restic/";
-$snapshots = array_reverse(list_snapshots());
+$snapshots = array_reverse(list_snapshots()??array());
 
 function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
