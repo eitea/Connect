@@ -20,8 +20,8 @@ function displaySuccess(string $msg = "")
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
     // picture upload
     if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-        require __DIR__ . "/utilities.php";
-        $pp = uploadFile("profilePictureUpload", 1, 1);
+        require_once __DIR__ . "/utilities.php";
+        $pp = uploadFile("profilePictureUpload", 1, 1, 1);
         if (!is_array($pp)) {
             $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
             echo $conn->error;
