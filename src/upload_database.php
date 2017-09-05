@@ -22,7 +22,9 @@ if(isset($_POST['accept'])){
     }
     $conn->close();
     $conn = new mysqli($servername, $username, $password, $dbName);
-
+    $conn->query("SET NAMES 'utf8';");
+    $conn->query("SET CHARACTER SET 'utf8';");
+    
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){

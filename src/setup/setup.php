@@ -145,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $name = test_input($data[1]);
                 $dayPay = floatval($data[2]);
                 $nightPay = floatval($data[3]);
-                $sql = "INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
+                $conn->query("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay')");
                 $thisLineIsNotOK = false;
               } elseif(count($data) > 4) {
                 $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
