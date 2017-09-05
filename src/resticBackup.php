@@ -274,7 +274,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             set_database("backup.sql");
             unlink("backup.sql");
         }else{ //Full backup
-            $connectFolder = dirname(__DIR__);
+            $connectFolder = dirname(dirname(__DIR__));
             set_time_limit(600);
             $connectFolder = escapeshellarg($connectFolder);
             exec("$path restore -t $connectFolder $snapshot 2>&1",$output,$status);
