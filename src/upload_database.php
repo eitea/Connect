@@ -28,21 +28,24 @@ if(isset($_POST['accept'])){
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){
-      $line = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
-      //$line = utf8_decode($line);
+
+
+      $conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
+      if($conv) $line = $conv;
+      
       //Skip comments
       if (substr($line, 0, 2) == '--' || $line == '') continue;
 
       $templine .= $line;
       //semicolon at the end = end of the query
       if(substr(trim($line), -1, 1) == ';'){
-        $conn->query($templine) or print(mysqli_error($conn));
+        $conn->query($templine) or print($conn->error);
         $templine = '';
       }
     }
     if(!mysqli_error($conn)){
       $conn->query("SET FOREIGN_KEY_CHECKS=1;");
-      redirect("../user/logout");
+      //redirect("../user/logout");
     } else {
       $error_output = mysqli_error($conn);
     }

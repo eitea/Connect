@@ -1534,7 +1534,7 @@ if($row['version'] < 100){
   if($conn->error){
     echo $conn->error;
   } else {
-    echo 'Repaired Wrong Charactersets';
+    echo '<br>Repaired Wrong Charactersets';
   }
 
 }
