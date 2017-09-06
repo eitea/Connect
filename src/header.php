@@ -174,18 +174,12 @@ if($isTimeAdmin){
 
     <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
     <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
+    <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
-    document.onreadystatechange = function() {
-      var state = document.readyState
-      if(state == 'complete') {
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("bodyContent").style.display = "block";
-      }
-    }
     $(document).ready(function() {
       if($(".js-example-basic-single")[0]){
         $(".js-example-basic-single").select2();
@@ -559,7 +553,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><span><?php echo $lang['PROJECT_BOOKINGS']; ?></span></a></li>
-                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['VIEW_PROJECTS']; ?></span></a></li>
+                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
               </ul>
             </div>
           </div>

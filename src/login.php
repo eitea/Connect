@@ -58,7 +58,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
   } else {
     if($masterpwset){
       $invalidLogin = "Invalid Username/Password/Master Key";
-    }else{
+    } else {
       $invalidLogin = "Invalid Username/ Password!";
     }
   }

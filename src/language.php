@@ -53,8 +53,8 @@ $lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';
 
-$lang_eng['ADMIN_PROJECT_OPTIONS'] = 'Project Bookings';
-$lang_ger['ADMIN_PROJECT_OPTIONS'] = 'Projektbuchungen';
+$lang_eng['ADMIN_PROJECT_OPTIONS'] = 'Projects';
+$lang_ger['ADMIN_PROJECT_OPTIONS'] = 'Projekte';
 
 $lang_eng['ADMIN_TIME_OPTIONS'] = 'Time Records';
 $lang_ger['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
@@ -869,7 +869,6 @@ $lang_ger['SICK_LEAVE'] = 'Krankenstand';
 $lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
 $lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
 
-/*------------------Social Media------------------*/
 $lang_eng['SOCIAL_MENU_ITEM'] = 'Social Media';
 $lang_ger['SOCIAL_MENU_ITEM'] = 'Soziale Medien';
 
@@ -926,13 +925,15 @@ $lang_ger['SOCIAL_EDIT_GROUP'] = 'Gruppe bearbeiten';
 
 $lang_eng['SOCIAL_NO_GROUPS'] = 'You are not member in any group';
 $lang_ger['SOCIAL_NO_GROUPS'] = 'Sie gehören keinen Gruppen an';
-/*------------------End Social Media------------------*/
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
 $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
+
+$lang_eng['STATIC_PROJECTS'] = 'Static Projects';
+$lang_ger['STATIC_PROJECTS'] = 'Statische Projekte';
 
 $lang_eng['STREET'] = 'Street';
 $lang_ger['STREET'] ='Straße';
