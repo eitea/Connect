@@ -2,7 +2,6 @@
 
 <?php 
 $resticDir =dirname(__DIR__)."/plugins/restic/";
-$snapshots = array_reverse(list_snapshots()??array());
 $exec_modifier = ""; //modifier to execute file in current directory
 if(stripos(php_uname("s"),"Windows") === false){
     $exec_modifier = "./";
@@ -138,7 +137,7 @@ function list_snapshots(){
     $snapshot_output = json_decode($str,true);
     return $snapshot_output;
 }
-
+$snapshots = array_reverse(list_snapshots()??array());
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST["path"])){
