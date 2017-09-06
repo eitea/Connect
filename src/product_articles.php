@@ -18,7 +18,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_unit = test_input($_POST['add_product_unit']);
     $product_is_cash = empty($_POST['add_product_as_bar']) ? 'FALSE' : 'TRUE';
     $product_purchase = floatval($_POST['add_product_purchase']);
-    $conn->query("INSERT INTO articles (name, description, price, unit, taxPercentage, cash, purchase) VALUES('$product_name', '$product_description', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase')");
+    $mc = mc();
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $conn->query("INSERT INTO articles (name, description, price, unit, taxPercentage, cash, purchase, iv, iv2) VALUES('".$mc->encrypt($product_name)."', '".$mc->encrypt($product_description)."', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase', '$iv', '$iv2')");
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
@@ -50,9 +53,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <?php
       $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE taxPercentage = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
+        $mc = mc($row['iv'],$row['iv2']);
         echo '<tr>';
-        echo '<td>'.$row['name'].'</td>';
-        echo '<td>'.$row['description'].'</td>';
+        echo '<td>'.mc_status().$mc->decrypt($row['name']).'</td>';
+        echo '<td>'.mc_status().$mc->decrypt($row['description']).'</td>';
         echo '<td>'.$row['price'].'</td>';
         echo '<td>'.$row['purchase'].'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
@@ -75,10 +79,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
       </div>
       <div class="modal-body">
-        <label>Name</label>
+        <label>Name<?php echo mc_status(); ?></label>
         <input type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
         <br>
-        <label><?php echo $lang['DESCRIPTION']; ?></label>
+        <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
         <input type="text" class="form-control" name="add_product_description" placeholder="<?php echo $lang['DESCRIPTION']; ?>" maxlength="190"/>
         <br>
         <div class="row">

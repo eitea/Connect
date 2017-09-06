@@ -18,8 +18,8 @@ function displaySuccess($msg = ""){
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
     // picture upload
     if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-        require __DIR__ . "/utilities.php";
-        $pp = uploadFile("profilePictureUpload", 1, 1);
+        require_once __DIR__ . "/utilities.php";
+        $pp = uploadFile("profilePictureUpload", 1, 1, 1);
         if (!is_array($pp)) {
             $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
             echo $conn->error;
@@ -189,7 +189,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
         <tbody>
             <?php
             $today = substr(getCurrentTimestamp(), 0, 10);
-            $sql = "SELECT * FROM socialprofile INNER JOIN UserData ON UserData.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' ORDER BY isAvailable ASC";
+            $sql = "SELECT * FROM socialprofile INNER JOIN UserData ON UserData.id = socialprofile.userID INNER JOIN roles ON roles.userID = socialprofile.userID WHERE canUseSocialMedia = 'TRUE' GROUP BY UserData.id ORDER BY isAvailable ASC";
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {

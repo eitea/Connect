@@ -166,7 +166,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 }
 
 
-function uploadFile($file_field = null, $check_image = true) { //should be named uploadImage
+function uploadFile($file_field = null, $check_image = true,$crop_square = false,$resize = false) { //should be named uploadImage
   //bytes
   $max_size = 5000000;
   //whitelist
@@ -211,6 +211,28 @@ function uploadFile($file_field = null, $check_image = true) { //should be named
     //remove interlacing bit
     $im = file_get_contents($_FILES[$file_field]['tmp_name']);
     $im = imagecreatefromstring($im);
+    if(!$im){
+      return file_get_contents($_FILES[$file_field]['tmp_name']);
+    }
+    if($crop_square){
+      $size = min(imagesx($im), imagesy($im));
+      $middlex = imagesx($im)/2;
+      $middley = imagesy($im)/2;
+      $im = imagecrop($im, ['x' => floor($middlex-($size/2)), 'y' => floor($middley-($size/2)), 'width' => $size, 'height' => $size]);
+    }
+    if($resize){
+      $aspect_ratio = imagesx($im) / imagesy($im);
+      if($aspect_ratio>1){
+        $y = 300;
+        $x = 300*$aspect_ratio;
+      }else{
+        $x = 300;
+        $y = 300* (imagesy($im) / imagesx($im));
+      }
+      $im2 = imagecreatetruecolor($x,$y);
+      imagecopyresized($im2,$im,0,0,0,0,$x,$y,imagesx($im),imagesy($im));
+      $im = $im2;
+    }
     imageinterlace($im, 0);
     if($_FILES[$file_field]["type"] == $whitelist_type[0] || $_FILES[$file_field]["type"] == $whitelist_type[1]){
       imagejpeg($im, $_FILES[$file_field]['tmp_name']);

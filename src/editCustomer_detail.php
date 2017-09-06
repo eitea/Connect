@@ -195,18 +195,13 @@ if(!empty($_POST['saveAll'])){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
     $activeTab = 'banking';
-    $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
-    $keyValue = bin2hex($keyValue);
-
+    $mc = mc();
     $bankName = test_input($_POST['bankName']);
-    $ibanVal = mc_encrypt(test_input($_POST['iban']), $keyValue);
-    $bicVal = mc_encrypt(test_input($_POST['bic']), $keyValue);
-
-    $ivValue = openssl_random_pseudo_bytes(8);
-    $ivValue = bin2hex($ivValue);
-
-    $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $_SESSION['unlock'], 0, $ivValue); //doesnt really need an iv value
-    $conn->query("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES ('$bankName', '$ibanVal', '$bicVal', '$keyValue', '$ivValue', $detailID)");
+    $ibanVal = $mc->encrypt(test_input($_POST['iban']));
+    $bicVal = $mc->encrypt(test_input($_POST['bic']));
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $conn->query("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES ('$bankName', '$ibanVal', '$bicVal', '$iv', '$iv2', $detailID)");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
   } elseif(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){
     $activeTab = 'banking';
@@ -513,12 +508,12 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             echo '<tr>';
             echo '<td>' . $rowBank['bankName'] . '</td>';
             if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
-              $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $_SESSION['unlock'], 0, $rowBank['iv2']);
-              echo '<td>'.mc_decrypt($rowBank['iban'], $keyValue). '</td>';
-              echo '<td>'.mc_decrypt($rowBank['bic'], $keyValue). '</td>';
+              $mc = mc($rowBank["iv"],$rowBank["iv2"]);
+              echo '<td>'.mc_status().$mc->decrypt($rowBank['iban']). '</td>';
+              echo '<td>'.mc_status().$mc->decrypt($rowBank['bic']). '</td>';
             } else { // **** it.
-              echo '<td>**** **** **** ****</td>';
-              echo '<td>******** ***</td>';
+              echo '<td>'.mc_status().'**** **** **** ****</td>';
+              echo '<td>'.mc_status().'******** ***</td>';
             }
             echo '</tr>';
           }

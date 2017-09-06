@@ -1456,13 +1456,12 @@ if ($row['version'] < 97) {
   }
 }
 
-if($row['version'] < 98){
+if($row['version'] < 99){
   $conn->query("ALTER TABLE DeactivatedUserData ADD COLUMN vacPerYear INT(2)");
   $conn->query("UPDATE DeactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE DeactivatedUserData DROP COLUMN daysPerYear");
-}
 
-if($row['version'] < 99){
+  
   //step1: delete all autocorrections
   $conn->query("DELETE FROM projectBookingData WHERE infoText = 'Admin Autocorrected Lunchbreak'");
 
@@ -1536,6 +1535,28 @@ if($row['version'] < 100){
     echo $conn->error;
   } else {
     echo 'Repaired Wrong Charactersets';
+  }
+
+
+  if($row['version'] < 101){
+    $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
+    $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
+    $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)"); //50 -> 255
+    $conn->query("ALTER TABLE articles CHANGE description description VARCHAR(1200)"); //600 -> 1200
+    $conn->query("ALTER TABLE products ADD COLUMN iv VARCHAR(255)");
+    $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
+    $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
+    $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
+    $conn->query("UPDATE configurationData set masterPassword = ''");
+  
+    $conn->query("CREATE TABLE resticconfiguration(
+      path VARCHAR(255),
+      password VARCHAR(255),
+      awskey VARCHAR(255),
+      awssecret VARCHAR(255),
+      location VARCHAR(255)
+    )");
+    $conn->query("INSERT INTO resticconfiguration () VALUES ()");
   }
 
 }

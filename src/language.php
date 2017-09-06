@@ -314,6 +314,18 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 
+$lang_eng['ENCRYPTION_ACTIVE'] = 'Encryption active';
+$lang_ger['ENCRYPTION_ACTIVE'] = 'Verschlüsselung aktiviert';
+
+$lang_eng['ENCRYPTION_DEACTIVATE'] = 'Deactivate Encryption';
+$lang_ger['ENCRYPTION_DEACTIVATE'] = 'Verschlüsselung deaktivieren';
+
+$lang_eng['ENCRYPTION_DEACTIVATED'] = 'Encryption deactivated';
+$lang_ger['ENCRYPTION_DEACTIVATED'] = 'Verschlüsselung deaktiviert';
+
+$lang_eng['ENCRYPTION_LOG'] = 'View Events';
+$lang_ger['ENCRYPTION_LOG'] = 'Ereignisse anzeigen';
+
 $lang_eng['END'] = 'End';
 $lang_ger['END'] = 'Ende';
 
@@ -554,6 +566,18 @@ $lang_ger['MARK_AS_ABSENT'] = 'Als Abwesend eintragen';
 $lang_eng['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
 $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
 
+$lang_eng['MASTER_PASSWORD'] = 'Master Password';
+$lang_ger['MASTER_PASSWORD'] = 'Master Passwort';
+
+$lang_eng['MASTER_PASSWORD_CURRENT'] = 'Current Password';
+$lang_ger['MASTER_PASSWORD_CURRENT'] = 'Aktuelles Passwort';
+
+$lang_eng['MASTER_PASSWORD_CONFIRM'] = 'Confirm Password';
+$lang_ger['MASTER_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
+
+$lang_eng['MASTER_PASSWORD_NEW'] = 'New Password';
+$lang_ger['MASTER_PASSWORD_NEW'] = 'Neues Passwort';
+
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
 $lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur die Anfrage, NICHT die eigentlichen Stunden!';
 
@@ -673,6 +697,12 @@ $lang_ger['PASSWORD'] = 'Passwort';
 
 $lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
 $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
+
+$lang_eng['PASSWORD_REMOVE_PROMPT'] = 'Do you really want to delete the master password? This may take a while. \nDO NOT INTERRUPT!';
+$lang_ger['PASSWORD_REMOVE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort löschen? Das könnte eine Weile dauern. \nBITTE NICHT UNTERBRECHEN!';
+
+$lang_eng['PASSWORD_CHANGE_PROMPT'] = 'Do you really want to change the master password? \nDO NOT INTERRUPT!';
+$lang_ger['PASSWORD_CHANGE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort ändern? \nBITTE NICHT UNTERBRECHEN!';
 
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';
@@ -840,7 +870,6 @@ $lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
 $lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
 
 /*------------------Social Media------------------*/
-
 $lang_eng['SOCIAL_MENU_ITEM'] = 'Social Media';
 $lang_ger['SOCIAL_MENU_ITEM'] = 'Soziale Medien';
 

@@ -15,10 +15,10 @@ if (isset($_GET["partner"], $_GET["message"]) && !empty($_SESSION["userid"])) {
     $conn->query("INSERT INTO socialgroupmessages (userID, groupID, message, seen) VALUES ($userID, $group, '$message', '$userID')");
     echo $conn->error;
 }else if (isset($_REQUEST["partner"],$_FILES["picture"]) && !empty($_SESSION["userid"])){
-    require __DIR__ . "/../utilities.php";
+    require_once __DIR__ . "/../utilities.php";
     $partner = intval($_REQUEST["partner"]);
     $userID = $_SESSION["userid"];
-    $picture = uploadFile("picture", 1, 1);
+    $picture = uploadFile("picture", 1, 0, 1);
     require dirname(__DIR__) . "/connection.php";
     $stmt = $conn->prepare("INSERT INTO socialmessages (userID, partner, picture) VALUES ($userID, $partner, ?)");
     echo $conn->error;
@@ -28,10 +28,10 @@ if (isset($_GET["partner"], $_GET["message"]) && !empty($_SESSION["userid"])) {
     $stmt->execute();
     echo $stmt->error;
 }else if (isset($_REQUEST["group"],$_FILES["picture"]) && !empty($_SESSION["userid"])){
-    require __DIR__ . "/../utilities.php";
+    require_once __DIR__ . "/../utilities.php";
     $group = intval($_REQUEST["group"]);
     $userID = $_SESSION["userid"];
-    $picture = uploadFile("picture", 1, 1);
+    $picture = uploadFile("picture", 1, 0, 1);
     require dirname(__DIR__) . "/connection.php";
     $stmt = $conn->prepare("INSERT INTO socialgroupmessages (userID, groupID, picture, seen) VALUES ($userID, $group, ?, '$userID')");
     echo $conn->error;
