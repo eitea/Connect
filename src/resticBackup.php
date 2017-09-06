@@ -204,7 +204,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_PASSWORD=$password");
 
         chdir($resticDir);
-        $cmd = "$path backup --stdin --stdin-filename backup.sql --tag database 2>&1";
+        $cmd = "${exec_modifier}$path backup --stdin --stdin-filename backup.sql --tag database 2>&1";
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
