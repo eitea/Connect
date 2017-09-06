@@ -1461,7 +1461,7 @@ if($row['version'] < 99){
   $conn->query("UPDATE DeactivatedUserData SET vacPerYear = daysPerYear");
   $conn->query("ALTER TABLE DeactivatedUserData DROP COLUMN daysPerYear");
 
-  
+
   //step1: delete all autocorrections
   $conn->query("DELETE FROM projectBookingData WHERE infoText = 'Admin Autocorrected Lunchbreak'");
 
@@ -1537,6 +1537,7 @@ if($row['version'] < 100){
     echo 'Repaired Wrong Charactersets';
   }
 
+}
 
   if($row['version'] < 101){
     $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
@@ -1559,7 +1560,6 @@ if($row['version'] < 100){
     $conn->query("INSERT INTO resticconfiguration () VALUES ()");
   }
 
-}
 
 
 //------------------------------------------------------------------------------

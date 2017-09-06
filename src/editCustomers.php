@@ -44,7 +44,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   $result = $conn->query($query);
   if($result && $result->num_rows > 0):
     ?>
-    <table id="clientTable" class="table table-hover">
+    <table class="table table-hover">
       <thead>
         <th><?php echo $lang['DELETE']; ?></th>
         <th><?php echo $lang['COMPANY']; ?></th>
@@ -70,7 +70,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         ?>
       </tbody>
     </table>
-  <?php endif; ?>
+  <?php endif; echo $conn->error; ?>
 </form>
 
 <?php $result->data_seek(0); while ($row = $result->fetch_assoc()): ?>
@@ -109,7 +109,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php endwhile; ?>
 
 <script>
-$(document).ready(function() {
   $('.table').DataTable({
     autoWidth: false,
     order: [[ 2, "asc" ]],
@@ -120,7 +119,7 @@ $(document).ready(function() {
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     }
   });
-});
 </script>
+
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
