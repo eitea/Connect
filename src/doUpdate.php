@@ -1468,7 +1468,7 @@ if($row['version'] < 99){
 
   $sql = "SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
   INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
   AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
   $result = $conn->query($sql);
   while($result && ($row = $result->fetch_assoc())){
@@ -1480,7 +1480,7 @@ if($row['version'] < 99){
       $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = $indexIM");
       if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
       $missingBreak = intval($row['hoursOfRest'] * 60 - $row_break['breakCredit']);
-      if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) {echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].": $missingBreak $indexIM </div>"; break;}
+      if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) { echo $missingBreak .' '.$indexIM; }
       $break_begin = $row_book['end'];
       $break_end = carryOverAdder_Minutes($break_begin, $missingBreak);
       $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', $indexIM)");
@@ -1492,7 +1492,52 @@ if($row['version'] < 99){
       echo mysqli_error($conn);
     }
   }
-  
+}
+
+if($row['version'] < 100){
+  //worst case scenario update: its not a wrong charset. its replaced special characters.
+  //fix holidays
+  $conn->query("DELETE FROM holidays");
+
+  function icsToArray($paramUrl) {
+    $icsFile = file_get_contents($paramUrl);
+    $icsData = explode("BEGIN:", $icsFile);
+    foreach ($icsData as $key => $value) {
+      $icsDatesMeta[$key] = explode("\n", $value);
+    }
+    foreach ($icsDatesMeta as $key => $value) {
+      foreach ($value as $subKey => $subValue) {
+        if ($subValue != "") {
+          if ($key != 0 && $subKey == 0) {
+            $icsDates[$key]["BEGIN"] = $subValue;
+          } else {
+            $subValueArr = explode(":", $subValue, 2);
+            $icsDates[$key][$subValueArr[0]] = $subValueArr[1];
+          }
+        }
+      }
+    }
+    return $icsDates;
+  }
+
+  $holidayFile = __DIR__ . '/setup/Feiertage.txt';
+  $holidayFile = icsToArray($holidayFile);
+  for($i = 1; $i < count($holidayFile); $i++){
+    if(trim($holidayFile[$i]['BEGIN']) == "VEVENT"){
+      $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
+      $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
+      $n = $holidayFile[$i]['SUMMARY'];
+      $conn->query("INSERT INTO holidays(begin, end, name) VALUES ('$start', '$end', '$n');");
+      echo $conn->error;
+    }
+  }
+
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo 'Repaired Wrong Charactersets';
+  }
+
 }
 
 
@@ -1501,11 +1546,12 @@ require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
 ?>
-<script type="text/javascript">
+<!--script type="text/javascript">
   window.setInterval(function(){
     window.location.href="../user/home";
   }, 6000);
-</script>
+</script-->
+
 <noscript>
   <meta http-equiv="refresh" content="0;url='.$url.'" />';
 </noscript>

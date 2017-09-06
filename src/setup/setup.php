@@ -116,7 +116,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $holidayFile = __DIR__ . '/Feiertage.txt';
       $holidayFile = icsToArray($holidayFile);
       for($i = 1; $i < count($holidayFile); $i++){
-        if($holidayFile[$i]['BEGIN'] == 'VEVENT'){
+        if(trim($holidayFile[$i]['BEGIN']) == 'VEVENT'){
           $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
           $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
           $n = $holidayFile[$i]['SUMMARY'];
