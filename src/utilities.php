@@ -211,6 +211,9 @@ function uploadFile($file_field = null, $check_image = true,$crop_square = false
     //remove interlacing bit
     $im = file_get_contents($_FILES[$file_field]['tmp_name']);
     $im = imagecreatefromstring($im);
+    if(!$im){
+      return file_get_contents($_FILES[$file_field]['tmp_name']);
+    }
     if($crop_square){
       $size = min(imagesx($im), imagesy($im));
       $middlex = imagesx($im)/2;
