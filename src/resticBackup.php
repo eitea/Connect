@@ -3,7 +3,10 @@
 <?php 
 $resticDir =dirname(__DIR__)."/plugins/restic/";
 $snapshots = array_reverse(list_snapshots()??array());
-
+$exec_modifier = ""; //modifier to execute file in current directory
+if(stripos(php_uname("s"),"Windows") === false){
+    $exec_modifier = "./";
+}
 function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
     require 'connection_config.php';
@@ -91,7 +94,7 @@ function set_database($filename){
     fclose($file);
 }
 function check_repo(){
-    global $conn, $resticDir;
+    global $conn, $resticDir, $exec_modifier;
     $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
 
     $location = "s3:".$row["location"];
@@ -106,12 +109,12 @@ function check_repo(){
     putenv("RESTIC_PASSWORD=$password");
     chdir($resticDir);
     $check_status = 1;
-    exec("$path check 2>&1",$check_output,$check_status);
+    exec("${exec_modifier}$path check 2>&1",$check_output,$check_status);
     chdir(__DIR__);
     return $check_status == 0 && count($check_output)>0;
 }
 function list_snapshots(){
-    global $conn,$resticDir;
+    global $conn,$resticDir, $exec_modifier;
     $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
     
     $location = "s3:".$row["location"];
@@ -126,7 +129,7 @@ function list_snapshots(){
     putenv("RESTIC_PASSWORD=$password");
 
     chdir($resticDir);
-    exec("$path snapshots --json",$snapshot_output,$snapshot_status);
+    exec("${exec_modifier}$path snapshots --json",$snapshot_output,$snapshot_status);
     chdir(__DIR__);
     $str = "";
     foreach ($snapshot_output as $line) {
@@ -182,7 +185,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_REPOSITORY=$location");
         putenv("RESTIC_PASSWORD=$password");
         chdir($resticDir);
-        exec("$path init 2>&1",$output,$status);
+        exec("chmod 777 $path");
+        exec("${exec_modifier}$path init 2>&1",$output,$status);
         chdir(__DIR__);
     }
     if(isset($_POST["backup-database"])){
@@ -240,7 +244,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $connectFolder = dirname(__DIR__);
         set_time_limit(600);
         $connectFolder = escapeshellarg($connectFolder);
-        exec("$path backup $connectFolder --tag files 2>&1",$output,$status);
+        exec("${exec_modifier}$path backup $connectFolder --tag files 2>&1",$output,$status);
         chdir(__DIR__);
     }
     if(isset($_POST["restore"],$_POST["snapshot"])){
@@ -270,14 +274,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         chdir($resticDir);
         if(in_array("database",$tags)){ //Database backup
-            exec("$path restore $snapshot -t . 2>&1",$output,$status);
+            exec("${exec_modifier}$path restore $snapshot -t . 2>&1",$output,$status);
             set_database("backup.sql");
             unlink("backup.sql");
         }else{ //Full backup
             $connectFolder = dirname(dirname(__DIR__));
             set_time_limit(600);
             $connectFolder = escapeshellarg($connectFolder);
-            exec("$path restore -t $connectFolder $snapshot 2>&1",$output,$status);
+            exec("${exec_modifier}$path restore -t $connectFolder $snapshot 2>&1",$output,$status);
         }
         chdir(__DIR__);
     }
