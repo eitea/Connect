@@ -4,6 +4,8 @@ if(empty($_SESSION['userid'])){
   die('Please <a href="../login/auth">login</a> first.');
 }
 
+error_reporting(E_ALL);
+
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $setActiveLink = 'class="active-link"';
