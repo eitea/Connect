@@ -264,7 +264,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         putenv("RESTIC_PASSWORD=$password");
 
         $tags = array();
-        global $snapshots;
         foreach ($snapshots as $snapshotInfo) {
             if($snapshotInfo["id"] == $snapshot){
                 $tags = $snapshotInfo["tags"];
@@ -273,23 +272,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $snapshot = escapeshellarg($snapshot);
 
         chdir($resticDir);
-        var_dump($tags);
         if(in_array("database",$tags)){ //Database backup
             exec("${exec_modifier}$path restore $snapshot -t . 2>&1",$output,$status);
             if(stripos(php_uname("s"),"Windows") === false){
                 exec("chmod 777 backup.sql");
             }
-            var_dump($tags);
-            echo getcwd();
-            die("DEBUG");
             set_database("backup.sql");
             unlink("backup.sql");
             redirect("../user/logout");
-        }else{ //Full backup
+        }else if(in_array("files",$tags)){ //Full backup
             $connectFolder = dirname(dirname(__DIR__));
             set_time_limit(600);
             $connectFolder = escapeshellarg($connectFolder);
             exec("${exec_modifier}$path restore -t $connectFolder $snapshot 2>&1",$output,$status);
+        }else{
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . "No matching tag found" . '</div>';
         }
         chdir(__DIR__);
     }
