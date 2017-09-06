@@ -275,6 +275,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         chdir($resticDir);
         if(in_array("database",$tags)){ //Database backup
             exec("${exec_modifier}$path restore $snapshot -t . 2>&1",$output,$status);
+            if(stripos(php_uname("s"),"Windows") === false){
+                exec("chmod 777 backup.sql");
+            }
             set_database("backup.sql");
             unlink("backup.sql");
         }else{ //Full backup
