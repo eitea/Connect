@@ -1567,11 +1567,11 @@ require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
 ?>
-<!--script type="text/javascript">
+<script type="text/javascript">
   window.setInterval(function(){
     window.location.href="../user/home";
   }, 6000);
-</script-->
+</script>
 
 <noscript>
   <meta http-equiv="refresh" content="0;url='.$url.'" />';
