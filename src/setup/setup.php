@@ -33,6 +33,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //establish connection
       if(!($conn = new mysqli($servername, $username, $password))){
         echo $conn->connect_error;
+        unlink(dirname(__DIR__) .'/connection_config.php');
         die("<br>Connection Error: Could not Connect.<br>");
       }
 
@@ -40,8 +41,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo "Database was created. <br>";
       } else {
         echo mysqli_error($conn);
-        echo "<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>";
-        die();
+        unlink(dirname(__DIR__) .'/connection_config.php');
+        die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
       }
 
       //reconnect to database
@@ -146,7 +147,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $name = test_input($data[1]);
                 $dayPay = floatval($data[2]);
                 $nightPay = floatval($data[3]);
-                $sql = "INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay') ";
+                $conn->query("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay')");
                 $thisLineIsNotOK = false;
               } elseif(count($data) > 4) {
                 $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
@@ -158,6 +159,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
           }
         fclose($travellingFile);
+      } else {
+        echo "File with Country Data not found!";
       }
       echo mysqli_error($conn);
 
@@ -266,7 +269,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="form-group">
         <div class="input-group">
           <span class="input-group-addon text-warning" style=min-width:150px>Login Password</span>
-          <input type='password' class="form-control" name='adminPass' value="" placeholder="****">
+          <input type='password' class="form-control" name='adminPass' value="" placeholder="****" />
         </div>
       </div>
     </div>
@@ -276,7 +279,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="form-group">
         <div class="input-group">
           <span class="input-group-addon text-warning" style="min-width:150px">Company Name</span>
-          <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php echo $companyName ?>">
+          <input type='text' class="form-control" name='companyName' placeholder='Company Name' value="<?php echo $companyName ?>" />
         </div>
       </div>
     </div>
@@ -300,11 +303,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <label>Your Login E-Mail</label>
     <div class="form-group">
       <div class="input-group">
-          <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>">
-          <span class="input-group-addon text-warning"> @ </span>
-          <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
-        </div>
+        <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>" />
+        <span class="input-group-addon text-warning"> @ </span>
+        <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
       </div>
+    </div>
     <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
   </div>
 </div>
@@ -317,10 +320,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Server Address
           </span>
-          <input type="text" class="form-control" name='serverName' value = "localhost">
+          <input type="text" class="form-control" name="serverName" value = "localhost" />
         </div>
       </div>
     </div>
@@ -329,10 +332,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Username
           </span>
-          <input type="text" class="form-control" name='mysqlUsername' value = 'root'>
+          <input type="text" class="form-control" name='mysqlUsername' value = 'root' />
         </div>
       </div>
     </div>
@@ -341,10 +344,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             Password
           </span>
-          <input type="text" class="form-control" name='pass' value = ''>
+          <input type="text" class="form-control" name='pass' value = '' />
         </div>
       </div>
     </div>
@@ -353,20 +356,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="col-sm-8">
       <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon" style=min-width:150px>
+          <span class="input-group-addon" style="min-width:150px">
             DB Name
           </span>
-          <input type="text" class="form-control" name='dbName' value = 'Zeit1'>
+          <input type="text" class="form-control" name='dbName' value = 'Zeit1' />
         </div>
       </div>
     </div>
   </div>
   <br><hr><br>
 <?php else: ?>
-  <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVER', true); ?>">
-  <input type="hidden" name='mysqlUsername' value = 'connect'>
-  <input type="hidden" name='pass' value = 'Uforonudi499'>
-  <input type="hidden" name='dbName' value = 'connect'>
+  <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
+  <input type="hidden" name='mysqlUsername' value = 'connect' />
+  <input type="hidden" name='pass' value = 'Uforonudi499' />
+  <input type="hidden" name='dbName' value = 'connect' />
 <?php endif; ?>
 
 <div class="container-fluid text-right">

@@ -219,7 +219,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="container-fluid form-group">
         <div class="input-group">
           <span class="input-group-addon" style=min-width:150px><?php echo $lang['ENTRANCE_DATE'] ?></span>
-          <input type="date" class="form-control" name="entryDate" value="<?php echo substr($begin,0,10); ?>">
+          <input type="text" class="form-control datepicker" name="entryDate" value="<?php echo substr($begin,0,10); ?>">
         </div>
       </div>
       <div class="container-fluid form-group">

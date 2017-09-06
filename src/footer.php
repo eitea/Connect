@@ -55,15 +55,45 @@ $(document).ready(function () {
   window.onbeforeunload = unloadPage;
 });
 $(function () {
-  $('.datepicker').datepicker({
-    format: 'yyyy-mm-dd'
+  //initalize them when the user needs them
+  $('.datetimepicker').click(function() {
+    $(this).datetimepicker({
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        forceParse: 0,
+        startDate: '2000-01-01',
+        format: 'yyyy-mm-dd hh:ii'
+      });
+      $(this).datetimepicker('show');
   });
-  $('.datetimepicker').datetimepicker({
-    format: 'YYYY-MM-DD HH:mm'
+  $('.datepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      minView: 2,
+      forceParse: 0,
+      startDate: '2000-01-01',
+      format: 'yyyy-mm-dd'
+    });
+      $(this).datetimepicker('show');
   });
-  $('.timepicker').datetimepicker({
-    format: 'HH:mm'
+  $('.timepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      todayHighlight: 1,
+      startView: 1,
+      minView: 0,
+      maxView: 1,
+      forceParse: 0,
+      format: 'hh:ii'
+    });
+      $(this).datetimepicker('show');
   });
+
 });
 </script>
 

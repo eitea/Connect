@@ -18,11 +18,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
   } elseif(isset($_POST['makeRequest'])){
-    if($_POST['requestText'] == 'I demand an easteregg'){
-      $unlock = TRUE;
-    } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
-    }
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   } elseif(isset($_POST['request_lunchbreak']) && !empty($_POST['lunch_FROM']) && !empty($_POST['lunch_TO'])){
     $timestampID = $_POST['request_lunchbreak'];
     $from = carryOverAdder_Hours(substr(getCurrentTimestamp(), 0, 11).$_POST['lunch_FROM'].':00', $timeToUTC * -1);
@@ -154,33 +150,9 @@ if($result && ($row = $result->fetch_assoc())): ?>
 <br>
 <div class="col-sm-3"><label><?php echo $lang['FORGOTTEN_LUNCHBREAK']; ?>: </label></div>
 <form method="POST">
-  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['FROM']; ?></span><input type="time" class="form-control" name="lunch_FROM" /></div></div>
-  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['TO']; ?></span><input type="time" class="form-control" name="lunch_TO" /></div></div>
+  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['FROM']; ?></span><input type="text" class="form-control timepicker" name="lunch_FROM" /></div></div>
+  <div class="col-sm-3"><div class="input-group"><span class="input-group-addon"><?php echo $lang['TO']; ?></span><input type="text" class="form-control timepicker" name="lunch_TO" /></div></div>
   <div class="col-sm-3"><button type="submit" class="btn btn-warning" name="request_lunchbreak" value="<?php echo $row['indexIM']; ?>"><?php echo $lang['REQUESTS']; ?></button></div>
 </form>
 <?php endif; ?>
-
-<?php if($unlock): ?>
-<br><br><br>
-
-<link rel="stylesheet" type="text/css" href="plugins/jsPlugin/css/main-snake.css" />
-<div style="display:none">
-<div id="mode-wrapper"><button id="Easy">Easy</button><br /><button id="Medium">Medium</button><br /><button id="Difficult">Difficult</button></div>
-<button id="high-score">High Score</button>
-</div>
-<div id="game-area" tabindex="0"></div>
-<script type="text/javascript" src="plugins/jsPlugin/js/snake.js"></script>
-<script type="text/javascript">
-var myBoard = new SNAKE.Board(  {
-  boardContainer: "game-area",
-  fullScreen: false
-});
-</script>
-
-<?php endif; ?>
-<script>
-var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d");
-</script>
 <?php include 'footer.php'; ?>

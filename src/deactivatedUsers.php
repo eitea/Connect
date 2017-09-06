@@ -29,24 +29,24 @@ if(isset($_POST['delete'])  && isset($_POST['indeces'])){
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
 
     //insert travelling expenses
-    $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
+    $sql = "INSERT IGNORE INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $deactivatedUserTravels WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>travelErr: '.mysqli_error($conn);}
 
     //insert interval
-    $sql = "INSERT INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate)
+    $sql = "INSERT IGNORE INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate)
     SELECT userID, mon, tue, wed, thu, fri, sat, sun, overTimeLump, pauseAfterHours, hoursOfRest, vacPerYear, startDate, endDate FROM $deactivatedUserDataTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>vacErr: '.mysqli_error($conn);}
 
     //insert roles if not present
     if($conn->query("SELECT userID from $roleTable WHERE userID = $x")->num_rows == 0){
-      $sql = "INSERT INTO $roleTable (userID) VALUES($x);";
+      $sql = "INSERT IGNORE INTO $roleTable (userID) VALUES($x);";
       if(!$conn->query($sql)){$acc = false; echo '<br>roleErr: '.mysqli_error($conn);}
     }
 
     //insert socialprofile if not present
     if($conn->query("SELECT userID from socialprofile WHERE userID = $x")->num_rows == 0){
-      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-');";
+      $sql = "INSERT IGNORE INTO socialprofile (userID, isAvailable, status) VALUES($x, 'TRUE', '-');";
       if(!$conn->query($sql)){$acc = false; echo '<br>socialErr: '.mysqli_error($conn);}
     }
 

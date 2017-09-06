@@ -22,7 +22,9 @@ if(isset($_POST['accept'])){
     }
     $conn->close();
     $conn = new mysqli($servername, $username, $password, $dbName);
-
+    $conn->query("SET NAMES 'utf8';");
+    $conn->query("SET CHARACTER SET 'utf8';");
+    
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){
@@ -37,9 +39,10 @@ if(isset($_POST['accept'])){
         $templine = '';
       }
     }
-    $conn->query("SET FOREIGN_KEY_CHECKS=1;");
     if(!mysqli_error($conn)){
-      redirect("../user/logout");
+      $conn->query("SET FOREIGN_KEY_CHECKS=1;");
+      //redirect("../user/logout");
+      die('<a href="../user/logout">Logout to finish the process</a>');
     } else {
       $error_output = mysqli_error($conn);
     }
@@ -67,6 +70,7 @@ if($error_output){
       <input type="file" name="fileToUpload" id="fileToUpload" />
       <br><br>
       <button class="btn btn-warning" type="submit" name="accept"><i class='fa fa-upload'></i> Upload</button>
+      <small>.sql Format</small>
     </div>
   </form>
 <?php else: ?>

@@ -56,7 +56,7 @@ if($result && ($row = $result->fetch_assoc())){
     </div>
     <div class="col-sm-3 col-sm-offset-1">
       <label>1. Runtime</label>
-      <input type='text' maxlength='19' value='<?php echo $runtime; ?>' name='mail_runtime' class='form-control' />
+      <input type='text' maxlength='19' value='<?php echo $runtime; ?>' name='mail_runtime' class='form-control datetimepicker' />
     </div>
   </div>
   <hr>

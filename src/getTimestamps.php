@@ -42,7 +42,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
         $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
       }
-      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
     } else { //update old
       $addBreakVal = floatval($_POST['addBreakValues']);
       if($addBreakVal){ //add a break
@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), status='$status' WHERE indexIM = $imm";
       }
       if($conn->query($sql)){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
       } else {
         echo mysqli_error($conn);
       }
@@ -121,10 +121,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       $chargedTimeStart= '0000-00-00 00:00:00';
       $chargedTimeFin = '0000-00-00 00:00:00';
-      if($_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
         $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
       }
-      if($_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
         $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
       }
       $new_text = test_input($_POST['editing_infoText_'.$x]);
@@ -201,7 +201,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         $insertInfoText = test_input($_POST['infoText']);
         $insertInternInfoText = test_input($_POST['internInfoText']);
-
+        
+        if(timeDiff_Hours($startDate, $endDate) < 0){
+          $endDate = carryOverAdder_Hours($endDate, 24);
+        }
         if(timeDiff_Hours($startDate, $endDate) > 0){
           if(isset($_POST['addBreak'])){ //checkbox
             $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
@@ -519,9 +522,9 @@ if($filterings['user']):
           <div class="modal-header"><h4><?php echo $lang['ADD_TIMESTAMPS']; ?></h4></div>
           <div class="modal-body">
             <div class="input-group input-daterange">
-              <input type="date" class="form-control datepicker" value="" placeholder="Von" name="add_multiple_start">
+              <input type="text" class="form-control datepicker" value="" placeholder="Von" name="add_multiple_start">
               <span class="input-group-addon"> - </span>
-              <input type="date" class="form-control datepicker" value="" placeholder="Bis" name="add_multiple_end">
+              <input type="text" class="form-control datepicker" value="" placeholder="Bis" name="add_multiple_end">
             </div>
             <br>
             <div class="row">
@@ -611,20 +614,22 @@ if($filterings['user']):
                   }
                   echo '</div>';
                   echo '<div class="col-md-6">';
-                  echo '<label>'.$lang['LUNCHBREAK'].'</label>';
+                  echo '<label>'.$lang['LUNCHBREAK'].' ('.$lang['HOURS'].')</label>';
                   if(!$calculator->indecesIM[$i]){
                     echo '<input type="number" step="0.01" class="form-control" name="newBreakValues" value="0.0" style="width:100px" />';
                   } else {
                     echo ': '.$lang['ADDITION']."<input type='number' step='0.01' name='addBreakValues' value='0.0' class='form-control' style='width:100px' />";
                   }
-                  echo '</div>';
+                  echo '<small>0,5h = 30min</small></div>';
                   ?>
                 </div>
                 <br><br>
                 <div class="row">
                   <div class="col-md-6">
                     <label><?php echo $lang['BEGIN']; ?></label>
-                    <input class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,16); ?>"/>
+                    <div class="checkbox">
+                      <input class='form-control datetimepicker' onkeydown="return event.keyCode != 13;" name="timesFrom" value="<?php echo substr($A,0,16); ?>"/>
+                    </div>
                   </div>
                   <div class="col-md-6">
                     <label><?php echo $lang['END']; ?></label>
@@ -736,7 +741,6 @@ if($filterings['user']):
       </form>
 
       <?php
-      //loop through this again
       mysqli_data_seek($bookingResult,0);
       while($row = $bookingResult->fetch_assoc()):
         $x = $row['bookingTableID'];
@@ -752,7 +756,7 @@ if($filterings['user']):
                 <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
                   <div class="row">
                   <?php
-                  if(!empty($row['projectID'])){ //if this is a break, do not display client/project selection
+                  if(!empty($row['projectID'])){
                     if(count($available_companies) > 1){
                       echo "<div class='col-md-4'><label>".$lang['COMPANY']."</label><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
                       $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");

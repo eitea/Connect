@@ -159,13 +159,13 @@ if(isset($_POST['request_submit'])){
               <label><?php echo $lang['FROM']; ?></label>
               <br>
               <div class="radio"> <!-- beauty purposes -->
-                <input type="time" name="request_start" class="form-control" value="<?php echo substr(carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]), 11, 5); ?>" />
+                <input type="text" name="request_start" class="form-control timepicker" value="<?php echo substr(carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]), 11, 5); ?>" />
               </div>
             </div>
             <div class="col-md-6">
               <label><?php echo $lang['TO']; ?></label>
               <div class="radio">
-                <label><input type="radio" name="request_open" value="0" /><input type="time" name="request_end" class="form-control" style="display:inline;max-width:200px;" min="01:00" value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
+                <label><input type="radio" name="request_open" value="0" /><input type="text" name="request_end" class="form-control timepicker" style="display:inline;max-width:200px;" min="01:00" value="<?php echo substr(carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]), 11, 5); ?>"/></label>
                 <br><br>
                 <label><input type="radio" name="request_open" value="1" checked /> <?php echo $lang['OPEN']; ?></label>
               </div>
@@ -246,8 +246,8 @@ if(isset($_POST['request_submit'])){
                       $x = $row['bookingTableID'];
                       echo '<tr style="background-color:#f0f0f0">';
                       echo "<td></td><td></td><td><i class='fa fa-arrow-right'</td><td>Split:</td>";
-                      echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_from_'.$x.'" />'.'</td>';
-                      echo '<td><input type="time" min="'.$A.'" max="'.$B.'" class="form-control" name="splits_to_'.$x.'" />'.'</td>';
+                      echo '<td><input type="text" min="'.$A.'" max="'.$B.'" class="form-control timepicker" name="splits_from_'.$x.'" />'.'</td>';
+                      echo '<td><input type="text" min="'.$A.'" max="'.$B.'" class="form-control timepicker" name="splits_to_'.$x.'" />'.'</td>';
                       echo '<td>';
                       echo "<select name='splits_activity_".$x."' class='js-example-basic-single' style='width:150px'>";
                       for($j = 0; $j < 5; $j++){ //can't do mixed split
@@ -273,12 +273,6 @@ if(isset($_POST['request_submit'])){
   <?php endfor; ?>
 
   <script>
-  $("#calendar").datepicker({
-    format: "yyyy-mm",
-    viewMode: "months",
-    minViewMode: "months"
-  });
-
   $('.datatable').DataTable({
   order: [[ 1, "desc" ]],
   columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}],

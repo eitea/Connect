@@ -90,7 +90,7 @@ echo mysqli_error($conn);
             </div>
             <div class="col-xs-3">
               <label><?php echo $lang['AFFECTED_MONTH']; ?></label>
-              <input id="calendar" type="month" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
+              <input type="month" placeholder="yyyy-mm" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
             </div>
             <div class="col-xs-2">
               <label><?php echo $lang['HOURS']; ?></label>
@@ -158,7 +158,7 @@ echo mysqli_error($conn);
               </div>
               <div class="col-xs-3">
                 <label><?php echo $lang['AFFECTED_MONTH']; ?></label>
-                <input id="calendar2" type="month" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
+                <input type="month" placeholder="yyyy-mm" class="form-control" name="creatTimeTime" value='<?php echo substr(getCurrentTimestamp(),0,7); ?>' />
               </div>
               <div class="col-xs-2">
                 <label><?php echo $lang['DAYS']; ?></label>
@@ -177,18 +177,6 @@ echo mysqli_error($conn);
                 </div>
               </div>
             </div>
-            <script>
-            $("#calendar").datepicker({
-              format: "yyyy-mm",
-              viewMode: "months",
-              minViewMode: "months"
-            });
-            $("#calendar2").datepicker({
-              format: "yyyy-mm",
-              viewMode: "months",
-              minViewMode: "months"
-            });
-            </script>
             <br><br><br>
 
             <table class="table table-hover">

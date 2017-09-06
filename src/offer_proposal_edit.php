@@ -16,15 +16,9 @@ if(!empty($_POST['proposalID'])){
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
   $filterings['client'] = intval($_POST['filterClient']);
   $process = $_POST['nERP'];
-
-  $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = ". intval($_POST['filterCompany']));
-  $row = $result->fetch_assoc();
-
-  $offset = $row['erp_'.strtolower($process)];
-  if($offset < 1) $offset = 1;
   $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
   if($row = $result->fetch_assoc()){
-    $filterings['number'] = getNextERP($process, $row['companyID'], $offset-1);
+    $filterings['number'] = getNextERP($process, $row['companyID']);
   }
 } else { //other visits
   $filterings = $_SESSION['filterings'];
@@ -358,7 +352,7 @@ $("#sort tbody").sortable({
           <li><button type="submit" class="btn btn-link" value="<?php echo $LAST_POSITION; ?>" name="add_position_page" ><?php echo $lang['NEW_PAGE']; ?></button></li>
           <?php
           $article_res = $conn->query("SELECT id FROM articles");
-          if($article_res && $article_res->num_rows > 0){ echo '<li><a href="#" data-toggle="modal" data-target=".add_article">'.$lang['ARTICLE'].'</a></li>'; }
+          if($article_res && $article_res->num_rows > 0){ echo '<li><button type="button" class="btn btn-link" data-toggle="modal" data-target=".add_article">'.$lang['ARTICLE'].'</button></li>'; }
           ?>
         </ul>
       </div>
@@ -494,7 +488,7 @@ $x = $prod_row['id'];
       <br>
       <div class="row">
         <div class="col-md-6">
-          <?php echo $lang['TAXES']; ?>
+          <label><?php echo $lang['TAXES']; ?></label>
           <select class="js-example-basic-single btn-block" name="add_product_taxes">
             <?php
             $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
@@ -565,11 +559,11 @@ $x = $prod_row['id'];
       <div class="container-fluid">
         <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
         <div class="col-md-4">
-          <input type="date" class="form-control" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
+          <input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
         </div>
         <div class="col-md-2 text-center"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
         <div class="col-md-4">
-          <input type="date" class="form-control" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
+          <input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
         </div>
       </div>
       <br>

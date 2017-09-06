@@ -1,5 +1,6 @@
 <?php
-/* SETTING UP A NEW TABLE:
+/*
+SETTING UP A NEW TABLE:
 1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
 2. Append your information to the specs or add them here.
 3. Put your CREATE TABLE statement in here, similar to already existing code.
@@ -9,8 +10,8 @@
 
 MAKING CHANGES TO EXISTING TABLE:
 1. make your changes in here
-3. increment the numbers in version_number.php
 2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
+3. increment the numbers in version_number.php
 4. relog inisde program with an account with core priviliges.
 
 Test the setup regularly

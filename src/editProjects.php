@@ -259,11 +259,6 @@ while($row = $result->fetch_assoc()):
 </form>
 
 <script>
-var myCalendar = new dhtmlXCalendarObject(["calendar"]);
-myCalendar.setSkin("material");
-myCalendar.setDateFormat("%Y-%m-%d");
-dhx.zim.first = function(){ return 2000 };
-
 $('.table').DataTable({
   order: [[ 2, "asc" ]],
   columns: [{orderable: false}, {orderable: false}, null, null, null, null, null, null, {orderable: false}],

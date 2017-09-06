@@ -8,7 +8,7 @@
   <div class="container-fluid">
     <div class="col-md-4">
       <label><input type="checkbox" name="setPassword" value="1" /> ZIP mit Passwort versehen: </label>
-      <br><small>*Funktioniert nur mit einer zip installation für windows</small>
+      <br><small>*Funktioniert auf Widnows nur mit einer zip Installation.</small>
     </div>
     <div class="col-md-6 disabled" disabled>
       <input type="password" name="password" class="form-control" placeholder="<?php echo $lang['PASSWORD']; ?>" />

@@ -23,10 +23,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       $chargedTimeStart= '0000-00-00 00:00:00';
       $chargedTimeFin = '0000-00-00 00:00:00';
-      if($_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
         $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
       }
-      if($_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
         $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
       }
       $new_text = test_input($_POST['editing_infoText_'.$x]);
@@ -115,6 +115,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $insertInfoText = test_input($_POST['infoText']);
         $insertInternInfoText = test_input($_POST['internInfoText']);
 
+        if(timeDiff_Hours($startDate, $endDate) < 0){
+          $endDate = carryOverAdder_Hours($endDate, 24);
+        }
         if(timeDiff_Hours($startDate, $endDate) > 0){
           if(isset($_POST['addBreak'])){ //checkbox
             $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
@@ -604,7 +607,7 @@ $(function () {
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="date" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
+            <input type="text" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
@@ -742,8 +745,6 @@ $(document).ready(function(){
     }
   });
 });
-
-
 </script>
 
 <?php

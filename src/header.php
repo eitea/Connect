@@ -39,7 +39,7 @@ if($result && $result->num_rows > 0){
 
 if($userID == 1){ //superuser
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'TRUE';
-  $canStamp = 'TRUE';
+  $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
 }
 
 $result = $conn->query("SELECT lastPswChange FROM UserData WHERE id = $userID");
@@ -69,9 +69,10 @@ if($isTimeAdmin){
   $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
   if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   //lunchbreaks
-  $result = $conn->query("SELECT indexIM FROM $logTable l1 INNER JOIN $userTable ON l1.userID = $userTable.id INNER JOIN $intervalTable ON $userTable.id = $intervalTable.userID
-    WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEND) > (pauseAfterHours * 60) AND
-    !EXISTS(SELECT id FROM projectBookingData WHERE TIMESTAMPDIFF(MINUTE, start, end) >= (hoursOfRest * 60) AND timestampID = l1.indexIM)");
+  $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
     if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   }
   $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
@@ -145,7 +146,7 @@ if($isTimeAdmin){
   if($_SESSION['color'] == 'light'){
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
   } elseif($_SESSION['color'] == 'dark'){
-    $css_file = 'plugins/homeMenu/homeMenu_green.css';
+    $css_file = 'plugins/homeMenu/homeMenu_metro.css';
   } elseif($_SESSION['color'] == 'stellar') {
     $css_file = 'plugins/homeMenu/homeMenu_dark.css';
   } else {
@@ -155,7 +156,7 @@ if($isTimeAdmin){
   <!DOCTYPE html>
   <html>
   <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -166,17 +167,13 @@ if($isTimeAdmin){
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
-    <script src='plugins/select2/js/select2.js'></script>
+    <script src='plugins/select2/js/select2.min.js'></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
     <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="plugins/datepicker/css/datepicker.css"/>
-    <script src="plugins/datepicker/js/bootstrap-datepicker.js"></script>
-
-    <script src="plugins/datetimepicker/moment/moment-with-locales.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="plugins/datetimepicker/bootstrap-datetimepicker.min.css"/>
-    <script src="plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+    <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
+    <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
@@ -213,7 +210,7 @@ if($isTimeAdmin){
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header hidden-xs">
-          <a class="navbar-brand" href="../user/home" style="width: 230px;"><?php if($_SESSION['color'] == 'dark') echo '<img alt="Connect" src="images/logo.png" height="30px" >'; else echo 'Connect'; ?></a>
+          <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT</a>
         </div>
         <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
           <ul class="nav navbar-nav" style="margin:10px">
@@ -244,9 +241,13 @@ if($isTimeAdmin){
         </div>
         <div class="navbar-right" style="margin-right:10px;">
           <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?> <span class="badge alert-badge hidden-xs"><a href="../time/check" title="Your Database is in an invalid state, please fix these Errors after clicking this button. "> <?php echo $numberOfAlerts; ?> </a></span> <?php endif; ?>
+          <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
+            <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
+              <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
+            </a>
+          <?php endif; ?>
           <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-          <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+          <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
           <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
           <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
         </div>
@@ -263,7 +264,7 @@ if($isTimeAdmin){
     </div>
 
     <!-- modal -->
-    <form method=post>
+    <form method="POST">
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -326,11 +327,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <?php if($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home" style="color:white"><br>
+              <form method='post' action="../user/home"><br>
                 <?php
                 echo $checkInButton;
-                if($diff > 0)
+                if($diff > 0){
+                  echo '<div class="clock-counter" style="display:inline">';
                   echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
+                  echo '</div>';
+                }
                 ?>
               </form><br>
             </div>
@@ -441,7 +445,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingCore">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE">
-              <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+            <i class="fa fa-gear"></i> <?php echo $lang['ADMIN_CORE_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
@@ -449,7 +453,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               <ul class="nav navbar-nav">
                 <li>
                   <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
-                    <i class="fa fa-users"></i> <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
+                    <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleUsers" style="height: 0px;">
                     <ul class="nav nav-list">
@@ -462,7 +466,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                 </li>
                 <li>
                   <a id="coreCompanyToggle" <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
-                    <i class="fa fa-building-o"></i> <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
+                    <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleCompany" style="height: 0px;">
                     <ul class="nav nav-list">
@@ -478,11 +482,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                     </ul>
                   </div>
                 </li>
-                <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><i class="fa fa-briefcase"></i><span><?php echo $lang['CLIENTS']; ?></span></a></li>
-                <li><a <?php if($this_page =='teamConfig.php'){echo $setActiveLink;}?> href="../system/teams"><i class="fa fa-share-alt"></i>Teams</a></li>
+                <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                <li><a <?php if($this_page =='teamConfig.php'){echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
                   <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
-                    <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleSettings" style="height: 0px;">
                     <ul class="nav nav-list">
@@ -498,7 +502,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                     </ul>
                   </div>
                 </li>
-                <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="../system/designer"> <i class="fa fa-file-pdf-o"></i> <span>Report Designer</span> </a></li><?php endif; ?>
+                <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li><?php endif; ?>
               </ul>
             </div>
           </div>
@@ -521,17 +525,17 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingTime">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME">
-              <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+            <i class="fa fa-history"></i> <?php echo $lang['ADMIN_TIME_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../time/view"><i class="fa fa-history"></i> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
-                <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><i class="fa fa-plus"></i> <?php echo $lang['CORRECTION']; ?></a></li>
-                <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><i class="fa fa-plane"></i> <?php echo $lang['TRAVEL_FORM']; ?></a></li>
-                <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><i class="fa fa-suitcase"></i> <?php echo $lang['VACATION']; ?></a></li>
-                <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="../time/check"><i class="fa fa-exclamation-triangle"></i> <?php echo $lang['CHECKLIST']; ?></a></li>
+                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
+                <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
+                <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
+                <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
+                <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="../time/check"><?php echo $lang['CHECKLIST']; ?></a></li>
               </ul>
             </div>
           </div>
@@ -548,18 +552,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingProject">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT">
-              <?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
+            <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><i class="fa fa-history"></i>
-                  <span><?php echo $lang['PROJECT_BOOKINGS']; ?></span>
-                </a></li>
-                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><i class="fa fa-tags"></i>
-                  <span><?php echo $lang['VIEW_PROJECTS']; ?></span>
-                </a></li>
+                <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><span><?php echo $lang['PROJECT_BOOKINGS']; ?></span></a></li>
+                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['VIEW_PROJECTS']; ?></span></a></li>
               </ul>
             </div>
           </div>
@@ -575,14 +575,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingReport">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
-              <?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down pull-right"></i>
+            <i class="fa fa-bar-chart"></i><?php echo $lang['REPORTS']; ?><i class="fa fa-caret-down pull-right"></i>
             </a>
           </div>
           <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a target="_blank" href="../report/send"><i class="fa fa-envelope-open-o"></i><span> Send E-Mails </span></a></li>
-                <li><a <?php if($this_page =='report_productivity.php'){echo $setActiveLink;}?> href="../report/productivity"><i class="fa fa-bar-chart"></i><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
+                <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
+                <li><a <?php if($this_page =='report_productivity.php'){echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
               </ul>
             </div>
           </div>
@@ -597,16 +597,16 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
       <?php if($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingERP">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP">ERP<i class="fa fa-caret-down pull-right"></i></a>
+            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-file-text-o"></i> ERP<i class="fa fa-caret-down pull-right"></i></a>
           </div>
           <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="../erp/view"><i class="fa fa-file-text-o"></i><span><?php echo $lang['PROCESSES']; ?></span></a></li>
-                <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><i class="fa fa-shopping-basket"></i><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESSES']; ?></span></a></li>
+                <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
                 <li>
                   <a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
-                    <i class="fa fa-gear"></i> <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleERPSettings" style="height: 0px;">
                     <ul class="nav nav-list">

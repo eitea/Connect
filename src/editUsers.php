@@ -3,44 +3,44 @@
 <!-- BODY -->
 
 <div class="page-header">
-  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register_basic.php' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
 </div>
 <?php
 $activeTab = 0;
 if(isset($_GET['ACT'])){$activeTab = $_GET['ACT']; }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1){
+  if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1 && $_POST['deactivate'] != $userID){
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
-    $sql = "INSERT INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
+    $sql = "INSERT IGNORE INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
     SELECT id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
     //copy logs
-    $sql = "INSERT INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, indexIM)
+    $sql = "INSERT IGNORE INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, indexIM)
     SELECT userID, time, timeEnd, status, timeToUTC, indexIM FROM $logTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo 'logErr: '.mysqli_error($conn);}
     //copy intervalTable
-    $sql = "INSERT INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate)
+    $sql = "INSERT IGNORE INTO $deactivatedUserDataTable(userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate)
     SELECT userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate, endDate FROM $intervalTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>dataErr: '.mysqli_error($conn);}
     //copy projectbookings
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID IS NOT NULL AND projectID != 0";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy projectbookings - foreign key null gets cast to 0... idky.
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND projectID != 0 AND projectID IS NOT NULL";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy projectbookings - null for every null, which is 0 #why
-    $sql = "INSERT INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
+    $sql = "INSERT IGNORE INTO $deactivatedUserProjects(start, end, projectID, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit)
     SELECT start, end, NULL, timestampID, infoText, booked, internInfo, chargedTimeStart, chargedTimeEnd, bookingType, mixedStatus, extra_1, extra_2, extra_3, exp_info, exp_price, exp_unit
     FROM $projectBookingTable, $logTable WHERE $logTable.indexIM = $projectBookingTable.timestampID AND $logTable.userID = $x AND (projectID = 0 OR projectID IS NULL)";
     if(!$conn->query($sql)){$acc = false; echo '<br>projErr: '. mysqli_error($conn);}
     //copy taveldata
-    $sql = "INSERT INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
+    $sql = "INSERT IGNORE INTO $deactivatedUserTravels(userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
     SELECT userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses FROM $travelTable WHERE userID = $x";
     if(!$conn->query($sql)){$acc = false; echo '<br>travelErr: '.mysqli_error($conn);}
     //if successful, delete the user, On Cascade Delete does the rest.
@@ -48,15 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql  = "DELETE FROM $userTable WHERE id = $x";
       if(!$conn->query($sql)){echo mysqli_error($conn);}
     }
+  } elseif(isset($_POST['deactivate'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ADMIN_DELETE'].'</div>';
   }
 
   if (isset($_POST['deleteUser'])) {
     $x = $_POST['deleteUser'];
-    if ($x != 1) {
-      $sql = "DELETE FROM $userTable WHERE id = $x;";
-      $conn->query($sql);
+    if ($x != 1 && $x != $userID)  {
+      $conn->query("DELETE FROM $userTable WHERE id = $x;");
     } else {
-      echo $lang['ADMIN_DELETE'] ."<br>";
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ADMIN_DELETE'].'</div>';
     }
   }
 
@@ -461,11 +462,11 @@ $(document).ready(function(){
                 </div>
                 <div class="col-md-2">
                   <?php echo $lang['CORE_TIME']; ?>
-                  <p><input type="text" class="form-control" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
+                  <p><input type="text" class="form-control timepicker" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
                 </div>
                 <div class="col-md-5">
                   <?php echo $lang['EXIT_DATE']; ?>
-                  <input type="text" class="form-control" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
+                  <input type="text" class="form-control datepicker" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
                 </div>
               </div>
               <br>
@@ -589,7 +590,7 @@ $(document).ready(function(){
                     <input type="text" readonly class="form-control" value="<?php echo substr($intervalStart,0,10); ?>" />
                   </div>
                   <div class="col-xs-3">
-                    <input type="text" class="form-control" name="intervalEnd" placeholder="yyyy-mm-dd" />
+                    <input type="text" class="form-control datepicker" name="intervalEnd" placeholder="yyyy-mm-dd" />
                   </div>
                   <div class="col-xs-2">
                     <button type="submit" class="btn btn-default" name="addNewInterval" value="<?php echo $x; ?>"> <?php echo $lang['CLOSE_INTERVAL']; ?></button>

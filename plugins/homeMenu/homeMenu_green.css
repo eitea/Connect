@@ -34,9 +34,6 @@
 .panel-group > .panel > .panel-heading a:link {
   color: #6D6D6D;
 }
-.panel-group > .panel > .panel-collapse > .panel-body{
-  border-top: 1px solid #A3F375;
-}
 
 .sidebar-nav .navbar li a, .panel-borderless .panel-collapse .nav li a{
   color: #6D6D6D;
@@ -162,7 +159,7 @@ input[type="radio"]:checked {
 .alert.alert-info, .alert.alert-success {
 	border-radius:0;
 	background-color: #A3F375;
-	olor: #6d6d6d;
+	color: #6d6d6d;
 }
 
 /* Datatables pagination */

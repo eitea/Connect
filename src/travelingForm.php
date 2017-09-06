@@ -173,9 +173,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
     <div class="col-md-3">
       <div class="input-group">
-        <input type="time"  class="form-control required-field" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" />
+        <input type="text"  class="form-control required-field timepicker" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeStart" />
         <span class="input-group-addon"> - </span>
-        <input type="time" class="form-control required-field" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd" />
+        <input type="text" class="form-control required-field timepicker" placeholder="00:00" onkeydown='if (event.keyCode == 13) return false;' name="addTimeEnd" />
       </div>
     </div>
     <div class="col-md-5">
