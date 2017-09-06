@@ -19,7 +19,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
-    require __DIR__ . "/utilities.php";
+    require_once __DIR__ . "/utilities.php";
     $logo = uploadFile("fileToUpload", 1); //returns array on false
     if(!is_array($logo)){
       $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID"); 

@@ -4,6 +4,7 @@ test.php
 aws
 images/ups/*
 !images/ups/.gitkeep
-.vscode
 cryptlog.txt
 plugins/restic/backup.sql
+backup.sql
+.vscode

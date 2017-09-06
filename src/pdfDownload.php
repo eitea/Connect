@@ -4,7 +4,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
 }
 require "connection.php";
 require_once "createTimestamps.php";
-require 'utilities.php';
+require_once 'utilities.php';
 require "Calculators/LogCalculator.php";
 
 $filterQuery = $_POST['filterQuery'];

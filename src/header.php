@@ -12,6 +12,7 @@ require __DIR__."/connection.php";
 require __DIR__."/createTimestamps.php";
 require __DIR__."/validate.php";
 require __DIR__."/language.php";
+require_once __DIR__."/encryption_functions.php";
 
 $random_hash = '';
 if($this_page != "editCustomer_detail.php"){
@@ -346,6 +347,8 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
             <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?><span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
             <script>
+              var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
+
               function updateSocialBadge() {
                 $.ajax({
                     url: 'ajaxQuery/AJAX_socialGetAlerts.php',
@@ -354,13 +357,67 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                         $("#numberOfSocialAlerts").html(response)
                         if(response == "0"){
                           $("#numberOfSocialAlerts").hide()
+                          alertsBeforeUpdate = parseInt(response)
                         }else{
                           $("#numberOfSocialAlerts").show()
+                          var alertDifference = parseInt(response) - alertsBeforeUpdate
+                          alertsBeforeUpdate = parseInt(response)
+                          if(alertDifference > 0){
+                            generateNotification(parseInt(response),alertDifference)
+                          }
                         }
                     },
                 })
               }
               setInterval(updateSocialBadge,10000) // 10 seconds
+
+
+
+              function sendNotification(messages, newMessages) {
+              // Let's check if the browser supports notifications
+              if (!("Notification" in window)) {
+                console.warn("This browser does not support system notifications");
+              }
+
+              // Let's check whether notification permissions have already been granted
+              else if (Notification.permission === "granted") {
+                // If it's okay let's create a notification
+                generateNotification(messages, newMessages)
+              }
+
+              // Otherwise, we need to ask the user for permission
+              else if (Notification.permission !== 'denied') {
+                Notification.requestPermission(function (permission) {
+                  // If the user accepts, let's create a notification
+                  if (permission === "granted") {
+                    generateNotification(messages, newMessages)
+                  }
+                });
+              }
+
+              // Finally, if the user has denied notifications and you 
+              // want to be respectful there is no need to bother them any more.
+            }
+            function generateNotification(messages, newMessages){
+              var image = 'images/messageIcon.png';
+              var options = {
+                  body: newMessages + " new\n"+messages+" unread",
+                  icon: image,
+                  tag: "tagToUpdateNotification",
+                  badge: image
+              }
+              var n = new Notification('Connect Social',options);
+              setTimeout(n.close.bind(n), 5000); 
+              n.onclick = function(){
+                console.info("Click");
+              }
+              n.onerror = function(){
+                console.warn("Error while displaying notification");
+              }
+              n.onshow = function(){
+                console.info("Show");
+              }
+            }
             </script>
             <?php endif; ?>
 
@@ -435,6 +492,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                       <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="../system/update"><span>Update</span></a></li>
                       <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                       <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
+                      <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
                     </ul>
                   </div>
                 </li>

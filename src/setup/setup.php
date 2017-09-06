@@ -102,7 +102,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query($sql);
 
       //insert configs
-      $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
+      $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
       $conn->query($sql);
       //insert ldap config
       $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
@@ -111,6 +111,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
       //insert mail options
       $conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
+      //insert restic backup configuration
+      $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 
       //insert holidays
       $holidayFile = __DIR__ . '/Feiertage.txt';

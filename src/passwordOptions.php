@@ -1,4 +1,4 @@
-<?php require 'header.php'; require_once 'utilities.php'; enableToCore($userID);?>
+<?php require 'header.php'; require_once 'utilities.php';require_once 'createTimestamps.php'; enableToCore($userID);?>
 <?php
 if(isset($_POST['saveButton'])){
   //allgemein
@@ -23,8 +23,14 @@ if(isset($_POST['saveButton'])){
   echo mysqli_error($conn);
 
   //master
-  if(isset($_POST['masterPass_current']) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
-    $passwordCurrent = test_input($_POST['masterPass_current']);
+  $masterPasswordResult = $conn->query("SELECT masterPassword FROM $configTable");
+  $masterPasswordSet = strlen($masterPasswordResult->fetch_assoc()["masterPassword"]) != 0;
+  if($masterPasswordSet && isset($_POST['masterPass_deactivate'])){
+    $conn->query("UPDATE $configTable SET masterPassword = ''");
+    mc_master_password_changed(false);
+  }
+  if((isset($_POST['masterPass_current'])||!$masterPasswordSet) && !empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm'])){
+    $passwordCurrent = test_input($_POST['masterPass_current'] ?? false);
     $password = $_POST['masterPass_new'];
     $passwordConfirm = $_POST['masterPass_newConfirm'];
     $output = '';
@@ -46,33 +52,12 @@ if(isset($_POST['saveButton'])){
     }
     //if everything was okay:
     if($acceptMasterPassword){
-      $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable");
-      while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
-        $curID = $rowBank['id'];
-        //decrypt all that has been encrypted with old password
-        $keyValue = openssl_decrypt($rowBank['iv'], 'aes-256-cbc', $passwordCurrent, 0, $rowBank['iv2']);
-        $ibanVal = mc_decrypt($rowBank['iban'], $keyValue);
-        $bicVal = mc_decrypt($rowBank['bic'], $keyValue);
-
-        //encrypt with new password
-        $keyValue = openssl_random_pseudo_bytes(32); //random 64 chars key, uncrypted
-        $keyValue = bin2hex($keyValue);
-
-        $ibanVal = mc_encrypt($ibanVal, $keyValue);
-        $bicVal = mc_encrypt($bicVal, $keyValue);
-
-        $ivValue = openssl_random_pseudo_bytes(8);
-        $ivValue = bin2hex($ivValue);
-
-        //this did not need an iv since keyValue was random anyway, but silly php thinks its smarter than me.
-        $keyValue = openssl_encrypt($keyValue, 'aes-256-cbc', $password, 0, $ivValue);
-
-        $conn->query("UPDATE $clientDetailBankTable SET iban='$ibanVal', bic='$bicVal', iv='$keyValue', iv2='$ivValue' WHERE id = $curID");
-        echo mysqli_error($conn);
-      }
+      
       //save new passwordhash
-      $password = password_hash($password, PASSWORD_BCRYPT);
-      $conn->query("UPDATE $configTable SET masterPassword = '$password'");
+      $passwordhash = password_hash($password, PASSWORD_BCRYPT);
+      $conn->query("UPDATE $configTable SET masterPassword = '$passwordhash'");
+
+      mc_master_password_changed($password);
     } else {
       echo '<br><div class="alert alert-danger fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -83,13 +68,14 @@ if(isset($_POST['saveButton'])){
 }
 
 $masterPasswordResult = $conn->query("SELECT masterPassword FROM $configTable");
+$masterPasswordSet = strlen($masterPasswordResult->fetch_assoc()["masterPassword"]) != 0;
 
 $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
 ?>
 
 
-<form method="POST">
+<form method="POST" id="formPasswordOptions">
   <div class="page-header">
     <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
       <div class="page-header-button-group">
@@ -162,36 +148,76 @@ $row = $result->fetch_assoc();
   <br><hr><br>
 
 
-  <h4>Master Passwort <a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4><?php echo mc_status(); ?><?php echo $lang["MASTER_PASSWORD"]; ?> <small><?php if($masterPasswordSet): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
-      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
+      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können. Es sind insgesamt <b><?php echo mc_total_row_count(); ?></b> Einträge betroffen.
     </div>
   </div>
   <br>
   <div class="container-fluid">
+    <?php if($masterPasswordSet): ?>
     <div class="col-md-4">
-      Aktuelles Passwort:
+    <?php echo $lang["MASTER_PASSWORD_CURRENT"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_current" value=""/>
     </div>
     <br><br>
+    <?php endif; ?>
     <div class="col-md-4">
-      Neues Passwort:
+    <?php echo $lang["MASTER_PASSWORD_NEW"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_new" value=""/>
     </div>
     <br><br>
     <div class="col-md-4">
-      Neues Passwort Wiederholen:
+    <?php echo $lang["MASTER_PASSWORD_CONFIRM"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
     </div>
+    <br><br>
+    <?php if($masterPasswordSet): ?>
+    <div class="col-md-4">
+    <?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?>:
+    </div>
+    <div class="col-md-8">
+      <input type="checkbox" class="" name="masterPass_deactivate" value="true"/>
+    </div>
+    <br><br><br>
+    <?php endif; ?>
+    <div class="col-md-4">
+      <?php echo $lang["ENCRYPTION_LOG"]; ?>:
+    </div>
+    <div class="col-md-8">
+    <a class="btn btn-warning" href="../system/cryptlog">Logs</a>
+    </div>
     <br><br><br>
   </div>
 </form>
+<script>
+  $("#formPasswordOptions").submit(function(event){
+    if($("input[name='masterPass_deactivate']").is(":checked")){
+      alert("<?php echo mc_list_changes(); ?>")
+      if (confirm("<?php echo $lang['PASSWORD_REMOVE_PROMPT'];?>") == true) {
+        return true
+      } else {
+        event.preventDefault()
+        return false
+      }
+    }else if ($("input[name='masterPass_new']").val() == $("input[name='masterPass_newConfirm']").val()){
+      alert("<?php echo mc_list_changes(); ?>")
+      if (confirm("<?php echo $lang['PASSWORD_CHANGE_PROMPT'];?>") == true) {
+        return true
+      } else {
+        event.preventDefault()
+        return false
+      }
+    }
+  })
+</script>
+
 <?php require 'footer.php'; ?>
