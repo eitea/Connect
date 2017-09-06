@@ -1536,29 +1536,37 @@ if($row['version'] < 100){
   } else {
     echo '<br>Repaired Wrong Charactersets';
   }
-
 }
 
-  if($row['version'] < 101){
-    $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
-    $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
-    $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)"); //50 -> 255
-    $conn->query("ALTER TABLE articles CHANGE description description VARCHAR(1200)"); //600 -> 1200
-    $conn->query("ALTER TABLE products ADD COLUMN iv VARCHAR(255)");
-    $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
-    $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
-    $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
-    $conn->query("UPDATE configurationData set masterPassword = ''");
-  
-    $conn->query("CREATE TABLE resticconfiguration(
-      path VARCHAR(255),
-      password VARCHAR(255),
-      awskey VARCHAR(255),
-      awssecret VARCHAR(255),
-      location VARCHAR(255)
-    )");
-    $conn->query("INSERT INTO resticconfiguration () VALUES ()");
+if($row['version'] < 101){
+  $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
+  $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
+  $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)"); //50 -> 255
+  $conn->query("ALTER TABLE articles CHANGE description description VARCHAR(1200)"); //600 -> 1200
+  $conn->query("ALTER TABLE products ADD COLUMN iv VARCHAR(255)");
+  $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
+  $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
+  $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
+  $conn->query("UPDATE configurationData set masterPassword = ''");
+
+  $conn->query("CREATE TABLE resticconfiguration(
+    path VARCHAR(255),
+    password VARCHAR(255),
+    awskey VARCHAR(255),
+    awssecret VARCHAR(255),
+    location VARCHAR(255)
+  )");
+  $conn->query("INSERT INTO resticconfiguration () VALUES ()");
+}
+
+if($row['version'] < 102){
+  $result = $conn->query("SELECT * FROM projectBookingData WHERE infoText LIKE '%_?_%'");
+  $pool = array('ä', 'ö', 'ü');
+  while($row = $result->fetch_assoc()){
+    $letter = $pool[rand(0, 2)];
+    $conn->query("UPDATE projectBookingData SET infoText = '".str_replace('?', $letter, $row['infoText'])."' WHERE id = ".$row['id'] );
   }
+}
 
 
 
