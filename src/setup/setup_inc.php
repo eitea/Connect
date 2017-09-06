@@ -682,7 +682,7 @@ function create_tables($conn){
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     proposalID INT(6) UNSIGNED,
     position INT(4),
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     description VARCHAR(600),
     price DECIMAL(10,2),
     unit VARCHAR(20),
@@ -690,6 +690,9 @@ function create_tables($conn){
     purchase DECIMAL(10,2),
     taxPercentage INT(3),
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    iv VARCHAR(255),
+    iv2 VARCHAR(255),
+
     UNIQUE KEY (proposalID, position),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
@@ -716,13 +719,15 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50),
-    description VARCHAR(600),
+    name VARCHAR(255),
+    description VARCHAR(1200),
     price DECIMAL(10,2),
     unit VARCHAR(20),
     taxPercentage INT(3),
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    purchase DECIMAL(10,2)
+    purchase DECIMAL(10,2),
+    iv VARCHAR(255),
+    iv2 VARCHAR(255)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -821,6 +826,15 @@ function create_tables($conn){
     seen TEXT
   )";
   if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  if(!$conn->query("CREATE TABLE resticconfiguration(
+    path VARCHAR(255),
+    password VARCHAR(255),
+    awskey VARCHAR(255),
+    awssecret VARCHAR(255),
+    location VARCHAR(255)
+  )")){
     echo mysqli_error($conn);
   }
 }
