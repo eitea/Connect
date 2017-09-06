@@ -87,7 +87,7 @@ function set_database($filename){
     }
     $conn->query("SET FOREIGN_KEY_CHECKS=1;");
     if(!mysqli_error($conn)){
-        redirect("../user/logout");
+        
     } else {
         $error_output = mysqli_error($conn);
     }
@@ -278,8 +278,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(stripos(php_uname("s"),"Windows") === false){
                 exec("chmod 777 backup.sql");
             }
+            echo `ls`;
+            echo getcwd();
+            die("DEBUG");
             set_database("backup.sql");
             unlink("backup.sql");
+            redirect("../user/logout");
         }else{ //Full backup
             $connectFolder = dirname(dirname(__DIR__));
             set_time_limit(600);
