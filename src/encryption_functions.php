@@ -32,7 +32,7 @@ require_once __DIR__ . "/utilities.php";
 
 //test if password has changed
 if(isset($_SESSION["userid"])){
-    $masterpw = $conn->query("SELECT masterPassword FROM configurationdata")->fetch_array()[0];
+    $masterpw = $conn->query("SELECT masterPassword FROM configurationData")->fetch_array()[0];
     $shouldLogOut = false;
     if(strlen($masterpw) != 0){
         $sessionmasterpw = $_SESSION['masterpassword'] ?? false;

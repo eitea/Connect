@@ -1501,7 +1501,7 @@ if($row['version'] < 99){
     $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
     $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
     $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
-    $conn->query("UPDATE configurationdata set masterPassword = ''");
+    $conn->query("UPDATE configurationData set masterPassword = ''");
   
     $conn->query("CREATE TABLE resticconfiguration(
       path VARCHAR(255),
