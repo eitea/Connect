@@ -219,8 +219,8 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
           if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
           ?>
-          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
-          AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
+          <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= '".$filterings['date'][0]."'
+          AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) <= '".$filterings['date'][1]."'
           AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
@@ -251,12 +251,12 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) > '".$filterings['date'][0]."'
-AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) < '".$filterings['date'][1]."'
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= '".$filterings['date'][0]."'
+AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) <= '".$filterings['date'][1]."'
 AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
-$editingResult = $conn->query($sql); //f*ck you php
+$editingResult = $conn->query($sql);
 if(!$result || $result->num_rows <= 0){
   echo '<script>document.getElementById("set_filter_search").click();</script>';
 }

@@ -173,6 +173,7 @@ if($isTimeAdmin){
 
     <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
     <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
+    <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />

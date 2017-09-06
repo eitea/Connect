@@ -288,7 +288,6 @@ if($result && $result->num_rows > 0):
 
 <form method="POST">
   <?php
-  //select all timestamps that do not have enough break
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
   INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
   WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 

@@ -62,7 +62,7 @@ $(function () {
         todayBtn:  1,
         autoclose: 1,
         forceParse: 0,
-        startDate: '2000-01-01',
+        startDate: '2010-01-01',
         format: 'yyyy-mm-dd hh:ii'
       });
       $(this).datetimepicker('show');
@@ -79,7 +79,10 @@ $(function () {
     });
       $(this).datetimepicker('show');
   });
-  $('.timepicker').click(function() {
+
+  $('.timepicker').mask("00:00", {placeholder:"--:--", selectOnFocus: true});
+
+  /*
     $(this).datetimepicker({
       weekStart: 1,
       todayBtn:  1,
@@ -92,8 +95,7 @@ $(function () {
       format: 'hh:ii'
     });
       $(this).datetimepicker('show');
-  });
-
+  */
 });
 </script>
 
