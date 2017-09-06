@@ -209,7 +209,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     }
                     $alerts = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID AND userID = $x")->num_rows;
                     $alertsvisible = $alerts == 0 ? "style='display:none;position:absolute'" : "style='position:absolute'";
-                    echo "<tr class='$class' data-toggle='modal' data-target='#chat$x'>";
+                    echo "<tr class='$class' data-toggle='modal' data-target='#chat$x' style='cursor:pointer;'>";
                     echo "<td><img src='$profilePicture' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;'><div id='badge$x' $alertsvisible class='badge row'>$alerts</div></td>";
                     echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
                     echo "<td>$status</td>";
@@ -348,8 +348,8 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row
                     $result_members = $conn->query("SELECT * FROM socialgroups INNER JOIN UserData ON UserData.id = socialgroups.userID  WHERE groupID = $x");
                     $alerts = $conn->query("SELECT * FROM socialgroupmessages WHERE groupID = $x AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen =  '$userID')")->num_rows;
                     $alertsvisible = $alerts == 0 ? "style='display:none;position:absolute'" : "style='position:absolute'";
-                    echo "<tr>";
-                    echo "<td data-toggle='modal' data-target='#editGroup$x'><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block; -webkit-filter: hue-rotate(${hue_rotate}deg); filter: hue-rotate(${hue_rotate}deg);position:relative;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
+                    echo "<tr style='cursor: pointer;'>";
+                    echo "<td data-toggle='modal' data-target='#editGroup$x' style='cursor: url(\"images/edit.gif\") 8 23,pointer;'><img src='$defaultGroupPicture' alt='Group picture' class='img-circle' style='width:40px;display:inline-block; -webkit-filter: hue-rotate(${hue_rotate}deg); filter: hue-rotate(${hue_rotate}deg);position:relative;'><div id='groupbadge$x' $alertsvisible class='badge row'>$alerts</div></td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>$name</td>";
                     echo "<td data-toggle='modal' data-target='#groupchat$x'>";
                     $userIsGroupAdmin = $userID == 1; //superuser
