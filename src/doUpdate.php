@@ -1564,7 +1564,26 @@ if($row['version'] < 102){
   $pool = array('ä', 'ö', 'ü');
   while($row = $result->fetch_assoc()){
     $letter = $pool[rand(0, 2)];
-    $conn->query("UPDATE projectBookingData SET infoText = '".str_replace('?', $letter, $row['infoText'])."' WHERE id = ".$row['id'] );
+    $newText = str_ireplace('f?', 'fü', $row['infoText']);
+    $newText = str_ireplace('l?r', 'lär', $newText);
+    $newText = str_ireplace('s?tz', 'sätz', $newText);
+    $newText = str_ireplace('tr?g', 'träg', $newText);
+    $newText = str_ireplace('w?', 'wö', $newText);
+    $newText = str_ireplace('k?', 'kö', $newText);
+    $newText = str_ireplace('m?', 'mö', $newText);
+    $newText = str_ireplace('l?', 'lö', $newText);
+    $newText = str_ireplace('z?', 'zü', $newText);
+    $newText = str_ireplace('sch?', 'schö', $newText);
+    $newText = str_ireplace('?b', 'üb', $newText);
+    $newText = str_ireplace('r?', 'rü', $newText);
+    $newText = str_ireplace('?nd', 'änd', $newText);
+    $newText = str_ireplace('?', $letter, $newText);
+    $conn->query("UPDATE projectBookingData SET infoText = '$newText' WHERE id = ".$row['id'] );
+  }
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>Repaired Wrong Charactersets';
   }
 }
 
