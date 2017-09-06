@@ -273,12 +273,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $snapshot = escapeshellarg($snapshot);
 
         chdir($resticDir);
+        var_dump($tags);
         if(in_array("database",$tags)){ //Database backup
             exec("${exec_modifier}$path restore $snapshot -t . 2>&1",$output,$status);
             if(stripos(php_uname("s"),"Windows") === false){
                 exec("chmod 777 backup.sql");
             }
-            echo `ls`;
+            var_dump($tags);
             echo getcwd();
             die("DEBUG");
             set_database("backup.sql");
