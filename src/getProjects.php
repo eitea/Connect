@@ -251,8 +251,8 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= '".$filterings['date'][0]."'
-AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) <= '".$filterings['date'][1]."'
+WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= DATE('".$filterings['date'][0]."')
+AND DATE(DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR)) <= DATE('".$filterings['date'][1]."')
 AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);

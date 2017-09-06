@@ -40,12 +40,12 @@ $(document).ready(function () {
     $(".blinking").attr('class', 'btn btn-warning blinking');
     setInterval(function() {
       $(".blinking").fadeOut(500, function() {
-           $(".blinking").fadeIn(500);
-        });
+        $(".blinking").fadeIn(500);
+      });
     }, 1000);
   });
   $(':submit').click(function() {
-      isDirty = false;
+    isDirty = false;
   });
   function unloadPage(){
     if(isDirty){
@@ -53,6 +53,7 @@ $(document).ready(function () {
     }
   }
   window.onbeforeunload = unloadPage;
+
 });
 $(function () {
   //initalize them when the user needs them
@@ -96,6 +97,11 @@ $(function () {
     });
       $(this).datetimepicker('show');
   */
+});
+
+$(document).ready(function () {
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("bodyContent").style.display = "block";
 });
 </script>
 

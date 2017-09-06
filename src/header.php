@@ -179,13 +179,6 @@ if($isTimeAdmin){
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
-    document.onreadystatechange = function() {
-      var state = document.readyState
-      if(state == 'complete') {
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("bodyContent").style.display = "block";
-      }
-    }
     $(document).ready(function() {
       if($(".js-example-basic-single")[0]){
         $(".js-example-basic-single").select2();
