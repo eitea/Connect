@@ -516,6 +516,11 @@ $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde ke
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
 
+$lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in users lunchbreaks and make corrections if needed. <br>
+                                     The validation will correspond to each users individual break settings. <br>';
+$lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
+                                     Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>';
+
 
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restriction <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>

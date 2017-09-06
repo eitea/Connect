@@ -1587,8 +1587,6 @@ if($row['version'] < 102){
   }
 }
 
-
-
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

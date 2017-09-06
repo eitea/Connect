@@ -61,9 +61,9 @@ function test_input($data){
   return $data;
 }
 
-function test_Date($date){
-  $dt = DateTime::createFromFormat("Y-m-d H:i:s", $date);
-  return $dt && $dt->format("Y-m-d H:i:s") === $date;
+function test_Date($date, $format = "Y-m-d H:i:s"){
+  $dt = DateTime::createFromFormat($format, $date);
+  return $dt && $dt->format($format) === $date;
 }
 
 function test_Time($time){

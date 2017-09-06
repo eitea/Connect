@@ -3,7 +3,7 @@
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   $error = false;
   if(isset($_POST['save_tasks'])){
-    if(!empty($_POST['mail_runtime']) && test_date($_POST['mail_runtime'])){
+    if(!empty($_POST['mail_runtime']) && test_date($_POST['mail_runtime'], "Y-m-d H:i")){
       $pattern = intval($_POST['mail_repeat']);
       $runtime = carryOverAdder_Hours($_POST['mail_runtime'], $timeToUTC * -1); //UTC
       $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (1, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Mailing schedule', 'sendMailReport.php')
@@ -12,11 +12,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $error = true;
       }
     }
-    if(!empty($_POST['restic_runtime']) && test_date($_POST['restic_runtime'])){
+    if(!empty($_POST['restic_runtime']) && test_date($_POST['restic_runtime'], "Y-m-d H:i")){
       $pattern = intval($_POST['restic_repeat']);
-      $runtime = carryOverAdder_Hours($_POST['restic_runtime'], $timeToUTC * -1); //UTC
+      $runtime = carryOverAdder_Hours($_POST['restic_runtime'].':00', $timeToUTC * -1);
       $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (2, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Restic Backup schedule', 'executeResticBackup.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern', runtime = '$runtime'");
+      if(!mysqli_error($conn)){
+        $error = true;
+      }
+    }
+
+    if(!empty($_POST['lunchbreak_repeat'])){
+      $pattern = intval($_POST['lunchbreak_repeat']);
+      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (3, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Lunchbreak Control', 'task_lunchbreak.php')
+                  ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
       if(!mysqli_error($conn)){
         $error = true;
       }
@@ -27,13 +36,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   }
 }
-$pattern = '-1';
-$runtime = getCurrentTimestamp();
 
-$result = $conn->query("SELECT * FROM taskData");
+$result = $conn->query("SELECT * FROM taskData WHERE id = 1");
 if($result && ($row = $result->fetch_assoc())){
   $pattern = $row['repeatPattern'];
-  $runtime = $row['runtime'];
+  $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
+} else {
+  $pattern = '-1';
+  $runtime = getCurrentTimestamp();
 }
 ?>
 
@@ -56,14 +66,19 @@ if($result && ($row = $result->fetch_assoc())){
     </div>
     <div class="col-sm-3 col-sm-offset-1">
       <label>1. Runtime</label>
-      <input type='text' maxlength='19' value='<?php echo $runtime; ?>' name='mail_runtime' class='form-control datetimepicker' />
+      <input type='text' maxlength='16' value='<?php echo substr($runtime,0,16); ?>' name='mail_runtime' class='form-control datetimepicker' />
     </div>
   </div>
   <hr>
+
 <?php 
+$result = $conn->query("SELECT * FROM taskData WHERE id = 2"); //really?
 if($result && ($row = $result->fetch_assoc())){
   $pattern = $row['repeatPattern'];
-  $runtime = $row['runtime'];
+  $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
+} else {
+  $pattern = '-1';
+  $runtime = getCurrentTimestamp();
 }
 ?>
   <h4>Restic Database Backup</h4><br>
@@ -81,10 +96,36 @@ if($result && ($row = $result->fetch_assoc())){
     </div>
     <div class="col-sm-3 col-sm-offset-1">
       <label>1. Runtime</label>
-      <input type='text' maxlength='19' value='<?php echo $runtime; ?>' name='restic_runtime' class='form-control' />
+      <input type='text' maxlength='16' value='<?php echo substr($runtime,0,16); ?>' name='restic_runtime' class='form-control datetimepicker' />
     </div>
   </div>
+<hr>
 
+<?php 
+$result = $conn->query("SELECT * FROM taskData WHERE id = 3");
+if($result && ($row = $result->fetch_assoc())){
+  $pattern = $row['repeatPattern'];
+  $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
+} else {
+  $pattern = '-1';
+  $runtime = getCurrentTimestamp();
+}
+?>
+  <h4><?php echo $lang['ILLEGAL_LUNCHBREAK']; ?></h4><br>
+  <div class="container-fluid">
+    <div class="col-sm-2">
+      <label>Status</label>
+      <select class="js-example-basic-single btn-block" name='lunchbreak_repeat'>
+        <?php
+          echo "<option $checked value='-1' >".$lang['SCHEDULE_TOSTRING'][-1] .'</option>';
+          echo "<option $checked value='1' >".$lang['SCHEDULE_TOSTRING'][1] .'</option>';
+        ?>
+      </select>
+    </div>
+    <div class="col-sm-8 col-sm-offset-1">
+      <?php echo $lang['INFO_LUNCHBREAK_TASK']; ?>
+    </div>
+  </div>
 </form>
 
 <?php include 'footer.php'; ?>

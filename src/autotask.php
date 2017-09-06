@@ -3,7 +3,6 @@
 require 'connection.php';
 require 'createTimestamps.php';
 
-
 /* repeat pattern identifiers
 '-1' => 'Inactive',
 '0' => 'Once',
