@@ -24,6 +24,8 @@ if($masterpw_result){
   $masterpw = $masterpw_result->fetch_assoc()["masterPassword"];
   $masterpwset = strlen($masterpw) != 0;
 }
+// DEBUG
+echo "Masterpw: $masterpw, Masterpwset: $masterpwset";
 
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton']) && (!empty($_POST['masterpassword']) || !$masterpwset)) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";

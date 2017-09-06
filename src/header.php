@@ -3,7 +3,7 @@ session_start();
 if(empty($_SESSION['userid'])){
   die('Please <a href="../login/auth">login</a> first.');
 }
-
+// DEBUG
 error_reporting(E_ALL);
 
 $userID = $_SESSION['userid'];
