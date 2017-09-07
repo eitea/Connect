@@ -1,4 +1,9 @@
 <?php
+/** included by:
+* sendMailReport
+* admin_saldoview
+* tableSummary
+*/
 class LogCalculator{
   public $overTimeAdditive = 0;
   public $vacationDays = 0; //still available vacation days (considers already used vacation)

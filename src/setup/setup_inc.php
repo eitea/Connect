@@ -842,4 +842,11 @@ function create_tables($conn){
   }
 }
 
+$sql = "CREATE TABLE identification(
+  id VARCHAR(60) PRIMARY KEY
+)";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
 ?>

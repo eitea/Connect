@@ -3,7 +3,6 @@
 require 'connection.php';
 require 'createTimestamps.php';
 
-
 /* repeat pattern identifiers
 '-1' => 'Inactive',
 '0' => 'Once',
@@ -15,11 +14,12 @@ require 'createTimestamps.php';
 
 $result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
+  //needed task data
   $task_id = $row['id'];
-  $pattern = $row['repeatPattern']; //1. grab schedule of task
-  $lastRuntime = $row['lastRuntime']; //2. grab last runtime of tasks
+  $pattern = $row['repeatPattern'];
+  $lastRuntime = $row['lastRuntime'];
   $runtime = $row['runtime'];
-  //3. check if task is supposed to run now
+  //check if task is supposed to run now
   $now = getCurrentTimestamp();
   if(timeDiff_Hours($now, $runtime) < 0 && timeDiff_Hours($now, $lastRuntime) < 0){
     $expiryDate = new DateTime($lastRuntime);
@@ -41,7 +41,9 @@ while($result && ($row = $result->fetch_assoc())){
       //4. execute task
       require $row['callee'];
       //5. update last runtime
-      $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
+      if($task_id != 3){
+        $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ if(isset($_POST['accept'])){
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["size"] <= 0) {
     $accept = false;
-  } elseif ($_FILES["fileToUpload"]["size"] > 5000000) { //5mb
+  } elseif ($_FILES["fileToUpload"]["size"] > 10000000) { //10mb
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["type"] != "application/octet-stream") {
     $accept = false;
@@ -28,8 +28,6 @@ if(isset($_POST['accept'])){
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){
-
-
       $conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
       if($conv) $line = $conv;
       

@@ -12,6 +12,7 @@ function getCurrentTimestamp(){
 }
 
 function carryOverAdder_Hours($a, $b){
+  $b = round($b);
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }
@@ -26,6 +27,7 @@ function carryOverAdder_Hours($a, $b){
 }
 
 function carryOverAdder_Minutes($a, $b){
+  $b = round($b);
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }
@@ -61,9 +63,9 @@ function test_input($data){
   return $data;
 }
 
-function test_Date($date){
-  $dt = DateTime::createFromFormat("Y-m-d H:i:s", $date);
-  return $dt && $dt->format("Y-m-d H:i:s") === $date;
+function test_Date($date, $format = "Y-m-d H:i:s"){
+  $dt = DateTime::createFromFormat($format, $date);
+  return $dt && $dt->format($format) === $date;
 }
 
 function test_Time($time){

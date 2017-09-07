@@ -528,6 +528,20 @@ $lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde ke
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
 
+$lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in users lunchbreaks and make corrections if needed. <br>
+                                     The validation will correspond to each users individual break settings. <br>
+                                     This task will be run exceptionally often. Make sure to deactivate this if you have a lot of active users and are experiencing performance issues. <br>';
+$lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
+                                     Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>
+                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie diesen Task falls sie viele aktive Benutzer haben und Performance Porbleme mitbekommen.';
+
+$lang_eng['INFO_TASKS'] = 'Set the status and times for Tasks to run. Inactive Tasks will not be run at all. Setting a status other than "Inactive" will activate the task. <br>
+                           Active tasks will only run once the 1st runtime has expired. Setting a task to run in the future is possible. <br>
+                           Date and Time will be considered everytime, meaning that daily tasks will re-run after 24 hours, weekly tasks after 7 days and yearly tasks after a passing of 12 months since the last schedule.';
+$lang_ger['INFO_TASKS'] = 'Hier können Status und Datum der Tasks eingestellt werden. Ein inaktiver Task wird niemals ausgeführt. Jeder andere Status als "Inaktiv" aktiviert den Task. <br>
+                           Aktive Tasks werden nur ausgeführt, sobald die 1. Laufzeit abgelaufen ist, wodurch ein starten in der Zukunft ebenso möglich ist. <br>
+                           Datum und Uhrzeit werden stets berücksichtigt, was bedeutet dass tägliche Tasks erst nach 24h frühestens wiederholt werden, wöchentliche Tasks nach 7 Tagen und jährliche Tasks nach 12 Monaten der letzten Ausführung.';
+
 
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restriction <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>
