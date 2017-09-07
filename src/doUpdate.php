@@ -1568,7 +1568,10 @@ if($row['version'] < 102){
   }
 }
 
-
+if($row['version'] < 102){
+  $conn->query("ALTER TABLE roles ADD COLUMN canUseDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
