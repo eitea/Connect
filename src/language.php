@@ -517,9 +517,11 @@ $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like hol
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
 
 $lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in users lunchbreaks and make corrections if needed. <br>
-                                     The validation will correspond to each users individual break settings. <br>';
+                                     The validation will correspond to each users individual break settings. <br>
+                                     This task will be run exceptionally often. Make sure to deactivate this if you have a lot of active users and are experiencing performance issues. <br>';
 $lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
-                                     Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>';
+                                     Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>
+                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie diesen Task falls sie viele aktive Benutzer haben und Performance Porbleme mitbekommen.';
 
 $lang_eng['INFO_TASKS'] = 'Set the status and times for Tasks to run. Inactive Tasks will not be run at all. Setting a status other than "Inactive" will activate the task. <br>
                            Active tasks will only run once the 1st runtime has expired. Setting a task to run in the future is possible. <br>
