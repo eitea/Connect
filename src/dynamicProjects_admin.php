@@ -3,9 +3,7 @@ isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
-    //Required
-    $project_name = $_POST["name"];
-    $project_description = $_POST["description"];
+    var_dump($_FILES);
     
 
     
@@ -30,8 +28,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
                     <!-- modal body -->
                     <!-- tab buttons -->
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#newProjectBasics">Grundlagen</a></li>
-                        <li><a data-toggle="tab" href="#newProjectDescription">Projektbeschreibung</a></li>
+                        <li class="active"><a data-toggle="tab" href="#newProjectBasics">Grundlagen*</a></li>
+                        <li><a data-toggle="tab" href="#newProjectDescription">Projektbeschreibung*</a></li>
                         <li><a data-toggle="tab" href="#newProjectAdvanced">Erweitert</a></li>
                         <li><a data-toggle="tab" href="#newProjectSeries">Serie</a></li>
                     </ul>
@@ -44,46 +42,56 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
                             <label>Projektname*:</label>
                             <input class="form-control" type="text" name="name" required>
                             <label>Mandant*:</label>
-                            <select class="form-control js-example-basic-single" name="company" required>
-                                <option value="" selected>...</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
+                            <select class="form-control js-example-basic-single" name="company" required onchange="showClients(this.value, 0,'#newDynamicProjectClients')">
+                                <option value="">...</option>
+                                <?php 
+                                $result = $conn->query("SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ");
+                                while ($row = $result->fetch_assoc()) {
+                                    $companyID = $row["id"];
+                                    $companyName = $row["name"];
+                                    echo "<option value='$companyID'>$companyName</option>";
+                                }
+                                ?>
                             </select>
                             <label>Kunde*:</label>
-                            <select class="form-control js-example-basic-single" name="client" multiple="multiple" required>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
+                            <select id="newDynamicProjectClients" class="form-control js-example-basic-single" name="client" multiple="multiple" required>
+                                <option>Zuerst Mandant auswählen</option>
                             </select>
                             <hr>
                             <label>Besitzer*:</label>
                             <select class="form-control js-example-basic-single" name="owner" required>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
+                                <?php
+                                $result = $conn->query("SELECT * FROM UserData");
+                                while ($row = $result->fetch_assoc()) {
+                                    $x = $row['id'];
+                                    $selected = $x == $userID ? "selected":"";
+                                    $name = "${row['firstname']} ${row['lastname']}";
+                                    echo "<option value='$x' $selected >$name</option>";
+                                }
+                                ?>
                             </select>
                             <label>Mitarbeiter*:</label>
                             <select class="form-control js-example-basic-single" name="employees" multiple="multiple" required>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
+                                <?php
+                                $result = $conn->query("SELECT * FROM UserData");
+                                while ($row = $result->fetch_assoc()) {
+                                    $x = $row['id'];
+                                    $selected = $x == $userID ? "selected":"";
+                                    $name = "${row['firstname']} ${row['lastname']}";
+                                    echo "<option value='$x' $selected >$name</option>";
+                                }
+                                ?>
                             </select>
                             <label>Optionale Mitarbeiter:</label>
                             <select class="form-control js-example-basic-single" name="optionalemployees" multiple="multiple">
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
-                                <option value="example">Example</option>
+                                <?php
+                                $result = $conn->query("SELECT * FROM UserData");
+                                while ($row = $result->fetch_assoc()) {
+                                    $x = $row['id'];
+                                    $name = "${row['firstname']} ${row['lastname']}";
+                                    echo "<option value='$x' $selected >$name</option>";
+                                }
+                                ?>
                             </select>
 
                             <!-- /basics -->
@@ -95,9 +103,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
 
                                 <label>Projektbeschreibung*:</label>
                                 <textarea class="form-control" style="max-width: 100%" rows="10" name="description" required></textarea>
-                                <label>Bilder auswählen:</label>
-                                <input type="file" name="images" multiple class="form-control">
-
+                                <label>Bilder auswählen:</label><br>
+                                <label class="btn btn-default" role="button">Durchsuchen...
+                                <input type="file" name="images" multiple class="form-control" style="display:none;" id="newProjectImageUpload"></label>
+                                <output id="newProjectPreview"></output>
                             <!-- /description -->
                             </div>
                         </div>
@@ -105,7 +114,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
                             <div class="modal-body">
                             <!-- advanced -->
                                 <label>Priorität*:</label>
-                                <select class="form-control js-example-basic-single" name="location" required>
+                                <select class="form-control js-example-basic-single" name="priority" required>
                                     <option value="example">Sehr niedrig</option>
                                     <option value="example">Niedrig</option>
                                     <option value="example" selected>Normal</option>
@@ -114,17 +123,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
                                 </select>
                                 <label>Status*:</label>
                                 <div class="input-group">
-                                <select class="form-control" name="location" required>
+                                <select class="form-control" name="status" required>
                                         <option value="example">Deaktiviert</option>
                                         <option value="example">Entwurf</option>
                                         <option value="example" selected>Aktiv</option>
                                         <option value="example">Abgeschlossen</option>
                                     </select>
                                     <span class="input-group-addon text-warning"> % abgeschlossen </span>
-                                    <input type='number' class="form-control" name='domainPart' value="0" min="0" max="100" step="10" required/>
+                                    <input type='number' class="form-control" name='completed' value="0" min="0" max="100" step="10" required/>
                                 </div>
                                 <label>Farbe:</label>
-                                <input type="color" class="form-control" value="#f44242">
+                                <input type="color" class="form-control" value="#f44242" name="color">
 
                             <!-- /advanced -->
                             </div>
@@ -132,32 +141,71 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
                         <div id="newProjectSeries" class="tab-pane fade">
                             <div class="modal-body">
                             <!-- series -->
-                                <div class="checkbox">
-                                    <label><input type="radio" name="asdf" value="once" checked> Einmalig</label>
-                                    <label><input type="radio" name="asdf" value="daily" > Täglich</label>
-                                    <label><input type="radio" name="asdf" value="monthly" > Monatlich</label>
-                                    <label><input type="radio" name="asdf" value="yearly" > Jährlich</label>
-                                </div>
-                                <hr>
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#newProjectSeriesOnce">Einmalig</a></li>
+                                    <li><a data-toggle="tab" href="#newProjectSeriesDaily">Täglich</a></li>
+                                    <li><a data-toggle="tab" href="#newProjectSeriesWeekly">Wöchentlich</a></li>
+                                    <li><a data-toggle="tab" href="#newProjectSeriesMonthly">Monatlich</a></li>
+                                    <li><a data-toggle="tab" href="#newProjectSeriesYearly">Jährlich</a></li>
+                                </ul>
+
                                 <label>Start:</label>
                                 <input type='text' class="form-control datepicker" name='localPart' placeholder='Startdatum' value="0000-00-00" />
                                 <label>Ende:</label><br>
                                 <label><input type="radio" name="asdfasdf" value="no" checked> Ohne</label><br>
                                 <input type="radio" name="asdfasdf" value="no"><label><input type='text' class="form-control datepicker" name='domainPart' placeholder="Enddatum" value="0000-00-00" /></label><br>
                                 <input type="radio" name="asdfasdf" value="no"><label><input type='number' class="form-control" name='localPart' placeholder="Nach _ wiederholungen"></label>
-                                <hr>
-                                Täglich<br>
-                                <input type="radio">Alle <input> tage<br>
-                                <input type="radio">jeden Arbeitstag<br>
-                                Wöchentlich<br>
-                                <input type="radio">alle <input> wochen am <input value="Montag"> <br>
-                                Monatlich<br>
-                                <input type="radio">am <input> tag jedes <input> monats<br>
-                                <input type="radio">am <input> <input value="Montag"> jedes <input> monats<br>
-                                Jährlich<br>
-                                <input type="radio">jeden <input value="1">. <input value="Jänner"><br>
-                                <input type="radio">am <input value="1">. <input value="Montag"> im september<br>
+                                
+                                <div class="tab-content">
+                                    <div id="newProjectSeriesOnce" class="tab-pane fade">
+                                    
+                                        <label>Einmalig</label><br>
 
+                                    </div>
+                                    <div id="newProjectSeriesDaily" class="tab-pane fade">
+
+                                        <label>Täglich</label><br>
+                                        <input type="radio">Alle <label><input class="form-control" type="number"></label> Tage<br>
+                                        <input type="radio">Montag bis Freitag<br>
+
+                                    </div>
+                                    <div id="newProjectSeriesWeekly" class="tab-pane fade">
+
+                                        <label>Wöchentlich</label><br>
+                                        <input type="radio">Alle <label><input class="form-control" type="number"></label> Wochen am <label><select class="form-control" name="day" required>
+                                        <option value="monday">Montag</option>
+                                        <option value="tuesday">Dienstag</option>
+                                        <option value="wednesday">Mittwoch</option>
+                                        <option value="thursday">Donnerstag</option>
+                                        <option value="Friday">Freitag</option>
+                                        <option value="Saturday">Samstag</option>
+                                        <option value="Sunday">Sonntag</option>
+                                </select></label> <br>
+
+                                    </div>
+                                    <div id="newProjectSeriesMonthly" class="tab-pane fade">
+
+                                        <label>Monatlich</label><br>
+                                        <input type="radio">am <label><input class="form-control" type="number"></label> Tag jedes <label><input class="form-control" type="number"></label>. Monats<br>
+                                        <input type="radio">am <label><input class="form-control" type="number"></label> <label><select class="form-control" name="day" required>
+                                        <option value="monday">Montag</option>
+                                        <option value="tuesday">Dienstag</option>
+                                        <option value="wednesday">Mittwoch</option>
+                                        <option value="thursday">Donnerstag</option>
+                                        <option value="Friday">Freitag</option>
+                                        <option value="Saturday">Samstag</option>
+                                        <option value="Sunday">Sonntag</option>
+                                </select></label> jedes <label><input class="form-control" type="number"></label> monats<br>
+
+                                    </div>
+                                    <div id="newProjectSeriesYearly" class="tab-pane fade">
+                                        
+                                        <label>Jährlich</label><br>
+                                        <input type="radio">jeden <input value="1">. <input value="Jänner"><br>
+                                        <input type="radio">am <input value="1">. <input value="Montag"> im september<br>
+
+                                    </div>
+                                </div>
                             <!-- /series -->
                             </div>
                         </div>
@@ -172,7 +220,51 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
     </div>
 </form>
 <!-- /new dynamic project modal -->
+<script>
+function showClients(company, client, targetSelector){
+    $.ajax({
+        url:'ajaxQuery/AJAX_getClient.php',
+        data:{companyID:company, clientID:client},
+        type: 'get',
+        success : function(resp){
+        $(targetSelector).html(resp);
+        },
+        error : function(resp){},
+    });
+}
 
+$("#newProjectImageUpload").change(function(event){
+    var files = event.target.files;
+    $("#newProjectPreview").html("");
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f; f = files[i]; i++) {
+      // Only process image files.
+      if (!f.type.match('image.*')) {
+        continue;
+      }
+      var reader = new FileReader();
+      // Closure to capture the file information.
+      reader.onload = (function(theFile) {
+        return function(e) {
+          // Render thumbnail.
+          var span = document.createElement('span');
+          span.innerHTML = 
+          [
+            '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="', 
+            e.target.result,
+            '" title="', escape(theFile.name), 
+            '"/>'
+          ].join('');
+          $("#newProjectPreview").append(span);
+        };
+      })(f);
+      // Read in the image file as a data URL.
+      reader.readAsDataURL(f);
+    }
+  });
+
+
+</script>
 
 
 

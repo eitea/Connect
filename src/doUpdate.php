@@ -1586,18 +1586,6 @@ if($row['version'] < 102){
     echo '<br>Repaired Wrong Charactersets';
   }
 }
-
-if($row['version'] < 102){
-  $conn->query("ALTER TABLE roles ADD COLUMN isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
-  $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
-
-  // $conn->query("CREATE TABLE dynamicprojects(
-  //   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  //   name VARCHAR(60) NOT NULL,
-  //   description VARCHAR(500) NOT NULL
-  // )");
-  
-}
   if($row['version'] < 103){
     $sql = "CREATE TABLE identification(
       id VARCHAR(60) UNIQUE NOT NULL
@@ -1611,6 +1599,19 @@ if($row['version'] < 102){
     if($conn->query($sql)){
       echo '<br> Created identification table';
     }
+  }
+
+  if($row['version'] < 104){
+    $conn->query("ALTER TABLE roles ADD COLUMN isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  
+    // $conn->query("CREATE TABLE dynamicprojects(
+    //   id VARCHAR(100) NOT NULL,
+    //   name VARCHAR(60) NOT NULL,
+    //   description VARCHAR(500) NOT NULL,
+    //   PRIMARY KEY (`id`)
+    // )");
+    
   }
 
 //------------------------------------------------------------------------------
