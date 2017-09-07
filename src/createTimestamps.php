@@ -12,6 +12,7 @@ function getCurrentTimestamp(){
 }
 
 function carryOverAdder_Hours($a, $b){
+  $b = round($b);
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }
@@ -26,6 +27,7 @@ function carryOverAdder_Hours($a, $b){
 }
 
 function carryOverAdder_Minutes($a, $b){
+  $b = round($b);
   if($a == '0000-00-00 00:00:00'){
     return $a;
   }

@@ -17,7 +17,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $runtime = carryOverAdder_Hours($_POST['restic_runtime'].':00', $timeToUTC * -1);
       $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (2, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Restic Backup schedule', 'executeResticBackup.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern', runtime = '$runtime'");
-      if(!mysqli_error($conn)){
+      if(mysqli_error($conn)){
         $error = true;
       }
     }
@@ -26,13 +26,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $pattern = intval($_POST['lunchbreak_repeat']);
       $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (3, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Lunchbreak Control', 'task_lunchbreak.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
-      if(!mysqli_error($conn)){
+      if(mysqli_error($conn)){
         $error = true;
       }
     }
     if(!$error){
       echo '<div class="alert alert-success fade in">';
       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+    } else {
+      echo $conn->error;
     }
   }
 }
@@ -116,8 +118,9 @@ if($result && ($row = $result->fetch_assoc())){
     <div class="col-sm-2">
       <label>Status</label>
       <select class="js-example-basic-single btn-block" name='lunchbreak_repeat'>
-        <?php
-          echo "<option $checked value='-1' >".$lang['SCHEDULE_TOSTRING'][-1] .'</option>';
+        <?php        
+        if($pattern == 1){ $checked = 'selected'; } else { $checked = ''; }
+          echo "<option value='-1' >".$lang['SCHEDULE_TOSTRING'][-1] .'</option>';
           echo "<option $checked value='1' >".$lang['SCHEDULE_TOSTRING'][1] .'</option>';
         ?>
       </select>

@@ -1,11 +1,19 @@
 <?php
-//grab all open timestamps which have MORE than >pauseAfterHours< hours.
+require_once __DIR__ . "/connection.php";
+require_once __DIR__ ."/createTimestamps.php";
 
-//accumulate all the break bookings he has and see if the sum of them are bigger or equal to >hoursOfRest<
+$sql = "SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1 INNER JOIN intervalData ON l1.userID = intervalData.userID
+WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd = '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, UTC_TIMESTAMP) >= (pauseAfterHours * 60) 
+AND hoursOfRest * 60 >= (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE timestampID = l1.indexIM AND bookingType = 'break' AND start < UTC_TIMESTAMP)";
+$result = $conn->query($sql);
 
-//if they are less: if he doesnt have any bookings at all, add the time for now()
+while($result && ($row = $result->fetch_assoc())){
+    $indexIM = $row['indexIM'];
+    $break_begin = getCurrentTimestamp();
+    $break_end = carryOverAdder_Minutes($break_begin, $row['hoursOfRest']*60);
+    $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Autocorrect: Lunchbreak', $indexIM)");
+    //TODO: Handle overlapped bookings
+}
 
-//if he has bookings already: does he have a booking which is up into the future (bigger than now())? if he doesnt have that, add the time for now()
-
-//but if he does, it gets complicated. put in a booking for now() and MOVE all the conflicting bookings right after now(+hoursOfRest). I guess we ought to do that.
+echo $conn->error;
 ?>

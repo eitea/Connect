@@ -40,7 +40,9 @@ while($result && ($row = $result->fetch_assoc())){
       //4. execute task
       require $row['callee'];
       //5. update last runtime
-      $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
+      if($task_id != 3){
+        $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
+      }
     }
   }
 }
