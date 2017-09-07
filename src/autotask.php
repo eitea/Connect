@@ -14,11 +14,12 @@ require 'createTimestamps.php';
 
 $result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
+  //needed task data
   $task_id = $row['id'];
-  $pattern = $row['repeatPattern']; //1. grab schedule of task
-  $lastRuntime = $row['lastRuntime']; //2. grab last runtime of tasks
+  $pattern = $row['repeatPattern'];
+  $lastRuntime = $row['lastRuntime'];
   $runtime = $row['runtime'];
-  //3. check if task is supposed to run now
+  //check if task is supposed to run now
   $now = getCurrentTimestamp();
   if(timeDiff_Hours($now, $runtime) < 0 && timeDiff_Hours($now, $lastRuntime) < 0){
     $expiryDate = new DateTime($lastRuntime);

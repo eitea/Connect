@@ -521,6 +521,13 @@ $lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in user
 $lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
                                      Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>';
 
+$lang_eng['INFO_TASKS'] = 'Set the status and times for Tasks to run. Inactive Tasks will not be run at all. Setting a status other than "Inactive" will activate the task. <br>
+                           Active tasks will only run once the 1st runtime has expired. Setting a task to run in the future is possible. <br>
+                           Date and Time will be considered everytime, meaning that daily tasks will re-run after 24 hours, weekly tasks after 7 days and yearly tasks after a passing of 12 months since the last schedule.';
+$lang_ger['INFO_TASKS'] = 'Hier können Status und Datum der Tasks eingestellt werden. Ein inaktiver Task wird niemals ausgeführt. Jeder andere Status als "Inaktiv" aktiviert den Task. <br>
+                           Aktive Tasks werden nur ausgeführt, sobald die 1. Laufzeit abgelaufen ist, wodurch ein starten in der Zukunft ebenso möglich ist. <br>
+                           Datum und Uhrzeit werden stets berücksichtigt, was bedeutet dass tägliche Tasks erst nach 24h frühestens wiederholt werden, wöchentliche Tasks nach 7 Tagen und jährliche Tasks nach 12 Monaten der letzten Ausführung.';
+
 
 $lang_eng['INFO_PASSWORD_GENERAL'] = 'Simple - No Restriction <br>
                                       Medium - Passwords have to contain at least 1 capital letter and 1 number <br>

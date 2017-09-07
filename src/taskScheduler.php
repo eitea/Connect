@@ -51,8 +51,14 @@ if($result && ($row = $result->fetch_assoc())){
 
 <form method="POST">
   <div class="page-header">
-    <h3><?php echo $lang['TASK_SCHEDULER']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="save_tasks"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3><?php echo $lang['TASK_SCHEDULER']; ?>
+    <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="save_tasks"><i class="fa fa-floppy-o"></i></button></div>
+    <div style="display:inline;float:right;"><a role="button" data-toggle="collapse" href="#info_taskplanner"><i class="fa fa-info-circle"></i></a></div>
+    </h3>
   </div>
+  <div class="collapse" id="info_taskplanner"><div class="well"><?php echo $lang['INFO_TASKS']; ?></div></div>
+
+
   <h4>E-Mail Report</h4><br>
   <div class="container-fluid">
     <div class="col-sm-2">
@@ -71,7 +77,7 @@ if($result && ($row = $result->fetch_assoc())){
       <input type='text' maxlength='16' value='<?php echo substr($runtime,0,16); ?>' name='mail_runtime' class='form-control datetimepicker' />
     </div>
   </div>
-  <hr>
+<hr>
 
 <?php 
 $result = $conn->query("SELECT * FROM taskData WHERE id = 2"); //really?
