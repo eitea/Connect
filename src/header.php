@@ -32,6 +32,7 @@ if($result && $result->num_rows > 0){
   $canStamp = $row['canStamp'];
   $canEditTemplates = $row['canEditTemplates'];
   $canUseSocialMedia = $row['canUseSocialMedia'];
+  $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
 } else {
   $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = FALSE;
   $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
@@ -51,6 +52,7 @@ $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
 
 $enableSocialMedia = $conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'];
+$enableDynamicProjects = $conn->query("SELECT enableDynamicProjects FROM modules")->fetch_assoc()['enableDynamicProjects'];
 if($enableSocialMedia = 'TRUE'){
   $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
   $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
@@ -423,7 +425,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
+            <?php if($enableDynamicProjects == 'TRUE'):?>
+              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
+            <?php endif; //dynamicProjects ?> 
+          <?php endif; ?>
+
+          <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
+              <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;} ?> href="../dynamic-projects/admin"><i class="fa fa-gavel"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
 

@@ -207,6 +207,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     }
     $conn->query($sql);
+    if(isset($_POST['isDynamicProjectsAdmin'.$x])){
+      $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
+    } else {
+        $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
+    }
+    $conn->query($sql);
 
     if(isset($_POST['isTimeAdmin'.$x])){
       $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
@@ -371,6 +377,7 @@ $(document).ready(function(){
       $rest = $row['hoursOfRest'];
 
       $isCoreAdmin = $row['isCoreAdmin'];
+      $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
       $isTimeAdmin = $row['isTimeAdmin'];
       $isProjectAdmin = $row['isProjectAdmin'];
       $isReportAdmin = $row['isReportAdmin'];
@@ -486,7 +493,10 @@ $(document).ready(function(){
                     </label><br>
                     <label>
                       <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
-                    </label>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_DYNAMIC_PROJECTS_OPTIONS']; ?></label><br>
+                    <label>
                   </div>
                 </div>
                 <div class="col-md-4">

@@ -248,6 +248,7 @@ function create_tables($conn){
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -487,7 +488,8 @@ function create_tables($conn){
   $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

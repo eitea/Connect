@@ -50,6 +50,9 @@ $lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin oder den eigenen Account lös
 $lang_eng['ADMIN_CORE_OPTIONS'] = 'General';
 $lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 
+$lang_eng['ADMIN_DYNAMIC_PROJECTS_OPTIONS'] = 'Dynamic Projects';
+$lang_ger['ADMIN_DYNAMIC_PROJECTS_OPTIONS'] = 'Dynamische Projekte';
+
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';
 
@@ -304,6 +307,12 @@ $lang_ger['DOUBLE'] = 'Doppelt';
 
 $lang_eng['DRIVES'] = 'Drives';
 $lang_ger['DRIVES'] = 'Fahrten';
+
+$lang_eng['DYNAMIC_PROJECTS_USER'] = 'Dynamic Projects';
+$lang_ger['DYNAMIC_PROJECTS_USER'] = 'Dynamische Projekte';
+
+$lang_eng['DYNAMIC_PROJECTS_ADMIN'] = 'Manage Dynamic Projects';
+$lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamische Projekte verwalten';
 
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
