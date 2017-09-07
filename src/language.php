@@ -314,6 +314,9 @@ $lang_ger['DYNAMIC_PROJECTS_USER'] = 'Dynamische Projekte';
 $lang_eng['DYNAMIC_PROJECTS_ADMIN'] = 'Manage Dynamic Projects';
 $lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamische Projekte verwalten';
 
+$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
+$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
+
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
 
