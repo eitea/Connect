@@ -371,8 +371,9 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               }
               setInterval(updateSocialBadge,10000) // 10 seconds
 
-
-
+              if ("Notification" in window) {
+                Notification.requestPermission();
+              }
               function sendNotification(messages, newMessages) {
               // Let's check if the browser supports notifications
               if (!("Notification" in window)) {
