@@ -8,7 +8,7 @@
 <script src='plugins/fullcalendar/lib/moment.min.js'></script>
 <script src='plugins/fullcalendar/fullcalendar.js'></script>
 <?php
-$dates = '';
+$dates = array();
 $start = getCurrentTimestamp(); //normal users can only see future dates
 if($isCoreAdmin) { $start = date('Y-m-d', strtotime('-1 year')); }
 $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID WHERE status != 0 AND DATE(time) > DATE('$start') ORDER BY userID, time, status");
@@ -26,7 +26,7 @@ if($result && ($row = $result->fetch_assoc())){
       }
       if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //chain
         $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-        $dates .= "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'},";
+        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
         $start = substr($row['time'], 0, 10);
       }
       $prev_row = $row;
@@ -37,28 +37,30 @@ if($result && ($row = $result->fetch_assoc())){
 }
 
 ?>
-<div id='calendar' style='height: 900px;'></div>
+<div id='calendar'></div>
 <script>
 $(document).ready(function(){
+setTimeout(function () {
   $("#calendar").fullCalendar({
     height: 600,
     firstDay: 1,
     header: {
-      left: "prev, next today",
-      center: "title",
-      right: "month, agendaWeek, listMonth"
+      left: 'prev, next today',
+      center: 'title',
+      right: 'month, agendaWeek, listMonth'
     },
-    defaultView: "month",
-    events: [<?php echo $dates; ?>],
+    events: [<?php echo implode(', ',$dates); ?>],
     eventTextColor: '#6D6D6D',
     eventBorderColor: '#FFFFFF'
   });
 });
+});
+
 </script>
 
 <?php
 if($isCoreAdmin) {
-  echo "<a href='../time/check' class='btn btn-warning'>" .$lang['VACATION_REQUESTS']. "</a>";
+  echo "<br><br><a href='../time/check' class='btn btn-warning'>" .$lang['VACATION_REQUESTS']. "</a>";
 }
 ?>
 <?php include 'footer.php'; ?>

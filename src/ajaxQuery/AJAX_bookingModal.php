@@ -14,8 +14,6 @@ while($result && ($row = $result->fetch_assoc())){
 
 $result = $conn->query("SELECT projectBookingData.*, clientID, companyID, timeToUTC FROM projectBookingData 
 INNER JOIN projectData ON projectData.id = projectID INNER JOIN clientData ON clientData.id = projectData.clientID INNER JOIN logs ON logs.indexIM = timestampID WHERE projectBookingData.id = $x");
-
-echo $conn->error;
 $row = $result->fetch_assoc(); //if this doesnt work, something really bad happened
 
 ?>

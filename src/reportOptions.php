@@ -35,8 +35,19 @@ $row = $result->fetch_assoc();
 
 <form method=post>
   <div class="page-header">
-    <h3>E-mail <?php echo $lang['OPTIONS']; ?><div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" name="saveButton"><i class="fa fa-floppy-o"></i></button></div></h3>
+    <h3>E-mail <?php echo $lang['OPTIONS']; ?>
+    <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" name="saveButton"><i class="fa fa-floppy-o"></i></button></div>
+    <div style="display:inline;float:right;"><a role="button" data-toggle="collapse" href="#info_emailserver"><i class="fa fa-info-circle"></i></a></div>
+    </h3>
   </div>
+
+  <div class="collapse" id="info_emailserver"><div class="well"><?php echo $lang['INFO_TASKS']; ?></div></div>
+  if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
+  $lang = $lang_eng;
+} elseif(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER'){
+  $lang = $lang_ger;
+}
+
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">
     <br>
