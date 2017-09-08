@@ -10,11 +10,11 @@ if(isset($_POST['saveButton'])){
     $val = intval($_POST['smtp_port']);
     $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
   }
-  if(!empty($_POST['smtp_username'])){
+  if(isset($_POST['smtp_username'])){
     $val = test_input($_POST['smtp_username']);
     $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
   }
-  if(!empty($_POST['smtp_password'])){
+  if(isset($_POST['smtp_password'])){
     $val = test_input($_POST['smtp_password']);
     $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
   }
@@ -41,12 +41,18 @@ $row = $result->fetch_assoc();
     </h3>
   </div>
 
-  <div class="collapse" id="info_emailserver"><div class="well"><?php echo $lang['INFO_TASKS']; ?></div></div>
+  <div class="collapse" id="info_emailserver"><div class="well">
+  <?php 
   if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
-  $lang = $lang_eng;
-} elseif(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER'){
-  $lang = $lang_ger;
-}
+    echo 'To send reports and login informations via email, an external e-mail server is required. <br>
+          When attempting to send an email, Connect will always work with the entered information below.';
+  } elseif(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER'){
+    echo 'Um Reports oder Login Informationen abzuschicken wird ein externer E-Mail Server benötigt. <br>
+          Sobald Informationen als E-Mail abgeschickt werden sollen, wird Connect die unten stehenden Daten verwenden.';
+  }
+  ?></div>
+  </div>
+
 
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">

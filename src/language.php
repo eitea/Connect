@@ -521,7 +521,7 @@ $lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in user
                                      This task will be run exceptionally often. Make sure to deactivate this if you have a lot of active users and are experiencing performance issues. <br>';
 $lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
                                      Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>
-                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie diesen Task falls sie viele aktive Benutzer haben und Performance Porbleme mitbekommen.';
+                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie daher diesen Task, falls sie viele aktive Benutzer haben und Probleme in der Performance mitbekommen.';
 
 $lang_eng['INFO_TASKS'] = 'Set the status and times for Tasks to run. Inactive Tasks will not be run at all. Setting a status other than "Inactive" will activate the task. <br>
                            Active tasks will only run once the 1st runtime has expired. Setting a task to run in the future is possible. <br>
@@ -849,6 +849,9 @@ $lang_ger['REQUEST_TYPE'] = "Art der Anfrage";
 
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
+
+$lang_eng['RUNTIME'] = 'Runtime';
+$lang_ger['RUNTIME'] = 'Laufzeit';
 
 $lang_eng['SAVE'] = 'Save';
 $lang_ger['SAVE'] = 'Speichern';
