@@ -82,7 +82,7 @@ if(isset($_POST['request_submit'])){
   </thead>
   <tbody>
     <?php
-    $now = $filterings['date'][0];
+    $now = $filterings['date'][0] .'-01 01:00:00';
     $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);

@@ -71,6 +71,30 @@ function onPageLoad(){
       5: {pattern: /[0-5]/}
     }
   });
+
+  $('.monthpicker').datetimepicker({
+    autoclose: 1,
+    todayBtn:  1,
+    startView: 3,
+    minView: 3,
+    maxView: 4,
+    format: 'yyyy-mm'
+  })
+
+  /*
+$('.timepicker').timepicker({
+      todayBtn:  1,
+      autoclose: 1,
+      todayHighlight: 1,
+      startView: 1,
+      minView: 0,
+      maxView: 1,
+      forceParse: 0,
+      format: 'hh:ii'
+    });
+  */
+
+
 }
 
 $(document).ready(function () {
