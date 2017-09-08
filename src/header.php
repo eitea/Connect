@@ -217,10 +217,7 @@ if($isTimeAdmin){
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
     <script>
-    $(document).ready(function() {
-      if($(".js-example-basic-single")[0]){
-        $(".js-example-basic-single").select2();
-      }
+    $(document).ready(function() {      
       if($('#seconds').length) {
         var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
         function pad(val) {

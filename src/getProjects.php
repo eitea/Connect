@@ -256,7 +256,6 @@ AND DATE(DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR)) 
 AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
-$editingResult = $conn->query($sql);
 if(!$result || $result->num_rows <= 0){
   echo '<script>document.getElementById("set_filter_search").click();</script>';
 }
@@ -372,7 +371,7 @@ if(!$result || $result->num_rows <= 0){
         if($row['exp_info']){ $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>'; $csv_expensesinfo .= ", {$lang['DESCRIPTION']}: {$row['exp_info']}"; }
         $csv_Add[] = $csv_expensesinfo;
         echo "<td>";
-        if($row['booked'] == 'FALSE'){ echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
+        if($row['booked'] == 'FALSE'){ echo '<button type="button" onclick="appendModal('.$x.', '.$userID.')" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
         if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}
         if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
         if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
@@ -404,102 +403,7 @@ $(function () {
 </script>
 
 <!-- Projectbooking Modal -->
-<?php while($row = $editingResult->fetch_assoc()): $x = $row['projectBookingID']; ?>
-  <form method="post">
-    <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
-      <div class="modal-dialog modal-lg modal-content" role="document">
-        <div class="modal-header">
-          <h4 class="modal-title"><?php echo substr($row['start'], 0, 10); ?></h4>
-        </div>
-        <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
-          <div class="row">
-          <?php
-          if(!empty($row['projectID'])){ //if this is no break, display client/project selection
-            if(count($available_companies) > 1){
-              echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
-              $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
-              while($companyRow = $companyResult->fetch_assoc()){
-                $selected = '';
-                if($companyRow['id'] == $row['companyID']){
-                  $selected = 'selected';
-                }
-                echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
-              }
-              echo '</select></div>';
-            }
-            echo "<div class='col-md-4'><select id='newClient$x' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
-            $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
-            if($filterings['company']){
-              $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
-            }
-            $clientResult = $conn->query($sql);
-            while($clientRow = $clientResult->fetch_assoc()){
-              $selected = '';
-              if($clientRow['id'] == $row['clientID']){
-                $selected = 'selected';
-              }
-              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
-            }
-            echo "</select></div><div class='col-md-4'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
-            $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
-            $clientResult = $conn->query($sql);
-            while($clientRow = $clientResult->fetch_assoc()){
-              $selected = '';
-              if($clientRow['id'] == $row['projectID']){
-                $selected = 'selected';
-              }
-              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
-            }
-            echo "</select></div> <br><br>";
-          } //end if(!break)
-
-          $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
-          $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
-
-          if($row['chargedTimeStart'] == '0000-00-00 00:00:00'){
-            $A_charged = '0000-00-00 00:00:00';
-          } else {
-            $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
-          }
-          if($row['chargedTimeEnd'] == '0000-00-00 00:00:00'){
-            $B_charged = '0000-00-00 00:00:00';
-          } else {
-            $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
-          }
-          ?>
-        </div>
-          <label><?php echo $lang['DATE']; ?>:</label>
-          <div class="row">
-            <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name="editing_time_from_<?php echo $x;?>" value="<?php echo substr($A,0,16); ?>"></div>
-            <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_time_to_<?php echo $x;?>' value="<?php echo substr($B,0,16); ?>"></div>
-          </div>
-          <br>
-          <?php if($row['bookingType'] != 'break'): ?>
-            <label><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?>:</label>
-            <div class="row">
-              <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_from_<?php echo $x;?>' value="<?php echo substr($A_charged,0,16); ?>"></div>
-              <div class="col-xs-6"><input type='text' class='form-control datetimepicker' maxlength='16' onkeydown='if(event.keyCode == 13){return false;}' name='editing_chargedtime_to_<?php echo $x;?>' value="<?php echo substr($B_charged,0,16); ?>"></div>
-            </div>
-          <?php endif; ?>
-          <br>
-          <label>Infotext</label>
-          <textarea style='resize:none;' name='editing_infoText_<?php echo $x;?>' class='form-control' rows="5"><?php echo $row['infoText']; ?></textarea>
-          <br>
-          <?php
-          if($row['bookingType'] != 'break' && $row['booked'] == 'FALSE'){//cant charge a break, can you
-            echo "<div class='row'><div class='col-xs-2 col-xs-offset-8'><input id='".$x."_1' type='checkbox' onclick='toggle2(\"".$x."_2\")' name='editing_charge' value='".$x."' /> <label>".$lang['CHARGED']. "</label> </div>";
-            echo "<div class='col-xs-2'><input id='".$x."_2' type='checkbox' onclick='toggle2(\"".$x."_1\")' name='editing_nocharge' value='".$x."' /> <label>".$lang['NOT_CHARGEABLE']. "</label> </div></div>";
-          }
-          ?>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-warning" name="editing_save" value="<?php echo $x;?>"><?php echo $lang['SAVE']; ?></button>
-        </div>
-      </div>
-    </div>
-  </form>
-<?php endwhile;?>
+<div id="editingModalDiv"></div>
 
 
 <!-- ADD BOOKING TO USER -->
@@ -629,6 +533,23 @@ $(function () {
 
 <script src="plugins/jsCookie/src/js.cookie.js"></script>
 <script>
+var existingModals = new Array();
+function appendModal(id, user){
+  if(existingModals.indexOf(id) == -1){
+    $.ajax({
+    url:'ajaxQuery/AJAX_bookingModal.php',
+    data:{bookingID:id, userID:user},
+    type: 'get',
+    success : function(resp){
+      $("#editingModalDiv").append(resp);
+      existingModals.push(id);
+      onPageLoad();
+      $('.editingModal-'+id).modal('show');
+    },
+    error : function(resp){}
+   });
+  }
+}
 function showClients(place, company, client, project, projectPlace){
   $.ajax({
     url:'ajaxQuery/AJAX_getClient.php',

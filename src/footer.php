@@ -33,9 +33,52 @@
 <?php endif; ?>
 
 <script>
+function onPageLoad(){
+  if($(".js-example-basic-single")[0]){
+    $(".js-example-basic-single").select2();
+  }
+
+  //initalize them when the user needs them
+  $('.datetimepicker').click(function() {
+  $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      forceParse: 0,
+      startDate: '2010-01-01',
+      format: 'yyyy-mm-dd hh:ii'
+    });
+    $(this).datetimepicker('show');
+  });
+  $('.datepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      minView: 2,
+      forceParse: 0,
+      startDate: '2000-01-01',
+      format: 'yyyy-mm-dd'
+    });
+      $(this).datetimepicker('show');
+  });
+  $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
+  $('.timepicker').mask("20:50", {
+    placeholder: "--:--", 
+    selectOnFocus: true, 
+    translation: {
+      2: {pattern: /[0-2]/},
+      5: {pattern: /[0-5]/}
+    }
+  });
+}
+
 $(document).ready(function () {
+  onPageLoad();
+
   var isDirty = false;
-  $(":input:not([type=search]):not(.not-dirty)").keyup(function(){ //triggers change in all input fields including text type
+  //triggers change in all input fields including text type
+  $(":input:not([type=search]):not(.not-dirty)").keyup(function(){
     isDirty = true;
     $(".blinking").attr('class', 'btn btn-warning blinking');
     setInterval(function() {
@@ -54,52 +97,7 @@ $(document).ready(function () {
   }
   window.onbeforeunload = unloadPage;
 
-});
-$(function () {
-  //initalize them when the user needs them
-  $('.datetimepicker').click(function() {
-    $(this).datetimepicker({
-        weekStart: 1,
-        todayBtn:  1,
-        autoclose: 1,
-        forceParse: 0,
-        startDate: '2010-01-01',
-        format: 'yyyy-mm-dd hh:ii'
-      });
-      $(this).datetimepicker('show');
-  });
-  $('.datepicker').click(function() {
-    $(this).datetimepicker({
-      weekStart: 1,
-      todayBtn:  1,
-      autoclose: 1,
-      minView: 2,
-      forceParse: 0,
-      startDate: '2000-01-01',
-      format: 'yyyy-mm-dd'
-    });
-      $(this).datetimepicker('show');
-  });
 
-  $('.timepicker').mask("00:00", {placeholder:"--:--", selectOnFocus: true});
-
-  /*
-    $(this).datetimepicker({
-      weekStart: 1,
-      todayBtn:  1,
-      autoclose: 1,
-      todayHighlight: 1,
-      startView: 1,
-      minView: 0,
-      maxView: 1,
-      forceParse: 0,
-      format: 'hh:ii'
-    });
-      $(this).datetimepicker('show');
-  */
-});
-
-$(document).ready(function () {
   document.getElementById("loader").style.display = "none";
   document.getElementById("bodyContent").style.display = "block";
 });

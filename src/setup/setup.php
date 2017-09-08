@@ -185,7 +185,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               $sql = "INSERT INTO roles (userID, isCoreAdmin, canStamp, canBook, canUseSocialMedia) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
               $conn->query($sql);
               //insert company-client relationship
-              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,1)";
+              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1, 1)";
               $conn->query($sql);
               //socialprofile
               $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";

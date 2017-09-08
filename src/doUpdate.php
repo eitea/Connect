@@ -1587,20 +1587,20 @@ if($row['version'] < 102){
   }
 }
 
-  if($row['version'] < 103){
-    $sql = "CREATE TABLE identification(
-      id VARCHAR(60) UNIQUE NOT NULL
-    )";
-    if($conn->query($sql)){
-      echo '<br> Created identification table';
-    }
-
-    $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
-    $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
-    if($conn->query($sql)){
-      echo '<br> Created identification table';
-    }
+if($row['version'] < 103){
+  $sql = "CREATE TABLE identification(
+    id VARCHAR(60) UNIQUE NOT NULL
+  )";
+  if($conn->query($sql)){
+    echo '<br> Created identification table';
   }
+
+  $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
+  $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
+  if($conn->query($sql)){
+    echo '<br> Created identification table';
+  }
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';
