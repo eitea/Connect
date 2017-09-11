@@ -50,6 +50,7 @@ if($result && ($row = $result->fetch_assoc())){
 }
 ?>
 
+<form method="POST">
 <div class="page-seperated-body" style="min-height:100vh">
   <div class="page-header page-seperated-section">
     <h3><?php echo $lang['TASK_SCHEDULER']; ?>
@@ -60,7 +61,7 @@ if($result && ($row = $result->fetch_assoc())){
   <div class="collapse" id="info_taskplanner"><div class="well"><?php echo $lang['INFO_TASKS']; ?></div></div>
 
 
-  <form method="POST" class="page-seperated-section">
+  <div class="page-seperated-section">
     <h4>E-Mail Report</h4>
     <br>
     <div class="container-fluid">
@@ -84,11 +85,11 @@ if($result && ($row = $result->fetch_assoc())){
         <input type='text' maxlength='5' value='<?php echo substr($runtime,11,5); ?>' name='mail_runtime_time' class='form-control timepicker' />
       </div>
     </div><br>
-  </form>
+  </div>
 
   <br>
 
-  <form method="POST" class="page-seperated-section">
+  <div class="page-seperated-section">
     <h4>Restic Database Backup</h4><br>
     <div class="container-fluid">
       <div class="col-sm-2">
@@ -114,18 +115,18 @@ if($result && ($row = $result->fetch_assoc())){
       ?>
       <div class="col-sm-3 col-sm-offset-1">
         <label>1. <?php echo $lang['RUNTIME'].' - '.$lang['DATE']; ?> </label>
-        <input type='text' maxlength='10' value='<?php echo substr($runtime,0,10); ?>' name='restic_runtime_date' class='form-control datetpicker' />
+        <input type='text' maxlength='10' value='<?php echo substr($runtime,0,10); ?>' name='restic_runtime_date' class='form-control datepicker' />
       </div>
       <div class="col-sm-2">
         <label><?php echo $lang['TIMES']; ?> </label>
         <input type='text' maxlength='5' value='<?php echo substr($runtime,11,5); ?>' name='restic_runtime_time' class='form-control timepicker' />
       </div>
     </div><br>
-  </form>
+  </div>
 
   <br>
 
-  <form method="POST" class="page-seperated-section">
+  <div class="page-seperated-section">
   <?php 
   $result = $conn->query("SELECT * FROM taskData WHERE id = 3");
   if($result && ($row = $result->fetch_assoc())){
@@ -151,8 +152,9 @@ if($result && ($row = $result->fetch_assoc())){
       <div class="col-sm-8 col-sm-offset-1">
         <?php echo $lang['INFO_LUNCHBREAK_TASK']; ?>
       </div>
-    </div><br>
-  </form>
+    </div>
+  </div>
 </div>
+</form>
 
 <?php include 'footer.php'; ?>
