@@ -13,7 +13,7 @@ $templateID = $_POST['templateID'];
 $html = getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause
 
 //prepend css
-$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="../plugins/homeMenu/template.css" rel="stylesheet" /></head>' .$html;
+$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="plugins/homeMenu/template.css" rel="stylesheet" /></head>' .$html;
 
 //replace all occuring relative paths with absolute paths in the html
 $doc = new DOMDocument();
