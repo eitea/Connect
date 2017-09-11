@@ -77,7 +77,7 @@ if($result && ($row = $result->fetch_assoc())){
       </div>
       <div class="col-sm-3 col-sm-offset-1">
         <label>1. <?php echo $lang['RUNTIME'].' - '.$lang['DATE']; ?> </label>
-        <input type='text' maxlength='10' value='<?php echo substr($runtime,0,10); ?>' name='mail_runtime_date' class='form-control datetimepicker' />
+        <input type='text' maxlength='10' value='<?php echo substr($runtime,0,10); ?>' name='mail_runtime_date' class='form-control datepicker' />
       </div>
       <div class="col-sm-2">
         <label><?php echo $lang['TIMES']; ?> </label>
