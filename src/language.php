@@ -314,6 +314,9 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 
+$lang_eng['EMPLOYEE'] = 'Employee';
+$lang_ger['EMPLOYEE'] = 'Mitarbeiter';
+
 $lang_eng['ENCRYPTION_ACTIVE'] = 'Encryption active';
 $lang_ger['ENCRYPTION_ACTIVE'] = 'Verschlüsselung aktiviert';
 

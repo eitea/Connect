@@ -210,7 +210,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
         <form id="csvDownPlace" action="csvDownload" method="POST" target='_blank' style="display:inline"></form>
         <form action="pdfDownload" method="POST" target='_blank' style="display:inline-block">
           <?php //quess who needs queries.
-          $companyQuery = $clientQuery = $projectQuery = $productiveQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
+          $companyQuery = $clientQuery = $projectQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
           if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
           if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
           if($filterings['project']){$projectQuery = "AND $projectTable.id = ".$filterings['project']; }
@@ -221,11 +221,12 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
           ?>
           <input type="hidden" name="filterQuery" value="<?php echo "WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= '".$filterings['date'][0]."'
           AND DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR) <= '".$filterings['date'][1]."'
-          AND (($projectBookingTable.projectID IS NULL $breakQuery $driveQuery $userQuery) OR ( 1 $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $userQuery $breakQuery $driveQuery))"; ?>" />
+          AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $driveQuery $breakQuery))"; ?>" />
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
             <ul class="dropdown-menu">
               <?php
+              echo "<li><button type='submit' name='templateID' value='-1' class='btn' style='background:none'>".$lang['OVERVIEW']."</button></li>";
               $res = $conn->query("SELECT * FROM $pdfTemplateTable");
               while($res && ($row = $res->fetch_assoc())){ echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>"; }
               ?>
@@ -253,7 +254,7 @@ LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
 WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= DATE('".$filterings['date'][0]."')
 AND DATE(DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR)) <= DATE('".$filterings['date'][1]."')
-AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $productiveQuery $driveQuery $breakQuery))
+AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $driveQuery $breakQuery))
 ORDER BY $projectBookingTable.start ASC";
 $result = $conn->query($sql);
 if(!$result || $result->num_rows <= 0){

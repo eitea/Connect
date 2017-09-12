@@ -32,7 +32,7 @@ while($result && ($row = $result->fetch_assoc())){
   $i = $row['indexIM'];
   $A = $row['time'];
   $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
-  while($row_b = $res_b->fetch_assoc()){
+  while($row_b = $res_b->fetch_assoc()){ //changes must be carried over to addendum page
     $has_bookings = true;
     $B = $row_b['start'];
     if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){
