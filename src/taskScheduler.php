@@ -33,8 +33,7 @@ if(isset($_POST['save_task'])){
       }
     }
     if(!$error){
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      echo '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     } else {
       echo $error;
     }
@@ -90,6 +89,16 @@ if($result && ($row = $result->fetch_assoc())){
   <br>
 
   <div class="page-seperated-section">
+    <?php 
+    $result = $conn->query("SELECT * FROM taskData WHERE id = 2");
+    if($result && ($row = $result->fetch_assoc())){
+      $pattern = $row['repeatPattern'];
+      $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
+    } else {
+      $pattern = '-1';
+      $runtime = getCurrentTimestamp();
+    }
+    ?>
     <h4>Restic Database Backup</h4><br>
     <div class="container-fluid">
       <div class="col-sm-2">
@@ -103,16 +112,6 @@ if($result && ($row = $result->fetch_assoc())){
           ?>
         </select>
       </div>
-      <?php 
-      $result = $conn->query("SELECT * FROM taskData WHERE id = 2"); //really?
-      if($result && ($row = $result->fetch_assoc())){
-        $pattern = $row['repeatPattern'];
-        $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
-      } else {
-        $pattern = '-1';
-        $runtime = getCurrentTimestamp();
-      }
-      ?>
       <div class="col-sm-3 col-sm-offset-1">
         <label>1. <?php echo $lang['RUNTIME'].' - '.$lang['DATE']; ?> </label>
         <input type='text' maxlength='10' value='<?php echo substr($runtime,0,10); ?>' name='restic_runtime_date' class='form-control datepicker' />

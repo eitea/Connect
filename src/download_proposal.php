@@ -54,6 +54,7 @@ class PDF extends FPDF {
 
 require "connection.php";
 require "language.php";
+require "encryption_functions.php";
 
 $result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
