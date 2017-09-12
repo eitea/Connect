@@ -78,13 +78,14 @@ while($result && ($row = $result->fetch_assoc())){
         $pdf->glob['logo'] = $logo_path;
         $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
         
-        $w = array(35, 20, 25, 10, 65, 35); //190
+        $w = array(40, 20, 25, 10, 65, 30); //190
 
-        if($companyID){
+        if($companyID){ //copy below
             $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
             $pdf->SetFont('Helvetica','B',10);
             $pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-            $pdf->Cell(0,10, $sum .' '.$lang['MINUTES'] );
+            $pdf->Cell(30,10, $sum .' '.$lang['MINUTES'] );
+            $pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
         }
 
         $pdf->AddPage();
@@ -94,7 +95,6 @@ while($result && ($row = $result->fetch_assoc())){
         $pdf->Cell(0, 10, 'Projektaufstellung', 0, 1, 'R');
         $pdf->SetFont('Helvetica','',10);
 
-        
         $pdf->Ln(5);
         $pdf->SetFillColor(200,200,200);
 
@@ -105,7 +105,6 @@ while($result && ($row = $result->fetch_assoc())){
         $pdf->Cell($w[4],7,'Infotext', '', 0, 'C', 1);
         $pdf->Cell($w[5],7,$lang['EMPLOYEE'], '', 1, 'C', 1);
     }
-
 
     $A = strtotime($row['start']);
     $B = strtotime($row['end']);
@@ -128,7 +127,8 @@ while($result && ($row = $result->fetch_assoc())){
 $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
 $pdf->SetFont('Helvetica','B',10);
 $pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-$pdf->Cell(0,10, $sum .' '.$lang['MINUTES'] );
+$pdf->Cell(30,10, $sum .' '.$lang['MINUTES'] );
+$pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
 
 /*
 A4 = 210 x 297
