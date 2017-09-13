@@ -1,6 +1,6 @@
 <?php include 'header.php'; enableToStamps($userID);?>
 <?php
-$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,8).'01'));
+$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,7)));
 
 require 'Calculators/IntervalCalculator.php';
 if(isset($_POST['request_submit'])){

@@ -21,23 +21,9 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
 
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <title>Setup Connect</title>
-  <script>
-  document.onreadystatechange = function() {
-    var state = document.readyState
-    if(state == 'complete') {
-      document.getElementById("loader").style.display = "none";
-      document.getElementById("bodyContent").style.display = "block";
-    }
-  }
-  $(document).ready(function() {
-    if($(".js-example-basic-single")[0]){
-      $(".js-example-basic-single").select2();
-    }
-  });
-  </script>
 </head>
 <body id="body_container" class="is-table-row">
-  <div id="loader"></div>
+<div id="loader" style="display:none"></div>
   <!-- navbar -->
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -65,6 +51,15 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   }
   function clean($string) {
     return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+  }
+  function randomPassword(){
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $psw = array();
+    for ($i = 0; $i < 8; $i++) {
+      $n = rand(0, strlen($alphabet) - 1);
+      $psw[] = $alphabet[$n];
+    }
+    return implode($psw); //turn the array into a string
   }
   function match_passwordpolicy($p, &$out = ''){
     if(strlen($p) < 6){
@@ -98,7 +93,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
     return $icsDates;
   }
   ?>
-  <div id="bodyContent" style="display:none;" >
+  <div id="bodyContent">
     <div class="affix-content">
       <div class="container-fluid">
 
@@ -349,7 +344,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
         }
         ?>
 
-        <form method='post'>
+        <form id="inputform" method='post'>
           <h1>Login Data</h1><br><br>
           <div class="row">
             <div class="col-sm-8 col-lg-4">
@@ -486,5 +481,18 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
       </div>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function() {
+      if($(".js-example-basic-single")[0]){
+        $(".js-example-basic-single").select2();
+      }
+    });
+
+  $('#inputform').submit(function(ev) {
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("bodyContent").style.display = "none";
+    });
+  </script>
 </body>
 </html>
