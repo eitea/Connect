@@ -1,8 +1,8 @@
 <?php
 function timeDiff_Hours($from, $to) {
-  $timeBegin = strtotime($from) /3600;
-  $timeEnd = strtotime($to) / 3600;
-  return $timeEnd - $timeBegin;
+  $timeBegin = strtotime($from);
+  $timeEnd = strtotime($to);
+  return ($timeEnd - $timeBegin)/3600;
 }
 
 function getCurrentTimestamp(){

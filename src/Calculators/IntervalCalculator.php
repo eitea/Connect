@@ -15,7 +15,6 @@ class Interval_Calculator{
   public $monthly_correctionHours = array();
 
   public $dayOfWeek = array();
-  public $daysAsNumber = array();
 
   public $date = array();
   public $start = array();
@@ -35,9 +34,11 @@ class Interval_Calculator{
     $this->from = substr($from, 0, 10).' 12:00:00';
     $this->to = substr($to, 0, 10).' 12:00:00';
     $this->id = $userid;
-    $this->days = (timeDiff_Hours($from, $to) / 24)+1;
-    if($this->days > 1){
+    $this->days = (strtotime($this->to) - strtotime($this->from)) / 86400 +1; //timeDiff is not accurate?
+    if($this->days > 0){
       $this->calculateValues();
+    } else {
+      echo "ERROR";
     }
   }
 
@@ -50,7 +51,7 @@ class Interval_Calculator{
     if($result && ($row = $result->fetch_assoc())){
       $this->beginDate = $beginDate = substr($row['beginningDate'],0,11).'00:00:00';
       //PHP funfact #038: 32Bit servers running php cannot calculate dates past 2038 (not enough bits).
-      $this->exitDate = $exitDate =  ($row['exitDate'] == '0000-00-00 00:00:00') ? '2037-12-30 23:00:00' : $row['exitDate'];
+      $this->exitDate = $exitDate = ($row['exitDate'] == '0000-00-00 00:00:00') ? '2037-12-30 23:00:00' : $row['exitDate'];
     } else {
       return "Invalid userID";
     }
@@ -145,34 +146,6 @@ class Interval_Calculator{
       $i = carryOverAdder_Hours($i, 24);
       $count++;
     } //endfor;
-    $this->daysAsNumber[] = $count;
-  }
-
-  private function timeDiff_Hours($from, $to) {
-    $timeEnd = strtotime($to) / 3600;
-    $timeBegin = strtotime($from) /3600;
-    return $timeEnd - $timeBegin;
-  }
-
-  private function carryOverAdder_Hours($a, $b) {
-    if($a == '0000-00-00 00:00:00'){
-      return $a;
-    }
-    $date = new DateTime($a);
-    if($b < 0){
-      $b *= -1;
-      $date->sub(new DateInterval("PT".$b."H"));
-    } else {
-      $date->add(new DateInterval("PT".$b."H"));
-    }
-    return $date->format('Y-m-d H:i:s');
-  }
-
-  private function isHoliday($ts){
-    require "connection.php";
-    $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
-    $result = mysqli_query($conn, $sql);
-    return($result && $result->num_rows>0);
   }
 }
 ?>

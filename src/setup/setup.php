@@ -488,8 +488,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
         $(".js-example-basic-single").select2();
       }
     });
-
-  $('#inputform').submit(function(ev) {
+    $('#inputform').submit(function(ev) {
       document.getElementById("loader").style.display = "block";
       document.getElementById("bodyContent").style.display = "none";
     });

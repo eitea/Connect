@@ -83,7 +83,7 @@ if(isset($_POST['request_submit'])){
   <tbody>
     <?php
     $now = $filterings['date'][0] .'-01 01:00:00';
-    $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
+    $calculator = new Interval_Calculator($now, date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), $userID);
     if(!empty($calculator->monthly_correctionHours[0])){
       $corrections = array_sum($calculator->monthly_correctionHours);
       echo "<tr style='font-weight:bold;'>";
@@ -146,7 +146,7 @@ if(isset($_POST['request_submit'])){
   </tbody>
 </table>
 
-<?php for($i = 0; $i < $calculator->days; $i++): ?>
+<?php for($i = 0; $i < $calculator->days; $i++): ?> 
   <form method="POST">
     <div class="modal fade my-request-<?php echo $i; ?>">
       <div class="modal-dialog modal-md modal-content">
