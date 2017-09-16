@@ -17,8 +17,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
 // variables for easy reuse for editing existing dynamic projects
 $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
 $modal_name = "";
-//not jet implemented:
 $modal_company = "";
+//not jet implemented:
 $modal_clients = array();
 $modal_owner = "";
 $modal_employees = array();
@@ -68,13 +68,19 @@ $modal_series = "";
                                     while ($row = $result->fetch_assoc()) {
                                         $companyID = $row["id"];
                                         $companyName = $row["name"];
-                                        echo "<option value='$companyID'>$companyName</option>";
+                                        $selected = $companyID == $modal_company && $modal_company != "" ? "selected":"";
+                                        echo "<option $selected value='$companyID'>$companyName</option>";
                                     }
                                     ?>
                                 </select>
                                 <label>Kunde*:</label>
                                 <select id="newDynamicProjectClients" class="form-control js-example-basic-single" name="client" multiple="multiple" required>
                                     <option>Zuerst Mandant auswählen</option>
+                                    <?php 
+                                        foreach ($modal_clients as $client) {
+                                            echo "<option>$client</option>";
+                                        }
+                                    ?>
                                 </select>
                             </div>
                             <div class="well">
