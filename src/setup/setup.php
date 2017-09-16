@@ -158,6 +158,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
       echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
       //create all tables
+      set_time_limit(0); //fix for slow computers
       require __DIR__ . "/setup_inc.php";
       create_tables($conn);
 
