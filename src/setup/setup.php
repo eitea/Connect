@@ -2,6 +2,7 @@
 if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   header("Location: ../login/auth");
 }
+require_once dirname(__DIR__) . "/createTimestamps.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,15 +59,10 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   </div>
   <!-- /navbar -->
   <?php
-  function test_input($data) {
-    $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§$%()+*öäüÖÄÜß_ ]~", "", $data);
-    $data = trim($data);
-    return $data;
-  }
   function clean($string) {
     return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
   }
-  function match_passwordpolicy($p, &$out = ''){
+  function match_passwordpolicy_setup($p, &$out = ''){
     if(strlen($p) < 6){
       $out = "Password must be at least 6 Characters long.";
       return false;
@@ -118,7 +114,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
             $domainname = clean($_POST['domainPart']);
             $loginname = clean($_POST['localPart']) .'@'.$domainname;
 
-            if(match_passwordpolicy(test_input($_POST['adminPass']), $out)){
+            if(match_passwordpolicy_setup(test_input($_POST['adminPass']), $out)){
               $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
               //create connection file
               $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
