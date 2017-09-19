@@ -18,19 +18,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
 $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
 $modal_name = "";
 $modal_company = "";
+$modal_description = "";
+$modal_color = "#777777";
+$modal_start = date("Y-m-d");
+$modal_end = ""; // Possibilities: ""(none);number (repeats); Y-m-d (date)
+$modal_status = "ACTIVE"; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
+$modal_priority = 3;
+
+
 //not jet implemented:
 $modal_clients = array();
 $modal_owner = "";
 $modal_employees = array();
 $modal_optional_employees = array();
-$modal_description = "";
 $modal_pictures = array();
-$modal_priority = 3;
-$modal_status = "";
-$modal_color = "#ffffff";
+
 $modal_parent = "";
-$modal_start = "";
-$modal_end = "";
+
 $modal_series = "";
 ?>
 <!-- new dynamic project modal -->
@@ -128,7 +132,7 @@ $modal_series = "";
                             <!-- description -->
                             <div class="well">
                                 <label>Projektbeschreibung*:</label>
-                                <textarea class="form-control" style="max-width: 100%" rows="10" name="description" required></textarea>
+                                <textarea class="form-control" style="max-width: 100%" rows="10" name="description" required><?php echo $modal_description; ?></textarea>
                                 <label>Bilder auswählen:</label><br>
                                 <label class="btn btn-default" role="button">Durchsuchen...
                                 <input type="file" name="images" multiple class="form-control" style="display:none;" id="newProjectImageUpload" accept=".jpg,.jpeg,.png"></label>
@@ -152,16 +156,16 @@ $modal_series = "";
                                 <label>Status*:</label>
                                 <div class="input-group">
                                 <select class="form-control" name="status" required>
-                                        <option value="example">Deaktiviert</option>
-                                        <option value="example">Entwurf</option>
-                                        <option value="example" selected>Aktiv</option>
-                                        <option value="example">Abgeschlossen</option>
+                                        <option value="example" <?php echo $modal_status == 'DEACTIVATED' ? "selected":"" ?> >Deaktiviert</option>
+                                        <option value="example" <?php echo $modal_status == 'DRAFT' ? "selected":"" ?> >Entwurf</option>
+                                        <option value="example" <?php echo $modal_status == 'ACTIVE' ? "selected":"" ?> >Aktiv</option>
+                                        <option value="example" <?php echo $modal_status == 'COMPLETED' ? "selected":"" ?> >Abgeschlossen</option>
                                     </select>
                                     <span class="input-group-addon text-warning"> % abgeschlossen </span>
                                     <input type='number' class="form-control" name='completed' value="0" min="0" max="100" step="10" required/>
                                 </div>
                                 <label>Farbe:</label>
-                                <input type="color" class="form-control" value="#f44242" name="color">
+                                <input type="color" class="form-control" value="<?php echo $modal_color; ?>" name="color">
                                 <label>Überprojekt:</label>
                                 <select class="form-control js-example-basic-single" name="parent" required>
                                     <option value="">Keines</option>
@@ -176,11 +180,23 @@ $modal_series = "";
 
                                 <div class="well">
                                     <label>Start:</label>
-                                    <input type='text' class="form-control datepicker" name='localPart' placeholder='Startdatum' value="0000-00-00" />
+                                    <input type='text' class="form-control datepicker" name='localPart' placeholder='Startdatum' value="<?php echo $modal_start; ?>" />
                                     <label>Ende:</label><br>
-                                    <label><input type="radio" name="asdfasdf" value="no" checked> Ohne</label><br>
-                                    <input type="radio" name="asdfasdf" value="no"><label><input type='text' class="form-control datepicker" name='domainPart' placeholder="Enddatum" value="0000-00-00" /></label><br>
-                                    <input type="radio" name="asdfasdf" value="no"><label><input type='number' class="form-control" name='localPart' placeholder="Nach _ wiederholungen"></label>
+                                    <?php if($modal_end == ""): ?>
+                                        <label><input type="radio" name="endradio" value="no" checked> Ohne</label><br>
+                                    <?php else: ?>
+                                        <label><input type="radio" name="endradio" value="no"> Ohne</label><br>
+                                    <?php endif; ?>
+                                    <?php if(preg_match("/\d{4}-\d{2}-\d{2}/",$modal_end)): ?>
+                                        <input type="radio" name="endradio" value="date" checked><label><input type='text' class="form-control datepicker" name='enddate' placeholder="Enddatum" value="<?php echo $modal_end; ?>" /></label><br>
+                                    <?php else: ?>
+                                        <input type="radio" name="endradio" value="date"><label><input type='text' class="form-control datepicker" name='enddate' placeholder="Enddatum" value="<?php echo date('Y-m-d');?>" /></label><br>
+                                    <?php endif; ?>
+                                    <?php if(preg_match("/^\d+$/",$modal_end)): ?>
+                                        <input type="radio" name="endradio" value="number" checked><label><input type='number' class="form-control" name='endnumber' placeholder="Wiederholungen" value="<?php echo $modal_end ?>"></label>
+                                    <?php else: ?>
+                                        <input type="radio" name="endradio" value="number"><label><input type='number' class="form-control" name='endnumber' placeholder="Wiederholungen"></label>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="well">
