@@ -93,8 +93,6 @@ $('.timepicker').timepicker({
       format: 'hh:ii'
     });
   */
-
-
 }
 
 $(document).ready(function () {

@@ -45,7 +45,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   <!-- /navbar -->
   <?php
   function test_input($data) {
-    $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§$%()+*öäüÖÄÜß_ ]~", "", $data);
+    $data = preg_replace("~[^A-Za-z0-9\-.öäüÖÄÜ_ ]~", "", $data);
     $data = trim($data);
     return $data;
   }
@@ -125,7 +125,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               fwrite($myfile, $txt);
               fclose($myfile);
               if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="/setup/run">Next</a></div>';
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="../login/auth">Next</a></div>';
               }
               require dirname(__DIR__) .'/connection_config.php';
               //establish connection
@@ -413,10 +413,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
             </div>
           </div>
           <br><hr><br>
-
-          <?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
             <h1>MySQL Database Connection</h1><br><br>
-
             <div class="row">
               <div class="col-sm-8">
                 <div class="form-group">
@@ -466,15 +463,9 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               </div>
             </div>
             <br><hr><br>
-          <?php else: ?>
-            <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
-            <input type="hidden" name='mysqlUsername' value = 'connect' />
-            <input type="hidden" name='pass' value = 'Uforonudi499' />
-            <input type="hidden" name='dbName' value = 'connect' />
-          <?php endif; ?>
 
           <div class="container-fluid text-right">
-            <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
+            <button type='submit' name'submitInput' class="btn btn-warning">Continue</button>
           </div>
         </form>
 

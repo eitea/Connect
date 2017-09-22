@@ -56,7 +56,7 @@ $(document).ready(function(){
 </script>
 
 <?php
-if($isCoreAdmin) {
+if($isCoreAdmin == 'TRUE') {
   echo "<br><br><a href='../time/check' class='btn btn-warning'>" .$lang['VACATION_REQUESTS']. "</a>";
 }
 ?>

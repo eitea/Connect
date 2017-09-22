@@ -22,7 +22,7 @@ if(isset($_POST['saveButton'])){
     $val = test_input($_POST['smtp_secure']);
     $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
   }
-  if(isset($_POST['mail_sender'])){
+  if(!empty($_POST['mail_sender'])){
     $val = test_input($_POST['mail_sender']);
     $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
   }
@@ -57,53 +57,29 @@ $row = $result->fetch_assoc();
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">
     <br>
-    <div class="checkbox col-md-4">
-      SMTP Security
-    </div>
-    <div class="checkbox col-md-8">
+    <div class="col-md-4">SMTP Security</div>
+    <div class="col-md-8">
       <select class="js-example-basic-single" name="smtp_secure" style="width:200px">
         <option value="" <?php if($row['smtpSecure'] == ''){echo "selected";} ?>> - </option>
         <option value="tls" <?php if($row['smtpSecure'] == 'tls'){echo "selected";} ?>> TLS </option>
         <option value="ssl" <?php if($row['smtpSecure'] == 'ssl'){echo "selected";} ?>> SSL </option>
       </select>
     </div>
-  </div>
-  <div class="container-fluid">
     <br><br>
-    <div class="checkbox col-md-4">
-      Absender-Adresse
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" />
-    </div>
+    <div class="col-md-4"> Absender-Adresse </div>
+    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" /></div>
     <br><br><br>
-    <div class="checkbox col-md-4">
-      Host
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" />
-    </div>
+    <div class="col-md-4">Host</div>
+    <div class="col-md-8"><input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" /></div>
     <br><br>
-    <div class="checkbox col-md-4">
-      Port
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" />
-    </div>
+    <div class="col-md-4">Port</div>
+    <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
     <br><br><br>
-    <div class="checkbox col-md-4">
-      Username
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="text" class="form-control" name="smtp_username"  value="<?php echo $row['username']; ?>" />
-    </div>
+    <div class="col-md-4">Username</div>
+    <div class="col-md-8"><input type="text" class="form-control" name="smtp_username"  value="<?php echo $row['username']; ?>" /></div>
     <br><br>
-    <div class="checkbox col-md-4">
-      Passwort
-    </div>
-    <div class="checkbox col-md-8">
-      <input type="password" class="form-control" name="smtp_password" />
-    </div>
+    <div class="col-md-4">Passwort</div>
+    <div class="col-md-8"><input type="password" class="form-control" name="smtp_password" /></div>
     <br>
   </div>
 </form>
