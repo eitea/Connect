@@ -2,6 +2,7 @@
 if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   header("Location: ../login/auth");
 }
+ignore_user_abort(1);
 ?>
 <!DOCTYPE html>
 <html lang="en">

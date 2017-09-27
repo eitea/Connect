@@ -1,9 +1,9 @@
 <?php
-$login_token = '';
-if(!empty($_POST['token'])) $login_token = $_POST['login_token'];
+$tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
+$login_token = $_POST['login_token'];
+
 require __DIR__ .'/connection.php';
 
-$tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
   if($result && ($row = $result->fetch_assoc())){
@@ -31,23 +31,24 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
           $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
           $result = $conn->query($sql);
           if($result && $result->num_rows > 0){
-              require __DIR__ ."/language.php";
-              include __DIR__ .'/version_number.php';
+            require __DIR__ ."/language.php";
+            include __DIR__ .'/version_number.php';
 
-              $sql = "SELECT * FROM $adminLDAPTable;";
-              $result = mysqli_query($conn, $sql);
-              $row = $result->fetch_assoc();
-              if($row['version'] < $VERSION_NUMBER){
-                  header("Location: update");
-                  die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
-              }
+            $sql = "SELECT * FROM $adminLDAPTable;";
+            $result = mysqli_query($conn, $sql);
+            $row = $result->fetch_assoc();
+            if($row['version'] < $VERSION_NUMBER){
+                header("Location: update");
+                die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
+            }
           }
           header('Location: ../user/home');
       } else {
         echo "psw not matched: ".$_POST['tester_pass'];
       }
     } else {
-      echo $conn->error;
+      echo $conn->error .'.';
+      exit;
     }
 }
 
