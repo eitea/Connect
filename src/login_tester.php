@@ -53,7 +53,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
 
 if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
   $login_token = urlencode($login_token);
-  //header("Location: /login?tok=$login_token");
+  header("Location: /login?tok=$login_token");
 }
 ?>
 
