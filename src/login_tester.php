@@ -1,6 +1,7 @@
 <?php
 $login_token = '';
 if(!empty($_POST['login_token'])) $login_token = $_POST['login_token'];
+require __DIR__ .'/connection.php';
 
 $tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
@@ -9,7 +10,6 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         echo $row['total'] ;
     }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
-    require __DIR__ .'/connection.php';
     function test_input($data){
         $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
         $data = trim($data);
