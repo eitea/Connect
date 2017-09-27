@@ -330,12 +330,8 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               exec($command, $output, $returnValue);
 
               //------------------------------------------------------------------------------
-              echo '<script type="text/javascript">';
-              echo 'window.location.href="../login/auth";';
-              echo '</script>';
-              echo '<noscript>';
-              echo '<meta http-equiv="refresh" content="0;url=../login/auth" />';
-              echo '</noscript>'; exit;
+              die('<br><br> Setup Finished. Click Next: <a href="../login/auth">Next</a>');
+              
             } else {
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
             }
