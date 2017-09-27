@@ -18,10 +18,9 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
     }
     $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
     if($row = $result->fetch_assoc()){
+      session_start();
       var_dump($row);
-      
-      if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
-          session_start();
+      if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {          
           $_SESSION['userid'] = $row['id'];
           $_SESSION['firstname'] = $row['firstname'];
           $_SESSION['language'] = $row['preferredLang'];
