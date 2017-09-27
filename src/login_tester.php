@@ -19,6 +19,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
     $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
     if($row = $result->fetch_assoc()){
       session_start();
+      var_dump($row);
       if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {          
           $_SESSION['userid'] = $row['id'];
           $_SESSION['firstname'] = $row['firstname'];
@@ -42,7 +43,12 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
                 die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
             }
           }
-          header('Location: ../user/home');
+          echo '<script type="text/javascript">';
+          echo 'window.location.href="../user/home";';
+          echo '</script>';
+          echo '<noscript>';
+          echo '<meta http-equiv="refresh" content="0;url=../user/home" />';
+          echo '</noscript>'; exit;
       } else {
         echo "psw not matched: ".$_POST['tester_pass'];
         exit;
