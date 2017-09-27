@@ -135,9 +135,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
                 die("<br>Connection Error: Could not Connect.<br>");
               }
 
-              if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
-                echo "Database was created. <br>";
-              } else {
+              if(!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
                 echo mysqli_error($conn);
                 unlink(dirname(__DIR__) .'/connection_config.php');
                 die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
@@ -149,8 +147,6 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
 
               $conn->query("SET NAMES 'utf8';");
               $conn->query("SET CHARACTER SET 'utf8';");
-
-              echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
 
               set_time_limit(0); //setup takes longer with a laptop in energy saving mode
               //create all tables
@@ -334,8 +330,12 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               exec($command, $output, $returnValue);
 
               //------------------------------------------------------------------------------
-              die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login/auth">Next</a>');
-
+              echo '<script type="text/javascript">';
+              echo 'window.location.href="../login/auth";';
+              echo '</script>';
+              echo '<noscript>';
+              echo '<meta http-equiv="refresh" content="0;url=../login/auth" />';
+              echo '</noscript>'; exit;
             } else {
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
             }
