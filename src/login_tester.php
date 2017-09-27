@@ -16,9 +16,10 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         $data = trim($data);
         return $data;
     }
-
+    echo 'Step 1';
     $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
     if($row = $result->fetch_assoc()){
+      echo 'Step 2';
       if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
           $_SESSION['userid'] = $row['id'];
           $_SESSION['firstname'] = $row['firstname'];
@@ -46,12 +47,13 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
       }
     } else {
       echo $conn->error;
+      echo 'mep';
     }
 }
 
 if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
   $login_token = urlencode($login_token);
-  header("Location: /login?tok=$login_token");
+  //header("Location: /login?tok=$login_token");
 }
 ?>
 
