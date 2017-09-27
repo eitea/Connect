@@ -90,7 +90,6 @@ else:
 </style>
 <title>Login</title>
 <body>
-  <div class="col text-center" style="margin-top:5%"><a href="demo" class="btn btn-primary btn-lg">Für Testversion Anmelden</a></div>
   <form method="POST">
     <div class="lightBox container-fluid">
       <div class="row">

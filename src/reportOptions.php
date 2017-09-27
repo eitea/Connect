@@ -10,12 +10,12 @@ if(isset($_POST['saveButton'])){
     $val = intval($_POST['smtp_port']);
     $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
   }
-  if(isset($_POST['smtp_username'])){
-    $val = test_input($_POST['smtp_username']);
+  if(isset($_POST['mail_username'])){
+    $val = test_input($_POST['mail_username']);
     $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
   }
-  if(isset($_POST['smtp_password'])){
-    $val = test_input($_POST['smtp_password']);
+  if(isset($_POST['mail_password'])){
+    $val = test_input($_POST['mail_password']);
     $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
   }
   if(isset($_POST['smtp_secure'])){
@@ -76,10 +76,10 @@ $row = $result->fetch_assoc();
     <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
     <br><br><br>
     <div class="col-md-4">Username</div>
-    <div class="col-md-8"><input type="text" class="form-control" name="smtp_username"  value="<?php echo $row['username']; ?>" /></div>
+    <div class="col-md-8"><input type="text" class="form-control" name="mail_username"  value="<?php echo $row['username']; ?>" /></div>
     <br><br>
     <div class="col-md-4">Passwort</div>
-    <div class="col-md-8"><input type="password" class="form-control" name="smtp_password" /></div>
+    <div class="col-md-8"><input type="password" class="form-control" name="mail_password" /></div>
     <br>
   </div>
 </form>
