@@ -1,6 +1,6 @@
 <?php
 $tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
-$login_token = $_POST['login_token'];
+$login_token = $_POST['token'];
 
 require __DIR__ .'/connection.php';
 
