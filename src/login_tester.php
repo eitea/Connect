@@ -16,41 +16,43 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         $data = trim($data);
         return $data;
     }
-    $result = mysqli_query($conn, "SELECT * FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
-    if($result){
-        $row = $result->fetch_assoc();
-        if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
-            $_SESSION['userid'] = $row['id'];
-            $_SESSION['firstname'] = $row['firstname'];
-            $_SESSION['language'] = $row['preferredLang'];
-            $_SESSION['timeToUTC'] = test_input($_POST['funZone']);
-            $_SESSION['filterings'] = array();
-            $_SESSION['color'] = $row['color'];
-        
-            //check for updates, if core admin
-            $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
-            $result = $conn->query($sql);
-            if($result && $result->num_rows > 0){
-                require __DIR__ ."/language.php";
-                include __DIR__ .'/version_number.php';
 
-                $sql = "SELECT * FROM $adminLDAPTable;";
-                $result = mysqli_query($conn, $sql);
-                $row = $result->fetch_assoc();
-                if($row['version'] < $VERSION_NUMBER){
-                    header("Location: update");
-                    die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
-                }
-            }
-            header('Location: ../user/home');
-        }
+    $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
+    if($row = $result->fetch_assoc()){
+      if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
+          $_SESSION['userid'] = $row['id'];
+          $_SESSION['firstname'] = $row['firstname'];
+          $_SESSION['language'] = $row['preferredLang'];
+          $_SESSION['timeToUTC'] = test_input($_POST['funZone']);
+          $_SESSION['filterings'] = array();
+          $_SESSION['color'] = $row['color'];
+      
+          //check for updates, if core admin
+          $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
+          $result = $conn->query($sql);
+          if($result && $result->num_rows > 0){
+              require __DIR__ ."/language.php";
+              include __DIR__ .'/version_number.php';
+
+              $sql = "SELECT * FROM $adminLDAPTable;";
+              $result = mysqli_query($conn, $sql);
+              $row = $result->fetch_assoc();
+              if($row['version'] < $VERSION_NUMBER){
+                  header("Location: update");
+                  die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
+              }
+          }
+          header('Location: ../user/home');
+      }
+    } else {
+      echo $conn->error;
     }
 }
 
-if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok):
-    $login_token = urlencode($login_token);
-    header("Location: /login?tok=$login_token");
-else:
+if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
+  $login_token = urlencode($login_token);
+  header("Location: /login?tok=$login_token");
+}
 ?>
 
 <!DOCTYPE html>
@@ -74,7 +76,7 @@ else:
   body{
     color:white;
     overflow:hidden;
-    background-image:url(background.png);
+    background-image:url(images/linz.jpg);
     background-repeat: no-repeat;
     background-origin: content-box;
     background-attachment: fixed;
@@ -93,20 +95,20 @@ else:
 <body>
   <form method="POST">
     <div class="lightBox container-fluid">
-      <div class="row">
+      <div class="row justify-content-end">
         <div class="col">
-            <h3><label style="font-weight:100" >Connect - Login</label></h3>
+            <h3>Connect - Login</h3>
         </div>
-        <div class="w-100"><br></div>
+        <br>
         <div class="col">
-            <input type="password" class="form-control" placeholder="Password" name="tester_pass"/>
-            <input type="hidden" name="tester_mail" value="<?php echo $_POST['mail']; ?>" />
-            <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
+          <input type="password" class="form-control" placeholder="Password" name="tester_pass" />
+          <input type="hidden" name="tester_mail" value="<?php echo $_POST['mail']; ?>" />
+          <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
         </div>
       </div>
       <div class="row justify-content-end">
         <div class="col">
-          <button type="submit" class="btn btn-light btn-block" style="font-weight:100" >Weiter</button>
+          <button type="submit" class="btn btn-default btn-block" style="font-weight:100" >Weiter</button>
         </div>
       </div>
       <input type="hidden" id="funZone" name="funZone" style="display:none"/>
@@ -130,5 +132,3 @@ else:
   </script>
 </body>
 </html>
-
-<?php endif; ?>
