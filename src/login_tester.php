@@ -16,10 +16,8 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         $data = trim($data);
         return $data;
     }
-    echo 'Step 1';
     $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
     if($row = $result->fetch_assoc()){
-      echo 'Step 2';
       if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
           $_SESSION['userid'] = $row['id'];
           $_SESSION['firstname'] = $row['firstname'];
@@ -44,6 +42,8 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
               }
           }
           header('Location: ../user/home');
+      } else {
+        echo "psw not matched: ".$_POST['tester_pass'];
       }
     } else {
       echo $conn->error;
