@@ -82,22 +82,15 @@ if(isset($_POST['request_submit'])){
   </thead>
   <tbody>
     <?php
-    $now = $filterings['date'][0] .'-01 01:00:00';
-    $calculator = new Interval_Calculator($now, date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), $userID);
-    if(!empty($calculator->monthly_correctionHours[0])){
-      $corrections = array_sum($calculator->monthly_correctionHours);
-      echo "<tr style='font-weight:bold;'>";
-      echo "<td>".$lang['CORRECTION']." </td>";
-      echo "<td>".$lang['MONTH_TOSTRING'][intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
-      echo "<td>".displayAsHoursMins($corrections)."</td><td></td>";
-      echo "</tr>";
-    } else {
-      $corrections = 0;
-    }
-    $accumulatedSaldo = $corrections;
+    $now = $filterings['date'][0];
+    $end = date('Y-m-d', strtotime('+1 month', strtotime($now)));
+    $calculator = new Interval_Calculator($userID, $now .'-01', $end);
+    
+    $accumulatedSaldo = 0;
     for($i = 0; $i < $calculator->days; $i++){
       if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
       if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
+
       if($calculator->start[$i]){
         $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
       } else {
@@ -175,7 +168,8 @@ if(isset($_POST['request_submit'])){
             <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
-              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Sonderzeichen werden immer entfernt.</small>
+              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Leere Felder sind ungültig.
+              Die Uhrzeit wird bei Bewilligung exakt auf die angegebenen Daten <u>ausgebessert</u>.  Sonderzeichen werden automatisch entfernt.</small>
             </div>
           </div>
         </div>

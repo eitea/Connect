@@ -1,6 +1,6 @@
 <?php
-require 'Calculators/LogCalculator.php';
-$logSums = new LogCalculator($curID);
+require 'Calculators/IntervalCalculator.php';
+$logSums = new Interval_Calculator($curID);
 
 if($logSums->saldo < 0){
   $color = 'style=color:red';
@@ -19,10 +19,10 @@ if($result_Sum && $result_Sum->num_rows > 0){
 <div class="container-fluid text-right"><a data-toggle="collapse" href="#infoSummarycollapse" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-question-circle"></i></a></div>
 <div class="collapse" id="infoSummarycollapse">
   <div class="well">
-    This is an overall summary of all hours this user has, filters do not apply here. <br>
     Sumamries below display all hours this User has, starting from entrance date until now or, if defined, the date of exit.
   </div>
 </div>
+
 
 <div class="container-fluid">
   <div class="col-md-4">
@@ -34,12 +34,16 @@ if($result_Sum && $result_Sum->num_rows > 0){
       </thead>
       <tbody>
         <?php
-        echo '<tr><td>'.$lang['EXPECTED_HOURS'].'</td><td>-'. number_format($logSums->expectedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format($logSums->absolvedHours, 2, '.', '') .'</td></tr>';
-        echo '<tr><td>'.$lang['LUNCHBREAK'].'</td><td>-'. number_format($logSums->breakCreditHours, 2, '.', '') . '</td></tr>';
-        echo '<tr><td>'.$lang['OTHER'].'</td><td>+'.number_format($logSums->vacationHours + $logSums->specialLeaveHours + $logSums->sickHours + $logSums->educationHours, 2, '.', '').'</td></tr>';
-        echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . '</td> <td> -' . number_format($logSums->overTimeAdditive,2,'.','') . ' </td></tr>';
-        echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a></td><td>'.sprintf('%+.2f',$logSums->correctionHours).'</td></tr>';
+        echo '<tr><td>'.$lang['EXPECTED_HOURS'].'</td><td>-'. number_format(array_sum($logSums->shouldTime), 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format(array_sum($logSums->absolvedTime), 2, '.', '') .'</td></tr>';
+        echo '<tr><td>'.$lang['LUNCHBREAK'].'</td><td>-'. number_format(array_sum($logSums->lunchTime), 2, '.', '') . '</td></tr>';
+        $overTimeAdditive = $corrections = 0;
+        foreach($logSums->endOfMonth as $arr){
+          $overTimeAdditive += $arr['overTimeLump'];
+          $corrections += $arr['correction'];
+        }
+        if($overTimeAdditive) echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . '</td> <td> -' . number_format($overTimeAdditive) . ' </td></tr>';
+        if($corrections) echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a></td><td>'.sprintf('%+.2f',$corrections).'</td></tr>';
         echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
         ?>
       </tbody>
@@ -79,7 +83,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
       <tbody>
         <?php
         echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
-        echo '<tr><td><a href="../time/vacations?curID='.$curID.'" >'. $lang['VACATION_DAYS'].' '.$lang['AVAILABLE'].'</a></td><td>'. sprintf('%.2f', $logSums->vacationDays) .'</td></tr>';
+        echo '<tr><td><a href="../time/vacations?curID='.$curID.'" >'. $lang['VACATION_DAYS'].' '.$lang['AVAILABLE'].'</a></td><td>'. sprintf('%.2f', $logSums->availableVacation) .'</td></tr>';
         echo '<tr><td>'. $lang['VACATION_DAYS'].$lang['PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
         echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
         ?>
