@@ -5,10 +5,11 @@ require __DIR__ .'/connection.php';
 
 $tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
-    $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
-    if($result && ($row = $result->fetch_assoc())){
-        echo $row['total'] ;
-    }
+  $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
+  if($result && ($row = $result->fetch_assoc())){
+      echo $row['total'] ;
+      exit;
+  }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
     function test_input($data){
         $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
