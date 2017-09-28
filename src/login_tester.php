@@ -11,52 +11,47 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
       exit;
   }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
-    function test_input($data){
-        $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
-        $data = trim($data);
-        return $data;
-    }
-    $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
-    if($row = $result->fetch_assoc()){
-      session_start();
-      var_dump($row); //it will not work without this
-      if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {          
-          $_SESSION['userid'] = $row['id'];
-          $_SESSION['firstname'] = $row['firstname'];
-          $_SESSION['language'] = $row['preferredLang'];
-          $_SESSION['timeToUTC'] = test_input($_POST['funZone']);
-          $_SESSION['filterings'] = array();
-          $_SESSION['color'] = $row['color'];
-      
-          //check for updates, if core admin
-          $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
-          $result = $conn->query($sql);
-          if($result && $result->num_rows > 0){
-            require __DIR__ ."/language.php";
-            include __DIR__ .'/version_number.php';
+  function test_input($data){
+      $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
+      $data = trim($data);
+      return $data;
+  }
+  $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
+  if($row = $result->fetch_assoc()){
+    session_start();
+    //magic, do not touch
+    var_dump($row); //it will not work without this
+    if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
+        $_SESSION['userid'] = $row['id'];
+        $_SESSION['firstname'] = $row['firstname'];
+        $_SESSION['language'] = $row['preferredLang'];
+        $_SESSION['timeToUTC'] = test_input($_POST['funZone']);
+        $_SESSION['filterings'] = array();
+        $_SESSION['color'] = $row['color'];
+    
+        //check for updates, if core admin
+        $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
+        $result = $conn->query($sql);
+        if($result && $result->num_rows > 0){
+          require __DIR__ ."/language.php";
+          include __DIR__ .'/version_number.php';
 
-            $sql = "SELECT * FROM $adminLDAPTable;";
-            $result = mysqli_query($conn, $sql);
-            $row = $result->fetch_assoc();
-            if($row['version'] < $VERSION_NUMBER){
-                header("Location: update");
-                die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
-            }
+          $sql = "SELECT * FROM $adminLDAPTable;";
+          $result = mysqli_query($conn, $sql);
+          $row = $result->fetch_assoc();
+          if($row['version'] < $VERSION_NUMBER){
+              header("Location: update");
+              die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
           }
-          echo '<script type="text/javascript">';
-          echo 'window.location.href="../user/home";';
-          echo '</script>';
-          echo '<noscript>';
-          echo '<meta http-equiv="refresh" content="0;url=../user/home" />';
-          echo '</noscript>'; exit;
-      } else {
-        echo "psw not matched: ".$_POST['tester_pass'];
-        exit;
-      }
-    } else {
-      echo $conn->error .'.';
-      exit;
+        }
+        echo '<script type="text/javascript">';
+        echo 'window.location.href="../user/home";';
+        echo '</script>';
+        echo '<noscript>';
+        echo '<meta http-equiv="refresh" content="0;url=../user/home" />';
+        echo '</noscript>'; exit;
     }
+  }
 }
 
 if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){

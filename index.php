@@ -43,7 +43,6 @@ if (strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64') || strpos($_SERVER["HTTP_USER_A
   die();
 }
 
-
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
 $params = explode('/', $url);

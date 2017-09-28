@@ -132,6 +132,7 @@ class Interval_Calculator{
         if($absolved_bonus > 0 && $mixed_row['status'] == 1){
           //do I have to check here if it was in core time or not?
           $this->absolvedTime[$this->days] += $absolved_bonus;
+          $this->availableVacation -= 0.5;
         } else {
           //if hours are missing (any breaks will cause a minus)
           if($absolved_bonus > 0 && $this->absolvedTime[$this->days] < $this->shouldTime[$this->days]){
