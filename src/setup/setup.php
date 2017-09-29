@@ -104,7 +104,17 @@ ignore_user_abort(1);
         }
         $firstname = $lastname = $companyName = $companyType = $localPart = $domainpart = $out = "";
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){          
+          $cmpDescription = $uid = $postal = $address = $phone = $homepage = $email = '';
+          if(isset($_POST['cmpDescription'])){
+            $cmpDescription = $_POST['cmpDescription'];
+            $uid = $_POST['uid'];
+            $postal = $_POST['postal'];
+            $address = $_POST['address'];
+            $phone = $_POST['phone'];
+            $homepage = $_POST['homepage'];
+            $email = $_POST['mail'];
+          }
           if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
             $psw = $_POST['adminPass'];
             $companyName = test_input($_POST['companyName']);
@@ -156,13 +166,13 @@ ignore_user_abort(1);
 
               require_once dirname(__DIR__) . "/version_number.php";
               //------------------------------ INSERTS ---------------------------------------
-
               //insert identification
               $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
-              $sql = "INSERT INTO companyData (name, companyType) VALUES ('$companyName', '$companyType')";
-              $conn->query($sql);
+              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+              $stmt->bind("sssssssss", $companyName, $companyType, $cmpDescription, $postal, $uid, $address, $phone, $email, $homepage);
+              $stmt->execute();
               //insert password policy
               $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
               //insert module en/disable
