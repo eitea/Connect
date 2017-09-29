@@ -1,5 +1,5 @@
 <?php
-if(file_exists(dirname(__DIR__) . '/connection_config.php')){
+if(file_exists(dirname(__DIR__) . '/connection_config.php') || getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
   header("Location: ../login/auth");
 }
 ignore_user_abort(1);
@@ -102,7 +102,7 @@ ignore_user_abort(1);
         if(!function_exists('mysqli_init') && !extension_loaded('mysqli')) {
           die('Mysqli not available.');
         }
-        $firstname = $lastname = $companyName = $companyType = $localPart = $domainpart = $out = "";
+        $firstname = $lastname = $companyName = $companyType = $localPart = $domainname = $out = "";
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){          
           $cmpDescription = $uid = $postal = $address = $phone = $homepage = $email = '';
@@ -414,7 +414,7 @@ ignore_user_abort(1);
                 <div class="input-group">
                   <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>" />
                   <span class="input-group-addon text-warning"> @ </span>
-                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
+                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainname ?>" />
                 </div>
               </div>
               <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
