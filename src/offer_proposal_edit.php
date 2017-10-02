@@ -471,7 +471,7 @@ $x = $prod_row['id'];
       <div class="row">
         <div class="col-md-6">
           <label><?php echo $lang['QUANTITY']; ?></label>
-          <input type="number" class="form-control required-field" name="add_product_quantity" value="1" />
+          <input type="number" step="0.01" class="form-control required-field" name="add_product_quantity" value="1" />
         </div>
         <div class="col-md-6">
           <label><?php echo $lang['UNIT']; ?></label>

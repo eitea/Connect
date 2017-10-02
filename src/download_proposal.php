@@ -178,7 +178,7 @@ if($prod_res && $prod_res->num_rows > 0){
       $pdf->Cell($w[0],6);
       $pdf->SetFont('Helvetica','B');
       $pdf->Cell($w[1] + $w[2] + $w[3] + $w[4],6,$lang['PARTIAL_SUM']);
-      $pdf->Cell($w[5],6,sprintf('%.2f', $netto_value - $part_sum_netto). ' EUR',0,1,'R');
+      $pdf->Cell($w[5],6,number_format($netto_value - $part_sum_netto,2,',','.'). ' EUR',0,1,'R');
       $pdf->SetFont('Helvetica');
       $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
       $part_sum_netto += $netto_value - $part_sum_netto;
@@ -214,7 +214,7 @@ if($prod_res && $prod_res->num_rows > 0){
       //Quantity
       $pdf->Cell($w[2],6,$prod_row['quantity'].' '.iconv('UTF-8', 'windows-1252', $prod_row['unit']),0,0,'R');
       //Price
-      $pdf->Cell($w[3],6,sprintf('%.2f', $prod_row['price']). ' EUR',0,0,'R');
+      $pdf->Cell($w[3],6,number_format($prod_row['price'],2,',','.'). ' EUR',0,0,'R');
       //Taxes
       if($prod_row['cash'] == 'TRUE'){
         $pdf->Cell($w[4],6,'BAR','',0,'R');
@@ -224,7 +224,7 @@ if($prod_res && $prod_res->num_rows > 0){
         $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
         $netto_value += $prod_row['total'];
       }
-      $pdf->Cell($w[5],6,sprintf('%.2f', $prod_row['total']). ' EUR',0,1,'R');
+      $pdf->Cell($w[5],6,number_format($prod_row['total'],2,',','.'). ' EUR',0,1,'R');
       $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
       $i++;
     }
@@ -238,10 +238,10 @@ if(280 - $pdf->GetY() < 30){ $pdf->AddPage(); } //if writable space is less than
 //Summary
 $pdf->SetFontSize(8);
 $col1 = "Warenwert";
-$col2 = $netto_value." EUR";
+$col2 = number_format($netto_value, 2, ',', '.')." EUR";
 if($row['porto']){
   $col1 .= "\nPorto";
-  $col2 .= "\n".$row['porto']." EUR";
+  $col2 .= "\n".number_format($row['porto'], 2, ',', '.')." EUR";
 }
 $pdf->MultiColCell(30, 4, $col1);
 $pdf->MultiColCell(30, 4, $col2 , 0, 'R');
@@ -253,11 +253,11 @@ $porto_vat = $row['porto'] * $row['portoRate'] / 100;
 $netto_value += $row['porto'];
 $vat_value += $porto_vat;
 $col1 =  $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT'];
-$col2 = sprintf('%.2f EUR', $netto_value)."\n".sprintf('%.2f EUR', $vat_value);
+$col2 = number_format($netto_value, 2, ',', '.')."\n".number_format($vat_value, 2, ',', '.');
 $dist = 10;
 if($cash_value){
   $col1 .= "\n".$lang['CASH_EXPENSE'];
-  $col2 .= "\n".sprintf('%.2f EUR', $cash_value);
+  $col2 .= "\n".number_format($cash_value, 2, ',', '.');
   $dist = 15;
 }
 $pdf->MultiColCell(30, 5, $col1, 'B', 1, 0, 70);
@@ -266,7 +266,7 @@ $pdf->SetFont('Helvetica', 'B');
 $pdf->Ln($dist);
 $pdf->Cell(130);
 $pdf->Cell(30, 6, $lang['SUM']);
-$pdf->Cell(30, 6, sprintf('%.2f EUR', $netto_value + $vat_value + $cash_value), 0 , 1, 'R');
+$pdf->Cell(30, 6, number_format($netto_value + $vat_value + $cash_value, 2, ',', '.'), 0 , 1, 'R');
 $pdf->SetFont('Helvetica');
 $pdf->Ln(5);
 
@@ -292,12 +292,12 @@ if($row['paymentMethod']){
     }
     if($paymentRow['skonto1'] > 0) {
       $date = date("d.m.Y", strtotime("+".$paymentRow['skonto1Days']." days", strtotime($row['curDate'])));
-      $payment_2 = $paymentRow['skonto1'].'% '.$lang['WITHIN'].' '.$paymentRow['skonto1Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. sprintf('%.2f EUR', $netto_value * ((100 - $paymentRow['skonto1']) / 100));
+      $payment_2 = $paymentRow['skonto1'].'% '.$lang['WITHIN'].' '.$paymentRow['skonto1Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. number_format($netto_value * ((100 - $paymentRow['skonto1']) / 100), 2, ',', '.');
       $payment_name = '';
     }
     if($paymentRow['skonto2'] > 0){
       $date = date("d.m.Y", strtotime("+".$paymentRow['skonto2Days']." days", strtotime($row['curDate'])));
-      $payment_3 =  $paymentRow['skonto2'].'% '.$lang['WITHIN'].' '.$paymentRow['skonto2Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. sprintf('%.2f EUR', $netto_value * ((100 - $paymentRow['skonto2']) / 100));
+      $payment_3 =  $paymentRow['skonto2'].'% '.$lang['WITHIN'].' '.$paymentRow['skonto2Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. number_format($netto_value * ((100 - $paymentRow['skonto2']) / 100), 2, ',', '.');
       $payment_name = '';
     }
   }
@@ -310,7 +310,7 @@ if($row['daysNetto'] > 0){
 }
 if($row['skonto1'] > 0){
   $date = date("d.m.Y", strtotime("+".$row['skonto1Days']." days", strtotime($row['curDate'])));
-  $payment_2 = $row['skonto1'].'% '.$lang['WITHIN'].' '.$row['skonto1Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. sprintf('%.2f EUR', $netto_value * ((100 - $row['skonto1']) / 100));
+  $payment_2 = $row['skonto1'].'% '.$lang['WITHIN'].' '.$row['skonto1Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. number_format($netto_value * ((100 - $row['skonto1']) / 100), 2, ',', '.');
 }
 
 if($payment_name) $pdf->Cell(0, 4, iconv('UTF-8', 'windows-1252', $payment_name), 0, 1);

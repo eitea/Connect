@@ -1614,11 +1614,6 @@ if($row['version'] < 104){
   } else {
     echo '<br>Zahlungsmethoden Update';
   }
-
-  $conn->query("INSERT INTO paymentMethods name VALUES ('Rechnung sofort nach Erhalt fällig')");
-  if($conn->query($sql)){
-    echo '<br> Insert Zahlungsmethode';
-  }
 }
 
 //------------------------------------------------------------------------------
