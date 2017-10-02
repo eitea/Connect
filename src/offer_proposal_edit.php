@@ -594,12 +594,8 @@ $x = $prod_row['id'];
     </div>
     <div class="modal-body">
       <div class="container-fluid">
-        <div class="col-xs-2">Tage Netto:</div>
-        <div class="col-xs-4">
-          <input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">Zahlungsweise:</div>
-        <div class="col-xs-4">
+        <div class="col-xs-2">Zahlungsweise:</div>
+        <div class="col-xs-10">
           <select class="js-example-basic-single" name="meta_paymentMethod">
             <option value="">...</option>
             <?php
@@ -612,7 +608,12 @@ $x = $prod_row['id'];
           </select>
         </div>
       </div>
-      <br>
+      <hr>
+      <div class="container-fluid">
+        <div class="col-xs-2">Tage Netto:</div>
+        <div class="col-xs-4"><input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" /></div>
+      </div>
+      <br>  
       <div class="container-fluid">
         <div class="col-xs-2">
           Skonto 1: (%)

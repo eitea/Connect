@@ -17,8 +17,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
   } elseif(isset($_POST['add']) && !empty($_POST['add_name'])){
+    $nam = $netto = $skonto1 = $skonto2 = $skonto1Days = $skonto2Days = 0;
     $nam = test_input($_POST['add_name']);
-    $conn->query("INSERT INTO paymentMethods (name) VALUES ('$nam')");
+    $skonto1 = $_POST['add_skonto1'];
+    $skonto2 = $_POST['add_skonto2'];
+    $skonto1Days = $_POST['add_skonto1Days'];
+    $skonto2Days = $_POST['add_skonto2Days'];
+    $stmt = $conn->prepare("INSERT INTO paymentMethods (name, daysNetto, skonto1, skonto2, skonto1Days, skonto2Days) VALUES (?, ?, ?, ?, ?, ?) ");
+    $stmt->bind_param("siddii", $nam, $netto, $skonto1, $skonto2, $skonto1Days, $skonto2Days);
+    $stmt->execute();
+    $stmt->close();
     if($conn->error){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
@@ -33,6 +41,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
     }
+  } else {
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 }
 ?>
@@ -47,27 +57,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </h3>
   </div>
   <div class="container-fluid">
-    <div class="col-md-6">
-      <table class="table table-hover">
-        <thead>
-          <th><?php echo $lang['DELETE']; ?></th>
-          <th>Name</th>
-          <th></th>
-        </thead>
-        <tbody>
-          <?php
-          $result = $conn->query("SELECT * FROM paymentMethods");
-          while ($result && ($row = $result->fetch_assoc())) {
-            echo '<tr>';
-            echo '<td><input type="checkbox" name="deleteIDs[]" value="'.$row['id'].'" /></td>';
-            echo '<td><input type="text" name="name[]" value="'.$row['name'].'" class="form-control" maxlength="100" /></td>';
-            echo '<td><input type="hidden" name="ids[]" value="'.$row['id'].'" /></td>';
-            echo '</tr>';
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
+    <table class="table table-hover">
+      <thead>
+        <th><?php echo $lang['DELETE']; ?></th>
+        <th>Name</th>
+        <th><?php echo $lang['TYPE']; ?></th>
+        <th></th>
+      </thead>
+      <tbody>
+        <?php
+        $result = $conn->query("SELECT * FROM paymentMethods");
+        while ($result && ($row = $result->fetch_assoc())) {
+          echo '<tr>';
+          echo '<td><input type="checkbox" name="deleteIDs[]" value="'.$row['id'].'" /></td>';
+          echo '<td><input type="text" name="name[]" value="'.$row['name'].'" class="form-control" maxlength="100" /></td>';
+          echo '<td>'.$row['daysNetto'].' '.$row['skonto1'].' '.$row['skonto1Days'].' '.$row['skonto2'].' '.$row['skonto2Days'].'</td>';
+          echo '<td><input type="hidden" name="ids[]" value="'.$row['id'].'" /></td>';
+          echo '</tr>';
+        }
+        ?>
+      </tbody>
+    </table>
   </div>
 </form>
 <?php include 'footer.php'; ?>
@@ -80,7 +90,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-body">
         <label>Name</label>
-        <input type="text" name="add_name" class="form-control" maxlength="100" placeholder="Name" /><br>
+        <input type="text" name="add_name" class="form-control" maxlength="100" placeholder="z.B.: 3% Skonto 8 Tage, 30 Tage Netto" /><br>
+        <div class="row">
+          <div class="col-xs-2">Netto:</div>
+          <div class="col-xs-3"><input type="number" class="form-control" name="add_daysNetto" placeholder="0" /></div>
+          <div class="col-xs-2">Tage</div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-xs-2">Skonto 1:</div>
+          <div class="col-xs-3"><input type="number" step="0.01" class="form-control" name="add_skonto1" placeholder="0" /></div>
+          <div class="col-xs-2 text-center">% Innerhalb von</div>
+          <div class="col-xs-3"><input type="number" class="form-control" name="add_skonto1Days" placeholder="0" /></div>
+          <div class="col-xs-1">Tagen</div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-xs-2">Skonto 2:</div>
+          <div class="col-xs-3"><input type="number" step="0.01" class="form-control" name="add_skonto2" placeholder="0" /></div>
+          <div class="col-xs-2 text-center">% Innerhalb von</div>
+          <div class="col-xs-3"><input type="number" class="form-control" name="add_skonto2Days" placeholder="0" /></div>
+          <div class="col-xs-1">Tagen</div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button"  class="btn btn-default" data-dismiss="modal" ><?php echo $lang['CANCEL']; ?></button>

@@ -1598,7 +1598,26 @@ if($row['version'] < 103){
   $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
   $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
   if($conn->query($sql)){
-    echo '<br> Created identification table';
+    echo '<br> Insert unique ID';
+  }
+}
+
+if($row['version'] < 104){
+  $conn->query("ALTER TABLE paymentMethods ADD COLUMN daysNetto INT(4)");
+  $conn->query("ALTER TABLE paymentMethods ADD COLUMN skonto1 DECIMAL(6,2)");
+  $conn->query("ALTER TABLE paymentMethods ADD COLUMN skonto2 DECIMAL(6,2)");
+  $conn->query("ALTER TABLE paymentMethods ADD COLUMN skonto1Days INT(4)");
+  $conn->query("ALTER TABLE paymentMethods ADD COLUMN skonto2Days INT(4)");
+
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>Zahlungsmethoden Update';
+  }
+
+  $conn->query("INSERT INTO paymentMethods name VALUES ('Rechnung sofort nach Erhalt fällig')");
+  if($conn->query($sql)){
+    echo '<br> Insert Zahlungsmethode';
   }
 }
 

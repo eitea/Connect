@@ -50,7 +50,6 @@ $result = $conn->query("SELECT enableReadyCheck FROM configurationData");
 $row = $result->fetch_assoc();
 $showReadyPlan = $row['enableReadyCheck'];
 
-//TODO: is this even setable?
 $result = $conn->query("SELECT enableSocialMedia FROM modules");
 if($result && ($row = $result->fetch_assoc())){
   $enableSocialMedia = $row['enableSocialMedia'];
@@ -472,7 +471,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                           }
                         }
                     },
-                })
+                });
               }
               setInterval(updateSocialBadge,10000) // 10 seconds
 

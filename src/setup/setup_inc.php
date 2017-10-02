@@ -745,7 +745,12 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE paymentMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100)
+    name VARCHAR(100),
+    daysNetto INT(4),
+    skonto1 DECIMAL(6,2),
+    skonto2 DECIMAL(6,2),
+    skonto1Days INT(4),
+    skonto2Days INT(4)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -838,13 +843,11 @@ function create_tables($conn){
   )")){
     echo mysqli_error($conn);
   }
-}
-
-$sql = "CREATE TABLE identification(
-  id VARCHAR(60) PRIMARY KEY
-)";
+  
+  $sql = "CREATE TABLE identification(
+    id VARCHAR(60) PRIMARY KEY
+  )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-
-?>
+}
