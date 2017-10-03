@@ -159,7 +159,7 @@ if($row['header']) {
   $pdf->MultiCell(0, 4, iconv('UTF-8', 'windows-1252', $row['header']));
 }
 
-if($row['referenceNumrow'] == 'checked'){
+if($row['yourSign'] || $row['yourOrder'] || $row['ourSign'] || $row['ourMessage']){
   $pdf->Ln(5);
   $pdf->SetFontSize(8);
   $pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
