@@ -92,7 +92,12 @@ class Interval_Calculator{
         $this->activity[$this->days] = $row['status'];
         $this->timeToUTC[$this->days] = $row['timeToUTC'];
         $this->indecesIM[$this->days] = $row['indexIM'];
-        $this->absolvedTime[$this->days] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? timeDiff_Hours($row['time'], getCurrentTimestamp()) : timeDiff_Hours($row['time'], $row['timeEnd']);
+        if($row['timeEnd'] == '0000-00-00 00:00:00'){
+          $this->absolvedTime[$this->days] = timeDiff_Hours($row['time'], getCurrentTimestamp());
+          $this->shouldTime[$this->days] = $this->absolvedTime[$this->days] < $this->shouldTime[$this->days] ? $this->absolvedTime[$this->days] : $this->shouldTime[$this->days];
+        } else {
+          $this->absolvedTime[$this->days] = timeDiff_Hours($row['time'], $row['timeEnd']);
+        }
         $row_break['breakCredit'] = 0;
         $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = ".$row['indexIM']);
         if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();

@@ -9,7 +9,7 @@ $filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'c
     <?php echo $lang['TIMESTAMPS']; ?>
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
-      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
+      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" <?php if(!$filterings['user']) echo 'disabled'; ?> title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
     </div>
   </h3>
 </div>
@@ -17,7 +17,56 @@ $filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'c
 <?php
 //i need some filterings vars in here
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  
+  if(isset($_POST['saveChanges'])){
+    $imm = $_POST['saveChanges'];
+    $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
+    $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
+    $status = intval($_POST['newActivity']);
+    if($imm == 0){ //create new
+      $creatUser = intval($filterings['user']);
+      $timeToUTC = intval($_POST['creatTimeZone']);
+      $newBreakVal = floatval($_POST['newBreakValues']);
+      if($_POST['is_open']){
+        $timeFin = '0000-00-00 00:00:00';
+      } else {
+        if($timeFin != '0000-00-00 00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
+      }
+      $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
+      $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $creatUser, '$status', '$timeToUTC');";
+      $conn->query($sql);
+      $insertID = mysqli_insert_id($conn);
+      //create break for new timestamp
+      if($newBreakVal != 0){
+        $timeStart = carryOverAdder_Hours($timeStart, 4);
+        $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
+        $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
+      }
+      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+    } else { //update old
+      $addBreakVal = floatval($_POST['addBreakValues']);
+      if($addBreakVal){ //add a break
+        $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
+        $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
+      }
+      if($timeFin == '0000-00-00 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
+        $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', status='$status' WHERE indexIM = $imm";
+      } else {
+        $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), status='$status' WHERE indexIM = $imm";
+      }
+      if($conn->query($sql)){
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      } else {
+        echo mysqli_error($conn);
+      }
+    }
+  }
+
+  if (isset($_POST['ts_remove'])){
+    $x = intval($_POST['ts_remove']);
+    $conn->query("DELETE FROM $logTable WHERE indexIM=$x;");
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+  }
+
 } //endif post
 ?>
 
@@ -30,7 +79,6 @@ if($filterings['user']):
   if($result && ($row = $result->fetch_assoc())){
     $x = $row['id'];
   }
-
   ?>
   <br>
   <form method="post">
@@ -117,7 +165,7 @@ if($filterings['user']):
             echo '<td>' . displayAsHoursMins($saldo_month + $calculator->prev_saldo) . '</td>';
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
-              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
+              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
             echo '</td>';
@@ -128,7 +176,7 @@ if($filterings['user']):
             $absolvedHoursSUM += $calculator->absolvedTime[$i] - $calculator->lunchTime[$i];
           }
 
-          if(isset($calculator->endOfMonth[$calculator->date[$i]])){              
+          if(isset($calculator->endOfMonth[$calculator->date[$i]])){
             //overTimeLump
             if($calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'] > 0){
               $saldo_month -= $calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'];
@@ -170,6 +218,8 @@ if($filterings['user']):
 
   <!-- ############################### END TABLE END ################################### -->
 
+  <div id="editingModalDiv"></div>
+
   <!-- add intervals modal -->
   <form method="POST">
     <div class="modal fade addInterval">
@@ -193,7 +243,7 @@ if($filterings['user']):
                   if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
                   echo "<option $checked value='".$row_fc['id']."' >".$row_fc['firstname'].' '.$row_fc['lastname']."</option>";
                 }
-                  ?>
+                ?>
               </select>
             </div>
             <div class="col-md-6">
@@ -223,6 +273,23 @@ endif;
 ?>
 
 <script>
+var existingModals = new Array();
+function appendModal(id, index, date){
+  if(existingModals.indexOf(index) == -1){
+    $.ajax({
+    url:'ajaxQuery/AJAX_timeModal.php',
+    data:{timestampID:id, index:index, date:date},
+    type: 'get',
+    success : function(resp){
+      $("#editingModalDiv").append(resp);
+      existingModals.push(id);
+      onPageLoad();
+      $('.editingModal-'+index).modal('show');
+    },
+    error : function(resp){}
+   });
+  }
+}
 </script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

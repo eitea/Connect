@@ -3,7 +3,7 @@
 <?php
 $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
 $meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
-$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
+$meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_header = $meta_referenceNumrow = '';
 
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
   $_SESSION['filterings'] = array(); //clear filterings if they come from another page
@@ -31,18 +31,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'].' 12:00:00')){
     $meta_deliveryDate = test_input($_POST['meta_deliveryDate'].' 12:00:00');
   }
-  if(isset($_POST['meta_yourSign'])){
-    $meta_yourSign = test_input($_POST['meta_yourSign']);
-  }
-  if(isset($_POST['meta_yourOrder'])){
-    $meta_yourOrder = test_input($_POST['meta_yourOrder']);
-  }
-  if(isset($_POST['meta_ourSign'])){
-    $meta_ourSign = test_input($_POST['meta_ourSign']);
-  }
-  if(isset($_POST['meta_ourMessage'])){
-    $meta_ourMessage = test_input($_POST['meta_ourMessage']);
-  }
   if(isset($_POST['meta_daysNetto'])){
     $meta_daysNetto = intval($_POST['meta_daysNetto']);
   }
@@ -64,13 +52,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_porto'])){
     $meta_porto = floatval($_POST['meta_porto']);
   }
+  if(isset($_POST['meta_header'])){
+    $meta_header = test_input($_POST['meta_header']);
+  }
+  if(isset($_POST['meta_referenceNumrow'])){
+    $meta_referenceNumrow = 'checked';
+  }
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
   if(!$filterings['proposal'] && $filterings['client']){ //new proposal
-    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
-    VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
-    '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
+    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate, header, referenceNumrow)
+    VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_daysNetto',
+    '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage', '$meta_header', $meta_referenceNumrow)");
     $filterings['proposal'] = mysqli_insert_id($conn);
     echo $conn->error;
   }
@@ -188,11 +182,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
   if(isset($_POST['meta_save'])){
-    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
-      ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
-      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
-      WHERE id =".$filterings['proposal']);
-    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
+    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
+      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', 
+      header = '$meta_header', referenceNumrow = '$meta_referenceNumrow' WHERE id =".$filterings['proposal']);
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 } //END POST
 
@@ -204,7 +197,7 @@ if($filterings['proposal']){
 } elseif ($filterings['client'] && $filterings['number']) {
   $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = ".$filterings['client']);
   $row = $result->fetch_assoc();
-  $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
+  $row['porto'] = '';
   $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
 } else {
   redirect('view?err=1');
@@ -558,35 +551,19 @@ $x = $prod_row['id'];
     <div class="modal-body">
       <div class="container-fluid">
         <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
-        </div>
+        <div class="col-md-4"><input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/></div>
+        <div class="col-md-2 text-center"><?php echo $lang['EXPIRATION_DATE']; ?>:</div>
+        <div class="col-md-4"><input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" /></div>
       </div>
       <br>
       <div class="container-fluid">
-        <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
-        </div>
+        <div class="col-md-2"><?php echo $lang['REFERENCE_NUMERAL_ROW']; ?></div>
+        <div class="col-md-4"><input type="checkbox" class="form-control" name="meta_referenceNumrow" <?php echo $row['referenceNumrow']; ?> /></div>
       </div>
       <br>
       <div class="container-fluid">
-        <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
-        </div>
+        <div class="col-md-2">Kopftext</div>
+        <div class="col-md-10"><textarea rows="4" class="form-control" maxlength="400" style="resize: none;" name="meta_header"><?php echo $row['header']; ?></textarea></div>
       </div>
     </div>
     <div class="modal-header">

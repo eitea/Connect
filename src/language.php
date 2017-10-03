@@ -817,6 +817,9 @@ $lang_ger['RECEIPT'] = 'Rechnung';
 $lang_eng['RECEIPTS'] = 'Receipts';
 $lang_ger['RECEIPTS'] = 'Rechnungen';
 
+$lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
+$lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
+
 $lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';
 

@@ -121,7 +121,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    if($conn->error){ echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; } else {
      echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
    }
+ } elseif(isset($_POST['save_erp_reference_numrow'])){
+    $ourSign = test_input($_POST['erp_ourSign']);
+    $ourMessage = test_input($_POST['erp_ourMessage']);
+    $yourSign = test_input($_POST['erp_yourSign']);
+    $yourOrder = test_input($_POST['erp_yourOrder']);
+    $stmt = $conn->prepare("UPDATE erpNumbers SET ourSign = ?, ourMessage = ?, yourSign = ?, yourOrder = ?");
+    echo $conn->error;
+    $stmt->bind_param("ssss", $ourSign, $ourMessage, $yourSign, $yourOrder);
+    $stmt->execute();
+    $stmt->close();
  }
+
  if(isset($_POST['hire']) && isset($_POST['hiring_userIDs'])){
    foreach($_POST['hiring_userIDs'] as $i){
      $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES ($cmpID, $i)");
@@ -185,7 +196,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
  }
 
 }
-$result = $conn->query("SELECT * FROM $companyTable WHERE id = $cmpID");
+$result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
 if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
   ?>
 
@@ -719,7 +730,7 @@ $row = $result->fetch_assoc();
       <div class="well">
         Festsetzen der kleinsten Nummer des nächsten Auftrags. <br>
         Aufträge werden fortlaufend nummeriert, beginnend von der höchsten, bereits vorhandenen Zahl, welche zum ausgewählten Vorgang und jeweiligen Mandanten passt. <br>
-        Dieser sog. mindest-Offset kann hier zustäzlich eingestellt werden.
+        Dieser sog. mindest-Offset kann hier zustäzlich eingestellt werden. Ist die eingetragene Zahl die größte vorhandene Zahl, wird diese als nächste Nummer festgelegt.
       </div>
     </div>
     <div class="col-md-4">
@@ -749,9 +760,49 @@ $row = $result->fetch_assoc();
       <label><?php echo $lang['PROPOSAL_TOSTRING']['STN']; ?></label>
         <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
     </div>
+  </div><br>
+</form><br>
+
+<!-- ERP REFERENCE NUMERAL ROW -->
+<?php
+$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$row = $result->fetch_assoc();
+?>
+
+<form method="POST" class="page-seperated-section">
+  <h4>ERP <?php echo $lang['REFERENCE_NUMERAL_ROW']; ?></a>
+    <div class="page-header-button-group">
+      <button type="submit" class="btn btn-default" name="save_erp_reference_numrow"><i class="fa fa-floppy-o"></i></button>
+    </div>
+  </h4>
+  <div class="container-fluid">
+    <br>
+    <div class="collapse" id="erp_number_info">
+      <div class="well">
+        Die Bezugszeichenzeile wird in Aufträgen gedruckt. Ändern sich die Werte hier, bleiben 
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label><?php echo $lang['PROP_OUR_SIGN']; ?></label>
+        <input type="text" class="form-control" name="erp_ourSign" value="<?php echo $row['ourSign']; ?>" maxlength="25"/>
+    </div>
+    <div class="col-md-6">
+      <label><?php echo $lang['PROP_OUR_MESSAGE']; ?></label>
+        <input type="text" class="form-control" name="erp_ourMessage" value="<?php echo $row['ourMessage']; ?>" maxlength="25"/>
+    </div>
   </div>
   <br>
-</form>
+  <div class="container-fluid">
+    <div class="col-md-6">
+      <label><?php echo $lang['PROP_YOUR_SIGN']; ?></label>
+        <input type="text" class="form-control" name="erp_yourSign" value="<?php echo $row['yourSign']; ?>" maxlength="25"/>
+    </div>
+    <div class="col-md-6">
+      <label><?php echo $lang['PROP_YOUR_ORDER']; ?></label>
+        <input type="text" class="form-control" name="erp_yourOrder" value="<?php echo $row['yourOrder']; ?>" maxlength="25"/>
+    </div>
+  </div><br>
+</form><br>
 
 <?php endif;?>
 </div> <!-- /page-seperated-body -->

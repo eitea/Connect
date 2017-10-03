@@ -58,11 +58,12 @@ require "encryption_functions.php";
 
 $result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
-  clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City
+  clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, erpNumbers.yourSign, erpNumbers.yourOrder, erpNumbers.ourSign, erpNumbers.ourMessage
   FROM proposals
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
+  INNER JOIN erpNumbers ON erpNumbers.companyID = companyData.id
   WHERE proposals.id = $proposalID OR proposals.id_number = '$proposal_number' OR proposals.history LIKE '%$proposal_number%'");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);
@@ -89,7 +90,6 @@ if(finfo_file($finfo, $logo_path) == 'image/png'){
 }
 
 $pdf->glob['logo'] = $logo_path;
-
 $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
 $pdf->glob['footer_left'] = $row['detailLeft'];
 $pdf->glob['footer_middle'] = $row['detailMiddle'];
@@ -147,20 +147,26 @@ if($row['representative']){
 }
 
 $pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][$proposal_mark])."\n".$proposal_number);
-$pdf->SetFontSize(8);
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
+$pdf->SetFontSize(8);
 $pdf->MultiColCell(25, 4, $col, 0, 'L', 0, 30);
 $pdf->MultiColCell(0, 4, $col2, 0, 'R');
-$pdf->SetY($pdf->GetY() + 5, false);
 
-if($row['yourSign']){
-  $pdf->Ln(20);
+$pdf->Ln(20);
+if($row['header']) {
+  $pdf->Ln(5);
+  $pdf->SetFontSize(10);
+  $pdf->MultiCell(0, 4, iconv('UTF-8', 'windows-1252', $row['header']));
+}
+
+if($row['referenceNumrow'] == 'checked'){
+  $pdf->Ln(5);
+  $pdf->SetFontSize(8);
   $pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
   $pdf->MultiColCell(55, 4, $lang['PROP_YOUR_ORDER']."\n".$row['yourOrder']);
   $pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
   $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
-} else {
-  $pdf->Ln(15);
+  $pdf->Ln(5);
 }
 
 //PRODUCT TABLE
@@ -169,7 +175,7 @@ $netto_value = $vat_value = $cash_value = $part_sum_netto = 0;
 $pdf->SetFontSize(10);
 $prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
 if($prod_res && $prod_res->num_rows > 0){
-  $pdf->Ln(10);
+  $pdf->Ln(5);
   $pdf->SetFillColor(200,200,200);
   // Column widths
   $w = array(15, 70, 25, 30, 20, 0);
@@ -225,7 +231,7 @@ if($prod_res && $prod_res->num_rows > 0){
         $pdf->SetXY($x + $w[1], $y - 1);
       }
       //Quantity
-      $pdf->Cell($w[2],6,$prod_row['quantity'].' '.iconv('UTF-8', 'windows-1252', $prod_row['unit']),0,0,'R');
+      $pdf->Cell($w[2],6,number_format($prod_row['quantity'],2,',','.').' '.iconv('UTF-8', 'windows-1252', $prod_row['unit']),0,0,'R');
       //Price
       $pdf->Cell($w[3],6,number_format($prod_row['price'],2,',','.'). ' EUR',0,0,'R');
       //Taxes
@@ -266,11 +272,11 @@ $porto_vat = $row['porto'] * $row['portoRate'] / 100;
 $netto_value += $row['porto'];
 $vat_value += $porto_vat;
 $col1 =  $lang['AMOUNT']." netto \n".$lang['AMOUNT'].' '.$lang['VAT'];
-$col2 = number_format($netto_value, 2, ',', '.')."\n".number_format($vat_value, 2, ',', '.');
+$col2 = number_format($netto_value, 2, ',', '.')." EUR\n".number_format($vat_value, 2, ',', '.').' EUR';
 $dist = 10;
 if($cash_value){
   $col1 .= "\n".$lang['CASH_EXPENSE'];
-  $col2 .= "\n".number_format($cash_value, 2, ',', '.');
+  $col2 .= "\n".number_format($cash_value, 2, ',', '.').' EUR';
   $dist = 15;
 }
 $pdf->MultiColCell(30, 5, $col1, 'B', 1, 0, 70);
@@ -279,7 +285,7 @@ $pdf->SetFont('Helvetica', 'B');
 $pdf->Ln($dist);
 $pdf->Cell(130);
 $pdf->Cell(30, 6, $lang['SUM']);
-$pdf->Cell(30, 6, number_format($netto_value + $vat_value + $cash_value, 2, ',', '.'), 0 , 1, 'R');
+$pdf->Cell(30, 6, number_format($netto_value + $vat_value + $cash_value, 2, ',', '.').' EUR', 0 , 1, 'R');
 $pdf->SetFont('Helvetica');
 $pdf->Ln(5);
 
@@ -319,7 +325,7 @@ if($row['paymentMethod']){
 
 if($row['daysNetto'] > 0){
   $date = date("d.m.Y", strtotime("+".$row['daysNetto']." days", strtotime($row['curDate'])));
-  $payment_1 = 'Netto '.$lang['WITHIN'].' '.$row['daysNetto'].' '.$lang['DAYS'].'('.$lang['TO'].' ('.$lang['TO'].' '.$date.'): '.$netto_value.' EUR';
+  $payment_1 = 'Netto '.$lang['WITHIN'].' '.$row['daysNetto'].' '.$lang['DAYS'].'('.$lang['TO'].' ('.$lang['TO'].' '.$date.'): '.$netto_value;
 }
 if($row['skonto1'] > 0){
   $date = date("d.m.Y", strtotime("+".$row['skonto1Days']." days", strtotime($row['curDate'])));
@@ -327,9 +333,9 @@ if($row['skonto1'] > 0){
 }
 
 if($payment_name) $pdf->Cell(0, 4, iconv('UTF-8', 'windows-1252', $payment_name), 0, 1);
-if($payment_1) $pdf->Cell(0, 5, $payment_1 , 0, 1);
-if($payment_2) $pdf->Cell(0, 5, $payment_2, 0, 1);
-if($payment_3) $pdf->Cell(0, 5, $payment_3, 0, 1);
+if($payment_1) $pdf->Cell(0, 5, $payment_1.' EUR' , 0, 1);
+if($payment_2) $pdf->Cell(0, 5, $payment_2.' EUR', 0, 1);
+if($payment_3) $pdf->Cell(0, 5, $payment_3.' EUR', 0, 1);
 
 /*
 A4 = 210 x 297

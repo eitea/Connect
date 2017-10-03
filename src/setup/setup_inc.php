@@ -647,10 +647,6 @@ function create_tables($conn){
     status INT(2),
     curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     deliveryDate DATETIME,
-    yourSign VARCHAR(50),
-    yourOrder VARCHAR(50),
-    ourSign VARCHAR(50),
-    ourMessage VARCHAR(50),
     daysNetto INT(4),
     skonto1 DECIMAL(8,2),
     skonto2 DECIMAL(8,2),
@@ -662,6 +658,8 @@ function create_tables($conn){
     porto DECIMAL(8,2),
     portoRate INT(3),
     history VARCHAR(100),
+    header VARCHAR(400),
+    referenceNumrow VARCHAR(10),
     FOREIGN KEY (clientID) REFERENCES clientData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -780,6 +778,10 @@ function create_tables($conn){
     erp_lfs INT(5) DEFAULT 1,
     erp_gut INT(5) DEFAULT 1,
     erp_stn INT(5) DEFAULT 1,
+    yourSign VARCHAR(30),
+    yourOrder VARCHAR(30),
+    ourSign VARCHAR(30),
+    ourMessage VARCHAR(30),
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

@@ -1616,15 +1616,46 @@ if($row['version'] < 104){
   }
 }
 
+if($row['version'] < 105){
+  $conn->query("ALTER TABLE proposals DROP COLUMN yourSign");
+  $conn->query("ALTER TABLE proposals DROP COLUMN yourOrder");
+  $conn->query("ALTER TABLE proposals DROP COLUMN ourMessage");
+  $conn->query("ALTER TABLE proposals DROP COLUMN ourSign");
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>ERP Bezugszeichenzeile aus Aufträge entfernt';
+  }
+
+  $conn->query("ALTER TABLE erpNumbers ADD COLUMN yourSign VARCHAR(30)");
+  $conn->query("ALTER TABLE erpNumbers ADD COLUMN yourOrder VARCHAR(30)");
+  $conn->query("ALTER TABLE erpNumbers ADD COLUMN ourMessage VARCHAR(30)");
+  $conn->query("ALTER TABLE erpNumbers ADD COLUMN ourSign VARCHAR(30)");
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>ERP Bezugszeichenzeile zu Mandant hinzugefügt';
+  }
+
+  $conn->query("ALTER TABLE proposals ADD COLUMN header VARCHAR(400)");
+  $conn->query("ALTER TABLE proposals ADD COLUMN referenceNumrow VARCHAR(10)");
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>ERP Kopftext und Bezugszeichenzeile an/aus Option';
+  }
+
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
-echo '<br><br>Update Finished. Click here if not redirected automatically: <a href="../user/home">redirect</a>';
+echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht automatisch weitergeleitet werden: <a href="../user/home">Weiter</a>';
 ?>
 <script type="text/javascript">
   window.setInterval(function(){
     window.location.href="../user/home";
-  }, 6000);
+  }, 4000);
 </script>
 
 <noscript>
