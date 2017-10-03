@@ -110,8 +110,10 @@ $pdf->SetFont('Helvetica','',10);
 //client general data
 $pdf->Cell(0,5, iconv('UTF-8', 'windows-1252', $row['clientName']), 0, 2);
 if($row['firstname'] || $row['lastname']){
-  if(stripos($row['clientName'], $row['firstname']) === false)
-  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['title'].' '.$row['firstname'].' '.$row['lastname'].' '.$row['nameAddition'])), 0, 2 );
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['title'].' '.$row['firstname'].' '.$row['lastname'])), 0, 2 );
+}
+if($row['nameAddition']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['nameAddition'])), 0, 2);
 }
 if($row['address_Street']){
   $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $row['address_Street']), 0, 2 );
@@ -129,26 +131,37 @@ $pdf->SetFontSize(14);
 if($proposal_number == 'empty'){
   $proposal_number = $row['id_number'];
 }
+$proposal_mark = preg_replace('/\d/', '', $proposal_number);
 
 $col = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].strtolower($lang['NUMBER']).": \n".$lang['VAT']." ID: ");
 $col2 = iconv('UTF-8', 'windows-1252', date('d.m.Y', strtotime($row['curDate']))."\n". date('d.m.Y', strtotime($row['deliveryDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']);
+
+if($proposal_mark == 'RE') {
+  $col = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['CLIENTS'].strtolower($lang['NUMBER']).": \n".$lang['VAT']." ID: ");
+  $col2 = iconv('UTF-8', 'windows-1252', date('d.m.Y', strtotime($row['curDate']))."\n".$row['clientNumber']."\n".$row['vatnumber']);
+}
+
 if($row['representative']){
   $col .= iconv('UTF-8', 'windows-1252',"\n".$lang['REPRESENTATIVE'].':');
   $col2 .= iconv('UTF-8', 'windows-1252',"\n".$row['representative']);
 }
 
-$pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][preg_replace('/\d/', '', $proposal_number)])."\n".$proposal_number);
+$pdf->MultiColCell(110, 7, iconv('UTF-8', 'windows-1252',$lang['PROPOSAL_TOSTRING'][$proposal_mark])."\n".$proposal_number);
 $pdf->SetFontSize(8);
 $pdf->SetY($pdf->GetY() - 5, false); //SetY(float y [, boolean resetX = true])
-
 $pdf->MultiColCell(25, 4, $col, 0, 'L', 0, 30);
 $pdf->MultiColCell(0, 4, $col2, 0, 'R');
 $pdf->SetY($pdf->GetY() + 5, false);
-$pdf->Ln(20);
-$pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
-$pdf->MultiColCell(55, 4, $lang['PROP_YOUR_ORDER']."\n".$row['yourOrder']);
-$pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
-$pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
+
+if($row['yourSign']){
+  $pdf->Ln(20);
+  $pdf->MultiColCell(50, 4, $lang['PROP_YOUR_SIGN']."\n".$row['yourSign']);
+  $pdf->MultiColCell(55, 4, $lang['PROP_YOUR_ORDER']."\n".$row['yourOrder']);
+  $pdf->MultiColCell(50, 4, $lang['PROP_OUR_SIGN']."\n".$row['ourSign']);
+  $pdf->MultiColCell(50, 4, $lang['PROP_OUR_MESSAGE']."\n".$row['ourMessage']);
+} else {
+  $pdf->Ln(15);
+}
 
 //PRODUCT TABLE
 $i = 1;
