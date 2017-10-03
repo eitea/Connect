@@ -126,26 +126,6 @@ if(!empty($_POST['saveAll'])){
     $val = $_POST['lastFaktura'].':00';
     $conn->query("UPDATE $clientDetailTable SET lastFaktura = '$val' WHERE id = $detailID");
   }
-  if(isset($_POST['daysNetto'])){
-    $val = intval($_POST['daysNetto']);
-    $conn->query("UPDATE $clientDetailTable SET daysNetto = '$val' WHERE id = $detailID");
-  }
-  if(isset($_POST['skonto1'])){
-    $val = floatval($_POST['skonto1']);
-    $conn->query("UPDATE $clientDetailTable SET skonto1 = '$val' WHERE id = $detailID");
-  }
-  if(isset($_POST['skonto2'])){
-    $val = floatval($_POST['skonto2']);
-    $conn->query("UPDATE $clientDetailTable SET skonto2 = '$val' WHERE id = $detailID");
-  }
-  if(isset($_POST['skonto1Days'])){
-    $val = intval($_POST['skonto1Days']);
-    $conn->query("UPDATE $clientDetailTable SET skonto1Days = '$val' WHERE id = $detailID");
-  }
-  if(isset($_POST['skonto2Days'])){
-    $val = intval($_POST['skonto2Days']);
-    $conn->query("UPDATE $clientDetailTable SET skonto2Days = '$val' WHERE id = $detailID");
-  }
   if(isset($_POST['warningEnabled'])){
     $conn->query("UPDATE $clientDetailTable SET warningEnabled = 'true' WHERE id = $detailID");
   } else {
@@ -590,7 +570,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         <div class="col-xs-2 text-right">
           Zahlungsweise
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-5">
           <select class="js-example-basic-single" name="paymentMethod">
             <option value="0">...</option>
             <?php
@@ -603,49 +583,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
             ?>
           </select>
         </div>
-      </div>
-      <hr>
-      <div class="row form-group">
-        <div class="col-xs-2 text-right">
-          Tage Netto
-        </div>
-        <div class="col-sm-8">
-          <input type="number" class="form-control" name="daysNetto" value="<?php echo $row['daysNetto']; ?>" />
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-xs-2 text-right">
-          Skonto 1
-        </div>
-        <div class="col-sm-3">
-          <input type="number" step="0.01" class="form-control" name="skonto1" value="<?php echo $row['skonto1']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">
-          % Innerhalb von
-        </div>
-        <div class="col-sm-3">
-          <input type="number" class="form-control" name="skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
-        </div>
-        <div class="col-sm-1">
-          Tagen
-        </div>
-      </div>
-      <div class="row form-group">
-        <div class="col-xs-2 text-right">
-          Skonto 2
-        </div>
-        <div class="col-sm-3">
-          <input type="number" step="0.01" class="form-control" name="skonto2" value="<?php echo $row['skonto2']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">
-          % Innerhalb von
-        </div>
-        <div class="col-sm-3">
-          <input type="number" class="form-control" name="skonto2Days" value="<?php echo $row['skonto2Days']; ?>" />
-        </div>
-        <div class="col-sm-1">
-          Tagen
-        </div>
+        <div class="col-sm-3"><a href="../erp/payment" class="btn btn-warning">Zahlungsarten verwalten</a></div>
       </div>
       <hr>
       <div class="row form-group">

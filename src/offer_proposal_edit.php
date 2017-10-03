@@ -2,7 +2,7 @@
 <script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <?php
 $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
-$meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
+$meta_porto = $meta_porto_percentage = 0;
 $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_header = $meta_referenceNumrow = '';
 
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
@@ -10,7 +10,7 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 }
 
 $filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => '');
-//first visit of page
+//first visit of page abuse
 if(!empty($_POST['proposalID'])){
   $filterings['proposal'] = intval($_POST['proposalID']);
 } elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
@@ -30,15 +30,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'].' 12:00:00')){
     $meta_deliveryDate = test_input($_POST['meta_deliveryDate'].' 12:00:00');
-  }
-  if(isset($_POST['meta_daysNetto'])){
-    $meta_daysNetto = intval($_POST['meta_daysNetto']);
-  }
-  if(isset($_POST['meta_skonto1'])){
-    $meta_skonto1 = floatval($_POST['meta_skonto1']);
-  }
-  if(isset($_POST['meta_skonto1Days'])){
-    $meta_skonto1Days = intval($_POST['meta_skonto1Days']);
   }
   if(isset($_POST['meta_paymentMethod'])){
     $meta_paymentMethod = test_input($_POST['meta_paymentMethod']);
@@ -62,9 +53,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
   }
   if(!$filterings['proposal'] && $filterings['client']){ //new proposal
-    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate, header, referenceNumrow)
-    VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_daysNetto',
-    '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage', '$meta_header', $meta_referenceNumrow)");
+    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative, porto, portoRate, header, referenceNumrow)
+    VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', 
+    '$meta_porto', '$meta_porto_percentage', '$meta_header', $meta_referenceNumrow)");
     $filterings['proposal'] = mysqli_insert_id($conn);
     echo $conn->error;
   }
@@ -177,14 +168,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   } elseif(isset($_POST['update_clientData']) && $filterings['client']){
     $conn->query("UPDATE proposals p, clientInfoData c
-      SET p.daysNetto = c.daysNetto, p.skonto1 = c.skonto1, p.skonto1Days = c.skonto1Days, p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
+      SET p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
       WHERE p.clientID = c.clientID AND p.id = ".$filterings['proposal']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
   if(isset($_POST['meta_save'])){
-    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
-      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', 
-      header = '$meta_header', referenceNumrow = '$meta_referenceNumrow' WHERE id =".$filterings['proposal']);
+    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', 
+    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header', referenceNumrow = '$meta_referenceNumrow' 
+    WHERE id =".$filterings['proposal']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 } //END POST
@@ -572,7 +563,7 @@ $x = $prod_row['id'];
     <div class="modal-body">
       <div class="container-fluid">
         <div class="col-xs-2">Zahlungsweise:</div>
-        <div class="col-xs-10">
+        <div class="col-xs-6">
           <select class="js-example-basic-single" name="meta_paymentMethod">
             <option value="">...</option>
             <?php
@@ -584,31 +575,9 @@ $x = $prod_row['id'];
             ?>
           </select>
         </div>
+        <div class="col-xs-4"><a href="payment" class="btn btn-block btn-warning">Zahlungsarten verwalten</a></div>
       </div>
       <hr>
-      <div class="container-fluid">
-        <div class="col-xs-2">Tage Netto:</div>
-        <div class="col-xs-4"><input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" /></div>
-      </div>
-      <br>  
-      <div class="container-fluid">
-        <div class="col-xs-2">
-          Skonto 1: (%)
-        </div>
-        <div class="col-xs-4">
-          <input type="number" step="0.01" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">
-          Innerhalb von
-        </div>
-        <div class="col-xs-3">
-          <input type="number" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
-        </div>
-        <div class="col-xs-1">
-          Tagen
-        </div>
-      </div>
-      <br>
       <div class="container-fluid">
         <div class="col-xs-2">Versandart:</div>
         <div class="col-xs-4">

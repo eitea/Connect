@@ -302,7 +302,7 @@ if($isTimeAdmin){
     </nav>
     <!-- /navbar -->
     <div class="collapse" id="infoDiv_collapse">
-      <div class="well">
+      <div class="well" style="margin:0">
         <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT; ?>
         <br>
         The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,

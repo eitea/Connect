@@ -323,15 +323,6 @@ if($row['paymentMethod']){
   echo $conn->error;
 }
 
-if($row['daysNetto'] > 0){
-  $date = date("d.m.Y", strtotime("+".$row['daysNetto']." days", strtotime($row['curDate'])));
-  $payment_1 = 'Netto '.$lang['WITHIN'].' '.$row['daysNetto'].' '.$lang['DAYS'].'('.$lang['TO'].' ('.$lang['TO'].' '.$date.'): '.$netto_value;
-}
-if($row['skonto1'] > 0){
-  $date = date("d.m.Y", strtotime("+".$row['skonto1Days']." days", strtotime($row['curDate'])));
-  $payment_2 = $row['skonto1'].'% '.$lang['WITHIN'].' '.$row['skonto1Days'].' '.$lang['DAYS'].' ('.$lang['TO'].' '.$date.'): '. number_format($netto_value * ((100 - $row['skonto1']) / 100), 2, ',', '.');
-}
-
 if($payment_name) $pdf->Cell(0, 4, iconv('UTF-8', 'windows-1252', $payment_name), 0, 1);
 if($payment_1) $pdf->Cell(0, 5, $payment_1.' EUR' , 0, 1);
 if($payment_2) $pdf->Cell(0, 5, $payment_2.' EUR', 0, 1);

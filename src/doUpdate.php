@@ -1645,6 +1645,22 @@ if($row['version'] < 105){
     echo '<br>ERP Kopftext und Bezugszeichenzeile an/aus Option';
   }
 
+  $conn->query("ALTER TABLE clientInfoData DROP COLUMN daysNetto");
+  $conn->query("ALTER TABLE clientInfoData DROP COLUMN skonto1");
+  $conn->query("ALTER TABLE clientInfoData DROP COLUMN skonto2");
+  $conn->query("ALTER TABLE clientInfoData DROP COLUMN skonto1Days");
+  $conn->query("ALTER TABLE clientInfoData DROP COLUMN skonto2Days");
+
+  $conn->query("ALTER TABLE proposals DROP COLUMN daysNetto");
+  $conn->query("ALTER TABLE proposals DROP COLUMN skonto1");
+  $conn->query("ALTER TABLE proposals DROP COLUMN skonto2");
+  $conn->query("ALTER TABLE proposals DROP COLUMN skonto1Days");
+  $conn->query("ALTER TABLE proposals DROP COLUMN skonto2Days");
+  if($conn->error){
+    echo $conn->error;
+  } else {
+    echo '<br>ERP: Zahlungsbedingung stark vereinfacht';
+  }
 }
 
 //------------------------------------------------------------------------------
