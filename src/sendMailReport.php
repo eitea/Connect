@@ -2,7 +2,7 @@
 <?php require_once __DIR__ . "/connection.php"; require_once __DIR__ ."/createTimestamps.php"; ?>
 <?php require_once dirname(__DIR__) ."/plugins/cssToInlineStyles/autoload.php"; ?>
 <?php require_once __DIR__ .'/utilities.php'; ?>
-<?php require_once __DIR__ ."/Calculators/LogCalculator.php"; ?>
+<?php require_once __DIR__ ."/Calculators/IntervalCalculator.php"; ?>
 <?php
 //for css
 set_time_limit(120);

@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $endDate = carryOverAdder_Hours($endDate, 24);
       $date = substr($endDate, 0, 10);
     }
-    if(timeDiff_Hours($startDate, $endDate) > 0){
+    if(timeDiff_Hours($startDate, $endDate) > 0 && timeDiff_Hours($startDate, $endDate) < 12){
       if(isset($_POST['addBreak'])){
         $startDate = substr($startDate, 0, 17). rand(10,59);
         $endDate = substr($endDate, 0, 17). rand(10,59);

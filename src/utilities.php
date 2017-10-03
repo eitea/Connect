@@ -26,7 +26,7 @@ function mc_decrypt($decrypt, $key){
 
 /*
 * requires createTimestamps.php
-* requires Calculator/LogCalculator
+* requires Calculator/IntervalCalculator
 *
 * query must contain WHERE clause
 */
@@ -87,7 +87,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
 
       //SALDO calculation:
       $curID = $row['id'];
-      $logSums = new LogCalculator($curID);
+      $logSums = new Interval_Calculator($curID);
       $saldo = sprintf('%.2f', $logSums->saldo);
       if($saldo > 20 || $saldo < -5){
         $saldo_Cell = "<td style=\"color:red;\">$saldo</td>";

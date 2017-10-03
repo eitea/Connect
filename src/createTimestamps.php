@@ -1,8 +1,8 @@
 <?php
 function timeDiff_Hours($from, $to) {
-  $timeBegin = strtotime($from) /3600;
-  $timeEnd = strtotime($to) / 3600;
-  return $timeEnd - $timeBegin;
+  $timeBegin = strtotime($from);
+  $timeEnd = strtotime($to);
+  return ($timeEnd - $timeBegin)/3600;
 }
 
 function getCurrentTimestamp(){
@@ -43,9 +43,8 @@ function carryOverAdder_Minutes($a, $b){
 
 function isHoliday($ts){
   require "connection.php";
-  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%' AND name LIKE '% (§)'";
-  $result = mysqli_query($conn, $sql);
-  return($result && $result->num_rows>0);
+  $result = $conn->query("SELECT * FROM holidays WHERE begin LIKE '". substr($ts, 0, 10)."%'"); //the sql § comparison aint working
+  return($result && ($row = $result->fetch_assoc()) && strpos($row['name'], '(§)'));
 }
 
 /*

@@ -432,11 +432,13 @@ $(function () {
             <select class="js-example-basic-single" name="user" onchange="showLastBooking(this.value);">
               <?php
               $result = $conn->query("SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
+              echo '<option>...</option>';
               while ($result && ($row = $result->fetch_assoc())) {
                 $selected = '';
                 if($filterings['user'] == $row['id']) {
                   $selected = 'selected';
                 }
+                
                 echo '<option '.$selected.' value="'.$row['id'].'">'.$row['firstname'].' '.$row['lastname'].'</option>';
               }
               ?>
@@ -481,8 +483,7 @@ $(function () {
             </div>
             <div class="col-xs-3">
               <label><?php echo $lang['PROJECT']; ?></label>
-              <select id="addSelectProject" class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);">
-              </select>
+              <select id="addSelectProject" class="js-example-basic-single" name="project" onchange="showProjectfields(this.value);"></select>
             </div>
           </div>
         </div>
@@ -506,18 +507,17 @@ $(function () {
             <br><textarea class="form-control" rows="3" name="internInfoText" placeholder="Intern... (Optional)"></textarea><br>
           </div>
         </div>
-        <div id="project_fields" class="row">
-        </div>
+        <div id="project_fields" class="row"></div>
         <br>
         <div class="row">
           <div class="col-sm-3">
             <label><?php echo $lang['DATE']; ?></label>
-            <input type="text" class="form-control datepicker" name="add_date" value="<?php echo $filterings['date'][0]; ?>"/>
+            <input id="date_field" type="text" class="form-control datepicker" name="add_date" placeholder="yyyy-mm-dd" maxlength="10" />
           </div>
           <div class="col-xs-6">
             <label><?php echo $lang['TIME']; ?></label>
             <div class="input-group">
-              <input id="time_field" type="time" class="form-control timepicker" onkeydown='if (event.keyCode == 13) return false;' name="start" value="" placeholder="00:00"/>
+              <input id="time_field" type="time" class="form-control timepicker" onkeydown='if (event.keyCode == 13) return false;' name="start" placeholder="00:00"/>
               <span class="input-group-addon"> - </span>
               <input type="time" class="form-control timepicker" onkeydown='if (event.keyCode == 13) return false;' name="end" placeholder="00:00"/>
             </div>
@@ -592,7 +592,8 @@ function showLastBooking(id){
     type:'get',
     data:{userID:id},
     success: function(resp){
-      $("#time_field").val(resp);
+      $("#date_field").val(resp.substr(0,11));
+      $("#time_field").val(resp.substr(11,17));
     },
     error : function(resp){}
   });

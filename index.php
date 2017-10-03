@@ -2,6 +2,7 @@
 $routes = array(
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
+  'login/test' => 'login_tester.php',
 
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
@@ -41,7 +42,6 @@ if (strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64') || strpos($_SERVER["HTTP_USER_A
   include 'msie.html';
   die();
 }
-
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');

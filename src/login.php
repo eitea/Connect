@@ -1,5 +1,6 @@
 <?php
-//check if this is the first time this app runs
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) header("Location: /login");
+
 if(file_exists(__DIR__.'/connection_config.php')){
   session_start();
 } else {
@@ -7,9 +8,7 @@ if(file_exists(__DIR__.'/connection_config.php')){
 }
 
 //TODO: put a brute-force stopper somwhere here too
-if(!empty($_POST['captcha'])){
-  die("");
-}
+if(!empty($_POST['captcha']))  die("mep.");
 
 require __DIR__ .'/connection.php';
 require __DIR__ .'/createTimestamps.php';
@@ -18,8 +17,7 @@ require __DIR__ .'/encryption_functions.php';
 
 $invalidLogin = "";
 $masterpw_result = $conn->query("SELECT masterPassword FROM $configTable");
-$masterpw = false;
-$masterpwset = false;
+$masterpw = $masterpwset = '';
 if($masterpw_result){
   $masterpw = $masterpw_result->fetch_assoc()["masterPassword"];
   $masterpwset = strlen($masterpw) != 0;

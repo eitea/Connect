@@ -93,8 +93,6 @@ $('.timepicker').timepicker({
       format: 'hh:ii'
     });
   */
-
-
 }
 
 $(document).ready(function () {
@@ -120,7 +118,6 @@ $(document).ready(function () {
     }
   }
   window.onbeforeunload = unloadPage;
-
 
   document.getElementById("loader").style.display = "none";
   document.getElementById("bodyContent").style.display = "block";

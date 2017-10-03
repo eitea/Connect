@@ -563,24 +563,8 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           <input type="text" class="form-control datetimepicker" name="lastFaktura" value="<?php echo $row['lastFaktura']; ?>" />
         </div>
       </div>
-      <div class="row form-group">
+      <div class="row form-group">        
         <div class="col-xs-2 text-right">
-          Zahlungsweise
-        </div>
-        <div class="col-sm-3">
-          <select class="js-example-basic-single" name="paymentMethod">
-            <option value="0">...</option>
-            <?php
-            $result_con = $conn->query("SELECT * FROM paymentMethods");
-            while($row_con = $result_con->fetch_assoc()){
-              $selected = '';
-              if($row['paymentMethod'] == $row_con['name']){$selected = 'selected';}
-              echo '<option '.$selected.' value="'.$row_con['name'].'">'.$row_con['name'].'</option>';
-            }
-            ?>
-          </select>
-        </div>
-        <div class="col-xs-3 text-center">
           Versandart
         </div>
         <div class="col-sm-3">
@@ -601,6 +585,25 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
 
     <div id="menuPayment" class="tab-pane fade <?php if($activeTab == 'payment'){echo 'in active';}?>">
       <h3>Zahlungsdaten</h3>
+      <hr>
+      <div class="row form-group">
+        <div class="col-xs-2 text-right">
+          Zahlungsweise
+        </div>
+        <div class="col-sm-8">
+          <select class="js-example-basic-single" name="paymentMethod">
+            <option value="0">...</option>
+            <?php
+            $result_con = $conn->query("SELECT * FROM paymentMethods");
+            while($row_con = $result_con->fetch_assoc()){
+              $selected = '';
+              if($row['paymentMethod'] == $row_con['name']){$selected = 'selected';}
+              echo '<option '.$selected.' value="'.$row_con['name'].'">'.$row_con['name'].'</option>';
+            }
+            ?>
+          </select>
+        </div>
+      </div>
       <hr>
       <div class="row form-group">
         <div class="col-xs-2 text-right">
