@@ -69,8 +69,6 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     <th><?php echo $lang['CLIENT']; ?></th>
     <th>Status</th>
     <th><?php echo $lang['PREVIOUS']; ?></th>
-    <th><?php echo $lang['PROP_OUR_SIGN']; ?></th>
-    <th><?php echo $lang['PROP_OUR_MESSAGE']; ?></th>
     <?php if($showBalance == 'TRUE') echo '<th>Bilanz</th>'; ?>
     <th>Option</th>
   </thead>
@@ -128,8 +126,6 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
           echo "<td>$status</td>";
         }
         echo '<td>'.$transited_from.'</td>';
-        echo '<td>'.$row['ourSign'].'</td>';
-        echo '<td>'.$row['ourMessage'].'</td>';
         $style = $balance > 0 ? "style='color:#6fcf2c'" : "style='color:#facf1e'";
         if($showBalance == 'TRUE') echo "<td $style>".sprintf('%+.2f',$balance).' EUR</td>';
         echo '<td>';

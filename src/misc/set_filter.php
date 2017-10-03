@@ -61,6 +61,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(!empty($_POST['searchDateTo'])){
     $filterings['date'][1] = test_input($_POST['searchDateTo']);
+    if(strtotime($filterings['date'][0]) > strtotime($filterings['date'][1])){
+      $filterings['date'][1] = $filterings['date'][0];
+    }
   }
 
   if(isset($_POST['searchTransitions'])){

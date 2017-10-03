@@ -1,7 +1,8 @@
 <?php
-if(file_exists(dirname(__DIR__) . '/connection_config.php')){
+if(file_exists(dirname(__DIR__) . '/connection_config.php') || getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
   header("Location: ../login/auth");
 }
+ignore_user_abort(1);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,23 +22,9 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
 
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <title>Setup Connect</title>
-  <script>
-  document.onreadystatechange = function() {
-    var state = document.readyState
-    if(state == 'complete') {
-      document.getElementById("loader").style.display = "none";
-      document.getElementById("bodyContent").style.display = "block";
-    }
-  }
-  $(document).ready(function() {
-    if($(".js-example-basic-single")[0]){
-      $(".js-example-basic-single").select2();
-    }
-  });
-  </script>
 </head>
 <body id="body_container" class="is-table-row">
-  <div id="loader"></div>
+<div id="loader" style="display:none"></div>
   <!-- navbar -->
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -59,12 +46,21 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
   <!-- /navbar -->
   <?php
   function test_input($data) {
-    $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§$%()+*öäüÖÄÜß_ ]~", "", $data);
+    $data = preg_replace("~[^A-Za-z0-9\-.öäüÖÄÜ_ ]~", "", $data);
     $data = trim($data);
     return $data;
   }
   function clean($string) {
     return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+  }
+  function randomPassword(){
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $psw = array();
+    for ($i = 0; $i < 8; $i++) {
+      $n = rand(0, strlen($alphabet) - 1);
+      $psw[] = $alphabet[$n];
+    }
+    return implode($psw); //turn the array into a string
   }
   function match_passwordpolicy($p, &$out = ''){
     if(strlen($p) < 6){
@@ -98,7 +94,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
     return $icsDates;
   }
   ?>
-  <div id="bodyContent" style="display:none;" >
+  <div id="bodyContent">
     <div class="affix-content">
       <div class="container-fluid">
 
@@ -106,9 +102,19 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
         if(!function_exists('mysqli_init') && !extension_loaded('mysqli')) {
           die('Mysqli not available.');
         }
-        $firstname = $lastname = $companyName = $companyType = $localPart = $domainpart = $out = "";
+        $firstname = $lastname = $companyName = $companyType = $localPart = $domainname = $out = "";
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){          
+          $cmpDescription = $uid = $postal = $address = $phone = $homepage = $email = '';
+          if(isset($_POST['cmpDescription'])){
+            $cmpDescription = $_POST['cmpDescription'];
+            $uid = $_POST['uid'];
+            $postal = $_POST['postal'];
+            $address = $_POST['address'];
+            $phone = $_POST['phone'];
+            $homepage = $_POST['homepage'];
+            $email = $_POST['mail'];
+          }
           if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
             $psw = $_POST['adminPass'];
             $companyName = test_input($_POST['companyName']);
@@ -130,7 +136,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               fwrite($myfile, $txt);
               fclose($myfile);
               if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="/setup/run">Next</a></div>';
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="../login/auth">Next</a></div>';
               }
               require dirname(__DIR__) .'/connection_config.php';
               //establish connection
@@ -140,9 +146,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
                 die("<br>Connection Error: Could not Connect.<br>");
               }
 
-              if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
-                echo "Database was created. <br>";
-              } else {
+              if(!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
                 echo mysqli_error($conn);
                 unlink(dirname(__DIR__) .'/connection_config.php');
                 die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
@@ -155,21 +159,20 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               $conn->query("SET NAMES 'utf8';");
               $conn->query("SET CHARACTER SET 'utf8';");
 
-              echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
-
+              set_time_limit(0); //setup takes longer with a laptop in energy saving mode
               //create all tables
               require __DIR__ . "/setup_inc.php";
               create_tables($conn);
 
               require_once dirname(__DIR__) . "/version_number.php";
               //------------------------------ INSERTS ---------------------------------------
-
               //insert identification
               $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
-              $sql = "INSERT INTO companyData (name, companyType) VALUES ('$companyName', '$companyType')";
-              $conn->query($sql);
+              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+              $stmt->bind("sssssssss", $companyName, $companyType, $cmpDescription, $postal, $uid, $address, $phone, $email, $homepage);
+              $stmt->execute();
               //insert password policy
               $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
               //insert module en/disable
@@ -338,8 +341,8 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               exec($command, $output, $returnValue);
 
               //------------------------------------------------------------------------------
-              die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login/auth">Next</a>');
-
+              die('<br><br> Setup Finished. Click Next: <a href="../login/auth">Next</a>');
+              
             } else {
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
             }
@@ -349,7 +352,7 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
         }
         ?>
 
-        <form method='post'>
+        <form id="inputform" method='post'>
           <h1>Login Data</h1><br><br>
           <div class="row">
             <div class="col-sm-8 col-lg-4">
@@ -411,17 +414,14 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
                 <div class="input-group">
                   <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>" />
                   <span class="input-group-addon text-warning"> @ </span>
-                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
+                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainname ?>" />
                 </div>
               </div>
               <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
             </div>
           </div>
           <br><hr><br>
-
-          <?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
             <h1>MySQL Database Connection</h1><br><br>
-
             <div class="row">
               <div class="col-sm-8">
                 <div class="form-group">
@@ -471,20 +471,26 @@ if(file_exists(dirname(__DIR__) . '/connection_config.php')){
               </div>
             </div>
             <br><hr><br>
-          <?php else: ?>
-            <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
-            <input type="hidden" name='mysqlUsername' value = 'connect' />
-            <input type="hidden" name='pass' value = 'Uforonudi499' />
-            <input type="hidden" name='dbName' value = 'connect' />
-          <?php endif; ?>
 
           <div class="container-fluid text-right">
-            <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
+            <button type='submit' name'submitInput' class="btn btn-warning">Continue</button>
           </div>
         </form>
 
       </div>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function() {
+      if($(".js-example-basic-single")[0]){
+        $(".js-example-basic-single").select2();
+      }
+    });
+    $('#inputform').submit(function(ev) {
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("bodyContent").style.display = "none";
+    });
+  </script>
 </body>
 </html>

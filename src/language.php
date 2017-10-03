@@ -209,8 +209,8 @@ $lang_ger['CONSUMED'] = 'Konsumiert';
 $lang_eng['CORE_TIME'] = 'Core Time';
 $lang_ger['CORE_TIME'] = 'Kernzeit';
 
-$lang_eng['CORRECTION'] = 'Correction';
-$lang_ger['CORRECTION'] = 'Korrektur';
+$lang_eng['CORRECTION'] = 'Correction Hours';
+$lang_ger['CORRECTION'] = 'Korrekturstunden';
 
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
@@ -816,6 +816,9 @@ $lang_ger['RECEIPT'] = 'Rechnung';
 
 $lang_eng['RECEIPTS'] = 'Receipts';
 $lang_ger['RECEIPTS'] = 'Rechnungen';
+
+$lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
+$lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
 
 $lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';
