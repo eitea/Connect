@@ -220,11 +220,9 @@ if($prod_res && $prod_res->num_rows > 0){
       //Name
       $pdf->Cell($w[1],6,iconv('UTF-8', 'windows-1252',$prod_row['name']),0,2);
       //Description
-      $pdf->SetFont('Arial','',8);
       $x = $pdf->GetX();
       $y = $pdf->GetY();
       $pdf->MultiCell($w[1],4,iconv('UTF-8', 'windows-1252',$prod_row['description']));
-      $pdf->SetFont('Helvetica','',10);
       if($prod_row['description']){
         $pdf->SetXY($x + $w[1], $pdf->GetY() - 6);
       } else {
