@@ -1,5 +1,6 @@
 <?php
 $tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
+if(!isset($_POST['token'])) header("Location: /login");
 $login_token = $_POST['token'];
 
 require __DIR__ .'/connection.php';
@@ -54,7 +55,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   }
 }
 
-if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
+if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
   $login_token = urlencode($login_token);
   header("Location: /login?tok=$login_token");
 }
@@ -67,11 +68,11 @@ if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) !
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="plugins/homeMenu/loginMenu.css" rel="stylesheet">
 </head>
 <style>
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
 .col{
-    padding-bottom: 20%;
+    padding: 0 15px 22% 15px;
   }
   .form-control{
     border:none;
@@ -79,6 +80,7 @@ if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) !
     border-radius:0;
   }
   body{
+    font-family: "Open Sans", "Lucida Sans", Verdana, sans-serif;
     color:white;
     overflow:hidden;
     background-image:url(images/linz.jpg);
@@ -100,10 +102,8 @@ if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) !
 <body>
   <form method="POST">
     <div class="lightBox container-fluid">
-      <div class="row justify-content-end">
-        <div class="col">
-            <h3>Connect - Login</h3>
-        </div>
+      <div class="row">
+        <div class="col"><h3 style="font-size:28px" >Connect - Login</h3></div>
         <br>
         <div class="col">
           <input type="password" class="form-control" placeholder="Password" name="tester_pass" />
@@ -111,7 +111,7 @@ if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) !
           <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
         </div>
       </div>
-      <div class="row justify-content-end">
+      <div class="row">
         <div class="col">
           <button type="submit" class="btn btn-default btn-block" style="font-weight:100" >Weiter</button>
         </div>
@@ -119,7 +119,7 @@ if(empty($login_token) || empty($_POST['gate']) || crypt($_POST['gate'], $tok) !
       <input type="hidden" id="funZone" name="funZone" style="display:none"/>
     </div>
   </form>
-  <div style="position: absolute; bottom: 5px;padding-left:30px;"><a href=http://www.eitea.at target='_blank' class="text-white" >EI-TEA Partner GmbH</a></div>
+  <div style="position: absolute; bottom: 5px;padding-left:30px;"><a href=http://www.eitea.at target='_blank' style="color:white;" >EI-TEA Partner GmbH</a></div>
 
   <script>
   var today = new Date();
