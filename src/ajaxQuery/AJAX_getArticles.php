@@ -6,6 +6,8 @@ if(isset($_GET['articleID'])){
 }
 
 require dirname(__DIR__)."/connection.php";
+require dirname(__DIR__)."/encryption_functions.php";
+
 $result = $conn->query("SELECT * FROM articles WHERE id = $articleID");
 $row = $result->fetch_assoc();
 $mc = mc($row["iv"],$row["iv2"]);

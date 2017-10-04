@@ -5,6 +5,25 @@ $login_token = $_POST['token'];
 
 require __DIR__ .'/connection.php';
 
+function redirect($url){
+  if (!headers_sent()) {
+    header('Location: '.$url);
+    exit;
+  } else {
+    echo '<script type="text/javascript">';
+    echo 'window.location.href="'.$url.'";';
+    echo '</script>';
+    echo '<noscript>';
+    echo '<meta http-equiv="refresh" content="0;url='.$url.'" />';
+    echo '</noscript>'; exit;
+  }
+}
+function test_input($data){
+  $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
+  $data = trim($data);
+  return $data;
+}
+
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
   if($result && ($row = $result->fetch_assoc())){
@@ -12,11 +31,6 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
       exit;
   }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
-  function test_input($data){
-      $data = preg_replace("~[^A-Za-z0-9@.+/öäüÖÄÜß_ ]~", "", $data);
-      $data = trim($data);
-      return $data;
-  }
   $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
   if($row = $result->fetch_assoc()){
     session_start();
@@ -41,23 +55,18 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
           $result = mysqli_query($conn, $sql);
           $row = $result->fetch_assoc();
           if($row['version'] < $VERSION_NUMBER){
-              header("Location: update");
-              die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
+            redirect("update");
+            die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
           }
         }
-        echo '<script type="text/javascript">';
-        echo 'window.location.href="../user/home";';
-        echo '</script>';
-        echo '<noscript>';
-        echo '<meta http-equiv="refresh" content="0;url=../user/home" />';
-        echo '</noscript>'; exit;
+       redirect("../user/home");
     }
   }
 }
 
 if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
   $login_token = urlencode($login_token);
-  header("Location: /login?tok=$login_token");
+  redirect("/login?tok=$login_token");
 }
 ?>
 
