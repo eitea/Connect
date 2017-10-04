@@ -532,9 +532,7 @@ $x = $prod_row['id'];
 
 <div class="modal fade proposal_details">
   <div class="modal-dialog modal-lg modal-content" role="document">
-    <div class="modal-header">
-      <h5>META</h5>
-    </div>
+    <div class="modal-header"><h5>META</h5></div>
     <div class="modal-body">
       <div class="container-fluid">
         <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
@@ -548,9 +546,7 @@ $x = $prod_row['id'];
         <div class="col-md-10"><textarea rows="4" class="form-control" maxlength="400" style="resize: none;" name="meta_header"><?php echo $row['header']; ?></textarea></div>
       </div>
     </div>
-    <div class="modal-header">
-      <h5>Zahlungsdaten</h5>
-    </div>
+    <div class="modal-header"><h5>Zahlungsdaten</h5></div>
     <div class="modal-body">
       <div class="container-fluid">
         <div class="col-xs-2">Zahlungsweise:</div>

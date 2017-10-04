@@ -106,8 +106,8 @@ while($result && ($row = $result->fetch_assoc())){
         $pdf->Cell($w[5],7,$lang['EMPLOYEE'], '', 1, 'C', 1);
     }
 
-    $A = strtotime($row['start']);
-    $B = strtotime($row['end']);
+    $A = strtotime($row['start']) + $row['timeToUTC']*3600;
+    $B = strtotime($row['end']) + $row['timeToUTC']*3600;
     $y = array(0);
     $y[] = $pdf->MultiColCell($w[0],5,$row['clientName']."\n".$row['projectName']);
     $pdf->Cell($w[1],7,date('d.m.Y', $A), '', 0, 'C');
