@@ -449,7 +449,8 @@ function showMyDiv(o, toShow){
 }
 </script>
 
-<?php if($keepFields && isset($_POST['filterClient']) && isset($_POST['filterProject'])){ //unsuccessfull event
+<?php if($keepFields && isset($_POST['filterClient']) && isset($_POST['filterProject'])){
+  //instead of the wait you COULD set a callback function in showProjectfields() "complete: "
   echo '<script>
         showProjects('.$_POST['filterClient'].', '.$_POST['filterProject'].');
         showProjectfields('.$_POST['filterProject'].');
@@ -457,7 +458,7 @@ function showMyDiv(o, toShow){
           $("#pro_field_1").val("'.$field_1.'");
           $("#pro_field_2").val("'.$field_2.'");
           $("#pro_field_3").val("'.$field_3.'");
-        }, 1500);
+        }, 1000);
         </script>';
 }
 ?>
