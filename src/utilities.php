@@ -31,6 +31,7 @@ function mc_decrypt($decrypt, $key){
 * query must contain WHERE clause
 */
 function getFilledOutTemplate($templateID, $bookingQuery = ""){
+  set_time_limit(60);
   require "connection.php";
   require "language.php";
 
