@@ -28,17 +28,18 @@ if($result && $result->num_rows > 0){
   $isProjectAdmin = $row['isProjectAdmin'];
   $isReportAdmin = $row['isReportAdmin'];
   $isERPAdmin = $row['isERPAdmin'];
+  $isFinanceAdmin = $row['isFinanceAdmin'];
   $canBook = $row['canBook'];
   $canStamp = $row['canStamp'];
   $canEditTemplates = $row['canEditTemplates'];
   $canUseSocialMedia = $row['canUseSocialMedia'];
 } else {
-  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = FALSE;
+  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = FALSE;
   $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
 }
 
 if($userID == 1){ //superuser
-  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'TRUE';
+  $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = 'TRUE';
   $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
 }
 
@@ -707,14 +708,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   <a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
-                  <div class="collapse" id="toggleERPSettings" style="height: 0px;">
+                  <div class="collapse" id="toggleERPSettings">
                     <ul class="nav nav-list">
                       <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editUnits.php'){echo $setActiveLink;}?> href="../erp/units"><span><?php echo $lang['UNITS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editPaymentMethods.php'){echo $setActiveLink;}?> href="../erp/payment"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editShippingMethods.php'){echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editRepres.php'){echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
-                      <?php if($isCoreAdmin == 'FALSE'): ?><li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li><?php endif; ?>
+                      <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -732,8 +733,45 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           echo "<script>$('#adminOption_ERP').click();</script>";
         }
         ?>
-        <br><br>
       <?php endif; ?>
+      <!-- Section Six: FINANCES -->
+      <?php if($isFinanceAdmin == 'TRUE'): ?>
+        <div class="panel panel-default panel-borderless">
+          <div class="panel-heading">
+            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-finance"  id="adminOption_FINANCE"><i class="fa fa-book"></i><?php echo $lang['FINANCES']; ?><i class="fa fa-caret-down pull-right"></i></a>
+          </div>
+          <div id="collapse-finance" class="panel-collapse collapse">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+                <?php
+                $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                while($result && ($row = $result->fetch_assoc())){
+                  echo '<li>';
+                  echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                  echo '<div class="collapse" id="tfinances-'.$row['id'].'" ><ul class="nav nav-list">';
+                  echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                  $acc_res = $conn->query("SELECT id, name FROM accounts WHERE (name LIKE 'Bank%' OR name LIKE 'Kassa%') AND companyID = ".$row['id']);
+                  while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                    echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                  }
+                  echo '</ul></div></li>';
+                }
+                ?>
+                <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <?php
+        if($this_page == "accounting.php" || $this_page == 'accountPlan.php'){
+          echo "<script>$('#adminOption_FINANCE').click();</script>";
+          if(isset($_GET['n'])){
+            echo "<script>$('#finance-click-".$_GET['n']."').click();</script>";
+          }
+        }
+        ?>
+      <?php endif; ?>
+      <br><br>
     </div> <!-- /accordions -->
     <br><br><br>
   </div>

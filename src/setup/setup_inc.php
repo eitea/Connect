@@ -244,6 +244,7 @@ function create_tables($conn){
     isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -670,8 +671,10 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE taxRates (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(200),
-    percentage INT(3)
+    description VARCHAR(100),
+    percentage INT(3),
+    account2 INT(4),
+    account3 INT(4)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -691,7 +694,6 @@ function create_tables($conn){
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     iv VARCHAR(255),
     iv2 VARCHAR(255),
-
     UNIQUE KEY (proposalID, position),
     FOREIGN KEY (proposalID) REFERENCES proposals(id)
     ON UPDATE CASCADE
@@ -852,4 +854,45 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
+
+  $sql = "CREATE TABLE accounts (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    num INT(4) UNSIGNED,
+    name VARCHAR(50),
+    type ENUM('1', '2', '3', '4') DEFAULT '1',
+    UNIQUE KEY (companyID, num),
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE account_balance(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    docNum INT(6),
+    payDate DATETIME,
+    account INT(6) UNSIGNED,
+    offAccount INT(6) UNSIGNED,
+    info VARCHAR(70),
+    tax INT(4) UNSIGNED,
+    should DECIMAL(18,2),
+    have DECIMAL(18,2),
+    FOREIGN KEY (account) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (offAccount) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (tax) REFERENCES taxRates(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+
 }

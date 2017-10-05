@@ -23,6 +23,9 @@ $lang_ger['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
 $lang_eng['ACCUMULATED_DAYS'] = 'Accumulated Days';
 $lang_ger['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
 
+$lang_eng['ACCOUNT_PLAN'] = 'Account Plan';
+$lang_ger['ACCOUNT_PLAN'] = 'Kontenplan';
+
 $lang_eng['ADD'] = 'Add';
 $lang_ger['ADD'] = 'Hinzufügen';
 
@@ -163,6 +166,9 @@ $lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
 
 $lang_eng['CITY'] = 'City';
 $lang_ger['CITY'] = 'Ort';
+
+$lang_eng['CLASS'] = 'Class';
+$lang_ger['CLASS'] = 'Klasse';
 
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
@@ -341,8 +347,14 @@ $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Ange
 $lang_eng['ERROR_DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
 $lang_ger['ERROR_DELETE_COMPANY'] = 'Die erste Firma darf nicht gelöscht werden.';
 
+$lang_eng['ERROR_DELETE_ACCOUNT'] = 'ERROR: You cannot delete charged accounts.';
+$lang_ger['ERROR_DELETE_ACCOUNT'] = 'Belastete Konten können nicht gelöscht werden.';
+
 $lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';
 $lang_ger['ERROR_EMAIL'] = 'Ungültige e-mail Adresse.';
+
+$lang_eng['ERROR_DUPLICATE'] = 'Entry already exists. ';
+$lang_ger['ERROR_DUPLICATE'] = 'Dieser Eintrag existiert bereits. ';
 
 $lang_eng['ERROR_EXISTING_EMAIL'] = 'Entered e-mail Address already exists.';
 $lang_ger['ERROR_EXISTING_EMAIL'] = 'Die angegebene e-mail Adresse existiert bereits.';
@@ -400,6 +412,15 @@ $lang_ger['FORWARDED'] = 'Weitergeleitet';
 
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
+
+$lang_eng['FINANCES'] = 'Finances';
+$lang_ger['FINANCES'] = 'Finanzen';
+
+$lang_eng['FINANCE_CREDIT'] = 'Credit';
+$lang_ger['FINANCE_CREDIT'] = 'Haben';
+
+$lang_eng['FINANCE_DEBIT'] = 'Debit';
+$lang_ger['FINANCE_DEBIT'] = 'Soll';
 
 $lang_eng['FIRSTNAME'] = 'First Name';
 $lang_ger['FIRSTNAME'] = 'Vorname';
@@ -666,6 +687,9 @@ $lang_ger['OFFER'] = 'Angebot';
 
 $lang_eng['OFFERS'] = 'Offers';
 $lang_ger['OFFERS'] = 'Angebote';
+
+$lang_eng['OFFSET_ACCOUNT'] = 'Offset Account';
+$lang_ger['OFFSET_ACCOUNT'] = 'Gegenkonto';
 
 $lang_eng['OK_CREATE'] = 'New entry was successfully created.';
 $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
@@ -1138,6 +1162,9 @@ $lang_ger['YES'] = 'Ja';
 
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
+
+$lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
+$lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');
 
 $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Vacation","2" => "Special Leave",
   "3" => "Sick","4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");

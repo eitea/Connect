@@ -201,7 +201,8 @@ ignore_user_abort(1);
               $sql = "INSERT INTO intervalData (userID) VALUES (2);";
               $conn->query($sql);
               //insert roletable
-              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canUseSocialMedia) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE');";
+              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE');";
               $conn->query($sql);
               //insert company-client relationship
               $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
@@ -222,29 +223,63 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
               //insert restic backup configuration
               $conn->query("INSERT INTO resticconfiguration () VALUES ()");
+              //insert accounts
+              $conn->query("INSERT INTO accounts(companyID, num, name)  VALUES(1, 2800, 'Bank')");
+              $conn->query("INSERT INTO accounts(companyID, num, name) VALUES(1, 2700, 'Kassa')");
 
               //insert holidays
-              $holidayFile = __DIR__ . '/Feiertage.txt';
-              $holidayFile = icsToArray($holidayFile);
+              $holidayFile = icsToArray(__DIR__ . '/Feiertage.txt');
+              $stmt = $conn->prepare("INSERT INTO holidays(begin, end, name) VALUES(?, ?, ?)");
+              echo mysqli_error($conn);
+              $stmt->bind_param("sss", $start, $end, $n);
               for($i = 1; $i < count($holidayFile); $i++){
                 if(trim($holidayFile[$i]['BEGIN']) == 'VEVENT'){
                   $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
                   $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
                   $n = $holidayFile[$i]['SUMMARY'];
-                  $conn->query("INSERT INTO holidays(begin, end, name) VALUES ('$start', '$end', '$n');");
+                  $stmt->execute();              
                 }
               }
-              echo mysqli_error($conn);
+              
 
               //insert github options
-              $sql = "INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')";
-              if (!$conn->query($sql)) {
-                echo mysqli_error($conn);
-              }
+              $conn->query("INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')");
+
+              //insert main report
+              $exampleTemplate = "<h1>Main Report</h1> \n [TIMESTAMPS] \n <br> [BOOKINGS] ";
+              $conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
+
+              //insert taxRates
+              $conn->query("INSERT INTO taxRates(description, percentage, account3) VALUES('Normalsatz', 20, 3500)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account3) VALUES('Ermäßigter Satz', 10, 3500)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2, account3) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2, account3) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2, account3) VALUES('Reverse Charge Normalsatz', 20, 2502,  3502)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2, account3) VALUES('Reverse Charge Ermäßigter Satz', 10, 2502, 3502)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2, account3) VALUES('UStBBKV', 20, 2506, 3506)");
+              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', 0)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2) VALUES('Vorsteuer', 20, 2500)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2) VALUES('Vorsteuer', 19, 2500)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2) VALUES('Vorsteuer', 13, 2500)");
+              $conn->query("INSERT INTO taxRates(description, percentage, account2) VALUES('Vorsteuer', 10, 2500)");
 
               //insert travelling expenses
               $travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
               if ($travellingFile) {
+                $stmt = $conn->prepare("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES(?, ?, ?, ?)");
+                echo mysqli_error($conn);
+                $stmt->bind_param("ssdd", $short, $name, $dayPay, $nightPay);
                 while (($line = fgets($travellingFile)) !== false) {
                   $line = iconv('UTF-8', 'windows-1252', $line);
                   $thisLineIsNotOK = true;
@@ -256,14 +291,13 @@ ignore_user_abort(1);
                       $name = test_input($data[1]);
                       $dayPay = floatval($data[2]);
                       $nightPay = floatval($data[3]);
-                      $conn->query("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay')");
+                      $stmt->execute();
                       $thisLineIsNotOK = false;
                     } elseif(count($data) > 4) {
                       $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
                     } else {
                       echo 'Ups! Something went wrong with that file. <br>';
                       print_r ($data);
-                      die();
                     }
                   }
                 }
@@ -271,33 +305,7 @@ ignore_user_abort(1);
               } else {
                 echo "File with Country Data not found!";
               }
-              echo mysqli_error($conn);
-
-              //insert main report
-              $exampleTemplate = "<h1>Main Report</h1> \n [TIMESTAMPS] \n <br> [BOOKINGS] ";
-              $conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
-
-              //insert taxRates
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
+             
 
               //insert sum units
               $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
@@ -316,6 +324,21 @@ ignore_user_abort(1);
               //insert shippign method
               $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
               $conn->query($sql);
+
+              //insert accounts
+              $file = fopen(__DIR__.'/Kontoplan.csv', 'r');
+              if($file){
+                $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name) SELECT id, ?, ? FROM companyData");
+                $stmt->bind_param("is", $num, $name);
+                while(($line= fgetcsv($file, 100, ';')) !== false){
+                  $num = $line[0];
+                  $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+                  $stmt->execute();
+                }
+                $stmt->close();
+              } else {
+                echo "<br>Error Opening csv File";
+              }
 
 
               //-------------------------------- GIT -----------------------------------------
