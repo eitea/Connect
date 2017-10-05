@@ -12,7 +12,7 @@ $dates = array();
 $start = getCurrentTimestamp(); //normal users can only see future dates
 if($isCoreAdmin == 'TRUE') { $start = date('Y-m-d', strtotime('-1 year')); }
 $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID 
-WHERE status != 0 AND status != 5 AND DATE(time) > DATE('$start') ORDER BY userID, status, time");
+WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
 if($result && ($row = $result->fetch_assoc())){
   $start = substr($row['time'], 0, 10);
   $prev_row = $row;
@@ -52,7 +52,6 @@ $(document).ready(function(){
     });
   });
 });
-
 </script>
 
 <?php
