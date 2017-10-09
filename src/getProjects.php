@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   }
   if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
-    if(test_Date($_POST['add_date'].' 08:00:00')){
+    if(test_Date(trim($_POST['add_date']).' 08:00:00')){
       $filterUserID = intval($_POST['user']);
       //get the timestamp. always(!) compre UTC to UTC
       $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'";

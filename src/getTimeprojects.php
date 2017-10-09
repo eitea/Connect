@@ -81,7 +81,7 @@ if($filterings['user']):
     <table id="mainTable" class="table table-hover table-condensed">
       <thead>
         <th><?php echo $lang['WEEKLY_DAY']; ?></th>
-        <th><?php echo $lang['DATE']; ?></th>
+        <th style="min-width:90px"><?php echo $lang['DATE']; ?></th>
         <th><?php echo $lang['BEGIN']; ?></th>
         <th><?php echo $lang['BREAK']; ?></th>
         <th><?php echo $lang['END']; ?></th>
@@ -91,7 +91,7 @@ if($filterings['user']):
         <th><?php echo $lang['SALDO_DAY']; ?></th>
         <th><?php echo $lang['SALDO_MONTH']; ?></th>
         <th>Saldo</th>
-        <th>Option</th>
+        <th style="min-width:110px">Option</th>
       </thead>
       <tbody>
         <?php
@@ -154,19 +154,17 @@ if($filterings['user']):
               $bookingStmt->execute();
               $result = $bookingStmt->get_result();
               while($row = $result->fetch_assoc()){
+
                 $A = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
                 $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
-                echo '<tr style="display:none" >';
-                echo '<td></td>';
-                echo '<td colspan="2"'. $row['name'] .'</td>';
-                echo '<td>'. $row['projectName'] .'</td>';
-                echo '<td>'.$A.'</td>';
-                echo '<td>'.$B.'</td>';
-                echo '<td colspan="3">'.$row['infoText'].'</td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '</tr>';
+                echo '<tr style="display:none;color:#b1b1b1;"><td colspan="12"><div class="row">';
+                echo '<div class="col-xs-1"></div>';
+                echo '<div class="col-sm-2">'.$row['name'].'</div>';
+                echo '<div class="col-sm-2">'.$row['projectName'].'</div>';
+                echo '<div class="col-sm-1">'.$A.'</div>';
+                echo '<div class="col-sm-1">'.$B.'</div>';
+                echo '<div class="col-sm-4">'.$row['infoText'].'</div>';
+                echo '</div></td></tr>';
               }
             }
           }
@@ -258,7 +256,6 @@ else:
 endif;
 ?>
 
-<script src="../plugins/jQuery/jquery-ui/jquery-ui.min.js"></script>
 <script>
 var existingModals = new Array();
 function appendModal(id, index, date){
@@ -277,9 +274,11 @@ function appendModal(id, index, date){
    });
   }
 }
+
 $('.clicker').click(function(){
-  $(this).nextUntil('.clicker').slideToggle('slow');
+  $(this).nextUntil('.clicker').toggle('normal');
 });
+
 </script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
