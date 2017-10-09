@@ -1,5 +1,5 @@
 <?php require 'header.php'; enableToERP($userID); ?>
-<script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="../plugins/jQuery/jquery-ui/jquery-ui.min.js"></script>
 <?php
 $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
 $meta_porto = $meta_porto_percentage = 0;

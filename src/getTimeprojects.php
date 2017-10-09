@@ -1,12 +1,11 @@
-<?php include 'header.php'; enableToTime($userID); ?>
+<?php include 'header.php'; enableToTime($userID); //project/time ?>
 <?php
 require_once 'Calculators/IntervalCalculator.php';
 $filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ) ;
 ?>
 
 <div class="page-header">
-  <h3>
-    <?php echo $lang['TIMESTAMPS']; ?>
+  <h3><?php echo $lang['TIMESTAMPS']; ?>
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
       <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" <?php if(!$filterings['user']) echo 'disabled'; ?> title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
@@ -59,9 +58,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
     }
-  }
-
-  if (isset($_POST['ts_remove'])){
+  } elseif (isset($_POST['ts_remove'])){
     $x = intval($_POST['ts_remove']);
     $conn->query("DELETE FROM $logTable WHERE indexIM=$x;");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
@@ -70,9 +67,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif post
 ?>
 
-Diese Seite befindet sich gerade im Umbau. Der Funktionsumfang wurde temporär eingeschränkt.
-<!-- ############################### TABLE ################################### -->
 
+<!-- ############################### TABLE ################################### -->
 <?php
 if($filterings['user']):
   $result = $conn->query("SELECT id, firstname FROM $userTable WHERE id = ".$filterings['user']);
@@ -89,7 +85,6 @@ if($filterings['user']):
         <th><?php echo $lang['BEGIN']; ?></th>
         <th><?php echo $lang['BREAK']; ?></th>
         <th><?php echo $lang['END']; ?></th>
-        <th width="60px"><small><?php $larr = explode(' ',$lang['LAST_BOOKING']); echo $larr[0] .'<br>'.$larr[1]; ?></small></th>
         <th><?php echo $lang['ACTIVITY']; ?></th>
         <th><?php echo $lang['SHOULD_TIME']; ?></th>
         <th><?php echo $lang['IS_TIME']; ?></th>
@@ -103,7 +98,7 @@ if($filterings['user']):
         $calculator = new Interval_Calculator($x, $filterings['date'][0], $filterings['date'][1]);
 
         $bookingStmt = $conn->prepare("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
-        LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id) LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id) WHERE timestampID = ? ORDER BY end DESC");
+        LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id) LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id) WHERE timestampID = ? ORDER BY end ASC");
         $bookingStmt->bind_param("i", $calcIndexIM);
 
         echo "<tr style='color:#626262;'>";
@@ -112,23 +107,10 @@ if($filterings['user']):
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $saldo_month = 0;
         for($i = 0; $i < $calculator->days; $i++){
           $calcIndexIM = $calculator->indecesIM[$i];
-          //sync with modal creation
           if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
-          if($filterings['logs'][1] != 'checked' || $calculator->shouldTime[$i] != 0 || $calculator->absolvedTime[$i] != 0){              
-            $style = "";
+          if($filterings['logs'][1] != 'checked' || $calculator->shouldTime[$i] != 0 || $calculator->absolvedTime[$i] != 0){
+            
             $tinyEndTime = '-';
-            $bookingStmt->execute();
-            $result = $bookingStmt->get_result();
-
-            if($calculator->end[$i] != '0000-00-00 00:00:00' && $canBook == 'TRUE' && ($calculator->activity[$i] == 0 || $calculator->activity[$i] == 5)){
-              $config2 = $result->fetch_assoc();
-              $bookingTimeDifference = timeDiff_Hours($config2['end'], $calculator->end[$i]) * 60;
-              if($bookingTimeDifference <= $bookingTimeBuffer) $style = "color:#6fcf2c"; //green
-              if($bookingTimeDifference > $bookingTimeBuffer)$style = "color:#facf1e"; //yellow
-              if($bookingTimeDifference > $bookingTimeBuffer * 2 || $bookingTimeDifference < 0)$style = "color:#fc8542"; //red
-              if($bookingTimeDifference < 0) $style = "color:#f0621c;font-weight:bold"; //monsterred
-              if($calculator->end[$i]) $tinyEndTime = substr(carryOverAdder_Hours($config2['end'], $calculator->timeToUTC[$i]),11,5);
-            }
 
             $A = $calculator->start[$i];
             $B = $calculator->end[$i];
@@ -136,27 +118,20 @@ if($filterings['user']):
             if($calculator->end[$i] && $calculator->end[$i] != '0000-00-00 00:00:00') $B = carryOverAdder_Hours($calculator->end[$i], $calculator->timeToUTC[$i]);
 
             $saldo_month += $calculator->absolvedTime[$i] - $calculator->shouldTime[$i] - $calculator->lunchTime[$i];
-
             $theSaldo = round($calculator->absolvedTime[$i] - $calculator->shouldTime[$i] - $calculator->lunchTime[$i], 2);
-            $saldoStyle = '';
-            if($theSaldo < 0){
-              $saldoStyle = 'style=color:#fc8542;'; //red
-            } elseif($theSaldo > 0) {
-              $saldoStyle = 'style=color:#6fcf2c;'; //green
-            }
+
+            $saldoStyle = 'style=color:#6fcf2c;'; //green
+            if($theSaldo < 0) $saldoStyle = 'style=color:#fc8542;'; //red
 
             $neutralStyle = '';
-            if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0){
-              $neutralStyle = "style=color:#c7c6c6;";
-            }
+            if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) $neutralStyle = "style=color:#c7c6c6;";
 
-            echo "<tr $neutralStyle>";
+            echo "<tr class='clicker' $neutralStyle class='clicker' >";
             echo '<td>' . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . '</td>';
             echo '<td>' . $calculator->date[$i] . '</td>';
             echo '<td>' . substr($A,11,5) . '</td>';
             echo "<td><small>" . displayAsHoursMins($calculator->lunchTime[$i]) . "</small></td>";
             echo '<td>' . substr($B,11,5) . '</td>';
-            echo "<td style='$style'><small>" . $tinyEndTime . "</small></td>";
             echo '<td>' . $lang['ACTIVITY_TOSTRING'][$calculator->activity[$i]]. '</td>';
             echo '<td>' . displayAsHoursMins($calculator->shouldTime[$i]) . '</td>';
             echo '<td>' . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . '</td>';
@@ -164,7 +139,7 @@ if($filterings['user']):
             echo '<td>' . displayAsHoursMins($saldo_month) . '</td>';
             echo '<td>' . displayAsHoursMins($saldo_month + $calculator->prev_saldo) . '</td>';
             echo '<td>';
-            if(strtotime($calculator->date[$i]. ' 12:00:00') >= strtotime($calculator->beginDate)){
+            if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
               echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
@@ -174,6 +149,28 @@ if($filterings['user']):
             $lunchbreakSUM += $calculator->lunchTime[$i];
             $expectedHoursSUM += $calculator->shouldTime[$i];
             $absolvedHoursSUM += $calculator->absolvedTime[$i] - $calculator->lunchTime[$i];
+
+            if($calcIndexIM){
+              $bookingStmt->execute();
+              $result = $bookingStmt->get_result();
+              while($row = $result->fetch_assoc()){
+                $A = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
+                $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
+                echo '<tr style="display:none" >';
+                echo '<td></td>';
+                echo "<td>". $row['name'] ."</td>";
+                echo "<td>". $row['projectName'] ."</td>";
+                echo '<td>'.$A.'</td>';
+                echo '<td>'.$B.'</td>';
+                echo '<td></td>';
+                echo '<td></td>';
+                echo '<td></td>';
+                echo '<td></td>';
+                echo '<td></td>';
+                echo '<td></td>';
+                echo '</tr>';
+              }
+            }
           }
 
           if(isset($calculator->endOfMonth[$calculator->date[$i]])){
@@ -198,8 +195,6 @@ if($filterings['user']):
             }
           }
         } //endfor
-
-        //complete
         echo "<tr style='font-weight:bold;'>";
         echo "<td colspan='11'>Gesamt: </td>";
         echo '<td>'.displayAsHoursMins($calculator->saldo).'</td>';
@@ -265,6 +260,7 @@ else:
 endif;
 ?>
 
+<script src="../plugins/jQuery/jquery-ui/jquery-ui.min.js"></script>
 <script>
 var existingModals = new Array();
 function appendModal(id, index, date){
@@ -284,7 +280,7 @@ function appendModal(id, index, date){
   }
 }
 $('.clicker').click(function(){
-  $(this).nextUntil('.clicker').slideToggle('normal');
+  $(this).nextUntil('.clicker').slideToggle('slow');
 });
 </script>
 <!-- /BODY -->
