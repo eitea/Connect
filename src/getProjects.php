@@ -666,7 +666,13 @@ $(document).ready(function(){
     },
     paging: false
   });
+
+  setTimeout(function() {
+    window.dispatchEvent(new Event('resize'));
+  }, 1500);
+
 });
+
 </script>
 
 <?php
