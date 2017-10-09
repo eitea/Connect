@@ -21,7 +21,7 @@
       echo implode('<br>', $output) .'<br><br>';
     }
 
-    if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
+    if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
       $command = "git -C $repositoryPath pull 2>&1";
       exec($command, $output, $returnValue);
     } else {

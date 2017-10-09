@@ -238,7 +238,9 @@ input[type="radio"]:checked {
 .alert-over{
   position:fixed;
   z-index: 50;
-  margin-left: 50%;
+  right: 0px;
+  margin-right:1px;
+  width:30%;
 }
 
 /* little helperlings */
@@ -299,4 +301,8 @@ span.select2.select2-container.select2-container--default {
 }
 .active-link:hover{
   color:white;
+}
+
+.clicker{
+  cursor: pointer;
 }

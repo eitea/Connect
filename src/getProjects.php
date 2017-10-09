@@ -190,7 +190,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
       }
     } else {
-      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+      echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'.</div>';
     }
   } elseif(isset($_POST['add'])) {
     echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
