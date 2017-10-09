@@ -158,13 +158,11 @@ if($filterings['user']):
                 $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
                 echo '<tr style="display:none" >';
                 echo '<td></td>';
-                echo "<td>". $row['name'] ."</td>";
-                echo "<td>". $row['projectName'] ."</td>";
+                echo '<td colspan="2"'. $row['name'] .'</td>';
+                echo '<td>'. $row['projectName'] .'</td>';
                 echo '<td>'.$A.'</td>';
                 echo '<td>'.$B.'</td>';
-                echo '<td></td>';
-                echo '<td></td>';
-                echo '<td></td>';
+                echo '<td colspan="3">'.$row['infoText'].'</td>';
                 echo '<td></td>';
                 echo '<td></td>';
                 echo '<td></td>';

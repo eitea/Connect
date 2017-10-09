@@ -169,7 +169,7 @@ if($filterings['user']):
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
             echo '</td>';
-            echo "</tr>";
+            echo '</tr>';
 
             $lunchbreakSUM += $calculator->lunchTime[$i];
             $expectedHoursSUM += $calculator->shouldTime[$i];

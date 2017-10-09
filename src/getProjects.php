@@ -263,7 +263,7 @@ if(!$result || $result->num_rows <= 0){
 ?>
 <form id="project_table" method="post">
   <div style="margin-top:120px;"></div>
-  <table class="table table-hover table-condensed display nowrap">
+  <table class="table table-hover table-condensed">
     <thead>
       <th><?php echo $conn->error ; ?></th>
       <th><?php echo $lang['COMPANY'].' - '.$lang['CLIENT'].' - '.$lang['PROJECT']; ?></th>
