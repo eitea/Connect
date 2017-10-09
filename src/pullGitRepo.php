@@ -15,22 +15,14 @@
 
     $repositoryPath =  dirname(__DIR__);
 
-    if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable, else do nothing
+    if(!$result || $result->num_rows <= 0){ //sslVerify is False -> disable
       $command = 'git -C ' .$repositoryPath. ' config http.sslVerify "false" 2>&1';
       exec($command, $output, $returnValue);
       echo implode('<br>', $output) .'<br><br>';
     }
 
-    if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
-      $command = "git -C $repositoryPath pull 2>&1";
-      exec($command, $output, $returnValue);
-    } else {
-      $command = "git -C $repositoryPath fetch --all 2>&1";
-      exec($command, $output, $returnValue);
-
-      $command = "git -C $repositoryPath reset --hard origin/master 2>&1";
-      exec($command, $output, $returnValue);
-    }
+    $command = "git -C $repositoryPath pull 2>&1";
+    exec($command, $output, $returnValue);
 
     echo implode('<br>', $output);
     session_destroy();

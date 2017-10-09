@@ -894,5 +894,75 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE projectBookingData_audit(
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    changedat DATETIME,
+    bookingID INT(6) UNSIGNED,
+    statement VARCHAR(100)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "DELIMITER |
+  CREATE TRIGGER projectBookingData_update_trigger 
+    BEFORE UPDATE ON projectBookingData
+    FOR EACH ROW
+  BEGIN
+    SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+    IF @cnt >= 150 THEN 
+      DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+    END IF;
+    INSERT INTO projectBookingData_audit
+    SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = CONCAT('UPDATE ', OLD.id);
+
+  END
+  |
+  DELIMITER ;
+  ";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "DELIMITER |
+    CREATE TRIGGER projectBookingData_delete_trigger 
+      BEFORE DELETE ON projectBookingData
+      FOR EACH ROW
+    BEGIN
+      SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+      IF @cnt >= 150 THEN 
+        DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+      END IF;
+      INSERT INTO projectBookingData_audit
+      SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
+  
+    END
+    |
+    DELIMITER ;
+  ";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "DELIMITER |
+    CREATE TRIGGER projectBookingData_insert_trigger 
+      AFTER INSERT ON projectBookingData
+      FOR EACH ROW
+    BEGIN
+      SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+      IF @cnt >= 150 THEN 
+        DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+      END IF;
+      INSERT INTO projectBookingData_audit
+      SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('INSERT ', NEW.timestampID);
+  
+    END
+    |
+    DELIMITER ;
+  ";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
 
 }

@@ -1764,6 +1764,76 @@ if($row['version'] < 106){
   }
 }
 
+
+if($row['version'] < 107){
+  $sql = "CREATE TABLE projectBookingData_audit(
+    id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    changedat DATETIME,
+    bookingID INT(6) UNSIGNED,
+    statement VARCHAR(100)
+  )";
+  if($conn->query($sql)){
+    echo '<br>Audit: Projektbuchungen hinzugefügt';
+  } else {
+    echo $conn->error;
+  }
+
+  $sql = "DELIMITER |
+  CREATE TRIGGER projectBookingData_update_trigger 
+    BEFORE UPDATE ON projectBookingData
+    FOR EACH ROW
+  BEGIN
+    SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+    IF @cnt >= 150 THEN 
+      DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+    END IF;
+    INSERT INTO projectBookingData_audit
+    SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('UPDATE ', OLD.id);
+
+  END
+  |
+  DELIMITER ;
+  ";
+  if($conn->query($sql)){
+    echo '<br>Audit: 150 Zeilen Trigger eingesetzt';
+  } else {
+    echo $conn->error;
+  }
+
+  $conn->query("DELIMITER |
+    CREATE TRIGGER projectBookingData_delete_trigger 
+      BEFORE DELETE ON projectBookingData
+      FOR EACH ROW
+    BEGIN
+      SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+      IF @cnt >= 150 THEN 
+        DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+      END IF;
+      INSERT INTO projectBookingData_audit
+      SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
+  
+    END
+    |
+    DELIMITER ;
+  ");
+
+  $conn->query("DELIMITER |
+    CREATE TRIGGER projectBookingData_insert_trigger 
+      AFTER INSERT ON projectBookingData
+      FOR EACH ROW
+    BEGIN
+      SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
+      IF @cnt >= 150 THEN 
+        DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
+      END IF;
+      INSERT INTO projectBookingData_audit
+      SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = 'INSERT';
+  
+    END
+    |
+    DELIMITER ;
+  ");
+}
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

@@ -660,6 +660,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><span><?php echo $lang['PROJECT_BOOKINGS']; ?></span></a></li>
                 <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
               </ul>
             </div>
           </div>
