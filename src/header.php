@@ -660,13 +660,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><span><?php echo $lang['PROJECT_BOOKINGS']; ?></span></a></li>
                 <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
-                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                <li><a <?php if($this_page =='audit_projectBookings.php'){echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "getProjects.php"|| $this_page == "editProjects.php"){
+        if($this_page == "getProjects.php"|| $this_page == "editProjects.php" || $this_page == "audit_projectBookings.php"){
           echo "<script>$('#adminOption_PROJECT').click();</script>";
         }
         ?>
