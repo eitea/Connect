@@ -145,15 +145,15 @@ input[type="radio"]:checked {
 .badge.alert-badge{
   background-color: #33C7D5;
 }
-a, button, code, div, img, input, label, li, p, pre, select, span, svg, table, td, textarea, th, ul {
-  -webkit-border-radius: 0!important;
-  -moz-border-radius: 0!important;
-  border-radius: 0!important;
-}
 .page-header{
   background-color:transparent;
 }
-
 .clock-counter{
   color:#B4BCC8;
+}
+
+.form-control, .btn, span{
+  -webkit-border-radius: 0!important;
+  -moz-border-radius: 0!important;
+  border-radius: 0!important;
 }

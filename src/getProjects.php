@@ -97,6 +97,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     if(test_Date(trim($_POST['add_date']).' 08:00:00')){
+      echo //TODO error output
       $filterUserID = intval($_POST['user']);
       //get the timestamp. always(!) compre UTC to UTC
       $sql = "SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'";
@@ -592,7 +593,7 @@ function showLastBooking(id){
     type:'get',
     data:{userID:id},
     success: function(resp){
-      $("#date_field").val(resp.substr(0,11));
+      $("#date_field").val(resp.substr(0,10));
       $("#time_field").val(resp.substr(11,17));
     },
     error : function(resp){}

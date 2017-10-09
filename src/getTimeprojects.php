@@ -154,7 +154,6 @@ if($filterings['user']):
               $bookingStmt->execute();
               $result = $bookingStmt->get_result();
               while($row = $result->fetch_assoc()){
-
                 $A = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
                 $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
                 echo '<tr style="display:none;color:#b1b1b1;"><td colspan="12"><div class="row">';
