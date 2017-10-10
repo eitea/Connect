@@ -39,14 +39,27 @@ function onPageLoad(){
   }
 
   //initalize them when the user needs them
+  $('.monthpicker').click(function() {
+    $('.monthpicker').datetimepicker({
+      autoclose: 1,
+      todayBtn:  1,
+      startView: 3,
+      minView: 3,
+      maxView: 4,
+      format: 'yyyy-mm',
+      keyboardNavigation: false
+    });
+    $(this).datetimepicker('show');
+  });
   $('.datetimepicker').click(function() {
-  $(this).datetimepicker({
+    $(this).datetimepicker({
       weekStart: 1,
       todayBtn:  1,
       autoclose: 1,
       forceParse: 0,
       startDate: '2010-01-01',
-      format: 'yyyy-mm-dd hh:ii'
+      format: 'yyyy-mm-dd hh:ii',
+      keyboardNavigation: false
     });
     $(this).datetimepicker('show');
   });
@@ -58,28 +71,20 @@ function onPageLoad(){
       minView: 2,
       forceParse: 0,
       startDate: '2000-01-01',
-      format: 'yyyy-mm-dd'
+      format: 'yyyy-mm-dd',
+      keyboardNavigation: false
     });
-      $(this).datetimepicker('show');
+    $(this).datetimepicker('show');
   });
   $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
   $('.timepicker').mask("20:50", {
-    placeholder: "--:--", 
-    selectOnFocus: true, 
+    placeholder: "--:--",
+    selectOnFocus: true,
     translation: {
       2: {pattern: /[0-2]/},
       5: {pattern: /[0-5]/}
     }
   });
-
-  $('.monthpicker').datetimepicker({
-    autoclose: 1,
-    todayBtn:  1,
-    startView: 3,
-    minView: 3,
-    maxView: 4,
-    format: 'yyyy-mm'
-  })
 
   /*
 $('.timepicker').timepicker({
@@ -97,7 +102,6 @@ $('.timepicker').timepicker({
 
 $(document).ready(function() {
   onPageLoad();
-
   var isDirty = false;
   //triggers change in all input fields including text type
   $(":input:not([type=search]):not(.not-dirty)").keyup(function(){

@@ -1764,8 +1764,7 @@ if($row['version'] < 106){
   }
 }
 
-
-if($row['version'] < 107){
+if($row['version'] < 107){  
   $sql = "CREATE TABLE projectBookingData_audit(
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     changedat DATETIME,
@@ -1778,6 +1777,7 @@ if($row['version'] < 107){
     echo $conn->error;
   }
 
+  //DELIMITERS are client syntax
   $sql = "CREATE TRIGGER projectBookingData_update_trigger 
     BEFORE UPDATE ON projectBookingData
     FOR EACH ROW
@@ -1788,10 +1788,9 @@ if($row['version'] < 107){
     END IF;
     INSERT INTO projectBookingData_audit
     SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('UPDATE ', OLD.id);
-
   END";
   if($conn->query($sql)){
-    echo '<br>Audit: 150 Zeilen Trigger eingesetzt';
+    echo '<br>Audit: 150 Zeilen Trigger für Projektbuchungen eingesetzt';
   } else {
     echo $conn->error;
   }
@@ -1805,8 +1804,7 @@ if($row['version'] < 107){
         DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
       END IF;
       INSERT INTO projectBookingData_audit
-      SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
-  
+      SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';  
     END");
 
   $conn->query("CREATE TRIGGER projectBookingData_insert_trigger 
@@ -1818,10 +1816,10 @@ if($row['version'] < 107){
         DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
       END IF;
       INSERT INTO projectBookingData_audit
-      SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = 'INSERT';
-  
+      SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = 'INSERT';  
     END");
 }
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
