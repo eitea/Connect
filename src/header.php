@@ -147,43 +147,41 @@ if($isTimeAdmin){
       $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
       $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
     }
-  }
-  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveSocial'])) {
-    // picture upload
-    if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
+    if(isset($_POST['saveSocial'])) {
+      // picture upload
+      if(isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
         require_once __DIR__ . "/utilities.php";
         $pp = uploadFile("profilePictureUpload", 1, 1, 1);
-        if (!is_array($pp)) {
-            $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
-            echo $conn->error;
-            $null = NULL;
-            $stmt->bind_param("b", $null);
-            $stmt->send_long_data(0, $pp);
-            $stmt->execute();
-            if ($stmt->errno) {
-                echo $stmt->error;//displayError($stmt->error);
-            }
-            else {
-                //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
-            }
-            $stmt->close();
-        }
-        else {
+        if(!is_array($pp)) {
+          $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
+          echo $conn->error;
+          $null = NULL;
+          $stmt->bind_param("b", $null);
+          $stmt->send_long_data(0, $pp);
+          $stmt->execute();
+          if ($stmt->errno) {
+              echo $stmt->error;//displayError($stmt->error);
+          } else {
+              //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
+          }
+          $stmt->close();
+        } else {
             echo print_r($filename);
         }
+      }
+      // other settings
+      if (isset($_POST['social_status'])) {
+          $status = test_input($_POST['social_status']);
+          $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
+      }
+      if (isset($_POST['social_isAvailable'])) {
+          $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
+      }
+      else {
+          $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
+      }
+      $conn->query($sql);
     }
-    // other settings
-    if (isset($_POST['social_status'])) {
-        $status = test_input($_POST['social_status']);
-        $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
-    }
-    if (isset($_POST['social_isAvailable'])) {
-        $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
-    }
-    else {
-        $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
-    }
-    $conn->query($sql);
   }
 
   if($_SESSION['color'] == 'light'){
@@ -285,9 +283,8 @@ if($isTimeAdmin){
             $row = $result->fetch_assoc();
             $social_status = $row["status"];
             $social_isAvailable = $row["isAvailable"];
-            $defaultPicture = "images/defaultProfilePicture.png";
             $defaultGroupPicture = "images/group.png";
-            $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
+            $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : "images/defaultProfilePicture.png";
           ?>
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
           <a data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;vertical-align:middle;'></a>
@@ -336,44 +333,32 @@ if($isTimeAdmin){
     </form>
     <!-- /modal -->
     <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
-        <!-- social settings modal -->
-        <form method="post" enctype="multipart/form-data">
+      <!-- social settings modal -->
+      <form method="post" enctype="multipart/form-data">
         <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog" aria-labelledby="socialSettingsLabel">
             <div class="modal-dialog" role="form">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="socialSettingsLabel">
-                            <?php echo $lang['SOCIAL_PROFILE_SETTINGS']; ?>
-                        </h4>
+                        <h4 class="modal-title" id="socialSettingsLabel"><?php echo $lang['SOCIAL_PROFILE_SETTINGS']; ?></h4>
                     </div>
                     <br>
                     <div class="modal-body">
                         <!-- modal body -->
-
-
-
                         <img src='<?php echo $profilePicture; ?>' style='width:30%;height:30%;' class='img-circle center-block' alt='Profile Picture'>
                         <br>
                         <label class="btn btn-default">
                             <?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>
                             <input type="file" name="profilePictureUpload" style="display:none">
                         </label>
-
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="social_isAvailable" <?php if ($social_isAvailable == 'TRUE') {
-                                                                                echo 'checked';
-                                                                            } ?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                                <input type="checkbox" name="social_isAvailable" <?php if ($social_isAvailable == 'TRUE') { echo 'checked';} ?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
                             </label>
                             <br>
                         </div>
-
                         <label for="social_status"> <?php echo $lang['SOCIAL_STATUS'] ?> </label>
                         <input type="text" class="form-control" name="social_status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $social_status; ?>">
-
-
-
                         <!-- /modal body -->
                     </div>
                     <div class="modal-footer">

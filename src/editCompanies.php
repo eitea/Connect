@@ -31,7 +31,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if($stmt->errno){ echo $stmt->error;} else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
       $stmt->close();
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($filename).'</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($logo).'</div>';
     }
   } elseif(isset($_POST['general_save'])){
     function max4Lines($str){
@@ -254,7 +254,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
       <?php if($row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $row['logo'] ).'"/>';} ?>
     </div>
     <div class="col-sm-8">
-      <input type="file" name="fileToUpload" id="fileToUpload"/>
+      <input type="file" name="fileToUpload"/>
     </div>
   </div>
 </form>
@@ -730,7 +730,7 @@ $row = $result->fetch_assoc();
 <form method="POST" class="page-seperated-section">
   <h4>ERP <?php echo $lang['SETTINGS']; ?><a role="button" data-toggle="collapse" href="#erp_number_info"><i class="fa fa-info-circle"></i></a>
     <div class="page-header-button-group">
-      <button type="submit" class="btn btn-default" name="save_erp_numbers"><i class="fa fa-floppy-o"></i></button>
+      <button type="submit" class="btn btn-default blinking" name="save_erp_numbers"><i class="fa fa-floppy-o"></i></button>
     </div>
   </h4>
   <div class="container-fluid">
@@ -781,7 +781,7 @@ $row = $result->fetch_assoc();
 <form method="POST" class="page-seperated-section">
   <h4>ERP <?php echo $lang['REFERENCE_NUMERAL_ROW']; ?></a>
     <div class="page-header-button-group">
-      <button type="submit" class="btn btn-default" name="save_erp_reference_numrow"><i class="fa fa-floppy-o"></i></button>
+      <button type="submit" class="btn btn-default blinking" name="save_erp_reference_numrow"><i class="fa fa-floppy-o"></i></button>
     </div>
   </h4>
   <div class="container-fluid">

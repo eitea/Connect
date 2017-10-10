@@ -889,6 +889,9 @@ $lang_ger['RUNTIME'] = 'Laufzeit';
 $lang_eng['SAVE'] = 'Save';
 $lang_ger['SAVE'] = 'Speichern';
 
+$lang_eng['SAVE_PICTURE'] = 'Save Picture';
+$lang_ger['SAVE_PICTURE'] = 'Bild Speichern';
+
 $lang_eng['SALDO_DAY'] = 'Daily Saldo';
 $lang_ger['SALDO_DAY'] = 'Tagessaldo';
 
@@ -934,7 +937,7 @@ $lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
 $lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
 $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 
-$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Can\' delete group';
+$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Cannot delete group';
 $lang_ger['SOCIAL_CANNOT_DELETE_GROUP'] = 'Gruppe kann nicht gelöscht werden';
 
 $lang_eng['SOCIAL_NAME'] = 'Name';

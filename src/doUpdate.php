@@ -1778,8 +1778,7 @@ if($row['version'] < 107){
     echo $conn->error;
   }
 
-  $sql = "DELIMITER |
-  CREATE TRIGGER projectBookingData_update_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_update_trigger 
     BEFORE UPDATE ON projectBookingData
     FOR EACH ROW
   BEGIN
@@ -1790,18 +1789,14 @@ if($row['version'] < 107){
     INSERT INTO projectBookingData_audit
     SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('UPDATE ', OLD.id);
 
-  END
-  |
-  DELIMITER ;
-  ";
+  END";
   if($conn->query($sql)){
     echo '<br>Audit: 150 Zeilen Trigger eingesetzt';
   } else {
     echo $conn->error;
   }
 
-  $conn->query("DELIMITER |
-    CREATE TRIGGER projectBookingData_delete_trigger 
+  $conn->query("CREATE TRIGGER projectBookingData_delete_trigger 
       BEFORE DELETE ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -1812,13 +1807,9 @@ if($row['version'] < 107){
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
   
-    END
-    |
-    DELIMITER ;
-  ");
+    END");
 
-  $conn->query("DELIMITER |
-    CREATE TRIGGER projectBookingData_insert_trigger 
+  $conn->query("CREATE TRIGGER projectBookingData_insert_trigger 
       AFTER INSERT ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -1829,10 +1820,7 @@ if($row['version'] < 107){
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = 'INSERT';
   
-    END
-    |
-    DELIMITER ;
-  ");
+    END");
 }
 //------------------------------------------------------------------------------
 require 'version_number.php';

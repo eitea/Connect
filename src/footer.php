@@ -95,17 +95,18 @@ $('.timepicker').timepicker({
   */
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
   onPageLoad();
 
   var isDirty = false;
   //triggers change in all input fields including text type
   $(":input:not([type=search]):not(.not-dirty)").keyup(function(){
     isDirty = true;
-    $(".blinking").attr('class', 'btn btn-warning blinking');
+    var blink = $(this).closest('form').find('.blinking');
+    blink.attr('class', 'btn btn-warning blinking');
     setInterval(function() {
-      $(".blinking").fadeOut(500, function() {
-        $(".blinking").fadeIn(500);
+      blink.fadeOut(500, function() {
+        blink.fadeIn(500);
       });
     }, 1000);
   });

@@ -122,7 +122,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if (isset($_POST['submitUser'])) {
-    $activeTab = $x = $_POST['submitUser'];
+    $activeTab = $x = $_POST['submitUser'];    
+
     if (!empty($_POST['firstname'.$x])) {
       $firstname = test_input($_POST['firstname'.$x]);
       $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$x';";
@@ -233,6 +234,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
+    if(isset($_POST['isFinanceAdmin'.$x])){
+      $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
     if(isset($_POST['canStamp'.$x])){
       $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
     } else {
@@ -314,6 +321,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       redirect("../system/users?ACT=$x");
     }
   }//end if isset submitX
+  if(!empty($_POST['saveSocial'])){
+    $x = intval($_POST['saveSocial']);
+    require_once __DIR__ . "/utilities.php";
+    $pp = uploadFile('profilePictureUpload', 1, 1, 1);
+    if(!is_array($pp)) {
+      $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
+      echo $conn->error;
+      $null = NULL;
+      $stmt->bind_param("b", $null);
+      $stmt->send_long_data(0, $pp);
+      $stmt->execute();
+      if($stmt->errno) echo $stmt->error;
+      $stmt->close();
+    } else {
+      echo print_r($pp);
+    }
+  }
 }
 ?>
 
@@ -340,8 +364,9 @@ $(document).ready(function(){
   }
   $query = "SELECT *, $userTable.id AS user_id FROM $userTable
   INNER JOIN $roleTable ON $roleTable.userID = $userTable.id
-  INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE endDate IS NULL
-  ORDER BY $userTable.id ASC";
+  INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id
+  LEFT JOIN socialprofile ON socialprofile.userID = $userTable.id
+  WHERE endDate IS NULL ORDER BY $userTable.id ASC";
   $result = mysqli_query($conn, $query);
   if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -356,6 +381,7 @@ $(document).ready(function(){
       $coreTime = $row['coreTime'];
 
       $intervalStart = $row['startDate'];
+      $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : "images/defaultProfilePicture.png";
 
       $mon = $row['mon'];
       $tue = $row['tue'];
@@ -375,6 +401,7 @@ $(document).ready(function(){
       $isProjectAdmin = $row['isProjectAdmin'];
       $isReportAdmin = $row['isReportAdmin'];
       $isERPAdmin = $row['isERPAdmin'];
+      $isFinanceAdmin = $row['isFinanceAdmin'];
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
@@ -406,35 +433,46 @@ $(document).ready(function(){
           <div class="panel-body">
 
             <!-- #########  CONTENT ######## -->
-
+            <form method="POST" enctype="multipart/form-data">
+              <div class="container-fluid">
+                <div class="col-sm-2">
+                  <label class="btn btn-default btn-block"><?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?> <input type="file" name="profilePictureUpload" style="display:none"></label><br>
+                  <button type="submit" class="btn btn-warning btn-block" name="saveSocial" value="<?php echo $x; ?>"><?php echo $lang['SAVE_PICTURE']; ?></button>
+                </div>
+                <div class="col-sm-8">
+                  <img src='<?php echo $profilePicture; ?>' style='width:120px;height:120px;' class='img-circle center-block'><br>
+                </div>
+              </div>
+            </form>
+            
             <form method="POST">
-              <div class=container-fluid>
-                <div class=form-group>
+              <div class="container-fluid">
+                <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
                     <input type="text" class="form-control" name="firstname<?php echo $x; ?>" value="<?php echo $firstname; ?>">
                   </div>
                 </div>
-                <div class=form-group>
+                <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
                     <input type="text" class="form-control" name="lastname<?php echo $x; ?>" value="<?php echo $lastname; ?>">
                   </div>
                 </div>
-                <div class=form-group>
+                <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
                     <input type="text" class="form-control" name="email<?php echo $x; ?>" value="<?php echo explode('@', $email)[0]; ?>"/>
                     <span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $email)[1]; ?></span>
                   </div>
                 </div>
-                <div class=form-group>
+                <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD']; ?></span>
                     <input type="password" class="form-control" name="password<?php echo $x; ?>" placeholder="* * * *">
                   </div>
                 </div>
-                <div class=form-group>
+                <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
                     <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="* * * *">
@@ -474,19 +512,24 @@ $(document).ready(function(){
                 <div class="col-md-4">
                   <?php echo $lang['ADMIN_MODULES']; ?>: <br>
                   <div class="checkbox">
-                    <label><input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?></label><br>
+                    <label>
+                    <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
+                    </label><br>
                     <label>
                       <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
                     </label><br>
                     <label>
-                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                     </label><br>
                     <label>
                       <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
                     </label><br>
                     <label>
                       <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
-                    </label>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
+                    </label>                    
                   </div>
                 </div>
                 <div class="col-md-4">
