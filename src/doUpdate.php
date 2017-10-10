@@ -1821,6 +1821,24 @@ if($row['version'] < 107){
 }
 
 if($row['version'] < 108){
+  $conn->query("DELETE FROM accounts");
+  $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
+  if($file){
+    $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
+    $stmt->bind_param("iss", $num, $name, $type);
+    while(($line= fgetcsv($file, 300, ';')) !== false){
+      $num = $line[0];
+      $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+      if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
+      if(!$name) $name = $line[1];
+      $type = trim($line[2]);
+      $stmt->execute();
+    }
+    $stmt->close();
+  } else {
+    echo "<br>Error Opening csv File";
+  }
+
   $sql = "CREATE TABLE account_journal(
     id UN
     )";

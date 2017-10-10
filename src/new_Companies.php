@@ -13,7 +13,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn->query("INSERT INTO $companyTable (name, companyType) VALUES('$compaName', '$type')");
     $ins_id = mysqli_insert_id($conn);
     $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
-    if($conn->error){ echo $conn->error; } else { redirect("company?cmp=$ins_id"); }
     
     $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
     if($file){
@@ -22,13 +21,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       while(($line= fgetcsv($file, 300, ';')) !== false){
         $num = $line[0];
         $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+        if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
+        if(!$name) $name = $line[1];
         $type = trim($line[2]);
         $stmt->execute();
       }
       $stmt->close();
     } else {
       echo "<br>Error Opening csv File";
-    }    
+    }
+
+    if($conn->error){ echo $conn->error; } else { redirect("company?cmp=$ins_id"); }
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
