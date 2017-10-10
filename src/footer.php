@@ -76,6 +76,8 @@ function onPageLoad(){
     });
     $(this).datetimepicker('show');
   });
+  //datepicker doc: https://www.malot.fr/bootstrap-datetimepicker/index.php
+
   $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
   $('.timepicker').mask("20:50", {
     placeholder: "--:--",
@@ -87,16 +89,16 @@ function onPageLoad(){
   });
 
   /*
-$('.timepicker').timepicker({
-      todayBtn:  1,
-      autoclose: 1,
-      todayHighlight: 1,
-      startView: 1,
-      minView: 0,
-      maxView: 1,
-      forceParse: 0,
-      format: 'hh:ii'
-    });
+  $('.timepicker').timepicker({
+    todayBtn:  1,
+    autoclose: 1,
+    todayHighlight: 1,
+    startView: 1,
+    minView: 0,
+    maxView: 1,
+    forceParse: 0,
+    format: 'hh:ii'
+  });
   */
 }
 

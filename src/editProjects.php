@@ -47,8 +47,7 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
 }
 ?>
 <div class="page-header">
-  <h3>
-    <?php echo $lang['PROJECT']; ?>
+  <h3><?php echo $lang['PROJECT']; ?>
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>

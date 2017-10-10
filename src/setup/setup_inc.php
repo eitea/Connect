@@ -904,8 +904,7 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "DELIMITER |
-  CREATE TRIGGER projectBookingData_update_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_update_trigger 
     BEFORE UPDATE ON projectBookingData
     FOR EACH ROW
   BEGIN
@@ -915,17 +914,12 @@ function create_tables($conn){
     END IF;
     INSERT INTO projectBookingData_audit
     SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = CONCAT('UPDATE ', OLD.id);
-
-  END
-  |
-  DELIMITER ;
-  ";
+  END";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
 
-  $sql = "DELIMITER |
-    CREATE TRIGGER projectBookingData_delete_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_delete_trigger 
       BEFORE DELETE ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -935,17 +929,12 @@ function create_tables($conn){
       END IF;
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
-  
-    END
-    |
-    DELIMITER ;
-  ";
+    END";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
 
-  $sql = "DELIMITER |
-    CREATE TRIGGER projectBookingData_insert_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_insert_trigger 
       AFTER INSERT ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -955,11 +944,7 @@ function create_tables($conn){
       END IF;
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('INSERT ', NEW.timestampID);
-  
-    END
-    |
-    DELIMITER ;
-  ";
+    END";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }

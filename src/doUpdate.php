@@ -1820,6 +1820,12 @@ if($row['version'] < 107){
     END");
 }
 
+if($row['version'] < 108){
+  $sql = "CREATE TABLE account_journal(
+    id UN
+    )";
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
