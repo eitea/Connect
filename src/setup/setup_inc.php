@@ -670,6 +670,10 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  /* IMPORTANT:
+  Tax IDs must always correspond to their current positon in place.
+  Taxes may only be altered under supervision of an accountant
+  */
   $sql = "CREATE TABLE taxRates (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(100),
@@ -876,22 +880,19 @@ function create_tables($conn){
   $sql = "CREATE TABLE account_journal(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6),
+    taxID INT(4) UNSIGNED,
     docNum INT(6),
     payDate DATETIME,
     inDate DATETIME,
     account INT(6) UNSIGNED,
     offAccount INT(6) UNSIGNED,
     info VARCHAR(70),
-    tax INT(4) UNSIGNED,
     should DECIMAL(18,2),
     have DECIMAL(18,2),
     FOREIGN KEY (account) REFERENCES accounts(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
     FOREIGN KEY (offAccount) REFERENCES accounts(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE,
-    FOREIGN KEY (tax) REFERENCES taxRates(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";

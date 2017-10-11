@@ -237,7 +237,6 @@ ignore_user_abort(1);
                   $stmt->execute();              
                 }
               }
-              
               //insert github options
               $conn->query("INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')");
 
@@ -246,29 +245,29 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
 
               //insert taxRates
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account3) VALUES(1, 'Normalsatz', 20, 3500)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account3) VALUES(2, 'Ermäßigter Satz', 10, 3500)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(3, 'Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(4, 'Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(5, 'Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(6, 'Reverse Charge Normalsatz', 20, 2502,  3502)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(7, 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(8, 'Bewirtung', 20)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(9, 'Bewirtung', 10)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(10, 'Innergemeinschaftliche Leistungen', NULL)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(11, 'Innergemeinschatliche Lieferungen steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(12, 'Ermäßigter Satz', 13)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(13, 'Sonder Ermäßigter Satz', 12)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(14, 'Zollausschulssgebiet', NULL)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(15, 'Zusatzsteuer LuF', 10)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(16, 'Zusatzsteuer LuF', 8)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(17, 'KFZ Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(18, 'UStBBKV', 20, 2506, 3506)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(19, 'Keine Steuer', 0)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2) VALUES(20, 'Vorsteuer', 20, 2500)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2) VALUES(21, 'Vorsteuer', 19, 2500)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2) VALUES(22, 'Vorsteuer', 13, 2500)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2) VALUES(23, 'Vorsteuer', 10, 2500)");
+              $i = 0;
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Keine Steuer', 0)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Normalsatz', 20, 3500, 1)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 10, 3500, 1)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501, 9)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501, 9)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Normalsatz', 20, 2502,  3502, 19)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502, 19)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 20)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 10)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Innergemeinschatliche Lieferungen steuerfrei', NULL)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 3500, 1)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Sonder Ermäßigter Satz', 12)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', NULL)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 10)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 8)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'KFZ Normalsatz', 20)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(".$i++.", 'UStBBKV', 20, 2506, 3506)");              
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 20, 2500, 2)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 19, 2500, 2)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 13, 2500, 2)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 10, 2500, 2)");
 
               //insert travelling expenses
               $travellingFile = fopen(__DIR__ . "/Laender.txt", "r");

@@ -29,6 +29,9 @@ $lang_ger['ABSOLVED'] = 'Absolviert';
 $lang_eng['ACCOUNT'] = 'Account';
 $lang_ger['ACCOUNT'] = 'Konto';
 
+$lang_eng['ACCOUNT_JOURNAL'] = 'Accounting Journal';
+$lang_ger['ACCOUNT_JOURNAL'] = 'Buchungsjournal';
+
 $lang_eng['ACCOUNT_PLAN'] = 'Account Plan';
 $lang_ger['ACCOUNT_PLAN'] = 'Kontenplan';
 

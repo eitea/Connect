@@ -737,6 +737,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
                   echo '<div class="collapse" id="tfinances-'.$row['id'].'" ><ul class="nav nav-list">';
                   echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                  echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
                   $acc_res = $conn->query("SELECT id, name FROM accounts WHERE (name LIKE 'Bank%' OR name LIKE 'Kassa%') AND companyID = ".$row['id']);
                   while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
                     echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';

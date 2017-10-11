@@ -8,6 +8,7 @@
       <th>Prozentsatz</th>
       <th>Steuerkonto Klasse 2</th>
       <th>Steuerkonto Klasse 3</th>
+      <th>Steuercode</th>
     </thead>
     <tbody>
       <?php
@@ -18,6 +19,7 @@
         echo '<td style="text-align:right">'.intval($row['percentage']).'%</td>';
         echo '<td style="text-align:center">'.$row['account2'].'</td>';
         echo '<td style="text-align:center">'.$row['account3'].'</td>';
+        echo '<td style="text-align:center">'.$row['code'].'</td>';
         echo '</tr>';
       }
       ?>
