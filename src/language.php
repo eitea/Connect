@@ -23,6 +23,12 @@ $lang_ger['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
 $lang_eng['ACCUMULATED_DAYS'] = 'Accumulated Days';
 $lang_ger['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
 
+$lang_eng['ABSOLVED'] = 'Absolved';
+$lang_ger['ABSOLVED'] = 'Absolviert';
+
+$lang_eng['ACCOUNT'] = 'Account';
+$lang_ger['ACCOUNT'] = 'Konto';
+
 $lang_eng['ACCOUNT_PLAN'] = 'Account Plan';
 $lang_ger['ACCOUNT_PLAN'] = 'Kontenplan';
 
@@ -532,10 +538,11 @@ $lang_ger['INFO_GEMINI'] = "Es existiert mehr als nur ein Zeitstempel für einen
 $lang_eng['INFO_HOLIDAY'] = 'National Holidays have to end with (§).';
 $lang_ger['INFO_HOLIDAY'] = 'Gesetzliche Feiertage müssen mit einem (§) Enden.';
 
-$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
-                                        Autocorrecting them appends the rest of the lunchbreak to the end of the day. (This break will be added)';
-$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
-                                        Die Korrektur trägt eine vollständige Mittagspause zur Mitte des Tages nach. (Diese Pause wird dazugerechnet)';
+$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have insufficient lunchbreaks. <br>
+                                        Autocorrecting them appends the rest of the lunchbreak to the last booking (if found), or to the middle of the day to avoid overlappings';
+$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine Mittagspause gefunden. Die automatische Korrektur trägt die fehlende Zeit nach.<br>
+                                        Sind bereits Buchungen vorhanden wird die Pause an die letzte Buchung des Tages angehängt, um Überschneidungen zu vermeiden.<br>
+                                        Sonst wird die Pause exakt nach Ablauf der Mindestzeit (normal 6h) hinzugefügt.';
 
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';

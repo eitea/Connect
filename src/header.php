@@ -278,13 +278,14 @@ if($isTimeAdmin){
               <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
             </a>
           <?php endif; ?>
-          <?php 
+          <?php
             $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
             $row = $result->fetch_assoc();
             $social_status = $row["status"];
             $social_isAvailable = $row["isAvailable"];
             $defaultGroupPicture = "images/group.png";
-            $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : "images/defaultProfilePicture.png";
+            $defaultPicture = "images/defaultProfilePicture.png";
+            $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
           ?>
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
           <a data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;vertical-align:middle;'></a>

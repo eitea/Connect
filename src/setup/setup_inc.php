@@ -97,7 +97,8 @@ function create_tables($conn){
     detailLeft VARCHAR(120),
     detailMiddle VARCHAR(120),
     detailRight VARCHAR(120),
-    uid VARCHAR(20)
+    uid VARCHAR(20),
+    istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -673,6 +674,7 @@ function create_tables($conn){
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(100),
     percentage INT(3),
+    code INT(2),
     account2 INT(4),
     account3 INT(4)
   )";
@@ -858,6 +860,7 @@ function create_tables($conn){
   $sql = "CREATE TABLE accounts (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     companyID INT(6) UNSIGNED,
+    manualBooking VARCHAR(10) DEFAULT 'FALSE',
     num INT(4) UNSIGNED,
     name VARCHAR(50),
     type ENUM('1', '2', '3', '4') DEFAULT '1',
@@ -870,10 +873,12 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE account_balance(
+  $sql = "CREATE TABLE account_journal(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6),
     docNum INT(6),
     payDate DATETIME,
+    inDate DATETIME,
     account INT(6) UNSIGNED,
     offAccount INT(6) UNSIGNED,
     info VARCHAR(70),
@@ -887,6 +892,23 @@ function create_tables($conn){
     ON UPDATE CASCADE
     ON DELETE CASCADE,
     FOREIGN KEY (tax) REFERENCES taxRates(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE account_balance(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    journalID INT(10) UNSIGNED,
+    accountID INT(4) UNSIGNED,
+    should DECIMAL(18,2),
+    have DECIMAL(18,2),  
+    FOREIGN KEY (accountID) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,  
+    FOREIGN KEY (journalID) REFERENCES account_journal(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";

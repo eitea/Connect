@@ -443,7 +443,7 @@ $x = $prod_row['id'];
         </div>
         <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
-          <label><?php echo $lang['PRICE_STK']; ?></label>
+          <label><?php echo $lang['PRICE_STK']; ?> <small>(Netto)</small></label>
           <input id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
         </div>
       </div>

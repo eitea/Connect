@@ -1822,6 +1822,7 @@ if($row['version'] < 107){
 
 if($row['version'] < 108){
   $conn->query("DELETE FROM accounts");
+  $conn->query("ALTER TABLE accounts AUTO_INCREMENT = 1");
   $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
   if($file){
     $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
@@ -1840,8 +1841,70 @@ if($row['version'] < 108){
   }
 
   $sql = "CREATE TABLE account_journal(
-    id UN
-    )";
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6),
+    docNum INT(6),
+    payDate DATETIME,
+    inDate DATETIME,
+    account INT(6) UNSIGNED,
+    offAccount INT(6) UNSIGNED,
+    info VARCHAR(70),
+    tax INT(4) UNSIGNED,
+    should DECIMAL(18,2),
+    have DECIMAL(18,2),
+    FOREIGN KEY (account) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (offAccount) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (tax) REFERENCES taxRates(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if($conn->query($sql)){
+    echo '<br>Finanzen: Buchungsjournal hinzugefügt';
+  } else {
+    echo $conn->error;
+  }
+
+  $conn->query("ALTER TABLE accounts ADD COLUMN manualBooking VARCHAR(10) DEFAULT 'FALSE' ");
+  if(!$conn->error){
+    echo '<br>Finanzen: Steuern';
+  } else {
+    echo $conn->error;
+  }
+
+  $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
+
+  $conn->query("ALTER TABLE companyData ADD istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+
+  $conn->query("DROP TABLE account_balance");
+  $sql = "CREATE TABLE account_balance(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    journalID INT(10) UNSIGNED,
+    accountID INT(4) UNSIGNED,
+    should DECIMAL(18,2),
+    have DECIMAL(18,2),  
+    FOREIGN KEY (accountID) REFERENCES accounts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,  
+    FOREIGN KEY (journalID) REFERENCES account_journal(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>Buchhungsjournal Eintrag mit Buchungen verknüpft';
+  }
+
+  $conn->query("ALTER TABLE taxRates ADD COLUMN code INT(2)");
+  if(!$conn->error){
+    echo '<br>Finanzen: Steuercode';
+  } else {
+    echo $conn->error;
+  }
 }
 
 //------------------------------------------------------------------------------

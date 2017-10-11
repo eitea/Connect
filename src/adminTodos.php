@@ -11,14 +11,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
       $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
-      if($result && ($row = $result->fetch_assoc())){
-
+      if($result && ($row = $result->fetch_assoc())){        
         $result_book = $conn->query("SELECT end FROM projectBookingData WHERE timestampID = $indexIM ORDER BY start DESC");
         if($result_book && ($row_book = $result_book->fetch_assoc())){
+          //grab last booking
           $row_break['breakCredit'] = 0;
           $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = $indexIM");
           if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
           $missingBreak = intval($row['hoursOfRest'] * 60 - $row_break['breakCredit']);
+          //unexpected missing break error
           if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) {echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].": $missingBreak $indexIM </div>"; break;}
           $break_begin = $row_book['end'];
           $break_end = carryOverAdder_Minutes($break_begin, $missingBreak);

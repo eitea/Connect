@@ -194,15 +194,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    } else {
      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
    }
- } elseif(isset($_POST['addFinanceAccount'])){
-   if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
-    $name = test_input($_POST['addFinance_name']);
-    $num = intval($_POST['addFinance_num']);
-    $conn->query("INSERT INTO accounts (companyID, num, name) VALUES('$cmpID', $num, '$name')");
-    if($conn->error){echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-   } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
-   }
  }
 }
 $result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
@@ -815,50 +806,15 @@ $row = $result->fetch_assoc();
 
 <!-- FINANCES -->
 <form method="POST" class="page-seperated-section">
-  <h4><?php echo $lang['FINANCES']; ?>
-    <div class="page-header-button-group">
-      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-finance-account" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-    </div>
-  </h4>
+  <h4><?php echo $lang['FINANCES']; ?></h4>
   <div class="container-fluid">
-    <table class="table table-hover">
-    <thead><tr>
-      <th>Nr.</th>
-      <th>Name</th>
-    </tr></thead>
-    <tbody>
-      <?php
-        $result = $conn->query("SELECT * FROM accounts WHERE companyID = $cmpID AND num >= 2000 AND num < 3000");
-        while($result && ($row = $result->fetch_assoc())){
-          echo '<tr>';
-          echo '<td>'.$row['num'].'</td>';
-          echo '<td>'.$row['name'].'</td>';
-          echo '</tr>';
-        }
-      ?>
-    </tbody>
+    Soll- /Istversteuerer
+    <br>
+    Bebuchbare Konten verwalten
+    <br>
+    
   </div>
 </form>
-
-<div class="modal fade add-finance-account">
-  <div class="modal-dialog modal-content modal-sm">
-    <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
-    <div class="modal-body container-fluid">
-      <div class="col-md-8">
-        <label>Nr.</label>
-        <input id="account2" name="addFinance_num" type="number" class="form-control" maxlength="4" min="2000" max="2999" placeholder="2000"/><br>
-      </div>
-      <div class="col-md-12">
-        <label>Name</label>
-        <input type="text" name="addFinance_name" class="form-control" maxlength="20" placeholder="Name"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      <button type="submit" name="addFinanceAccount" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-    </div>
-  </div>
-</div>
 
 <script>
   $('#account2').mask("0000");

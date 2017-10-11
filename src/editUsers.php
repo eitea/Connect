@@ -321,10 +321,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       redirect("../system/users?ACT=$x");
     }
   }//end if isset submitX
-  if(!empty($_POST['saveSocial'])){
-    $x = intval($_POST['saveSocial']);
+  if(!empty($_POST['saveProfilePicture'])){
+    $x = intval($_POST['saveProfilePicture']);
     require_once __DIR__ . "/utilities.php";
-    $pp = uploadFile('profilePictureUpload', 1, 1, 1);
+    $pp = uploadFile('profilePicture', 1, 1, 1);
     if(!is_array($pp)) {
       $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
       echo $conn->error;
@@ -436,8 +436,8 @@ $(document).ready(function(){
             <form method="POST" enctype="multipart/form-data">
               <div class="container-fluid">
                 <div class="col-sm-2">
-                  <label class="btn btn-default btn-block"><?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?> <input type="file" name="profilePictureUpload" style="display:none"></label><br>
-                  <button type="submit" class="btn btn-warning btn-block" name="saveSocial" value="<?php echo $x; ?>"><?php echo $lang['SAVE_PICTURE']; ?></button>
+                  <label class="btn btn-default btn-block"><?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?> <input type="file" name="profilePicture" style="display:none"></label><br>
+                  <button type="submit" class="btn btn-warning btn-block" name="saveProfilePicture" value="<?php echo $x; ?>"><?php echo $lang['SAVE_PICTURE']; ?></button>
                 </div>
                 <div class="col-sm-8">
                   <img src='<?php echo $profilePicture; ?>' style='width:120px;height:120px;' class='img-circle center-block'><br>
