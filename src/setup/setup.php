@@ -326,6 +326,8 @@ ignore_user_abort(1);
                 while(($line= fgetcsv($file, 100, ';')) !== false){
                   $num = $line[0];
                   $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+                  if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
+                  if(!$name) $name = $line[1];
                   $stmt->execute();
                 }
                 $stmt->close();
