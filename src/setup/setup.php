@@ -12,7 +12,7 @@ ignore_user_abort(1);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-  <script src="plugins/jQuery/jquery-3.2.1.min.js"></script>
+  <script src="plugins/jQuery/jquery.min.js"></script>
 
   <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
@@ -28,9 +28,7 @@ ignore_user_abort(1);
   <!-- navbar -->
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
-      <div class="navbar-header hidden-xs">
-        <a class="navbar-brand" >Connect</a>
-      </div>
+      <div class="navbar-header hidden-xs"><a class="navbar-brand" >Connect</a></div>
       <div class="navbar-right">
         <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><strong>info</strong></a>
       </div>
@@ -51,7 +49,7 @@ ignore_user_abort(1);
     return $data;
   }
   function clean($string) {
-    return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+    return trim(preg_replace('/[^\.A-Za-z0-9\-]/', '', $string));
   }
   function randomPassword(){
     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
@@ -105,11 +103,12 @@ ignore_user_abort(1);
         $firstname = $lastname = $companyName = $companyType = $localPart = $domainname = $out = "";
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){          
-          $cmpDescription = $uid = $postal = $address = $phone = $homepage = $email = '';
+          $cmpDescription = $uid = $postal = $city = $address = $phone = $homepage = $email = '';
           if(isset($_POST['cmpDescription'])){
             $cmpDescription = $_POST['cmpDescription'];
             $uid = $_POST['uid'];
             $postal = $_POST['postal'];
+            $city = $_POST['city'];
             $address = $_POST['address'];
             $phone = $_POST['phone'];
             $homepage = $_POST['homepage'];
@@ -170,9 +169,10 @@ ignore_user_abort(1);
               $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
-              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-              $stmt->bind("sssssssss", $companyName, $companyType, $cmpDescription, $postal, $uid, $address, $phone, $email, $homepage);
+              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+              $stmt->bind("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
               $stmt->execute();
+              $stmt->close();
               //insert password policy
               $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
               //insert module en/disable
@@ -299,8 +299,7 @@ ignore_user_abort(1);
                 fclose($travellingFile);
               } else {
                 echo "File with Country Data not found!";
-              }
-             
+              }            
 
               //insert sum units
               $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
