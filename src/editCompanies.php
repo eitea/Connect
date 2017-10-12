@@ -2,7 +2,7 @@
 <!-- BODY -->
 
 <?php
-if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){die("Invalid Access");}
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ include'footer.php'; die("Invalid Access");}
 $cmpID = intval($_GET['cmp']);
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -194,15 +194,55 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    } else {
      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
    }
- }
+ } elseif(isset($_POST['addFinanceAccount'])){
+    if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
+      $name = test_input($_POST['addFinance_name']);
+      $num = intval($_POST['addFinance_num']);
+      $ggk = 'FALSE';
+      if(isset($_POST['addFinance_booking'])) $ggk = 'TRUE';
+      $conn->query("INSERT INTO accounts (companyID, num, name, manualBooking) VALUES('$cmpID', $num, '$name', '$ggk')");
+      if($conn->error){
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
+      } else {
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+      }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    }
+  } elseif(isset($_POST['saveFinances']) && isset($_POST['finance_istVersteuerer'])){
+    $val = 'FALSE';
+    if($_POST['finance_istVersteuerer']) $val = 'TRUE';
+    $conn->query("UPDATE companyData SET istVersteuerer = '$val' WHERE id = $cmpID");
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+    }
+  } elseif(!empty($_POST['turnBookingOn'])){
+    $val = intval($_POST['turnBookingOn']);
+    $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+    }
+  } elseif(!empty($_POST['turnBookingOff'])){
+    $val = intval($_POST['turnBookingOff']);
+    $conn->query("UPDATE accounts SET manualBooking = 'FALSE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+    }
+  }
 }
 $result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
-if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $available_companies)):
+if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
   ?>
 
 <div class="page-seperated-body">
 <div class="page-header page-seperated-section">
-  <h3><?php echo $lang['COMPANY'] .' - '.$row['name']; ?>
+  <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
     </div>
@@ -214,7 +254,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     <div class="modal-dialog modal-sm" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $row['name']); ?></h4>
+          <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4>
         </div>
         <div class="modal-body">
           <?php echo $lang['WARNING_DELETE_COMPANY']; ?>
@@ -242,7 +282,7 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
   </div>
   <div class="container-fluid">
     <div class="col-sm-4">
-      <?php if($row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $row['logo'] ).'"/>';} ?>
+      <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
     </div>
     <div class="col-sm-8">
       <input type="file" name="fileToUpload"/>
@@ -262,87 +302,67 @@ if ($result && ($row = $result->fetch_assoc()) && in_array($row['id'], $availabl
     </div>
     <br>
     <div class="row">
-      <div class="col-sm-3">
-        <label><?php echo $lang['COMPANY_NAME']; ?></label>
-      </div>
+      <div class="col-sm-3"><label><?php echo $lang['COMPANY_NAME']; ?></label></div>
       <div class="col-sm-9">
-        <input type="text" class="form-control" name="general_description" value="<?php echo $row['cmpDescription'];?>" />
+        <input type="text" class="form-control" name="general_description" value="<?php echo $companyRow['cmpDescription'];?>" />
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label><?php echo $lang['ADDRESS']; ?></label>
-      </div>
+      <div class="col-sm-3"><label><?php echo $lang['ADDRESS']; ?></label></div>
       <div class="col-sm-9">
-        <input type="text" class="form-control" name="general_address" placeholder="Address" value="<?php echo $row['address'];?>" />
+        <input type="text" class="form-control" name="general_address" placeholder="Address" value="<?php echo $companyRow['address'];?>" />
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label><?php echo $lang['PLZ']; ?></label>
-      </div>
+      <div class="col-sm-3"><label><?php echo $lang['PLZ']; ?></label></div>
       <div class="col-sm-4">
-        <input type="text" class="form-control" name="general_postal" value="<?php echo $row['companyPostal'];?>" />
+        <input type="text" class="form-control" name="general_postal" value="<?php echo $companyRow['companyPostal'];?>" />
       </div>
-      <div class="col-sm-1 text-center">
-        <label><?php echo $lang['CITY']; ?></label>
-      </div>
+      <div class="col-sm-1 text-center"><label><?php echo $lang['CITY']; ?></label></div>
       <div class="col-sm-4">
-        <input type="text" class="form-control" name="general_city" value="<?php echo $row['companyCity'];?>" />
+        <input type="text" class="form-control" name="general_city" value="<?php echo $companyRow['companyCity'];?>" />
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label>UID</label>
-      </div>
+      <div class="col-sm-3"><label>UID</label></div>
       <div class="col-sm-9">
-        <input type="text" class="form-control" name="general_uid" value="<?php echo $row['uid'];?>" />
+        <input type="text" class="form-control" name="general_uid" value="<?php echo $companyRow['uid'];?>" />
       </div>
-    </div>
+    </div>  
     <div class="row">
-      <div class="col-sm-3">
-        <label><?php echo $lang['PHONE_NUMBER']; ?></label>
-      </div>
+      <div class="col-sm-3"><label><?php echo $lang['PHONE_NUMBER']; ?></label></div>
       <div class="col-sm-9">
-        <input type="text" class="form-control" name="general_phone" placeholder="Tel nr." value="<?php echo $row['phone'];?>"/>
+        <input type="text" class="form-control" name="general_phone" placeholder="Tel nr." value="<?php echo $companyRow['phone'];?>"/>
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label>E-Mail</label>
-      </div>
+      <div class="col-sm-3"><label>E-Mail</label></div>
       <div class="col-sm-9">
-        <input type="mail" class="form-control"  name="general_mail" placeholder="E-Mail" value="<?php echo $row['mail'];?>" />
+        <input type="mail" class="form-control"  name="general_mail" placeholder="E-Mail" value="<?php echo $companyRow['mail'];?>" />
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label>Homepage</label>
-      </div>
+      <div class="col-sm-3"><label>Homepage</label></div>
       <div class="col-sm-9">
-        <input type="text" class="form-control"  name="general_homepage" placeholder="Homepage" value="<?php echo $row['homepage'];?>" />
+        <input type="text" class="form-control"  name="general_homepage" placeholder="Homepage" value="<?php echo $companyRow['homepage'];?>" />
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
-        <label>ERP Text</label>
-      </div>
+      <div class="col-sm-3"><label>ERP Text</label></div>
       <div class="col-sm-9">
-        <textarea name="general_erpText" class="form-control" placeholder=""><?php echo $row['erpText'];?></textarea>
+        <textarea name="general_erpText" class="form-control" placeholder=""><?php echo $companyRow['erpText'];?></textarea>
       </div>
     </div>
     <div class="row">
+      <div class="col-sm-3"><label>Detail (<?php echo $lang['FOOT_NOTE']; ?>)</label></div>
       <div class="col-sm-3">
-        <label>Detail (<?php echo $lang['FOOT_NOTE']; ?>)</label>
-      </div>
-      <div class="col-sm-3">
-        <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailLeft'];?></textarea>
+        <textarea name="general_detail_left" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $companyRow['detailLeft'];?></textarea>
       </div>
       <div class="col-sm-3 text-center">
-        <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailMiddle'];?></textarea>
+        <textarea name="general_detail_middle" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $companyRow['detailMiddle'];?></textarea>
       </div>
       <div class="col-sm-3 text-right">
-        <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $row['detailRight'];?></textarea>
+        <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $companyRow['detailRight'];?></textarea>
       </div>
     </div>
   </div>
@@ -806,18 +826,83 @@ $row = $result->fetch_assoc();
 
 <!-- FINANCES -->
 <form method="POST" class="page-seperated-section">
-  <h4><?php echo $lang['FINANCES']; ?></h4>
+  <h4><?php echo $lang['FINANCES']; ?>
+    <div class="page-header-button-group">
+      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-finance-account" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+      <button id="blinker" type="submit" class="btn btn-default" name="saveFinances" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+    </div>
+  </h4>
   <div class="container-fluid">
-    Soll- /Istversteuerer
-    <br>
-    Bebuchbare Konten verwalten
-    <br>
-    
+  <br><br>
+  <div class="row">
+      <div class="col-sm-2 radio"><label><strong><?php echo $lang['VAT']; ?>:</strong></label></div>
+      <div class="col-sm-8 radio">
+        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="1" <?php if($companyRow['istVersteuerer'] == 'TRUE') echo 'checked'; ?>> Ist-Versteuerer</label>
+        <br>
+        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="0" <?php if($companyRow['istVersteuerer'] != 'TRUE') echo 'checked' ?>> Soll-Versteuerer</label>
+      </div>
+  </div><br>
+    <table class="table table-hover">
+    <thead><tr>
+      <th>Nr.</th>
+      <th>Name</th>
+      <th>Menübar</th>
+    </tr></thead>
+    <tbody>
+      <?php
+        $result = $conn->query("SELECT * FROM accounts WHERE companyID = $cmpID AND num >= 2000 AND num < 3000");
+        while($result && ($row = $result->fetch_assoc())){
+          echo '<tr>';
+          echo '<td>'.$row['num'].'</td>';
+          echo '<td>'.$row['name'].'</td>';
+          echo '<td>';
+          if($row['manualBooking'] == 'TRUE'){
+            echo '<button type="submit" name="turnBookingOff" class="btn btn-warning" title="Buchung deaktivieren" value="'.$row['id'].'"><i class="fa fa-check"></i> Gegenkonto</button>';
+          } else {
+            echo '<button type="submit" name="turnBookingOn" class="btn btn-default" title="Buchung aktivieren" value="'.$row['id'].'"><i class="fa fa-times"></i> Gegenkonto</button>';
+          }
+          echo '</td>';
+          echo '</tr>';
+        }
+      ?>
+    </tbody>
   </div>
 </form>
 
+<div class="modal fade add-finance-account">
+  <div class="modal-dialog modal-content modal-sm">
+    <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
+    <div class="modal-body container-fluid">
+      <div class="col-md-8">
+        <label for="account2">Nr.</label>
+        <input id="account2" name="addFinance_num" type="number" class="form-control" maxlength="4" min="2000" max="2999" placeholder="2000"/>
+      </div>
+      <div class="col-md-12 checkbox">
+        <label><input type="checkbox" name="addFinance_booking" value="1"> Gegenkonto</label>
+      </div>
+      <div class="col-md-12">
+        <label>Name</label>
+        <input type="text" name="addFinance_name" class="form-control" maxlength="20" placeholder="Name"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      <button type="submit" name="addFinanceAccount" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+    </div>
+  </div>
+</div>
+
 <script>
   $('#account2').mask("0000");
+function startBlinker(){
+  var blink = $('#blinker');
+    blink.attr('class', 'btn btn-warning blinking');
+    setInterval(function() {
+      blink.fadeOut(500, function() {
+        blink.fadeIn(500);
+      });
+    }, 1000);
+}
 </script>
 
 

@@ -37,6 +37,7 @@ ul.nav.navbar-nav .nav.nav-list {
   width:100%;
 }
 .affix-sidebar{
+  white-space: nowrap;
   padding-left: 0;
   width: 250px;
   position:fixed;

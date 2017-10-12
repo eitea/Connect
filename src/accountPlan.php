@@ -29,13 +29,23 @@ if(isset($_POST['addFinanceAccount'])){
     }
 } elseif(isset($_POST['delete'])){
     $id = intval($_POST['delete']);
-    $result = $conn->query("SELECT * FROM account_balance WHERE account = $id OR offAccount = $id");
+    $result = $conn->query("SELECT * FROM account_balance WHERE accountID = $id");
+    echo $conn->error;
     if(!$result || $result->num_rows < 1){
-        $conn->query("DELETE FROM accounts WHERE id = $id");
+        $conn->query("DELETE FROM accounts WHERE id = $id AND companyID = $cmpID ");
         echo $conn->error;
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
     } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DELETE_ACCOUNT'].'</div>';
+    }
+} elseif(!empty($_POST['saveNameChange']) && !empty("changeName")){
+    $val = test_input($_POST['changeName']);
+    $id = intval($_POST['saveNameChange']);
+    $conn->query("UPDATE accounts SET name = '$val' WHERE id = $id AND companyID = $cmpID");
+    if($conn->error){
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
 }
 ?>
@@ -49,6 +59,7 @@ if(isset($_POST['addFinanceAccount'])){
 </tr></thead>
 <tbody>
 <?php
+    $modals = '';
     $result = $conn->query("SELECT * FROM accounts WHERE companyID = $cmpID ");
     while($result && ($row = $result->fetch_assoc())){
         echo '<tr>';
@@ -56,10 +67,18 @@ if(isset($_POST['addFinanceAccount'])){
         echo '<td>'.$row['name'].'</td>';
         echo '<td>'.$lang['ACCOUNT_TOSTRING'][$row['type']].'</td>';
         echo '<td>';
-        echo '<form method="POST" style="display:inline"><button type="submit" name="delete" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></form>';
+        echo '<form method="POST" style="display:inline"><button type="submit" name="delete" value="'.$row['id'].'" title="'.$lang['DELETE'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></form>';
         echo '<a href="account?v='.$row['id'].'" class="btn btn-default" title="Zum Konto" ><i class="fa fa-arrow-right"></i></a>';
+        echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editName-'.$row['id'].'" title="'.$lang['EDIT'].'" ><i class="fa fa-pencil"></i></button>';
         echo '</td>';
         echo '</tr>';
+
+
+        $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md">
+                    <div class="modal-header"><h3>'.$lang['EDIT'].'</h3></div>
+                    <div class="modal-body"><form method="POST"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ></form></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning" name="saveNameChange" value="'.$row['id'].'">'.$lang['SAVE'].'</button></div></div></div>';
     }
 ?>
 </tbody>
@@ -67,15 +86,17 @@ if(isset($_POST['addFinanceAccount'])){
 
 <script>
     $('.table').DataTable({
-  order: [[ 0, "asc" ]],
-deferRender: true,
-  responsive: true,
-  autoWidth: false,
-  language: {
+    order: [[ 0, "asc" ]],
+    deferRender: true,
+    responsive: true,
+    autoWidth: false,
+    language: {
     <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
   }
 });
 </script>
+
+<?php echo $modals; ?>
 
 <div class="modal fade add-finance-account">
   <div class="modal-dialog modal-content modal-md">

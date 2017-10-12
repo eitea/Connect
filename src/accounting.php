@@ -47,7 +47,7 @@ if(isset($_POST['addFinance'])){
         }
 
         //journal
-        $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, tax, should, have, info)
+        $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
         VALUES ($docNum, $userID, $account, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");
         echo $conn->error;
         $journalID = $conn->insert_id;

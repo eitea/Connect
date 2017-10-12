@@ -288,7 +288,7 @@ if($isTimeAdmin){
             $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
           ?>
           <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
-          <a data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:40px;display:inline-block;vertical-align:middle;'></a>
+          <a data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
           <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
           <?php else: ?>
           <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
@@ -311,7 +311,7 @@ if($isTimeAdmin){
 
     <!-- modal -->
     <form method="POST">
-      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -738,7 +738,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   echo '<div class="collapse" id="tfinances-'.$row['id'].'" ><ul class="nav nav-list">';
                   echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
                   echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                  $acc_res = $conn->query("SELECT id, name FROM accounts WHERE (name LIKE 'Bank%' OR name LIKE 'Kassa%') AND companyID = ".$row['id']);
+                  $acc_res = $conn->query("SELECT id, name FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
                   while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
                     echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
                   }
