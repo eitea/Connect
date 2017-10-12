@@ -148,7 +148,7 @@ ignore_user_abort(1);
               if(!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
                 echo mysqli_error($conn);
                 unlink(dirname(__DIR__) .'/connection_config.php');
-                die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
+                die("<br>Invalid DB Connection: Could not instantiate a database.<a href='run'>Return</a><br>");
               }
 
               //reconnect to database
@@ -170,7 +170,7 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
               $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-              $stmt->bind("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
+              $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
               $stmt->execute();
               $stmt->close();
               //insert password policy
@@ -220,7 +220,7 @@ ignore_user_abort(1);
               //insert ERP numbers
               $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
               //insert mail options
-              $conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
+              $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
               //insert restic backup configuration
               $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 
@@ -445,7 +445,7 @@ ignore_user_abort(1);
                     <span class="input-group-addon" style="min-width:150px">
                       Server Address
                     </span>
-                    <input type="text" class="form-control" name="serverName" value = "localhost" />
+                    <input type="text" class="form-control" name="serverName" value = "127.0.0.1" />
                   </div>
                 </div>
               </div>
