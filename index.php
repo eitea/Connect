@@ -39,12 +39,6 @@ $mime_types = array(
   '.gif' => "image/gif",                '.woff' => "application/font-woff"
  );
 
-//kill internet explorer
-if (strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64') || strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64')) {
-  include 'msie.html';
-  die();
-}
-
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
 $params = explode('/', $url);

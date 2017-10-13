@@ -73,7 +73,6 @@ if(isset($_POST['addFinanceAccount'])){
         echo '</td>';
         echo '</tr>';
 
-
         $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
                     <div class="modal-header"><h3>'.$lang['EDIT'].'</h3></div>
                     <div class="modal-body"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ></div>
