@@ -74,11 +74,11 @@ if(isset($_POST['addFinanceAccount'])){
         echo '</tr>';
 
 
-        $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md">
+        $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
                     <div class="modal-header"><h3>'.$lang['EDIT'].'</h3></div>
-                    <div class="modal-body"><form method="POST"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ></form></div>
+                    <div class="modal-body"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ></div>
                     <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning" name="saveNameChange" value="'.$row['id'].'">'.$lang['SAVE'].'</button></div></div></div>';
+                    <button type="submit" class="btn btn-warning" name="saveNameChange" value="'.$row['id'].'">'.$lang['SAVE'].'</button></div></form></div></div>';
     }
 ?>
 </tbody>
