@@ -1,7 +1,7 @@
 <?php require 'header.php'; ?>
 
 <div class="page-header"><h3><?php echo $lang['ACCOUNT_JOURNAL']; ?>
-<div class="page-header-button-group"><a href="" class="btn btn-default" title="CSV Download"><i class="fa fa-download"></i></a></div>
+<div class="page-header-button-group"><button type="submit" form="csvForm" class="btn btn-default" title="CSV Download"><i class="fa fa-download"></i></button></div>
 </h3></div>
 
 <?php
@@ -29,12 +29,13 @@ if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
 </tr></thead>
 <tbody>
 <?php
-$result = $conn->query("SELECT account_journal.*, taxRates.percentage, taxRates.description, firstname, lastname, a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName
+$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName
 FROM account_journal LEFT JOIN accounts a1 ON a1.id = account_journal.account
 LEFT JOIN accounts a2 ON a2.id = account_journal.offAccount
 LEFT JOIN UserData ON UserData.id = account_journal.userID INNER JOIN taxRates ON account_journal.taxID = taxRates.id
 WHERE a1.companyID = $cmpID");
 echo $conn->error;
+$csv = "Nr.;Datum;Konto;Gegenkonto;Text;Steuer;Steuercode\n";
 while($result && ($row = $result->fetch_assoc())){
     echo '<tr>';
     echo '<td>'.$row['docNum'].'</td>';
@@ -48,8 +49,13 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td>'.$row['have'].'</td>';
     echo '<td>'.$row['percentage'].'% '.$row['description'].'</td>';
     echo '</tr>';
+    $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.$row['info'].';'.$row['percentage'].'%;'.$row['code']."\n";
 }
 ?>
 </tbody>
 </table>
+
+<form id="csvForm" method="POST" target="_blank" action="../project/csvDownload">
+    <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+</form>
 <?php require 'footer.php'; ?>
