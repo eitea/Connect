@@ -18,7 +18,7 @@ $account_row = $result->fetch_assoc();
 
 if(isset($_POST['addFinance'])){
     //either should or have can be 0
-    if($_POST['add_nr'] > 0 && test_Date($_POST['add_date'], "Y-m-d") && $_POST['add_account'] > 0 && (!empty($_POST['add_should']) xor !empty($_POST['add_have'])) && !empty($_POST['add_tax']) ){
+    if($_POST['add_nr'] > 0 && test_Date($_POST['add_date'], "Y-m-d") && $_POST['add_account'] > 0 && (!empty($_POST['add_should']) xor !empty($_POST['add_have']))){
         $account = intval($_POST['add_account']);
         $offAccount = $id;
         $docNum = $_POST['add_nr'];
@@ -26,7 +26,8 @@ if(isset($_POST['addFinance'])){
         $text = test_input($_POST['add_text']);
         $should = floatval($_POST['add_should']);
         $have = floatval($_POST['add_have']);
-        $tax = intval($_POST['add_tax']);
+        $tax = 1;
+        if(isset($_POST['add_tax'])) $tax = intval($_POST['add_tax']);
 
         //STRRRIKES!
         $res = $conn->query("SELECT num FROM accounts WHERE id = $account");
@@ -116,8 +117,7 @@ if(isset($_POST['addFinance'])){
         $should = $have;
         $have = $temp;
         $account = $offAccount;
-        $stmt->execute();
-        
+        $stmt->execute();        
     } else {
         echo '<div class="alert alert-danger" class="close"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
