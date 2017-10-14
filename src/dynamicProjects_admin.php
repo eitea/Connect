@@ -2,9 +2,9 @@
 isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     //var_dump($_POST);
-    $title = $name = $company = $description = $color = $start = $end = $status = $priority = $id = $pictures = "";
+    $pictures = "";
     $clients = $owner = $employees = $optional_employees = $parent = $series = "";
 
 
@@ -15,7 +15,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
     $company = $_POST["company"] ?? false;
     $color = $_POST["color"] ?? "#FFFFFF";
     $start = $_POST["start"] ?? date("Y-m-d");
-    $end = $_POST["end"] ?? "";
+    $end = $_POST["endradio"] ?? "";
+    $status = $_POST["status"] ?? 'DRAFT';
+    $priority = intval($_POST["priority"] ?? "3") ?? 3;
+    $pictures = $_POST["imagesbase64"] ?? false;
+    
 
     if($end == "no"){
         $end = "";
@@ -34,8 +38,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["newDynamicProject"])){
             $id = uniqid($connectIdentification);        
         }
     }
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end')");
+
+    $description = $conn->real_escape_string($description);
+    $id =  $conn->real_escape_string($id);
+    $name =  $conn->real_escape_string($name);
+    $color =  $conn->real_escape_string($color);
+    $start =  $conn->real_escape_string($start);
+    $end =  $conn->real_escape_string($end);
+    $status =  $conn->real_escape_string($status);
+    
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority')");
     echo $conn->error;
+    if($pictures){
+        foreach ($pictures as $picture) {
+            // $conn->query("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id','$picture')");
+            $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
+            echo $conn->error;
+            $null = NULL;
+            $stmt->bind_param("b", $null);
+            $stmt->send_long_data(0, $picture);
+            $stmt->execute();
+            echo $stmt->error;
+        }
+    }
 }
 ?>
 <br>
@@ -88,8 +113,9 @@ require "dynamicProjects_template.php";
         <th>Company</th>
         <th>Start</th>
         <th>End</th>
-        <th></th>
-        <th></th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Pictures</th>
     </tr>
 </thead>
 <tbody>
@@ -104,6 +130,9 @@ require "dynamicProjects_template.php";
         $color = $row["projectcolor"];
         $start = $row["projectstart"];
         $end = $row["projectend"];
+        $status = $row["projectstatus"];
+        $priority = $row["projectpriority"];
+        $pictureResult = $conn->query("SELECT picture FROM dynamicprojectspictures WHERE projectid='$id'");
 
         echo "<tr>";
         echo "<td>$id</td>";
@@ -112,6 +141,14 @@ require "dynamicProjects_template.php";
         echo "<td>$companyName</td>";
         echo "<td>$start</td>";
         echo "<td>$end</td>";
+        echo "<td>$status</td>";
+        echo "<td>$priority</td>";
+        echo "<td>";
+            while($pictureRow = $pictureResult->fetch_assoc()){
+                $picture = $pictureRow["picture"];
+                echo "<img  height='50' src='$picture'>";
+            }
+        echo "</td>";
         echo "</tr>";
     }
 ?>
