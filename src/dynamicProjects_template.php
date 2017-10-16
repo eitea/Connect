@@ -145,7 +145,18 @@ This template is a modal for editing new and existing dynamic projects
                                 <input type="color" class="form-control" value="<?php echo $modal_color; ?>" name="color">
                                 <label>Überprojekt:</label>
                                 <select class="form-control js-example-basic-single" name="parent" required>
-                                    <option value="none" selected>Keines</option>
+                                    <?php 
+                                        $parentResult = $conn->query("SELECT * FROM dynamicprojects");
+                                        if ($modal_parent == "" || $modal_parent == "none"){
+                                            echo "<option value='none' selected>Keines</option>";
+                                        }
+                                        while($parentRow = $parentResult->fetch_assoc()){
+                                            $parentID = $parentRow["projectid"];
+                                            $parentSelected = ($parentID == $modal_parent) ? "selected" : "";
+                                            $parentName = $parentRow["projectname"];
+                                            echo "<option $parentSelected value='$parentID' >$parentName</option>";
+                                        }
+                                    ?>
                                 </select>
                             </div>
                             <!-- /advanced -->
@@ -289,16 +300,17 @@ function removeImg(event){
 $("#projectForm<?php echo $modal_id ?>").submit(function(event){
     $("#projectPreview<?php echo $modal_id ?>").find("input").remove()
     $("#projectPreview<?php echo $modal_id ?>").find("img").each(function(index,elem){
+        console.log(getImageSrc(elem).length)
         $("#projectPreview<?php echo $modal_id ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>")
     })
 })
 
 function getImageSrc(img){
     var c = document.createElement("canvas");
-    c.width = img.width;
-    c.height = img.height;
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
     var ctx = c.getContext("2d");
-    ctx.drawImage(img, 10, 10);
+    ctx.drawImage(img, 0, 0);
     return c.toDataURL();
 }
 
