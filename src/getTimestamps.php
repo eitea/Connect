@@ -67,6 +67,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   }
 
+  if(isset($_POST['add_multiple']) && !empty($_POST['add_multiple_user'])){
+    $filterID = intval($_POST['add_multiple_user']);
+    if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
+      $status = intval($_POST['add_multiple_status']);
+      $i = $_POST['add_multiple_start'].' 08:00:00';
+      $days = (timeDiff_Hours($i, $_POST['add_multiple_end'].' 08:00:00')/24) + 1; //days
+      for($j = 0; $j < $days; $j++){
+        //get the expected Hours for currenct day (read the latest interval which matches criteria)
+        $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) < DATE('$i') ORDER BY startDate DESC");
+        if ($result && ($row = $result->fetch_assoc())) {
+          $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
+          if($expected != 0){
+            $i2 = carryOverAdder_Minutes($i, intval($expected * 60));
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', $filterID, '0', '$status')";
+            $conn->query($sql);
+          }
+          $i = carryOverAdder_Hours($i, 24);
+        } else {
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        }
+      }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+    }
+    if($conn->error){ echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; }
+    else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+  } elseif(isset($_POST['add_multiple'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+  }
+
 } //endif post
 ?>
 

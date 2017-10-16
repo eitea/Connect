@@ -465,12 +465,12 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               if ("Notification" in window) {
                 Notification.requestPermission();
               }
+
               function sendNotification(messages, newMessages) {
               // Let's check if the browser supports notifications
               if (!("Notification" in window)) {
                 console.warn("This browser does not support system notifications");
               }
-
               // Let's check whether notification permissions have already been granted
               else if (Notification.permission === "granted") {
                 // If it's okay let's create a notification
@@ -490,26 +490,27 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
               // Finally, if the user has denied notifications and you 
               // want to be respectful there is no need to bother them any more.
             }
-            function generateNotification(messages, newMessages){
-              var image = 'images/messageIcon.png';
-              var options = {
-                  body: newMessages + " new\n"+messages+" unread",
-                  icon: image,
-                  tag: "tagToUpdateNotification",
-                  badge: image
+
+              function generateNotification(messages, newMessages){
+                var image = 'images/messageIcon.png';
+                var options = {
+                    body: newMessages + " new\n"+messages+" unread",
+                    icon: image,
+                    tag: "tagToUpdateNotification",
+                    badge: image
+                }
+                var n = new Notification('Connect Social',options);
+                setTimeout(n.close.bind(n), 5000); 
+                n.onclick = function(){
+                  console.info("Click");
+                }
+                n.onerror = function(){
+                  console.warn("Error while displaying notification");
+                }
+                n.onshow = function(){
+                  console.info("Show");
+                }
               }
-              var n = new Notification('Connect Social',options);
-              setTimeout(n.close.bind(n), 5000); 
-              n.onclick = function(){
-                console.info("Click");
-              }
-              n.onerror = function(){
-                console.warn("Error while displaying notification");
-              }
-              n.onshow = function(){
-                console.info("Show");
-              }
-            }
             </script>
             <?php endif; ?>
 
@@ -733,14 +734,18 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                 <?php
                 $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                 while($result && ($row = $result->fetch_assoc())){
-                  echo '<li>';
+                  echo '<li>';                  
                   echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                  echo '<div class="collapse" id="tfinances-'.$row['id'].'" ><ul class="nav nav-list">';
+                  echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';                  
+                  echo '<ul class="nav nav-list">';
                   echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
                   echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                  $acc_res = $conn->query("SELECT id, name FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
                   while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
                     echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                    if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                      echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                    }
                   }
                   echo '</ul></div></li>';
                 }
@@ -751,11 +756,12 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           </div>
         </div>
         <?php
-        if($this_page == "accounting.php" || $this_page == 'accountPlan.php'){
-          echo "<script>$('#adminOption_FINANCE').click();</script>";
+        if($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php'){
+          echo "<script>$('#adminOption_FINANCE').click();";
           if(isset($_GET['n'])){
-            echo "<script>$('#finance-click-".$_GET['n']."').click();</script>";
+            echo "$('#finance-click-".$_GET['n']."').click();";
           }
+          echo '</script>';
         }
         ?>
       <?php endif; ?>

@@ -407,7 +407,6 @@ $(function () {
 <!-- Projectbooking Modal -->
 <div id="editingModalDiv"></div>
 
-
 <!-- ADD BOOKING TO USER -->
 <form method="POST">
   <div class="modal fade add-booking">

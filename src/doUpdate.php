@@ -1867,23 +1867,23 @@ if($row['version'] < 108){
 
   $conn->query("ALTER TABLE taxRates ADD COLUMN code INT(2)");
   echo $conn->error;
+}
 
+if($row['version'] < 109){
   $conn->query("DELETE FROM taxRates");
   $i = 1;
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Keine Steuer', 0)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Normalsatz', 20, 3500, 1)");
+  $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 13, 3500, 1)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 10, 3500, 1)");
+  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Sonder Ermäßigter Satz', 12)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501, 9)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501, 9)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Normalsatz', 20, 2502,  3502, 19)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502, 19)");
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 20)");
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 10)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Innergemeinschatliche Lieferungen steuerfrei', NULL)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 3500, 1)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Sonder Ermäßigter Satz', 12)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', NULL)");
+  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', 0)");
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 10)");
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 8)");
   $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'KFZ Normalsatz', 20)");
@@ -1893,7 +1893,7 @@ if($row['version'] < 108){
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 13, 2500, 2)");
   $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 10, 2500, 2)");
   if(!$conn->error){
-    echo '<br>Finanzen: Steuercode';
+    echo '<br>Finanzen: Neue Steuersätze';
   } else {
     echo $conn->error;
   }

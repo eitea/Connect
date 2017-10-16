@@ -23,9 +23,10 @@ if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
     <th><?php echo $lang['ACCOUNT']; ?></th>
     <th><?php echo $lang['OFFSET_ACCOUNT']; ?></th>
     <th>Text</th>
-    <th><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></th>
-    <th><?php echo $lang['FINANCE_CREDIT'];?> <small>(Brutto)</small></th>
+    <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></th>
+    <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT'];?> <small>(Brutto)</small></th>
     <th><?php echo $lang['VAT']; ?></th>
+    <th style="text-align:right"><?php echo $lang['TAXES']; ?></th>
 </tr></thead>
 <tbody>
 <?php
@@ -45,9 +46,12 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td><a title="Zum Konto" href="account?v='.$row['account'].'" >'.$row['accNum'].' '.$row['accName'].'</a></td>';
     echo '<td><a title="Zum Konto" href="account?v='.$row['offAccount'].'" >'.$row['offNum'].' '.$row['offName'].'</a></td>';
     echo '<td>'.$row['info'].'</td>';
-    echo '<td>'.$row['should'].'</td>';
-    echo '<td>'.$row['have'].'</td>';
+    echo '<td style="text-align:right">'.number_format($row['should'],2,',','.').'</td>';
+    echo '<td style="text-align:right">'.number_format($row['have'],2,',','.').'</td>';
     echo '<td>'.$row['percentage'].'% '.$row['description'].'</td>';
+    if($row['should'] != 0) $t = $row['should'] * $row['percentage']/100;
+    if($row['have'] != 0) $t = $row['have'] * $row['percentage']/100;
+    echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     echo '</tr>';
     $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.$row['info'].';'.$row['percentage'].'%;'.$row['code']."\n";
 }
