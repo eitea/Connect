@@ -34,7 +34,7 @@ $result = $conn->query("SELECT account_journal.*, taxRates.description, percenta
 FROM account_journal LEFT JOIN accounts a1 ON a1.id = account_journal.account
 LEFT JOIN accounts a2 ON a2.id = account_journal.offAccount
 LEFT JOIN UserData ON UserData.id = account_journal.userID INNER JOIN taxRates ON account_journal.taxID = taxRates.id
-WHERE a1.companyID = $cmpID");
+WHERE a1.companyID = $cmpID ORDER BY docNum, inDate");
 echo $conn->error;
 $csv = "Nr.;Datum;Konto;Gegenkonto;Text;Steuer;Steuercode\n";
 while($result && ($row = $result->fetch_assoc())){
@@ -62,4 +62,23 @@ while($result && ($row = $result->fetch_assoc())){
 <form id="csvForm" method="POST" target="_blank" action="../project/csvDownload">
     <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
 </form>
+
+<script>
+$('.table').DataTable({
+    order: [[ 0, "asc" ]],
+    deferRender: true,
+    responsive: true,
+    colReorder: true,
+    language: {
+        <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    fixedHeader: {
+      header: true,
+      headerOffset: 50,
+      zTop: 1
+    }
+});
+
+setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
+</script>
 <?php require 'footer.php'; ?>

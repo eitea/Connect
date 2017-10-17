@@ -189,15 +189,14 @@ while($result && ($row = $result->fetch_assoc())){
         <div class="modal-header"><h4>'.$lang['EDIT'].'</h4></div><div class="modal-body"><div class="row">
         <div class="col-md-4"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="'.$row['docNum'].'"/><br></div>
         <div class="col-md-8"><label>'.$lang['DATE'].'</label><input type="text" class="form-control datepicker" name="add_date" value="'.substr($row['payDate'],0,10).'" /><br></div>
-        <div class="col-md-6"><label>'.$lang['ACCOUNT'].'</label><select class="js-example-basic-single" name="add_account" ><option>...</otpion>'.$account_select.'</select><br></div>
-        <div class="col-md-6"><label>'.$lang['VAT'].'</label><select class="js-example-basic-single" name="add_tax">'.$tax_select.'</select><br><br></div>
+        <div class="col-md-6"><label>'.$lang['ACCOUNT'].'</label><select class="js-example-basic-single" name="add_account" ><option>...</otpion>'.str_replace('<option value="'.$row['account'].'">', '<option selected value="'.$row['account'].'">', $account_select).'</select><br></div>
+        <div class="col-md-6"><label>'.$lang['VAT'].'</label><select class="js-example-basic-single" name="add_tax">'.str_replace('<option value="'.$row['taxID'].'">', '<option selected value="'.$row['taxID'].'">', $tax_select).'</select><br><br></div>
         <div class="col-md-6"><label>Text</label><input type="text" class="form-control" name="add_text" maxlength="64" value="'.$row['info'].'" /><br></div>
         <div class="col-md-3"><label>'.$lang['FINANCE_DEBIT'].'<small> (Brutto)</small></label><input type="number" step="0.01" class="form-control" name="add_should" value="'.$row['should'].'"/></div>
         <div class="col-md-3"><label>'.$lang['FINANCE_CREDIT'].'<small> (Brutto)</small></label><input type="number" step="0.01" class="form-control" name="add_have" value="'.$row['have'].'"/></div>
         </div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" value="'.$row['id'].'" name="editJournalEntry">'.$lang['SAVE'].'</button></div></form></div></div>';
-
-        //$("[name='add_product_unit']").val(res[4]).trigger('change');
+    
     } else {
         echo '<td></td>';
     }
@@ -231,6 +230,9 @@ while($result && ($row = $result->fetch_assoc())){
 <?php endif; ?>
 
 <script>
+$("form").each(function(){
+    $(this).find('[name='add_product_unit']')
+});
 var active_should = true;
 var active_have = true;
 

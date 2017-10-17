@@ -3,16 +3,16 @@ require 'Calculators/IntervalCalculator.php';
 $logSums = new Interval_Calculator($curID);
 
 if($logSums->saldo < 0){
-  $color = 'style=color:red';
+  $color = 'style="color:red"';
 } else {
-  $color = 'style=color:#00ba29';
+  $color = 'style="color:#00ba29"';
 }
 
 $result_Sum = $conn->query("SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $curID AND endDate IS NULL");
 if($result_Sum && $result_Sum->num_rows > 0){
   $userRow = $result_Sum->fetch_assoc();
 } else {
-  die(mysqli_error($conn));
+  echo $conn->error;
 }
 ?>
 
