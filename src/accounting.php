@@ -230,9 +230,6 @@ while($result && ($row = $result->fetch_assoc())){
 <?php endif; ?>
 
 <script>
-$("form").each(function(){
-    $(this).find('[name='add_product_unit']')
-});
 var active_should = true;
 var active_have = true;
 
