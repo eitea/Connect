@@ -84,15 +84,14 @@ if(isset($_POST['addFinanceAccount'])){
 </table>
 
 <script>
-    $('.table').DataTable({
+$('.table').DataTable({
     order: [[ 0, "asc" ]],
     deferRender: true,
     responsive: true,
     autoWidth: false,
-    language: {
-    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-  }
+    language: {<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>}
 });
+setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
 </script>
 
 <?php echo $modals; ?>
