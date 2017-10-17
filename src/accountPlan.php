@@ -82,18 +82,6 @@ if(isset($_POST['addFinanceAccount'])){
 ?>
 </tbody>
 </table>
-
-<script>
-$('.table').DataTable({
-    order: [[ 0, "asc" ]],
-    deferRender: true,
-    responsive: true,
-    autoWidth: false,
-    language: {<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>}
-});
-setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
-</script>
-
 <?php echo $modals; ?>
 
 <div class="modal fade add-finance-account">
@@ -127,4 +115,19 @@ setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').tr
     </form>
   </div>
 </div>
+
+<script>
+$('.table').DataTable({
+    order: [[ 0, "asc" ]],
+    deferRender: true,
+    responsive: true,
+    autoWidth: false,
+    language: {<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>}
+});
+setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
+
+$('.add-finance-account').on('shown.bs.modal', function () {
+    $('#account2').focus();
+});
+</script>
 <?php include 'footer.php'; ?>

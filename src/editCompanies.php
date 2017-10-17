@@ -320,7 +320,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
       </div>
       <div class="col-sm-1 text-center"><label><?php echo $lang['CITY']; ?></label></div>
       <div class="col-sm-4">
-        <input type="text" class="form-control" name="general_city" value="<?php echo $companyRow['companyCity'];?>" />
+        <input type="text" maxlength="54" class="form-control" name="general_city" value="<?php echo $companyRow['companyCity'];?>" />
       </div>
     </div>
     <div class="row">

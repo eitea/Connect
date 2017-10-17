@@ -53,7 +53,7 @@ while($result && ($row = $result->fetch_assoc())){
     if($row['have'] != 0) $t = $row['have'] * $row['percentage']/100;
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     echo '</tr>';
-    $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.$row['info'].';'.$row['percentage'].'%;'.$row['code']."\n";
+    $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.iconv('UTF-8','windows-1252',$row['info']).';'.$row['percentage'].'%;'.$row['code']."\n";
 }
 ?>
 </tbody>

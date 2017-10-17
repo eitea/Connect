@@ -23,6 +23,11 @@ ul.nav.navbar-nav .nav.nav-list {
 .panel-body .nav.navbar-nav {
   width:100%;
 }
+
+.panel-group > .panel.panel-borderless > .panel-collapse > .panel-body{
+  padding-top:0px;
+}
+
 .nav.navbar-nav > ul, .sidebar-nav .navbar > ul {
   float: none;
   display: block;

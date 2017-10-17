@@ -29,32 +29,29 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         $tax = 1;
         if(isset($_POST['add_tax'])) $tax = intval($_POST['add_tax']);
 
-        //STRRRIKES!
         $res = $conn->query("SELECT num FROM accounts WHERE id = $account");
-        if($res && ( $rowP = $res->fetch_assoc())) $accNum = $rowP['num'];
-        // else: strike
+        if($res && ( $rowP = $res->fetch_assoc())) $accNum = $rowP['num']; //else STRIKE
+        
         if($accNum >= 5000 && $accNum < 8000 && $have ){
-            //STRIKE
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
-            include 'footer.php';
-            die ();
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 5, 6 und 7 dürfen nicht im Haben stehen.</div>';
+            $accept = false;
         } elseif($accNum >= 4000 && $accNum < 5000 && $should){
-            //STRIKE
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
-            include 'footer.php';
-            die ();
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 4 dürfen nicht im Soll stehen.</div>';
+            $accept = false;
         } elseif(($accNum >= 8000 && $accNum < 10000) && ($accNum >= 1000 && $accNum < 3000)){
             $tax = 1; //id1 = no tax;
         }
 
-         //journal
-         $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
-         VALUES ($docNum, $userID, $account, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
-         $journalID = $conn->insert_id;
+        if($accept){
+            //journal
+            $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
+            VALUES ($docNum, $userID, $account, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
+            $journalID = $conn->insert_id;
+        }
 
-         if($conn->error){
-             $accept = false;
-             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Journal Failed: '.$conn->error.'</div>';
+        if($accept && $conn->error){
+            $accept = false;
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Journal Failed: '.$conn->error.'</div>';
         } else {
             //tax
             $res = $conn->query("SELECT percentage, account2, account3, code FROM taxRates WHERE id = $tax");
@@ -208,20 +205,18 @@ while($result && ($row = $result->fetch_assoc())){
 <?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; ?>
     <form method="POST" class="well">
         <div class="row">
-            <div class="col-md-1"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>"/></div>
+            <div class="col-md-1"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
             <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate,0,10); ?>" /></div>
             <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
                 <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
-                <small><a href="plan?n=<?php echo $cmpID; ?>" ><?php echo $lang['ACCOUNT_PLAN'];?></a></small>
+                <small><a href="plan?n=<?php echo $cmpID; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN'];?></a></small>
             </div>
-            <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label>
-                <select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select>
-            </div>
+            <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
         </div>
         <div class="row">
             <div class="col-md-5"><label>Text</label><input type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control" name="add_should" placeholder="0.0"/></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control" name="add_have" placeholder="0.0"/></div>
+            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control" name="add_should" placeholder="0,0"/></div>
+            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control" name="add_have" placeholder="0,0"/></div>
             <div class="col-md-1"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning" name="addFinance"><?php echo $lang['ADD']; ?></button></div>        
         </div>
     </form>
@@ -273,15 +268,6 @@ $('#account').change(function(e) {
         $('#tax').select2().attr('tabindex', '-1');
     }
 });
-
-$('select').on(
-    'select2:select',(
-        function(){
-            $(this).focus();
-        }
-    )
-);
-
 </script>
 
 <?php include "footer.php"; ?>

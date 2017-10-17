@@ -119,8 +119,8 @@ function enableToClients($userID){
 }
 
 function denyToContainer(){
-  if(getenv('IS_Container') || isset($_SERVER['IS_Container'])){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
+  if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+    echo 'Docker access denied. <a href="../user/logout"> logout</a>';
     include 'footer.php';
     die();
   }

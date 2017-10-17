@@ -1897,6 +1897,13 @@ if($row['version'] < 109){
   } else {
     echo $conn->error;
   }
+
+  $conn->query("ALTER TABLE companyData MODIFY column companyCity VARCHAR(60) ");
+  if(!$conn->error){
+    echo '<br>Mandant: 54 Zeichen Ort';
+  } else {
+    echo $conn->error;
+  }
 }
 
 //------------------------------------------------------------------------------

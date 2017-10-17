@@ -257,7 +257,7 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502, 19)");
               $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 20)");
               $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 10)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', NULL)");
+              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', 0)");
               $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 10)");
               $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 8)");
               $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'KFZ Normalsatz', 20)");

@@ -89,7 +89,7 @@ function create_tables($conn){
     logo MEDIUMBLOB,
     address VARCHAR(100),
     companyPostal VARCHAR(20),
-    companyCity VARCHAR(20),
+    companyCity VARCHAR(60),
     phone VARCHAR(100),
     mail VARCHAR(100),
     homepage VARCHAR(100),

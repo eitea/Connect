@@ -23,7 +23,6 @@ if($result_Sum && $result_Sum->num_rows > 0){
   </div>
 </div>
 
-
 <div class="container-fluid">
   <div class="col-md-4">
     <h4>Saldo</h4><hr>

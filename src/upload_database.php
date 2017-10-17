@@ -1,4 +1,4 @@
-<?php require 'header.php'; enableToCore($userID); ?>
+<?php require 'header.php'; enableToCore($userID); denyToContainer(); ?>
 <?php
 if(isset($_POST['accept'])){
   $accept = true;

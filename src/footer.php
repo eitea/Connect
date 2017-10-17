@@ -35,8 +35,10 @@
 <script>
 function onPageLoad(){
   if($(".js-example-basic-single")[0]){
-    $(".js-example-basic-single").select2();
+    $(".js-example-basic-single").select2();    
   }
+
+  $('select').on('select2:select', (function(){ $(this).focus(); }));
 
   //initalize them when the user needs them
   $('.monthpicker').click(function() {
@@ -75,7 +77,9 @@ function onPageLoad(){
       keyboardNavigation: false
     });
     $(this).datetimepicker('show');
+    $(this).datetimepicker().on('changeDate', function() { this.focus(); });
   });
+
   //datepicker doc: https://www.malot.fr/bootstrap-datetimepicker/index.php
 
   $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
