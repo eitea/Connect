@@ -1,6 +1,6 @@
 <?php
 require dirname(__DIR__)."/connection.php";
-require dirname(__DIR__)."/createTimestamps.php";
+require dirname(__DIR__)."/utilities.php";
 require dirname(__DIR__)."/language.php";
 
 $x = intval($_GET['bookingID']);

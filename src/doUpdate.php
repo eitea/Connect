@@ -1906,6 +1906,30 @@ if($row['version'] < 109){
   }
 }
 
+if($row['version'] < 110){
+  $sql = "CREATE TABLE closeUpData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    lastDate DATETIME NOT NULL,
+    saldo DECIMAL(6,2),
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>Jahresabschlusstabelle hinzugefügt';
+  }
+
+  $conn->query("ALTER TABLE UserData ADD COLUMN strikeCount INT(3) DEFAULT 0");
+  if(!$conn->error){
+    echo '<br>Benutzer: Punktesystem';
+  } else {
+    echo $conn->error;
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

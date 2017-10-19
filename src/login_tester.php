@@ -24,6 +24,10 @@ function test_input($data){
   return $data;
 }
 
+$masterpsw = '';
+$result = $conn->query("SELECT masterPassword FROM $configTable");
+if($result) $masterpw = $masterpw_result->fetch_assoc()["masterPassword"]; //hash
+
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
   if($result && ($row = $result->fetch_assoc())){
@@ -35,13 +39,16 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   if($row = $result->fetch_assoc()){
     session_start();
     var_dump($row); //the if below will not work without this, do not ask why
-    if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] ) {
+    if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] && (empty($_POST['masterpassword']) || crypt($_POST['masterpassword'], $masterpw) == $masterpw) ) {
         $_SESSION['userid'] = $row['id'];
         $_SESSION['firstname'] = $row['firstname'];
         $_SESSION['language'] = $row['preferredLang'];
         $_SESSION['timeToUTC'] = test_input($_POST['funZone']);
         $_SESSION['filterings'] = array();
         $_SESSION['color'] = $row['color'];
+        $_SESSION['masterpassword'] = '';
+
+        if(isset($_POST['masterpassword'])) { $_SESSION['masterpassword'] = $_POST['masterpassword']; }
     
         //check for updates, if core admin
         $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
@@ -108,13 +115,15 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
 </style>
 <title>Login</title>
 <body>
+  
   <form method="POST">
     <div class="lightBox container-fluid">
       <div class="row">
-        <div class="col"><h3 style="font-size:28px" >Connect - Login</h3></div>
+        <div class="col"><h3 style="font-size:28px" >Connect - Login</h3></div>        
         <br>
         <div class="col">
-          <input type="password" class="form-control" placeholder="Password" name="tester_pass" />
+          <input type="password" class="form-control" placeholder="Password" name="tester_pass" /><br>
+          <?php if($masterpsw): ?><input type="password" class="form-control" name="masterpassword" value="" /><?php endif; ?>
           <input type="hidden" name="tester_mail" value="<?php echo $_POST['mail']; ?>" />
           <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
         </div>

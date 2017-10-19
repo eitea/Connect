@@ -63,11 +63,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("DELETE FROM $logTable WHERE indexIM=$x;");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   }
-
 } //endif post
 ?>
-
-
 <!-- ############################### TABLE ################################### -->
 <?php
 if($filterings['user']):
@@ -126,7 +123,7 @@ if($filterings['user']):
             $neutralStyle = '';
             if($calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) $neutralStyle = "style=color:#c7c6c6;";
 
-            echo "<tr class='clicker' $neutralStyle class='clicker' >";
+            echo "<tr class='clicker' $neutralStyle>";
             echo '<td>' . $lang['WEEKDAY_TOSTRING'][$calculator->dayOfWeek[$i]] . '</td>';
             echo '<td>' . $calculator->date[$i] . '</td>';
             echo '<td>' . substr($A,11,5) . '</td>';
@@ -156,7 +153,7 @@ if($filterings['user']):
               while($row = $result->fetch_assoc()){
                 $A = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
                 $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
-                echo '<tr style="display:none;color:#b1b1b1;"><td colspan="12"><div class="row">';
+                echo '<tr style="display:none;color:#797979;"><td colspan="12"><div class="row">';
                 echo '<div class="col-xs-1"></div>';
                 echo '<div class="col-sm-2">'.$row['name'].'</div>';
                 echo '<div class="col-sm-2">'.$row['projectName'].'</div>';
@@ -191,7 +188,7 @@ if($filterings['user']):
           }
         } //endfor
         echo "<tr style='font-weight:bold;'>";
-        echo "<td colspan='11'>Gesamt: </td>";
+        echo "<td colspan='10'>Gesamt: </td>";
         echo '<td>'.displayAsHoursMins($calculator->saldo).'</td>';
         echo "<td></td></tr>";
         ?>
@@ -265,19 +262,27 @@ function appendModal(id, index, date){
     type: 'get',
     success : function(resp){
       $("#editingModalDiv").append(resp);
-      existingModals.push(id);
+      existingModals.push(index);
       onPageLoad();
-      $('.editingModal-'+index).modal('show');
+      $('.editingModal-'+index).modal('show');      
     },
     error : function(resp){}
    });
+  } else {
+    $('.editingModal-'+index).modal('show');
   }
+  event.stopPropagation(); //propagation stop for tr clicker
 }
 
+var existingModals_p = new Array();
+function appendModal_p (id, user){
+  if(existingModals.indexOf(id) == -1){
+
+  }
+}
 $('.clicker').click(function(){
   $(this).nextUntil('.clicker').toggle('normal');
 });
-
 </script>
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

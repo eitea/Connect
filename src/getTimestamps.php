@@ -305,7 +305,7 @@ function appendModal(id, index, date){
     type: 'get',
     success : function(resp){
       $("#editingModalDiv").append(resp);
-      existingModals.push(id);
+      existingModals.push(index);
       onPageLoad();
       $('.editingModal-'+index).modal('show');
     },

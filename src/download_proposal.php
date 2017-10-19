@@ -7,6 +7,8 @@ if(isset($_POST['download_proposal'])){
   $proposalID = 0;
 }
 
+session_start();
+
 if(isset($_POST['num'])){
   $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_POST['num']);
 } elseif(isset($_GET['num'])){
@@ -54,7 +56,7 @@ class PDF extends FPDF {
 
 require "connection.php";
 require "language.php";
-require "encryption_functions.php";
+require "utilities.php";
 
 $result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
@@ -188,7 +190,7 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Cell($w[5],7,$lang['TOTAL_PRICE'], '', 1, 'R', 1);
 
   while($prod_row = $prod_res->fetch_assoc()){
-    $mc = mc($prod_row["iv"],$prod_row["iv2"]);
+    $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row["iv"],$prod_row["iv2"]);
     $prod_row["name"] = $mc->decrypt($prod_row["name"]);
     $prod_row["description"] = $mc->decrypt($prod_row["description"]);
     if($prod_row['name'] == 'NEW_PAGE'){

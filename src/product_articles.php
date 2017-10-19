@@ -14,27 +14,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_name = test_input($_POST['add_product_name']);
     $product_description = test_input($_POST['add_product_description']);
     $product_price = floatval($_POST['add_product_price']);
-    $product_tax_id = intval($_POST['add_product_taxes']);
     $product_unit = test_input($_POST['add_product_unit']);
+    $product_tax_id = intval($_POST['add_product_taxes']);
     $product_is_cash = empty($_POST['add_product_as_bar']) ? 'FALSE' : 'TRUE';
     $product_purchase = floatval($_POST['add_product_purchase']);
-    $mc = mc();
+
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $conn->query("INSERT INTO articles (name, description, price, unit, taxPercentage, cash, purchase, iv, iv2) VALUES('".$mc->encrypt($product_name)."', '".$mc->encrypt($product_description)."', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase', '$iv', '$iv2')");
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
-      echo '<div class="alert alert-success fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>O.K.: </strong>'.$lang['OK_CREATE'];
-      echo '</div>';
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
     }
   } elseif (isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-    echo '</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
 }
 ?>
@@ -53,10 +48,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <?php
       $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE taxPercentage = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
-        $mc = mc($row['iv'],$row['iv2']);
+        $mc = new MasterCrypt($_SESSION["masterpassword"], $row['iv'],$row['iv2']);
         echo '<tr>';
-        echo '<td>'.mc_status().$mc->decrypt($row['name']).'</td>';
-        echo '<td>'.mc_status().$mc->decrypt($row['description']).'</td>';
+        echo '<td>'.$mc->getStatus().$mc->decrypt($row['name']).'</td>';
+        echo '<td>'.$mc->getStatus().$mc->decrypt($row['description']).'</td>';
         echo '<td>'.$row['price'].'</td>';
         echo '<td>'.$row['purchase'].'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
@@ -68,7 +63,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </tbody>
   </table>
   <div class="text-right"><br>
+    <?php if(!$masterPassword || $_SESSION['masterpassword']): ?>
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target=".add_product"><i class="fa fa-plus"></i> <?php echo $lang['ADD']; ?></button>
+    <?php endif; ?>
   </div>
 </form>
 

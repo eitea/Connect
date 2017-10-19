@@ -1,4 +1,4 @@
-<?php include "header.php"; require_once 'utilities.php'; enableToClients($userID); ?>
+<?php include "header.php"; enableToClients($userID); ?>
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = intval($_GET['custID']);
@@ -175,23 +175,19 @@ if(!empty($_POST['saveAll'])){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
     $activeTab = 'banking';
-    $mc = mc();
-    $bankName = test_input($_POST['bankName']);
-    $ibanVal = $mc->encrypt(test_input($_POST['iban']));
-    $bicVal = $mc->encrypt(test_input($_POST['bic']));
+    //will be empty and unencrypted if masterpass not specified
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
+    $bankName = $mc->encrypt($_POST['bankName']);
+    $ibanVal = $mc->encrypt($_POST['iban']);
+    $bicVal = $mc->encrypt($_POST['bic']);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES ('$bankName', '$ibanVal', '$bicVal', '$iv', '$iv2', $detailID)");
+
+    $stmt = $conn->prepare("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('sssssi', $bankName, $ibanVal, $bicVal, $iv, $iv2, $detailID);
+    $stmt->execute();
+    $stmt->close();
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
-  } elseif(isset($_POST['displayBank']) && isset($_POST['displayBankingDetailPass'])){
-    $activeTab = 'banking';
-    $result = $conn->query("SELECT masterPassword FROM $configTable");
-    $row = $result->fetch_assoc();
-    if(crypt($_POST['displayBankingDetailPass'], $row['masterPassword']) == $row['masterPassword'] && !empty($row['masterPassword'])){ //unlock
-      $_SESSION['unlock'] = $_POST['displayBankingDetailPass']; //TODO: this is no good.
-    } else {
-      unset($_SESSION['unlock']);
-    }
   } elseif(isset($_POST['delete_projects']) && !empty($_POST['delete_projects_index'])){
     $activeTab = 'project';
     foreach($_POST['delete_projects_index'] as $x){
@@ -465,14 +461,6 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           <div class="col-sm-9">
             Bankdaten
           </div>
-          <div class="col-sm-3">
-            <div class="input-group">
-              <input type="password" class="form-control" name="displayBankingDetailPass" value="" />
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-warning" name="displayBank">Unlock</button>
-              </span>
-            </div>
-          </div>
         </h3>
       </div>
       <hr>
@@ -485,23 +473,18 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
         <tbody>
           <?php
           while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
+            $mc = new MasterCrypt($_SESSION["masterpassword"], $rowBank['iv'], $rowBank['iv2']);
             echo '<tr>';
-            echo '<td>' . $rowBank['bankName'] . '</td>';
-            if(isset($_SESSION['unlock'])){ //If this is set, decrypt banking detail
-              $mc = mc($rowBank["iv"],$rowBank["iv2"]);
-              echo '<td>'.mc_status().$mc->decrypt($rowBank['iban']). '</td>';
-              echo '<td>'.mc_status().$mc->decrypt($rowBank['bic']). '</td>';
-            } else { // **** it.
-              echo '<td>'.mc_status().'**** **** **** ****</td>';
-              echo '<td>'.mc_status().'******** ***</td>';
-            }
+            echo '<td>'.$mc->decrypt($rowBank['bankName']).'</td>';            
+            echo '<td>'.$mc->decrypt($rowBank['iban']).'</td>';
+            echo '<td>'.$mc->decrypt($rowBank['bic']).'</td>';
             echo '</tr>';
           }
           ?>
         </tbody>
       </table>
       <br><br><br>
-      <?php if(isset($_SESSION['unlock'])): ?>
+      <?php if(!empty($_SESSION['masterpassword'])): ?>
         <div class="container">
           <div class="col-md-3">
             <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />

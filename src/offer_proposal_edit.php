@@ -58,7 +58,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
@@ -66,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $txt = $mc->encrypt($txt);
@@ -74,7 +74,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
@@ -95,7 +95,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
       $row_tax = $result_tax->fetch_assoc();
-      $mc = mc();
+      $mc = new MasterCrypt($_SESSION["masterpassword"]);
       $iv = $mc->iv;
       $iv2 = $mc->iv2;
       $product_name = $mc->encrypt($product_name);
@@ -116,7 +116,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $x = intval($_POST['update_product']);
     $check_result = $conn->query("SELECT name,iv,iv2 FROM products WHERE id = $x");
     if($check_row = $check_result->fetch_assoc()){
-      $mc = mc($check_row["iv"],$check_row["iv2"]);
+      $mc = new MasterCrypt($_SESSION["masterpassword"],$check_row["iv"],$check_row["iv2"]);
       if($mc->decrypt($check_row['name']) == 'CLEAR_TEXT'){
         $product_description = test_input($_POST['update_description_'.$x]);
         $product_description = $mc->encrypt($product_description);
@@ -228,18 +228,18 @@ $_SESSION['filterings'] = $filterings; //save your filterings
       $LAST_POSITION = 0;
       $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal'] .' ORDER BY position ASC');
       while($result && ($prod_row = $result->fetch_assoc())){
-        $mc = mc($prod_row['iv'],$prod_row['iv2']);
+        $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
         $prod_row["name"] = $mc->decrypt($prod_row["name"]);
         $prod_row["description"] = $mc->decrypt($prod_row["description"]);
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
-        echo '<td>'.mc_status().$prod_row['name'].'</td>';
-        echo '<td style="max-width:500px;">'.mc_status().$prod_row['description'].'</td>';
+        echo '<td>'.$mc->getStatus().$prod_row['name'].'</td>';
+        echo '<td style="max-width:500px;">'.$mc->getStatus().$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.intval($prod_row['taxPercentage']).'%</td>';
         echo '<td style="min-width:120px;">';
-        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE')
+        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE' && (!$masterPassword || $_SESSION['masterpassword']))
           echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
         echo '<button type="submit" class="btn btn-default" name="delete_product" value="'.$prod_row['id'].'" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button>';
         echo '</td>';
@@ -287,7 +287,7 @@ $("#sort tbody").sortable({
           if($result){  $result->data_seek(0); }
           $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
-            $mc = mc($prod_row['iv'],$prod_row['iv2']);
+            $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
             $prod_row["name"] = $mc->decrypt($prod_row["name"]);
             $prod_row["description"] = $mc->decrypt($prod_row["description"]);
             if($prod_row['name'] != 'CLEAR_TEXT' && $prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'){
@@ -321,6 +321,7 @@ $("#sort tbody").sortable({
 </div>
 
 <form method="POST">
+  <?php if(!$masterPassword || $_SESSION['masterpassword']): ?>
   <div class="container-fluid">
     <div class="col-xs-12 text-right">
       <div class="btn-group">
@@ -338,10 +339,11 @@ $("#sort tbody").sortable({
       </div>
     </div>
   </div>
+  <?php endif; ?>
 <?php
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
-  $mc = mc($prod_row['iv'],$prod_row['iv2']);
+  $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
   $prod_row["name"] = $mc->decrypt($prod_row["name"]);
   $prod_row["description"] = $mc->decrypt($prod_row["description"]);
   if($prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'):
@@ -501,7 +503,7 @@ $x = $prod_row['id'];
         <?php
         $result = $conn->query("SELECT * FROM articles");
         while($result && ($prod_row = $result->fetch_assoc())){
-          $mc = mc($prod_row['iv'],$prod_row['iv2']);
+          $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
           echo "<option value='".$prod_row['id']."'>".$mc->decrypt($prod_row['name'])."</option>";
         }
         ?>
