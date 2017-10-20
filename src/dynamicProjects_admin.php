@@ -3,8 +3,7 @@ isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
-    //var_dump($_POST);
-    $clients = $owner = $employees = $optional_employees = $series = "";
+    $employees = $optional_employees = $series = "";
 
 
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
@@ -20,7 +19,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $parent = $_POST["parent"] ?? "";
     $pictures = $_POST["imagesbase64"] ?? false;
     $owner = $_POST["owner"] ?? $userID+"";
-
+    $clients = $_POST["clients"] ?? array();
+    var_dump($clients);
 
     if($parent == "none"){
         $parent = "";
@@ -42,9 +42,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
             $id = uniqid($connectIdentification);        
         }
     }
-    var_dump($owner);
-    $owner = intval($userID) ?? $userID;
-    var_dump($owner);
+    $owner = intval($owner) ?? $userID;
 
     $description = $conn->real_escape_string($description);
     $id =  $conn->real_escape_string($id);
@@ -69,6 +67,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
             echo $stmt->error;
         }
     }
+    foreach ($clients as $client){
+        $client = intval($client);
+        $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid) VALUES ('$id',$client)");
+    }
 }
 ?>
 <br>
@@ -92,7 +94,7 @@ $modal_parent = ""; //default: "none" or ""
 
 
 //not jet implemented:
-$modal_clients = array();
+$modal_clients = array(); //array of ids
 $modal_owner = "";
 $modal_employees = array();
 $modal_optional_employees = array();
@@ -125,6 +127,7 @@ require "dynamicProjects_template.php";
         <th>Priority</th>
         <th>Parent</th>
         <th>Pictures</th>
+        <th>Clients</th>
     </tr>
 </thead>
 <tbody>
@@ -146,6 +149,7 @@ require "dynamicProjects_template.php";
         $owner = $row["projectowner"];
         $owner = $conn->query("SELECT * FROM UserData WHERE id='$owner'")->fetch_assoc();
         $owner = "${owner['firstname']} ${owner['lastname']}";
+        $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
 
         if(!empty($parent)){
             $parent =  $conn->real_escape_string($parent);
@@ -169,6 +173,13 @@ require "dynamicProjects_template.php";
                 echo "<img  height='50' src='$picture'>";
             }
         echo "</td>";
+        echo "<td>";
+            while($clientRow = $clientsResult->fetch_assoc()){
+                $client = $clientRow["name"];
+                //var_dump($clientRow);
+                echo "$client, ";
+            }
+        echo "</td>";        
         echo "</tr>";
     }
 ?>

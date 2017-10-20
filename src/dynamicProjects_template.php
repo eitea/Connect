@@ -49,11 +49,11 @@ This template is a modal for editing new and existing dynamic projects
                                     ?>
                                 </select>
                                 <label>Kunde*:</label>
-                                <select id="dynamicProjectClients<?php echo $modal_id ?>" class="form-control js-example-basic-single" name="client" multiple="multiple" required>
+                                <select id="dynamicProjectClients<?php echo $modal_id ?>" class="form-control js-example-basic-single" name="clients[]" multiple="multiple" required>
                                     <option>Zuerst Mandant auswählen</option>
                                     <?php 
                                         foreach ($modal_clients as $client) {
-                                            echo "<option>$client</option>";
+                                            echo "<option value='$client'>$client</option>";
                                         }
                                     ?>
                                 </select>
