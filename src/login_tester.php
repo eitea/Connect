@@ -26,7 +26,7 @@ function test_input($data){
 
 $masterpsw = '';
 $result = $conn->query("SELECT masterPassword FROM $configTable");
-if($result) $masterpw = $masterpw_result->fetch_assoc()["masterPassword"]; //hash
+if($result) $masterpw = $result->fetch_assoc()["masterPassword"]; //hash
 
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
