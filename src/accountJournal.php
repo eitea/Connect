@@ -69,6 +69,7 @@ $('.table').DataTable({
     deferRender: true,
     responsive: true,
     colReorder: true,
+    autoWidth: false,
     language: {
         <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     },
