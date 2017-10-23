@@ -3,7 +3,7 @@ isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
-    $employees = $optional_employees = $series = "";
+    $optional_employees = $series = "";
 
 
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
@@ -20,7 +20,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $pictures = $_POST["imagesbase64"] ?? false;
     $owner = $_POST["owner"] ?? $userID+"";
     $clients = $_POST["clients"] ?? array();
-    var_dump($clients);
+    $employees = $_POST["employees"] ?? array();
 
     if($parent == "none"){
         $parent = "";
@@ -70,6 +70,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     foreach ($clients as $client){
         $client = intval($client);
         $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid) VALUES ('$id',$client)");
+    }
+    foreach ($employees as $employee){
+        $employee = intval($employee);
+        $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
     }
 }
 ?>
@@ -128,6 +132,7 @@ require "dynamicProjects_template.php";
         <th>Parent</th>
         <th>Pictures</th>
         <th>Clients</th>
+        <th>Employees</th>
     </tr>
 </thead>
 <tbody>
@@ -150,6 +155,7 @@ require "dynamicProjects_template.php";
         $owner = $conn->query("SELECT * FROM UserData WHERE id='$owner'")->fetch_assoc();
         $owner = "${owner['firstname']} ${owner['lastname']}";
         $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
+        $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
 
         if(!empty($parent)){
             $parent =  $conn->real_escape_string($parent);
@@ -179,7 +185,14 @@ require "dynamicProjects_template.php";
                 //var_dump($clientRow);
                 echo "$client, ";
             }
-        echo "</td>";        
+        echo "</td>";   
+        echo "<td>";
+        while($employeeRow = $employeesResult->fetch_assoc()){
+            $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
+            //var_dump($clientRow);
+            echo "$employee, ";
+        }
+        echo "</td>"; 
         echo "</tr>";
     }
 ?>

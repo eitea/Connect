@@ -72,7 +72,7 @@ This template is a modal for editing new and existing dynamic projects
                                     ?>
                                 </select>
                                 <label>Mitarbeiter*:</label>
-                                <select class="form-control js-example-basic-single" name="employees" multiple="multiple" required>
+                                <select class="form-control js-example-basic-single" name="employees[]" multiple="multiple" required>
                                     <?php
                                     $result = $conn->query("SELECT * FROM UserData");
                                     while ($row = $result->fetch_assoc()) {
