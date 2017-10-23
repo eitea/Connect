@@ -35,10 +35,14 @@
 <script>
 function onPageLoad(){
   if($(".js-example-basic-single")[0]){
-    $(".js-example-basic-single").select2();    
+    var open = false;
+    var elem = $(".js-example-basic-single");
+    elem.select2();
+    elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
+    elem.on("select2:focus", function (e) {
+      if(!open) $(this).select2("open");
+    });
   }
-
-  $('select').on('select2:select', (function(){ $(this).focus(); }));
 
   //initalize them when the user needs them
   $('.monthpicker').click(function() {

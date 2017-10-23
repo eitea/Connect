@@ -68,7 +68,7 @@ function move() {
 <br>
 <?php
 require  "connection.php";
-require  "createTimestamps.php";
+require  "utilities.php";
 include 'validate.php';
 
 $sql = "SELECT * FROM $adminLDAPTable;";
@@ -1085,27 +1085,6 @@ if($row['version'] < 86){
     echo '<br> Added units to products';
   }
 
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
-  $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
-
   $sql = "ALTER TABLE proposals ADD COLUMN history VARCHAR(100)";
   if($conn->query($sql)){
     echo '<br> Added transitions to proposals';
@@ -1688,21 +1667,6 @@ if($row['version'] < 106){
     echo $conn->error;
   }
 
-  $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
-  if($file){
-    $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
-    $stmt->bind_param("iss", $num, $name, $type);
-    while(($line= fgetcsv($file, 300, ';')) !== false){
-      $num = $line[0];
-      $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
-      $type = trim($line[2]);
-      $stmt->execute();
-    }
-    $stmt->close();
-  } else {
-    echo "<br>Error Opening csv File";
-  }
-
   $sql = "CREATE TABLE account_balance(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     docNum INT(6),
@@ -1717,9 +1681,6 @@ if($row['version'] < 106){
     ON UPDATE CASCADE
     ON DELETE CASCADE,
     FOREIGN KEY (offAccount) REFERENCES accounts(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE,
-    FOREIGN KEY (tax) REFERENCES taxRates(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
@@ -1790,25 +1751,6 @@ if($row['version'] < 107){
 }
 
 if($row['version'] < 108){
-  $conn->query("DELETE FROM accounts");
-  $conn->query("ALTER TABLE accounts AUTO_INCREMENT = 1");
-  $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
-  if($file){
-    $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
-    $stmt->bind_param("iss", $num, $name, $type);
-    while(($line= fgetcsv($file, 300, ';')) !== false){
-      $num = $line[0];
-      $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
-      if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
-      if(!$name) $name = $line[1];
-      $type = trim($line[2]);
-      $stmt->execute();
-    }
-    $stmt->close();
-  } else {
-    echo "<br>Error Opening csv File";
-  }
-
   $sql = "CREATE TABLE account_journal(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6),
@@ -1841,10 +1783,6 @@ if($row['version'] < 108){
     echo $conn->error;
   }
 
-  $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
-
-  $conn->query("ALTER TABLE companyData ADD istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
-
   $conn->query("DROP TABLE account_balance");
   $sql = "CREATE TABLE account_balance(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1870,34 +1808,6 @@ if($row['version'] < 108){
 }
 
 if($row['version'] < 109){
-  $conn->query("DELETE FROM taxRates");
-  $i = 1;
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Keine Steuer', 0)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Normalsatz', 20, 3500, 1)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 13, 3500, 1)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 10, 3500, 1)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Sonder Ermäßigter Satz', 12)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501, 9)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501, 9)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Normalsatz', 20, 2502,  3502, 19)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502, 19)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 20)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 10)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', 0)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 10)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 8)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'KFZ Normalsatz', 20)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(".$i++.", 'UStBBKV', 20, 2506, 3506)");              
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 20, 2500, 2)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 19, 2500, 2)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 13, 2500, 2)");
-  $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 10, 2500, 2)");
-  if(!$conn->error){
-    echo '<br>Finanzen: Neue Steuersätze';
-  } else {
-    echo $conn->error;
-  }
-
   $conn->query("ALTER TABLE companyData MODIFY column companyCity VARCHAR(60) ");
   if(!$conn->error){
     echo '<br>Mandant: 54 Zeichen Ort';
@@ -1907,6 +1817,58 @@ if($row['version'] < 109){
 }
 
 if($row['version'] < 110){
+  //WEB
+  $sql = "CREATE TABLE receiptBook(
+    id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    supplierID INT(6) UNSIGNED,
+    taxID INT(4) UNSIGNED,
+    journalID INT(10) UNSIGNED,
+    invoiceDate DATETIME,
+    info VARCHAR(64),
+    amount DECIMAL(10,2),
+    FOREIGN KEY (supplierID) REFERENCES clientData(id)
+    ON UPDATE CASCADE 
+    ON DELETE CASCADE,
+    FOREIGN KEY (journalID) REFERENCES account_journal(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>ERP: Wareneingangsbuch';
+  }
+
+  //suppliers
+  $conn->query("ALTER TABLE clientData ADD COLUMN isSupplier VARCHAR(10) DEFAULT 'FALSE' ");
+  if(!$conn->error){
+    echo '<br>ERP: Lieferanten';
+  } else {
+    echo $conn->error;
+  }
+
+  //new accounts
+  $conn->query("DELETE FROM accounts");
+  $conn->query("ALTER TABLE accounts AUTO_INCREMENT = 1");
+  $file = fopen(__DIR__.'/setup/Kontoplan.csv', 'r');
+  if($file){
+    $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
+    $stmt->bind_param("iss", $num, $name, $type);
+    while(($line= fgetcsv($file, 300, ';')) !== false){
+      $num = $line[0];
+      $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+      if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
+      if(!$name) $name = $line[1];
+      $type = trim($line[2]);
+      $stmt->execute();
+    }
+    $stmt->close();
+  } else {
+    echo "<br>Error Opening csv File";
+  }
+  $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
+  $conn->query("ALTER TABLE companyData ADD istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+
   $sql = "CREATE TABLE closeUpData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
@@ -1925,6 +1887,33 @@ if($row['version'] < 110){
   $conn->query("ALTER TABLE UserData ADD COLUMN strikeCount INT(3) DEFAULT 0");
   if(!$conn->error){
     echo '<br>Benutzer: Punktesystem';
+  } else {
+    echo $conn->error;
+  }
+
+  $i = 1;
+  $conn->query("DELETE FROM taxRates");
+  $file = fopen(__DIR__.'/setup/Steuerraten.csv', 'r');
+  if($file){
+    $stmt = $conn->prepare("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("isiiii", $i, $name, $percentage, $account2, $account3, $code);
+    while($line = fgetcsv($file, 100, ';')){
+      $name = trim($line[0]);
+      $percentage = $line[1];
+      $account2 = $line[2] ? $line[2] : NULL;
+      $account3 = $line[3] ? $line[3] : NULL;
+      $code = $line[4] ? $line[4] : NULL;
+      $stmt->execute();
+      $i++;
+    }
+    $stmt->close();
+    fclose($file);
+  } else {
+    echo "<br>Error Opening csv File";
+  }
+  
+  if(!$conn->error){
+    echo '<br>Finanzen: Neue Steuersätze';
   } else {
     echo $conn->error;
   }

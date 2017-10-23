@@ -30,6 +30,7 @@ $routes = array(
   'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
   'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
+  'erp/receipts' => 'receiptBook.php',             'erp/suppliers' => 'editSuppliers.php',
 
   'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php'
 );

@@ -19,7 +19,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
     $accept = true;
     //either should or have can be 0
     if($_POST['add_nr'] > 0 && test_Date($_POST['add_date'], "Y-m-d") && $_POST['add_account'] > 0 && (!empty($_POST['add_should']) xor !empty($_POST['add_have']))){
-        $account = intval($_POST['add_account']);
+        $addAccount = intval($_POST['add_account']);
         $offAccount = $id;
         $docNum = $_POST['add_nr'];
         $date = $_POST['add_date'];
@@ -29,7 +29,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         $tax = 1;
         if(isset($_POST['add_tax'])) $tax = intval($_POST['add_tax']);
 
-        $res = $conn->query("SELECT num FROM accounts WHERE id = $account");
+        $res = $conn->query("SELECT num FROM accounts WHERE id = $addAccount");
         if($res && ( $rowP = $res->fetch_assoc())) $accNum = $rowP['num']; //else STRIKE
         
         if($accNum >= 5000 && $accNum < 8000 && $have ){
@@ -45,7 +45,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         if($accept){
             //journal
             $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
-            VALUES ($docNum, $userID, $account, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
+            VALUES ($docNum, $userID, $addAccount, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
             $journalID = $conn->insert_id;
         }
 
@@ -75,44 +75,45 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         }
          
         if($accept){
-             //tax deduction
+            //tax calculation
             $should_tax = ($taxRow['percentage'] / 100) * $should;
             $have_tax = ($taxRow['percentage'] / 100) * $have;
-            
-            //tax balance
+
+            //account balance
             if($account2){
-                //netto balance
-                $should = $temp_should - $should_tax;
-                $have = $temp_have - $have_tax;
-                $stmt->execute();
-                //tax
                 $should = $should_tax;
                 $have = $have_tax;
                 $account = $account2;
                 $stmt->execute();
-                //restore
-                $should = $temp_should;
-                $have = $temp_have;
-            } else {
-                //no tax deduction
-                $stmt->execute();
-            }
+                if($account3){
+                    $should = $temp_should; 
+                    $have = $temp_have; 
+                } else {
+                    $should = $temp_should - $should_tax;
+                    $have = $temp_have - $have_tax;
+                }
+            }                   
+            $account = $addAccount;
+            $stmt->execute();
+
+            //offAccount balance
+            $should = $temp_have;
+            $have = $temp_should;
 
             if($account3){
-                //turnaround tax
                 $should = $have_tax;
                 $have = $should_tax;
                 $account = $account3;
                 $stmt->execute();
-                //tax deduct should and have
-                $should = $temp_should - $should_tax;
-                $have = $temp_have - $have_tax;
+                if($account2){
+                    $have = $temp_should; 
+                    $should = $temp_have; 
+                } else {
+                    $have = $temp_should - $should_tax;
+                    $should = $temp_have - $have_tax;
+                }
             }
-
-            //turnaround offset balance
-            $temp = $should;
-            $should = $have;
-            $have = $temp;
+            
             $account = $offAccount;
             $stmt->execute();
         }
@@ -227,7 +228,6 @@ while($result && ($row = $result->fetch_assoc())){
 <script>
 var active_should = true;
 var active_have = true;
-
 function disenable(xor1, xor2, active){
     if($('#' + xor1).val()){
         $('#' + xor2).val('');
@@ -268,6 +268,8 @@ $('#account').change(function(e) {
         $('#tax').select2().attr('tabindex', '-1');
     }
 });
+
+  $('.datepicker').mask("0000-00-00");
 </script>
 
 <?php include "footer.php"; ?>

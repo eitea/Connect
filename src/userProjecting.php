@@ -333,7 +333,7 @@ endif;
         $setCompany = $available_companies[1];
       endif;
       echo '<div class="col-sm-2"><select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 0)">';
-      $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID=$setCompany");
+      $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE isSupplier = 'FALSE' AND companyID=$setCompany");
       echo "<option value='0'>".$lang['CLIENT']."...</option>";
       if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {

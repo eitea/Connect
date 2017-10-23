@@ -1,15 +1,15 @@
 <?php
-/**
-* company => id
-* client  => id
-* project  => id
-* user => id
-* bookings => [charged, break, drive]
-* logs => [activity, hideAll]
-* date => [fromDate, toDate] || [month]
-* procedures => [transitions[id], status, hideAll]
-* acceptance => status
-* requestType => type
+/** 
+ * company => id
+ * client  => id
+ * project  => id
+ * user => id
+ * bookings => [charged, break, drive]
+ * logs => [activity, hideAll]
+ * date => [fromDate, toDate] || [month]
+ * procedures => [transitions[id], status, hideAll]
+ * acceptance => status
+ * requestType => type
 **/
 
 if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
@@ -21,6 +21,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(isset($_POST['searchClient'])){
     $filterings['client'] = intval($_POST['searchClient']);
+  }
+  if(isset($_POST['searchSupplier'])){
+    $filterings['supplier'] = intval($_POST['searchSupplier']);
   }
   if(isset($_POST['searchProject'])){
     $filterings['project'] = intval($_POST['searchProject']);
@@ -131,6 +134,8 @@ if($scale > 2){ //3 columns
               echo '<label>'.$lang['COMPANY'].'</label>';
               if(isset($filterings['client'])){
                 echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showClients(this.value, \''.$filterings['client'].'\');" >';
+              } elseif(isset($filterings['supplier'])){
+                echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showSupplier(this.value, \''.$filterings['supplier'].'\');" >';
               } else {
                 echo '<select class="js-example-basic-single" name="searchCompany">';
               }
@@ -145,6 +150,20 @@ if($scale > 2){ //3 columns
               echo '</select><br><br>';
             }
           }
+          if(isset($filterings['supplier'])){
+            echo '<label>'.$lang['SUPPLIER'].'</label>';
+            echo '<select id="searchSupplierHint" class="js-example-basic-single" name="searchSupplier">';
+            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE isSupplier = 'TRUE' AND companyID IN (".implode(', ', $available_companies).")");
+            echo '<option value="0">...</option>';
+            while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+              $checked = '';
+              if($filterings['supplier'] == $row_fc['id']) {
+                $checked = 'selected';
+              }
+              echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+            }
+            echo '</select><br><br>';
+          }
           if(isset($filterings['client'])){
             echo '<label>'.$lang['CLIENT'].'</label>';
             if(isset($filterings['project'])){
@@ -152,7 +171,7 @@ if($scale > 2){ //3 columns
             } else {
               echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient">';
             }
-            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE companyID IN (".implode(', ', $available_companies).")");
+            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
             echo '<option value="0">...</option>';
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
@@ -340,6 +359,17 @@ $('#filterings_dropdown .dropdown-menu').on({
       error : function(resp){}
     });
   };
+  set_filter.showSupplier = function(company, supplier){
+    $.ajax({
+      url:'ajaxQuery/AJAX_getSupplier.php',
+      data:{companyID:company, supplierID:supplier},
+      type: 'get',
+      success : function(resp){
+        $("#searchSupplierHint").html(resp);
+      },
+      error : function(resp){}
+    });
+  };
   set_filter.changeValue = function(cVal, id, val){
     if(cVal == ''){
       document.getElementById(id).selectedIndex = val;
@@ -352,12 +382,14 @@ $('#filterings_dropdown .dropdown-menu').on({
 <?php
 echo '<script>';
 if(!empty($filterings['company'])){
-  if(!empty($filterings['client'])){
+  if(isset($filterings['client'])){
     $nextID = $filterings['client'];
-  } else {
-    $nextID = 0;
+    echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
   }
-  echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
+  if(isset($filterings['supplier'])){
+    $nextID = $filterings['supplier'];
+    echo 'set_filter.showSupplier('.$filterings['company'].', '.$nextID.');';
+  }
 }
 if(!empty($filterings['client'])){
   if(!empty($filterings['project'])){

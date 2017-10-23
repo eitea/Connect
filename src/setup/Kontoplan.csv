@@ -1,117 +1,962 @@
-120; Software;1;0;;;;1023;1111;1064;2;;9999;9999
-400; Fertigungsmaschinen;1;0;;;;1024;1071;1124;4;;9999;9999
-600; Betriebs- und Geschäftsausstattung;1;0;;;;1024;1081;1134;4;;9999;9999
-620; Büromaschinen, EDV-Anlagen;1;0;;;;1024;1081;1134;4;;9999;9999
-640; LKW;1;0;;;;1024;1081;1134;4;;9999;9999
-680; Geringw.Vermögensgegenst.;1;0;;;;1024;1081;1134;4;;9999;9999
-2000; Lieferforderungen Inland;1;2;;;;1244;1331;1362;14;;9999;9999
-2060; noch nicht fakt.Lief.u.Leistungen;1;2;;;;1244;2231;1362;68;;9999;9999
-2290; geleistete Anzahlungen 0 %;1;2;;;;1245;1474;1392;18;;9999;9999
-2500; Vorsteuer;1;2;;;;1245;1474;1392;18;;9999;9999
-2501; Vorsteuer aus i. g. Erwerb;1;2;;;;1245;1474;1392;18;;9999;9999
-2502; Vorsteuer § 19/Art 19 (reverse ch.);1;2;;;;1245;1474;1392;18;;9999;9999
-2520; noch nicht verrechenbare Vorsteuer;1;2;;;;1245;1474;1392;18;;9999;9999
-2535; FA Guthaben;1;2;;;;1245;1474;1412;18;;;
-2575; Verrechnungskonto Gesellschafter;1;2;;;;1245;1474;1392;18;;9999;9999
-2580; Firmenbuchgebühr Klienten;1;2;;;;1245;1474;1392;18;;9999;9999
-2700; Kassa;1;2;;;;1247;1451;1503;12;;9999;9999
-2800; Bank;1;2;;;;1247;1461;1505;12;;9999;9999
-2840; Oberbank;1;2;;;;1247;1461;1505;12;;9999;9999
-2895; Schwebende Geldbewegungen;1;2;;;;1247;1474;1505;12;;9999;9999
-2900; Aktive Rechnungsabgrenzungsposten;1;2;;;;1260;1500;1600;22;;9999;9999
-3020; Rückstellung für Körperschaftsteuer;2;3;;;;2360;2321;2322;70;;9999;9999
-3292; Anzahlungen von Kunden 20 %;2;3;1;20;1;2373;2411;2442;46;;9999;9999
-3296; Anzahlungen von Kunden grenzüb.DL;2;3;1;;27;2373;2411;2442;46;;9999;9999
-3300; Lieferverbindlichkeiten Inland;2;3;;;;2374;2491;2452;40;;9999;9999
-3500; Umsatzsteuer;2;3;;;;2377;2575;2495;46;;9999;9999
-3501; Umsatzsteuer aus i. g. Erwerb;2;3;;;;2377;2575;2495;46;;9999;9999
-3502; Ust § 19/Art 19 (reverse charge);2;3;;;;2377;2575;2495;46;;9999;9999
-3510; noch nicht geschuldete USt;2;3;;;;2377;2575;2495;46;;9999;9999
-3520; Umsatzsteuer-Zahllast;2;3;;;;2377;2575;2495;46;;9999;9999
-3530; Verrechnung Finanzamt;2;3;;;;2377;2575;2495;46;;9999;9999
-3541; Verr. Dienstgeberbeitrag;2;3;;;;2377;2575;2495;46;;9999;9999
-3542; Verr. Dienstgeberzuschlag;2;3;;;;2377;2575;2495;46;;9999;9999
-3550; Verr. Kommunalsteuer;2;3;;;;2377;2575;2495;46;;9999;9999
-3551; Verr. Wiener Dienstgeberabgabe;2;3;;;;2377;2575;2495;46;;9999;9999
-3600; Sozialversicherungsanstalten;2;3;;;;2377;2575;2496;46;;9999;9999
-3620; Pensions- u. Unterstützungskassen;2;3;;;;2377;2575;2496;46;;9999;9999
-3640; Verr. Löhne u. Gehälter;2;3;;;;2377;2575;2492;46;;9999;9999
-3700; übrige sonstige Verbindlichkeiten;2;3;;;;2377;2575;2492;46;;9999;9999
-3800; Gewinnausschüttung;2;3;;;;2301;2575;2492;60;;9999;9999
-3900; Passive Rechnungsabgrenzungsposten;2;3;;;;2380;2600;2600;80;;9999;9999
-4000; Erlöse 20 %;4;4;1;20;;4412;4010;3100;100;3012;3000;5600
-4099; sonstige Nebenerlöse;4;4;;;;4414;4010;3100;100;3012;3000;5600
-4113; Erlöse sonstige Leistungen EU;4;4;77;;;4412;4010;3100;100;3012;3000;5600
-4400; Kundenskonto 20 %;4;4;1;20;;4419;4051;3143;160;3012;3400;5600
-4520; Bestandsveränd.n.n.abrechenb.Leist.;4;4;;;;4420;4131;3165;180;3083;3300;5600
-4600; Erlöse Anlagenverkauf 20%;4;4;1;20;;4440;4151;3253;740;3293;5400;5600
-4800; Sonstige betriebliche Erträge 20 %;4;4;1;20;;4440;4212;3271;780;3063;3200;5600
-4830; sonstige betriebliche Erträge 0 %;4;4;1;;;4440;4212;3271;780;3063;3200;5600
-5000; Wareneinkauf 20 %;3;5;;20;;3501;3012;3321;300;3113;3600;3300
-5700; Fremdleistungen;3;5;;20;;3506;3062;3381;310;3115;3800;3100
-5800; Skontoertrag 20 %;3;5;;20;;3507;3022;3391;370;3113;3600;5600
-6000; Löhne;3;6;;;;3611;3111;3401;400;3123;4000;3900
-6040; Sonderzahlungen Arbeiter;3;6;;;;3611;3111;3401;400;3123;4000;3900
-6200; Gehälter;3;6;;;;3612;3112;3411;410;3124;4200;4100
-6205; Lehrlingsentschädigung Angestellte;3;6;;;;3612;3112;3411;410;3124;4200;4100
-6240; Sonderzahlungen Angestellte;3;6;;;;3612;3112;3411;410;3124;4200;4100
-6402; Betriebl. Vorsorgekasse (BVK) Arb.;3;6;;;;3618;3111;3431;440;3125;4000;3900
-6407; Betriebl. Vorsorgekasse (BVK) Ang.;3;6;;;;3618;3112;3431;440;3125;4200;4100
-6600; Gesetzl. Sozialaufwand Arbeiter;3;6;;;;3615;3221;3441;420;3125;4100;4000
-6605; Gesetzl. Sozialaufwand Angestellte;3;6;;;;3615;3221;3441;420;3125;4300;4200
-6620; DB (Arbeiter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6621; DB (Angestellter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6630; DZ (Arbeiter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6631; DZ (Angestellter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6640; Kommunalsteuer (Arbeiter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6641; Kommunalsteuer (Angestellter);3;6;;;;3616;3211;3441;420;3125;4100;4000
-6680; Centausgleich;3;6;;;;3616;3211;3441;420;3125;4600;4900
-6790; Freiwilliger Sozialaufwand;3;6;;;;3615;3231;3451;450;3125;4000;3900
-7010; AfA immaterielles Anlagevermögen;3;7;;;;3751;;3461;730;3133;4900;5100
-7020; AfA Sachanlagevermögen;3;7;;;;3751;;3464;730;3133;4900;5100
-7021; Geringwertiges Sachanlagevermögen;3;7;;;;3751;;3464;730;3133;4900;5100
-7030; außerplanm. Abschr. PKW Unternehmer;3;7;;;;3770;3332;3464;820;3133;4900;5100
-7162; Park- und Mautgebühr;3;7;;20;;3784;3511;3501;500;3163;4700;4800
-7163; LKW-Kosten;3;7;;20;;3784;3511;3501;500;3163;4700;4800
-7165; Leasing Kia Soul;3;7;2;20;;3784;3511;3501;500;3163;4700;4800
-7180; Sonstige Gebühren u. Abgaben;3;7;;;;3784;3682;3501;500;3163;4600;4500
-7200; Instandhaltung;3;7;;20;;3735;3622;3513;510;3164;4800;4400
-7205; Instandh.Betriebs-u.Geschäftsausst.;3;7;;20;;3735;3622;3513;510;3164;4800;4400
-7210; Reinigung durch Dritte;3;7;;20;;3735;3682;3513;510;3164;4800;4900
-7215; Reinigungsmaterial;3;7;;20;;3706;3042;3513;510;3164;4600;4900
-7321; PKW Kosten;3;7;2;20;;3733;3622;3515;540;3183;4700;4800
-7330; Kfz-Versicherungen;3;7;;;;3733;3622;3515;540;3183;4700;4800
-7340; Reisespesen;3;7;;;;3747;3622;3516;550;3185;4700;5000
-7380; Telefon;3;7;;20;;3742;3632;3517;580;3203;4600;4900
-7381; Internet;3;7;;20;;3742;3632;3517;580;3203;4600;4900
-7390; Postgebühren;3;7;;;;3742;3632;3517;580;3203;4600;4900
-7400; Mietaufwand unbew. WG 20 %;3;7;;20;;3731;3642;3518;560;3213;4600;4700
-7401; Mietaufwand unbewegl. WG 10 %;3;7;;10;;3731;3642;3518;560;3213;4600;4700
-7500; Aufwand für beigestelltes Personal;3;7;;20;;3706;3682;3519;570;3235;4800;4900
-7540; Provisionen an Dritte;3;7;;;;3749;3682;3519;570;3235;4700;5000
-7585; Geschäftsführerbezug;3;7;;;;3749;3682;3537;570;3235;4200;4100
-7600; Büromaterial und Drucksorten;3;7;;20;;3741;3682;3523;580;3235;4600;4900
-7630; Fachliteratur und Zeitungen;3;7;;10;;3746;3682;3523;580;3235;4600;4900
-7650; Werbung;3;7;;20;;3723;3682;3523;590;3223;4700;4600
-7653; Dekorationsmaterial;3;7;;13;;3706;3042;3523;590;3223;4700;5000
-7660; Repräsentationsaufwand;3;7;;20;;3723;3700;3523;590;3223;4700;5000
-7697; Trinkgelder;3;7;;;;3723;3700;3523;580;3223;4700;4600
-7700; Versicherungen;3;7;;;;3737;3682;3524;600;3225;4800;4900
-7750; Rechts- u. Beratungsaufwand;3;7;;;;3744;3682;3528;620;3235;4600;4900
-7770; Aus- und Weiterbildung;3;7;;20;;3746;3682;3595;620;3235;4600;4900
-7780; gesetzliche Pflichtbeiträge;3;7;;;;3785;3531;3525;580;3235;4600;4500
-7785; Mitgliedsbeiträge;3;7;;;;3749;3531;3525;580;3235;4600;4500
-7790; Spesen des Geldverkehrs;3;7;;;;3743;3415;3526;580;3235;4600;4900
-7805; Abschreibung von Forderungen 0 %;3;7;1;;;3756;3361;3533;610;3235;4900;5100
-7820; Buchwert abgegangener Anlagen;3;7;;;;3753;3682;3529;740;3294;5400;5600
-7840; sonstige betriebl. Aufwendungen;3;7;;20;;3749;3600;3595;630;3235;5100;5300
-8120; Kundenverzugszinsen 0%;4;8;;;;4870;4300;3710;700;3263;5400;5600
-8500; Körperschaftsteuer;3;8;;;;3882;3511;3920;850;3163;5400;5600
-8530; Körperschaftsteuer aus Vorperioden;3;8;;;;3882;3511;3920;850;3163;5400;5600
-9010; Stammkapital;2;9;;;;2901;2010;2111;60;;9999;9999
-9014; § 10b Abs.4 GmbHG n.einf.ausst.Einl;2;9;;;;2901;2010;2111;60;;;
-9100; nicht eingeforderte ausst. Einlagen;2;9;;;;2901;2010;2113;60;;9999;9999
-9370; Jahresgewinn;2;9;;;;2905;2111;2271;60;;9999;9999
-9380; Gewinnvortrag aus Vorjahren;2;9;;;;2905;2111;2273;60;;9999;9999
-9800; Eröffnungsbilanzkonto;2;9;;;;2901;2010;2101;60;;9999;9999
-9890; Gewinn lfd. Jahr (Schattenkonto);3;9;;;;3905;2010;9999;9999;;9999;9999
+10; Aufwd.f.d.Ingangs. e. Betr.;1;0;;;;1010;1030;1013;4;;;9999;9999
+19; kum. Afa. Ingangs. e. Betr.;1;0;;;;1010;1030;1013;4;;;9999;9999
+20; Aufwd.f.d.Erweitern e. Betr.;1;0;;;;1010;1030;1015;4;;;9999;9999
+29; kum. Afa. Erweitern e. Betr.;1;0;;;;1010;1030;1015;4;;;9999;9999
+100; Konzessionen;1;0;;;;1023;1111;1063;2;;;9999;9999
+109; kum. Afa. Konzessionen;1;0;;;;1023;1111;1063;2;;;9999;9999
+110; Patentrechte;1;0;;;;1023;1111;1064;2;;;9999;9999
+111; Lizenzen;1;0;;;;1023;1111;1065;2;;;9999;9999
+118; kumulierte Abschreibungen Patentrec;1;0;;;;1023;1111;1063;2;;;9999;9999
+119; kum.Afa. Lizenzen;1;0;;;;1023;1111;1065;2;;;9999;9999
+120; Software;1;0;;;;1023;1111;1064;2;;;9999;9999
+129; kum.Afa. Software;1;0;;;;1023;1111;1065;2;;;9999;9999
+130; Marken;1;0;;;;1023;1111;1064;2;;;9999;9999
+131; Warenzeichen;1;0;;;;1023;1111;1064;2;;;9999;9999
+132; Musterschutzrechte;1;0;;;;1023;1111;1064;2;;;9999;9999
+133; sonstige Urheberrechte;1;0;;;;1023;1111;1064;2;;;9999;9999
+140; Pacht u. Mietrechte;1;0;;;;1023;1111;1064;2;;;9999;9999
+148; kumul.Abschr. Pacht- u. Mietrechte;1;0;;;;1023;1111;1063;2;;;9999;9999
+149; kum.Afa.gewerbl.Schutzrechte,ähnl.;1;0;;;;1023;1111;1064;2;;;9999;9999
+150; Geschäfts(Firmen)wert;1;0;;;;1023;1121;1082;2;;;9999;9999
+159; kum. Afa. Geschäfts(Firmen)-wert;1;0;;;;1023;1121;1082;2;;;9999;9999
+160; Umgründungsmehrwert (immat. AV);1;0;;;;1023;1121;1082;2;;;9999;9999
+169; kum.Afa. Umgründungsmehrw. (imm.AV);1;0;;;;1023;1121;1082;2;;;9999;9999
+170; Unterschiedsbetrag Kapitalkons.;1;0;;;;1023;1121;1082;2;;;9999;9999
+179; kum.Afa.Unterschiedsb. Kapitalkons.;1;0;;;;1023;1121;1082;2;;;9999;9999
+180; Anzahlungen f. immaterielles Verm.;1;0;;;;1029;1111;1092;2;;;9999;9999
+200; unbebaute Grundstücke;1;0;;;;1024;1041;1103;4;;;9999;9999
+205; Grundstücke mit Substanzverzehr;1;0;;;;1024;1041;1103;4;;;9999;9999
+210; bebaute Grundstücke (Grundwert);1;0;;;;1024;1041;1103;4;;;9999;9999
+219; kum. Afa. Grundstücke;1;0;;;;1024;1041;1103;4;;;9999;9999
+220; grundstücksgleiche Rechte;1;0;;;;1024;1041;1104;4;;;9999;9999
+229; kum.Afa. grundstücksgleiche Rechte;1;0;;;;1024;1041;1104;4;;;9999;9999
+300; Betriebs-u.Geschäftsgebäude;1;0;;;;1024;1031;1105;4;;;9999;9999
+310; Wohn- und Sozialgebäude;1;0;;;;1024;1031;1105;4;;;9999;9999
+320; Betriebs-u.Geschäftsgebäude fr.Gr.;1;0;;;;1024;1031;1106;4;;;9999;9999
+330; Wohn- u.Sozialgebäude a. fr. Grund;1;0;;;;1024;1031;1106;4;;;9999;9999
+340; Grundstückseinrichtungen;1;0;;;;1024;1031;1105;4;;;9999;9999
+349; kum. Afa. Gebäude;1;0;;;;1024;1041;1105;4;;;9999;9999
+350; Grundstückseinrichtungen fr. Grund;1;0;;;;1024;1031;1106;4;;;9999;9999
+359; kum.Afa. Gebäude a.fremd.Grund;1;0;;;;1024;1041;1106;4;;;9999;9999
+360; Investitionen i.fremd.Betr.Gebäuden;1;0;;;;1024;1031;1106;4;;;9999;9999
+370; Investitionen i.fremd.Wohngebäuden;1;0;;;;1024;1031;1106;4;;;9999;9999
+379; kum.Afa Einbauten i. fr. Gebäuden;1;0;;;;1024;1061;1106;4;;;9999;9999
+400; Fertigungsmaschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+410; Antriebsmaschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+420; Energieversorgungsanlagen;1;0;;;;1024;1071;1123;4;;;9999;9999
+430; Transportanlagen;1;0;;;;1024;1071;1123;4;;;9999;9999
+439; kum.Afa. technische Anlagen;1;0;;;;1024;1071;1123;4;;;9999;9999
+440; sonstige Maschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+500; Maschinenwerkzeuge;1;0;;;;1024;1081;1124;4;;;9999;9999
+510; allg. Werkzeuge u. Handwerkzeuge;1;0;;;;1024;1081;1124;4;;;9999;9999
+520; Vorrichtungen, Formen, Modelle;1;0;;;;1024;1081;1124;4;;;9999;9999
+530; andere Erzeugungshilfsmittel;1;0;;;;1024;1081;1124;4;;;9999;9999
+540; Hebezeuge und Montageanlagen;1;0;;;;1024;1081;1124;4;;;9999;9999
+550; GWG Maschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+555; Festwert Maschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+559; kum. Afa Maschinen;1;0;;;;1024;1071;1124;4;;;9999;9999
+600; Betriebs- und Geschäftsausstattung;1;0;;;;1024;1081;1134;4;;;9999;9999
+605; Beheizungs- u. Beleuchtungsanlagen;1;0;;;;1024;1081;1133;4;;;9999;9999
+610; andere Anlagen;1;0;;;;1024;1081;1133;4;;;;
+620; Büromaschinen, EDV-Anlagen;1;0;;;;1024;1081;1134;4;;;9999;9999
+630; PKW;1;0;;;;1024;1081;1134;4;;;9999;9999
+640; LKW;1;0;;;;1024;1081;1134;4;;;9999;9999
+645; andere Beförderungsmittel;1;0;;;;1024;1081;1134;4;;;9999;9999
+649; kum. Afa Fuhrpark;1;0;;;;1024;1081;1134;4;;;9999;9999
+659; kum. Afa andere Anlagen;1;0;;;;1024;1081;1133;4;;;9999;9999
+670; Gebinde;1;0;;;;1024;1081;1134;4;;;9999;9999
+680; Geringw.Vermögensgegenst.,s.n.i.Erz;1;0;;;;1024;1081;1134;4;;;9999;9999
+685; Festwert Betriebs-u.Geschäftsausst.;1;0;;;;1024;1081;1134;4;;;9999;9999
+689; kum.Afa Betr.u.Geschäftsausstattung;1;0;;;;1024;1081;1134;4;;;9999;9999
+700; Anzahlungen für Sachanlagen;1;0;;;;1029;1141;1153;4;;;9999;9999
+710; Anlagen in Bau;1;0;;;;1024;1101;1154;4;;;9999;9999
+800; Anteile a. verbundenen Unternehmen;1;0;;;;1028;1121;1192;6;;;9999;9999
+809; kum. Abschr.Anteile an verb.Untern.;1;0;;;;1028;1121;1192;6;;;9999;9999
+810; Beteil. a. Kapitalgesellschaften;1;0;;;;1028;1121;1212;6;;;9999;9999
+820; Beteil. a. Personengesellschaften;1;0;;;;1028;1121;1212;6;;;9999;9999
+830; eig.Ant.Ant.an herrsch.o.m.Mehrheit;1;0;;;;1028;1121;1212;6;;;9999;9999
+840; sonstige Beteiligungen;1;0;;;;1028;1121;1202;6;;;9999;9999
+849; kum. Abschreibung Beteiligungen;1;0;;;;1028;1121;1212;6;;;9999;9999
+850; Ausleihung an verbundene Unternehme;1;0;;;;1028;1121;1222;6;;;9999;9999
+859; kum. Abschr.Ausleihungen an Untern.;1;0;;;;1028;1121;1222;6;;;9999;9999
+860; Ausleihungen a.Untern.mit Beteilig.;1;0;;;;1028;1121;1242;6;;;9999;9999
+867; Darlehen;1;0;;;;1028;1121;1242;6;;;9999;9999
+869; kum.Abschr.Ausleih.a.Untern.m.Betei;1;0;;;;1028;1121;1222;6;;;9999;9999
+870; Ausleihung an Gesellschafter;1;0;;;;1028;1121;1232;6;;;9999;9999
+880; sonstige Ausleihungen;1;0;;;;1028;1121;1232;6;;;9999;9999
+889; kumulierte Abschr.sonstige Ausleih.;1;0;;;;1028;1121;1222;6;;;9999;9999
+890; Anteile an Kapitalgesellschaften;1;0;;;;1028;1121;1232;6;;;9999;9999
+900; Anteile an Personengesellschaften;1;0;;;;1028;1121;1232;6;;;9999;9999
+910; Genossenschaftsanteile;1;0;;;;1028;1121;1232;6;;;9999;9999
+920; Anteile an Investmentfonds;1;0;;;;1028;1131;1232;6;;;9999;9999
+930; Festverzinsliche Wertpapiere d. AV;1;0;;;;1028;1131;1232;6;;;9999;9999
+940; sonstige Finanzanlagen, Wertrechte;1;0;;;;1028;1141;1232;6;;;9999;9999
+980; Anzahlungen für Finanzanlagen;1;0;;;;1029;1141;1232;6;;;9999;9999
+989; kum. Abschr. Wertpapiere des Anlage;1;0;;;;1029;1141;1232;6;;;9999;9999
+1000; Bezugsverrechnung;1;1;;;;1142;1201;1313;10;;;9999;9999
+1100; Rohstoffe;1;1;;;;1142;1201;1313;10;;;9999;9999
+1200; bezogene Teile;1;1;;;;1142;1201;1314;10;;;9999;9999
+1300; Hilfsstoffe;1;1;;;;1142;1201;1314;10;;;9999;9999
+1350; Betriebsstoffe;1;1;;;;1142;1201;1315;10;;;9999;9999
+1360; Heizmaterialvorrat;1;1;;;;1142;1201;1315;10;;;9999;9999
+1400; unfertige Erzeugnisse;1;1;;;;1142;1211;1322;10;;;9999;9999
+1500; fertige Erzeugnisse;1;1;;;;1142;1231;1333;10;;;9999;9999
+1600; Waren;1;1;;;;1142;1231;1334;10;;;9999;9999
+1700; noch nicht abrechenbare Leist.;1;1;;;;1145;1212;1342;18;;;9999;9999
+1750; erh. Anzahlungen auf Bestellungen;1;1;;;;1145;1212;1342;18;;;9999;9999
+1800; geleistete Anzahlungen 20 %;1;1;;20;;1145;1311;1352;18;;;9999;9999
+1801; geleistete Anzahlungen 10 %;1;1;;10;;1145;1311;1352;18;;;9999;9999
+1802; geleistete Anzahlungen 0 %;1;1;;;;1145;1311;1352;18;;;9999;9999
+1910; Wertberichtigung Rohstoffe;1;1;;;;1142;2231;1313;68;;;9999;9999
+1911; Wertberichtigung Hilfsstoffe;1;1;;;;1142;2231;1314;68;;;9999;9999
+1912; Wertberichtigung Betriebstoffe;1;1;;;;1142;2231;1315;68;;;9999;9999
+1913; Wertberichtigung unfert.Erzeugnisse;1;1;;;;1142;2231;1322;68;;;9999;9999
+1914; Wertberichtigung fert. Erzeugnisse;1;1;;;;1142;2231;1333;68;;;9999;9999
+1915; Wertberichtigung Waren;1;1;;;;1142;2231;1334;68;;;9999;9999
+1916; Wertberichtigung n.n.abr.Leistungen;1;1;;;;1142;2231;1342;68;;;9999;9999
+2000; Lieferforderungen Inland;1;2;;;;1244;1331;1362;14;;;9999;9999
+2060; noch nicht fakt.Lief.u.Leistungen;1;2;;;;1244;2231;1362;68;;;9999;9999
+2080; Einzelwertber. Forderungen Inland;1;2;;;;1244;2231;1362;68;;;9999;9999
+2090; Pausch.Wertberichtigung Lief.Inland;1;2;;;;1244;2231;1362;68;;;9999;9999
+2100; Lieferforderungen EU;1;2;;;;1244;1331;1362;14;;;9999;9999
+2130; Einzelwertber.Lieferforderungen EU;1;2;;;;1244;1331;1362;68;;;9999;9999
+2140; Pausch.Wertberichtigung Lieferf. EU;1;2;;;;1244;1331;1362;68;;;9999;9999
+2150; Lieferforderungen sonstiges Ausland;1;2;;;;1244;1331;1362;14;;;9999;9999
+2180; Einzelwertber. Lieferf. Ausland;1;2;;;;1244;2231;1362;68;;;9999;9999
+2190; Pausch.Wertberichtigung Lief. Ausl.;1;2;;;;1244;2172;1362;68;;;9999;9999
+2200; Forderungen geg. verbundene Untern.;1;2;;;;1244;1351;1372;18;;;9999;9999
+2201; andere Ford. geg. verb. Untern.;1;2;;;;1244;1351;1372;18;;;9999;9999
+2230; EinzelWB.Ford.geg.verb.Unternehmen;1;2;;;;1244;1351;1372;68;;;9999;9999
+2240; Pausch.WB.Ford.geg.verb.Unternehmen;1;2;;;;1244;1351;1372;68;;;9999;9999
+2250; Ford.geg.Unternehmen m. Beteiligung;1;2;;;;1244;1351;1382;18;;;9999;9999
+2251; andere Ford.geg.Untern.m.Beteilig.;1;2;;;;1244;1351;1382;18;;;9999;9999
+2260; EinzelWB.z.Lieferford.g.UN.m.B.;1;2;;;;1244;1351;1382;68;;;9999;9999
+2270; EinzelWB.z.Finanzford.g.UN.m.B.;1;2;;;;1244;1351;1382;68;;;9999;9999
+2280; Pausch.WB.Ford.geg.Unternehmen m.B.;1;2;;;;1244;1351;1382;68;;;9999;9999
+2289; geleistete Anzahlungen n.steuerbar;1;2;;;;1245;1474;1392;18;;;9999;9999
+2290; geleistete Anzahlungen 0 %;1;2;;;;1245;1474;1392;18;;;9999;9999
+2291; geleistete Anzahlungen 10 %;1;2;;10;;1245;1474;1392;18;;;9999;9999
+2292; geleistete Anzahlungen 20 %;1;2;;20;;1245;1474;1392;18;;;9999;9999
+2293; geleistete Anzahlungen 20 % Brutto;1;2;;20;;1245;1474;1392;18;;;9999;9999
+2294; geleistete Anzahlungen Bau §19/1a;1;2;29;20;;1245;1474;1392;18;;;9999;9999
+2295; Lohn- und Gehaltsvorschüsse;1;2;;;;1245;1474;1392;18;;;9999;9999
+2297; geleistete Anzahlungen sst.Leist.EU;1;2;79;20;;1245;1474;1392;18;;;9999;9999
+2299; geleistete Anzahlungen 13 %;1;2;;13;;1245;1474;1392;18;;;9999;9999
+2300; sonstige Forderungen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2310; Forderungen aus Anlagenabgängen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2320; Forderungen a.Finanzanlagenabgängen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2330; sst. Forderungen Ertragssteuerverr.;1;2;;;;1245;1474;1392;18;;;9999;9999
+2340; Forderungen aus a.o. Erträgen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2350; gewährte Zuschüsse;1;2;;;;1245;1474;1392;18;;;9999;9999
+2470; eingeforderte, n.n.eingez.Einlagen;1;2;;;;1245;1474;1393;18;;;9999;9999
+2480; EinzelWB zu sonstigen Forderungen;1;2;;;;1245;1473;1392;68;;;9999;9999
+2490; PauschalWB zu sonstigen Forderungen;1;2;;;;1245;1473;1392;68;;;9999;9999
+2500; Vorsteuer;1;2;;;;1245;1474;1392;18;;;9999;9999
+2501; Vorsteuer aus i. g. Erwerb;1;2;;;;1245;1474;1392;18;;;9999;9999
+2502; Vorsteuer § 19/Art 19 (reverse ch.);1;2;;;;1245;1474;1392;18;;;9999;9999
+2504; Vorsteuer aus Bauleistungen §19/1a;1;2;;;;1245;1474;1392;18;;;9999;9999
+2505; Vorsteuer § 19/1b;1;2;;;;1245;1474;1392;18;;;;
+2506; Vorsteuer § 19/1d;1;2;;;;1245;1474;1392;18;;;;
+2507; Vorsteuer § 19/1c;1;2;;;;1245;1474;1392;18;;;;
+2508; Vorsteuer sonstige Leistungen EU;1;2;;;;1245;1474;1392;18;;;;
+2509; EUSt (Abgabenart EU) Forderung;1;2;;;;1245;1295;1392;18;;;9999;9999
+2510; Einfuhrumsatzsteuer;1;2;;;;1245;1474;1392;18;;;9999;9999
+2511; Vorsteuer Deutschland;1;2;;;;1245;1474;1392;18;;;9999;9999
+2512; Vorsteuer Italien;1;2;;;;1245;1474;1392;18;;;9999;9999
+2513; Vorsteuer Frankreich;1;2;;;;1245;1474;1392;18;;;9999;9999
+2514; Vorsteuer § 19/1e;1;2;;;;1245;1474;1392;18;;;;
+2515; VSt-Evidenzkonto f. geleist. Anzlg.;1;2;;;;1245;1474;1392;18;;;9999;9999
+2518; Vorsteuer übrige EU-Länder;1;2;;;;1245;1474;1392;18;;;9999;9999
+2519; n.n. fällige EUSt, Vorsteuer;1;2;;;;1245;1474;1392;18;;;9999;9999
+2520; noch nicht verrechenbare Vorsteuer;1;2;;;;1245;1474;1392;18;;;9999;9999
+2560; Vorauszahlung Körperschaftsteuer;1;2;;;;1245;1474;1412;18;;;9999;9999
+2565; Aktivierung Körperschaftsteuer;1;2;;;;1245;1474;1392;18;;;9999;9999
+2567; Aktivierung GSVG;1;2;;;;1245;1474;1392;18;;;9999;9999
+2570; Forderungen geg.Mitglieder (Verein);1;2;;;;1245;1474;1392;18;;;9999;9999
+2573; Gesellschafterdarlehen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2575; Verrechnungskonto Gesellschafter;1;2;;;;1245;1474;1392;18;;;9999;9999
+2577; Dienstnehmerdarlehen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2580; Kostenvorschüsse;1;2;;;;1245;1474;1392;18;;;9999;9999
+2582; Darlehensforderungen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2584; Kautionen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2586; Leasing, Depotzahlungen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2590; Versicherungsaktivierungen;1;2;;;;1245;1474;1392;18;;;9999;9999
+2600; eigene Anteile;1;2;;;;1246;1271;1443;60;;;9999;9999
+2601; Anteile an herrschenden Unternehmen;1;2;;;;1246;1271;1443;60;;;9999;9999
+2602; Wertberichtigung eigene Anteile;1;2;;;;1246;1271;1443;60;;;9999;9999
+2610; Anteile an verbundenen Unternehmen;1;2;;;;1246;1351;1432;6;;;9999;9999
+2612; Wertber. Anteile a.verb.Unternehmen;1;2;;;;1246;2231;1432;68;;;9999;9999
+2620; sonstige Anteile;1;2;;;;1246;1351;1442;6;;;9999;9999
+2630; sonstige Wertpapiere;1;2;;;;1246;1351;1442;6;;;9999;9999
+2680; Besitzwechsel;1;2;;;;1246;1411;1442;18;;;9999;9999
+2690; Wertberichtigungen Wertpapiere d.UV;1;2;;;;1246;2231;1442;68;;;9999;9999
+2700; Kassa;1;2;;;;1247;1451;1503;12;;;9999;9999
+2730; Postwertzeichen;1;2;;;;1247;1451;1503;12;;;9999;9999
+2740; Stempelmarken;1;2;;;;1247;1451;1503;12;;;9999;9999
+2750; Kassa in Fremdwährung;1;2;;;;1247;1451;1503;12;;;9999;9999
+2780; Schecks in Inlandswährung;1;2;;;;1247;1431;1504;12;;;9999;9999
+2790; Schecks in Fremdwährung;1;2;;;;1247;1431;1504;12;;;9999;9999
+2800; Bank;1;2;;;;1247;1461;1505;12;;;9999;9999
+2810; Bank Austria;1;2;;;;1247;1461;1505;12;;;9999;9999
+2820; Raiffeisenbank;1;2;;;;1247;1461;1505;12;;;9999;9999
+2830; Volksbank;1;2;;;;1247;1461;1505;12;;;9999;9999
+2840; Oberbank;1;2;;;;1247;1461;1505;12;;;9999;9999
+2850; Sparkasse;1;2;;;;1247;1461;1505;12;;;9999;9999
+2860; Volkskreditbank;1;2;;;;1247;1461;1505;12;;;9999;9999
+2890; Telebanking Verrechnungskonto;1;2;;;;1247;1474;1505;12;;;9999;9999
+2895; Schwebende Geldbewegungen;1;2;;;;1247;1474;1505;12;;;9999;9999
+2900; aktive Rechnungsabgrenzungsposten;1;2;;;;1260;1500;1600;22;;;9999;9999
+2930; Mietvorauszahlungen;1;2;;;;1245;1474;1412;18;;;9999;9999
+2940; Aktivposten Leasing KFZ;1;2;;;;1260;1500;1600;22;;;9999;9999
+2950; Disagio;1;2;;;;1260;1500;1600;22;;;9999;9999
+2960; Unterschiedsbetrag z. Pensions-RSt.;1;2;;;;1260;1500;1600;22;;;9999;9999
+2970; Unterschiedsb.gem. PensionskassenG.;1;2;;;;1260;1500;1600;22;;;9999;9999
+2980; Steuerabgrenzung;1;2;;;;1260;1500;1600;22;;;9999;9999
+2990; Eventualforderungen;1;2;;;;1260;1500;1600;22;;;9999;9999
+2999; Gegenkonto Eventualforderungen;1;2;;;;1260;1500;1600;22;;;9999;9999
+3000; Rückstellung für Abfertigungen;2;3;;;;2360;2311;2342;70;;;9999;9999
+3010; Rückstellung für Pensionen;2;3;;;;2360;2311;2352;70;;;9999;9999
+3020; Rückstellung für Körperschaftsteuer;2;3;;;;2360;2321;2362;70;;;9999;9999
+3030; Rst.f.latente Steuern § 198 (9) HGB;2;3;;;;2360;2321;2372;70;;;9999;9999
+3035; Rückstellung für sonstige Steuern;2;3;;;;2360;2321;2372;70;;;9999;9999
+3040; Rückstellungen für Sonstiges;2;3;;;;2360;2321;2372;70;;;9999;9999
+3041; Rückstellung f.nicht konsum.Urlaube;2;3;;;;2360;2321;2372;70;;;9999;9999
+3042; Rückstellung für Sonderzahlungen;2;3;;;;2360;2321;2372;70;;;9999;9999
+3043; Rückstellung für Jubiläumsgelder;2;3;;;;2360;2321;2372;70;;;9999;9999
+3044; Rückstellung für Prämien;2;3;;;;2360;2321;2372;70;;;9999;9999
+3045; Rückstellung für Gutstunden;2;3;;;;2360;2321;2372;70;;;9999;9999
+3047; Rückstellung für Altersteilzeit;2;3;;;;2360;2321;2372;70;;;9999;9999
+3050; Rückstellung für Beratungskosten;2;3;;;;2360;2321;2372;70;;;9999;9999
+3051; Rückstellung für WT-Honorar;2;3;;;;2360;2321;2372;70;;;9999;9999
+3052; Rückstellung für Prozesskosten;2;3;;;;2360;2321;2372;70;;;9999;9999
+3060; Rückstellung für Produkthaftung;2;3;;;;2360;2321;2372;70;;;9999;9999
+3061; Rückstellung für Gewährleistungen;2;3;;;;2360;2321;2372;70;;;9999;9999
+3070; Rückstellung für Wechselobligo;2;3;;;;2360;2321;2372;70;;;9999;9999
+3071; Rückstellung für Bürgschaften;2;3;;;;2360;2321;2372;70;;;9999;9999
+3080; Rückstellung f.droh.Verl.schweb.G.;2;3;;;;2360;2321;2372;70;;;9999;9999
+3085; Rückstellung f. Erlösminderungen;2;3;;;;2360;2321;2372;70;;;9999;9999
+3090; sst. Rückstellungen a.o. Aufwand;2;3;;;;2360;2321;2372;70;;;9999;9999
+3100; Anleihen;2;3;;;;2371;2321;2422;44;;;9999;9999
+3105; Anleihen (konvertibel);2;3;;;;2371;2321;2424;44;;;9999;9999
+3110; Bankverbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3115; Bank Austria Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3120; Raiffeisenbank Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3125; Volksbank Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3130; Oberbank Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3135; Sparkasse Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3140; Volkskreditbank Verbindlichkeiten;2;3;;;;2372;2321;2432;42;;;9999;9999
+3150; Darlehen von Kreditinstituten;2;3;;;;2372;2321;2432;44;;;9999;9999
+3180; Verbindlichk.geg.Finanzinstituten;2;3;;;;2372;2321;2432;44;;;9999;9999
+3289; Anzahlungen von Kunden n. steuerbar;2;3;;;;2373;2411;2442;46;;;9999;9999
+3290; Anzahlungen von Kunden 0 %;2;3;1;;1;2373;2411;2442;46;;;9999;9999
+3291; Anzahlungen von Kunden 10 %;2;3;1;10;1;2373;2411;2442;46;;;9999;9999
+3292; Anzahlungen von Kunden 20 %;2;3;1;20;1;2373;2411;2442;46;;;9999;9999
+3293; Anzahlungen von Kunden 20 % Brutto;2;3;1;20;1;2373;2411;2442;46;;;9999;9999
+3294; Anzahlungen von Kunden §19 Abs.1a;2;3;1;;17;2373;2411;2442;46;;;9999;9999
+3295; Anzahlungen von Kunden ig.Lieferung;2;3;7;;;2373;2411;2442;46;;;9999;9999
+3296; Anzahlungen von Kunden grenzüb.DL;2;3;1;;27;2373;2411;2442;46;;;9999;9999
+3297; Anzahlungen v. Kunden sst.Leist EU;2;3;77;;;2373;2411;2442;46;;;9999;9999
+3298; Anzahlungen n.v.Vorräten absetzbar;2;3;;;;2373;2411;2442;46;;;9999;9999
+3299; Anzahlungen von Kunden 13 %;2;3;1;13;1;2373;2411;2442;46;;;9999;9999
+3300; Lieferverbindlichkeiten Inland;2;3;;;;2374;2491;2452;40;;;9999;9999
+3360; Lieferverbindlichkeiten EU;2;3;;;;2374;2531;2452;40;;;9999;9999
+3370; Lieferverbindlichkeiten sst.Ausland;2;3;;;;2374;2531;2452;40;;;9999;9999
+3380; Wechselverbindlichkeiten;2;3;;;;2375;2531;2462;46;;;9999;9999
+3390; Verbindlichkeiten Werkverträge;2;3;;;;2375;2531;2462;46;;;9999;9999
+3400; Verb. geg. verbundene Unternehmen;2;3;;;;2377;2511;2472;46;;;9999;9999
+3401; Finanzverb. geg. verb. Unternehmen;2;3;;;;2377;2511;2472;46;;;9999;9999
+3440; Verb. geg. Unternehmen m. Beteilig.;2;3;;;;2377;2511;2482;46;;;9999;9999
+3441; Finanzverb. geg. Untern.m.Beteilig.;2;3;;;;2377;2511;2482;46;;;9999;9999
+3450; Verbindlichk.a. Zweckbindg (Verein);2;3;;;;2377;2511;2482;46;;;9999;9999
+3455; nachrangiges Genussrechtskap.(Verb);2;3;;;;2377;2511;2492;46;;;9999;9999
+3460; Verbindlichkeiten aus Anlagenzugang;2;3;;;;2377;2511;2482;46;;;9999;9999
+3470; Verbindlichkeiten aus a.o. Aufwand;2;3;;;;2377;2511;2482;46;;;9999;9999
+3480; Gesellschafterdarlehen;2;3;;;;2377;2573;2492;46;;;9999;9999
+3481; Verbindlichk. geg. Gesellschafter;2;3;;;;2377;2573;2492;46;;;9999;9999
+3485; Verrechnung Kommanditisten;2;3;;;;2377;2573;2492;46;;;9999;9999
+3486; Verr. Kommanditisten cash-wirksam;2;3;;;;2377;2573;2492;46;;;9999;9999
+3487; Verrechnung Stille Gesellschafter;2;3;;;;2377;2573;2492;46;;;9999;9999
+3488; Verr. Stille Gesellsch.cash-wirksam;2;3;;;;2377;2573;2492;46;;;9999;9999
+3490; Einlagen stiller Gesellschafter;2;3;;;;2377;2573;2492;46;;;9999;9999
+3491; Gewinnanteil stille Gesellschafter;2;3;;;;2377;2573;2492;46;;;9999;9999
+3493; Entnahmen stille Gesellschafter;2;3;;;;2377;2573;2492;46;;;9999;9999
+3495; Verbindlichk. geg.Mitglied.(Verein);2;3;;;;2377;2573;2492;46;;;9999;9999
+3500; Umsatzsteuer;2;3;;;;2377;2575;2495;46;;;9999;9999
+3501; Umsatzsteuer aus i. g. Erwerb;2;3;;;;2377;2575;2495;46;;;9999;9999
+3502; Ust § 19/Art 19 (reverse charge);2;3;;;;2377;2575;2495;46;;;9999;9999
+3503; USt.a.i.Inland stpfl.EU-Lieferungen;2;3;;;;2377;2575;2495;46;;;9999;9999
+3504; Umsatzsteuer Bauleistungen § 19/1a;2;3;;;;2377;2575;2495;46;;;9999;9999
+3505; Umsatzsteuer § 19/1b;2;3;;;;2377;2575;2495;46;;;9999;9999
+3506; Umsatzsteuer § 19/1d;2;3;;;;2377;2575;2495;46;;;9999;9999
+3507; Umsatzsteuer § 19/1c;2;3;;;;2377;2575;2495;46;;;9999;9999
+3508; Umsatzsteuer sonstige Leistungen EU;2;3;;;;2377;2575;2495;46;;;9999;9999
+3509; EUSt (Abgabenart EU) Verbindlichk.;2;3;;;;2377;2433;2495;46;;;9999;9999
+3510; noch nicht geschuldete USt;2;3;;;;2377;2575;2495;46;;;9999;9999
+3511; Umsatzsteuer in anderem EU-Land;2;3;;;;2377;2575;2495;46;;;9999;9999
+3514; Umsatzsteuer § 19/1e;2;3;;;;2377;2575;2495;46;;;9999;9999
+3515; USt-Evidenzkonto f.erh.Anzahlungen;2;3;;;;2373;2554;2442;46;;;9999;9999
+3520; Umsatzsteuer-Zahllast;2;3;;;;2377;2575;2495;46;;;9999;9999
+3530; Verrechnung Finanzamt;2;3;;;;2377;2575;2495;46;;;9999;9999
+3536; Rückstellung GSVG;2;3;;;;2377;2575;2495;46;;;9999;9999
+3540; Verr. Lohnsteuer;2;3;;;;2377;2575;2495;46;;;9999;9999
+3541; Verr. Dienstgeberbeitrag;2;3;;;;2377;2575;2495;46;;;9999;9999
+3542; Verr. Dienstgeberzuschlag;2;3;;;;2377;2575;2495;46;;;9999;9999
+3550; Verr. Kommunalsteuer;2;3;;;;2377;2575;2495;46;;;9999;9999
+3551; Verr. Wiener Dienstgeberabgabe;2;3;;;;2377;2575;2495;46;;;9999;9999
+3554; Verr. Gewerkschaftsbeitrag;2;3;;;;2377;2575;2492;46;;;9999;9999
+3556; Verr. Betriebsratsumlage;2;3;;;;2377;2575;2492;46;;;9999;9999
+3560; sonstige kurzfristige Steuern;2;3;;;;2377;2575;2495;46;;;9999;9999
+3590; Körperschaftsteuer;2;3;;;;2377;2575;2495;46;;;9999;9999
+3600; Sozialversicherungsanstalten;2;3;;;;2377;2575;2496;46;;;9999;9999
+3601; UEL Verrechnung GKK;2;3;;;;2377;2575;2496;46;;;9999;9999
+3610; Arbeitsstiftungen;2;3;;;;2377;2575;2496;46;;;9999;9999
+3620; Pensions- u. Unterstützungskassen;2;3;;;;2377;2575;2496;46;;;9999;9999
+3630; übrige Verb.i.R.d. soz. Sicherheit;2;3;;;;2377;2575;2496;46;;;9999;9999
+3640; Verr. Löhne u. Gehälter;2;3;;;;2377;2575;2492;46;;;9999;9999
+3650; Verr. Bauarbeiter Urlaubskassa BUAK;2;3;;;;2377;2575;2492;46;;;9999;9999
+3699; Verbindl. Personalaufw.(Finanzplan);2;3;;;;2377;2575;2492;46;;;9999;9999
+3700; übrige sonstige Verbindlichkeiten;2;3;;;;2377;2575;2492;46;;;9999;9999
+3750; Darlehen;2;3;;;;2372;2575;2492;44;;;9999;9999
+3760; Kautionen;2;3;;;;2372;2575;2492;44;;;9999;9999
+3800; Gewinnausschüttung;2;3;;;;2301;2575;2492;60;;;9999;9999
+3900; Passive Rechnungsabgrenzungsposten;2;3;;;;2380;2600;2600;80;;;9999;9999
+3990; Eventualverbindlichkeiten;2;3;;;;2377;2600;2900;80;;;9999;9999
+3991; Verbl.a.d.Begebung u.Übertr.Wechsel;2;3;;;;2377;2600;2900;80;;;9999;9999
+3992; Bürgschaften;2;3;;;;2377;2600;2900;80;;;9999;9999
+3993; Garantien;2;3;;;;2377;2600;2900;80;;;9999;9999
+3994; son. vertragliche Haftungsrücklässe;2;3;;;;2377;2600;2900;80;;;9999;9999
+3999; Eventualverb. (Schattenkonto);2;3;;;;2377;2600;9999;80;;;9999;9999
+4000; Erlöse 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4030; Erlöse 10 %;4;4;1;10;;4412;4010;3100;100;3012;;3000;5600
+4042; Erlöse 12 %;4;4;1;12;;4412;4010;3100;100;3012;;3000;5600
+4043; Erlöse 13 %;4;4;1;13;;4412;4010;3100;100;3012;;3000;5600
+4050; Erlöse 0 % Ausfuhrlieferungen;4;4;1;;;4412;4010;3100;100;3012;;3000;5600
+4052; Erlöse 0 % Lohnveredelung;4;4;1;;12;4412;4010;3100;100;3012;;3000;5600
+4054; Erlöse 0 % Personenbeförderung;4;4;1;;15;4412;4010;3100;100;3012;;3000;5600
+4060; Erlöse 0 % Grundstücksumsätze;4;4;1;;19;4412;4010;3100;100;3012;;3000;5600
+4062; Erlöse 0 % Kleinunternehmer;4;4;1;;16;4412;4010;3100;100;3012;;3000;5600
+4064; übrige steuerfr.Umsätze o.VST-Abzug;4;4;1;;20;4412;4010;3100;100;3012;;3000;5600
+4066; Erlöse § 19/1b;4;4;1;;47;4412;4010;3100;100;3012;;3000;5600
+4067; Erlöse § 19/1e;4;4;1;;67;4412;4010;3100;100;3012;;3000;5600
+4068; Erlöse § 19/1c Gas/Elektrizitätsl.;4;4;1;;67;4412;4010;3100;100;3012;;3000;5600
+4069; Erlöse § 19/1d Schrott;4;4;1;;57;4412;4010;3100;100;3012;;3000;5600
+4070; Erlöse Bauleistungen 0% § 19 Abs.1a;4;4;1;;17;4412;4010;3100;100;3012;;3000;5600
+4080; Erl. Teilrechnungen n.n.f.Ust;4;4;;;;4412;4010;3100;100;3012;;3100;5600
+4084; Erl. Teilrechnungen §19/1a ohne Ust;4;4;;;17;4412;4010;3100;100;3012;;3100;5600
+4090; Leistungen gemäß § 109a Ust-befreit;4;4;;;;4414;4010;3100;100;3012;;3000;5600
+4092; Leistungen gemäß § 109a 20%;4;4;1;20;;4414;4010;3100;100;3012;;3000;5600
+4095; Honorare 0%;4;4;;;;4414;4010;3100;100;3043;;3000;5600
+4096; Honorare 20%;4;4;1;20;;4414;4010;3100;100;3043;;3000;5600
+4098; Hausapotheke 20%;4;4;1;20;;4414;4010;3100;100;3012;;3000;5600
+4099; sonstige Nebenerlöse;4;4;;;;4414;4010;3100;100;3012;;3000;5600
+4100; Erlöse i.g.Lieferungen (stfr.);4;4;7;;;4412;4010;3100;100;3012;;3000;5600
+4110; Erlöse igL Dreiecksgeschäfte;4;4;7;;3;4412;4010;3100;100;3012;;3000;5600
+4111; Erlöse grenzüberschr. DL steuerbar;4;4;1;;27;4412;4010;3100;100;3012;;3000;5600
+4112; Erlöse grenzüb. DL nicht steuerbar;4;4;;;13;4412;4010;3100;100;3012;;3000;5600
+4113; Erlöse sonstige Leistungen EU;4;4;77;;;4412;4010;3100;100;3012;;3000;5600
+4120; Erlöse i.g.L. Neufahrzeuge Art.6/1;4;4;7;;4;4412;4010;3100;100;3012;;3000;5600
+4200; Erlöse stpfl. in anderem EU-Land;4;4;;;13;4412;4010;3100;100;3012;;3000;5600
+4210; nicht steuerbare Auslandsumsätze;4;4;;;13;4412;4010;3100;100;3012;;3000;5600
+4290; Erlöse 20 % werbeabgabepflichtig 5%;4;4;1;20;9;4412;4010;3100;100;3012;;3000;5600
+4300; Erlöse Küche 10 %;4;4;1;10;;4412;4010;3100;100;3012;;3000;5600
+4301; Erlöse Wein 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4302; Erlöse Bier 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4303; Erlöse Kaffee + Tee 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4304; Erlöse alkoholfreie Getränke 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4305; Erlöse Spirituosen 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4306; Erlöse Eis 10 %;4;4;1;10;;4412;4010;3100;100;3012;;3000;5600
+4307; Erlöse Sekt 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4308; Erlöse Rauchwaren 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4309; Automatenerlöse 20 %;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4310; Beherbergungserlöse10%(Gastronomie);4;4;1;10;;4414;4010;3100;100;3012;;3000;5600
+4313; Beherbergungserlöse13%(Gastronomie);4;4;1;13;;4414;4010;3100;100;3012;;3000;5600
+4326; Erlösabgrenzungen;4;4;1;20;;4412;4010;3100;100;3012;;3000;5600
+4350; Mitgliedsbeiträge (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4352; Spenden (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4353; gewidmete Spenden (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4354; sonstige Vermögenserwerbe (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4356; öffentliche Zuschüsse (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4358; sonstige Erlöse (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4360; Bildung Ausgleichsposten (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4362; Auflösung Ausgleichsposten (Verein);4;4;;;;4412;4010;3100;100;3063;;3200;5600
+4364; Umwidmung zweckgeb.Verpfl. (Verein);4;4;;;;4412;4010;3100;100;3012;;3200;5600
+4400; Kundenskonto 20 %;4;4;1;20;;4419;4051;3143;160;3012;;3400;5600
+4401; Kundenskonto 10 %;4;4;1;10;;4419;4051;3143;160;3012;;3400;5600
+4402; Kundenskonto 13 %;4;4;1;13;;4419;4051;3143;160;3012;;3400;5600
+4403; Kundenskonto 12 %;4;4;1;12;;4419;4051;3143;160;3012;;3400;5600
+4405; Kundenskonto 0 %;4;4;1;;;4419;4051;3143;160;3012;;3400;5600
+4406; Kundenskonto 0 % Teilrechnungen;4;4;;;;4419;4051;3143;160;3012;;3400;5600
+4407; Kundenskonto Bauleistungen § 19/1a;4;4;1;;17;4419;4051;3143;160;3012;;3400;5600
+4410; Kundenskonto i.g. Lieferungen;4;4;7;;;4419;4051;3143;160;3012;;3400;5600
+4411; Kundenskonto igL Dreiecksgeschäft;4;4;7;;3;4419;4051;3143;160;3012;;3400;5600
+4412; Kundenskonto grenzüberschreit. DL;4;4;1;;27;4419;4051;3143;160;3012;;3400;5600
+4413; Kundenskonto sonstige Leistungen EU;4;4;77;;;4419;4051;3143;160;3012;;3400;5600
+4420; Kundenskonto steupfl.in and.EU-Land;4;4;;;13;4419;4051;3143;160;3012;;3400;5600
+4450; Kundenskonto 0 % Lohnveredelung;4;4;1;;12;4419;4051;3143;160;3012;;3400;5600
+4451; Kundenskonto n.steuerb.Auslandsums.;4;4;;;13;4419;4051;3143;160;3012;;3400;5600
+4452; Kundenskonto 0 % Personenbeförderg.;4;4;1;;15;4419;4051;3143;160;3012;;3400;5600
+4453; Kundenskonto 0 % Kleinunternehmer;4;4;1;;16;4419;4051;3143;160;3012;;3400;5600
+4454; Kundenskonto Art.6 Abs.1 (Fahrz.EU);4;4;7;;4;4419;4051;3143;160;3012;;3400;5600
+4455; Kundenskonto 0 % Grundstücksumsätze;4;4;1;;19;4419;4051;3143;160;3012;;3400;5600
+4456; Kundenskonto übrige Ums.o.Vst-Abzug;4;4;1;;20;4419;4051;3143;160;3012;;3400;5600
+4457; Kundenskonto §19/1b;4;4;1;;47;4419;4051;3143;160;3012;;3400;5600
+4458; Kundenskonto §19/1d;4;4;1;;57;4419;4051;3143;160;3012;;3400;5600
+4459; Kundenskonto §19/1c;4;4;1;;67;4419;4051;3143;160;3012;;3400;5600
+4460; Kundenskonto §19/1e;4;4;1;;67;4419;4051;3143;160;3012;;3400;5600
+4480; Kundenboni und Rabatte 20%;4;4;1;20;;4419;4051;3144;160;3012;;3400;5600
+4481; Kundenboni und Rabatte 10%;4;4;1;10;;4419;4051;3144;160;3012;;3400;5600
+4482; Kundenboni und Rabatte 12%;4;4;1;12;;4419;4051;3144;160;3012;;3400;5600
+4483; Kundenboni und Rabatte 0%;4;4;1;;;4419;4051;3144;160;3012;;3400;5600
+4484; Kundenboni und Rabatte 13 %;4;4;1;13;;4419;4051;3144;160;3012;;3400;5600
+4490; andere Erlösminderungen 20 %;4;4;1;20;;4419;4051;3144;160;3012;;3400;5600
+4491; andere Erlösminderungen 10 %;4;4;1;10;;4419;4051;3144;160;3012;;3400;5600
+4492; andere Erlösminderungen 12 %;4;4;1;12;;4419;4051;3144;160;3012;;3400;5600
+4493; andere Erlösminderungen 0 %;4;4;1;;;4419;4051;3144;160;3012;;3400;5600
+4494; andere Erlösminderungen 13 %;4;4;1;13;;4419;4051;3144;160;3012;;3400;5600
+4500; Bestandsveränd. fertige Erzeugnisse;4;4;;;;4420;4131;3164;180;3083;;3300;5600
+4510; Bestandsveränd. unfert. Erzeugnisse;4;4;;;;4420;4131;3163;180;3083;;3300;5600
+4520; Bestandsveränd.n.n.abrechenb.Leist.;4;4;;;;4420;4131;3165;180;3083;;3300;5600
+4580; andere aktivierte Eigenleistungen;4;4;;;;4430;4151;3200;190;3083;;5400;5600
+4600; Erlöse Anlagenverkauf 20%;4;4;1;20;;4440;4151;3253;740;3293;;5400;5600
+4605; Erlöse Anlagenverkauf 0% Ausland;4;4;1;;;4440;4151;3253;740;3293;;5400;5600
+4610; Erlöse Anlagenverkauf 0% ig.Lief.;4;4;7;;;4440;4151;3253;740;3293;;5400;5600
+4625; Erlöse a.d. Abgang von Anlagen (-);4;4;;;;4440;4151;3253;740;3293;;5400;5600
+4660; Zuschreibung zum Anlagevermögen;4;4;;;;4440;4151;3254;750;3293;;5400;5600
+4700; Auflösung Abfertigungsrückstellung;4;4;;;;4490;4400;3261;760;3303;;5400;5600
+4701; Auflösung Pensionsrückstellung;4;4;;;;4490;4400;3261;760;3303;;5400;5600
+4702; Auflösung Jubiläumsrückstellung;4;4;;;;4490;4400;3261;760;3303;;5400;5600
+4705; Auflösung Steuerrückstellung;4;4;;;;4490;4400;3261;760;3303;;5400;5600
+4709; Auflösung sonstige Rückstellungen;4;4;;;;4490;4400;3261;760;3303;;5400;5600
+4800; sonstige betriebliche Erträge 20 %;4;4;1;20;;4440;4212;3271;780;3063;;3200;5600
+4810; sonstige betriebliche Erträge 10 %;4;4;1;10;;4440;4212;3271;780;3063;;3200;5600
+4820; sonstige betriebliche Erträge 12 %;4;4;1;12;;4440;4212;3271;780;3063;;3200;5600
+4823; sonstige betriebliche Erträge 13 %;4;4;1;13;;4440;4212;3271;780;3063;;3200;5600
+4830; sonstige betriebliche Erträge 0 %;4;4;1;;;4440;4212;3271;780;3063;;3200;5600
+4831; sst. betriebl. Erträge n. steuerbar;4;4;;99;;4440;4212;3271;780;3063;;3200;5600
+4835; Provisionen;4;4;1;20;;4440;4400;3271;780;3063;;3200;5600
+4840; Patent- und Lizenzerträge;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4850; Miet- und Pachterträge 20 %;4;4;1;20;;4418;4212;3271;140;3053;;3200;5600
+4851; Miet- und Pachterträge 10 %;4;4;1;10;;4418;4212;3271;140;3053;;3200;5600
+4852; Miet- und Pachterträge 0 %;4;4;1;;;4418;4212;3271;140;3053;;3200;5600
+4855; Nebenerlöse 20%;4;4;1;20;;4440;4212;3271;780;3063;;3200;5600
+4860; Kursgewinne Fremdwährungstransakt.;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4865; Zuwendungen aus öffentl. Mitteln;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4870; Schuldnachlässe;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4875; Auflösung Wertberichtigung Forderg.;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4880; Schadenersatz;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4881; Versicherungsvergütungen;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4885; Zuschreibungen im Umlaufvermögen;4;4;;;;4440;4212;3271;780;3063;;5400;5600
+4900; Eigenverbrauch 20 %;4;4;1;20;10;4440;4232;3271;780;3093;;5400;5600
+4910; Eigenverbrauch 10 %;4;4;1;10;10;4440;4232;3271;780;3093;;5400;5600
+4920; Eigenverbrauch 12 %;4;4;1;12;10;4440;4232;3271;780;3093;;5400;5600
+4923; Eigenverbrauch 13 %;4;4;1;13;10;4440;4232;3271;780;3093;;5400;5600
+4930; Eigenverbrauch 0 %;4;4;1;;10;4440;4232;3271;780;3093;;5400;5600
+4940; Privatanteil (n.steuerbar);4;4;;;;4440;4232;3271;780;3093;;5400;5600
+4950; Privatanteil 20 %;4;4;1;20;;4440;4232;3271;780;3093;;5400;5600
+4960; Privatanteil 10 %;4;4;1;10;;4440;4232;3271;780;3093;;5400;5600
+4970; Sachbezüge 20 %;4;4;1;20;;4440;4232;3271;780;3093;;5400;5600
+4980; Sachbezüge 10 %;4;4;1;10;;4440;4232;3271;780;3093;;5400;5600
+4990; Sachbezüge 12 %;4;4;1;12;;4440;4232;3271;780;3093;;5400;5600
+4991; Sachbezüge 0 %;4;4;;;;4440;4232;3271;780;3093;;5400;5600
+4993; Sachbezüge 13 %;4;4;1;13;;4440;4232;3271;780;3093;;5400;5600
+4995; Auflösung Sonderposten Inv.-Zuschuß;4;4;;;;4440;4232;3271;780;3063;;5400;5600
+4999; nicht cash-wirksame übr.betr.Erlöse;4;4;1;20;;4440;4212;3271;780;3063;;3200;5600
+5000; Wareneinkauf 20 %;3;5;;20;;3501;3012;3321;300;3113;;3600;3300
+5030; Wareneinkauf 10 %;3;5;;10;;3501;3012;3321;300;3113;;3600;3300
+5033; Wareneinkauf 13 %;3;5;;13;;3501;3012;3321;300;3113;;3600;3300
+5040; Wareneinkauf 0 %;3;5;;;;3501;3012;3321;300;3113;;3600;3300
+5050; Wareneinsatz;3;5;;;;3501;3012;3321;300;3113;;3600;3300
+5080; erhaltene Teilrechnungen;3;5;;;;3503;3012;3321;300;3113;;3600;3000
+5084; erhaltene Teilrechnungen § 19/1a;3;5;;;29;3503;3012;3321;300;3113;;3600;3000
+5100; Rohstoffverbrauch;3;5;;20;;3503;3011;3321;300;3113;;3600;3000
+5200; bezogene Fertigteile;3;5;;20;;3503;3011;3321;300;3113;;3600;3000
+5300; Hilfsstoffverbrauch;3;5;;20;;3506;3012;3321;300;3113;;3700;3500
+5310; Wareneinkauf ig.Erwerb 10 %;3;5;9;10;;3501;3012;3321;300;3113;;3600;3300
+5320; Wareneinkauf ig.Erwerb 20 %;3;5;9;20;;3501;3012;3321;300;3113;;3600;3300
+5330; Wareneinkauf ig.Erwerb 13 %;3;5;9;13;;3501;3012;3321;300;3113;;3600;3300
+5400; Betriebsstoffverbrauch;3;5;;20;;3506;3042;3321;300;3113;;3700;3500
+5410; Einkauf Küche 10 %;3;5;;10;;3501;3042;3321;300;3113;;3700;3300
+5411; Einkauf Wein 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5412; Einkauf Bier 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5413; Einkauf Kaffee + Tee 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5414; Einkauf alkoholfreie Getränke 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5415; Einkauf Spirituosen 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5416; Einkauf Eis 10 %;3;5;;10;;3501;3042;3321;300;3113;;3700;3300
+5417; Einkauf Sekt 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5418; Einkauf Rauchwaren 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5419; Einkauf Emballagen 20 %;3;5;;20;;3501;3042;3321;300;3113;;3700;3300
+5440; Bezugskosten;3;5;;20;;3501;3012;3321;300;3113;;3600;3300
+5450; Verpackungsmaterial;3;5;;20;;3506;3042;3321;300;3113;;3700;3500
+5460; Dekorationsmaterial;3;5;;20;;3506;3042;3321;300;3113;;3700;3500
+5470; Reinigungsmaterial;3;5;;20;;3506;3042;3321;300;3113;;3700;3500
+5500; Werkzeuge u.a.Erzeugungshilfsmittel;3;5;;20;;3506;3041;3321;300;3113;;3700;3600
+5600; Treibstoffe PKW;3;5;;;;3506;3042;3321;300;3115;;4800;4900
+5601; Treibstoffe LKW;3;5;;20;;3506;3042;3321;300;3115;;4800;4900
+5610; Strom;3;5;;20;;3506;3042;3321;300;3115;;4800;4900
+5615; Heizung, Gas, Energie;3;5;;20;;3506;3042;3321;300;3115;;4800;4900
+5620; Wasser und Kanalgebühren;3;5;;;;3506;3042;3321;300;3115;;4800;4900
+5621; Abfallentsorgung;3;5;;;;3506;3042;3321;300;3115;;4600;4900
+5700; Fremdleistungen;3;5;;20;;3506;3062;3381;310;3115;;3800;3100
+5750; Fremdleistungen Ausland Rev.Charge;3;5;19;20;;3506;3062;3381;310;3115;;3800;3100
+5755; Sonstige Leistungen EU 20% Rev.Ch.;3;5;79;20;;3506;3062;3381;310;3115;;3800;3100
+5770; Bauleistungen von Sub. § 19 Abs.1a;3;5;29;20;;3506;3062;3381;310;3115;;3800;3100
+5772; Aufwand § 19/1b Vorb.kauf,Sichü.eig;3;5;49;20;;3506;3062;3381;310;3115;;3800;3100
+5773; Aufwand § 19/1e;3;5;69;20;;3506;3062;3381;310;3115;;3800;3100
+5774; Aufwand § 19/1c Gas/Elektrizitätsl.;3;5;69;20;;3506;3062;3381;310;3115;;3800;3100
+5775; Aufwand § 19/1d Schrott;3;5;59;20;;3506;3062;3381;310;3115;;3800;3100
+5780; Aufw.satzungsm.Aufgerfüllg.(Verein);3;5;;;;3506;3062;3381;310;3115;;3800;3100
+5800; Skontoertrag 20 %;3;5;;20;;3507;3022;3391;370;3113;;3600;5600
+5801; Skontoertrag 10 %;3;5;;10;;3507;3022;3391;370;3113;;3600;5600
+5802; Skontoertrag 13 %;3;5;;13;;3507;3022;3391;370;3113;;3600;5600
+5803; Skontoertrag 12 %;3;5;;12;;3507;3022;3391;370;3113;;3600;5600
+5805; Skontoertrag 0 %;3;5;;;;3507;3022;3391;370;3113;;3600;5600
+5806; Skontoertrag 0 % Teilrechnungen;3;5;;;;3507;3022;3391;370;3113;;3600;5600
+5810; Skontoertrag ig.E. 0% (m.VST);3;5;9;;;3507;4212;3391;370;3113;;3600;5600
+5811; Skontoertrag ig.E. 10% (m.VST);3;5;9;10;;3507;4212;3391;370;3113;;3600;5600
+5812; Skontoertrag ig.E. 20% (m.VST);3;5;9;20;;3507;4212;3391;370;3113;;3600;5600
+5813; Skontoertrag ig.E. 13% (m.VST);3;5;9;13;;3507;4212;3391;370;3113;;3600;5600
+5820; Skontoertrag ig.E. 0% (o.VST);3;5;8;;;3507;4212;3391;370;3113;;3600;5600
+5821; Skontoertrag ig.E. 10% (o.VST);3;5;8;10;;3507;4212;3391;370;3113;;3600;5600
+5822; Skontoertrag ig.E. 20% (o.VST);3;5;8;20;;3507;4212;3391;370;3113;;3600;5600
+5823; Skontoertrag ig.E. 13% (o.VST);3;5;8;13;;3507;4212;3391;370;3113;;3600;5600
+5830; Skontoertrag 20% bezog. Leistungen;3;5;;20;;3507;3022;3391;370;3115;;3600;5600
+5831; Skontoertrag 10% bezog. Leistungen;3;5;;10;;3507;3022;3391;370;3115;;3600;5600
+5834; Skontoertrag 20% Rev.Charge Leist.;3;5;19;20;;3507;3022;3391;370;3115;;3600;5600
+5835; Skontoertrag 10% Rev.Charge Leist.;3;5;19;10;;3507;3022;3391;370;3115;;3600;5600
+5836; Skontoertrag 20% sonst. Leist. EU;3;5;79;20;;3507;3022;3391;370;3115;;3600;5600
+5840; Skontoertrag Bauleistungen § 19/1a;3;5;29;20;;3507;3022;3391;370;3113;;3600;5600
+5842; Skontoertrag §19/1b;3;5;49;20;;3507;3022;3391;370;3113;;3600;5600
+5843; Skontoertrag §19/1e;3;5;59;20;;3507;3022;3391;370;3113;;3600;5600
+5844; Skontoertrag §19/1d;3;5;59;20;;3507;3022;3391;370;3113;;3600;5600
+5845; Skontoertrag §19/1c;3;5;69;20;;3507;3022;3391;370;3113;;3600;5600
+5850; Lieferantenboni 20 %;3;5;;20;;3507;3022;3391;370;3113;;3600;5600
+5851; Lieferantenboni 10 %;3;5;;10;;3507;3022;3391;370;3113;;3600;5600
+5852; Lieferantenboni 12 %;3;5;;12;;3507;3022;3391;370;3113;;3600;5600
+5853; Lieferantenboni 0 %;3;5;;;;3507;3022;3391;370;3113;;3600;5600
+5854; Lieferantenboni 13 %;3;5;;13;;3507;3022;3391;370;3113;;3600;5600
+5855; Lieferantenrabatte 20 %;3;5;;20;;3507;3022;3391;370;3113;;3600;5600
+5856; Lieferantenrabatte 10 %;3;5;;10;;3507;3022;3391;370;3113;;3600;5600
+5857; Lieferantenrabatte 12 %;3;5;;12;;3507;3022;3391;370;3113;;3600;5600
+5858; Lieferantenrabatte 0 %;3;5;;;;3507;3022;3391;370;3113;;3600;5600
+5859; Lieferantenrabatte 13 %;3;5;;13;;3507;3022;3391;370;3113;;3600;5600
+5860; Kursverluste Fremdwährungstransakt.;3;5;;;;3506;3022;3321;630;3113;;5400;5600
+6000; Löhne;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6005; Lehrlingsentschädigung Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6010; Überstunden Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6015; Hilfslöhne;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6020; Nichtleistungslöhne;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6025; Zulagen Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6030; Prämien Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6040; Sonderzahlungen Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6050; Jubiläumsaufwendungen Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6060; freiw.Fahrt-u.Verpflegungszuschüsse;3;6;;;;3615;3111;3401;400;3123;;4000;3900
+6070; Sachbezüge Arbeiter;3;6;;;;3611;3111;3401;400;3123;;5400;5600
+6090; Urlaubsablösen Arbeiter;3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6100; Personalaufwand (Verein);3;6;;;;3611;3111;3401;400;3123;;4000;3900
+6200; Gehälter;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6205; Lehrlingsentschädigung Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6210; Überstunden Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6220; Nichtleistungsgehälter;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6225; Zulagen Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6230; Prämien und Provisionen Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6240; Sonderzahlungen Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6250; Jubiläumsaufwendungen Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6260; freiw.Fahrt-u.Verpflegungszuschüsse;3;6;;;;3615;3111;3411;410;3124;;4200;4100
+6270; Sachbezüge Angestellte;3;6;;;;3612;3111;3411;410;3124;;5400;5600
+6290; Urlaubsablösen Angestellte;3;6;;;;3612;3112;3411;410;3124;;4200;4100
+6400; Abfertigungsaufwand - Arbeiter;3;6;;;;3618;3111;3421;430;3125;;4000;4100
+6401; Pensionsaufwand - Arbeiter;3;6;;;;3618;3111;3431;440;3125;;4000;4100
+6402; Betriebl. Vorsorgekasse (BVK) Arb.;3;6;;;;3618;3111;3431;440;3125;;4000;3900
+6405; Abfertigungsaufwand - Angestellte;3;6;;;;3618;3112;3421;430;3125;;4200;4100
+6406; Pensionsaufwand - Angestellte;3;6;;;;3618;3112;3431;440;3125;;4200;4100
+6407; Betriebl. Vorsorgekasse (BVK) Ang.;3;6;;;;3618;3112;3431;440;3125;;4200;4100
+6410; Veränderg. Abfertigungsrückst. Arb.;3;6;;;;3618;3221;3421;430;3125;;4200;4100
+6411; Veränderg Pensionsrückstellung Arb.;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6412; Veränderg Jubiläumsrückstellung Arb;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6413; Veränderg. Urlaubsrückstellung Arb.;3;6;;;;3611;3231;3401;400;3125;;4200;4100
+6415; Veränderg. Abfertigungsrückst. Ang.;3;6;;;;3618;3221;3421;430;3125;;4200;4100
+6416; Veränderg Pensionsrückstellung Ang.;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6417; Veränderg Jubiläumsrückstellung Ang;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6418; Veränderg. Urlaubsrückstellung Ang.;3;6;;;;3612;3231;3411;410;3125;;4200;4100
+6419; Veränd.Gutstundenrückstellung(Arb.);3;6;;;;3612;3231;3411;410;3125;;4200;4100
+6420; Veränd.Gutstundenrückstellung(Ang.);3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6421; Veränd.Sonderzahlungsrückst.(Arb.);3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6422; Veränd.Sonderzahlungsrückst.(Ang.);3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6423; Veränd.Altersteilzeitrückstell(Arb.;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6424; Veränd.Altersteilzeitrückstell(Ang.;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6430; Zahlungen an Pensionskasse;3;6;;;;3618;3231;3431;440;3125;;4200;4100
+6435; sonst.Beiträge f.d. Altersvorsorge;3;6;;;;3618;3231;3431;440;3125;;;
+6440; Abfertigungsversicherungen;3;6;;;;3618;3111;3421;430;3125;;4000;4100
+6600; Gesetzl. Sozialaufwand Arbeiter;3;6;;;;3615;3221;3441;420;3125;;4100;4000
+6605; Gesetzl. Sozialaufwand Angestellte;3;6;;;;3615;3221;3441;420;3125;;4300;4200
+6610; Lohnsteuer;3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6620; DB (Arbeiter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6621; DB (Angestellter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6630; DZ (Arbeiter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6631; DZ (Angestellter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6640; Kommunalsteuer (Arbeiter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6641; Kommunalsteuer (Angestellter);3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6650; Wr. Dienstgeberabg.(U-Bahn) Arb.;3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6651; Wr. Dienstgeberabg.(U-Bahn) Angest.;3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6660; Vergütung Entgeltfortzahlung;3;6;;;;3616;4212;3441;420;3125;;4000;4000
+6665; Vorschreibung BUAK;3;6;;;;3616;4212;3441;420;3125;;4000;4000
+6670; Wohnbauförderungsbeitrag;3;6;;;;3616;3211;3441;420;3125;;4100;4000
+6680; Centausgleich;3;6;;;;3616;3211;3441;420;3125;;4600;4900
+6700; Zuwendung an den Betriebsratsfonds;3;6;;;;3615;3211;3451;450;3125;;4200;4100
+6710; Zuwendung an Unterstützungskassen;3;6;;;;3615;3211;3451;450;3125;;4200;4100
+6720; Aufwendungen für Betriebsausflüge;3;6;;;;3615;3211;3451;450;3125;;4200;4100
+6730; Weihnachtsgeschenke Arbeitnehmer;3;6;;;;3615;3211;3451;450;3125;;4200;4100
+6740; Betriebsveranstaltungen;3;6;;;;3615;3231;3451;450;3125;;4200;4100
+6750; Arbeitskleidung;3;6;;20;;3615;3231;3451;450;3125;;4000;3900
+6790; freiwilliger Sozialaufwand;3;6;;;;3615;3231;3451;450;3125;;4000;3900
+6800; AMF Beihilfe;3;6;;;;3615;3231;3451;450;3125;;4200;4100
+7000; AfA aktiv. Ingangsetzungsaufwand;3;7;;;;3751;;3465;730;3133;;4900;5100
+7001; AfA aktiv. Erweiterungsaufwand;3;7;;;;3751;;3465;730;3133;;4900;5100
+7009; außerplanm. Abschr.Ingangsetzungsa.;3;7;;;;3770;3332;3465;820;3133;;4900;5100
+7010; AfA immaterielles Anlagevermögen;3;7;;;;3751;;3463;730;3133;;4900;5100
+7011; geringwertiges immat.Anlagevermögen;3;7;;;;3751;;3463;730;3133;;4900;5100
+7019; außerplanm. Abschr. immat. Anlagen;3;7;;;;3770;3332;3463;820;3133;;4900;5100
+7020; AfA Sachanlagevermögen;3;7;;;;3751;;3464;730;3133;;4900;5100
+7021; Geringwertiges Sachanlagevermögen;3;7;;20;;3751;;3464;730;3133;;4900;5100
+7022; Equipment;3;7;;20;;3751;;3464;730;3133;;;
+7025; Abschreibung PKW Unternehmer;3;7;;;;3751;;3464;730;3133;;4900;5100
+7029; außerplanm. Abschr. Sachanlagen;3;7;;;;3770;3332;3464;820;3133;;4900;5100
+7030; außerplanm. Abschr. PKW Unternehmer;3;7;;;;3770;3332;3464;820;3133;;4900;5100
+7100; nicht abzugsfähige Vorsteuer (VSTK);3;7;;;2;3784;;3501;500;3163;;4600;4500
+7110; Getränkesteuer;3;7;;;;3784;3511;3501;500;3163;;4600;4500
+7120; Vergnügungssteuer;3;7;;;;3784;3511;3501;500;3163;;4600;4500
+7130; Gesellschaftssteuer;3;7;;;;3784;3511;3501;500;3163;;4600;4500
+7140; sonstige Steuern;3;7;;;;3784;;3501;500;3163;;4600;4500
+7150; Grundsteuer;3;7;;;;3784;3511;3501;500;3163;;4600;4500
+7160; Beförderungsteuer;3;7;;;;3784;3511;3501;500;3163;;4600;4500
+7161; Straßenbenützungsabgabe;3;7;;;;3784;3511;3501;500;3163;;4700;4800
+7162; PKW-Maut;3;7;;;;3784;3511;3501;540;3163;;4700;4800
+7170; AKM und Lustbarkeitsabgabe;3;7;;;;3784;3682;3501;500;3163;;4600;4500
+7171; Fremdenverkehrsabgabe;3;7;;;;3784;3682;3501;500;3163;;4600;4500
+7180; Sonstige Gebühren u. Abgaben;3;7;;;;3784;3682;3501;500;3163;;4600;4500
+7200; Instandhaltung;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7201; Instandhaltung Gebäude;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7202; Instandhaltung technische Anlagen;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7203; Instandhaltung Maschinen;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7204; Instandhaltung andere Anlagen;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7205; Instandh.Betriebs-u.Geschäftsausst.;3;7;;20;;3735;3622;3513;510;3164;;4800;4400
+7206; Software Wartung;3;7;;20;;3735;3622;3513;510;3164;;4600;4900
+7210; Reinigung durch Dritte;3;7;;20;;3735;3682;3513;510;3164;;4800;4900
+7215; Reinigungsmaterial;3;7;;20;;3706;3042;3513;510;3164;;4600;4900
+7220; Wasser und Kanalgebühren;3;7;;;;3735;3652;3513;520;3164;;4800;4900
+7225; Abfallentsorgung;3;7;;;;3735;3652;3513;520;3164;;4800;4900
+7230; Strom;3;7;;20;;3734;3042;3513;520;3235;;4800;4900
+7235; Heizung, Gas, Energie;3;7;;20;;3734;3042;3513;520;3235;;4800;4900
+7300; Transporte durch Dritte;3;7;;20;;3721;3622;3514;530;3175;;4700;5000
+7320; Instandhaltungen LKW;3;7;;20;;3733;3622;3515;540;3183;;4700;4800
+7321; Instandhaltungen PKW;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7322; LKW Betriebstoffverbrauch;3;7;;20;;3733;3622;3515;540;3183;;4700;4800
+7323; PKW Betriebstoffverbrauch;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7324; LKW Reparatur- und Serviceaufwand;3;7;;20;;3733;3622;3515;540;3183;;4700;4800
+7325; PKW Reparatur- und Serviceaufwand;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7326; Instandhaltungen PKW Unternehmer;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7327; PKW Betriebstoffverbrauch Untern.;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7328; PKW Reparatur-u.Serviceaufw. Untern;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7330; Kfz-Versicherungen;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7331; Kfz-Versicherungen Unternehmer;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7332; Kfz-Steuer;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7333; Kfz-Steuer Unternehmer;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7334; sonstiger Aufwand LKW;3;7;;20;;3733;3622;3515;540;3183;;4700;4800
+7335; sonstiger Aufwand PKW;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7336; sonstiger Aufwand PKW Unternehmer;3;7;;;;3733;3622;3515;540;3183;;4700;4800
+7340; Reisespesen;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7341; Reisespesen Unternehmer;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7342; Reisespesen Weiterbildung Dienstn.;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7345; Kilometergelder;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7346; Kilometergelder Unternehmer;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7347; Kilometergelder Weiterbildung DN;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7350; Diäten Inland;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7352; Diäten Ausland Weiterbildung DN;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7355; Diäten Ausland;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7356; Diäten Inland Unternehmer;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7357; Diäten Inland Weiterbildung Dienstn;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7360; Taggelder;3;7;;10;;3747;3652;3516;550;3185;;4700;5000
+7361; Diäten Ausland Unternehmer;3;7;;;;3747;3622;3516;550;3185;;4700;5000
+7363; Taggelder 13 %;3;7;;13;;3747;3652;3516;550;3185;;4700;5000
+7370; Nächtigungsgelder;3;7;;10;;3747;3652;3516;550;3185;;4700;5000
+7373; Nächtigungsgelder 13 %;3;7;;13;;3747;3652;3516;550;3185;;4700;5000
+7380; Telefon;3;7;;;;3742;3632;3517;580;3203;;4600;4900
+7381; Internet;3;7;;20;;3742;3632;3517;580;3203;;4600;4900
+7382; Mobiltelefon;3;7;;20;;3742;3632;3517;580;3203;;4600;4900
+7385; Miete und Wartung Telefonanlage;3;7;;20;;3742;3632;3517;580;3203;;4600;4900
+7390; Postgebühren;3;7;;;;3742;3632;3517;580;3203;;4600;4900
+7400; Mietaufwand unbew. WG 20 %;3;7;;20;;3731;3642;3518;560;3213;;4600;4700
+7401; Mietaufwand unbewegl. WG 10 %;3;7;;10;;3731;3642;3518;560;3213;;4600;4700
+7402; Mietaufwand unbewegl. WG 0 %;3;7;;;;3731;3642;3518;560;3213;;4600;4700
+7403; Mietaufwand bewegliche WG 20 %;3;7;;20;;3731;3642;3518;560;3213;;4600;4700
+7404; Mietaufwand bewegliche WG 10 %;3;7;;10;;3731;3642;3518;560;3213;;4600;4700
+7405; Mietaufwand bewegliche WG 0 %;3;7;;;;3731;3642;3518;560;3213;;4600;4700
+7406; Betriebskosten Lager;3;7;;;;3742;3632;3517;580;3203;;;
+7410; Pachtaufwand 20 %;3;7;;20;;3731;3642;3518;560;3213;;4600;4700
+7411; Pachtaufwand 10 %;3;7;;10;;3731;3642;3518;560;3213;;4600;4700
+7412; Pachtaufwand 0 %;3;7;;;;3731;3642;3518;560;3213;;4600;4700
+7440; Leasingaufwand bewegl. Wirtschaftsg;3;7;;20;;3732;3642;3518;560;3213;;4700;4700
+7441; Leasingaufwand unbewegl. Wirtschaft;3;7;;20;;3732;3642;3518;560;3213;;4700;4700
+7450; PKW Leasingaufwand;3;7;;;;3732;3642;3518;540;3213;;4700;4700
+7451; LKW Leasingaufwand;3;7;;20;;3732;3642;3518;540;3213;;4700;4700
+7452; PKW Leasingaufwand Unternehmer;3;7;;;;3732;3642;3518;540;3213;;4700;4700
+7480; Lizenzgebühren;3;7;;20;;3732;3642;3518;560;3213;;4700;5000
+7490; Patentgebühren;3;7;;;;3732;3642;3518;560;3213;;4700;5000
+7500; Aufwand für beigestelltes Personal;3;7;;20;;3706;3682;3519;570;3235;;4800;4900
+7540; Provisionen an Dritte;3;7;;;;3749;3682;3519;570;3235;;4700;5000
+7580; Aufsichtsratsvergütungen;3;7;;;;3749;3682;3519;570;3235;;4600;4900
+7585; Geschäftsführerbezug;3;7;;;;3749;3682;3519;570;3235;;4200;4100
+7600; Büromaterial und Drucksorten;3;7;;20;;3741;3682;3523;580;3235;;4600;4900
+7605; EDV-Kosten;3;7;;;;3741;3682;3537;580;3235;;;
+7610; Druckerzeugnisse u.Vervielfältigung;3;7;;20;;3741;3682;3523;580;3235;;4700;4900
+7630; Fachliteratur und Zeitungen;3;7;;10;;3746;3682;3523;580;3235;;4600;4900
+7650; Werbung;3;7;;20;;3723;3682;3523;590;3223;;4700;4600
+7651; Inserate u. Prospekte;3;7;;20;;3723;3682;3523;590;3223;;4700;5000
+7652; Messen und Ausstellungen;3;7;;20;;3723;3682;3523;590;3223;;4700;5000
+7653; Dekorationsmaterial;3;7;;20;;3706;3042;3523;590;3223;;4700;5000
+7660; Repräsentationsaufwand;3;7;;;;3723;3700;3523;590;3223;;4700;5000
+7661; Repräsentation nicht abzugsfähig;3;7;;20;;3723;3700;3523;590;3223;;4700;5000
+7685; Anzeigen- und Ankündigungsabgaben;3;7;;;;3723;3700;3523;590;3223;;4700;4600
+7690; Spenden;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7691; Spenden an begünstigte Institutione;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7692; Spenden an mildtätige Organisatione;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7693; Spenden an Umweltsch.u.Tierheime;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7694; Spenden an freiw. Feuerwehren u.Lan;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7695; Strafen;3;7;;;;3749;3700;3595;580;3235;;4600;4900
+7696; Säumnis- u. Verspätungszuschläge;3;7;;;;3749;3700;3595;580;3235;;4600;4900
+7697; Trinkgelder;3;7;;;;3723;3700;3523;580;3223;;4700;4600
+7700; Sachversicherungen;3;7;;;;3737;3682;3524;600;3225;;4800;4900
+7710; Lebensversicherungen;3;7;;;;3737;3682;3524;600;3225;;4800;4900
+7720; Unfallversicherungen;3;7;;;;3737;3682;3524;600;3225;;4800;4900
+7730; Liegenschaftsbezogene Versicherunge;3;7;;;;3737;3682;3524;600;3225;;;
+7740; Steuerberatungsaufwand;3;7;;20;;3744;3682;3528;620;3235;;4600;4900
+7750; Rechts- u. Beratungsaufwand;3;7;;20;;3744;3682;3528;620;3235;;4600;4900
+7755; Buchhaltungsaufwand;3;7;;20;;3744;3682;3595;620;3235;;4600;4900
+7758; Prüfungsaufwand;3;7;;20;;3744;3682;3528;620;3235;;4600;4900
+7760; Unternehmensberatung;3;7;;20;;3744;3682;3528;620;3235;;4600;4900
+7765; Lohnverrechnungsaufwand;3;7;;20;;3744;3682;3595;620;3235;;4600;4900
+7770; Aus- und Weiterbildung;3;7;;20;;3746;3682;3595;620;3235;;4600;4900
+7771; Aus- und Weiterbildung Unternehmer;3;7;;20;;3746;3682;3595;620;3235;;4600;4900
+7775; Forschung und Entwicklung;3;7;;20;;3746;3682;3595;630;3235;;4600;4900
+7780; Gesetzliche Pflichtbeiträge;3;7;;;;3785;3531;3525;580;3235;;4600;4500
+7781; Selbständigenvorsorgebeitrag;3;7;;;;3785;3531;3525;580;3235;;4600;4500
+7782; Kammerumlage;3;7;;;;3785;3531;3525;580;3235;;4600;4500
+7785; Mitgliedsbeiträge;3;7;;;;3749;3531;3525;580;3235;;4600;4500
+7790; Spesen des Geldverkehrs;3;7;;;;3743;3415;3526;580;3235;;4600;4900
+7800; Schadensfälle;3;7;;20;;3749;3361;3527;610;3233;;5000;5000
+7801; Abschreibung von Vorräten;3;7;;;;3756;3361;3533;610;3235;;4900;5100
+7802; Abschreibung von Forderungen 20 %;3;7;1;20;;3756;3361;3533;610;3235;;4900;5100
+7803; Abschreibung von Forderungen 10 %;3;7;1;10;;3756;3361;3533;610;3235;;4900;5100
+7804; Abschreibung von Forderungen 12 %;3;7;1;12;;3756;3361;3533;610;3235;;4900;5100
+7805; Abschreibung von Forderungen 0 %;3;7;1;;;3756;3361;3533;610;3235;;4900;5100
+7806; Abschreibung Forderungen (EU);3;7;7;;;3756;3361;3533;610;3235;;4900;5100
+7807; Abschreibung Forderungen(Drittland);3;7;1;;;3756;3361;3533;610;3235;;4900;5100
+7808; Abschr.v.Ford. aus Bauleistungen;3;7;1;;17;3756;3361;3533;610;3235;;4900;5100
+7809; Abschreibung von Forderungen 13 %;3;7;1;13;;3756;3361;3533;610;3235;;4900;5100
+7810; Zuweisung Pauschal-WB Forderungen;3;7;;;;3756;3682;3533;610;3235;;5400;5600
+7811; Zuweisung Pauschal-WB Ausland;3;7;;;;3756;3682;3533;610;3235;;5400;5600
+7815; Zuweis. Einzel-WB Forderungen;3;7;;;;3756;3682;3533;610;3235;;5400;5600
+7816; Zuweis. Einzel-WB Forderungen Ausl.;3;7;;;;3756;3682;3533;610;3235;;5400;5600
+7820; Buchwert abgegangener Anlagen;3;7;;;;3753;3682;3529;740;3294;;5400;5600
+7825; Buchwert verkaufter Anlagen (+);3;7;;;;3753;3682;3253;740;3294;;5400;5600
+7830; Buchwert verkaufter Anlagen (-);3;7;;;;3753;3682;3529;740;3294;;5400;5600
+7840; sonstige betriebl. Aufwendungen;3;7;;20;;3749;3600;3595;630;3235;;5100;5300
+7850; Kursdifferenzen;3;7;;;;3749;3415;3830;580;3235;;5400;5600
+7860; Abschr. a.d. nächsten Zukunftswert;3;7;;;;3749;3415;3830;580;3235;;5400;5600
+7870; nicht abzugsfähige Aufwendungen;3;7;;;;3749;3415;3830;580;3235;;5400;5600
+7890; Skontoerträge auf sst.betr.Aufwend.;3;7;;;;3749;3600;3596;700;3235;;5400;5600
+7999; nicht cash-wirksame sst.betr.Aufw.;3;7;;20;;3749;3600;3595;630;3235;;5100;5300
+8000; Gewinnanteil Personengesellschaft;4;8;;;;4850;4300;3650;700;9999;;5400;5600
+8010; Ausschüttung Kapitalgesellschaft;4;8;;;;4850;4300;3650;700;9999;;5400;5600
+8020; Ausschüttung Genossenschaft;4;8;;;;4850;4300;3650;700;9999;;5400;5600
+8030; Gewinnüberrechnung Ergebnisabführg.;4;8;;;;4850;4300;3650;700;9999;;5400;5600
+8040; Beteiligungserträge verb. Untern.;4;8;;;;4850;4300;3653;700;9999;;5400;5600
+8045; Erträge assoziierte Unternehmen;4;8;;;;4850;4300;3653;700;9999;;5400;5600
+8050; Erträge aus anderen Wertpapieren;4;8;;;;4870;4300;3700;700;3263;;5400;5600
+8052; Erträge aus Ausleihungen;4;8;;;;4870;4300;3700;700;3263;;5400;5600
+8055; Erträge andere WP/Ausl. verb. U.;4;8;;;;4870;4300;3700;700;3263;;5400;5600
+8060; Zinserträge festverzinsliche Wertp.;4;8;;;;4870;4300;3700;700;3263;;5400;5600
+8070; Dividendenerträge;4;8;;;;4870;4300;3700;700;3263;;5400;5600
+8080; Zinsen u. Dividenden verb. Untern.;4;8;;;;4870;4300;3703;700;3263;;5400;5600
+8100; Zinserträge aus Bankguthaben;4;8;;;;4870;4300;3710;700;3263;;5400;5600
+8101; Zinserträge sonst. gewährte Kredite;4;8;;;;4870;4300;3710;700;3263;;5400;5600
+8110; Zinsen u. ähnl.Erträge verb.Untern.;4;8;;;;4870;4300;3713;700;3263;;5400;5600
+8120; Kundenverzugszinsen 0%;4;8;;;;4870;4300;3710;700;3263;;5400;5600
+8121; Kundenverzugszinsen 10%;4;8;1;10;;4870;4300;3710;700;3263;;5400;5600
+8122; Kundenverzugszinsen 20%;4;8;1;20;;4870;4300;3710;700;3263;;5400;5600
+8125; Mahngebühren 20%;4;8;1;20;;4870;4300;3710;700;3063;;5400;5600
+8140; Erlöse Abgang von Beteiligungen (-);4;8;;;;4850;4300;3753;700;3293;;5400;5600
+8150; Erlöse Abg. sonst.Finanzanlagen (-);4;8;;;;4860;4300;3753;700;3293;;5400;5600
+8160; Erlöse Abg. Wertpapiere Umlaufv.(-);4;8;;;;4860;4300;3753;700;3293;;5400;5600
+8170; Buchwert abgeg. Beteiligungen (+);3;8;;;;3853;3418;3811;700;3294;;5400;5600
+8171; Buchwert abgeg. Beteiligungen (-);3;8;;;;3853;3418;3800;710;3294;;5400;5600
+8180; Buchwert abg.sonst.Finanzanlagen(+);3;8;;;;3853;3418;3811;700;3294;;5400;5600
+8181; Buchwert abg.sonst.Finanzanl. (-);3;8;;;;3853;3418;3800;710;3294;;5400;5600
+8190; Buchwert abg. Wertpapiere Uml. (+);3;8;;;;3853;3418;3811;700;3294;;5400;5600
+8191; Buchwert abg. Wertpapiere Uml. (-);3;8;;;;3853;3418;3800;710;3294;;5400;5600
+8200; Erlöse Abgang v. Beteiligungen (+);4;8;;;;4850;3418;3753;700;3293;;5400;5600
+8201; Zuschreibung zu Beteiligungen;4;8;;;;4850;3418;3754;700;3293;;5400;5600
+8210; Erlöse Abg.sonst.Finanzanlagen (+);4;8;;;;4860;3418;3753;700;3293;;5400;5600
+8211; Zuschreibung sonstige Finanzanlagen;4;8;;;;4860;3418;3754;700;3293;;5400;5600
+8220; Erlöse Abg.Wertpapiere des Uml. (+);4;8;;;;4860;3418;3753;700;3293;;5400;5600
+8221; Zuschreibung Wertpapiere des Uml.;4;8;;;;4860;3418;3754;700;3293;;5400;5600
+8230; Verlustübernahme Ergebnisabführung;4;8;;;;4850;3418;3800;710;3293;;5400;5600
+8231; Abschreibung von Finanzanlagen;3;8;;;;3852;3418;3811;710;3283;;5400;5600
+8232; Abschreibung Wertpapiere d. UV.;3;8;;;;3852;3418;3811;710;3283;;5400;5600
+8260; Aufwendungen Finanzanlagen verb.U.;3;8;;;;3860;3418;3800;710;3283;;5400;5600
+8261; Aufwendungen Wertp. des UV. verb.U.;3;8;;;;3860;3418;3800;710;3283;;5400;5600
+8270; sonst Aufwendungen Wertpapiere d.UV;3;8;;;;3860;3418;3800;710;3283;;5400;5600
+8271; sonst Aufwendungen a. Finanzanlagen;3;8;;;;3860;3418;3800;710;3283;;5400;5600
+8280; Zinsen für Bankkredite;3;8;;;;3860;3415;3830;710;3273;;4600;5200
+8281; Zinsenzuschüsse;3;8;;;;3860;3415;3830;710;3273;;4600;5200
+8290; Zinsen für Darlehen;3;8;;;;3860;3415;3830;710;3273;;4600;5200
+8300; Bereitstellungsprovisionen;3;8;;;;3860;3415;3830;710;3273;;4600;5200
+8310; Überziehungsprovisionen;3;8;;;;3860;3415;3830;710;3273;;4600;5200
+8320; Stundungsgebühren;3;8;;;;3860;3415;3830;710;3273;;4600;5600
+8340; Lieferantenzinsen;3;8;;20;;3860;3418;3830;710;3273;;4600;5600
+8350; nicht ausgenützte Lieferantenskonti;3;8;;20;;3860;3418;3830;710;3273;;5400;5600
+8360; Zinsaufwand betr. verb. Unternehmen;3;8;;;;3860;3418;3833;710;3273;;5400;5600
+8400; außerordentliche Erträge;4;8;;;;4880;4500;3870;810;3353;;5400;5600
+8410; Ertrag aus Sale-and-Lease-Back;4;8;;20;;4880;4500;3870;810;3353;;5400;5600
+8420; Ertrag aus Betriebsstilllegung;4;8;;20;;4880;4500;3870;810;3353;;5400;5600
+8440; Zuschüsse zur Umstrukturierung;4;8;;;;4880;4500;3870;810;3353;;5400;5600
+8445; außerordentliche Abschreibungen;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8446; außerordentliche Abschreib. Sachanl;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8447; außerordentliche Abschreib. Finanza;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8450; außerordentliche Aufwendungen;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8460; Forderungsausfälle;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8470; Verluste aus Betriebsstilllegung;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8480; außerplanmäßige Abschreibungen;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8490; außergewöhnliche Schadensfälle;3;8;;;;3870;3800;3880;820;3363;;5400;5600
+8500; Körperschaftsteuer;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8510; Dotierung Köst-Rückstellung;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8520; Auflösung Köst-Rückstellung;4;8;;;;4890;3511;3920;850;3163;;5400;5600
+8521; Aktivierung Körperschaftssteuer;4;8;;;;4890;3511;3920;850;3163;;5400;5600
+8530; Körperschaftsteuer aus Vorperioden;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8540; Kapitalertragsteuer;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8550; sonstige Steuern vom Einkommen;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8560; Steuern vom a.o. Ergebnis;3;8;;;;3882;3511;3920;850;3163;;5400;5600
+8600; Auflösung Bewertungsreserven;4;8;;;;4890;3800;3943;830;3303;;5400;5600
+8610; Auflösung sonst. unverst. Rücklagen;4;8;;;;4890;3800;3944;830;3303;;5400;5600
+8620; Auflösung FB inv.Gewinn Sachanlagen;4;8;;;;4890;3800;3944;830;3303;;5400;5600
+8621; Auflösung FB inv.Gewinn Wertpapiere;4;8;;;;4890;3800;3944;830;3303;;5400;5600
+8622; Auflösung Gewinnfreib. (körperl.W);4;8;;;;4890;3800;3944;830;3303;;5400;5600
+8623; Auflösung Gewinnfreib.(Wertpapier);4;8;;;;4890;3800;3944;830;3303;;5400;5600
+8700; Auflösung gebundene Kapitalrücklage;4;8;;;;4890;3800;3953;830;3303;;5400;5600
+8710; Auflösung Rücklage f.eigene Anteile;4;8;;;;4890;3800;3954;830;3303;;5400;5600
+8720; Auflösung n. geb. Kapitalrücklage;4;8;;;;4890;3800;3955;830;3303;;5400;5600
+8750; Auflösung gesetzliche Rücklage;4;8;;;;4890;3800;3963;830;3303;;5400;5600
+8760; Auflösung satzungsmäßige Rücklage;4;8;;;;4890;3800;3964;830;3303;;5400;5600
+8770; Auflösung andere (freie) Rücklage;4;8;;;;4890;3800;3965;830;3303;;5400;5600
+8800; Zuweisung Bewertungsreserve;3;8;;;;3890;3800;3973;840;3313;;5400;5600
+8810; Zuweisung sonst. unverst. Rücklagen;3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8820; Zuweisung FB inv.Gewinn Sachanlagen;3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8821; Zuweisung FB inv.Gewinn Wertpapiere;3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8822; Zuweisung Gewinnfreib.(körperl.W.);3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8823; Zuweisung Gewinnfreib.(Wertpapiere);3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8824; Zuweisung Gewinnfreib.(Grundfreib.);3;8;;;;3890;3800;3974;840;3313;;5400;5600
+8900; Zuweisung gesetzliche Rücklagen;3;8;;;;3890;3800;3983;840;3313;;5400;5600
+8910; Zuweisung satzungsmäßige Rücklagen;3;8;;;;3890;3800;3984;840;3313;;5400;5600
+8920; Zuweisung andere (freie) Rücklagen;3;8;;;;3890;3800;3985;840;3313;;5400;5600
+8930; Gewinnanteile and. Gesellschafter;3;8;;;;3890;3800;3985;840;9999;;5400;5600
+8940; Verlustanteile and. Gesellschafter;3;8;;;;3890;3800;3985;840;9999;;5400;5600
+9000; Kapital;2;9;;;;2901;2010;2101;60;;;9999;9999
+9001; Kapital (1. Gesellschafter OG);2;9;;;;2901;2010;2104;60;;;9999;9999
+9002; Kapital (2. Gesellschafter OG);2;9;;;;2901;2010;2105;60;;;9999;9999
+9003; Kapital (3. Gesellschafter OG);2;9;;;;2901;2010;2106;60;;;9999;9999
+9009; Kapitaländerungen lt. Betr.Prüfung;2;9;;;;2901;2010;2101;60;;;9999;9999
+9010; Stammkapital;2;9;;;;2901;2010;2111;60;;;9999;9999
+9011; Erhöhung Stammkapital (aus Gewinn);2;9;;;;2901;2010;2111;60;;;9999;9999
+9030; Grundkapital;2;9;;;;2901;2131;2121;60;;;9999;9999
+9031; Erhöhung Grundkapital (aus Gewinn);2;9;;;;2901;2131;2121;60;;;9999;9999
+9040; Festkapital (Komplementär);2;9;;;;2901;2010;2132;60;;;9999;9999
+9045; Kapital zu Beginn des Gesch.jahres;2;9;;;;2901;2010;2132;60;;;9999;9999
+9050; variables Kapital (Komplementär);2;9;;;;2901;2010;2142;60;;;9999;9999
+9060; Einlage (1. Kommanditist);2;9;;;;2901;2010;2154;60;;;9999;9999
+9061; Einlage (2. Kommanditist);2;9;;;;2901;2010;2155;60;;;9999;9999
+9062; Einlage (3. Kommanditist);2;9;;;;2901;2010;2156;60;;;9999;9999
+9080; Verlustanteil (1. Kommanditist);2;9;;;;2901;2131;2172;60;;;9999;9999
+9081; Verlustanteil (2. Kommanditist);2;9;;;;2901;2131;2172;60;;;9999;9999
+9082; Verlustanteil (3. Kommanditist);2;9;;;;2901;2131;2172;60;;;9999;9999
+9090; n.d.bed.Einl.ged.Verlustant.(Komm.);2;9;;;;2901;2131;2181;60;;;9999;9999
+9091; n.d.bed.Einl.ged.Verlustant.(Komm.);2;9;;;;2901;2131;2181;60;;;9999;9999
+9092; n.d.bed.Einl.ged.Verlustant.(Komm.);2;9;;;;2901;2131;2181;60;;;9999;9999
+9100; nicht eingeforderte ausst. Einlagen;2;9;;;;2901;2010;2113;60;;;9999;9999
+9110; nicht eingeforderte Einlagen (Komm);2;9;;;;2901;2010;2162;60;;;9999;9999
+9120; nicht eingef. ausst. Grundkapital;2;9;;;;2901;2010;2162;60;;;9999;9999
+9130; Stiftungsvermögen;2;9;;;;2901;2010;2162;60;;;9999;9999
+9135; Gewinnrückl. gem. Stiftungsurkunde;2;9;;;;2901;2010;2162;60;;;9999;9999
+9136; Ergebnisvortrag aus Vorjahren;2;9;;;;2901;2010;2162;60;;;9999;9999
+9137; Jahresergebnis;2;9;;;;2901;2010;2162;60;;;9999;9999
+9138; Zuwendung an Begünstigte;2;9;;;;2901;2010;2162;60;;;9999;9999
+9139; nicht durch Ergebnis gedeckte Zuwen;2;9;;;;2901;2010;2162;60;;;9999;9999
+9140; Nettovereinsvermögen;2;9;;;;2901;2010;2162;60;;;9999;9999
+9150; gewidmete Rücklagen (Verein);2;9;;;;2901;2010;2162;60;;;9999;9999
+9160; Einlage atyp. stiller Ges.(Eigenk.);2;9;;;;2902;2010;2101;60;;;9999;9999
+9161; Sacheinl.atyp.stiller Ges.(Eigenk.);2;9;;;;2902;2010;2101;60;;;9999;9999
+9162; Gewinn atyp. stiller Ges.(Eigenk.);2;9;;;;2902;2010;2101;60;;;9999;9999
+9163; Entnahme atyp.stiller Ges.(Eigenk.);2;9;;;;2902;2010;2101;60;;;9999;9999
+9200; gebundene Rücklagen;2;9;;;;2903;2131;2202;65;;;9999;9999
+9210; Rücklage für eigene Anteile;2;9;;;;2903;2131;2212;65;;;9999;9999
+9220; Rückl.f.Ant.a.herrschenden Untern.;2;9;;;;2903;2111;2212;65;;;9999;9999
+9240; nicht gebundene Rücklagen;2;9;;;;2903;2131;2222;65;;;9999;9999
+9300; gesetzliche Rücklagen;2;9;;;;2904;2111;2232;65;;;9999;9999
+9310; Rücklage für eigene Anteile;2;9;;;;2904;2111;2242;65;;;9999;9999
+9320; Rückl.f.Ant.a.herrschenden Untern.;2;9;;;;2904;2111;2242;65;;;9999;9999
+9330; satzungsmäßige Rücklagen;2;9;;;;2904;2111;2252;65;;;9999;9999
+9340; andere Rücklagen (freie Rücklagen);2;9;;;;2904;2111;2262;65;;;9999;9999
+9345; freie Rücklage aus Auflösung IFB;2;9;;;;2904;2111;2262;65;;;9999;9999
+9350; Jahresgewinn/-verlust;2;9;;;;2901;2111;2101;60;;;9999;9999
+9351; Gewinn-/Verlustverr. N.N. (OG);2;9;;;;2901;2111;2104;60;;;9999;9999
+9352; Gewinn-/Verlustverr. N.N. (OG);2;9;;;;2901;2111;2105;60;;;9999;9999
+9353; Gewinn-/Verlustverr. N.N. (OG);2;9;;;;2901;2111;2106;60;;;9999;9999
+9360; Gewinn-/Verlustverr. (Komplementär);2;9;;;;2901;2111;2142;60;;;9999;9999
+9370; Jahresgewinn;2;9;;;;2905;2111;2271;60;;;9999;9999
+9371; Jahresverlust;2;9;;;;2905;2111;2271;60;;;9999;9999
+9380; Gewinnvortrag aus Vorjahren;2;9;;;;2905;2111;2273;60;;;9999;9999
+9381; Verlustvortrag aus Vorjahren;2;9;;;;2905;2111;2273;60;;;9999;9999
+9385; Gewinnausschüttung;2;9;;;;2905;2111;2273;60;;;9999;9999
+9389; geplante Gewinnausschüttung;2;9;;;;2905;2111;2273;60;;;9999;9999
+9400; Übertr. stiller Reserven § 12 EStG;2;9;;;;2920;2010;2302;60;;;9999;9999
+9410; vorzeitige Abschreibung § 8 EStG;2;9;;;;2920;4500;2302;60;;;9999;9999
+9420; Abschreibung § 8 Abs 2 EStG;2;9;;;;2920;2010;2302;60;;;9999;9999
+9430; Sofortabschreibung GWG § 13 EStG;2;9;;;;2920;2010;2302;60;;;9999;9999
+9500; sonstige unversteuerte Rücklagen;2;9;;;;2920;2135;2312;65;;;9999;9999
+9510; Freibetrag investierte Gewinne;2;9;;;;2920;2135;2312;65;;;9999;9999
+9550; Investitionszuschüsse;2;9;;;;2920;2131;2330;60;;;9999;9999
+9570; Unterschiedsbetrag Kapitalkons.;2;9;;;;2920;2131;2330;60;;;9999;9999
+9580; Genussrechtskapital (Eigenkapital);2;9;;;;2900;2131;2100;60;;;9999;9999
+9581; nachrangiges Genussrechtskapital;2;9;;;;2900;2131;2100;60;;;9999;9999
+9600; Privat;2;9;;;;2901;2131;2101;60;;;9999;9999
+9601; Entnahmen/Einlagen(1.Gesellschafter;2;9;;;;2901;2131;2104;60;;;9999;9999
+9602; Entnahmen/Einlagen(2.Gesellschafter;2;9;;;;2901;2131;2105;60;;;9999;9999
+9603; Entnahmen/Einlagen(3.Gesellschafter;2;9;;;;2901;2131;2106;60;;;9999;9999
+9610; Privatentnahmen;2;9;;;;2901;2131;2101;60;;;9999;9999
+9611; Warenentnahmen;2;9;;;;2901;2131;2101;60;;;9999;9999
+9612; Privatanteile;2;9;;;;2901;2131;2101;60;;;9999;9999
+9613; Sonderausgaben, außerg. Belastungen;2;9;;;;2901;2131;2101;60;;;9999;9999
+9614; Private Steuern;2;9;;;;2901;2131;2101;60;;;9999;9999
+9618; Privateinlagen;2;9;;;;2901;2131;2101;60;;;9999;9999
+9620; genehmigte Entnahmen(1.Kommanditist;2;9;;;;2901;2131;2162;60;;;9999;9999
+9621; genehmigte Entnahmen(2.Kommanditist;2;9;;;;2901;2131;2162;60;;;9999;9999
+9622; genehmigte Entnahmen(3.Kommanditist;2;9;;;;2901;2131;2162;60;;;9999;9999
+9630; Anteile anderer Gesellschafter;2;9;;;;2901;2131;2162;60;;;9999;9999
+9640; Sacheinlagen (Einzelunternehmen);2;9;;;;2901;2131;2101;60;;;9999;9999
+9641; Sacheinlagen (1. Ges. OG);2;9;;;;2901;2131;2104;60;;;9999;9999
+9642; Sacheinlagen (2. Ges. OG);2;9;;;;2901;2131;2105;60;;;9999;9999
+9643; Sacheinlagen (3. Ges. OG);2;9;;;;2901;2131;2106;60;;;9999;9999
+9644; Sacheinlagen (Komplementär);2;9;;;;2901;2131;2131;60;;;9999;9999
+9700; Einlagen stiller Gesellschafter;2;9;;;;2902;2041;2390;60;;;9999;9999
+9710; ausstehende Einlagen stiller Ges.;2;9;;;;2902;2041;2390;60;;;9999;9999
+9720; Verlustverrechnung stiller Ges.;2;9;;;;2902;2041;2390;60;;;9999;9999
+9730; Entnahme atypisch stiller Gesellsch;2;9;;;;2902;2041;2390;60;;;9999;9999
+9800; Eröffnungsbilanzkonto;2;9;;;;2901;2010;2101;60;;;9999;9999
+9810; Saldenübernahme;2;9;;;;2901;2010;2101;60;;;9999;9999
+9890; Gewinn lfd. Jahr (Schattenkonto);3;9;;;;3905;2010;9999;9999;;;9999;9999
+9891; Verlust lfd. Jahr (Schattenkonto);4;9;;;;4905;2010;9999;9999;;;9999;9999
+9900; Gegenkonto Splitt;2;9;;;;2901;2010;2101;60;;;9999;9999
+9990; Unklare Buchungsfälle;2;9;;;;2901;2010;2101;60;;;9999;9999
+9991; Gewinnvortrag (Schattenkonto);3;9;;;;3999;9999;9999;9999;;;9999;9999
+9992; Gewinnvortrag;3;9;;;;3999;9999;4200;9999;;;9999;9999
+9993; Verlustvortrag (Schattenkonto);4;9;;;;4999;9999;9999;9999;;;9999;9999
+9994; Verlustvortrag;4;9;;;;4999;9999;4210;9999;;;9999;9999

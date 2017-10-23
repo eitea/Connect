@@ -246,26 +246,24 @@ ignore_user_abort(1);
 
               //insert taxRates
               $i = 1;
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Keine Steuer', 0)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Normalsatz', 20, 3500, 1)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 13, 3500, 1)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account3, code) VALUES(".$i++.", 'Ermäßigter Satz', 10, 3500, 1)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Sonder Ermäßigter Satz', 12)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Normalsatz', 20, 2501, 3501, 9)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10, 2501, 3501, 9)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Normalsatz', 20, 2502,  3502, 19)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES(".$i++.", 'Reverse Charge Ermäßigter Satz', 10, 2502, 3502, 19)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 20)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Bewirtung', 10)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zollausschulssgebiet', 0)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 10)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'Zusatzsteuer LuF', 8)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage) VALUES(".$i++.", 'KFZ Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, account3) VALUES(".$i++.", 'UStBBKV', 20, 2506, 3506)");              
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 20, 2500, 2)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 19, 2500, 2)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 13, 2500, 2)");
-              $conn->query("INSERT INTO taxRates(id, description, percentage, account2, code) VALUES(".$i++.", 'Vorsteuer', 10, 2500, 2)");
+              $file = fopen(__DIR__.'/Steuerraten.csv', 'r');
+              if($file){
+                $stmt = $conn->prepare("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("isiiii", $i, $name, $percentage, $account2, $account3, $code);
+                while($line = fgetcsv($file, 100, ';')){
+                  $name = trim($line[0]);
+                  $percentage = $line[1];
+                  $account2 = $line[2] ? $line[2] : NULL;
+                  $account3 = $line[3] ? $line[3] : NULL;
+                  $code = $line[4] ? $line[4] : NULL;
+                  $stmt->execute();
+                  $i++;
+                }
+                $stmt->close();
+                fclose($file);
+              } else {
+                echo "<br>Error Steuerraten File";
+              }
 
               //insert travelling expenses
               $travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
@@ -289,14 +287,14 @@ ignore_user_abort(1);
                     } elseif(count($data) > 4) {
                       $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
                     } else {
-                      echo 'Ups! Something went wrong with that file. <br>';
+                      echo 'Error Inside Laender File <br>';
                       print_r ($data);
                     }
                   }
                 }
                 fclose($travellingFile);
               } else {
-                echo "File with Country Data not found!";
+                echo "Error Laender File <br>";
               }            
 
               //insert sum units

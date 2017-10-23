@@ -854,6 +854,12 @@ $lang_ger['RECEIPT'] = 'Rechnung';
 $lang_eng['RECEIPTS'] = 'Receipts';
 $lang_ger['RECEIPTS'] = 'Rechnungen';
 
+$lang_eng['RECEIPT_DATE'] = 'Receipt Date';
+$lang_ger['RECEIPT_DATE'] = 'Rechnungsdatum';
+
+$lang_eng['RECEIPT_BOOK'] = 'Receipt Book';
+$lang_ger['RECEIPT_BOOK'] = 'Wareneingangsbuch';
+
 $lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
 $lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
 
@@ -1003,6 +1009,12 @@ $lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';
+
+$lang_eng['SUPPLIER'] = 'Supplier';
+$lang_ger['SUPPLIER'] = 'Lieferant';
+
+$lang_eng['SUPPLIERS'] = 'Suppliers';
+$lang_ger['SUPPLIERS'] = 'Lieferanten';
 
 $lang_eng['TASK_SCHEDULER'] = 'Task Scheduler';
 $lang_ger['TASK_SCHEDULER'] = 'Taskplaner';

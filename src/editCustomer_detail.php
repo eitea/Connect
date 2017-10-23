@@ -2,9 +2,12 @@
 <?php
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   $filterClient = intval($_GET['custID']);
-} else {
-  redirect("editCustomer.php");
+} elseif(isset($_GET['supID']) && is_numeric($_GET['supID'])) {
+  $filterClient = intval($_GET['supID']);
+} else { //STRIKE  
+  redirect("../user/logout");
 }
+
 //get corresponding id from detailTable
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
 if($result && ($row = $result->fetch_assoc())){
@@ -239,7 +242,6 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
   <h3><?php echo $lang['CLIENT'] .' - '.$rowClient['name']; ?>
     <div class="page-header-button-group">
       <button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
-      <a href="editCustomers.php?custID=<?php echo $filterClient; ?>" title="<?php echo $lang['CLIENT']; ?>" class="btn btn-default"><i class="fa fa-briefcase"></i></a><br>
     </div>
   </h3>
 </div>
@@ -387,7 +389,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       <hr>
       <div class="row form-group">
         <div class="col-xs-2 text-right">
-          Debit Nr.
+          <?php if(isset($_GET['supID'])){ echo "Credit Nr."; } else { echo "Debit Nr."; } ?>
         </div>
         <div class="col-sm-4">
           <input type="number" class="form-control" name="debitNumber" value="<?php echo $row['debitNumber']; ?>" />

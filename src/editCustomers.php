@@ -36,11 +36,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <form id="mainForm" method="POST">
   <?php
-  $companyQuery = $clientQuery = $projectQuery = $productiveQuery = "";
+  $companyQuery = $clientQuery = "";
   if($filterings['company']){$companyQuery = " AND $clientTable.companyID = ".$filterings['company']; }
   if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
-  $query = "SELECT $clientTable.*, $companyTable.name AS companyName FROM $clientTable INNER JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-  WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC";
+  $query = "SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
+  WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSupplier = 'FALSE' $companyQuery $clientQuery ORDER BY name ASC";
   $result = $conn->query($query);
   if($result && $result->num_rows > 0):
     ?>

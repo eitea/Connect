@@ -77,7 +77,7 @@ if($result && $result->num_rows > 0){
   <div id="footer">
     <form method="POST" style="display:inline-block">
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
-      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel" /><br>
+      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><br>
       <?php if($masterpw): ?><label for="masterpw">Master Password: </label> <input id="masterpw" type="password" name="masterpassword" value="" /><br><?php endif; ?>
       <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="loginButton" value="Submit" /><br>
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>" />

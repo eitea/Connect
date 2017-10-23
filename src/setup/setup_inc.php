@@ -36,7 +36,8 @@ function create_tables($conn){
     emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
     color VARCHAR(10) DEFAULT 'dark',
     real_email VARCHAR(50),
-    erpOption VARCHAR(10) DEFAULT 'TRUE'
+    erpOption VARCHAR(10) DEFAULT 'TRUE',
+    strikeCount INT(3) DEFAULT 0
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -109,6 +110,7 @@ function create_tables($conn){
     name VARCHAR(60) NOT NULL,
     companyID INT(6) UNSIGNED,
     clientNumber VARCHAR(12),
+    isSupplier VARCHAR(10) DEFAULT 'FALSE',
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -972,5 +974,36 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE receiptBook(
+    id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    supplierID INT(6) UNSIGNED,
+    taxID INT(4) UNSIGNED,
+    journalID INT(10) UNSIGNED,
+    invoiceDate DATETIME,
+    info VARCHAR(64),
+    amount DECIMAL(10,2),
+    FOREIGN KEY (supplierID) REFERENCES clientData(id)
+    ON UPDATE CASCADE 
+    ON DELETE CASCADE,
+    FOREIGN KEY (journalID) REFERENCES account_journal(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE closeUpData(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
+    lastDate DATETIME NOT NULL,
+    saldo DECIMAL(6,2),
+    FOREIGN KEY (userID) REFERENCES UserData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
 
 }

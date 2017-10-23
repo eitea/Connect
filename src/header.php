@@ -711,18 +711,19 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                     </ul>
                   </div>
                 </li>
+                <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIERS']; ?></span></a></li>
+                <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php")){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
-        }
         if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
-        } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" ){
-          echo "<script>$('#adminOption_ERP').click();</script>";
+          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+        } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" || $this_page == "receiptBook.php" || $this_page == "editSuppliers.php" || ($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php"))){
+          echo "<script>$('#adminOption_ERP').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         }
         ?>
       <?php endif; ?>
@@ -765,6 +766,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           if(isset($_GET['n'])){
             echo "$('#finance-click-".$_GET['n']."').click();";
           }
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';
         }
         ?>
