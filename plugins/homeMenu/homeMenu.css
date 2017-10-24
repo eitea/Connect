@@ -174,9 +174,6 @@ ul.nav.navbar-nav .nav.nav-list {
 .checkbox input[type=checkbox], .radio input[type=radio]{
   position: initial;
 }
-input[type="checkbox"]:focus, input[type="radio"]:focus {
-  outline:0;
-}
 input[type="checkbox"]:disabled, input[type="radio"]:disabled {
   background-color:#ccc;
 }

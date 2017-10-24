@@ -7,7 +7,6 @@ if(!empty($_GET['v'])){
     include 'footer.php';
     die();
 }
-
 $result = $conn->query("SELECT * FROM accounts WHERE id = $id AND companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows < 1) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Zugriff verweigert</div>';
@@ -15,6 +14,14 @@ if(!$result || $result->num_rows < 1) {
     die();
 }
 $account_row = $result->fetch_assoc();
+if(!empty($_POST['webID']) && empty($_POST['transferToWEB']) ){
+    $val = intval($_POST['webID']);
+    $result = $conn->query("SELECT * FROM receiptBook WHERE id = $val");
+    $row = $result->fetch_assoc();
+    $_POST['add_should'] = $row['amount'];
+    $_POST['add_tax'] = $row['taxID'];
+}
+$journalID = false;
 if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
     $accept = true;
     //either should or have can be 0
@@ -49,7 +56,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
             $journalID = $conn->insert_id;
         }
 
-        if($accept && $conn->error){
+        if($accept && !$journalID){
             $accept = false;
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Journal Failed: '.$conn->error.'</div>';
         } else {
@@ -132,12 +139,36 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         }
     }
 }
+if(isset($_POST['transferToWEB']) && $journalID){
+    if(!empty($_POST['filterSupplier']) && test_Date($_POST['add_invoiceDate'], 'Y-m-d') && !empty($_POST['add_tax']) && !empty($_POST['add_should'])){
+        $date = $_POST['add_invoiceDate'];
+        $supplierID = intval($_POST['filterSupplier']);
+        $taxID = intval($_POST['add_tax']);
+        $text = test_input($_POST['add_text']);
+        $amount = floatval($_POST['add_should']);
+        $stmt = $conn->prepare("INSERT INTO receiptBook (supplierID, taxID, invoiceDate, info, amount, journalID) VALUES(?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iissdi", $supplierID, $taxID, $date, $text, $amount, $journalID);
+        $stmt->execute();
+        $stmt->close();
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        }
+    } else {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    }
+} elseif(!empty($_POST['webID']) && $journalID){
+    $val = intval($_POST['webID']);
+    $conn->query("UPDATE receiptBook SET journalID = $journalID WHERE id = $val");
+    if($conn->error){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    }
+}
+
 
 $account_select = $tax_select = '';
 $result = $conn->query("SELECT id, num, name, companyID FROM accounts WHERE companyID IN (SELECT companyID FROM accounts WHERE id = $id) ");
 while($result && ($row = $result->fetch_assoc())){
     $account_select .= '<option value="'.$row['id'].'">'.$row['num'].' '.$row['name'].'</option>';
-    $cmpID = $row['companyID'];
 }
 $result = $conn->query("SELECT * FROM taxRates");
 while($result && ($row = $result->fetch_assoc())){
@@ -182,7 +213,6 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($saldo, 2, ',', '.').'</td>';
     if($account_row['manualBooking'] == 'TRUE'){
         echo '<td><button type="button" class="btn btn-default" title="Editieren" data-toggle="modal" data-target=".edit-journal-'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
-
         $modals .= '<div class="modal fade edit-journal-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
         <div class="modal-header"><h4>'.$lang['EDIT'].'</h4></div><div class="modal-body"><div class="row">
         <div class="col-md-4"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="'.$row['docNum'].'"/><br></div>
@@ -194,7 +224,6 @@ while($result && ($row = $result->fetch_assoc())){
         <div class="col-md-3"><label>'.$lang['FINANCE_CREDIT'].'<small> (Brutto)</small></label><input type="number" step="0.01" class="form-control" name="add_have" value="'.$row['have'].'"/></div>
         </div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" value="'.$row['id'].'" name="editJournalEntry">'.$lang['SAVE'].'</button></div></form></div></div>';
-    
     } else {
         echo '<td></td>';
     }
@@ -205,25 +234,71 @@ while($result && ($row = $result->fetch_assoc())){
 <hr><br><br>
 <?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; ?>
     <form method="POST" class="well">
+        <div class="row form-group">
+            <div id="openWebButton" style="display:none" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'].' WEB'; ?></button></div>
+            <div class="col-md-2"><label id="transferToWEB" style="display:none;padding-top:5px;"><input type="checkbox" name="transferToWEB" value="1" /><?php echo $lang['RECEIPT_BOOK'];?></label></div>
+            <span id="transferToWebInputs" style="display:none">
+                <?php include __DIR__ . '/misc/select_supplier.php'; ?>
+                <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_invoiceDate" value="<?php echo substr($docDate,0,10); ?>" /></div>
+            </span>
+        </div>
         <div class="row">
-            <div class="col-md-1"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
+            <div class="col-md-2"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
             <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate,0,10); ?>" /></div>
             <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
                 <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
-                <small><a href="plan?n=<?php echo $cmpID; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN'];?></a></small>
+                <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN'];?></a></small>
             </div>
             <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
         </div>
-        <div class="row">
-            <div class="col-md-5"><label>Text</label><input type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
+        <div class="row form-group">            
+            <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
             <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control" name="add_should" placeholder="0,0"/></div>
             <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control" name="add_have" placeholder="0,0"/></div>
-            <div class="col-md-1"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning" name="addFinance"><?php echo $lang['ADD']; ?></button></div>        
-        </div>
+            <div class="col-md-2"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>   
+        </div>        
+        <input type="hidden" id="webID" name="webID" value="0"/>
     </form>
+    <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
 <?php else: ?>
     <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als buchbar markiert werden und ein Konto der Klasse 2 sein. </div>
 <?php endif; ?>
+
+<div id="openWEB" class="modal fade">
+  <div class="modal-dialog modal-content modal-md">
+	<div class="modal-header"><h4><?php echo $lang['RECEIPT_BOOK']; ?> - <small>Zeile auswählen</small></h4></div>
+	<div class="modal-body">
+        <table class="table table-hover">
+            <thead><tr>
+                <th>Nr.</th>
+                <th><?php echo $lang['RECEIPT_DATE']; ?></th>
+                <th><?php echo $lang['SUPPLIER']; ?></th>
+                <th>Infotext</th>
+                <th><?php echo $lang['AMOUNT']; ?> <small>(Brutto)</small></th>
+                <th><?php echo $lang['VAT']; ?></th>
+            </tr></thead>
+            <tbody>
+                <?php
+                $val = $account_row['companyID']; $i = 1;
+                $res = $conn->query("SELECT receiptBook.*, clientData.name, taxRates.percentage
+                FROM receiptBook INNER JOIN taxRates ON  taxRates.id = taxID INNER JOIN clientData ON clientData.id = supplierID WHERE companyID = $val AND (journalID IS NULL OR journalID = 0)");
+                while($row = $res->fetch_assoc()){
+                    echo '<tr onclick="webFillout('.$row['id'].', '.$row['amount'].',  \''.$row['info'].'\', '.$row['taxID'].');">';
+                    echo '<td>'.$i++.'</td>';
+                    echo '<td>'.substr($row['invoiceDate'], 0, 10).'</td>';
+                    echo '<td>'.$row['name'].'</td>';
+                    echo '<td>'.$row['info'].'</td>';
+                    echo '<td>'.number_format(($row['amount']), 2, ',', '.').'</td>';
+                    echo '<td>'.number_format($row['amount'] * $row['percentage'] / 100, 2, ',', '.').'</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+	<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></div>
+  </div>
+</div>
 
 <script>
 var active_should = true;
@@ -237,16 +312,15 @@ function disenable(xor1, xor2, active){
         $('#' + xor2).prop('readonly', false);
     }
 }
-
 $('#should').keyup(function(e) { disenable('should', 'have', active_have); });
 $('#have').keyup(function(e) { disenable('have', 'should', active_should); });
 
 $('#account').change(function(e) {
-    $('#tax').select2().attr('disabled', false);
     active_should = true;
     active_have = true;
     disenable('should', 'have', true);
     disenable('have', 'should', true);
+    $('#tax').select2().attr('disabled', false);
     var account = $(this).select2('data')[0].text.split(' ')[0];
     if(account >= 5000 && account < 8000){
         active_should = true;
@@ -267,9 +341,35 @@ $('#account').change(function(e) {
         $('#tax').select2().attr('disabled', true);
         $('#tax').select2().attr('tabindex', '-1');
     }
+    if(account >= 5000 && account < 6000){
+        $('#transferToWEB').show();
+        $('#openWebButton').show();
+    } else {
+        $('#openWebButton').hide();
+        $('#transferToWEB').hide();
+    }
 });
+$('.datepicker').mask("0000-00-00");
 
-  $('.datepicker').mask("0000-00-00");
+$('input:checkbox[name=transferToWEB]').click(function(){
+    $('#openWebButton').show();
+    $('#transferToWebInputs').hide();
+    if(this.checked) {
+        $('#openWebButton').hide();
+        $('#transferToWebInputs').show();
+    }
+});
+function webFillout(id, amount, text, tax){
+    $('#openWEB').modal('toggle');
+    $('#webID').val(id);
+    $('#should').val(amount);
+    $('#should').prop('readonly', true);
+    $('#should').attr('tabindex', '-1');
+    $('#infoText').val(text);
+    $('#tax').val(tax).trigger('change');
+    $('#tax').select2().attr('disabled', true);
+    $('#tax').select2().attr('tabindex', '-1');
+    $('#transferToWEB').hide();
+}
 </script>
-
 <?php include "footer.php"; ?>

@@ -52,7 +52,10 @@ $row = $result->fetch_assoc();
   }
   ?></div>
   </div>
-
+  
+  <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+  <input style="display:none" type="text" name="fakeusernameremembered"/>
+  <input style="display:none" type="password" name="fakepasswordremembered"/>
 
   <h4>SMTP Einstellungen</h4>
   <div class="container-fluid">

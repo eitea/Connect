@@ -19,7 +19,7 @@ if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
     <th>Nr.</th>
     <th>Benutzer</th>
     <th>Buchungsdatum</th>
-    <th>Rechnungsdatum</th>
+    <th><?php echo $lang['DATE']; ?></th>
     <th><?php echo $lang['ACCOUNT']; ?></th>
     <th><?php echo $lang['OFFSET_ACCOUNT']; ?></th>
     <th>Text</th>

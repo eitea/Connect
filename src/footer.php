@@ -40,9 +40,16 @@ function onPageLoad(){
     elem.select2();
     elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
     elem.on("select2:focus", function (e) {
-      if(!open) $(this).select2("open");
+      if(!open && $(this).is(':enabled')) $(this).select2("open");
     });
   }
+
+  $('input:checkbox').keypress(function(e) {
+      if((e.keyCode ? e.keyCode : e.which) == 13){
+        $(this).trigger('click');
+        e.preventDefault();
+    }
+  });
 
   //initalize them when the user needs them
   $('.monthpicker').click(function() {
