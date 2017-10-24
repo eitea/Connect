@@ -48,14 +48,15 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         } elseif(($accNum >= 8000 && $accNum < 10000) && ($accNum >= 1000 && $accNum < 3000)){
             $tax = 1; //id1 = no tax;
         }
-
+        if(!empty($_POST['webID']) && ($accNum < 5000 || $accNum >= 6000)){ //STRIKE
+            $accept = false;
+        }
         if($accept){
             //journal
             $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
             VALUES ($docNum, $userID, $addAccount, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
             $journalID = $conn->insert_id;
         }
-
         if($accept && !$journalID){
             $accept = false;
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Journal Failed: '.$conn->error.'</div>';
@@ -80,7 +81,6 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
                 if($res && $res->num_rows > 0) $account3 = $res->fetch_assoc()['id'];
             }
         }
-         
         if($accept){
             //tax calculation
             $should_tax = ($taxRow['percentage'] / 100) * $should;
@@ -119,8 +119,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
                     $have = $temp_should - $should_tax;
                     $should = $temp_have - $have_tax;
                 }
-            }
-            
+            }            
             $account = $offAccount;
             $stmt->execute();
         }
@@ -257,7 +256,7 @@ while($result && ($row = $result->fetch_assoc())){
             <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control" name="add_have" placeholder="0,0"/></div>
             <div class="col-md-2"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>   
         </div>        
-        <input type="hidden" id="webID" name="webID" value="0"/>
+        <input type="hidden" id="webID" name="webID" value=""/>
     </form>
     <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
 <?php else: ?>
@@ -347,6 +346,7 @@ $('#account').change(function(e) {
     } else {
         $('#openWebButton').hide();
         $('#transferToWEB').hide();
+        $('#webID').val(0);
     }
 });
 $('.datepicker').mask("0000-00-00");
