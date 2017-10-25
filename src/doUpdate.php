@@ -1867,7 +1867,6 @@ if($row['version'] < 110){
     echo "<br>Error Opening csv File";
   }
   $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
-  $conn->query("ALTER TABLE companyData ADD istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
 
   $sql = "CREATE TABLE closeUpData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

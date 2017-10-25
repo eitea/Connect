@@ -317,13 +317,14 @@ ignore_user_abort(1);
               //insert accounts
               $file = fopen(__DIR__.'/Kontoplan.csv', 'r');
               if($file){
-                $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name) SELECT id, ?, ? FROM companyData");
-                $stmt->bind_param("is", $num, $name);
-                while(($line= fgetcsv($file, 100, ';')) !== false){
+                $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
+                $stmt->bind_param("iss", $num, $name, $type);
+                while(($line= fgetcsv($file, 300, ';')) !== false){
                   $num = $line[0];
                   $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
                   if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
                   if(!$name) $name = $line[1];
+                  $type = trim($line[2]);
                   $stmt->execute();
                 }
                 $stmt->close();
