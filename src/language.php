@@ -119,6 +119,12 @@ $lang_ger['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
 $lang_eng['BOOK_PROJECTS'] = 'Book Projects';
 $lang_ger['BOOK_PROJECTS'] = 'Projekte Buchen';
 
+$lang_eng['BOOKED'] = 'Booked';
+$lang_ger['BOOKED'] = 'Verbucht';
+
+$lang_eng['BOOKED_NOT'] = 'Not Booked';
+$lang_ger['BOOKED_NOT'] = 'Nicht Verbucht';
+
 $lang_eng['BOOKINGS'] = 'Bookings';
 $lang_ger['BOOKINGS'] = 'Buchungen';
 

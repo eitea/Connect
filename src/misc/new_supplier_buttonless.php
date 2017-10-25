@@ -18,7 +18,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <div class="modal fade" id="create_client" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog modal-content" role="document">
-    <form method="post">
+    <form method="POST">
       <div class="modal-header"><h4><?php echo $lang['SUPPLIER']; ?></h4></div>
       <div class="modal-body">
         <br>
@@ -43,7 +43,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           </div>
           <div class="col-md-6">
             <input type="text" class="form-control" name="clientNumber" placeholder="#" >
-            <small> &nbsp Lieferantennummer - Optional</small>
+            <small> &nbsp Lieferantennummer - optional</small>
           </div>
         </div>
       </div>

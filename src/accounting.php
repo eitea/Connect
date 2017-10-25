@@ -186,6 +186,7 @@ while($result && ($row = $result->fetch_assoc())){
     <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
     <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT'];?></th>
     <th style="text-align:right">Saldo</th>
+    <th>WEB</th>
     <th></th>
 </tr></thead>
 <tbody>
@@ -194,8 +195,11 @@ $docNum = 1;
 $docDate = getCurrentTimestamp();
 $modals = '';
 $saldo = 0;
-$result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should FROM account_journal, account_balance, accounts
-WHERE account_journal.id = account_balance.journalID AND account_journal.account = accounts.id AND account_balance.accountID = $id ORDER BY docNum, inDate ");
+$result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should, r1.id AS receiptID
+FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
+INNER JOIN accounts ON account_journal.account = accounts.id
+LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
+WHERE account_balance.accountID = $id ORDER BY docNum, inDate ");
 echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
     $docNum = $row['docNum'];
@@ -210,7 +214,8 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($row['netto_should'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_have'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($saldo, 2, ',', '.').'</td>';
-    if($account_row['manualBooking'] == 'TRUE'){
+    if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>';  }
+    if($account_row['manualBooking'] == 'TRUE' && !$row['receiptID']){
         echo '<td><button type="button" class="btn btn-default" title="Editieren" data-toggle="modal" data-target=".edit-journal-'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
         $modals .= '<div class="modal fade edit-journal-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
         <div class="modal-header"><h4>'.$lang['EDIT'].'</h4></div><div class="modal-body"><div class="row">
@@ -231,15 +236,10 @@ while($result && ($row = $result->fetch_assoc())){
 </tbody>
 </table>
 <hr><br><br>
-<?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; ?>
+<?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; include __DIR__ .'/misc/new_supplier_buttonless.php';  ?>
     <form method="POST" class="well">
         <div class="row form-group">
-            <div id="openWebButton" style="display:none" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'].' WEB'; ?></button></div>
-            <div class="col-md-2"><label id="transferToWEB" style="display:none;padding-top:5px;"><input type="checkbox" name="transferToWEB" value="1" /><?php echo $lang['RECEIPT_BOOK'];?></label></div>
-            <span id="transferToWebInputs" style="display:none">
-                <?php include __DIR__ . '/misc/select_supplier.php'; ?>
-                <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_invoiceDate" value="<?php echo substr($docDate,0,10); ?>" /></div>
-            </span>
+            <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'].' WEB'; ?></button></div>
         </div>
         <div class="row">
             <div class="col-md-2"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
@@ -250,17 +250,24 @@ while($result && ($row = $result->fetch_assoc())){
             </div>
             <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
         </div>
-        <div class="row form-group">            
+        <div class="row form-group">
             <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control" name="add_should" placeholder="0,0"/></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control" name="add_have" placeholder="0,0"/></div>
-            <div class="col-md-2"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>   
-        </div>        
+            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
+            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
+            <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
+            <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input id="transferToWEBc" type="checkbox" name="transferToWEB" value="1" />In WEB</label></div>
+        </div>
+        <div class="row">
+            <span id="transferToWebInputs" style="display:none">
+                <?php include __DIR__ . '/misc/select_supplier.php'; ?>
+                <div class="col-md-2"><label><?php echo $lang['RECEIPT_DATE']; ?></label><input id="receiptDate" type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div>
+            </span>
+        </div>
         <input type="hidden" id="webID" name="webID" value=""/>
     </form>
     <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
 <?php else: ?>
-    <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als buchbar markiert werden und ein Konto der Klasse 2 sein. </div>
+    <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als Gegenkonto markiert werden und ein Konto der Klasse 2 sein. </div>
 <?php endif; ?>
 
 <div id="openWEB" class="modal fade">
@@ -274,6 +281,7 @@ while($result && ($row = $result->fetch_assoc())){
                 <th><?php echo $lang['SUPPLIER']; ?></th>
                 <th>Infotext</th>
                 <th><?php echo $lang['AMOUNT']; ?> <small>(Brutto)</small></th>
+                <th><?php echo $lang['TAXES']; ?></th>
                 <th><?php echo $lang['VAT']; ?></th>
             </tr></thead>
             <tbody>
@@ -288,7 +296,8 @@ while($result && ($row = $result->fetch_assoc())){
                     echo '<td>'.$row['name'].'</td>';
                     echo '<td>'.$row['info'].'</td>';
                     echo '<td>'.number_format(($row['amount']), 2, ',', '.').'</td>';
-                    echo '<td>'.number_format($row['amount'] * $row['percentage'] / 100, 2, ',', '.').'</td>';
+                    echo '<td>'.$row['percentage'].'% </td>';
+                    echo '<td>'.number_format($row['amount'] - ($row['amount'] * 100) / (100 + $row['percentage'] ), 2, ',', '.').'</td>';
                     echo '</tr>';
                 }
                 ?>
@@ -315,6 +324,7 @@ $('#should').keyup(function(e) { disenable('should', 'have', active_have); });
 $('#have').keyup(function(e) { disenable('have', 'should', active_should); });
 
 $('#account').change(function(e) {
+    if($('#webID').val()) return;
     active_should = true;
     active_have = true;
     disenable('should', 'have', true);
@@ -342,34 +352,44 @@ $('#account').change(function(e) {
     }
     if(account >= 5000 && account < 6000){
         $('#transferToWEB').show();
-        $('#openWebButton').show();
     } else {
-        $('#openWebButton').hide();
+        if($('#transferToWEBc').is(':checked')){
+            $('#transferToWEBc').trigger('click');            
+        }
         $('#transferToWEB').hide();
-        $('#webID').val(0);
     }
 });
-$('.datepicker').mask("0000-00-00");
-
-$('input:checkbox[name=transferToWEB]').click(function(){
-    $('#openWebButton').show();
-    $('#transferToWebInputs').hide();
+$('#transferToWEBc').click(function(){    
     if(this.checked) {
         $('#openWebButton').hide();
         $('#transferToWebInputs').show();
+    } else {
+        $('#openWebButton').show();
+        $('#transferToWebInputs').hide();
     }
+    $('#receiptDate').trigger('change');
 });
 function webFillout(id, amount, text, tax){
     $('#openWEB').modal('toggle');
-    $('#webID').val(id);
+    $('#webID').val(id);    
     $('#should').val(amount);
     $('#should').prop('readonly', true);
     $('#should').attr('tabindex', '-1');
+    $('#have').prop('readonly', true);
+    $('#have').attr('tabindex', '-1');
     $('#infoText').val(text);
     $('#tax').val(tax).trigger('change');
     $('#tax').select2().attr('disabled', true);
     $('#tax').select2().attr('tabindex', '-1');
     $('#transferToWEB').hide();
+
+    $('#account').children().filter(function(){ //remove all class 5
+        var account = $(this).text().split(' ')[0];
+        return (account < 5000 || account > 5999);
+    }).remove();
 }
+$('#receiptDate').change(function(e) {
+    $('#addFinance').attr('disabled', ($("#receiptDate").val() == false));
+});
 </script>
 <?php include "footer.php"; ?>

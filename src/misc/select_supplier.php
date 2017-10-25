@@ -37,7 +37,14 @@ var select_supplier = {
     }
   }
 };
+
+$("#supplierHint").change(function(){
+  if($(this).val() == 'new'){
+    $('#create_client').modal().toggle();
+  }
+});
 </script>
+
 
 <?php
 if($filterCompany){

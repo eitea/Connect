@@ -390,12 +390,14 @@ $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00
 if($result && ($row = $result->fetch_assoc())) { //checkout
   $buttonVal = $lang['CHECK_OUT'];
   $buttonNam = 'stampOut';
+  $buttonEmoji = '<div class="btn-group btn-group-xs"><button type="submit" class="btn btn-danger">1</button><button type="submit" class="btn btn-warning">2</button></div>';
   $showProjectBookingLink = TRUE;
   $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
   if($diff < $cd / 60) { $disabled = 'disabled'; }
 } else {
   $buttonVal = $lang['CHECK_IN'];
   $buttonNam = 'stampIn';
+  $buttonEmoji = '';
   $today = getCurrentTimestamp();
   $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr($today, 0, 10)." %' AND status = '0'");
   if($result && ($row = $result->fetch_assoc())){
@@ -422,6 +424,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
                   echo '</div>';
                 }
+                echo '<br>'.$buttonEmoji;
                 ?>
               </form><br>
             </div>

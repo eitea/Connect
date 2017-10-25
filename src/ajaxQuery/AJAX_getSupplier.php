@@ -9,9 +9,8 @@ if(isset($_GET['supplierID'])){
   $p = 0;
 }
 $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID AND isSupplier = 'TRUE' ");
-if($result && $result->num_rows > 1){
-  echo "<option value=0 >...</option>";
-}
+echo "<option value=0 >...</option>";
+echo "<option value='new' >+ Neu</option>";
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $clientID = $row['id'];

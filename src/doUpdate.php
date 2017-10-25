@@ -1889,7 +1889,9 @@ if($row['version'] < 110){
   } else {
     echo $conn->error;
   }
+}
 
+if($row['version'] < 111){
   $i = 1;
   $conn->query("DELETE FROM taxRates");
   $file = fopen(__DIR__.'/setup/Steuerraten.csv', 'r');
@@ -1897,7 +1899,9 @@ if($row['version'] < 110){
     $stmt = $conn->prepare("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isiiii", $i, $name, $percentage, $account2, $account3, $code);
     while($line = fgetcsv($file, 100, ';')){
-      $name = trim($line[0]);
+      $name = trim(iconv(mb_detect_encoding($line[0], mb_detect_order(), true), "UTF-8", $line[0]));
+      if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[0]));
+      if(!$name) $name = $line[0];
       $percentage = $line[1];
       $account2 = $line[2] ? $line[2] : NULL;
       $account3 = $line[3] ? $line[3] : NULL;

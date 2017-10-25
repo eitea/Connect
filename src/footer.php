@@ -52,6 +52,7 @@ function onPageLoad(){
   });
 
   //initalize them when the user needs them
+  //datepicker doc: https://www.malot.fr/bootstrap-datetimepicker/index.php
   $('.monthpicker').click(function() {
     $('.monthpicker').datetimepicker({
       autoclose: 1,
@@ -64,18 +65,7 @@ function onPageLoad(){
     });
     $(this).datetimepicker('show');
   });
-  $('.datetimepicker').click(function() {
-    $(this).datetimepicker({
-      weekStart: 1,
-      todayBtn:  1,
-      autoclose: 1,
-      forceParse: 0,
-      startDate: '2010-01-01',
-      format: 'yyyy-mm-dd hh:ii',
-      keyboardNavigation: false
-    });
-    $(this).datetimepicker('show');
-  });
+
   $('.datepicker').click(function() {
     $(this).datetimepicker({
       weekStart: 1,
@@ -90,19 +80,21 @@ function onPageLoad(){
     $(this).datetimepicker('show');
     $(this).datetimepicker().on('changeDate', function() { this.focus(); });
   });
+  $('.datepicker').mask("0000-00-00");
+  $('.datepicker').attr('placeholder', 'yyyy-mm-dd');
 
-  //datepicker doc: https://www.malot.fr/bootstrap-datetimepicker/index.php
-
-  $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
-  $('.timepicker').mask("20:50", {
-    placeholder: "--:--",
-    selectOnFocus: true,
-    translation: {
-      2: {pattern: /[0-2]/},
-      5: {pattern: /[0-5]/}
-    }
+  $('.datetimepicker').click(function() {
+    $(this).datetimepicker({
+      weekStart: 1,
+      todayBtn:  1,
+      autoclose: 1,
+      forceParse: 0,
+      startDate: '2010-01-01',
+      format: 'yyyy-mm-dd hh:ii',
+      keyboardNavigation: false
+    });
+    $(this).datetimepicker('show');
   });
-
   /*
   $('.timepicker').timepicker({
     todayBtn:  1,
@@ -115,6 +107,15 @@ function onPageLoad(){
     format: 'hh:ii'
   });
   */
+  $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
+  $('.timepicker').mask("20:50", {
+    placeholder: "--:--",
+    selectOnFocus: true,
+    translation: {
+      2: {pattern: /[0-2]/},
+      5: {pattern: /[0-5]/}
+    }
+  });
 }
 
 $(document).ready(function() {
@@ -143,6 +144,12 @@ $(document).ready(function() {
 
   document.getElementById("loader").style.display = "none";
   document.getElementById("bodyContent").style.display = "block";
+});
+
+$('.money').blur(function(e){
+  var number = this.value;
+  if(number == "") return;
+  this.value = parseFloat(number).toFixed(2);
 });
 </script>
 

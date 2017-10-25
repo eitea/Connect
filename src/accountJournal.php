@@ -27,13 +27,16 @@ if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
     <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT'];?> <small>(Brutto)</small></th>
     <th><?php echo $lang['VAT']; ?></th>
     <th style="text-align:right"><?php echo $lang['TAXES']; ?></th>
+    <th>WEB</th>
 </tr></thead>
 <tbody>
 <?php
-$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName
-FROM account_journal LEFT JOIN accounts a1 ON a1.id = account_journal.account
-LEFT JOIN accounts a2 ON a2.id = account_journal.offAccount
-LEFT JOIN UserData ON UserData.id = account_journal.userID INNER JOIN taxRates ON account_journal.taxID = taxRates.id
+$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName, r1.id AS receiptID
+FROM account_journal INNER JOIN accounts a1 ON a1.id = account_journal.account
+INNER JOIN accounts a2 ON a2.id = account_journal.offAccount
+LEFT JOIN UserData ON UserData.id = account_journal.userID
+INNER JOIN taxRates ON account_journal.taxID = taxRates.id
+LEFT JOIN receiptBook r1 ON r1.journalID = account_journal.id
 WHERE a1.companyID = $cmpID ORDER BY docNum, inDate");
 echo $conn->error;
 $csv = "Nr.;Datum;Konto;Gegenkonto;Text;Steuer;Steuercode\n";
@@ -52,6 +55,7 @@ while($result && ($row = $result->fetch_assoc())){
     if($row['should'] != 0) $t = $row['should'] * $row['percentage']/100;
     if($row['have'] != 0) $t = $row['have'] * $row['percentage']/100;
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
+    if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>';  }
     echo '</tr>';
     $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.iconv('UTF-8','windows-1252',$row['info']).';'.$row['percentage'].'%;'.$row['code']."\n";
 }
