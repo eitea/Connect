@@ -1605,8 +1605,6 @@ if($row['version'] < 102){
     $conn->query("ALTER TABLE roles ADD COLUMN isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
   
-
-
     $conn->multi_query("CREATE TABLE dynamicprojects(
       projectid VARCHAR(100) NOT NULL,
       projectname VARCHAR(60) NOT NULL,
@@ -1619,23 +1617,37 @@ if($row['version'] < 102){
       projectpriority INT(6),
       projectparent VARCHAR(100),
       projectowner INT(6),
+      projectseries MEDIUMBLOB,
+      projectnextdate VARCHAR(12),
       PRIMARY KEY (`projectid`)
     );
     CREATE TABLE dynamicprojectsclients(
       projectid VARCHAR(100) NOT NULL,
-      clientid INT(6)
+      clientid INT(6),
+      FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
     );
     CREATE TABLE dynamicprojectsemployees(
       projectid VARCHAR(100) NOT NULL,
-      userid INT(6)
+      userid INT(6),
+      FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
     );
     CREATE TABLE dynamicprojectsoptionalemployees(
       projectid VARCHAR(100) NOT NULL,
-      userid INT(6)
+      userid INT(6),
+      FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
     );
     CREATE TABLE dynamicprojectspictures(
       projectid VARCHAR(100) NOT NULL,
-      picture MEDIUMBLOB
+      picture MEDIUMBLOB,
+      FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
     );");
     
   }
