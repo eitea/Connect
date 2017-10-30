@@ -2,6 +2,16 @@
 isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
+class ProjectSeries{
+    var $no_repeat;
+    function get_next_date(){
+
+    }
+    function __construct(){
+
+    }
+}
+
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $series = "";
 
@@ -22,6 +32,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();
     $series = $_POST["series"] ?? "once";
+    //var_dump($clients);
+    $series = new ProjectSeries($series);
 
     if($parent == "none"){
         $parent = "";
@@ -56,6 +68,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $end =  $conn->real_escape_string($end);
     $status =  $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
+    $series = serialize($series);
     
     $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner')");
     echo $conn->error;
@@ -129,7 +142,6 @@ require "dynamicProjects_template.php";
 <table class="table">
 <thead>
     <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Description</th>
         <th>Company</th>
@@ -173,7 +185,6 @@ require "dynamicProjects_template.php";
         }
 
         echo "<tr>";
-        echo "<td>$id</td>";
         echo "<td style='background-color:$color;'>$name</td>";
         echo "<td>$description</td>";
         echo "<td>$companyName</td>";

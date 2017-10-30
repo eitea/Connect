@@ -849,4 +849,51 @@ $sql = "CREATE TABLE identification(
     echo mysqli_error($conn);
   }
 
+  $conn->multi_query("CREATE TABLE dynamicprojects(
+    projectid VARCHAR(100) NOT NULL,
+    projectname VARCHAR(60) NOT NULL,
+    projectdescription VARCHAR(500) NOT NULL,
+    companyid INT(6),
+    projectcolor VARCHAR(10),
+    projectstart VARCHAR(12),
+    projectend VARCHAR(12),
+    projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+    projectpriority INT(6),
+    projectparent VARCHAR(100),
+    projectowner INT(6),
+    projectseries MEDIUMBLOB,
+    projectnextdate VARCHAR(12),
+    PRIMARY KEY (`projectid`)
+  );
+  CREATE TABLE dynamicprojectsclients(
+    projectid VARCHAR(100) NOT NULL,
+    clientid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsoptionalemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectspictures(
+    projectid VARCHAR(100) NOT NULL,
+    picture MEDIUMBLOB,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );");
+    if ($conn->error) {
+      echo $conn->error;
+    }
 ?>
