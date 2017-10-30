@@ -1617,8 +1617,6 @@ if($row['version'] < 102){
       projectpriority INT(6),
       projectparent VARCHAR(100),
       projectowner INT(6),
-      projectseries MEDIUMBLOB,
-      projectnextdate VARCHAR(12),
       PRIMARY KEY (`projectid`)
     );
     CREATE TABLE dynamicprojectsclients(
@@ -1644,14 +1642,15 @@ if($row['version'] < 102){
     );
     CREATE TABLE dynamicprojectspictures(
       projectid VARCHAR(100) NOT NULL,
-      picture MEDIUMBLOB
+      picture MEDIUMBLOB,
       FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
     CREATE TABLE dynamicprojectsseries(
       projectid VARCHAR(100) NOT NULL,
-      nextdate VARCHAR(12)
+      projectnextdate VARCHAR(12),
+      projectseries MEDIUMBLOB,
       FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
       ON UPDATE CASCADE
       ON DELETE CASCADE

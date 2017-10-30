@@ -4,32 +4,32 @@ This template is a modal for editing new and existing dynamic projects
 */
 ?>
 
-<button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo $modal_id ?>" type="button"><i class="fa fa-plus"></i></button>
+<button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo stripSymbols($modal_id) ?>" type="button"><i class="fa fa-plus"></i></button>
 
 
 <!-- new dynamic project modal -->
 <form method="post" autocomplete="off" id="projectForm<?php echo $modal_id ?>">
 <input type="hidden" name="id" value="<?php echo $modal_id ?>">
-    <div class="modal fade" id="dynamicProject<?php echo $modal_id ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo $modal_id ?>">
+    <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo $modal_id ?>">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="dynamicProjectLabel<?php echo $modal_id ?>">
+                    <h4 class="modal-title" id="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
                         <?php echo $modal_title; ?>
                     </h4>
                 </div>
                     <!-- modal body -->
                     <!-- tab buttons -->
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $modal_id ?>">Grundlagen*</a></li>
-                        <li><a data-toggle="tab" href="#projectDescription<?php echo $modal_id ?>">Projektbeschreibung*</a></li>
-                        <li><a data-toggle="tab" href="#projectAdvanced<?php echo $modal_id ?>">Erweitert</a></li>
-                        <li><a data-toggle="tab" href="#projectSeries<?php echo $modal_id ?>">Serie</a></li>
+                        <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo stripSymbols($modal_id) ?>">Grundlagen*</a></li>
+                        <li><a data-toggle="tab" href="#projectDescription<?php echo stripSymbols($modal_id) ?>">Projektbeschreibung*</a></li>
+                        <li><a data-toggle="tab" href="#projectAdvanced<?php echo stripSymbols($modal_id) ?>">Erweitert</a></li>
+                        <li><a data-toggle="tab" href="#projectSeries<?php echo stripSymbols($modal_id) ?>">Serie</a></li>
                     </ul>
                     <!-- /tab buttons -->
                     <div class="tab-content">
-                        <div id="projectBasics<?php echo $modal_id ?>" class="tab-pane fade in active">
+                        <div id="projectBasics<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade in active">
                             <div class="modal-body">
                             <!-- basics -->
                             <div class="well">
@@ -49,7 +49,7 @@ This template is a modal for editing new and existing dynamic projects
                                     ?>
                                 </select>
                                 <label>Kunde*:</label>
-                                <select id="dynamicProjectClients<?php echo $modal_id ?>" class="form-control js-example-basic-single" name="clients[]" multiple="multiple" required>
+                                <select id="dynamicProjectClients<?php echo stripSymbols($modal_id) ?>" class="form-control js-example-basic-single" name="clients[]" multiple="multiple" required>
                                     <option>Zuerst Mandant auswählen</option>
                                     <?php 
                                         foreach ($modal_clients as $client) {
@@ -98,7 +98,7 @@ This template is a modal for editing new and existing dynamic projects
                             <!-- /basics -->
                             </div>
                         </div>
-                        <div id="projectDescription<?php echo $modal_id ?>" class="tab-pane fade">
+                        <div id="projectDescription<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
                             <div class="modal-body">
                             <!-- description -->
                             <div class="well">
@@ -107,7 +107,7 @@ This template is a modal for editing new and existing dynamic projects
                                 <label>Bilder auswählen:</label><br>
                                 <label class="btn btn-default" role="button">Durchsuchen...
                                 <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo $modal_id ?>" accept=".jpg,.jpeg,.png"></label>
-                                <div id="projectPreview<?php echo $modal_id ?>">
+                                <div id="projectPreview<?php echo stripSymbols($modal_id) ?>">
                                 <?php 
                                 foreach ($modal_pictures as $picture) {
                                     echo "<span><img src='$picture' alt='Previously uploaded picture' class='img-thumbnail' style='width:49%;margin:0.5%'></span>";
@@ -118,7 +118,7 @@ This template is a modal for editing new and existing dynamic projects
                             <!-- /description -->
                             </div>
                         </div>
-                        <div id="projectAdvanced<?php echo $modal_id ?>" class="tab-pane fade">
+                        <div id="projectAdvanced<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
                             <div class="modal-body">
                             <!-- advanced -->
                             <div class="well">
@@ -162,7 +162,7 @@ This template is a modal for editing new and existing dynamic projects
                             <!-- /advanced -->
                             </div>
                         </div>
-                        <div id="projectSeries<?php echo $modal_id ?>" class="tab-pane fade">
+                        <div id="projectSeries<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
                             <div class="modal-body">
                             <!-- series -->
 
@@ -198,7 +198,7 @@ This template is a modal for editing new and existing dynamic projects
 
 
                                         <label>Wöchentlich</label><br>
-                                        <input type="radio" name="series" value="weekly">Alle <label><input class="form-control" type="number"></label> Wochen am <label><select class="form-control" name="day" required>
+                                        <input type="radio" name="series" value="weekly">Alle <label><input class="form-control" type="number" max="52" name="weekly_weeks"></label> Wochen am <label><select class="form-control" name="weekly_day" required>
                                         <option value="monday">Montag</option>
                                         <option value="tuesday">Dienstag</option>
                                         <option value="wednesday">Mittwoch</option>
@@ -210,8 +210,8 @@ This template is a modal for editing new and existing dynamic projects
 
 
                                         <label>Monatlich</label><br>
-                                        <input type="radio" name="series" value="monthly_day_of_month">am <label><input class="form-control" type="number"></label> Tag jedes <label><input class="form-control" type="number"></label>. Monats<br>
-                                        <input type="radio" name="series" value="monthly_nth_day_of_week">am <label><input class="form-control" type="number"></label> <label><select class="form-control" name="day" required>
+                                        <input type="radio" name="series" value="monthly_day_of_month">am <label><input name="monthly_day_of_month_day" class="form-control" type="number" min="1" max="31"></label> Tag jedes <label><input name="monthly_day_of_month_month" class="form-control" type="number" min="1" max="12"></label>. Monats<br>
+                                        <input type="radio" name="series" value="monthly_nth_day_of_week">am <label><input name="monthly_nth_day_of_week_nth" class="form-control" type="number" min="1" max="5"></label> <label><select class="form-control" name="monthly_nth_day_of_week_day" required>
                                         <option value="monday">Montag</option>
                                         <option value="tuesday">Dienstag</option>
                                         <option value="wednesday">Mittwoch</option>
@@ -219,11 +219,11 @@ This template is a modal for editing new and existing dynamic projects
                                         <option value="Friday">Freitag</option>
                                         <option value="Saturday">Samstag</option>
                                         <option value="Sunday">Sonntag</option>
-                                </select></label> jedes <label><input class="form-control" type="number"></label> monats<br>
+                                </select></label> jedes <label><input name="monthly_nth_day_of_week_month" class="form-control" type="number" min="1" max="12"></label> monats<br>
 
                                         
                                         <label>Jährlich</label><br>
-                                        <input type="radio" name="series" value="">jeden <input value="1">. <label><select class="form-control" name="month" required>
+                                        <input type="radio" name="series" value="yearly_nth_day_of_month">jeden <label><input name="yearly_nth_day_of_month_nth" class="form-control" min="1" max="31" type="number"></label>. <label><select class="form-control" name="yearly_nth_day_of_month_month" required>
                                         <option value="JAN">Jänner</option>
                                         <option value="FEB">Februar</option>
                                         <option value="MAR">März</option>
@@ -237,7 +237,7 @@ This template is a modal for editing new and existing dynamic projects
                                         <option value="NOV">November</option>
                                         <option value="DEC">Dezember</option>
                                 </select></label><br>
-                                        <input type="radio" name="series" value="">am <input value="1">. <label><select class="form-control" name="day" required>
+                                        <input type="radio" name="series" value="yearly_nth_day_of_week">am <label><input name="yearly_nth_day_of_week_nth" class="form-control" min="1" max="5" type="number"></label>. <label><select class="form-control" name="yearly_nth_day_of_week_day" required>
                                         <option value="monday">Montag</option>
                                         <option value="tuesday">Dienstag</option>
                                         <option value="wednesday">Mittwoch</option>
@@ -245,7 +245,7 @@ This template is a modal for editing new and existing dynamic projects
                                         <option value="Friday">Freitag</option>
                                         <option value="Saturday">Samstag</option>
                                         <option value="Sunday">Sonntag</option>
-                                </select></label> im <label><select class="form-control" name="month" required>
+                                </select></label> im <label><select name="yearly_nth_day_of_week_month" class="form-control" name="month" required>
                                         <option value="JAN">Jänner</option>
                                         <option value="FEB">Februar</option>
                                         <option value="MAR">März</option>
@@ -291,7 +291,7 @@ function showClients(company, client, targetSelector){
     });
 }
 
-$("#projectImageUpload<?php echo $modal_id ?>").change(function(event){
+$("#projectImageUpload<?php echo stripSymbols($modal_id) ?>").change(function(event){
     var files = event.target.files;
     //$("#newProjectPreview").html(""); //delete old pictures
     // Loop through the FileList and render image files as thumbnails.
@@ -313,8 +313,8 @@ $("#projectImageUpload<?php echo $modal_id ?>").change(function(event){
             '" title="', escape(theFile.name), 
             '"/>'
           ].join('');
-          $("#projectPreview<?php echo $modal_id ?>").append(span);
-          $("#projectPreview<?php echo $modal_id ?> img").unbind("click").click(removeImg)
+          $("#projectPreview<?php echo stripSymbols($modal_id) ?>").append(span);
+          $("#projectPreview<?php echo stripSymbols($modal_id) ?> img").unbind("click").click(removeImg)
         };
       })(f);
       // Read in the image file as a data URL.
@@ -324,18 +324,18 @@ $("#projectImageUpload<?php echo $modal_id ?>").change(function(event){
   });
 
 $(function(){
-    $("#projectPreview<?php echo $modal_id ?> img").click(removeImg)
+    $("#projectPreview<?php echo stripSymbols($modal_id) ?> img").click(removeImg)
 })
 
 function removeImg(event){
    $(event.target).remove()
 }
 
-$("#projectForm<?php echo $modal_id ?>").submit(function(event){
-    $("#projectPreview<?php echo $modal_id ?>").find("input").remove()
-    $("#projectPreview<?php echo $modal_id ?>").find("img").each(function(index,elem){
+$("#projectForm<?php echo stripSymbols($modal_id) ?>").submit(function(event){
+    $("#projectPreview<?php echo stripSymbols($modal_id) ?>").find("input").remove()
+    $("#projectPreview<?php echo stripSymbols($modal_id) ?>").find("img").each(function(index,elem){
         console.log(getImageSrc(elem).length)
-        $("#projectPreview<?php echo $modal_id ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>")
+        $("#projectPreview<?php echo stripSymbols($modal_id) ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>")
     })
 })
 
