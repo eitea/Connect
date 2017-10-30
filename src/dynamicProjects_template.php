@@ -84,7 +84,7 @@ This template is a modal for editing new and existing dynamic projects
                                     ?>
                                 </select>
                                 <label>Optionale Mitarbeiter:</label>
-                                <select class="form-control js-example-basic-single" name="optionalemployees" multiple="multiple">
+                                <select class="form-control js-example-basic-single" name="optionalemployees[]" multiple="multiple">
                                     <?php
                                     $result = $conn->query("SELECT * FROM UserData");
                                     while ($row = $result->fetch_assoc()) {
@@ -190,15 +190,15 @@ This template is a modal for editing new and existing dynamic projects
                                 <div class="well">
                                     
                                         <label>Einmalig</label><br>
-                                        <input type="radio" checked>Keine Wiederholungen<br>
+                                        <input type="radio" checked name="series" value="once">Keine Wiederholungen<br>
 
                                         <label>Täglich</label><br>
-                                        <input type="radio">Alle <label><input class="form-control" type="number"></label> Tage<br>
-                                        <input type="radio">Montag bis Freitag<br>
+                                        <input type="radio" name="series" value="daily_every_nth">Alle <label><input class="form-control" type="number" min="1" max="365" name="daily_days"></label> Tage<br>
+                                        <input type="radio" name="series" value="daily_every_weekday">Montag bis Freitag<br>
 
 
                                         <label>Wöchentlich</label><br>
-                                        <input type="radio">Alle <label><input class="form-control" type="number"></label> Wochen am <label><select class="form-control" name="day" required>
+                                        <input type="radio" name="series" value="weekly">Alle <label><input class="form-control" type="number"></label> Wochen am <label><select class="form-control" name="day" required>
                                         <option value="monday">Montag</option>
                                         <option value="tuesday">Dienstag</option>
                                         <option value="wednesday">Mittwoch</option>
@@ -210,8 +210,8 @@ This template is a modal for editing new and existing dynamic projects
 
 
                                         <label>Monatlich</label><br>
-                                        <input type="radio">am <label><input class="form-control" type="number"></label> Tag jedes <label><input class="form-control" type="number"></label>. Monats<br>
-                                        <input type="radio">am <label><input class="form-control" type="number"></label> <label><select class="form-control" name="day" required>
+                                        <input type="radio" name="series" value="monthly_day_of_month">am <label><input class="form-control" type="number"></label> Tag jedes <label><input class="form-control" type="number"></label>. Monats<br>
+                                        <input type="radio" name="series" value="monthly_nth_day_of_week">am <label><input class="form-control" type="number"></label> <label><select class="form-control" name="day" required>
                                         <option value="monday">Montag</option>
                                         <option value="tuesday">Dienstag</option>
                                         <option value="wednesday">Mittwoch</option>
@@ -223,8 +223,42 @@ This template is a modal for editing new and existing dynamic projects
 
                                         
                                         <label>Jährlich</label><br>
-                                        <input type="radio">jeden <input value="1">. <input value="Jänner"><br>
-                                        <input type="radio">am <input value="1">. <input value="Montag"> im september<br>
+                                        <input type="radio" name="series" value="">jeden <input value="1">. <label><select class="form-control" name="month" required>
+                                        <option value="JAN">Jänner</option>
+                                        <option value="FEB">Februar</option>
+                                        <option value="MAR">März</option>
+                                        <option value="APR">April</option>
+                                        <option value="MAY">Mai</option>
+                                        <option value="JUN">Juni</option>
+                                        <option value="JUL">Juli</option>
+                                        <option value="AUG">August</option>
+                                        <option value="SEPT">September</option>
+                                        <option value="OCT">Oktober</option>
+                                        <option value="NOV">November</option>
+                                        <option value="DEC">Dezember</option>
+                                </select></label><br>
+                                        <input type="radio" name="series" value="">am <input value="1">. <label><select class="form-control" name="day" required>
+                                        <option value="monday">Montag</option>
+                                        <option value="tuesday">Dienstag</option>
+                                        <option value="wednesday">Mittwoch</option>
+                                        <option value="thursday">Donnerstag</option>
+                                        <option value="Friday">Freitag</option>
+                                        <option value="Saturday">Samstag</option>
+                                        <option value="Sunday">Sonntag</option>
+                                </select></label> im <label><select class="form-control" name="month" required>
+                                        <option value="JAN">Jänner</option>
+                                        <option value="FEB">Februar</option>
+                                        <option value="MAR">März</option>
+                                        <option value="APR">April</option>
+                                        <option value="MAY">Mai</option>
+                                        <option value="JUN">Juni</option>
+                                        <option value="JUL">Juli</option>
+                                        <option value="AUG">August</option>
+                                        <option value="SEPT">September</option>
+                                        <option value="OCT">Oktober</option>
+                                        <option value="NOV">November</option>
+                                        <option value="DEC">Dezember</option>
+                                </select></label><br>
 
                                     
                                 </div>

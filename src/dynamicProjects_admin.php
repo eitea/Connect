@@ -3,8 +3,7 @@ isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
-    $optional_employees = $series = "";
-
+    $series = "";
 
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
     $id = $_POST["id"] ?? "";
@@ -21,6 +20,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $owner = $_POST["owner"] ?? $userID+"";
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
+    $optional_employees = $_POST["optionalemployees"] ?? array();
+    $series = $_POST["series"] ?? "once";
 
     if($parent == "none"){
         $parent = "";
@@ -43,6 +44,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
         }
     }
     $owner = intval($owner) ?? $userID;
+    if($series == "once"){
+        $series = "";
+    }
 
     $description = $conn->real_escape_string($description);
     $id =  $conn->real_escape_string($id);
@@ -74,6 +78,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     foreach ($employees as $employee){
         $employee = intval($employee);
         $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
+    }
+    foreach ($optional_employees as $optional_employee){
+        $optional_employee = intval($optional_employee);
+        $conn->query("INSERT INTO dynamicprojectsoptionalemployees (projectid, userid) VALUES ('$id',$optional_employee)");
     }
 }
 ?>
@@ -133,6 +141,7 @@ require "dynamicProjects_template.php";
         <th>Pictures</th>
         <th>Clients</th>
         <th>Employees</th>
+        <th>Optional Employees</th>
     </tr>
 </thead>
 <tbody>
@@ -156,6 +165,7 @@ require "dynamicProjects_template.php";
         $owner = "${owner['firstname']} ${owner['lastname']}";
         $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
         $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
+        $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
 
         if(!empty($parent)){
             $parent =  $conn->real_escape_string($parent);
@@ -191,6 +201,13 @@ require "dynamicProjects_template.php";
             $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
             //var_dump($clientRow);
             echo "$employee, ";
+        }
+        echo "</td>"; 
+        echo "<td>";
+        while($optional_employeeRow = $optional_employeesResult->fetch_assoc()){
+            $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
+            //var_dump($clientRow);
+            echo "$optional_employee, ";
         }
         echo "</td>"; 
         echo "</tr>";

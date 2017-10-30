@@ -1636,7 +1636,13 @@ if($row['version'] < 102){
     CREATE TABLE dynamicprojectspictures(
       projectid VARCHAR(100) NOT NULL,
       picture MEDIUMBLOB
-    );");
+    );
+    CREATE TABLE dynamicprojectsseries(
+      projectid VARCHAR(100) NOT NULL,
+      nextdate VARCHAR(12)
+
+    );
+    ");
     
   }
 
