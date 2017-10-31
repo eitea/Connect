@@ -70,7 +70,7 @@ class MySQLImport {
 			} elseif (substr($ts = rtrim($s), -strlen($delimiter)) === $delimiter) {
 				$sql .= substr($ts, 0, -strlen($delimiter));
 				if (!$this->connection->query($sql)) {
-					echo $this->connection->error;
+					echo '<br>'.$this->connection->error.$sql;
 				}
 				$sql = '';
 				$count++;
@@ -86,7 +86,7 @@ class MySQLImport {
 		if (rtrim($sql) !== '') {
 			$count++;
 			if (!$this->connection->query($sql)) {
-				echo $this->connection->error;
+				echo '<br>'.$this->connection->error.$sql;
 			}
 			if ($this->onProgress) {
 				call_user_func($this->onProgress, $count, isset($stat['size']) ? 100 : NULL);
