@@ -1,4 +1,4 @@
-<?php
+<?php //accountJournal, getProjects
 header("Cache-Control: public");
 header("Content-Description: File Transfer");
 header("Content-Disposition: attachment; filename='export.csv'");

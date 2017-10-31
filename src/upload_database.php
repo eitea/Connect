@@ -15,11 +15,6 @@ if(isset($_POST['accept'])){
   if($accept){
     $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');
 
-    if($conn->query("DROP DATABASE $dbName")){
-      $conn->query("CREATE DATABASE $dbName");
-    } else {
-      die(mysqli_error($conn));
-    }
     $conn->close();
     $conn = new mysqli($servername, $username, $password, $dbName);
     $conn->query("SET NAMES 'utf8';");
@@ -28,8 +23,8 @@ if(isset($_POST['accept'])){
     $conn->query("SET FOREIGN_KEY_CHECKS=0;");
     $templine = '';
     while(($line = fgets($file)) !== false){
-      $conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
-      if($conv) $line = $conv;
+      //$conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
+      //if($conv) $line = $conv;
       
       //Skip comments
       if (substr($line, 0, 2) == '--' || $line == '') continue;

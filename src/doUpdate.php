@@ -1914,11 +1914,24 @@ if($row['version'] < 111){
   } else {
     echo "<br>Error Opening csv File";
   }
-  
   if(!$conn->error){
     echo '<br>Finanzen: Neue Steuersätze';
   } else {
     echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE accountingLocks(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    lockDate DATE NOT NULL,
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>Finanzen: Buchungsmonat-Sperre';
   }
 }
 

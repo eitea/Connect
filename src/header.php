@@ -390,7 +390,7 @@ $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00
 if($result && ($row = $result->fetch_assoc())) { //checkout
   $buttonVal = $lang['CHECK_OUT'];
   $buttonNam = 'stampOut';
-  $buttonEmoji = '<div class="btn-group btn-group-xs"><button type="submit" class="btn btn-danger">1</button><button type="submit" class="btn btn-warning">2</button></div>';
+  $buttonEmoji = '<div class="btn-group btn-group-xs"><button type="submit" class="btn btn-danger">1</button></div>';
   $showProjectBookingLink = TRUE;
   $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
   if($diff < $cd / 60) { $disabled = 'disabled'; }
@@ -424,7 +424,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
                   echo '</div>';
                 }
-                echo '<br>'.$buttonEmoji;
+                //echo '<br>'.$buttonEmoji;
                 ?>
               </form><br>
             </div>
@@ -589,7 +589,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                       <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                       <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="../system/update"><span>Update</span></a></li>
                       <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
-                      <?php if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])): ?>
+                      <?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
                         <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                       <?php endif; ?>
                       <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>

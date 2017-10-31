@@ -366,7 +366,6 @@ function mc_update_values($current, $new, $statement = ''){
 
 
 /*
-* requires createTimestamps.php
 * requires Calculator/IntervalCalculator
 *
 * query must contain WHERE clause

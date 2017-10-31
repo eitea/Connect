@@ -602,6 +602,9 @@ $lang_ger['LAST_BOOKING'] = 'Letzte Buchung';
 $lang_eng['LASTNAME'] = 'Lastname';
 $lang_ger['LASTNAME'] = 'Nachname';
 
+$lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
+$lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
+
 $lang_eng['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
 $lang_ger['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
 
