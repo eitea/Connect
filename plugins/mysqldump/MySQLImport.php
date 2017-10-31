@@ -39,9 +39,7 @@ class MySQLImport
 	 * @param  string filename
 	 * @return int
 	 */
-	public function load($file)
-	{
-		$handle = strcasecmp(substr($file, -3), '.gz') ? fopen($file, 'rb') : gzopen($file, 'rb');
+	public function load($handle){
 		if (!$handle) {
 			throw new Exception("ERROR: Cannot open file '$file'.");
 		}

@@ -14,34 +14,12 @@ if(isset($_POST['accept'])){
 
   if($accept){
     $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');
-
     $conn->close();
-    $conn = new mysqli($servername, $username, $password, $dbName);
-    $conn->query("SET NAMES 'utf8';");
-    $conn->query("SET CHARACTER SET 'utf8';");
-
-    $conn->query("SET FOREIGN_KEY_CHECKS=0;");
-    $templine = '';
-    while(($line = fgets($file)) !== false){
-      //$conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
-      //if($conv) $line = $conv;
-      
-      //Skip comments
-      if (substr($line, 0, 2) == '--' || $line == '') continue;
-
-      $templine .= $line;
-      //semicolon at the end = end of the query
-      if(substr(trim($line), -1, 1) == ';'){
-        $conn->query($templine) or print($conn->error);
-        $templine = '';
-      }
-    }
-    if(!mysqli_error($conn)){
-      $conn->query("SET FOREIGN_KEY_CHECKS=1;");
-      //redirect("../user/logout");
-    } else {
-      $error_output = mysqli_error($conn);
-    }
+    
+    require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
+    $import = new MySQLImport(new mysqli($servername, $username, $password, $dbName));
+    $import->load($file);
+    redirect("../user/logout");
   } else {
     $error_output = $lang['ERROR_INVALID_UPLOAD'];
   }

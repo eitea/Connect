@@ -30,6 +30,7 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   $dump = new MySQLDump(new mysqli($host, $user, $pass, $dbName));
   $dump->save($backup_name);
   $content = file_get_contents($backup_name);
+  unlink($backup_name);
 
   $zip = new ZipArchive();
   if ($zip->open($zip_name, ZIPARCHIVE::CREATE) === false) {
@@ -51,7 +52,6 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   header("Content-Length: ".filesize($zip_name));
   readfile($zip_name);
   unlink($zip_name);
-  unlink($backup_name);
   exit;
 }
 ?>
