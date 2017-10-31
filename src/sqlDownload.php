@@ -26,7 +26,7 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   $backup_name = $backup_name.".sql";
 
   //exec("mysqldump --user=$user --password=$pass --host=$host $dbName", $content); will not work without mysql installation
-  require dirname(__DIR__).'/plugins/mysqldump/MySQLDump.php';
+  require dirname(__DIR__).'/plugins/mysqldump/Mysqldump.php';
   $dump = new MySQLDump(new mysqli($host, $user, $pass, $dbName));
   $dump->save($backup_name);
   $content = file_get_contents($backup_name);
