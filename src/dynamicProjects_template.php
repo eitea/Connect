@@ -1,6 +1,19 @@
-<!--
-This template is a modal for editing new and existing dynamic projects
--->
+<?php
+//This template is a modal for editing new and existing dynamic projects
+if (!function_exists('stripSymbols')) { 
+    function stripSymbols($s)
+    {
+        $result = "";
+        foreach (str_split($s) as $char) {
+            if (ctype_alnum($char)) {
+                $result = $result . $char;
+            }
+        }
+        return $result;
+    }
+  } 
+
+?>
 
 <button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo stripSymbols($modal_id) ?>" type="button">
     <i class="fa fa-plus"></i>
@@ -441,5 +454,3 @@ This template is a modal for editing new and existing dynamic projects
     }
 
 </script>
-
-<?php

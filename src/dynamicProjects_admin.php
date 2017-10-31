@@ -2,17 +2,6 @@
 isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
-function stripSymbols($s)
-{
-    $result = "";
-    foreach (str_split($s) as $char) {
-        if (ctype_alnum($char)) {
-            $result = $result . $char;
-        }
-    }
-    return $result;
-}
-echo time();
 class ProjectSeries
 {
     public $once;
@@ -93,25 +82,25 @@ class ProjectSeries
             $this->end = intval($end);
         }
         else {
-            echo $end;
             $this->end = new DateTime($end);
         }
         $this->last_date = $this->start;
     }
-    function __sleep(){
-        echo $this->end->getTimestamp();
+    function __sleep()
+    {
         $this->start = $this->start->getTimestamp();
-        if(!is_numeric($this->end)&&$this->end != false){
+        if (!is_numeric($this->end) && $this->end != false) {
             //end is a DateTime which can't be serialized
-            $this->end = $this->end->getTimestamp(); 
+            $this->end = $this->end->getTimestamp();
         }
         return array_keys(get_object_vars($this));
     }
-    function __wakeup(){
+    function __wakeup()
+    {
         $startTimestamp = $this->start;
         $this->start = new DateTime();
         $this->start->setTimestamp($startTimestamp);
-        if($this->end > 100000000){ //probably a timestamp
+        if ($this->end > 100000000) { //probably a timestamp
             $endTimestamp = $this->end;
             $this->end = new DateTime();
             $this->end->setTimestamp($endTimestamp);
@@ -225,6 +214,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
         $conn->query("INSERT INTO dynamicprojectsoptionalemployees (projectid, userid) VALUES ('$id',$optional_employee)");
     }
 }
+else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    foreach (array_keys($_POST) as $post_var) {
+        if (strpos($post_var, "dynamicProject") !== false) {
+            echo "Trying to edit " . preg_replace('/dynamicProject/s', '', $post_var);
+            echo ": NOT IMPLEMENTED YET";
+        }
+    }
+}
 ?>
 <br>
     
@@ -319,12 +316,12 @@ require "dynamicProjects_template.php";
         $series = null;
         if ($seriesResult) {
             $series = $seriesResult->fetch_assoc()["projectseries"];
-            $series = base64_decode($series);         
-            $series = unserialize($series, array("allowed_classes"=>array("ProjectSeries")));
-        }else{
+            $series = base64_decode($series);
+            $series = unserialize($series, array("allowed_classes" => array("ProjectSeries")));
+        }
+        else {
             echo "series couldn't be unserialized";
         }
-       // echo $series->start;
 
         echo "<tr>";
         echo "<td style='background-color:$color;'>$name</td>";
