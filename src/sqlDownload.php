@@ -26,15 +26,9 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   $backup_name = $backup_name.".sql";
 
   //exec("mysqldump --user=$user --password=$pass --host=$host $dbName", $content); will not work without mysql installation
-  require dirname(__DIR__).'/plugins/mysqldump/Mysqldump.php';
-  
-  try {
-    $dump = new Ifsnop\Mysqldump\Mysqldump("mysql:host=$host;dbname=$dbName", $user, $pass, array('add-drop-table' => true));
-    $dump->start($backup_name);
-  } catch (\Exception $e) {
-    return 'mysqldump-php error: ' . $e->getMessage();
-  }
-
+  require dirname(__DIR__).'/plugins/mysqldump/MySQLDump.php';
+  $dump = new MySQLDump(new mysqli($host, $user, $pass, $dbName));
+  $dump->save($backup_name);
   $content = file_get_contents($backup_name);
 
   $zip = new ZipArchive();
