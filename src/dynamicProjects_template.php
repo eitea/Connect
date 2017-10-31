@@ -265,6 +265,8 @@ if (!function_exists('stripSymbols')) {
 
                                 <div class="well">
                                     <?php 
+                                    echo "test1234";
+                                    var_dump($modal_series);
                                     $modal_series = empty($modal_series) ? new ProjectSeries("", "", "") : $modal_series;
                                     ?>
                                     <label>Einmalig</label>
@@ -276,7 +278,7 @@ if (!function_exists('stripSymbols')) {
                                     <br>
                                     <input type="radio" <?php echo $modal_series->daily_every_nth ? "checked" : ""; ?> name="series" value="daily_every_nth">Alle
                                     <label>
-                                        <input class="form-control" type="number" min="1" max="365" name="daily_days">
+                                        <input class="form-control" type="number" min="1" max="365" value="<?php echo $modal_series->daily_days; ?>" name="daily_days">
                                     </label> Tage
                                     <br>
                                     <input type="radio" <?php echo $modal_series->daily_every_weekday ? "checked" : ""; ?> name="series" value="daily_every_weekday">Montag
@@ -288,17 +290,17 @@ if (!function_exists('stripSymbols')) {
                                     <br>
                                     <input type="radio" <?php echo $modal_series->weekly ? "checked" : ""; ?> name="series" value="weekly">Alle
                                     <label>
-                                        <input class="form-control" type="number" max="52" name="weekly_weeks">
+                                        <input class="form-control" type="number" max="52"  value="<?php echo $modal_series->weekly_weeks; ?>"  name="weekly_weeks">
                                     </label> Wochen am
                                     <label>
                                         <select class="form-control" name="weekly_day" required>
-                                            <option value="monday">Montag</option>
-                                            <option value="tuesday">Dienstag</option>
-                                            <option value="wednesday">Mittwoch</option>
-                                            <option value="thursday">Donnerstag</option>
-                                            <option value="Friday">Freitag</option>
-                                            <option value="Saturday">Samstag</option>
-                                            <option value="Sunday">Sonntag</option>
+                                        <?php
+                                        $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
+                                        foreach (array_keys($days_of_the_week) as $day) {
+                                            $selected = $modal_series->weekly_day == $day ? "selected" : "";
+                                            echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
+                                        }
+                                        ?>
                                         </select>
                                     </label>
                                     <br>
@@ -308,29 +310,29 @@ if (!function_exists('stripSymbols')) {
                                     <br>
                                     <input type="radio" <?php echo $modal_series->monthly_day_of_month ? "checked" : ""; ?> name="series" value="monthly_day_of_month">am
                                     <label>
-                                        <input name="monthly_day_of_month_day" class="form-control" type="number" min="1" max="31">
+                                        <input name="monthly_day_of_month_day" class="form-control" value="<?php echo $modal_series->monthly_day_of_month_day; ?>"  type="number" min="1" max="31">
                                     </label> Tag jedes
                                     <label>
-                                        <input name="monthly_day_of_month_month" class="form-control" type="number" min="1" max="12">
+                                        <input name="monthly_day_of_month_month" value="<?php echo $modal_series->monthly_day_of_month_month; ?>"  class="form-control" type="number" min="1" max="12">
                                     </label>. Monats
                                     <br>
                                     <input type="radio" <?php echo $modal_series->monthly_nth_day_of_week ? "checked" : ""; ?> name="series" value="monthly_nth_day_of_week">am
                                     <label>
-                                        <input name="monthly_nth_day_of_week_nth" class="form-control" type="number" min="1" max="5">
+                                        <input name="monthly_nth_day_of_week_nth" value="<?php echo $modal_series->monthly_nth_day_of_week_nth; ?>"  class="form-control" type="number" min="1" max="5">
                                     </label>
                                     <label>
                                         <select class="form-control" name="monthly_nth_day_of_week_day" required>
-                                            <option value="monday">Montag</option>
-                                            <option value="tuesday">Dienstag</option>
-                                            <option value="wednesday">Mittwoch</option>
-                                            <option value="thursday">Donnerstag</option>
-                                            <option value="Friday">Freitag</option>
-                                            <option value="Saturday">Samstag</option>
-                                            <option value="Sunday">Sonntag</option>
+                                        <?php
+                                        $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
+                                        foreach (array_keys($days_of_the_week) as $day) {
+                                            $selected = $modal_series->monthly_nth_day_of_week_day == $day ? "selected" : "";
+                                            echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
+                                        }
+                                        ?>
                                         </select>
                                     </label> jedes
                                     <label>
-                                        <input name="monthly_nth_day_of_week_month" class="form-control" type="number" min="1" max="12">
+                                        <input name="monthly_nth_day_of_week_month"   value="<?php echo $modal_series->monthly_nth_day_of_week_month; ?>" class="form-control" type="number" min="1" max="12">
                                     </label> monats
                                     <br>
 
@@ -339,54 +341,44 @@ if (!function_exists('stripSymbols')) {
                                     <br>
                                     <input type="radio" <?php echo $modal_series->yearly_nth_day_of_month ? "checked" : ""; ?> name="series" value="yearly_nth_day_of_month">jeden
                                     <label>
-                                        <input name="yearly_nth_day_of_month_nth" class="form-control" min="1" max="31" type="number">
+                                        <input name="yearly_nth_day_of_month_nth"  value="<?php echo $modal_series->yearly_nth_day_of_month_nth; ?>"  class="form-control" min="1" max="31" type="number">
                                     </label>.
                                     <label>
                                         <select class="form-control" name="yearly_nth_day_of_month_month" required>
-                                            <option value="JAN">Jänner</option>
-                                            <option value="FEB">Februar</option>
-                                            <option value="MAR">März</option>
-                                            <option value="APR">April</option>
-                                            <option value="MAY">Mai</option>
-                                            <option value="JUN">Juni</option>
-                                            <option value="JUL">Juli</option>
-                                            <option value="AUG">August</option>
-                                            <option value="SEPT">September</option>
-                                            <option value="OCT">Oktober</option>
-                                            <option value="NOV">November</option>
-                                            <option value="DEC">Dezember</option>
+                                        <?php
+                                        $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
+                                        foreach (array_keys($months_of_the_year) as $month) {
+                                            $selected = $modal_series->yearly_nth_day_of_month_month == $month ? "selected" : "";
+                                            echo "<option $selected value='$month'>${months_of_the_year[$month]}</option>";
+                                        }
+                                        ?>
                                         </select>
                                     </label>
                                     <br>
                                     <input type="radio" <?php echo $modal_series->yearly_nth_day_of_week ? "checked" : ""; ?> name="series" value="yearly_nth_day_of_week">am
                                     <label>
-                                        <input name="yearly_nth_day_of_week_nth" class="form-control" min="1" max="5" type="number">
+                                        <input name="yearly_nth_day_of_week_nth"  value="<?php echo $modal_series->yearly_nth_day_of_week_nth; ?>"  class="form-control" min="1" max="5" type="number">
                                     </label>.
                                     <label>
                                         <select class="form-control" name="yearly_nth_day_of_week_day" required>
-                                            <option value="monday">Montag</option>
-                                            <option value="tuesday">Dienstag</option>
-                                            <option value="wednesday">Mittwoch</option>
-                                            <option value="thursday">Donnerstag</option>
-                                            <option value="Friday">Freitag</option>
-                                            <option value="Saturday">Samstag</option>
-                                            <option value="Sunday">Sonntag</option>
+                                            <?php
+                                            $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
+                                            foreach (array_keys($days_of_the_week) as $day) {
+                                                $selected = $modal_series->yearly_nth_day_of_week_day == $day ? "selected" : "";
+                                                echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
+                                            }
+                                            ?>
                                         </select>
                                     </label> im
                                     <label>
                                         <select name="yearly_nth_day_of_week_month" class="form-control" name="month" required>
-                                            <option value="JAN">Jänner</option>
-                                            <option value="FEB">Februar</option>
-                                            <option value="MAR">März</option>
-                                            <option value="APR">April</option>
-                                            <option value="MAY">Mai</option>
-                                            <option value="JUN">Juni</option>
-                                            <option value="JUL">Juli</option>
-                                            <option value="AUG">August</option>
-                                            <option value="SEPT">September</option>
-                                            <option value="OCT">Oktober</option>
-                                            <option value="NOV">November</option>
-                                            <option value="DEC">Dezember</option>
+                                        <?php
+                                        $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
+                                        foreach (array_keys($months_of_the_year) as $month) {
+                                            $selected = $modal_series->yearly_nth_day_of_week_month == $month ? "selected" : "";
+                                            echo "<option $selected value='$month'>${months_of_the_year[$month]}</option>";
+                                        }
+                                        ?>
                                         </select>
                                     </label>
                                     <br>

@@ -106,6 +106,10 @@ class ProjectSeries
             $this->end->setTimestamp($endTimestamp);
         }
     }
+    function __toString()
+    {
+        return "the __toString method hasn't been implemented yet";
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
@@ -125,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();
-    $completed = (int) $_POST["completed"] ?? 0;
+    $completed = (int)$_POST["completed"] ?? 0;
     //series one of: once daily_every_nth daily_every_weekday weekly monthly_day_of_month monthly_nth_day_of_week yearly_nth_day_of_month yearly_nth_day_of_week
     $series = $_POST["series"] ?? "once";
     if ($end == "no") {
@@ -138,20 +142,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
         $end = $_POST["enddate"] ?? "";
     }
     $series = new ProjectSeries($series, $start, $end);
-    $series->daily_days = $_POST["daily_days"] || 1;
-    $series->weekly_weeks = $_POST["weekly_weeks"] || 1;
-    $series->weekly_day = $_POST["weekly_day"] || "monday";
-    $series->monthly_day_of_month_day = $_POST["monthly_day_of_month_day"] || 1;
-    $series->monthly_day_of_month_month = $_POST["monthly_day_of_month_month"] || 1;
-    $series->monthly_nth_day_of_week_nth = $_POST["monthly_nth_day_of_week_nth"] || 1;
-    $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] || "monday";
-    $series->monthly_nth_day_of_week_month = $_POST["monthly_nth_day_of_week_month"] || 1;
-    $series->yearly_nth_day_of_month_nth = $_POST["yearly_nth_day_of_month_nth"] || 1;
-    $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] || "JAN";
-    $series->yearly_nth_day_of_week_nth = $_POST["yearly_nth_day_of_week_nth"] || 1;
-    $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] || "monday";
-    $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] || "JAN";
-
+    $series->daily_days = (int)$_POST["daily_days"] ?? 1;
+    $series->weekly_weeks = (int)$_POST["weekly_weeks"] ?? 1;
+    $series->weekly_day = $_POST["weekly_day"] ?? "monday";
+    $series->monthly_day_of_month_day = (int)$_POST["monthly_day_of_month_day"] ?? 1;
+    $series->monthly_day_of_month_month = (int)$_POST["monthly_day_of_month_month"] ?? 1;
+    $series->monthly_nth_day_of_week_nth = (int)$_POST["monthly_nth_day_of_week_nth"] ?? 1;
+    $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] ?? "monday";
+    $series->monthly_nth_day_of_week_month = (int)$_POST["monthly_nth_day_of_week_month"] ?? 1;
+    $series->yearly_nth_day_of_month_nth = (int)$_POST["yearly_nth_day_of_month_nth"] ?? 1;
+    $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] ?? "JAN";
+    $series->yearly_nth_day_of_week_nth = (int)$_POST["yearly_nth_day_of_week_nth"] ?? 1;
+    $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] ?? "monday";
+    $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
+    var_dump($series);
+    echo "<br><br><br>";
     if ($parent == "none") {
         $parent = "";
     }
@@ -170,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
     var_dump($series);
     $series = serialize($series);
     $series = base64_encode($series);
-    
+
 
     $description = $conn->real_escape_string($description);
     $id = $conn->real_escape_string($id);
@@ -377,7 +382,7 @@ require "dynamicProjects_template.php";
         $modal_owner = $ownerId;
         $modal_employees = $employees;
         $modal_optional_employees = $optional_employees;
-        $modal_series = "";
+        $modal_series = $series;
         $modal_completed = $completed;
         require "dynamicProjects_template.php";
         echo "</td>";
