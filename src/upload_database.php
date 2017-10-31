@@ -6,7 +6,7 @@ if(isset($_POST['accept'])){
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["size"] <= 0) {
     $accept = false;
-  } elseif ($_FILES["fileToUpload"]["size"] > 10000000) { //10mb
+  } elseif ($_FILES["fileToUpload"]["size"] > 15000000) { //15mb
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["type"] != "application/octet-stream") {
     $accept = false;

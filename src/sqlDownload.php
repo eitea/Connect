@@ -18,14 +18,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 
+//changes here have to be copied to resticBackup.php 
 function Export_Database($host, $user, $pass, $dbName, $password=false){
-  // changes here have to be copied to resticBackup.php 
   $content = '';
-  exec("mysqldump --user=$user --password=$pass --host=$host $dbName", $content);
-
   $backup_name = $dbName."_".date('dmY_Hi', time());
   $zip_name = $backup_name.".zip";
-  $backup_name = $backup_name. ".sql";
+  $backup_name = $backup_name.".sql";
+
+  //exec("mysqldump --user=$user --password=$pass --host=$host $dbName", $content); will not work without mysql installation
+  require dirname(__DIR__).'/plugins/mysqldump/Mysqldump.php';
+  
+  try {
+    $dump = new Ifsnop\Mysqldump\Mysqldump("mysql:host=$host;dbname=$dbName", $user, $pass, array('add-drop-table' => true));
+    $dump->start($backup_name);
+  } catch (\Exception $e) {
+    return 'mysqldump-php error: ' . $e->getMessage();
+  }
+
+  $content = file_get_contents($backup_name);
 
   $zip = new ZipArchive();
   if ($zip->open($zip_name, ZIPARCHIVE::CREATE) === false) {
@@ -35,8 +45,9 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   $zip->close();
 
   if($password){
-    //$zip->setEncryptionName($backup_name, ZipArchive::EM_AES_256); //php 7.2. update
-    system("zip -P $password $zip_name $zip_name");
+    $zip->setPassword($password);
+    $zip->setEncryptionName($backup_name, ZipArchive::EM_AES_256); //php 7.2. update
+    //system("zip -P $password $zip_name $zip_name");
   }
 
   header('Content-Type: application/octet-stream');
@@ -46,6 +57,7 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   header("Content-Length: ".filesize($zip_name));
   readfile($zip_name);
   unlink($zip_name);
+  unlink($backup_name);
   exit;
 }
 ?>
