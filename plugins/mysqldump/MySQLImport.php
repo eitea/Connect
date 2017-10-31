@@ -69,7 +69,7 @@ class MySQLImport {
 			} elseif (substr($ts = rtrim($s), -strlen($delimiter)) === $delimiter) {
 				$sql .= substr($ts, 0, -strlen($delimiter));
 				if (!$this->connection->query($sql)) {
-					$sql = preg_replace("/\/\*![0-9]+ DEFINER=`.{1,10}`@`.{1,10}`\*\/ /", "", $sql);
+					$sql = preg_replace("/\/\*![0-9]+ DEFINER=`.+`@`.+`\*\/ /", "", $sql);
 					$this->connection->query($sql);
 					echo $this->connection->error;
 				}
