@@ -2,17 +2,19 @@
 isDynamicProjectAdmin($userID); ?>
 <!-- BODY -->
 <?php
-function stripSymbols($s){
+function stripSymbols($s)
+{
     $result = "";
-    foreach(str_split($s) as $char){
-        if (ctype_alnum($char)){
+    foreach (str_split($s) as $char) {
+        if (ctype_alnum($char)) {
             $result = $result . $char;
         }
     }
     return $result;
 }
-
-class ProjectSeries{
+echo time();
+class ProjectSeries
+{
     public $once;
     public $daily_every_nth;
     public $daily_days;
@@ -34,16 +36,90 @@ class ProjectSeries{
     public $yearly_nth_day_of_week_nth;
     public $yearly_nth_day_of_week_day;
     public $yearly_nth_day_of_week_month;
-    function get_next_date(){
-        //TODO: calculate next date
-        return "2018-01-01";
+    public $start;
+    public $end;
+    public $last_date;
+    function get_next_date()
+    {
+        $now = new DateTime();
+        //$date->format('Y-m-d')
+        // "" indicates end of series
+        switch (true) {
+            case ($this->once) :
+                return "";
+                break;
+            case ($this->daily_every_nth) :
+                return "";
+                break;
+            case ($this->$daily_every_weekday) :
+                return "";
+                break;
+            case ($this->weekly) :
+                return "";
+                break;
+            case ($this->monthly_day_of_month) :
+                return "";
+                break;
+            case ($this->monthly_nth_day_of_week) :
+                return "";
+                break;
+            case ($this->yearly_nth_day_of_month) :
+                return "";
+                break;
+            case ($this->yearly_nth_day_of_week) :
+                return "";
+                break;
+            default :
+                return "";
+                break;
+        }
     }
-    function __construct(){
-
+    function __construct($series /*eg once, daily_every_nth, ...*/, $start, $end)
+    {
+        // $start and $end are both strings like "2018-01-01" end can also be ""/"no" for no end or "3" for 3 repetions
+        $this->once = $series == "once";
+        $this->daily_every_nth = $series == "daily_every_nth";
+        $this->daily_every_weekday = $series == "daily_every_weekday";
+        $this->weekly = $series == "weekly";
+        $this->monthly_day_of_month = $series == "monthly_day_of_month";
+        $this->monthly_nth_day_of_week = $series == "monthly_nth_day_of_week";
+        $this->yearly_nth_day_of_month = $series == "yearly_nth_day_of_month";
+        $this->yearly_nth_day_of_week = $series == "yearly_nth_day_of_week";
+        $this->start = new DateTime($start);
+        if ($end == "no" || $end == "") {
+            $this->end = false;
+        }
+        elseif (is_numeric($end)) {
+            $this->end = intval($end);
+        }
+        else {
+            echo $end;
+            $this->end = new DateTime($end);
+        }
+        $this->last_date = $this->start;
+    }
+    function __sleep(){
+        echo $this->end->getTimestamp();
+        $this->start = $this->start->getTimestamp();
+        if(!is_numeric($this->end)&&$this->end != false){
+            //end is a DateTime which can't be serialized
+            $this->end = $this->end->getTimestamp(); 
+        }
+        return array_keys(get_object_vars($this));
+    }
+    function __wakeup(){
+        $startTimestamp = $this->start;
+        $this->start = new DateTime();
+        $this->start->setTimestamp($startTimestamp);
+        if($this->end > 100000000){ //probably a timestamp
+            $endTimestamp = $this->end;
+            $this->end = new DateTime();
+            $this->end->setTimestamp($endTimestamp);
+        }
     }
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
     $id = $_POST["id"] ?? "";
     $name = $_POST["name"] ?? "missing name";
@@ -56,70 +132,63 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $priority = intval($_POST["priority"] ?? "3") ?? 3;
     $parent = $_POST["parent"] ?? "";
     $pictures = $_POST["imagesbase64"] ?? false;
-    $owner = $_POST["owner"] ?? $userID+"";
+    $owner = $_POST["owner"] ?? $userID + "";
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();
     //series one of: once daily_every_nth daily_every_weekday weekly monthly_day_of_month monthly_nth_day_of_week yearly_nth_day_of_month yearly_nth_day_of_week
     $series = $_POST["series"] ?? "once";
     //var_dump($clients);
-    $series = new ProjectSeries($series);
-    $series->once =                                isset($_POST["once"]);
-    $series->daily_every_nth =                     isset($_POST["once"]);
-    $series->daily_days =                          $_POST["daily_days"] || 1;
-    $series->daily_every_weekday =                 isset($_POST["once"]);
-    $series->weekly =                              isset($_POST["once"]);
-    $series->weekly_weeks =                        $_POST["weekly_weeks"] || 1;
-    $series->weekly_day =                          $_POST["weekly_day"] || "monday";
-    $series->monthly_day_of_month =                isset($_POST["once"]);
-    $series->monthly_day_of_month_day =            $_POST["monthly_day_of_month_day"] || 1;
-    $series->monthly_day_of_month_month =          $_POST["monthly_day_of_month_month"] || 1;
-    $series->monthly_nth_day_of_week =             isset($_POST["once"]);
-    $series->monthly_nth_day_of_week_nth =         $_POST["monthly_nth_day_of_week_nth"] || 1;
-    $series->monthly_nth_day_of_week_day =         $_POST["monthly_nth_day_of_week_day"] || "monday";
-    $series->monthly_nth_day_of_week_month =       $_POST["monthly_nth_day_of_week_month"] || 1;
-    $series->yearly_nth_day_of_month =             isset($_POST["once"]);
-    $series->yearly_nth_day_of_month_nth =         $_POST["yearly_nth_day_of_month_nth"] || 1;
-    $series->yearly_nth_day_of_month_month =       $_POST["yearly_nth_day_of_month_month"] || "JAN";
-    $series->yearly_nth_day_of_week =              isset($_POST["once"]);
-    $series->yearly_nth_day_of_week_nth =          $_POST["yearly_nth_day_of_week_nth"] || 1;
-    $series->yearly_nth_day_of_week_day =          $_POST["yearly_nth_day_of_week_day"] || "monday";
-    $series->yearly_nth_day_of_week_month =        $_POST["yearly_nth_day_of_week_month"] || "JAN";
-
-    if($parent == "none"){
-        $parent = "";
-    }
-    if($end == "no"){
+    if ($end == "no") {
         $end = "";
-    }else if ($end == "number"){
+    }
+    else if ($end == "number") {
         $end = $_POST["endnumber"] ?? "";
-    }else if($end == "date"){
+    }
+    else if ($end == "date") {
         $end = $_POST["enddate"] ?? "";
     }
-    if(empty($company) || !is_numeric($company)){
+    $series = new ProjectSeries($series, $start, $end);
+    $series->daily_days = $_POST["daily_days"] || 1;
+    $series->weekly_weeks = $_POST["weekly_weeks"] || 1;
+    $series->weekly_day = $_POST["weekly_day"] || "monday";
+    $series->monthly_day_of_month_day = $_POST["monthly_day_of_month_day"] || 1;
+    $series->monthly_day_of_month_month = $_POST["monthly_day_of_month_month"] || 1;
+    $series->monthly_nth_day_of_week_nth = $_POST["monthly_nth_day_of_week_nth"] || 1;
+    $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] || "monday";
+    $series->monthly_nth_day_of_week_month = $_POST["monthly_nth_day_of_week_month"] || 1;
+    $series->yearly_nth_day_of_month_nth = $_POST["yearly_nth_day_of_month_nth"] || 1;
+    $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] || "JAN";
+    $series->yearly_nth_day_of_week_nth = $_POST["yearly_nth_day_of_week_nth"] || 1;
+    $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] || "monday";
+    $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] || "JAN";
+
+    if ($parent == "none") {
+        $parent = "";
+    }
+    if (empty($company) || !is_numeric($company)) {
         echo "Company not set";
         goto bodyEnd;
     }
-    if($id == ""){
+    if ($id == "") {
         $id = uniqid($connectIdentification);
-        while ($conn->query("SELECT * FROM dynamicprojects WHERE projectid = 'asdf'")->num_rows != 0){
-            $id = uniqid($connectIdentification);        
+        while ($conn->query("SELECT * FROM dynamicprojects WHERE projectid = 'asdf'")->num_rows != 0) {
+            $id = uniqid($connectIdentification);
         }
     }
     $owner = intval($owner) ?? $userID;
     $nextDate = $series->get_next_date();
-    $series = serialize($series);    
+    $series = serialize($series);
+    $series = base64_encode($series);
 
     $description = $conn->real_escape_string($description);
-    $id =  $conn->real_escape_string($id);
-    $name =  $conn->real_escape_string($name);
-    $color =  $conn->real_escape_string($color);
-    $start =  $conn->real_escape_string($start);
-    $end =  $conn->real_escape_string($end);
-    $status =  $conn->real_escape_string($status);
+    $id = $conn->real_escape_string($id);
+    $name = $conn->real_escape_string($name);
+    $color = $conn->real_escape_string($color);
+    $start = $conn->real_escape_string($start);
+    $end = $conn->real_escape_string($end);
+    $status = $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
-    $series = $conn->real_escape_string($series);
-    
     $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner')");
     echo $conn->error;
     // series
@@ -131,7 +200,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
     $stmt->execute();
     echo $stmt->error;
     // /series
-    if($pictures){
+    if ($pictures) {
         foreach ($pictures as $picture) {
             // $conn->query("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id','$picture')");
             $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
@@ -143,15 +212,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])){
             echo $stmt->error;
         }
     }
-    foreach ($clients as $client){
+    foreach ($clients as $client) {
         $client = intval($client);
         $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid) VALUES ('$id',$client)");
     }
-    foreach ($employees as $employee){
+    foreach ($employees as $employee) {
         $employee = intval($employee);
         $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
     }
-    foreach ($optional_employees as $optional_employee){
+    foreach ($optional_employees as $optional_employee) {
         $optional_employee = intval($optional_employee);
         $conn->query("INSERT INTO dynamicprojectsoptionalemployees (projectid, userid) VALUES ('$id',$optional_employee)");
     }
@@ -218,7 +287,7 @@ require "dynamicProjects_template.php";
 <tbody>
     <?php
     $result = $conn->query("SELECT * FROM dynamicprojects");
-    while ($row = $result->fetch_assoc()){
+    while ($row = $result->fetch_assoc()) {
         $id = $row["projectid"];
         $name = $row["projectname"];
         $description = $row["projectdescription"];
@@ -230,6 +299,8 @@ require "dynamicProjects_template.php";
         $status = $row["projectstatus"];
         $priority = $row["projectpriority"];
         $pictureResult = $conn->query("SELECT picture FROM dynamicprojectspictures WHERE projectid='$id'");
+        $seriesResult = $conn->query("SELECT projectseries FROM dynamicprojectsseries WHERE projectid='$id'");
+        echo $conn->error;
         $parent = $row["projectparent"];
         $ownerId = $row["projectowner"];
         $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
@@ -241,10 +312,19 @@ require "dynamicProjects_template.php";
         $clients = array();
         $employees = array();
         $optional_employees = array();
-        if(!empty($parent)){
-            $parent =  $conn->real_escape_string($parent);
+        if (!empty($parent)) {
+            $parent = $conn->real_escape_string($parent);
             $parent = $conn->query("SELECT * FROM dynamicprojects WHERE projectid='$parent'")->fetch_assoc()["projectname"];
         }
+        $series = null;
+        if ($seriesResult) {
+            $series = $seriesResult->fetch_assoc()["projectseries"];
+            $series = base64_decode($series);         
+            $series = unserialize($series, array("allowed_classes"=>array("ProjectSeries")));
+        }else{
+            echo "series couldn't be unserialized";
+        }
+       // echo $series->start;
 
         echo "<tr>";
         echo "<td style='background-color:$color;'>$name</td>";
@@ -257,34 +337,33 @@ require "dynamicProjects_template.php";
         echo "<td>$parent</td>";
         echo "<td>$owner</td>";
         echo "<td>";
-            while($pictureRow = $pictureResult->fetch_assoc()){
-                array_push($pictures,$picture);
-                $picture = $pictureRow["picture"];
-                echo "<img  height='50' src='$picture'>";
-            }
+        while ($pictureRow = $pictureResult->fetch_assoc()) {
+            array_push($pictures, $picture);
+            $picture = $pictureRow["picture"];
+            echo "<img  height='50' src='$picture'>";
+        }
         echo "</td>";
         echo "<td>";
-            while($clientRow = $clientsResult->fetch_assoc()){
-                array_push($clients,$clientRow["id"]);
-                $client = $clientRow["name"];
-                echo "$client, ";
-            }
-        echo "</td>";   
+        while ($clientRow = $clientsResult->fetch_assoc()) {
+            array_push($clients, $clientRow["id"]);
+            $client = $clientRow["name"];
+            echo "$client, ";
+        }
+        echo "</td>";
         echo "<td>";
-        while($employeeRow = $employeesResult->fetch_assoc()){
-            array_push($employees,$employeesResult["id"]);
+        while ($employeeRow = $employeesResult->fetch_assoc()) {
+            array_push($employees, $employeeRow["id"]);
             $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
             echo "$employee, ";
         }
-        echo "</td>"; 
+        echo "</td>";
         echo "<td>";
-        while($optional_employeeRow = $optional_employeesResult->fetch_assoc()){
-            array_push($optional_employees,$optional_employeesResult["id"]);
+        while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
+            array_push($optional_employees, $optional_employeeRow["id"]);
             $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
             echo "$optional_employee, ";
         }
-        echo "</td>"; 
-       
+        echo "</td>";
 
         echo "<td>";
         $modal_title = "Edit Dynamic Project";
@@ -304,11 +383,11 @@ require "dynamicProjects_template.php";
         $modal_employees = $employees;
         $modal_optional_employees = $optional_employees;
         $modal_series = "";
-        require "dynamicProjects_template.php";
+        //require "dynamicProjects_template.php";
         echo "</td>";
         echo "</tr>";
     }
-?>
+    ?>
 </tbody>
 </table>
 
@@ -318,5 +397,5 @@ require "dynamicProjects_template.php";
 
 <!-- /BODY -->
 <?php
-bodyEnd: //to stop loader when displaying an error
+bodyEnd : //to stop loader when displaying an error
 include 'footer.php'; ?>

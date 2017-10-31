@@ -8,9 +8,9 @@ This template is a modal for editing new and existing dynamic projects
 
 
 <!-- new dynamic project modal -->
-<form method="post" autocomplete="off" id="projectForm<?php echo $modal_id ?>">
+<form method="post" autocomplete="off" id="projectForm<?php echo stripSymbols($modal_id) ?>">
 <input type="hidden" name="id" value="<?php echo $modal_id ?>">
-    <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo $modal_id ?>">
+    <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -36,7 +36,7 @@ This template is a modal for editing new and existing dynamic projects
                                 <label>Projektname*:</label>
                                 <input class="form-control" type="text" name="name" required value="<?php echo $modal_name; ?>">
                                 <label>Mandant*:</label>
-                                <select class="form-control js-example-basic-single" name="company" required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo $modal_id ?>')">
+                                <select class="form-control js-example-basic-single" name="company" required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')">
                                     <option value="">...</option>
                                     <?php 
                                     $result = $conn->query("SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ");
@@ -106,7 +106,7 @@ This template is a modal for editing new and existing dynamic projects
                                 <textarea class="form-control" style="max-width: 100%" rows="10" name="description" required><?php echo $modal_description; ?></textarea>
                                 <label>Bilder auswählen:</label><br>
                                 <label class="btn btn-default" role="button">Durchsuchen...
-                                <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo $modal_id ?>" accept=".jpg,.jpeg,.png"></label>
+                                <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo stripSymbols($modal_id) ?>" accept=".jpg,.jpeg,.png"></label>
                                 <div id="projectPreview<?php echo stripSymbols($modal_id) ?>">
                                 <?php 
                                 foreach ($modal_pictures as $picture) {
@@ -271,7 +271,7 @@ This template is a modal for editing new and existing dynamic projects
                     <!-- /modal body -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                    <button type="submit" class="btn btn-warning" name="dynamicProject<?php echo $modal_id ?>"><?php echo $lang['SAVE']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="dynamicProject<?php echo stripSymbols($modal_id) ?>"><?php echo $lang['SAVE']; ?></button>
                 </div>
             </div>
         </div>
