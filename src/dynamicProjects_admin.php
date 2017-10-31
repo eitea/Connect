@@ -383,7 +383,7 @@ require "dynamicProjects_template.php";
         $modal_employees = $employees;
         $modal_optional_employees = $optional_employees;
         $modal_series = "";
-        //require "dynamicProjects_template.php";
+        require "dynamicProjects_template.php";
         echo "</td>";
         echo "</tr>";
     }
