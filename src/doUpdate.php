@@ -1617,6 +1617,7 @@ if($row['version'] < 102){
       projectpriority INT(6),
       projectparent VARCHAR(100),
       projectowner INT(6),
+      projectcompleted INT(6),
       PRIMARY KEY (`projectid`)
     );
     CREATE TABLE dynamicprojectsclients(
