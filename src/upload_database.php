@@ -13,11 +13,9 @@ if(isset($_POST['accept'])){
   }
 
   if($accept){
-    $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');
-    $conn->close();
-    
+    $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');   
     require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
-    $import = new MySQLImport(new mysqli($servername, $username, $password, $dbName));
+    $import = new MySQLImport($conn);
     $import->load($file);
     redirect("../user/logout");
   } else {

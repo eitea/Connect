@@ -8,8 +8,7 @@
  * @license    New BSD License
  * @version    1.0
  */
-class MySQLImport
-{
+class MySQLImport {
 	/** @var callable  function (int $count, ?float $percent): void */
 	public $onProgress;
 
@@ -21,8 +20,7 @@ class MySQLImport
 	 * Connects to database.
 	 * @param  mysqli connection
 	 */
-	public function __construct(mysqli $connection, $charset = 'utf8')
-	{
+	public function __construct(mysqli $connection, $charset = 'utf8') {
 		$this->connection = $connection;
 
 		if ($connection->connect_errno) {
@@ -52,8 +50,7 @@ class MySQLImport
 	 * @param  resource
 	 * @return int
 	 */
-	public function read($handle)
-	{
+	public function read($handle) {
 		if (!is_resource($handle) || get_resource_type($handle) !== 'stream') {
 			throw new Exception('Argument must be stream resource.');
 		}
@@ -73,7 +70,7 @@ class MySQLImport
 			} elseif (substr($ts = rtrim($s), -strlen($delimiter)) === $delimiter) {
 				$sql .= substr($ts, 0, -strlen($delimiter));
 				if (!$this->connection->query($sql)) {
-					throw new Exception($this->connection->error);
+					echo $this->connection->error;
 				}
 				$sql = '';
 				$count++;
@@ -89,7 +86,7 @@ class MySQLImport
 		if (rtrim($sql) !== '') {
 			$count++;
 			if (!$this->connection->query($sql)) {
-				throw new Exception($this->connection->error);
+				echo $this->connection->error;
 			}
 			if ($this->onProgress) {
 				call_user_func($this->onProgress, $count, isset($stat['size']) ? 100 : NULL);
