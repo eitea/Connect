@@ -1,13 +1,6 @@
 <?php include 'header.php';
 enableToDynamicProjects($userID); ?>
 <!-- BODY -->
-<?php
-
-
-
-?>
-
-
 <table class="table">
 <thead>
     <tr>
@@ -45,8 +38,5 @@ enableToDynamicProjects($userID); ?>
     ?>
 </tbody>
 </table>
-
-
-
 <!-- /BODY -->
 <?php include 'footer.php'; ?>

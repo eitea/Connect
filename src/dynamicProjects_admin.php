@@ -108,7 +108,37 @@ class ProjectSeries
     }
     function __toString()
     {
-        return "the __toString method hasn't been implemented yet";
+        $text_before = "Dieses Projekt wiederholt sich ";
+        $text_after = ".";
+        switch (true) {
+            case ($this->once) :
+                return "${text_before}nicht${text_after}";
+                break;
+            case ($this->daily_every_nth) :
+                return "${text_before}jeden ${daily_days}.Tag${text_after}";
+                break;
+            case ($this->daily_every_weekday) :
+                return "${text_before}jeden Wochentag${text_after}";
+                break;
+            case ($this->weekly) :
+                return "${text_before}jede ${weekly_weeks}. Woche am ${weekly_day}${text_after}";
+                break;
+            case ($this->monthly_day_of_month) :
+                return "${text_before}jeden ${monthly_day_of_month_day} jedes ${monthly_day_of_month_month}. Monats${text_after}";
+                break;
+            case ($this->monthly_nth_day_of_week) :
+                return "${text_before}jeden ${monthly_nth_day_of_week_nth}. ${monthly_nth_day_of_week_day} jedes ${monthly_nth_day_of_week_month}. Monats${text_after}";
+                break;
+            case ($this->yearly_nth_day_of_month) :
+                return "${text_before}jeden ${yearly_nth_day_of_month_nth}. ${yearly_nth_day_of_month_month}${text_after}";
+                break;
+            case ($this->yearly_nth_day_of_week) :
+                return "${text_before}jeden ${yearly_nth_day_of_week_nth}. ${yearly_nth_day_of_week_day} im ${yearly_nth_day_of_week_month}${text_after}";
+                break;
+            default :
+                return "ERROR";
+                break;
+        }
     }
 }
 
@@ -239,7 +269,7 @@ $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
 $modal_name = "";
 $modal_company = ""; //id
 $modal_description = "No description given";
-$modal_color = "#777777";
+$modal_color = "#ededed";
 $modal_start = date("Y-m-d");
 $modal_end = ""; // Possibilities: ""(none);number (repeats); Y-m-d (date)
 $modal_status = "ACTIVE"; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
