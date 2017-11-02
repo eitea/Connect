@@ -311,12 +311,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
     }
 }
 else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    foreach (array_keys($_POST) as $post_var) {
-        if (strpos($post_var, "dynamicProject") !== false) {
-            echo "Trying to edit " . preg_replace('/dynamicProject/s', '', $post_var);
-            echo ": NOT IMPLEMENTED YET";
+    if(isset($_POST["deleteDynamicProject"])){
+        $id = $id = $_POST["id"] ?? "error - no id";
+        $id = $conn->real_escape_string($id);
+        $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'");
+    }else{
+        foreach (array_keys($_POST) as $post_var) {
+            if (strpos($post_var, "dynamicProject") !== false) {
+                echo "Trying to edit " . preg_replace('/dynamicProject/s', '', $post_var);
+                echo ": NOT IMPLEMENTED YET";
+            }
         }
     }
+    
 }
 ?>
 <br>
