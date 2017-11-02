@@ -264,9 +264,7 @@ if (!function_exists('stripSymbols')) {
                                 </div>
 
                                 <div class="well">
-                                    <?php 
-                                    echo "test1234";
-                                    var_dump($modal_series);
+                                    <?php
                                     $modal_series = empty($modal_series) ? new ProjectSeries("", "", "") : $modal_series;
                                     ?>
                                     <label>Einmalig</label>

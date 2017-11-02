@@ -28,41 +28,85 @@ class ProjectSeries
     public $start;
     public $end;
     public $last_date;
+
     function get_next_date()
     {
         $now = new DateTime();
-        //$date->format('Y-m-d')
-        // "" indicates end of series
+        $retDate = $this->last_date;
+        // "" should indicate the end of series
+        $daily_days = $this->daily_days;
+        $weekly_day = $this->weekly_day;
+        $weekly_weeks = $this->weekly_weeks;
+        $monthly_day_of_month_day = $this->monthly_day_of_month_day;
+        $monthly_day_of_month_month = $this->monthly_day_of_month_month;
+        $yearly_nth_day_of_week_nth = $this->yearly_nth_day_of_week_nth;
+        $yearly_nth_day_of_week_day = $this->yearly_nth_day_of_week_day;
+        $monthly_nth_day_of_week_day = $this->monthly_nth_day_of_week_day;
+        $monthly_nth_day_of_week_nth = $this->monthly_nth_day_of_week_nth;
+        $yearly_nth_day_of_month_nth = $this->yearly_nth_day_of_month_nth;
+        $yearly_nth_day_of_week_month = $this->yearly_nth_day_of_week_month;
+        $monthly_nth_day_of_week_month = $this->monthly_nth_day_of_week_month;
+        $yearly_nth_day_of_month_month = $this->yearly_nth_day_of_month_month;
         switch (true) {
             case ($this->once) :
                 return "";
-                break;
             case ($this->daily_every_nth) :
-                return "";
+                while($retDate < $now){
+                    $retDate->add(new DateInterval("P${daily_days}D"));
+                }
                 break;
             case ($this->daily_every_weekday) :
-                return "";
+                while($retDate < $now){
+                    $retDate->setTimestamp(strtotime("+1 weekday", $retDate->getTimestamp()));
+                }
                 break;
             case ($this->weekly) :
-                return "";
+                while($retDate < $now){
+                    $retDate->setTimestamp(strtotime("+${weekly_weeks} weeks ${weekly_day}", $retDate->getTimestamp()));
+                }
                 break;
             case ($this->monthly_day_of_month) :
-                return "";
+                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
+                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+                while($retDate < $now){
+                    $ordinal = $formatter->format($monthly_day_of_month_day);
+                    $retDate->setTimestamp(strtotime("+${monthly_day_of_month_month} months ${ordinal} day", $retDate->getTimestamp()));
+                }
                 break;
             case ($this->monthly_nth_day_of_week) :
-                return "";
+                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
+                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+                while($retDate < $now){
+                    $ordinal = $formatter->format($monthly_nth_day_of_week_nth);
+                    $retDate->setTimestamp(strtotime("+${monthly_nth_day_of_week_month} months ${ordinal} ${monthly_nth_day_of_week_day}", $retDate->getTimestamp()));
+                }
                 break;
             case ($this->yearly_nth_day_of_month) :
-                return "";
+                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
+                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+                while($retDate < $now){
+                    $ordinal = $formatter->format($yearly_nth_day_of_month_nth);
+                    $retDate->setTimestamp(strtotime("${ordinal} day of ${yearly_nth_day_of_month_month}", $retDate->getTimestamp()));
+                }
                 break;
             case ($this->yearly_nth_day_of_week) :
-                return "";
+                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
+                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+                while($retDate < $now){
+                    $ordinal = $formatter->format($yearly_nth_day_of_week_nth);
+                    $retDate->setTimestamp(strtotime("${ordinal} day of ${yearly_nth_day_of_week_day} ${yearly_nth_day_of_week_month}", $retDate->getTimestamp()));
+                }
                 break;
             default :
-                return "";
-                break;
+                return "ERROR";
         }
+        $this->last_date = $retDate;
+        if($retDate > $this->end){
+            return "";
+        }
+        return $retDate->format("Y-m-d");
     }
+
     function __construct($series /*eg once, daily_every_nth, ...*/, $start, $end)
     {
         // $start and $end are both strings like "2018-01-01" end can also be ""/"no" for no end or "3" for 3 repetions
@@ -86,6 +130,7 @@ class ProjectSeries
         }
         $this->last_date = $this->start;
     }
+    
     function __sleep()
     {
         $this->start = $this->start->getTimestamp();
@@ -95,6 +140,7 @@ class ProjectSeries
         }
         return array_keys(get_object_vars($this));
     }
+    
     function __wakeup()
     {
         $startTimestamp = $this->start;
@@ -106,10 +152,24 @@ class ProjectSeries
             $this->end->setTimestamp($endTimestamp);
         }
     }
+    
     function __toString()
     {
         $text_before = "Dieses Projekt wiederholt sich ";
         $text_after = ".";
+        $daily_days = $this->daily_days;
+        $weekly_weeks = $this->weekly_weeks;
+        $weekly_day = $this->weekly_day;
+        $monthly_day_of_month_day = $this->monthly_day_of_month_day;
+        $monthly_day_of_month_month = $this->monthly_day_of_month_month;
+        $monthly_nth_day_of_week_day = $this->monthly_nth_day_of_week_day;
+        $monthly_nth_day_of_week_nth = $this->monthly_nth_day_of_week_nth;
+        $monthly_nth_day_of_week_month = $this->monthly_nth_day_of_week_month;
+        $yearly_nth_day_of_month_month = $this->yearly_nth_day_of_month_month;
+        $yearly_nth_day_of_month_nth = $this->yearly_nth_day_of_month_nth;
+        $yearly_nth_day_of_week_nth = $this->yearly_nth_day_of_week_nth;
+        $yearly_nth_day_of_week_day = $this->yearly_nth_day_of_week_day;
+        $yearly_nth_day_of_week_month = $this->yearly_nth_day_of_week_month;
         switch (true) {
             case ($this->once) :
                 return "${text_before}nicht${text_after}";
@@ -192,7 +252,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["dynamicProject"])) {
     }
     if (empty($company) || !is_numeric($company)) {
         echo "Company not set";
-        goto bodyEnd;
     }
     if ($id == "") {
         $id = uniqid($connectIdentification);
@@ -428,5 +487,4 @@ require "dynamicProjects_template.php";
 
 <!-- /BODY -->
 <?php
-bodyEnd : //to stop loader when displaying an error
 include 'footer.php'; ?>
