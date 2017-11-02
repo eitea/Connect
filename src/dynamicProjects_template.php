@@ -398,14 +398,14 @@ if (!function_exists('stripSymbols')) {
                     <!-- /modal body -->
                     <div class="modal-footer">
                         <?php if ($modal_id):?>
-                        <button type="submit" class="btn btn-danger ask-before-submit<?php echo stripSymbols($modal_id) ?>" name="deleteDynamicProject">
+                        <button type="submit" class="btn btn-danger ask-before-submit<?php echo stripSymbols($modal_id) ?> disable-required-fields<?php echo stripSymbols($modal_id) ?>" name="deleteDynamicProject">
                             <?php echo $lang["DELETE"]; ?>
                         </button>
                         <?php endif; ?>
                         <button type="button" class="btn btn-default" data-dismiss="modal">
                             <?php echo $lang['CANCEL']; ?>
                         </button>
-                        <button type="submit" class="btn btn-warning" name="dynamicProject<?php echo stripSymbols($modal_id) ?>">
+                                    <button type="submit" class="btn btn-warning show-required-fields<?php echo stripSymbols($modal_id) ?>" <?php if($modal_id): ?> name="editDynamicProject" <?php else: ?> name="dynamicProject" <?php endif; ?>  >
                             <?php echo $lang['SAVE']; ?>
                         </button>
                     </div>
@@ -490,6 +490,33 @@ if (!function_exists('stripSymbols')) {
                 }
                 event.preventDefault();
                 return false;
+            });
+
+            $(".disable-required-fields<?php echo stripSymbols($modal_id) ?>").click(function (event){
+                 $("#projectForm<?php echo stripSymbols($modal_id) ?> input, #projectForm<?php echo stripSymbols($modal_id) ?> textarea, #projectForm<?php echo stripSymbols($modal_id) ?> select").filter("[required]").each(function(index,elem){
+                     $(elem).attr("required",false);
+                 })
+                 $("#projectForm<?php echo stripSymbols($modal_id) ?> select").each(function(index,elem){
+                     $(elem).attr("required",false);
+                 })
+                 $("#projectForm<?php echo stripSymbols($modal_id) ?> input").each(function(index,elem){
+                     if($(elem).attr("min") || $(elem).attr("max"))
+                     $(elem).attr("min", false);
+                     $(elem).attr("max", false);
+                 })
+            })
+
+            $(".show-required-fields<?php echo stripSymbols($modal_id) ?>").click(function (event){
+                 var fields = [];
+                 $("#projectForm<?php echo stripSymbols($modal_id) ?> input, #projectForm<?php echo stripSymbols($modal_id) ?> textarea, #projectForm<?php echo stripSymbols($modal_id) ?> select").filter("[required]").each(function(index,elem){
+                    if($(elem).val() == ""){
+                        var name = $(elem).attr("name");
+                        name = name.charAt(0).toUpperCase() + name.slice(1);
+                        name = name.replace("[]","");
+                        fields.push(name);
+                    }
+                 })
+                 if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
             })
         })
 
