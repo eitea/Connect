@@ -104,12 +104,6 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
     background-repeat: no-repeat;
     /*background-attachment: fixed;  not supported on android/ios*/
   }
-  @media screen and (min-width:550px){
-    body{
-      background-size:cover;
-      background-attachment: fixed;
-    }
-  }
   .lightBox{
     position:fixed;
     bottom:5%;
@@ -117,6 +111,18 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
     background-color:rgba(255, 255, 255, 0.25);
     width: 30%;
     margin-left:35%
+  }
+  @media screen and (min-width:550px){
+    body{
+      background-size:cover;
+      background-attachment: fixed;
+    }
+  }
+  @media screen and (max-width:550px){
+    .lightBox{
+      margin-left:5%;
+      width:90%;
+    }
   }
 </style>
 <title>Login</title>
