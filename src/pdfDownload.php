@@ -3,7 +3,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST'){
   header("Location: bookings");
 }
 require "connection.php";
-require_once "createTimestamps.php";
+//require_once "createTimestamps.php";
 require_once 'utilities.php';
 require "Calculators/IntervalCalculator.php";
 
