@@ -97,9 +97,10 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
     border-radius:0;
   }
   body{
+    font-family: "Open Sans", "Lucida Sans", Verdana, sans-serif;
     color:white;
     overflow:hidden;
-    background-image:url(background.jpg);
+    background-image:url(images/linz.jpg);
     background-repeat: no-repeat;
     /*background-attachment: fixed;  not supported on android/ios*/
   }
