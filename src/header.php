@@ -45,13 +45,10 @@
   $row = $result->fetch_assoc();
   $lastPswChange = $row['lastPswChange'];
 
-  $result = $conn->query("SELECT masterPassword FROM $configTable");
-  $row = $result->fetch_assoc();
-  $masterPassword = $row['masterPassword'];
-
-  $result = $conn->query("SELECT enableReadyCheck FROM configurationData");
+  $result = $conn->query("SELECT masterPassword, enableReadyCheck FROM configurationData");
   $row = $result->fetch_assoc();
   $showReadyPlan = $row['enableReadyCheck'];
+  $masterPassword = $row['masterPassword'];
 
   $result = $conn->query("SELECT enableSocialMedia FROM modules");
   if($result && ($row = $result->fetch_assoc())){

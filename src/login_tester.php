@@ -31,14 +31,16 @@ if($result) $masterpw = $result->fetch_assoc()["masterPassword"]; //hash
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
   if($result && ($row = $result->fetch_assoc())){
-      echo $row['total'] ;
+      echo $row['total'];
       exit;
   }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
   $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
   if($row = $result->fetch_assoc()){
     session_start();
+    echo '<p style="color:white">';
     var_dump($row); //the if below will not work without this, do not ask why
+    echo '</p>';
     if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] && (empty($_POST['masterpassword']) || crypt($_POST['masterpassword'], $masterpw) == $masterpw) ) {
         $_SESSION['userid'] = $row['id'];
         $_SESSION['firstname'] = $row['firstname'];

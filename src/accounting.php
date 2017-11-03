@@ -1,5 +1,9 @@
-<?php require "header.php"; enableToFinance($userID); ?>
 <?php
+require "header.php";
+enableToFinance($userID);
+
+$filterings = array('date' => array(''));
+
 if(!empty($_GET['v'])){
     $id = intval($_GET['v']);
 } else {
@@ -199,7 +203,7 @@ while($result && ($row = $result->fetch_assoc())){
 ?>
 
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'].' <small>'.$account_row['num'].' - '.$account_row['name'].'</small>'; ?>
-<div class="page-header-button-group"><?php $cmpID = $account_row['companyID']; include __DIR__.'/misc/lockAccounting.php'; ?></div></h3></div>
+<div class="page-header-button-group"><?php include __DIR__.'/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__.'/misc/lockAccounting.php'; ?></div></h3></div>
 <br>
 <table class="table table-hover">
 <thead><tr>
@@ -286,7 +290,7 @@ while($result && ($row = $result->fetch_assoc())){
             <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
             <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
             <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
-            <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />In WEB</label></div>
+            <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
         </div>
         <div class="row">
             <span id="transferToWebInputs" style="display:none">

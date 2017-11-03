@@ -13,6 +13,7 @@ if(isset($_POST['accept'])){
   }
 
   if($accept){
+    //changes here have to be copied to resticBackup.php 
     $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');   
     require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
     $import = new MySQLImport($conn);
