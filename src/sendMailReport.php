@@ -1,5 +1,5 @@
 <?php use PHPMailer\PHPMailer\PHPMailer; require_once dirname(__DIR__) ."/plugins/phpMailer/autoload.php"; ?>
-<?php require_once __DIR__ . "/connection.php"; require_once __DIR__ ."/createTimestamps.php"; ?>
+<?php require_once __DIR__ . "/connection.php"; ?>
 <?php require_once dirname(__DIR__) ."/plugins/cssToInlineStyles/autoload.php"; ?>
 <?php require_once __DIR__ .'/utilities.php'; ?>
 <?php require_once __DIR__ ."/Calculators/IntervalCalculator.php"; ?>
