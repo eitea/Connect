@@ -14,8 +14,7 @@ while($result && ($row = $result->fetch_assoc())){
 
 $result = $conn->query("SELECT projectBookingData.*, clientID, companyID, timeToUTC FROM projectBookingData 
 LEFT JOIN projectData ON projectData.id = projectID LEFT JOIN clientData ON clientData.id = projectData.clientID INNER JOIN logs ON logs.indexIM = timestampID WHERE projectBookingData.id = $x");
-$row = $result->fetch_assoc(); //if this doesnt work, something really bad happened
-
+$row = $result->fetch_assoc(); //else STRIKE
 ?>
   <form method="post">
     <div class="modal fade editingModal-<?php echo $x ?>" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -43,6 +42,9 @@ $row = $result->fetch_assoc(); //if this doesnt work, something really bad happe
             $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             if($filterings['company']){
               $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
+            }
+            if($row['companyID']){ 
+              $sql = "SELECT * FROM clientData WHERE companyID = ".$row['companyID']." ORDER BY NAME ASC";
             }
             $clientResult = $conn->query($sql);
             while($clientRow = $clientResult->fetch_assoc()){

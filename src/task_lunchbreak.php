@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/connection.php";
-require_once __DIR__ ."/createTimestamps.php";
+require_once __DIR__ ."/utilities.php";
 
 $sql = "SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1 INNER JOIN intervalData ON l1.userID = intervalData.userID
 WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd = '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, UTC_TIMESTAMP) >= (pauseAfterHours * 60) 

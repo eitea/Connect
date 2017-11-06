@@ -232,6 +232,7 @@ while($result && ($row = $result->fetch_assoc())):
 
 <script type="text/javascript">
 $('.table').DataTable({
+  order: [{1, "asc"}],
   ordering: false,
   responsive: true,
   autoWidth: false,

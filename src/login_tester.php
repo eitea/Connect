@@ -118,6 +118,12 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
       background-attachment: fixed;
     }
   }
+  @media screen and (max-width:950px){
+    .lightBox{
+      margin-left:25%;
+      width:50%;
+    }
+  }
   @media screen and (max-width:550px){
     .lightBox{
       margin-left:5%;
