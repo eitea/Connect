@@ -140,7 +140,7 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
         <div class="col"><h3 style="font-size:28px" >Connect - Login</h3></div>        
         <br>
         <div class="col">
-          <input type="password" class="form-control" placeholder="Password" name="tester_pass" /><br>
+          <input type="password" class="form-control" placeholder="Password" name="tester_pass" autofocus /><br>
           <?php if($masterpsw): ?><input type="password" class="form-control" name="masterpassword" value="" /><?php endif; ?>
           <input type="hidden" name="tester_mail" value="<?php echo $_POST['mail']; ?>" />
           <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
