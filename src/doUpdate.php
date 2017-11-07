@@ -1935,6 +1935,15 @@ if($row['version'] < 111){
   }
 }
 
+if($row['version'] < 112){
+  $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
+  if(!$conn->error){
+    echo '<br>Kunden und Lieferanten: Adresszusatz';
+  } else {
+    echo $conn->error;
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

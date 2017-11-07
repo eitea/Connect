@@ -63,6 +63,10 @@ if(!empty($_POST['saveAll'])){
     $val = test_input($_POST['address_Country_Postal']);
     $conn->query("UPDATE $clientDetailTable SET address_Country_Postal = '$val' WHERE id = $detailID");
   }
+  if(isset($_POST['address_Addition'])){
+    $val = test_input($_POST['address_Addition']);
+    $conn->query("UPDATE $clientDetailTable SET address_Addition = '$val' WHERE id = $detailID");
+  }
   if(isset($_POST['phone'])){
     $val = test_input($_POST['phone']);
     $conn->query("UPDATE $clientDetailTable SET phone = '$val' WHERE id = $detailID");
@@ -357,11 +361,14 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       </div>
       <div class="row form-group">
         <div class="col-sm-2"></div>
-        <div class="col-sm-5">
+        <div class="col-sm-3">
           <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row['address_Country_City']; ?>" placeholder="<?php echo $lang['CITY']; ?>" />
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-2">
           <input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" placeholder="<?php echo $lang['PLZ']; ?>" />
+        </div>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" name="address_Addition" value="<?php echo $row['address_Addition']; ?>" placeholder="<?php echo $lang['ADDITION']; ?>"/>
         </div>
       </div>
       <div class="row form-group">

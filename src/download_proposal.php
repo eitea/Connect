@@ -60,7 +60,8 @@ require "utilities.php";
 
 $result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
-  clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, erpNumbers.yourSign, erpNumbers.yourOrder, erpNumbers.ourSign, erpNumbers.ourMessage
+  clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
+  erpNumbers.yourSign, erpNumbers.yourOrder, erpNumbers.ourSign, erpNumbers.ourMessage
   FROM proposals
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
@@ -126,6 +127,9 @@ if($row['address_Country_Postal'] || $row['address_Country_City']){
 if($row['address_Country']){
   $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Country'])), 0, 2 );
 }
+if($row['address_Street'] && $row['address_Country_Postal'] && $row['address_Country_City'] &&  $row['address_Addition']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Addition'])), 0, 2 );
+}
 
 $pdf->Ln(5);
 //client proposal data
@@ -183,7 +187,7 @@ if($prod_res && $prod_res->num_rows > 0){
   $w = array(15, 70, 25, 30, 20, 0);
   // Header
   $pdf->Cell($w[0],7,'Position',0,0,'L',1);
-  $pdf->Cell($w[1],7,'Name',0,0,'L',1);
+  $pdf->Cell($w[1],7,'Text',0,0,'L',1);
   $pdf->Cell($w[2],7,$lang['QUANTITY'], '', 0, 'R', 1);
   $pdf->Cell($w[3],7,$lang['PRICE_STK'], '', 0, 'R', 1);
   $pdf->Cell($w[4],7,$lang['TAXES'], '', 0, 'R', 1);
