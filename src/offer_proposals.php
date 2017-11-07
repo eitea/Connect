@@ -126,8 +126,8 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
           echo "<td>$status</td>";
         }
         echo '<td>'.$transited_from.'</td>';
-        $style = $balance > 0 ? "style='color:#6fcf2c'" : "style='color:#facf1e'";
-        if($showBalance == 'TRUE') echo "<td $style>".sprintf('%+.2f',$balance).' EUR</td>';
+        $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
+        if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
         echo '<td>';
         echo "<a href='download?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
         if($transitable){
