@@ -1,5 +1,4 @@
-<?php require 'header.php'; enableToERP($userID); ?>
-<?php
+<?php require 'header.php'; enableToERP($userID);
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
 
@@ -20,9 +19,43 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $conn->query("UPDATE UserData SET erpOption = 'FALSE' WHERE id = $userID");
   } elseif(isset($_POST['turnBalanceOn'])) {
     $conn->query("UPDATE UserData SET erpOption = 'TRUE' WHERE id = $userID");
+  } elseif(isset($_POST['add_new_process']) && !empty($_POST['filterClient']) && !empty($_POST['nERP'])){
+    $val = intval($_POST['filterClient']);
+    $result = $conn->query("SELECT representative, paymentMethod, shipmentType FROM clientInfoData WHERE clientID = $val");
+    if($result && $row = $result->fetch_assoc()){
+      $meta_paymentMethod = $row['paymentMethod'];
+      $meta_shipmentType = $row['shipmentType'];
+      $meta_representative = $row['representative'];
+    } else {
+      echo $conn->error;
+      $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
+    }
+    $date = getCurrentTimestamp();
+    $num = getNextERP(test_input($_POST['nERP']), $_POST['filterCompany']);
+
+    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative)
+    VALUES ('$num', $val, '0', '$date', '$date', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative')");
+    $val = mysqli_insert_id($conn);
+    if(!$conn->error){
+      redirect("edit?val=$val");
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    }
   }
 }
-if(isset($_GET['err']) && $_GET['err'] == 1){echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';}
+
+if(isset($_GET['err'])){
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>';
+  $val = $_GET['err'];
+  if($val == 1){
+    echo $lang['ERROR_MISSING_SELECTION'];
+  } elseif($val == 2){
+    echo $lang['ERROR_UNEXPECTED'];
+  }  else {
+    echo 'Unknown error';
+  }
+  echo '</div>';
+}
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
@@ -73,73 +106,77 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     <th>Option</th>
   </thead>
   <tbody>
-    <?php //my gosh what is this
-    while($result && ($row = $result->fetch_assoc())){
-      foreach($CURRENT_TRANSITIONS as $currentProcess){
-        $transitable = false;
-        $transited_from = $transited_into = $lineColor = '';
-        $current_transition = preg_replace('/\d/', '', $row['id_number']); //remove all numbers
-        if($current_transition == $currentProcess){
-          $id_name = $row['id_number'];
-          $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
-          $transitable = true;
-          $transited_from = substr($row['history'],-10);
-          if($row['status'] == 2){
-            $lineColor = '#c7c6c6';
-          }
-        } else {
-          $p = strpos($row['history'], $currentProcess);
-          if($p !== false){ //it may also! have used to be it
-            $id_name = substr($row['history'], $p, 10);
-            $status = $lang['FORWARDED'].': '.$row['id_number'];
-            if($p > 8){
-              $transited_from = substr($row['history'], $p-11, 10);
+    <?php
+      while($result && ($row = $result->fetch_assoc())){
+        //each row can span into multiple processes
+        foreach($CURRENT_TRANSITIONS as $currentProcess){
+          $transitable = false;
+          $transited_from = $transited_into = $lineColor = '';
+          $current_transition = preg_replace('/\d/', '', $row['id_number']);
+          //handle the rows current status, else handle history
+          if($current_transition == $currentProcess){
+            $id_name = $row['id_number'];
+            $status = $lang['OFFERSTATUS_TOSTRING'][$row['status']];
+            $transitable = true;
+            $transited_from = substr($row['history'],-10);
+            //cancelled grey
+            if($row['status'] == 2){
+              $lineColor = '#c7c6c6';
             }
-            if(strlen($row['history']) > $p + 15){
-              $status = $lang['FORWARDED'].': '.substr($row['history'], $p+11, 10);
-            }
-            $lineColor = '#6fcf2c';
           } else {
-            continue;
+            $p = strpos($row['history'], $currentProcess);
+            //it may also! have used to be it
+            if($p !== false){
+              $id_name = substr($row['history'], $p, 10);
+              $status = $lang['FORWARDED'].': '.$row['id_number'];
+              if($p > 8){
+                $transited_from = substr($row['history'], $p-11, 10);
+              }
+              if(strlen($row['history']) > $p + 15){
+                $status = $lang['FORWARDED'].': '.substr($row['history'], $p+11, 10);
+              }
+              $lineColor = '#6fcf2c';
+            } else {
+              continue;
+            }
           }
-        }
 
-        if(!$transitable && $filterings['procedures'][2]){ continue; }
+          if(!$transitable && $filterings['procedures'][2]){ continue; }
 
-        $i = $row['id'];
-        echo "<tr style='color:$lineColor'>";
-        echo '<td>'.$id_name.'</td>';
-        if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>';}
-        echo '<td>'.$row['clientName'].'</td>';
-        $balance = 0;
-        if($transitable){
-          echo '<td><form method="POST"><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
-          echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
-          echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
-          echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
-          echo '</ul></div></form></td>';
-          $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
-          while($rowB = $result_b->fetch_assoc()){
-            $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+          $i = $row['id'];
+          echo "<tr style='color:$lineColor'>";
+          echo '<td>'.$id_name.'</td>';
+          if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>';}
+          echo '<td>'.$row['clientName'].'</td>';
+          $balance = 0;
+          if($transitable){
+            echo '<td><form method="POST"><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
+            echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
+            echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
+            echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$i.'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
+            echo '</ul></div></form></td>';
+            $result_b = $conn->query("SELECT * FROM products WHERE proposalID = $i");
+            while($rowB = $result_b->fetch_assoc()){
+              $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+            }
+          } else {
+            echo "<td>$status</td>";
           }
-        } else {
-          echo "<td>$status</td>";
+          echo '<td>'.$transited_from.'</td>';
+          $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
+          if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
+          echo '<td>';
+          echo "<a href='download?propID=$i&num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
+          if($transitable){
+            echo '<a href="edit?val='.$row['id'].'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+            if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
+            echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+          }
+          echo '</td>';
+          echo '</tr>';
         }
-        echo '<td>'.$transited_from.'</td>';
-        $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
-        if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
-        echo '<td>';
-        echo "<a href='download?num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
-        if($transitable){
-          echo '<form method="POST" action="edit" style="display:inline-block;"><button type="submit" class="btn btn-default" title="'.$lang['EDIT'].'" name="proposalID" value="'.$row['id'].'"><i class="fa fa-pencil"></i></button></form> ';
-          if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
-          echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
-        }
-        echo '</td>';
-        echo '</tr>';
       }
-    }
-    echo mysqli_error($conn);
+      echo $conn->error;
     ?>
   </tbody>
 </table>
@@ -154,7 +191,7 @@ while($result && ($row = $result->fetch_assoc())):
   $bad = array_slice($transitions, 0, $pos);
   $bad[] = $transitions[$pos];
   ?>
-  <form method="POST" action="edit">
+  <form method="POST" action="edit?val=<?php echo $i; ?>">
     <div class="modal fade choose-transition-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header">
@@ -181,7 +218,7 @@ while($result && ($row = $result->fetch_assoc())):
         </div>
         <div class="modal-footer">
           <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-          <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $i; ?>">OK</button>
+          <button type="submit" class="btn btn-warning" name="translate">OK</button>
         </div>
       </div>
     </div>
@@ -191,9 +228,7 @@ while($result && ($row = $result->fetch_assoc())):
     <div class="modal fade confirm-delete-<?php echo $i; ?>">
       <div class="modal-dialog modal-sm modal-content">
         <div class="modal-header"><h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $row['id_number']); ?></h4></div>
-        <div class="modal-body">
-          <?php echo $lang['WARNING_DELETE_TRANSITION']; ?>
-        </div>
+        <div class="modal-body"><?php echo $lang['WARNING_DELETE_TRANSITION']; ?></div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
           <button type="submit" name='delete_proposal' class="btn btn-warning" value="<?php echo $i; ?>"><?php echo $lang['CONFIRM']; ?></button>
@@ -203,15 +238,13 @@ while($result && ($row = $result->fetch_assoc())):
   </form>
 <?php endwhile; ?>
 
-<form method="POST" action="edit">
+<form method="POST">
   <div class="modal fade add_process">
     <div class="modal-dialog modal-md modal-content">
       <div class="modal-header"><h4><?php echo $lang['NEW_PROCESS']; ?></h4></div>
       <div class="modal-body">
         <div class="container-fluid">
-          <div class="col-sm-12">
-            <?php include 'misc/select_client.php'; ?>
-          </div>
+          <div class="col-sm-12"><?php include 'misc/select_client.php'; ?></div>
           <div class="col-sm-6"><br>
             <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
             <select class="js-example-basic-single" name="nERP">
@@ -232,8 +265,7 @@ while($result && ($row = $result->fetch_assoc())):
 
 <script type="text/javascript">
 $('.table').DataTable({
-  order: [[1, "asc"]],
-  ordering: false,
+  columns: [null, { "orderable": false }, { "orderable": false }, { "orderable": false }, { "orderable": false }, null, { "orderable": false }],
   responsive: true,
   autoWidth: false,
   dom: 'f',

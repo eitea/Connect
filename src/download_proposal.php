@@ -1,24 +1,15 @@
 <?php
-if(isset($_POST['download_proposal'])){
-  $proposalID = intval($_POST['download_proposal']);
-} elseif(isset($_GET['propID'])){
+if(isset($_GET['propID'])){
   $proposalID = intval($_GET['propID']);
 } else {
-  $proposalID = 0;
+  die("Access denied.");
 }
 
 session_start();
 
-if(isset($_POST['num'])){
-  $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_POST['num']);
-} elseif(isset($_GET['num'])){
-  $proposal_number = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€$%()+*öäüÖÄÜß\\n ]~", "", $_GET['num']);
-} else {
-  $proposal_number = 'empty'; //false == 0 -> returns TRUE when mysql search for string LIKE %0%
-}
-
-if(!$proposalID && !$proposal_number){
-  die("Access denied.");
+$proposal_number = '';
+if(isset($_GET['num'])){
+  $proposal_number = preg_replace("~[^A-Za-z0-9]~", "", $_GET['num']);
 }
 
 require dirname(__DIR__)."/plugins/fpdf/fpdf.php";
@@ -67,7 +58,7 @@ $result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyD
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
   INNER JOIN erpNumbers ON erpNumbers.companyID = companyData.id
-  WHERE proposals.id = $proposalID OR proposals.id_number = '$proposal_number' OR proposals.history LIKE '%$proposal_number%'");
+  WHERE proposals.id = $proposalID");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);
   die();
@@ -134,7 +125,7 @@ if($row['address_Street'] && $row['address_Country_Postal'] && $row['address_Cou
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-if($proposal_number == 'empty'){
+if(!$proposal_number){
   $proposal_number = $row['id_number'];
 }
 $proposal_mark = preg_replace('/\d/', '', $proposal_number);

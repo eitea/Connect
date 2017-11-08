@@ -134,7 +134,6 @@ function match_passwordpolicy($p, &$out = ''){
 
 function getNextERP($identifier, $companyID, $offset = 0){
   require "connection.php";
-  $offset = 0;
   if(!$companyID){$companyID = $available_companies[1]; }
   $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $companyID");
   if($row = $result->fetch_assoc()){
