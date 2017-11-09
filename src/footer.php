@@ -125,6 +125,7 @@ $(document).ready(function() {
   $(":input:not([type=search]):not(.not-dirty)").keyup(function(){
     isDirty = true;
     var blink = $(this).closest('form').find('.blinking');
+    if(!blink.length){ blink = $('.blinking'); }
     blink.attr('class', 'btn btn-warning blinking');
     setInterval(function() {
       blink.fadeOut(500, function() {
@@ -152,6 +153,5 @@ $('.money').blur(function(e){
   this.value = parseFloat(number).toFixed(2);
 });
 </script>
-
 </body>
 </html>
