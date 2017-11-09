@@ -31,7 +31,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
     }
     $date = getCurrentTimestamp();
-    $num = getNextERP(test_input($_POST['nERP']), $_POST['filterCompany']);
+    if(isset($_POST['filterCompany'])){
+      $num = getNextERP(test_input($_POST['nERP']), $_POST['filterCompany']); 
+    } else {
+      $num = getNextERP(test_input($_POST['nERP']), $available_companies[1]);
+    }
 
     $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative)
     VALUES ('$num', $val, '0', '$date', '$date', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative')");
