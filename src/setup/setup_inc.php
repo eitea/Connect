@@ -691,6 +691,7 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    taxID INT(4),
     proposalID INT(6) UNSIGNED,
     position INT(4),
     name VARCHAR(255) NOT NULL,
@@ -698,8 +699,7 @@ function create_tables($conn){
     price DECIMAL(10,2),
     unit VARCHAR(20),
     quantity DECIMAL(8,2),
-    purchase DECIMAL(10,2),
-    taxPercentage INT(3),
+    purchase DECIMAL(10,2),    
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     iv VARCHAR(255),
     iv2 VARCHAR(255),
@@ -729,11 +729,11 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    taxID INT(4) UNSIGNED,
     name VARCHAR(255),
     description VARCHAR(1200),
     price DECIMAL(10,2),
     unit VARCHAR(20),
-    taxPercentage INT(3),
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     purchase DECIMAL(10,2),
     iv VARCHAR(255),

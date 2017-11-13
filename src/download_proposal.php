@@ -170,7 +170,7 @@ if($row['yourSign'] || $row['yourOrder'] || $row['ourSign'] || $row['ourMessage'
 $i = 1;
 $netto_value = $vat_value = $cash_value = $part_sum_netto = 0;
 $pdf->SetFontSize(10);
-$prod_res = $conn->query("SELECT *, (quantity * price) AS total FROM products WHERE proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
+$prod_res = $conn->query("SELECT products.*, (quantity * price) AS total, percentage AS taxPercentage FROM products, taxRates WHERE taxRates.id = taxID, proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
 if($prod_res && $prod_res->num_rows > 0){
   $pdf->Ln(5);
   $pdf->SetFillColor(200,200,200);

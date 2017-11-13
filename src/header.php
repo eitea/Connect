@@ -118,7 +118,7 @@
         checkIn($userID);
         $validation_output .= $lang['INFO_CHECKIN'].'</div>';
       } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, $_POST['stampOut']);
+        $error_output = checkOut($userID, intval($_POST['stampOut']));
         $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
       }
     } elseif(isset($_POST["GERMAN"])){
@@ -412,7 +412,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
   <button type="button" class="btn btn-emji emji3" title="Neutral">3</button>
   <button type="button" class="btn btn-emji emji4" title="Gut">4</button>
   <button type="button" class="btn btn-emji emji5" title="Exzellent">5</button></div>
-    <br><br>Drücke dafür statt "Ausstempeln" einfach auf eine Zahl von 1 für "Schrecklich" bis 5 für "Exzellent".
+    <br><br>Drücke dafür statt "Ausstempeln" einfach auf eine Zahl von 1 für "Schrecklich" bis 5 für "Ausgezeichnet".
     <br><br>Damit wirst du ausgestempelt und lässt den Admin wissen, wie dein Tag war.
     <br><br>Möchtest du gar kein Statement abgeben, kannst du auch wie gewohnt auf "Ausstempeln" drücken.</div>
     <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">OK</button></div>

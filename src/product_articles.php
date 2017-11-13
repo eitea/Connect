@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO articles (name, description, price, unit, taxPercentage, cash, purchase, iv, iv2) VALUES('".$mc->encrypt($product_name)."', '".$mc->encrypt($product_description)."', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase', '$iv', '$iv2')");
+    $conn->query("INSERT INTO articles (name, description, price, unit, taxID, cash, purchase, iv, iv2) VALUES('".$mc->encrypt($product_name)."', '".$mc->encrypt($product_description)."', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase', '$iv', '$iv2')");
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
@@ -46,7 +46,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </thead>
     <tbody>
       <?php
-      $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE taxPercentage = taxRates.id");
+      $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE taxID = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
         $mc = new MasterCrypt($_SESSION["masterpassword"], $row['iv'],$row['iv2']);
         echo '<tr>';

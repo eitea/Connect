@@ -89,15 +89,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if(!empty($_POST['add_product_as_bar'])){
         $product_is_cash = 'TRUE';
       }
-      $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
-      $row_tax = $result_tax->fetch_assoc();
       $mc = new MasterCrypt($_SESSION["masterpassword"]);
       $iv = $mc->iv;
       $iv2 = $mc->iv2;
       $product_name = $mc->encrypt($product_name);
       $product_description = $mc->encrypt($product_description);
-      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxPercentage, cash, unit, purchase, iv, iv2)
-      VALUES($proposalID, $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
+      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
+      VALUES($proposalID, $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '$product_tax_id', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -146,7 +144,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     }
   } elseif(isset($_POST['update_articles'])){
-    $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxPercentage = a.taxPercentage, p.purchase = a.purchase, p.cash = a.cash
+    $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxID = a.taxID, p.purchase = a.purchase, p.cash = a.cash
     WHERE a.name = p.name AND p.proposalID = $proposalID");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   } elseif(isset($_POST['update_clientData'])){
@@ -196,7 +194,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <tbody>
       <?php
       $LAST_POSITION = 0;
-      $result = $conn->query("SELECT * FROM products WHERE proposalID = $proposalID ORDER BY position ASC");
+      $result = $conn->query("SELECT products.*, percentage FROM products, taxRates WHERE taxRates.id = taxID AND proposalID = $proposalID ORDER BY position ASC");
       while($result && ($prod_row = $result->fetch_assoc())){
         $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
         $prod_row["name"] = $mc->decrypt($prod_row["name"]);
@@ -207,7 +205,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<td style="max-width:500px;">'.$mc->getStatus().$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
-        echo '<td>'.intval($prod_row['taxPercentage']).'%</td>';
+        echo '<td>'.intval($prod_row['percentage']).'%</td>';
         echo '<td style="min-width:120px;">';
         if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE' && (!$masterPassword || $_SESSION['masterpassword']))
           echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
@@ -642,11 +640,11 @@ function displayArticle(i){
       type: 'get',
       success : function(resp){
         var res = resp.split("; ");
-        $("[name='add_product_name']").val(res[1]);
-        $("[name='add_product_description']").val(res[2]);
-        $("[name='add_product_price']").val(res[3]);
-        $("[name='add_product_unit']").val(res[4]).trigger('change');
-        $("[name='add_product_taxes']").val(res[5]).trigger('change');
+        $("[name='add_product_name']").val(res[0]);
+        $("[name='add_product_description']").val(res[1]);
+        $("[name='add_product_price']").val(res[2]);
+        $("[name='add_product_unit']").val(res[3]).trigger('change');
+        $("[name='add_product_taxes']").val(res[4]).trigger('change');
         if(res[6] == 'TRUE'){
           $("[name='add_product_as_bar']").prop('checked', true);
         } else {

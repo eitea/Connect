@@ -1961,6 +1961,16 @@ if($row['version'] < 113){
   }
 }
 
+$conn->query("ALTER TABLE articles ADD COLUMN taxID INT(4) UNSIGNED");
+
+$conn->query("ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED");
+
+$conn->query("ALTER TABLE products DROP COLUMN taxPercentage");
+
+$conn->query("UPDATE articles SET taxID = taxPercentage");
+
+$conn->query("ALTER TABLE articles DROP COLUMN taxPercentage");
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

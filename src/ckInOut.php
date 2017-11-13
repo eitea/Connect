@@ -41,7 +41,6 @@ function checkOut($userID, $emoji = 0) {
 
   $indexIM = $row['indexIM'];
   $start = $row['time'];
-
   $emoji = intval($emoji);
 
   $sql = "UPDATE $logTable SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";
