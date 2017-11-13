@@ -42,7 +42,7 @@ function checkOut($userID, $emoji = 0) {
   $indexIM = $row['indexIM'];
   $start = $row['time'];
 
-  $sql = "UPDATE $logTable SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";
+  $sql = "UPDATE $logTable SET timeEnd = UTC_TIMESTAMP, emoji = '$emoji' WHERE indexIM = $indexIM;";
   $conn->query($sql);
   return mysqli_error($conn);
 }

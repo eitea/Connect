@@ -94,7 +94,6 @@ if($filterings['user']):
       <tbody>
         <?php
         $calculator = new Interval_Calculator($x, $filterings['date'][0], $filterings['date'][1]);
-
         $bookingStmt = $conn->prepare("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
         LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id) LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id) WHERE timestampID = ? ORDER BY end ASC");
         $bookingStmt->bind_param("i", $calcIndexIM);
@@ -172,7 +171,7 @@ if($filterings['user']):
             if($calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'] > 0){
               $saldo_month -= $calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'];
               echo "<tr>";
-              echo "<td colspan='10'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
+              echo "<td colspan='9'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
               echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'])."</td>";
               echo '<td>'.displayAsHoursMins($saldo_month).'</td>';
               echo '<td>'.displayAsHoursMins($saldo_month + $calculator->prev_saldo).'</td>';
@@ -182,7 +181,7 @@ if($filterings['user']):
             if($calculator->endOfMonth[$calculator->date[$i]]['correction']){
               $saldo_month += $calculator->endOfMonth[$calculator->date[$i]]['correction'];
               echo "<tr>";
-              echo "<td colspan='10'>".$lang['CORRECTION'].": </td>";
+              echo "<td colspan='9'>".$lang['CORRECTION'].": </td>";
               echo "<td style='color:#9222cc'>" . displayAsHoursMins($calculator->endOfMonth[$calculator->date[$i]]['correction']) . "</td>";
               echo '<td>'.displayAsHoursMins($saldo_month).'</td>';
               echo "<td>".displayAsHoursMins($saldo_month + $calculator->prev_saldo)."</td><td></td></tr>";

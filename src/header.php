@@ -387,7 +387,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
   <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'"></button>
   <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
   <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
-  <a data-toggle="modal" data-target="#explain-emji"><i class="fa fa-question-circle-o"></i></a>';
+  <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 } else {
   $buttonVal = $lang['CHECK_IN'];
   $buttonNam = 'stampIn';
