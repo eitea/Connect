@@ -194,10 +194,10 @@ class MasterCrypt{
   private $password;
 
   function __construct($pass, $iv = '', $iv2 = ''){
-    $this->password = $pass;
+    $this->password = trim($pass);
     $this->iv = $iv;
     $this->iv2 = $iv2;
-    if($pass && (!$iv || !$iv2)){
+    if($this->password && (!$iv || !$iv2)){
       $this->iv2 = bin2hex(openssl_random_pseudo_bytes(8));
       $this->iv = bin2hex(openssl_random_pseudo_bytes(32));
       $this->iv = openssl_encrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
