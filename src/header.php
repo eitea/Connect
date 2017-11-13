@@ -111,16 +111,6 @@
       }
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
-    } elseif(isset($_POST['savePIN'])){
-      if(is_numeric($_POST['pinCode']) && !empty($_POST['pinCode'])){
-        $sql = "UPDATE $userTable SET terminalPin = '".$_POST['pinCode']."' WHERE id = '$userID';";
-        $conn->query($sql);
-        $validation_output  = '<div class="alert alert-success fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        $validation_output .= '<strong>Success! </strong>Your Pincode was changed.</div>';
-      } else {
-        $validation_output  = '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        $validation_output .= '<strong>Failed: </strong>Invalid PIN.</div>';
-      }
     } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
       require __DIR__ ."/ckInOut.php";
       $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -128,7 +118,7 @@
         checkIn($userID);
         $validation_output .= $lang['INFO_CHECKIN'].'</div>';
       } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID);
+        $error_output = checkOut($userID, $_POST['stampOut']);
         $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
       }
     } elseif(isset($_POST["GERMAN"])){
@@ -387,10 +377,16 @@ $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00
 if($result && ($row = $result->fetch_assoc())) { //checkout
   $buttonVal = $lang['CHECK_OUT'];
   $buttonNam = 'stampOut';
-  $buttonEmoji = '<div class="btn-group btn-group-xs"><button type="submit" class="btn btn-danger">1</button></div>';
+  //<img width="15px" height="15px" src="images/emji1.png"> 
   $showProjectBookingLink = TRUE;
   $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
   if($diff < $cd / 60) { $disabled = 'disabled'; }
+  $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin">
+  <button type="submit" '.$disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'">1</button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'">2</button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'">3</button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'">4</button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'">5</button></div>';
 } else {
   $buttonVal = $lang['CHECK_IN'];
   $buttonNam = 'stampIn';
@@ -402,7 +398,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     if($diff < $cd/60){ $disabled = 'disabled'; }
   }
 }
-$checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='$buttonNam'>$buttonVal</button>";
+$checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-ckin' name='$buttonNam'>$buttonVal</button>";
 ?>
 
 <!-- side menu -->
@@ -421,7 +417,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
                   echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
                   echo '</div>';
                 }
-                //echo '<br>'.$buttonEmoji;
+                echo '<br>'.$buttonEmoji;
                 ?>
               </form><br>
             </div>
@@ -622,7 +618,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning' name='
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
+                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../project/time"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
                 <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
                 <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
                 <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
