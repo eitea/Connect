@@ -99,7 +99,7 @@ input[type="radio"]:checked {
 .active-link{
   color: white !important;
   background-color: #33C7D5;
-  margin: 0px -40px;
+  margin-left: -40px;
   padding-left: 55px !important;
 }
 .active-link:hover{

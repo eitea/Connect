@@ -381,12 +381,13 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
   $showProjectBookingLink = TRUE;
   $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
   if($diff < $cd / 60) { $disabled = 'disabled'; }
-  $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin">
-  <button type="submit" '.$disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'">1</button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'">2</button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'">3</button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'">4</button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'">5</button></div>';
+  $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
+  <button type="submit" '.$disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
+  <a data-toggle="modal" data-target="#explain-emji"><i class="fa fa-question-circle-o"></i></a>';
 } else {
   $buttonVal = $lang['CHECK_IN'];
   $buttonNam = 'stampIn';
@@ -400,6 +401,23 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
 }
 $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-ckin' name='$buttonNam'>$buttonVal</button>";
 ?>
+
+<div id="explain-emji" class="modal fade">
+  <div class="modal-dialog modal-content modal-sm">
+    <div class="modal-header h4">Bewerte deinen Tag!</div>
+    <div class="modal-body">Bevor du ausstempelst, kannst du dabei auch gleichzeitig ein kurzes Feedback abgeben und deinem Tag Ausdruck verleihen.<br><br>
+    <div class="btn-group btn-group-xs" style="padding-left:25%">
+  <button type="button" class="btn btn-emji emji1" title="Schrecklich">1</button>
+  <button type="button" class="btn btn-emji emji2" title="Enttäuschend">2</button>
+  <button type="button" class="btn btn-emji emji3" title="Neutral">3</button>
+  <button type="button" class="btn btn-emji emji4" title="Gut">4</button>
+  <button type="button" class="btn btn-emji emji5" title="Exzellent">5</button></div>
+    <br><br>Drücke dafür statt "Ausstempeln" einfach auf eine Zahl von 1 für "Schrecklich" bis 5 für "Exzellent".
+    <br><br>Damit wirst du ausgestempelt und lässt den Admin wissen, wie dein Tag war.
+    <br><br>Möchtest du gar kein Statement abgeben, kannst du auch wie gewohnt auf "Ausstempeln" drücken.</div>
+    <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">OK</button></div>
+  </div>
+</div>
 
 <!-- side menu -->
 <div id="sidemenu" class="affix-sidebar sidebar-nav">
@@ -618,7 +636,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../project/time"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
+                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
                 <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
                 <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
                 <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
@@ -628,7 +646,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "getTimestamps.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php'){
+        if($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php'){
           echo "<script>document.getElementById('adminOption_TIME').click();</script>";
         }
         ?>

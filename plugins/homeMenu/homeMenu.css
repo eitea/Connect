@@ -320,31 +320,37 @@ span.select2.select2-container.select2-container--default {
   background-color:#dddddd;
 }
 
+/* EMOJI BUTTONING */
 .btn-ckin{
   width:111px;
   text-align:center;
 }
-
-.btn-ckin > .btn {
-  width: 23px;
+.btn-ckin[name=stampOut]{
+  border-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
-
 .btn-emji{
-  color:white;
+  width: 23px;
+  height:10px;
+  border-left: 0;
+  border-right: 0;
+  color:transparent;
 }
-
 .btn.btn-emji.emji1{
-  background-color:red;
+  border-top-left-radius:0;
+  background: red;
 }
 .btn.btn-emji.emji2{
-  background-color:orange;
+  background: orange;
 }
 .btn.btn-emji.emji3{
-  background-color:#c5c5c5;
+  background: lightgrey;
 }
 .btn.btn-emji.emji4{
-  background-color:yellowgreen;
+  background: yellowgreen;
 }
 .btn.btn-emji.emji5{
-  background-color:forestgreen;
+  border-top-right-radius:0;
+  background: forestgreen;
 }

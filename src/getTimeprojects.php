@@ -88,7 +88,7 @@ if($filterings['user']):
         <th><?php echo $lang['SALDO_DAY']; ?></th>
         <th><?php echo $lang['SALDO_MONTH']; ?></th>
         <th>Saldo</th>
-        <th></th>
+        <th><?php echo $lang['EVALUATION']; ?></th>
         <th style="min-width:110px">Option</th>
       </thead>
       <tbody>
@@ -100,8 +100,8 @@ if($filterings['user']):
         $bookingStmt->bind_param("i", $calcIndexIM);
 
         echo "<tr style='color:#626262;'>";
-        echo "<td colspan='12'><strong>Vorheriges Saldo: </strong></td>";
-        echo "<td>".displayAsHoursMins($calculator->prev_saldo)."</td></tr>";
+        echo "<td colspan='10'><strong>Vorheriges Saldo: </strong></td>";
+        echo "<td>".displayAsHoursMins($calculator->prev_saldo)."</td><td></td><td></td></tr>";
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $saldo_month = 0;
         for($i = 0; $i < $calculator->days; $i++){
           $calcIndexIM = $calculator->indecesIM[$i];
@@ -139,7 +139,7 @@ if($filterings['user']):
             echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
-              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
+              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal_time('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
             echo '</td>';
@@ -256,7 +256,7 @@ endif;
 
 <script>
 var existingModals = new Array();
-function appendModal(id, index, date){
+function appendModal_time(id, index, date){
   if(existingModals.indexOf(index) == -1){
     $.ajax({
     url:'ajaxQuery/AJAX_timeModal.php',
@@ -277,9 +277,22 @@ function appendModal(id, index, date){
 }
 
 var existingModals_p = new Array();
-function appendModal_p (id, user){
-  if(existingModals.indexOf(id) == -1){
-
+function appendModal_proj(id, user){
+  if(existingModals_p.indexOf(id) == -1){
+    if(existingModals_p.indexOf(id) == -1){
+    $.ajax({
+    url:'ajaxQuery/AJAX_bookingModal.php',
+    data:{bookingID:id, userID:user},
+    type: 'get',
+    success : function(resp){
+      $("#editingModalDiv").append(resp);
+      existingModals_p.push(id);
+      onPageLoad();
+      $('.editingModal-'+id).modal('show');
+    },
+    error : function(resp){}
+   });
+  }
   }
 }
 $('.clicker').click(function(){

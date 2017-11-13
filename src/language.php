@@ -398,6 +398,9 @@ $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 $lang_eng['ERROR_UNEXPECTED'] = 'An unexpected error has occured. Please try again. If this message continues to be displayed, please contact support.'; //we dont have a support.
 $lang_ger['ERROR_UNEXPECTED'] = 'Ein unerwarteter Fehler ist aufgetaucht. Bitte versuchen Sie es erneut. Wird diese Nachricht weiterhin angezeigt, wenden Sie sich an den Support.';
 
+$lang_eng['EVALUATION'] = 'Evaluation';
+$lang_ger['EVALUATION'] = 'Bewertung';
+
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
 
