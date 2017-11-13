@@ -194,7 +194,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <tbody>
       <?php
       $LAST_POSITION = 0;
-      $result = $conn->query("SELECT products.*, percentage FROM products, taxRates WHERE taxRates.id = taxID AND proposalID = $proposalID ORDER BY position ASC");
+      $result = $conn->query("SELECT products.*, percentage FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE proposalID = $proposalID ORDER BY position ASC");
       while($result && ($prod_row = $result->fetch_assoc())){
         $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
         $prod_row["name"] = $mc->decrypt($prod_row["name"]);
