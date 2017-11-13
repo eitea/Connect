@@ -19,7 +19,7 @@ class PDF extends FPDF {
   function Header(){
     $this->Image($this->glob["logo"], 10, 10, 0, 27); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
     $this->SetFont('Helvetica','',8);
-    // Address
+    //Address
     $this->Cell(91,5);
     $this->MultiCell(100, 4, $this->glob["headerAddress"], 0, 'R');
     //2cm Line break
@@ -29,7 +29,7 @@ class PDF extends FPDF {
   function Footer(){
     $this->SetFont('Helvetica','', 8);
     $this->Line(10, 280, 210-10, 280);
-    // Position at 1.6 cm from bottom
+    //Position at 1.6 cm from bottom
     $this->SetXY(9, -16);
     //$this->Cell(0,5,$this->PageNo().'/{nb}',0,2,'C');
     $this->MultiColCell(61, 3, iconv('UTF-8', 'windows-1252',$this->glob['footer_left']));
