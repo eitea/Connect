@@ -1208,6 +1208,9 @@ $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Va
 $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
   "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
 
+$lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
+$lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");
+
 $lang_eng['MONTH_TOSTRING'] = array("", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 $lang_ger['MONTH_TOSTRING'] = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 

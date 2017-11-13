@@ -1944,6 +1944,23 @@ if($row['version'] < 112){
   }
 }
 
+if($row['version'] < 113){
+  $conn->query("CREATE TABLE checkinLogs(
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    remoteAddr VARCHAR(50),
+    userAgent VARCHAR(150)
+  )");
+  if(!$conn->error){
+    echo '<br>Checkin: IP und Header Logs';
+  }
+
+  $conn->query("ALTER TABLE logs ADD COLUMN emoji INT(2) DEFAULT 0 ");
+  if(!$conn->error){
+    echo '<br>Checkout: Emoji';
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

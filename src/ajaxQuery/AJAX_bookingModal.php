@@ -25,9 +25,9 @@ $row = $result->fetch_assoc(); //else STRIKE
         <div class="modal-body" style="max-height: 80vh;  overflow-y: auto;">
           <div class="row">
           <?php
-          if(!empty($row['projectID'])){ //if this is no break, display client/project selection
-            if(count($available_companies) > 1){
-              echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' >";
+          if($row['bookingType'] != 'break'){ //display client/project selection
+            if(count($available_companies) > 2){
+              echo "<div class='col-md-4'><select class='js-example-basic-single' onchange='showClients(\"#newClient$x\", this.value, 0, 0, \"#newProjectName$x\");' ><option value='0'>...</option>";
               $companyResult = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
               while($companyRow = $companyResult->fetch_assoc()){
                 $selected = '';
@@ -37,34 +37,41 @@ $row = $result->fetch_assoc(); //else STRIKE
                 echo "<option $selected value=".$companyRow['id'].">".$companyRow['name']."</option>";
               }
               echo '</select></div>';
+              $sql = "";
+            } else {
+              //he only has 1 company available
+              $sql = "SELECT * FROM clientData WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
             }
             echo "<div class='col-md-4'><select id='newClient$x' class='js-example-basic-single' onchange='showProjects(\" #newProjectName$x \", this.value, 0);' >";
-            $sql = "SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).") ORDER BY NAME ASC";
-            if($filterings['company']){
-              $sql = "SELECT * FROM $clientTable WHERE companyID = ".$filterings['company']." ORDER BY NAME ASC";
-            }
             if($row['companyID']){ 
               $sql = "SELECT * FROM clientData WHERE companyID = ".$row['companyID']." ORDER BY NAME ASC";
             }
-            $clientResult = $conn->query($sql);
-            while($clientRow = $clientResult->fetch_assoc()){
-              $selected = '';
-              if($clientRow['id'] == $row['clientID']){
-                $selected = 'selected';
+            if($sql){
+              $clientResult = $conn->query($sql);
+              while($clientRow = $clientResult->fetch_assoc()){
+                $selected = '';
+                if($clientRow['id'] == $row['clientID']){
+                  $selected = 'selected';
+                }
+                echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
               }
-              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
             }
             echo "</select></div><div class='col-md-4'> <select id='newProjectName$x' class='js-example-basic-single' name='editing_projectID_$x'>";
-            $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
-            $clientResult = $conn->query($sql);
-            while($clientRow = $clientResult->fetch_assoc()){
-              $selected = '';
-              if($clientRow['id'] == $row['projectID']){
-                $selected = 'selected';
-              }
-              echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+            $sql = "";
+            if($row['projectID']){
+              $sql = "SELECT * FROM $projectTable WHERE clientID =".$row['clientID'].'  ORDER BY NAME ASC';
             }
-            echo "</select></div> <br><br>";
+            if($sql){
+              $clientResult = $conn->query($sql);
+              while($clientRow = $clientResult->fetch_assoc()){
+                $selected = '';
+                if($clientRow['id'] == $row['projectID']){
+                  $selected = 'selected';
+                }
+                echo "<option $selected value=".$clientRow['id'].">".$clientRow['name']."</option>";
+              }
+            }
+            echo "</select></div><br><br>";
           } //end if(!break)
 
           $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);

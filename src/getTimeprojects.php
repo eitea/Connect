@@ -88,6 +88,7 @@ if($filterings['user']):
         <th><?php echo $lang['SALDO_DAY']; ?></th>
         <th><?php echo $lang['SALDO_MONTH']; ?></th>
         <th>Saldo</th>
+        <th></th>
         <th style="min-width:110px">Option</th>
       </thead>
       <tbody>
@@ -99,7 +100,7 @@ if($filterings['user']):
         $bookingStmt->bind_param("i", $calcIndexIM);
 
         echo "<tr style='color:#626262;'>";
-        echo "<td colspan='11'><strong>Vorheriges Saldo: </strong></td>";
+        echo "<td colspan='12'><strong>Vorheriges Saldo: </strong></td>";
         echo "<td>".displayAsHoursMins($calculator->prev_saldo)."</td></tr>";
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $saldo_month = 0;
         for($i = 0; $i < $calculator->days; $i++){
@@ -135,6 +136,7 @@ if($filterings['user']):
             echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . '</td>';
             echo '<td>' . displayAsHoursMins($saldo_month) . '</td>';
             echo '<td>' . displayAsHoursMins($saldo_month + $calculator->prev_saldo) . '</td>';
+            echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
               echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
@@ -153,7 +155,7 @@ if($filterings['user']):
               while($row = $result->fetch_assoc()){
                 $A = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
                 $B = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
-                echo '<tr style="display:none;color:#797979;"><td colspan="12"><div class="row">';
+                echo '<tr style="display:none;color:#797979;"><td colspan="13"><div class="row">';
                 echo '<div class="col-xs-1"></div>';
                 echo '<div class="col-sm-2">'.$row['name'].'</div>';
                 echo '<div class="col-sm-2">'.$row['projectName'].'</div>';
@@ -170,7 +172,7 @@ if($filterings['user']):
             if($calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'] > 0){
               $saldo_month -= $calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'];
               echo "<tr>";
-              echo "<td colspan='9'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
+              echo "<td colspan='10'>".$lang['OVERTIME_ALLOWANCE'].": </td>";
               echo "<td style='color:#fc8542;'>-" . displayAsHoursMins($calculator->endOfMonth[$calculator->date[$i]]['overTimeLump'])."</td>";
               echo '<td>'.displayAsHoursMins($saldo_month).'</td>';
               echo '<td>'.displayAsHoursMins($saldo_month + $calculator->prev_saldo).'</td>';
@@ -180,7 +182,7 @@ if($filterings['user']):
             if($calculator->endOfMonth[$calculator->date[$i]]['correction']){
               $saldo_month += $calculator->endOfMonth[$calculator->date[$i]]['correction'];
               echo "<tr>";
-              echo "<td colspan='9'>".$lang['CORRECTION'].": </td>";
+              echo "<td colspan='10'>".$lang['CORRECTION'].": </td>";
               echo "<td style='color:#9222cc'>" . displayAsHoursMins($calculator->endOfMonth[$calculator->date[$i]]['correction']) . "</td>";
               echo '<td>'.displayAsHoursMins($saldo_month).'</td>';
               echo "<td>".displayAsHoursMins($saldo_month + $calculator->prev_saldo)."</td><td></td></tr>";
@@ -188,7 +190,7 @@ if($filterings['user']):
           }
         } //endfor
         echo "<tr style='font-weight:bold;'>";
-        echo "<td colspan='10'>Gesamt: </td>";
+        echo "<td colspan='11'>Gesamt: </td>";
         echo '<td>'.displayAsHoursMins($calculator->saldo).'</td>';
         echo "<td></td></tr>";
         ?>

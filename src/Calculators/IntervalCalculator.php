@@ -25,6 +25,7 @@ class Interval_Calculator{
   public $end = array();
   public $timeToUTC = array();
   public $indecesIM = array();
+  public $feeling = array();
 
   public $lunchTime = array();
   public $shouldTime = array();
@@ -93,6 +94,7 @@ class Interval_Calculator{
         $this->timeToUTC[$this->days] = $row['timeToUTC'];
         $this->indecesIM[$this->days] = $row['indexIM'];
         $this->absolvedTime[$this->days] = ($row['timeEnd'] == '0000-00-00 00:00:00') ? timeDiff_Hours($row['time'], getCurrentTimestamp()) : timeDiff_Hours($row['time'], $row['timeEnd']);
+        $this->feeling[$this->days] = $row['emoji'];
         $row_break['breakCredit'] = 0;
         $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = ".$row['indexIM']);
         if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
@@ -106,6 +108,7 @@ class Interval_Calculator{
         $this->lunchTime[$this->days] = 0;
         $this->timeToUTC[$this->days] = 0;
         $this->indecesIM[$this->days] = 0;
+        $this->feeling[$this->days] = 0;
       }
       if(isHoliday($i)){
         $this->shouldTime[$this->days] = 0;

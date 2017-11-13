@@ -319,3 +319,32 @@ span.select2.select2-container.select2-container--default {
   text-align:center;
   background-color:#dddddd;
 }
+
+.btn-ckin{
+  width:111px;
+  text-align:center;
+}
+
+.btn-ckin > .btn {
+  width: 23px;
+}
+
+.btn-emji{
+  color:white;
+}
+
+.btn.btn-emji.emji1{
+  background-color:red;
+}
+.btn.btn-emji.emji2{
+  background-color:orange;
+}
+.btn.btn-emji.emji3{
+  background-color:#c5c5c5;
+}
+.btn.btn-emji.emji4{
+  background-color:yellowgreen;
+}
+.btn.btn-emji.emji5{
+  background-color:forestgreen;
+}

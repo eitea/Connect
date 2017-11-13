@@ -16,6 +16,7 @@ if(isset($_POST['request_submit'])){
         $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
         if(timeDiff_Hours($startTime, $endTime) < 0){
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          include 'footer.php';
           die(); //still better than a goto.
         }
       }
@@ -79,6 +80,7 @@ if(isset($_POST['request_submit'])){
     <th><?php echo $lang['DIFFERENCE']?></th>
     <th>Saldo</th>
     <th></th>
+    <th></th>
   </thead>
   <tbody>
     <?php
@@ -124,6 +126,7 @@ if(isset($_POST['request_submit'])){
       echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
       echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
       echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
+      echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
       echo '<td>';
       echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='.my-request-$i' ><i class='fa fa-pencil'></i></button>";
       if($calculator->indecesIM[$i]){
@@ -235,7 +238,7 @@ if(isset($_POST['request_submit'])){
                     echo "<td>$A</td>";
                     echo "<td>$B</td>";
                     echo "<td style='text-align:left'>$C</td>";
-                    echo '<td></td></tr>';
+                    echo '<td></td><td></td></tr>';
                     if($row['bookingType'] == 'break'){
                       $x = $row['bookingTableID'];
                       echo '<tr style="background-color:#f0f0f0">';
@@ -249,7 +252,7 @@ if(isset($_POST['request_submit'])){
                       }
                       echo "</select>";
                       echo '</td>';
-                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td>';
+                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td><td></td>';
                       echo '</tr>';
                     }
                   }
@@ -269,7 +272,7 @@ if(isset($_POST['request_submit'])){
   <script>
   $('.datatable').DataTable({
   order: [[ 1, "desc" ]],
-  columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}],
+  columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}, {orderable: false}],
   deferRender: true,
   responsive: true,
   autoWidth: false,

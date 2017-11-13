@@ -8,35 +8,46 @@
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['editing_save'])){ //comes from the modal
+    $accept = true;
     $x = $_POST['editing_save'];
     $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
+    if(!$result || $result->num_rows < 1){
+      $accept = false;
+      echo mysqli_error($conn);
+    }
     $row = $result->fetch_assoc();
     $toUtc = $row['timeToUTC'] * -1;
-    if(test_Date($_POST["editing_time_from_".$x].':00') && test_Date($_POST["editing_time_to_".$x].':00')){
-      if(!empty($_POST["editing_projectID_".$x])){
-        $new_projectID = $_POST["editing_projectID_".$x];
-      } else { //break
-        $new_projectID = 'NULL';
-      }
-      $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
-      $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
+    if(!test_Date($_POST["editing_time_from_".$x].':00')  || !test_Date($_POST["editing_time_to_".$x].':00')){
+      $accept = false;
+    }
+    if(!empty($_POST["editing_projectID_".$x])){
+      $new_projectID = $_POST["editing_projectID_".$x];
+    } else {
+      $accept = false;
+    }
 
-      $chargedTimeStart= '0000-00-00 00:00:00';
-      $chargedTimeFin = '0000-00-00 00:00:00';
-      if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
-        $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
-      }
-      if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
-        $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
-      }
-      $new_text = test_input($_POST['editing_infoText_'.$x]);
+    $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
+    $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
 
-      $new_charged = 'FALSE';
-      if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
-        $new_charged = 'TRUE';
-      }
+    $chargedTimeStart= '0000-00-00 00:00:00';
+    $chargedTimeFin = '0000-00-00 00:00:00';
+    if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
+    }
+    if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
+    }
+
+    $new_text = test_input($_POST['editing_infoText_'.$x]);
+    if(!$new_text) $accept = false;
+
+    $new_charged = 'FALSE';
+    if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
+      $new_charged = 'TRUE';
+    }
+
+    if($accept){
       $conn->query("UPDATE $projectBookingTable SET start='$new_A', end='$new_B', projectID=$new_projectID, infoText='$new_text', booked='$new_charged', chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $x");
-
       //update charged
       if(isset($_POST['editing_charge'])){
         if($chargedTimeStart != '0000-00-00 00:00:00'){
@@ -53,7 +64,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
-    echo mysqli_error($conn);
   } elseif(isset($_POST['saveChanges'])){ //i dont want one save button to trigger the other
     if(isset($_POST['editingIndeces'])) {
       //update free of charge

@@ -2,7 +2,7 @@
 /*
 SETTING UP A NEW TABLE:
 1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
-2. Append your information to the specs or add them here.
+2. Append your information to the specs or add them here. TODO: Create specs.
 3. Put your CREATE TABLE statement in here, similar to already existing code.
 4. increment the version numbers in version_number.php.
 5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
@@ -14,7 +14,7 @@ MAKING CHANGES TO EXISTING TABLE:
 3. increment the numbers in version_number.php
 4. relog inisde program with an account with core priviliges.
 
-Test the setup regularly
+Please test the setup after every change.
 */
 
 function create_tables($conn){
@@ -45,11 +45,12 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE logs (
     indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userID INT(6) UNSIGNED,
     time DATETIME NOT NULL,
     timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-    status INT(3),
     timeToUTC INT(2) DEFAULT '2',
-    userID INT(6) UNSIGNED,
+    status INT(3),
+    emoji INT(2) DEFAULT 0,
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -1013,6 +1014,16 @@ function create_tables($conn){
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE checkinLogs(
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    timestampID INT(10) UNSIGNED,
+    remoteAddr VARCHAR(50),
+    userAgent VARCHAR(150)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
