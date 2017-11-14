@@ -722,20 +722,20 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page == 'editShippingMethods.php'){echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editRepres.php'){echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
                       <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                      <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIERS']; ?></span></a></li>
                     </ul>
                   </div>
-                </li>
-                <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIERS']; ?></span></a></li>
+                </li>                
                 <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
+        if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php" || $this_page == "editSuppliers.php" || ($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php")) ){
           echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
           echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
-        } elseif($this_page == "offer_proposal_process.php" || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" || $this_page == "receiptBook.php" || $this_page == "editSuppliers.php" || ($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php"))){
+        } elseif($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
           echo "<script>$('#adminOption_ERP').click();";
           echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         }

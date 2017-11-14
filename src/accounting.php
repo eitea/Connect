@@ -95,8 +95,13 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         }
         if($accept){
             //tax calculation
-            $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
-            $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
+            if($account2 && $account3){
+                $should_tax = $should * ($taxRow['percentage'] / 100);
+                $have_tax = $have * ($taxRow['percentage'] / 100);
+            } else {
+                $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
+                $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
+            }
 
             //account balance
             if($account2){
@@ -234,12 +239,12 @@ $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
 while($result && ($row = $result->fetch_assoc())){
     $docNum = $row['docNum'];
     $docDate = $row['payDate'];
-    $saldo -= $row['netto_should'];
-    $saldo += $row['netto_have'];
+    $saldo += $row['netto_should'];
+    $saldo -= $row['netto_have'];
     echo '<tr>';
     echo '<td>'.$row['docNum'].'</td>';
     echo '<td>'.substr($row['payDate'],0, 10).'</td>';
-    echo '<td>'.$row['num'].'</td>';
+    echo '<td><a href="account?v='.$row['account'].'" class="btn btn-link" >'.$row['num'].'</a></td>';
     echo '<td>'.$row['info'].'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_should'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_have'], 2, ',', '.').'</td>';

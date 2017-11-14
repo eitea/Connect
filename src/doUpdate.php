@@ -2003,9 +2003,16 @@ if($row['version'] < 114){
         if($res && $res->num_rows > 0) $account3 = $res->fetch_assoc()['id'];
     }
 
-    $should_tax = $should - ($should * 100) / (100 + $row['percentage']);
-    $have_tax = $have - ($have * 100) / (100 + $row['percentage']);
+    //tax calculation
+    if($account2 && $account3){
+      $should_tax = $should * ($row['percentage'] / 100);
+      $have_tax = $have * ($row['percentage'] / 100);
+    } else {
+      $should_tax = $should - ($should * 100) / (100 + $row['percentage']);
+      $have_tax = $have - ($have * 100) / (100 + $row['percentage']);
 
+    }
+    
     //account balance
     if($account2){
         $should = $should_tax;
