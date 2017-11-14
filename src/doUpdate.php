@@ -1968,8 +1968,7 @@ if($row['version'] < 113){
   $conn->query("ALTER TABLE products DROP COLUMN taxPercentage");
 }
 
-//dont's ask, just do it I guess?
-if($row['version'] < 115){
+if($row['version'] < 114){
   $conn->query("DELETE FROM account_balance");
   $result = $conn->query("SELECT account_journal.*, percentage, account2, account3, code FROM account_journal LEFT JOIN taxRates ON taxRates.id = taxID");
   echo $conn->error;
@@ -2053,6 +2052,18 @@ if($row['version'] < 115){
     $stmt->execute();
 
   }
+}
+
+if($row['version'] < 115){
+  $conn->query("ALTER TABLE account_journal ADD UNIQUE KEY double_submit (userID, inDate)");
+  if(!$conn->error){
+    echo '<br>Finanzen: Doppelte Buchungen Fix';
+  } else {
+    echo $conn->error;
+  }
+
+  $conn->query("DELETE a1 FROM account_journal a1, account_journal a2 WHERE a1.id > a2.id AND a1.userID = a2.userID AND a1.inDate = a2.inDate");
+
 }
 
 //------------------------------------------------------------------------------

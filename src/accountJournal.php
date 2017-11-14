@@ -45,7 +45,7 @@ INNER JOIN taxRates ON account_journal.taxID = taxRates.id
 LEFT JOIN receiptBook r1 ON r1.journalID = account_journal.id
 WHERE a1.companyID = $cmpID $userQuery $dateQuery ORDER BY docNum, inDate");
 echo $conn->error;
-$csv = "Nr.;Datum;Konto;Gegenkonto;Text;Steuer;Steuercode\n";
+$csv = "belegnr;konto;gkto;belegdat;text;buchdat;bucod;betrag;steuer;steucod;prozent;buchsymbol\n";
 while($result && ($row = $result->fetch_assoc())){
     echo '<tr>';
     echo '<td>'.$row['docNum'].'</td>';
@@ -63,15 +63,20 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>'; }
     echo '</tr>';
-    $csv .= $row['docNum'].';'.substr($row['payDate'], 0, 10).';'.$row['accNum'].';'.$row['offNum'].';'.iconv('UTF-8','windows-1252',$row['info']).';'.$row['percentage'].'%;'.$row['code']."\n";
+
+    //### CSV ####
+    if($row['should'] != 0) { $val = $row['should']; $code = 1; } else { $val = $row['have']; $code = 2; }
+    $sym = 'ka';
+    if($row['offNum'] >= 2800){ $sym = 'bk'; }
+    //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
+    $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info'])
+    .';'.date('Ymd', strtotime($row['inDate'])).';'.$code.';'.$val.';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage'].";$sym\n";
 }
 ?>
 </tbody>
 </table>
 
-<form id="csvForm" method="POST" target="_blank" action="../project/csvDownload">
-    <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
-</form>
+<form id="csvForm" method="POST" target="_blank" action="../project/csvDownload"><input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" /></form>
 
 <script>
 $('.table').DataTable({

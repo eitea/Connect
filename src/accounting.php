@@ -3,6 +3,7 @@ require "header.php";
 enableToFinance($userID);
 
 $filterings = array('date' => array(''));
+$show_undo = false;
 
 if(!empty($_GET['v'])){
     $id = intval($_GET['v']);
@@ -17,8 +18,19 @@ if(!$result || $result->num_rows < 1) {
     include 'footer.php';
     die();
 }
+if(isset($_POST['undo'])){
+    $res = $conn->query("SELECT id FROM account_journal WHERE offAccount = $id AND userID = $userID ORDER BY inDate DESC ");
+    echo $conn->error;
+    $val = $res->fetch_assoc()['id'];
+    $conn->query("DELETE FROM account_journal WHERE id = $val");
+    if($conn->error){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+    }
+}
 $account_row = $result->fetch_assoc();
-if(!empty($_POST['webID']) && !isset($_POST['transferToWEB']) ){
+if(!empty($_POST['webID']) && !isset($_POST['transferToWEB'])){
     $val = intval($_POST['webID']);
     $result = $conn->query("SELECT * FROM receiptBook WHERE id = $val");
     $row = $result->fetch_assoc();
@@ -66,13 +78,15 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         if($accept){
             //journal
             $conn->query("INSERT INTO account_journal(docNum, userID, account, offAccount, payDate, inDate, taxID, should, have, info)
-            VALUES ($docNum, $userID, $addAccount, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");         
-            $journalID = $conn->insert_id;
+            VALUES ($docNum, $userID, $addAccount, $offAccount, '$date', UTC_TIMESTAMP, $tax, $should, $have, '$text')");     
+            if($conn->error){
+                $accept = false;
+            } else {
+                $journalID = $conn->insert_id;
+            }
         }
-        if($accept && !$journalID){
-            $accept = false;
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Journal Failed: '.$conn->error.'</div>';
-        } else {
+            
+        if($accept){
             //tax
             $res = $conn->query("SELECT percentage, account2, account3, code FROM taxRates WHERE id = $tax");
             if(!$res || $res->num_rows < 1) $accept = false; //STRIKE
@@ -94,53 +108,55 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
             }
         }
         if($accept){
-        //tax calculation
-        if($account2 && $account3){
-            $should_tax = $should * ($taxRow['percentage'] / 100);
-            $have_tax = $have * ($taxRow['percentage'] / 100);
-        } else {
-            $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
-            $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
-        }
+            //tax calculation
+            if($account2 && $account3){
+                $should_tax = $should * ($taxRow['percentage'] / 100);
+                $have_tax = $have * ($taxRow['percentage'] / 100);
+            } else {
+                $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
+                $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
+            }
 
-        $should = $temp_have;
-        $have = $temp_should;
-        //account balance
-        if($account2){
-          $should = $have_tax;
-          $have = $should_tax;
-          $account = $account2;
-          $stmt->execute();
-          if($account3){
             $should = $temp_have;
             $have = $temp_should;
-          } else {
-              $have = $temp_should - $should_tax;
-              $should = $temp_have - $have_tax;
-          }
-        }
-        $account = $offAccount;
-        $stmt->execute();
-    
-    
-        //offAccount balance
-        $have = $temp_have;
-        $should = $temp_should;
-        if($account3){
-          $have = $have_tax;
-          $should = $should_tax;
-          $account = $account3;
-          $stmt->execute();
-          if($account2){
-              $should = $temp_should; 
-              $have = $temp_have; 
-          } else {
-              $should = $temp_should - $should_tax;
-              $have = $temp_have - $have_tax;
-          }
-        }
-        $account = $addAccount;
-        $stmt->execute();
+            //account balance
+            if($account2){
+            $should = $have_tax;
+            $have = $should_tax;
+            $account = $account2;
+            $stmt->execute();
+            if($account3){
+                $should = $temp_have;
+                $have = $temp_should;
+            } else {
+                $have = $temp_should - $should_tax;
+                $should = $temp_have - $have_tax;
+            }
+            }
+            $account = $offAccount;
+            $stmt->execute();
+        
+        
+            //offAccount balance
+            $have = $temp_have;
+            $should = $temp_should;
+            if($account3){
+            $have = $have_tax;
+            $should = $should_tax;
+            $account = $account3;
+            $stmt->execute();
+            if($account2){
+                $should = $temp_should; 
+                $have = $temp_have; 
+            } else {
+                $should = $temp_should - $should_tax;
+                $have = $temp_have - $have_tax;
+            }
+            }
+            $account = $addAccount;
+            $stmt->execute();
+
+            $show_undo = true;
         }
     } else {
         $accept = false;
@@ -210,7 +226,11 @@ while($result && ($row = $result->fetch_assoc())){
 ?>
 
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'].' <small>'.$account_row['num'].' - '.$account_row['name'].'</small>'; ?>
-<div class="page-header-button-group"><?php include __DIR__.'/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__.'/misc/lockAccounting.php'; ?></div></h3></div>
+<div class="page-header-button-group"><?php include __DIR__.'/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__.'/misc/lockAccounting.php'; ?>
+<?php if ($show_undo): ?>
+    <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
+<?php endif; ?>
+</div></h3></div>
 <br>
 <table class="table table-hover">
 <thead><tr>
@@ -438,6 +458,19 @@ $('#receiptDate').change(function(e) {
     } else {
         $('#addFinance').attr('disabled', false);
     }
+});
+
+$(document).ready(function(){
+  $('.table').DataTable({
+    order: [],
+    ordering: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    responsive: true,
+    autoWidth: false
+  });
+setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
 });
 </script>
 <?php include "footer.php"; ?>
