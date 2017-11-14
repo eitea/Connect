@@ -678,7 +678,6 @@ $(document).ready(function(){
   });
   setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
 });
-
 </script>
 
 <?php

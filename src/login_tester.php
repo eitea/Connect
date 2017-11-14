@@ -89,7 +89,7 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
 <style>
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
 .col{
-    padding: 0 15px 22% 15px;
+    padding: 0 15px 55px 15px;
   }
   .form-control{
     border:none;

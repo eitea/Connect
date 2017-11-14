@@ -37,7 +37,8 @@ $filterings = array('user' => 0, "date" => array(substr(getCurrentTimestamp(), 0
 $userQuery = $dateQuery = '';
 if($filterings['user']) $userQuery = "AND UserData.id = ".$filterings['user'];
 if($filterings['date']) $dateQuery = "AND DATE(payDate) >= DATE('".$filterings['date'][0]."') AND DATE(payDate) <=  DATE('".$filterings['date'][1]."') ";
-$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName, r1.id AS receiptID
+$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, 
+a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName, r1.id AS receiptID, taxRates.account2, taxRates.account3
 FROM account_journal INNER JOIN accounts a1 ON a1.id = account_journal.account
 INNER JOIN accounts a2 ON a2.id = account_journal.offAccount
 LEFT JOIN UserData ON UserData.id = account_journal.userID
@@ -47,6 +48,13 @@ WHERE a1.companyID = $cmpID $userQuery $dateQuery ORDER BY docNum, inDate");
 echo $conn->error;
 $csv = "belegnr;konto;gkto;belegdat;text;buchdat;bucod;betrag;steuer;steucod;prozent;buchsymbol\n";
 while($result && ($row = $result->fetch_assoc())){
+    if($row['account2'] && $row['account3']){
+        if($row['should'] != 0) $t = $row['should'] * $row['percentage'] / 100;
+        if($row['have'] != 0) $t = $row['have'] * $row['percentage'] / 100;
+    } else {
+        if($row['should'] != 0) $t = $row['should'] - (100 * $row['should']) / (100 + $row['percentage']);
+        if($row['have'] != 0) $t = $row['have'] - (100 * $row['have']) / (100 + $row['percentage']);
+    }
     echo '<tr>';
     echo '<td>'.$row['docNum'].'</td>';
     echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
@@ -58,8 +66,7 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($row['should'],2,',','.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['have'],2,',','.').'</td>';
     echo '<td>'.$row['percentage'].'% '.$row['description'].'</td>';
-    if($row['should'] != 0) $t = $row['should'] - (100 * $row['should']) / (100 + $row['percentage']);
-    if($row['have'] != 0) $t = $row['have'] - (100 * $row['have']) / (100 + $row['percentage']);
+
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>'; }
     echo '</tr>';
@@ -70,7 +77,7 @@ while($result && ($row = $result->fetch_assoc())){
     if($row['offNum'] >= 2800){ $sym = 'bk'; }
     //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
     $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info'])
-    .';'.date('Ymd', strtotime($row['inDate'])).';'.$code.';'.$val.';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage'].";$sym\n";
+    .';'.date('Ymd', strtotime($row['payDate'])).';'.$code.';'.$val.';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage'].";$sym\n";
 }
 ?>
 </tbody>

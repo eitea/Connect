@@ -4,6 +4,7 @@
  * client  => id
  * project  => id
  * user => id
+ * users => [id1, id2, ...]
  * bookings => [charged, break, drive]
  * logs => [activity, hideAll]
  * date => [fromDate, toDate] || [month]
@@ -30,6 +31,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(isset($_POST['searchUser'])){
     $filterings['user'] = intval($_POST['searchUser']);
+  }
+  if(isset($_POST['searchUsers'])){
+    $filterings['users'] = array_map("intval", $_POST['searchUsers']);
   }
   if(isset($_POST['searchCharged'])){
     $filterings['bookings'][0] = intval($_POST['searchCharged']);
@@ -102,7 +106,7 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 
 $scale = 0;
 if(isset($filterings['date'])){$scale++;}
-if(isset($filterings['user']) || isset($filterings['logs'])){$scale++;}
+if(isset($filterings['user']) || isset($filterings['users']) || isset($filterings['logs'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);
@@ -194,11 +198,21 @@ if($scale > 2){ //3 columns
             echo '<label>'.$lang['USERS'].'</label>';
             echo '<select class="js-example-basic-single" name="searchUser" >';
             echo '<option value="0">...</option>';
-            $result_fc = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
+            $result_fc = mysqli_query($conn, "SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
               if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
               echo "<option $checked value='".$row_fc['id']."' >".$row_fc['firstname'].' '.$row_fc['lastname']."</option>";
+            }
+            echo '</select><br><br>';
+          } elseif(isset($filterings['users'])){
+            echo '<label>'.$lang['USERS'].'</label>';
+            echo '<select class="js-example-basic-single" name="searchUsers[]" multiple="multiple">';
+            $result_fc = mysqli_query($conn, "SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
+            while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+              $selected = '';
+              if(in_array($row_fc['id'], $filterings['users'])) { $selected = 'selected'; }
+              echo "<option $selected value='".$row_fc['id']."'>".$row_fc['firstname'].' '.$row_fc['lastname'].'</option>';
             }
             echo '</select><br><br>';
           }
@@ -215,7 +229,6 @@ if($scale > 2){ //3 columns
               <label><input type="checkbox" name="searchBreaks" <?php echo $filterings['bookings'][1]; ?> /><?php echo $lang['BREAKS']; ?></label>
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
             </div>
-            <br><br>
           <?php endif; ?>
           <?php if(isset($filterings['logs'])): ?>
             <label><?php echo $lang['ACTIVITY']; ?></label>

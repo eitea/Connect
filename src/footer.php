@@ -40,7 +40,7 @@ function onPageLoad(){
     elem.select2();
     elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
     elem.on("select2:focus", function (e) {
-      if(!open && $(this).is(':enabled')) $(this).select2("open");
+      if(!open && $(this).is(':enabled') && !$(this).attr('multiple')){ $(this).select2("open") };
     });
   }
 
