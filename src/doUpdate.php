@@ -1969,7 +1969,7 @@ if($row['version'] < 113){
 }
 
 //dont's ask, just do it I guess?
-if($row['version'] < 114){
+if($row['version'] < 115){
   $conn->query("DELETE FROM account_balance");
   $result = $conn->query("SELECT account_journal.*, percentage, account2, account3, code FROM account_journal LEFT JOIN taxRates ON taxRates.id = taxID");
   echo $conn->error;
@@ -2015,39 +2015,46 @@ if($row['version'] < 114){
     
     //account balance
     if($account2){
-        $should = $should_tax;
-        $have = $have_tax;
-        $account = $account2;
-        $stmt->execute();
-        if($account3){
-            $should = $temp_should; 
-            $have = $temp_have; 
-        } else {
-            $should = $temp_should - $should_tax;
-            $have = $temp_have - $have_tax;
-        }
+      $should = $should_tax;
+      $have = $have_tax;
+      $account = $account2;
+      $stmt->execute();
+      if($account3){
+          $should = $temp_should; 
+          $have = $temp_have; 
+      } else {
+          $should = $temp_should - $should_tax;
+          $have = $temp_have - $have_tax;
+      }
     }
-    $account = $addAccount;
+    $temp = $should;
+    $should = $have;
+    $have = $temp;
+    $account = $offAccount;
     $stmt->execute();
+
 
     //offAccount balance
     $should = $temp_have;
     $have = $temp_should;
-
     if($account3){
-        $should = $have_tax;
-        $have = $should_tax;
-        $account = $account3;
-        $stmt->execute();
-        if($account2){
-            $have = $temp_should; 
-            $should = $temp_have; 
-        } else {
-            $have = $temp_should - $should_tax;
-            $should = $temp_have - $have_tax;
-        }
-    }            
-    $account = $offAccount;
+      $should = $have_tax;
+      $have = $should_tax;
+      $account = $account3;
+      $stmt->execute();
+      if($account2){
+          $have = $temp_should; 
+          $should = $temp_have; 
+      } else {
+          $have = $temp_should - $should_tax;
+          $should = $temp_have - $have_tax;
+      }
+    }
+
+    $temp = $should;
+    $should = $have;
+    $have = $temp;
+    $account = $addAccount;
     $stmt->execute();
 
   }
