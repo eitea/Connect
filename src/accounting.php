@@ -94,57 +94,53 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
             }
         }
         if($accept){
-            //tax calculation
-            if($account2 && $account3){
-                $should_tax = $should * ($taxRow['percentage'] / 100);
-                $have_tax = $have * ($taxRow['percentage'] / 100);
-            } else {
-                $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
-                $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
-            }
+        //tax calculation
+        if($account2 && $account3){
+            $should_tax = $should * ($taxRow['percentage'] / 100);
+            $have_tax = $have * ($taxRow['percentage'] / 100);
+        } else {
+            $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
+            $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
+        }
 
-            //account balance
-            if($account2){
-                $should = $should_tax;
-                $have = $have_tax;
-                $account = $account2;
-                $stmt->execute();
-                if($account3){
-                    $should = $temp_should; 
-                    $have = $temp_have; 
-                } else {
-                    $should = $temp_should - $should_tax;
-                    $have = $temp_have - $have_tax;
-                }
-            }
-            $temp = $should;
-            $should = $have;
-            $have = $temp;
-            $account = $offAccount;
-            $stmt->execute();
-
-
-            //offAccount balance
+        $should = $temp_have;
+        $have = $temp_should;
+        //account balance
+        if($account2){
+          $should = $have_tax;
+          $have = $should_tax;
+          $account = $account2;
+          $stmt->execute();
+          if($account3){
             $should = $temp_have;
             $have = $temp_should;
-            if($account3){
-                $should = $have_tax;
-                $have = $should_tax;
-                $account = $account3;
-                $stmt->execute();
-                if($account2){
-                    $have = $temp_should; 
-                    $should = $temp_have; 
-                } else {
-                    $have = $temp_should - $should_tax;
-                    $should = $temp_have - $have_tax;
-                }
-            }
-            $temp = $should;
-            $should = $have;
-            $have = $temp;
-            $account = $addAccount;
-            $stmt->execute();
+          } else {
+              $have = $temp_should - $should_tax;
+              $should = $temp_have - $have_tax;
+          }
+        }
+        $account = $offAccount;
+        $stmt->execute();
+    
+    
+        //offAccount balance
+        $have = $temp_have;
+        $should = $temp_should;
+        if($account3){
+          $have = $have_tax;
+          $should = $should_tax;
+          $account = $account3;
+          $stmt->execute();
+          if($account2){
+              $should = $temp_should; 
+              $have = $temp_have; 
+          } else {
+              $should = $temp_should - $should_tax;
+              $have = $temp_have - $have_tax;
+          }
+        }
+        $account = $addAccount;
+        $stmt->execute();
         }
     } else {
         $accept = false;
