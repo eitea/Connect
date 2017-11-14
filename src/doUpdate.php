@@ -1959,16 +1959,93 @@ if($row['version'] < 113){
   if(!$conn->error){
     echo '<br>Checkout: Emoji';
   }
+
+  $conn->query("ALTER TABLE articles ADD COLUMN taxID INT(4) UNSIGNED");
+  $conn->query("ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED");
+  $conn->query("UPDATE articles SET taxID = taxPercentage");
+  $conn->query("ALTER TABLE articles DROP COLUMN taxPercentage");
+  $conn->query("UPDATE products p1 SET taxID = (SELECT id FROM taxRates WHERE percentage = p1.taxPercentage LIMIT 1)");
+  $conn->query("ALTER TABLE products DROP COLUMN taxPercentage");
 }
 
-/*
-$conn->query("ALTER TABLE articles ADD COLUMN taxID INT(4) UNSIGNED");
-$conn->query("ALTER TABLE products ADD COLUMN taxID INT(4) UNSIGNED");
-$conn->query("UPDATE articles SET taxID = taxPercentage");
-$conn->query("ALTER TABLE articles DROP COLUMN taxPercentage");
-$conn->query("UPDATE products p1 SET taxID = (SELECT id FROM taxRates WHERE percentage = p1.taxPercentage LIMIT 1)");
-$conn->query("ALTER TABLE products DROP COLUMN taxPercentage");
-*/
+//dont's ask, just do it I guess?
+if($row['version'] < 114){
+  $conn->query("DELETE FROM account_balance");
+  $result = $conn->query("SELECT account_journal.*, percentage, account2, account3, code FROM account_journal LEFT JOIN taxRates ON taxRates.id = taxID");
+  echo $conn->error;
+
+  $stmt = $conn->prepare("INSERT INTO account_balance (journalID, accountID, should, have) VALUES(?, ?, ?, ?)");
+  echo $conn->error;
+  $stmt->bind_param("iidd", $journalID, $account, $should, $have);
+
+  while($row = $result->fetch_assoc()){    
+    $addAccount = $row['account'];
+    $offAccount = $row['offAccount'];
+    $docNum = $row['docNum'];
+    $date = $row['payDate'];
+    $text = $row['info'];
+    $should = $temp_should = $row['should'];
+    $have = $temp_have = $row['have'];
+    $tax = $row['taxID'];
+    $journalID = $row['id'];
+
+    $res = $conn->query("SELECT num FROM accounts WHERE id = $addAccount");
+    if($res && ( $rowP = $res->fetch_assoc())) $accNum = $rowP['num'];
+
+    //prepare balance
+    $account2 = $account3 = '';
+    if($row['account2']){
+        $res = $conn->query("SELECT id FROM accounts WHERE num = ".$row['account2']." AND companyID IN (SELECT companyID FROM accounts WHERE id = $offAccount) "); echo $conn->error;
+        if($res && $res->num_rows > 0) $account2 = $res->fetch_assoc()['id'];
+    }
+    if($row['account3']){
+        $res = $conn->query("SELECT id FROM accounts WHERE num = ".$row['account3']." AND companyID IN (SELECT companyID FROM accounts WHERE id = $offAccount) "); echo $conn->error;
+        if($res && $res->num_rows > 0) $account3 = $res->fetch_assoc()['id'];
+    }
+
+    $should_tax = $should - ($should * 100) / (100 + $row['percentage']);
+    $have_tax = $have - ($have * 100) / (100 + $row['percentage']);
+
+    //account balance
+    if($account2){
+        $should = $should_tax;
+        $have = $have_tax;
+        $account = $account2;
+        $stmt->execute();
+        if($account3){
+            $should = $temp_should; 
+            $have = $temp_have; 
+        } else {
+            $should = $temp_should - $should_tax;
+            $have = $temp_have - $have_tax;
+        }
+    }
+    $account = $addAccount;
+    $stmt->execute();
+
+    //offAccount balance
+    $should = $temp_have;
+    $have = $temp_should;
+
+    if($account3){
+        $should = $have_tax;
+        $have = $should_tax;
+        $account = $account3;
+        $stmt->execute();
+        if($account2){
+            $have = $temp_should; 
+            $should = $temp_have; 
+        } else {
+            $have = $temp_should - $should_tax;
+            $should = $temp_have - $have_tax;
+        }
+    }            
+    $account = $offAccount;
+    $stmt->execute();
+
+  }
+}
+
 //------------------------------------------------------------------------------
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");

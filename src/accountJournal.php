@@ -58,8 +58,8 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($row['should'],2,',','.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['have'],2,',','.').'</td>';
     echo '<td>'.$row['percentage'].'% '.$row['description'].'</td>';
-    if($row['should'] != 0) $t = $row['should'] * $row['percentage']/100;
-    if($row['have'] != 0) $t = $row['have'] * $row['percentage']/100;
+    if($row['should'] != 0) $t = $row['should'] - (100 * $row['should']) / (100 + $row['percentage']);
+    if($row['have'] != 0) $t = $row['have'] - (100 * $row['have']) / (100 + $row['percentage']);
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>'; }
     echo '</tr>';

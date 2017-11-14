@@ -95,8 +95,8 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         }
         if($accept){
             //tax calculation
-            $should_tax = ($taxRow['percentage'] / 100) * $should;
-            $have_tax = ($taxRow['percentage'] / 100) * $have;
+            $should_tax = $should - ($should * 100) / (100 + $taxRow['percentage']);
+            $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
 
             //account balance
             if($account2){
@@ -111,7 +111,7 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
                     $should = $temp_should - $should_tax;
                     $have = $temp_have - $have_tax;
                 }
-            }                   
+            }
             $account = $addAccount;
             $stmt->execute();
 
