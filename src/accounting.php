@@ -103,49 +103,48 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
                 $have_tax = $have - ($have * 100) / (100 + $taxRow['percentage']);
             }
 
-    //account balance
-    if($account2){
-      $should = $should_tax;
-      $have = $have_tax;
-      $account = $account2;
-      $stmt->execute();
-      if($account3){
-          $should = $temp_should; 
-          $have = $temp_have; 
-      } else {
-          $should = $temp_should - $should_tax;
-          $have = $temp_have - $have_tax;
-      }
-    }
-    $temp = $should;
-    $should = $have;
-    $have = $temp;
-    $account = $offAccount;
-    $stmt->execute();
+            //account balance
+            if($account2){
+                $should = $should_tax;
+                $have = $have_tax;
+                $account = $account2;
+                $stmt->execute();
+                if($account3){
+                    $should = $temp_should; 
+                    $have = $temp_have; 
+                } else {
+                    $should = $temp_should - $should_tax;
+                    $have = $temp_have - $have_tax;
+                }
+            }
+            $temp = $should;
+            $should = $have;
+            $have = $temp;
+            $account = $offAccount;
+            $stmt->execute();
 
 
-    //offAccount balance
-    $should = $temp_have;
-    $have = $temp_should;
-    if($account3){
-      $should = $have_tax;
-      $have = $should_tax;
-      $account = $account3;
-      $stmt->execute();
-      if($account2){
-          $have = $temp_should; 
-          $should = $temp_have; 
-      } else {
-          $have = $temp_should - $should_tax;
-          $should = $temp_have - $have_tax;
-      }
-    }
-
-    $temp = $should;
-    $should = $have;
-    $have = $temp;
-    $account = $addAccount;
-    $stmt->execute();
+            //offAccount balance
+            $should = $temp_have;
+            $have = $temp_should;
+            if($account3){
+                $should = $have_tax;
+                $have = $should_tax;
+                $account = $account3;
+                $stmt->execute();
+                if($account2){
+                    $have = $temp_should; 
+                    $should = $temp_have; 
+                } else {
+                    $have = $temp_should - $should_tax;
+                    $should = $temp_have - $have_tax;
+                }
+            }
+            $temp = $should;
+            $should = $have;
+            $have = $temp;
+            $account = $addAccount;
+            $stmt->execute();
         }
     } else {
         $accept = false;

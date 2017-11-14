@@ -897,7 +897,8 @@ function create_tables($conn){
     ON DELETE CASCADE,
     FOREIGN KEY (offAccount) REFERENCES accounts(id)
     ON UPDATE CASCADE
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+    UNIQUE KEY double_submit (userID, inDate)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

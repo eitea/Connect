@@ -2013,13 +2013,35 @@ if($row['version'] < 115){
 
     }
     
+    $should = $temp_have;
+    $have = $temp_should;
     //account balance
     if($account2){
-      $should = $should_tax;
-      $have = $have_tax;
+      $should = $have_tax;
+      $have = $should_tax;
       $account = $account2;
       $stmt->execute();
       if($account3){
+        $should = $temp_have;
+        $have = $temp_should;
+      } else {
+          $have = $temp_should - $should_tax;
+          $should = $temp_have - $have_tax;
+      }
+    }
+    $account = $offAccount;
+    $stmt->execute();
+
+
+    //offAccount balance
+    $have = $temp_have;
+    $should = $temp_should;
+    if($account3){
+      $have = $have_tax;
+      $should = $should_tax;
+      $account = $account3;
+      $stmt->execute();
+      if($account2){
           $should = $temp_should; 
           $have = $temp_have; 
       } else {
@@ -2027,33 +2049,6 @@ if($row['version'] < 115){
           $have = $temp_have - $have_tax;
       }
     }
-    $temp = $should;
-    $should = $have;
-    $have = $temp;
-    $account = $offAccount;
-    $stmt->execute();
-
-
-    //offAccount balance
-    $should = $temp_have;
-    $have = $temp_should;
-    if($account3){
-      $should = $have_tax;
-      $have = $should_tax;
-      $account = $account3;
-      $stmt->execute();
-      if($account2){
-          $have = $temp_should; 
-          $should = $temp_have; 
-      } else {
-          $have = $temp_should - $should_tax;
-          $should = $temp_have - $have_tax;
-      }
-    }
-
-    $temp = $should;
-    $should = $have;
-    $have = $temp;
     $account = $addAccount;
     $stmt->execute();
 
