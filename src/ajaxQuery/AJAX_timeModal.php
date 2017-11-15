@@ -4,6 +4,7 @@ require dirname(__DIR__)."/utilities.php";
 require dirname(__DIR__)."/language.php";
 
 $i = intval($_GET['timestampID']);
+$x = intval($_GET['userID']);
 
 $A = $B = $_GET['date'].' 08:00';
 $row['status'] = $row['timeToUTC'] = 0;
@@ -18,6 +19,7 @@ if($i > 0){
 ?>
 
 <form method="POST">
+<input type="hidden" name="setActiveTab" value="<?php echo $x; ?>" />
     <div class="modal fade editingModal-<?php echo $_GET['index']; ?>" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
@@ -80,7 +82,12 @@ if($i > 0){
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" name="saveChanges" class="btn btn-warning" title="Save" value="<?php echo $i; ?>"><?php echo $lang['SAVE']; ?></button>
+                    <?php if($i > 0){
+                        echo '<button type="submit" name="saveTimestamp" class="btn btn-warning" title="Save" value="'.$i.'">'.$lang['SAVE'].'</button>';
+                    } else {
+                        echo '<button type="submit" name="addTimestamp" class="btn btn-warning" title="Save" value="'.$x.'">'.$lang['SAVE'].'</button>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>

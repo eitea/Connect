@@ -13,7 +13,7 @@ $filterings = array('user' => 0, "date" => array(substr(getCurrentTimestamp(), 0
 
 <div class="page-header"><h3><?php echo $lang['ACCOUNT_JOURNAL']; ?><div class="page-header-button-group">
     <?php include __DIR__.'/misc/set_filter.php'; ?>
-    <button type="submit" form="csvForm" class="btn btn-default" title="CSV Download"><i class="fa fa-download"></i></button>
+    <button type="submit" form="csvForm" class="btn btn-default" title="CSV Download"><i class="fa fa-download"></i> CSV</button>
     <?php include __DIR__.'/misc/lockAccounting.php'; ?>
 </div></h3></div>
 

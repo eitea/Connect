@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $result = explode("\n", rawurldecode($_POST['csv']));
     $fp = fopen('php://output', 'w');
     foreach($result as $line){
-      $val = explode(';', $result);
+      $val = explode(';', $line);
       fputcsv($fp, $val, ';');
     }
     fclose($fp);

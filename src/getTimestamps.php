@@ -100,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif post
 ?>
 
-Diese Seite befindet sich gerade im Umbau. Der Funktionsumfang wurde temporär eingeschränkt.
+Diese Seite ist veraltet und wird nicht mehr gewartet. Benutzung auf eigene Gefahr.
 <!-- ############################### TABLE ################################### -->
 
 <?php

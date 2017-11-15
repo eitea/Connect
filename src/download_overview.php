@@ -61,9 +61,8 @@ $pdf->SetLeftMargin(10);
 $pdf->SetRightMargin(10);
 
 $companyID = $sum = 0;
-echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
-    if($companyID != $row['companyID']){        
+    if($companyID != $row['companyID']){
         if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription'])){
             die($lang['ERROR_MISSING_DATA']. "(Name, Logo, Adr.)");
         }
