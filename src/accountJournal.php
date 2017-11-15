@@ -72,8 +72,7 @@ while($result && ($row = $result->fetch_assoc())){
     echo '</tr>';
 
     //### CSV ####
-    if($row['should'] != 0) { $val = $row['should']; $code = 1; } else { $val = $row['have']; $code = 2; }
-    if($row['accNum'] >= 4000 && $row['accNum'] < 5000 ){ $val *= -1; $t *= -1; }
+    if($row['should'] != 0) { $val = $row['should']; $code = 1; } else { $val = $row['have'] * -1; $code = 2; $t *= -1; }
     if($row['offNum'] >= 2800){ $sym = 'bk'; } else { $sym = 'ka'; }
     //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
     $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info']).';'
