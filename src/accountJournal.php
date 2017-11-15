@@ -46,7 +46,7 @@ INNER JOIN taxRates ON account_journal.taxID = taxRates.id
 LEFT JOIN receiptBook r1 ON r1.journalID = account_journal.id
 WHERE a1.companyID = $cmpID $userQuery $dateQuery ORDER BY docNum, inDate");
 echo $conn->error;
-$csv = "belegnr;konto;gkto;belegdat;text;buchdat;bucod;betrag;steuer;steucod;mwst;symbol;periode\n";
+$csv = "belegnr;konto;gkto;belegdat;text;buchdat;bucod;betrag;steuer;steucod;mwst;symbol;periode;gegenbuchkz;verbuchkz\n";
 while($result && ($row = $result->fetch_assoc())){    
     if($row['account2'] && $row['account3']){
         if($row['should'] != 0) $t = $row['should'] * $row['percentage'] / 100;
@@ -78,7 +78,7 @@ while($result && ($row = $result->fetch_assoc())){
     //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
     $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info']).';'
     .date('Ymd', strtotime($row['payDate'])).';'.$code.';'.number_format($val, 2, ',','.').';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage']
-    .";$sym;". date('n', strtotime($row['payDate']))."\n";
+    .";$sym;". date('n', strtotime($row['payDate'])).";E;A\n";
 }
 ?>
 </tbody>
