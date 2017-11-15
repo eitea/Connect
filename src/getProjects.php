@@ -1,10 +1,5 @@
 <?php include 'header.php'; enableToProject($userID); ?>
 <?php include dirname(__DIR__) . "/plugins/csvParser/Csv.php"; use Deblan\Csv\Csv; ?>
-<style>
-.popover{
-  max-width: 40%; /* Max Width of the popover (depending on the container!) */
-}
-</style>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['editing_save'])){ //comes from the modal

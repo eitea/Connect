@@ -1,7 +1,13 @@
 <?php //accountJournal, getProjects
+if(isset($_GET['name'])){
+  $name = $_GET['name'];
+} else {
+  $name = "export";
+}
+
 header("Cache-Control: public");
 header("Content-Description: File Transfer");
-header("Content-Disposition: attachment; filename='export.csv'");
+header("Content-Disposition: attachment; filename=$name.csv");
 header("Content-Type: application/csv; charset=UTF-16LE");
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){

@@ -1,17 +1,11 @@
 <?php include 'header.php'; enableToTime($userID); //project/time ?>
 <?php
 require_once 'Calculators/IntervalCalculator.php';
-$filterings = array("savePage" => $this_page, "user" => 0, "logs" => array(0, 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ) ;
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, "users" => array(), "bookings" => array(1, '', 'checked'), "date" => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))) ) ;
+$activeTab = 'home';
 ?>
 
-<div class="page-header">
-  <h3><?php echo $lang['TIMESTAMPS']; ?>
-    <div class="page-header-button-group">
-      <?php include 'misc/set_filter.php'; ?>
-      <a class="btn btn-default" data-toggle="modal" data-target=".addInterval" <?php if(!$filterings['user']) echo 'disabled'; ?> title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></a>
-    </div>
-  </h3>
-</div>
+<div class="page-header"><h3><?php echo $lang['TIMESTAMPS']; ?><div class="page-header-button-group"><?php include 'misc/set_filter.php'; ?></div></h3></div>
 
 <?php
 //i need some filterings vars in here
@@ -65,17 +59,199 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 } //endif post
 ?>
-<!-- ############################### TABLE ################################### -->
-<?php
-if($filterings['user']):
-  $result = $conn->query("SELECT id, firstname FROM $userTable WHERE id = ".$filterings['user']);
-  if($result && ($row = $result->fetch_assoc())){
-    $x = $row['id'];
+
+<ul class="nav nav-tabs">
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
+  <?php foreach($filterings['users'] as $u){
+    $active = '';
+    if($u == $activeTab) $active = 'class="active"';
+    $result_fc = mysqli_query($conn, "SELECT firstname FROM UserData WHERE id = $u");
+    echo '<li '.$active.' ><a data-toggle="tab" href="#'.$u.'">'.$result_fc->fetch_assoc()['firstname'].'</a></li>';
   }
   ?>
-  <br>
-  <form method="post">
-    <table id="mainTable" class="table table-hover table-condensed">
+</ul>
+
+<div class="tab-content">
+  <!-- ############################### Projects ################################### -->
+
+  <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
+
+  <div class="page-header"><h3><?php echo $lang['VIEW_PROJECTS']; ?></h3></div>
+
+  <?php //quess who needs queries.
+    $companyQuery = $clientQuery = $projectQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
+    if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
+    if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
+    if($filterings['project']){$projectQuery = "AND $projectTable.id = ".$filterings['project']; }
+    if($filterings['users']){$userQuery = "AND $userTable.id IN (".implode(', ', $filterings['users']).')'; }
+    if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
+    if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
+    if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
+
+    //filtering a project means excluding all breaks. we dont want that, which explains the query below.
+    $sql = "SELECT $projectTable.id AS projectID,
+    $clientTable.id AS clientID, $companyTable.id AS companyID,
+    $companyTable.name AS companyName, $clientTable.name AS clientName, $projectTable.name AS projectName,
+    $userTable.id AS userID, $userTable.firstname, $userTable.lastname,
+    $projectBookingTable.*, $projectBookingTable.id AS projectBookingID,
+    $logTable.timeToUTC,
+    $projectTable.hours, $projectTable.hourlyPrice, $projectTable.status
+    FROM $projectBookingTable
+    INNER JOIN $logTable ON  $projectBookingTable.timeStampID = $logTable.indexIM
+    INNER JOIN $userTable ON $logTable.userID = $userTable.id
+    LEFT JOIN $projectTable ON $projectBookingTable.projectID = $projectTable.id
+    LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
+    LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
+    WHERE DATE_ADD($projectBookingTable.start, INTERVAL $logTable.timeToUTC HOUR) >= DATE('".$filterings['date'][0]."')
+    AND DATE(DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR)) <= DATE('".$filterings['date'][1]."')
+    AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $driveQuery $breakQuery))
+    ORDER BY $projectBookingTable.start ASC";
+    $result = $conn->query($sql);
+    if(!$result || $result->num_rows <= 0){
+      echo '<script>document.getElementById("set_filter_search").click();</script>';
+    }
+  ?>
+  <form id="project_table" method="post">
+    <table id="projectTable" class="table table-hover table-condensed">
+      <thead>
+        <th><?php echo $conn->error ; ?></th>
+        <th><?php echo $lang['COMPANY'].' - '.$lang['CLIENT'].' - '.$lang['PROJECT']; ?></th>
+        <th><?php echo $lang['USERS']; ?></th>
+        <th style="max-width:300px">Infotext</th>
+        <th><?php echo $lang['DATE']; ?></th>
+        <th><?php echo $lang['DATE'] .' '. $lang['CHARGED']; ?></th>
+        <th><?php echo $lang['MINUTES']; ?></th>
+        <th>
+          <label><input type="radio" class="disable-styling" onClick="toggle('checkingIndeces', 'noCheckCheckingIndeces')" name="toggleRadio"> <?php echo $lang['CHARGED']; ?></label>
+          <label><input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></label>
+        </th>
+        <th>Detail</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <?php
+        $csv = $lang['CLIENT'].';'.$lang['PROJECT'].';Info;'.$lang['DATE'].' - '. $lang['FROM'].';'. $lang['DATE'].' - '. $lang['TO'].';'.
+        $lang['TIMES'].' - '. $lang['FROM'].';'.$lang['TIMES'].' - '. $lang['TO'].';'.$lang['SUM'].' (min)'.';'.$lang['HOURS_CREDIT'].';Person;'.$lang['HOURLY_RATE'].';'.
+        $lang['ADDITIONAL_FIELDS'].';'.$lang['EXPENSES']."\n";
+
+        $sum_min = 0;
+        $numRows = $result->num_rows;
+        for($i = 0; $i < $numRows; $i++) {
+          $row = $result->fetch_assoc();
+          //have to make sure admin can only see what is available to him
+          if(($row['companyID'] && !in_array($row['companyID'], $available_companies)) || ($row['userID'] && !in_array($row['userID'], $available_users))){
+            continue;
+          }
+          $x = $row['projectBookingID'];
+          $timeDiff = timeDiff_Hours($row['start'], $row['end']);
+
+          if($row['bookingType'] == 'break'){
+            $icon = "fa fa-cutlery";
+          } elseif($row['bookingType'] == 'drive'){
+            $icon = "fa fa-car";
+          } elseif($row['bookingType'] == 'mixed'){
+            $icon = "fa fa-plus";
+            $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
+          } else {
+            $icon = "fa fa-bookmark";
+          }
+
+          echo '<tr>';
+          echo "<td style='width:10px'><i class='$icon'></i></td>";
+          echo '<td>'.$row['companyName'].'<br> '.$row['clientName'].'<br> '.$row['projectName'].'</td>';
+          echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+          echo '<td style="max-width:300px">'.$row['infoText'].'</td>';
+
+          $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
+          $B = carryOverAdder_Hours($row['end'],$row['timeToUTC']);
+
+          $A_charged = $B_charged = '--';
+          if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+            $A_charged = carryOverAdder_Hours($row['chargedTimeStart'],$row['timeToUTC']);
+          }
+          if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+            $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
+          }
+
+          $csv .= $row['clientName'] .';';
+          $csv .= $row['projectName'] .';';
+          $csv .= str_replace(array("\r", "\n",";"), ' ', $row['infoText']) .';';
+          $csv .= substr($A,0,10) .';';
+          $csv .= substr($B,0,10) .';';
+          $csv .= substr($A,11,6) .';';
+          $csv .= substr($B,11,6) .';';
+          $csv .= number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') .';';
+          $csv .= $row['hours'] .';';
+          $csv .= $row['firstname']." ".$row['lastname'] .';';
+          $csv .= ' '.$row['hourlyPrice'].' ';
+
+          echo '<td style="width:200px;">'.substr($A,0,16).' - '.substr($B,11,5)."</td>";
+          echo '<td style="max-width:200px;whitpre;">'.$lang['FROM'].': '.substr($A_charged,0,16)."<br>".$lang['TO'].':   '.substr($B_charged,0,16)."</td>";
+          echo "<td>" .number_format((timeDiff_Hours($row['start'], $row['end']))*60, 0, '.', '') . "</td>";
+
+          if($row['bookingType'] != 'break' && $row['booked'] != 'TRUE'){ //if this is a break or has been charged already, do not display dis
+            echo "<td><input id='".$row['projectBookingID']."_01' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_02\")' name='checkingIndeces[]' value='".$row['projectBookingID']."'>"; //gotta know which ones he wants checked.
+            echo " / <input id='".$row['projectBookingID']."_02' type='checkbox' class='disable-styling' onclick='toggle2(\"".$row['projectBookingID']."_01\")' name='noCheckCheckingIndeces[]' value='".$row['projectBookingID']."'></td>";
+          } else {
+            echo "<td></td>";
+          }
+
+          $projStat = (!empty($row['status']))? $lang['PRODUCTIVE'] :  $lang['PRODUCTIVE_FALSE'];
+          $detailInfo = $row['hours'] .' || '. $row['hourlyPrice'] .' || '. $projStat;
+          $interninfo = $row['internInfo'];
+          $optionalinfo = $csv_optionalinfo = $expensesinfo = $csv_expensesinfo = '';
+          $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
+          if($extraFldRes && $extraFldRes->num_rows > 0){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; $csv_optionalinfo = $extraFldRow['name'].': '.$row['extra_1']; }
+          }
+          if($extraFldRes && $extraFldRes->num_rows > 1){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_2'];}
+          }
+          if($extraFldRes && $extraFldRes->num_rows > 2){
+            $extraFldRow = $extraFldRes->fetch_assoc();
+            if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; $csv_optionalinfo .= ', '.$extraFldRow['name'].': '.$row['extra_3'];}
+          }
+          $csv .= $csv_optionalinfo .';';
+          if($row['exp_unit'] > 0){ $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>'; $csv_expensesinfo .= "{$lang['QUANTITY']}: {$row['exp_unit']},"; }
+          if($row['exp_price'] > 0){ $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>'; $csv_expensesinfo .= "{$lang['PRICE_STK']}: {$row['exp_price']}"; }
+          if($row['exp_info']){ $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>'; $csv_expensesinfo .= ", {$lang['DESCRIPTION']}: {$row['exp_info']}"; }
+          $csv .= $csv_expensesinfo .';';
+          echo "<td>";
+          if($row['booked'] == 'FALSE'){ echo '<button type="button" onclick="appendModal_proj('.$x.', '.$userID.')" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
+          if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}
+          if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+          if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+          if(!empty($expensesinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }
+          echo "<button type='submit' class='btn btn-default' value='$x' name='delete_booking'><i class='fa fa-trash-o'></i></button>";
+          echo '</td>';
+          echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged
+          echo "</tr>";
+
+          $csv .= "\n";
+          $sum_min += timeDiff_Hours($row['start'], $row['end']);
+        } //end while fetch_assoc
+
+        echo "<tr>";
+        echo '<td style="font-weight:bold">'.$lang['SUM'].'</td> <td></td> <td></td> <td></td> <td></td> <td></td>';
+        echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
+        echo "</tr>";
+        ?>
+      </tbody>
+    </table>
+  </form>
+  <form id="csvForm" method="POST" target="_blank" action="../project/csvDownload"><input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" /></form>
+</div>
+
+<!-- ############################### UserData ################################### -->
+
+<?php foreach($filterings['users'] as $x): 
+if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade in active'>"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
+?>
+<br><br>
+  <form method="POST">
+    <table class="table table-hover table-condensed">
       <thead>
         <th><?php echo $lang['WEEKLY_DAY']; ?></th>
         <th style="min-width:90px"><?php echo $lang['DATE']; ?></th>
@@ -104,9 +280,8 @@ if($filterings['user']):
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $saldo_month = 0;
         for($i = 0; $i < $calculator->days; $i++){
           $calcIndexIM = $calculator->indecesIM[$i];
-          if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
-          if($filterings['logs'][1] != 'checked' || $calculator->shouldTime[$i] != 0 || $calculator->absolvedTime[$i] != 0){
-            
+          //if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
+          //$filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
             $tinyEndTime = '-';
 
             $A = $calculator->start[$i];
@@ -164,7 +339,6 @@ if($filterings['user']):
                 echo '</div></td></tr>';
               }
             }
-          }
 
           if(isset($calculator->endOfMonth[$calculator->date[$i]])){
             //overTimeLump
@@ -196,8 +370,11 @@ if($filterings['user']):
       </tbody>
     </table>
   </form>
+</div>
+<?php endforeach; ?>
+</div>
 
-  <!-- ############################### END TABLE END ################################### -->
+<!-- ############################### END TABBING END ################################### -->
 
   <div id="editingModalDiv"></div>
 
@@ -246,12 +423,6 @@ if($filterings['user']):
       </div>
     </div>
   </form>
-<?php
-else:
-  echo '<br><div class="alert alert-info">'.$lang['INFO_REQUIRE_USER'].'</div>';
-  echo '<script>document.getElementById("set_filter_search").click();</script>';
-endif;
-?>
 
 <script>
 var existingModals = new Array();
@@ -296,6 +467,105 @@ function appendModal_proj(id, user){
 }
 $('.clicker').click(function(){
   $(this).nextUntil('.clicker').toggle('normal');
+});
+
+
+function showClients(place, company, client, project, projectPlace){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getClient.php',
+    data:{companyID:company, clientID:client},
+    type: 'get',
+    success : function(resp){
+      $(place).html(resp);
+    },
+    error : function(resp){}
+  });
+  showProjects(projectPlace, client, project);
+};
+function showProjects(place, client, project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjects.php',
+    data:{clientID:client, projectID:project},
+    type: 'get',
+    success : function(resp){
+      $(place).html(resp);
+    },
+    error : function(resp){}
+  });
+  showProjectfields(project);
+};
+function showProjectfields(project){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getProjectFields.php',
+    data:{projectID:project},
+    type: 'get',
+    success : function(resp){
+      $("#project_fields").html(resp);
+    },
+    error : function(resp){}
+  });
+}
+function showLastBooking(id){
+  $.ajax({
+    url:'ajaxQuery/AJAX_getLastBooking.php',
+    type:'get',
+    data:{userID:id},
+    success: function(resp){
+      $("#date_field").val(resp.substr(0,10));
+      $("#time_field").val(resp.substr(11,17));
+    },
+    error : function(resp){}
+  });
+}
+function showMyDiv(o, toShow){
+  if(o.checked){
+    document.getElementById(toShow).style.display='block';
+  } else {
+    document.getElementById(toShow).style.display='none';
+  }
+}
+function hideMyDiv(o, toShow){
+  if(o.checked){
+    document.getElementById(toShow).style.display='none';
+  } else {
+    document.getElementById(toShow).style.display='block';
+  }
+}
+
+function toggle(checkId, uncheckId) {
+  checkboxes = document.getElementsByName(checkId + '[]');
+  checkboxesUncheck = document.getElementsByName(uncheckId + '[]');
+  for(var i = 0; i<checkboxes.length; i++) {
+    checkboxes[i].checked = true;
+    checkboxesUncheck[i].checked = false;
+    checkboxValues[checkboxes[i].id] = true;
+  }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
+}
+function toggle2(uncheckID){
+  uncheckBox = document.getElementById(uncheckID);
+  uncheckBox.checked = false;
+  checkboxValues[uncheckBox.id] = false;
+}
+
+$(document).ready(function(){
+  $('#projectTable').DataTable({
+    order: [],
+    ordering: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    responsive: true,
+    dom: 'f',
+    autoWidth: false,
+    fixedHeader: {
+      header: true,
+      headerOffset: 50,
+      zTop: 1
+    },
+    paging: false
+  });
+  setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('#projectTable').trigger('column-reorder.dt'); }, 500);
 });
 </script>
 <!-- /BODY -->

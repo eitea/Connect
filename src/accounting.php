@@ -238,6 +238,7 @@ while($result && ($row = $result->fetch_assoc())){
     <th><?php echo $lang['DATE']; ?></th>
     <th><?php echo $lang['ACCOUNT']; ?></th>
     <th>Text</th>
+    <th>Steuer Nr.</th>
     <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
     <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT'];?></th>
     <th style="text-align:right">Saldo</th>
@@ -268,6 +269,7 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td>'.substr($row['payDate'],0, 10).'</td>';
     echo '<td><a href="account?v='.$row['account'].'" class="btn btn-link" >'.$row['num'].'</a></td>';
     echo '<td>'.$row['info'].'</td>';
+    echo '<td>'.sprintf('%02d', $row['taxID']).'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_should'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_have'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($saldo, 2, ',', '.').'</td>';
