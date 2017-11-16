@@ -252,7 +252,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
 
 <ul class="nav nav-tabs">
   <li <?php if($activeTab == 'project'){echo 'class="active"';}?>><a data-toggle="tab" href="#project" onclick="$('#sav').val('project');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
-  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['DATA']; ?></a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['RECORD']; ?></a></li>
   <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes" onclick="$('#sav').val('taxes');"><?php echo $lang['TAXES']; ?></a></li>
   <li <?php if($activeTab == 'banking'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBank" onclick="$('#sav').val('banking');">Banking</a></li>
   <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling" onclick="$('#sav').val('billing');"><?php echo $lang['BILLING']; ?></a></li>

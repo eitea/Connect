@@ -33,7 +33,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 ?>
-<form method="post">
+<form method="POST">
   <table class="table table-hover">
     <thead>
       <th>Name</th>
@@ -80,7 +80,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <input type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
         <br>
         <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
-        <input type="text" class="form-control" name="add_product_description" placeholder="<?php echo $lang['DESCRIPTION']; ?>" maxlength="190"/>
+        <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"></textarea>
         <br>
         <div class="row">
           <div class="col-md-3">
@@ -104,9 +104,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <label><?php echo $lang['TAXES']; ?></label>
             <select class="js-example-basic-single btn-block" name="add_product_taxes">
               <?php
-              $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+              $tax_result = $conn->query("SELECT * FROM taxRates");
               while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+                $selected = '';
+                if($tax_row['id'] == 3) $selected = 'selected'; 
+                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
               }
               ?>
             </select>

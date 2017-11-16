@@ -105,8 +105,8 @@ if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['saveP
 }
 
 $scale = 0;
-if(isset($filterings['date'])){$scale++;}
-if(isset($filterings['user']) || isset($filterings['users']) || isset($filterings['logs'])){$scale++;}
+if(isset($filterings['date']) || isset($filterings['logs'])){$scale++;}
+if(isset($filterings['user']) || isset($filterings['users'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);
@@ -230,17 +230,6 @@ if($scale > 2){ //3 columns
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
             </div>
           <?php endif; ?>
-          <?php if(isset($filterings['logs'])): ?>
-            <label><?php echo $lang['ACTIVITY']; ?></label>
-              <select name="searchActivity" class="js-example-basic-single">
-                <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
-                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
-                <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
-                <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
-                <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
-              </select>
-              <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
-          <?php endif; ?>
           <?php if(isset($filterings['requestType'])): ?>
             <label><?php echo $lang['REQUEST_TYPE']; ?></label>
             <select name="searchRequestType" class="js-example-basic-single">
@@ -266,7 +255,7 @@ if($scale > 2){ //3 columns
           <?php endif; ?>
         </div>
 
-        <?php if(isset($filterings['date'])): ?>
+        <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
           <div class="filter_column">
             <?php if(isset($filterings['date'][1])): ?>
               <label><?php echo $lang['FROM']; ?></label>
@@ -282,13 +271,26 @@ if($scale > 2){ //3 columns
                 <span class="input-group-btn">
                   <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
                 </span>
-              </div>
+              </div><br>
             <?php else: ?>
               <label><?php echo $lang['DATE']; ?></label>
-              <input type="text" maxlength="7" class="form-control monthpicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+              <input type="text" maxlength="7" class="form-control monthpicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" /><br>
+            <?php endif; ?>
+
+            <?php if(isset($filterings['logs'])): ?>
+            <label><?php echo $lang['ACTIVITY']; ?></label>
+              <select name="searchActivity" class="js-example-basic-single">
+                <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
+                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
+                <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+                <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
+                <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+              </select>
+              <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
             <?php endif; ?>
           </div>
         <?php endif; ?>
+
 
         <?php if(isset($filterings['procedures'])): ?>
           <div class="filter_column">

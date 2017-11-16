@@ -3,7 +3,7 @@
 require_once 'Calculators/IntervalCalculator.php';
 $day = date('w');
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, "users" => array(), "bookings" => array(1, '', 'checked'),
-"date" => array(date('Y-m-d', strtotime('-'.$day.' days')), substr(getCurrentTimestamp(), 0, 10)));
+"date" => array(date('Y-m-d', strtotime('-'.$day.' days')), substr(getCurrentTimestamp(), 0, 10)), "logs" => array(0, 'checked'));
 $activeTab = 'home';
 ?>
 
@@ -65,8 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
     }
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
-  }
-  elseif(isset($_POST['add_multiple'])){
+  } elseif(isset($_POST['add_multiple'])){
     $filterID = intval($_POST['add_multiple']);
     if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
       $status = intval($_POST['add_multiple_status']);
@@ -94,8 +93,65 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     }
   }
+  if(!empty($_POST['editing_save'])){
+    $accept = true;
+    $x = $_POST['editing_save'];
+    $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
+    if(!$result || $result->num_rows < 1){
+      $accept = false;
+      echo mysqli_error($conn);
+    }
+    $row = $result->fetch_assoc();
+    $toUtc = $row['timeToUTC'] * -1;
+    if(!test_Date($_POST["editing_time_from_".$x].':00')  || !test_Date($_POST["editing_time_to_".$x].':00')){
+      $accept = false;
+    }
+    $new_projectID = 'NULL';
+    if(!empty($_POST["editing_projectID_".$x])){
+      $new_projectID = $_POST["editing_projectID_".$x];
+    } elseif(isset($_POST["editing_projectID_".$x])) { //breaks dont have this set
+      echo 'No ID found';
+      $accept = false;
+    }
 
-  if(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+    $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
+    $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
+
+    $chargedTimeStart= '0000-00-00 00:00:00';
+    $chargedTimeFin = '0000-00-00 00:00:00';
+    if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+      $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
+    }
+    if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+      $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
+    }
+
+    $new_text = test_input($_POST['editing_infoText_'.$x]);
+    if(!$new_text) $accept = false;
+
+    $new_charged = 'FALSE';
+    if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
+      $new_charged = 'TRUE';
+    }
+    if($accept){
+      $conn->query("UPDATE $projectBookingTable SET start='$new_A', end='$new_B', projectID=$new_projectID, infoText='$new_text', booked='$new_charged', chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $x");
+      //update charged
+      if(isset($_POST['editing_charge'])){
+        if($chargedTimeStart != '0000-00-00 00:00:00'){
+          $new_A = $chargedTimeStart;
+        }
+        if($chargedTimeFin != '0000-00-00 00:00:00'){
+          $new_B = $chargedTimeFin;
+        }
+        $hours = timeDiff_Hours($new_A, $new_B);
+        $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
+        $conn->query($sql);
+      }
+      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    }
+  } elseif(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
     $accept = true;
     $filterUserID = intval($_POST['user']);
 
@@ -199,8 +255,40 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['add'])) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+  } elseif(isset($_POST['saveCharged'])){
+    //update free of charge
+    if(isset($_POST['noCheckCheckingIndeces'])){
+      foreach ($_POST["noCheckCheckingIndeces"] as $e) {
+        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+        $conn->query($sql);
+      }
+    }
+    //charged
+    if(isset($_POST['checkingIndeces'])){
+      foreach ($_POST["checkingIndeces"] as $e) {
+        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+        $conn->query($sql);
+        $sql = "SELECT start, end, chargedTimeStart, chargedTimeEnd, projectID FROM $projectBookingTable WHERE id = $e";
+        if($result = $conn->query($sql)){
+          $row = $result->fetch_assoc();
+          $A = $row['start'];
+          $B = $row['end'];
+          if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+            $A = $row['chargedTimeStart'];
+          }
+          if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+            $B = $row['chargedTimeEnd'];
+          }
+          $hours = timeDiff_Hours($A, $B);
+          $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
+          $conn->query($sql);
+        }
+      }
+    }
+    if(!mysqli_error($conn)){
+      echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+    }
   }
-
 } //endif post
 ?>
 
@@ -218,7 +306,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="tab-content">
   <!-- ############################### Projects ################################### -->
   
-  <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
+  <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'active in';}?>">
   <div class="page-header"><h3><?php echo $lang['VIEW_PROJECTS']; ?><div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addProjectBookings" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
     <button type='submit' class="btn btn-default" name='saveCharged' form="project_table"><i class="fa fa-floppy-o"></i></button>
@@ -289,7 +377,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <label><input type="radio" class="disable-styling" onClick="toggle('noCheckCheckingIndeces', 'checkingIndeces')" name="toggleRadio"> <?php echo $lang['NOT_CHARGEABLE']; ?></label>
         </th>
         <th>Detail</th>
-        <th></th>
       </thead>
       <tbody>
         <?php
@@ -382,14 +469,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           if($row['exp_info']){ $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>'; $csv_expensesinfo .= ", {$lang['DESCRIPTION']}: {$row['exp_info']}"; }
           $csv .= $csv_expensesinfo .';';
           echo "<td>";
-          if($row['booked'] == 'FALSE'){ echo '<button type="button" onclick="appendModal_proj('.$x.', '.$userID.')" class="btn btn-default" data-toggle="modal" data-target=".editingModal-'.$x.'" ><i class="fa fa-pencil"></i></button>'; }
+          if($row['booked'] == 'FALSE'){ echo '<button type="button" onclick="appendModal_proj('.$x.', '.$userID.')" class="btn btn-default"><i class="fa fa-pencil"></i></button>'; }
           if($row['bookingType'] != 'break'){ echo "<a tabindex='0' role='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Stundenkonto - Stundenrate - Projektstatus' data-content='$detailInfo' data-placement='left'><i class='fa fa-info-circle'></i></a>";}
           if(!empty($interninfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
           if(!empty($optionalinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['ADDITIONAL_FIELDS']."' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
           if(!empty($expensesinfo)){ echo "<a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }
           echo "<button type='submit' class='btn btn-default' value='$x' name='bk_remove'><i class='fa fa-trash-o'></i></button>";
           echo '</td>';
-          echo '<td><input type="hidden" name="editingIndeces[]" value="'.$row['projectBookingID'].'"></td>'; //needed to check what has been charged
           echo "</tr>";
 
           $csv .= "\n";
@@ -410,7 +496,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!-- ############################### UserData ################################### -->
 
 <?php foreach($filterings['users'] as $x): 
-if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade in active'>"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
+if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade active in'>"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
 ?>
 <div class="page-header"><h3><?php echo $lang['TIMESTAMPS']; ?>
 <div class="page-header-button-group">
@@ -447,8 +533,8 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade in active'>"; } els
         $lunchbreakSUM = $expectedHoursSUM = $absolvedHoursSUM = $saldo_month = 0;
         for($i = 0; $i < $calculator->days; $i++){
           $calcIndexIM = $calculator->indecesIM[$i];
-          //if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
-          //$filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
+          if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
+          if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
             $tinyEndTime = '-';
 
             $A = $calculator->start[$i];
@@ -481,7 +567,11 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade in active'>"; } els
                 $booking_content .= '<div class="col-sm-1">'.$Ap.'</div>';
                 $booking_content .= '<div class="col-sm-1">'.$Bp.'</div>';
                 $booking_content .= '<div class="col-sm-5">'.$row['infoText'].'</div>';
-                $booking_content .= '<div class="col-sm-1"><button type="submit" class="btn btn-default" value="'.$row['bookingTableID'].'" name="bk_remove"><i class="fa fa-trash-o"></i></button></div>'; 
+                $booking_content .= '<div class="col-sm-1"><button type="submit" class="btn btn-default" value="'.$row['bookingTableID'].'" name="bk_remove"><i class="fa fa-trash-o"></i></button>';
+                if($row['booked'] == 'FALSE'){
+                  $booking_content .= '<button type="button" onclick="appendModal_proj('.$row['bookingTableID'].', '.$x.');" class="btn btn-default" ><i class="fa fa-pencil"></i></button>';
+                }
+                $booking_content .= '</div>'; 
                 $booking_content .= '</div>';
               }
               $booking_content .= '</td></tr>';
@@ -502,7 +592,7 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade in active'>"; } els
             echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
             echo '<td>';
             if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
-              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal_time('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\', '.$x.')"  data-toggle="modal" data-target=".editingModal-'.$i.'"><i class="fa fa-pencil"></i></button> ';
+              echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal_time('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\', '.$x.')"><i class="fa fa-pencil"></i></button> ';
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
             echo '</td>';
@@ -747,6 +837,8 @@ function appendModal_proj(id, user){
     },
     error : function(resp){}
    });
+  } else {
+    $('.editingModal-'+id).modal('show');
   }
 }
 

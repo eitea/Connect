@@ -4,10 +4,9 @@ $routes = array(
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
   'login/access' => 'login_tester.php',
 
-  'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/calendar' => 'calendar.php',
-  'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/travel' => 'travelingForm.php',
-  'user/ready' => 'readyPlan.php',                 'user/book' => 'userProjecting.php',
-
+  'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/book' => 'userProjecting.php',
+  'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/ready' => 'readyPlan.php',
+  
   'social/home' => 'socialMedia.php',
 
   'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',

@@ -219,10 +219,10 @@ $lang_eng['COMPLEXITY'] = 'Complexity';
 $lang_ger['COMPLEXITY'] = 'Komplexität';
 
 $lang_eng['CONFIRM'] = 'Confirm';
-$lang_ger['CONFIRM'] = 'Bestätigen';
+$lang_ger['CONFIRM'] = 'Ja';
 
-$lang_eng['CONFIRM_CANCEL'] = 'No, I\'m sorry.';
-$lang_ger['CONFIRM_CANCEL'] = 'Nein, tut mir leid.';
+$lang_eng['CONFIRM_CANCEL'] = 'No';
+$lang_ger['CONFIRM_CANCEL'] = 'Nein';
 
 $lang_eng['CONSUMED'] = 'Consumed';
 $lang_ger['CONSUMED'] = 'Konsumiert';
@@ -617,6 +617,9 @@ $lang_ger['LUNCHBREAK'] = 'Mittagspause';
 $lang_eng['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
 $lang_ger['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 
+$lang_eng['MAKE_REQUEST'] = 'File Application';
+$lang_ger['MAKE_REQUEST'] = 'Antrag Stellen';
+
 $lang_eng['MANDATORY_SETTINGS'] = 'Mandatory Settings';
 $lang_ger['MANDATORY_SETTINGS'] = 'Pflichtfelder';
 
@@ -639,7 +642,7 @@ $lang_eng['MASTER_PASSWORD_NEW'] = 'New Password';
 $lang_ger['MASTER_PASSWORD_NEW'] = 'Neues Passwort';
 
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
-$lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur die Anfrage, NICHT die eigentlichen Stunden!';
+$lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur den Antrag, NICHT die eigentlichen Stunden!';
 
 $lang_eng['MINUTES'] = 'Minutes';
 $lang_ger['MINUTES'] = 'Minuten';
@@ -654,7 +657,7 @@ $lang_eng['MONTHLY_REPORT'] ='Monthly Report';
 $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 
 $lang_eng['MY_REQUESTS'] = 'My Requests';
-$lang_ger['MY_REQUESTS'] = 'Meine Anfragen';
+$lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
@@ -798,13 +801,13 @@ $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
 $lang_eng['PROCESS'] = 'Process';
-$lang_ger['PROCESS'] = 'Auftrag';
+$lang_ger['PROCESS'] = 'Vorgang';
 
 $lang_eng['PROCESS_STATUS'] = 'Process Status';
 $lang_ger['PROCESS_STATUS'] = 'Prozessstatus';
 
 $lang_eng['PROCESSES'] = 'Processes';
-$lang_ger['PROCESSES'] = 'Aufträge';
+$lang_ger['PROCESSES'] = 'Vorgänge';
 
 $lang_eng['PRODUCTIVE'] = 'Productive';
 $lang_ger['PRODUCTIVE'] = 'Produktiv';
@@ -851,8 +854,8 @@ $lang_ger['PURCHASE_PRICE'] = 'Einkaufspreis';
 $lang_eng['QUANTITY'] = 'Quantity';
 $lang_ger['QUANTITY'] = 'Menge';
 
-$lang_eng['READY_STATUS'] = 'Ready Status';
-$lang_ger['READY_STATUS'] = 'Bereitschaftsstatus';
+$lang_eng['READY_STATUS'] = 'Present';
+$lang_ger['READY_STATUS'] = 'Anwesend';
 
 $lang_eng['REASON'] = 'Reason';
 $lang_ger['REASON'] = 'Grund';
@@ -871,6 +874,9 @@ $lang_ger['RECEIPT_DATE'] = 'Rechnungsdatum';
 
 $lang_eng['RECEIPT_BOOK'] = 'Receipt Book';
 $lang_ger['RECEIPT_BOOK'] = 'Wareneingangsbuch';
+
+$lang_eng['RECORD'] = 'Record';
+$lang_ger['RECORD'] = 'Datenstamm';
 
 $lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
 $lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
@@ -903,10 +909,10 @@ $lang_eng['RETURN'] = 'Return';
 $lang_ger['RETURN'] = 'Zurück';
 
 $lang_eng['REQUESTS'] = "Request";
-$lang_ger['REQUESTS'] = "Anfragen";
+$lang_ger['REQUESTS'] = "Anträge";
 
 $lang_eng['REQUEST_TYPE'] = "Request Type";
-$lang_ger['REQUEST_TYPE'] = "Art der Anfrage";
+$lang_ger['REQUEST_TYPE'] = "Art des Antrags";
 
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
@@ -1089,7 +1095,7 @@ $lang_eng['UNDO'] ='Undo';
 $lang_ger['UNDO'] = 'Rückgängig';
 
 $lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
-$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
+$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anträge';
 
 $lang_eng['UNIT'] ='Unit';
 $lang_ger['UNIT'] = 'Einheit';
@@ -1139,7 +1145,7 @@ $lang_eng['VACATION_REPAIR'] = 'Repair Vacations';
 $lang_ger['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
 
 $lang_eng['VACATION_REQUESTS'] = 'Vacation Requests';
-$lang_ger['VACATION_REQUESTS'] = 'Urlaubsanfragen';
+$lang_ger['VACATION_REQUESTS'] = 'Urlaubsanträge';
 
 $lang_eng['VALID_PERIOD'] = 'Validity Period';
 $lang_ger['VALID_PERIOD'] = 'Gültigkeitszeitraum';
@@ -1156,8 +1162,8 @@ $lang_ger['VIEW'] = 'Ansehen';
 $lang_eng['VIEW_PROJECTS'] = 'View Projects';
 $lang_ger['VIEW_PROJECTS'] = 'Projekte';
 
-$lang_eng['VIEW_TIMESTAMPS'] = 'View Timestamps';
-$lang_ger['VIEW_TIMESTAMPS'] = 'Zeitstempel Ansehen';
+$lang_eng['VIEW_TIMESTAMPS'] = 'My Times';
+$lang_ger['VIEW_TIMESTAMPS'] = 'Meine Zeiten';
 
 $lang_eng['VIEW_USER'] = 'View Users';
 $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';

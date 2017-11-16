@@ -695,7 +695,7 @@ function create_tables($conn){
     proposalID INT(6) UNSIGNED,
     position INT(4),
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(600),
+    description VARCHAR(400),
     price DECIMAL(10,2),
     unit VARCHAR(20),
     quantity DECIMAL(8,2),

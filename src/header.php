@@ -274,6 +274,7 @@
         <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
         <a class="hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
         <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
+        <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>"><i class="fa fa-commenting"></i></a>
         <?php else: ?>
         <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
         <?php endif; ?>
@@ -443,103 +444,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <!-- User-Section: BASIC -->
           <li><a <?php if($this_page =='home.php'){echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
           <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
-          <li><a <?php if($this_page == 'calendar.php'){echo $setActiveLink;}?> href="../user/calendar"><i class="fa fa-calendar"></i> <span><?php echo $lang['CALENDAR']; ?></span></a></li>
           <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
-          <li><a <?php if($this_page =='travelingForm.php'){echo $setActiveLink;}?> href="../user/travel"><i class="fa fa-suitcase"></i> <span><?php echo $lang['TRAVEL_FORM']; ?></span></a></li>
-
-          <?php if($showReadyPlan == 'TRUE'): ?>
-            <li><a <?php if($this_page =='readyPlan.php'){echo $setActiveLink;}?> href="../user/ready"><i class="fa fa-user-times"></i> <?php echo $lang['READY_STATUS']; ?></a></li>
-          <?php endif; ?>
-
-          <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
-            <li><a <?php if($this_page =='socialMedia.php'){echo $setActiveLink;}?> href="../social/home"><i class="fa fa-commenting"></i> <?php echo $lang['SOCIAL_MENU_ITEM']; ?><span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
-            <script>
-              var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
-
-              function updateSocialBadge() {
-                $.ajax({
-                    url: 'ajaxQuery/AJAX_socialGetAlerts.php',
-                    type: 'GET',
-                    success: function (response) {
-                        $("#numberOfSocialAlerts").html(response)
-                        if(response == "0"){
-                          $("#numberOfSocialAlerts").hide()
-                          alertsBeforeUpdate = parseInt(response)
-                        }else{
-                          $("#numberOfSocialAlerts").show()
-                          var alertDifference = parseInt(response) - alertsBeforeUpdate
-                          alertsBeforeUpdate = parseInt(response)
-                          if(alertDifference > 0){
-                            generateNotification(parseInt(response),alertDifference)
-                          }
-                        }
-                    },
-                });
-              }
-              setInterval(updateSocialBadge,10000) // 10 seconds
-
-              if ("Notification" in window) {
-                Notification.requestPermission();
-              }
-
-              function sendNotification(messages, newMessages) {
-              // Let's check if the browser supports notifications
-              if (!("Notification" in window)) {
-                console.warn("This browser does not support system notifications");
-              }
-              // Let's check whether notification permissions have already been granted
-              else if (Notification.permission === "granted") {
-                // If it's okay let's create a notification
-                generateNotification(messages, newMessages)
-              }
-
-              // Otherwise, we need to ask the user for permission
-              else if (Notification.permission !== 'denied') {
-                Notification.requestPermission(function (permission) {
-                  // If the user accepts, let's create a notification
-                  if (permission === "granted") {
-                    generateNotification(messages, newMessages)
-                  }
-                });
-              }
-
-              // Finally, if the user has denied notifications and you 
-              // want to be respectful there is no need to bother them any more.
-            }
-
-              function generateNotification(messages, newMessages){
-                var image = 'images/messageIcon.png';
-                var options = {
-                    body: newMessages + " new\n"+messages+" unread",
-                    icon: image,
-                    tag: "tagToUpdateNotification",
-                    badge: image
-                }
-                var n = new Notification('Connect Social',options);
-                setTimeout(n.close.bind(n), 5000); 
-                n.onclick = function(){
-                  console.info("Click");
-                }
-                n.onerror = function(){
-                  console.warn("Error while displaying notification");
-                }
-                n.onshow = function(){
-                  console.info("Show");
-                }
-              }
-            </script>
-            <?php endif; ?>
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
             <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
-
-        <!-- User-Section: EDITING -->
-        <?php if($canEditTemplates == 'TRUE'):?>
-          <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink; $this_page='nutter';} ?> href="../system/designer"><i class="fa fa-file-pdf-o"></i><span>Report Designer</span></a></li>
-        <?php endif; ?>
       </ul>
     </div>
     <div class="panel-group" id="sidebar-accordion">
@@ -606,8 +517,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
                     </ul>
                   </div>
-                </li>
-                <?php if($canEditTemplates != 'TRUE'):?><li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li><?php endif; ?>
+                </li>               
               </ul>
             </div>
           </div>
@@ -619,7 +529,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "templateSelect.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
@@ -663,7 +573,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getProjects.php'){echo $setActiveLink;}?> href="../project/bookings"><span><?php echo $lang['PROJECT_BOOKINGS']; ?></span></a></li>
                 <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if($this_page =='audit_projectBookings.php'){echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
               </ul>
@@ -671,13 +580,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "getProjects.php"|| $this_page == "editProjects.php" || $this_page == "audit_projectBookings.php"){
+        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php"){
           echo "<script>$('#adminOption_PROJECT').click();</script>";
         }
         ?>
       <?php endif; ?>
       <!-- Section Four: REPORTS -->
-      <?php if($isReportAdmin == 'TRUE'): ?>
+      <?php if($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingReport">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
@@ -687,14 +596,17 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+              <?php if($isReportAdmin == 'TRUE'): ?>
                 <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
                 <li><a <?php if($this_page =='report_productivity.php'){echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
+              <?php endif; ?>
+                <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "report_productivity.php"){
+        if($this_page == "report_productivity.php" || $this_page =='templateSelect.php'){
           echo "<script>$('#adminOption_REPORT').click();</script>";
         }
         ?>
@@ -710,8 +622,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESSES']; ?></span></a></li>
                 <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
-                <li>
-                  <a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
+                <li><a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleERPSettings">
@@ -725,7 +636,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIERS']; ?></span></a></li>
                     </ul>
                   </div>
-                </li>                
+                </li>
                 <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
               </ul>
             </div>
