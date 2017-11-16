@@ -8,7 +8,7 @@ $cmpID = intval($_GET['cmp']);
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['deleteCompany'])){
     if($cmpID == 1){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_DELETE_COMPANY'].'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_DELETE_COMPANY'].'</div>';
     } else {
       $sql = "DELETE FROM companyData WHERE id = $cmpID;";
       $conn->query($sql);
@@ -18,7 +18,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!mysqli_error($conn)){
       $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
     }
-    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
     require_once __DIR__ . "/utilities.php";
     $logo = uploadFile("fileToUpload", 1); //returns array on false
@@ -28,10 +28,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $stmt->bind_param("b", $null);
       $stmt->send_long_data(0, $logo);
       $stmt->execute();
-      if($stmt->errno){ echo $stmt->error;} else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+      if($stmt->errno){ echo $stmt->error;} else { echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
       $stmt->close();
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($logo).'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($logo).'</div>';
     }
   } elseif(isset($_POST['general_save'])){
     function max4Lines($str){
@@ -137,14 +137,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
  if(isset($_POST['hire']) && isset($_POST['hiring_userIDs'])){
    foreach($_POST['hiring_userIDs'] as $i){
      $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES ($cmpID, $i)");
-     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
    }
  } elseif(isset($_POST['delete_assigned_users']) && isset($_POST['indexUser'])){
    foreach ($_POST['indexUser'] as $i) {
      $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $i AND companyID = $cmpID";
      $conn->query($sql);
    }
-   if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+   if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
  }
  if(isset($_POST['save_additional_fields'])){
    for($i = 1; $i < 4; $i++){
@@ -175,10 +175,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
          $conn->query("UPDATE $projectTable, $clientTable SET $projectTable.field_$i = 'FALSE' WHERE $clientTable.companyID = $cmpID AND $clientTable.id = $projectTable.clientID");
        }
      } elseif(!empty($_POST['active_'.$i])){ //if name is empty, but the active button is not
-       echo '<div class="alert alert-danger fade in">';
-       echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-       echo "<strong>Could not save Field nr. $i : </strong> Cannot set active field without a name";
-       echo '</div>';
+        echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Could not save Field nr. $i : </strong> Cannot set active field without a name</div>';
      }
    }
  } elseif(isset($_POST['field_add_save']) && !empty($_POST['field_add_name'])){
@@ -192,7 +189,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      $forall = !empty($_POST['field_add_forall']) ? 'TRUE' : 'FALSE';
      $conn->query("INSERT INTO $companyExtraFieldsTable (id, companyID, name, isActive, isRequired, isForAllProjects, description) VALUES ($id_save, $cmpID, '$name', '$active', '$required', '$forall', '$description')");
    } else {
-     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
+     echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
    }
  } elseif(isset($_POST['addFinanceAccount'])){
     if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
@@ -202,37 +199,37 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if(isset($_POST['addFinance_booking'])) $ggk = 'TRUE';
       $conn->query("INSERT INTO accounts (companyID, num, name, manualBooking) VALUES('$cmpID', $num, '$name', '$ggk')");
       if($conn->error){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
+        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
       } else {
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
       }
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
   } elseif(isset($_POST['saveFinances']) && isset($_POST['finance_istVersteuerer'])){
     $val = 'FALSE';
     if($_POST['finance_istVersteuerer']) $val = 'TRUE';
     $conn->query("UPDATE companyData SET istVersteuerer = '$val' WHERE id = $cmpID");
     if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
   } elseif(!empty($_POST['turnBookingOn'])){
     $val = intval($_POST['turnBookingOn']);
     $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
     if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
   } elseif(!empty($_POST['turnBookingOff'])){
     $val = intval($_POST['turnBookingOff']);
     $conn->query("UPDATE accounts SET manualBooking = 'FALSE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
     if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
   }
 }

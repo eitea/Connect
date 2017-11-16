@@ -547,7 +547,7 @@ function uploadFile($file_field, $check_image = true,$crop_square = false,$resiz
 
     //remove interlacing bit
     $im = file_get_contents($_FILES[$file_field]['tmp_name']);
-    $im = imagecreatefromstring($im);
+    $im = @imagecreatefromstring($im); //suppress the warning, since im handling it anyways
     if(!$im){
       return file_get_contents($_FILES[$file_field]['tmp_name']);
     }
