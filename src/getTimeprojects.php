@@ -358,7 +358,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $driveQuery $breakQuery))
   ORDER BY $projectBookingTable.start ASC";
   $result = $conn->query($sql);
-  if(!$result || $result->num_rows <= 0){
+  if(!$filterings['users'] && (!$result || $result->num_rows <= 0)){
     echo '<script>document.getElementById("set_filter_search").click();</script>';
   }
   ?>
@@ -627,9 +627,9 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade active in'>"; } els
           }
         } //endfor
         echo "<tr style='font-weight:bold;'>";
-        echo "<td colspan='11'>Gesamt: </td>";
+        echo "<td colspan='10'>Gesamt: </td>";
         echo '<td>'.displayAsHoursMins($calculator->saldo).'</td>';
-        echo "<td></td></tr>";
+        echo "<td></td><td></td></tr>";
         ?>
       </tbody>
     </table>

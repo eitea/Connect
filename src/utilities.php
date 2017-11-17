@@ -175,6 +175,31 @@ echo $test=strtotime('2016-02-3 05:44:21');
 echo date('Y-m-d H:i:s', $test);
 */
 
+function simple_encryption($message, $key){
+  $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+  $nonce = openssl_random_pseudo_bytes($nonceSize);
+
+  $ciphertext = openssl_encrypt($message,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
+
+  return base64_encode($nonce.$ciphertext);
+  return $nonce.$ciphertext;
+}
+
+function simple_decryption($message, $key){
+  $message = base64_decode($message, true);
+  if($message === false) {
+    throw new Exception('Encryption failure');
+  }
+
+  $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+  $nonce = mb_substr($message, 0, $nonceSize, '8bit');
+  $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
+
+  $plaintext = openssl_decrypt($ciphertext,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
+
+  return $plaintext;
+}
+
 /** Usage
 * Encrypt
 * $c = new MasterCrypt();

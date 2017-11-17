@@ -2065,8 +2065,6 @@ if($row['version'] < 115){
   $conn->query("ALTER TABLE UserData ADD COLUMN keyCode VARCHAR(100)");
   if(!$conn->error){
     echo '<br>Verschlüsselung: Master Passwort aktualisiert';
-  } else {
-    echo '<br>'.$conn->error;
   }
 }
 

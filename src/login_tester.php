@@ -24,9 +24,6 @@ function test_input($data){
   return $data;
 }
 
-$masterpsw = '';
-$result = $conn->query("SELECT masterPassword FROM $configTable");
-if($result) $masterpw = $result->fetch_assoc()["masterPassword"]; //hash
 
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
@@ -35,13 +32,13 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
       exit;
   }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
-  $result = $conn->query("SELECT firstname, id, preferredLang, color, psw FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
+  $result = $conn->query("SELECT firstname, id, preferredLang, color, psw, keyCode FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
   if($row = $result->fetch_assoc()){
     session_start();
     echo '<p style="color:white">';
     var_dump($row); //the if below will not work without this, do not ask why
     echo '</p>';
-    if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw'] && (empty($_POST['masterpassword']) || crypt($_POST['masterpassword'], $masterpw) == $masterpw) ) {
+    if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw']) {
         $_SESSION['userid'] = $row['id'];
         $_SESSION['firstname'] = $row['firstname'];
         $_SESSION['language'] = $row['preferredLang'];
@@ -50,8 +47,10 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         $_SESSION['color'] = $row['color'];
         $_SESSION['masterpassword'] = '';
 
-        if(isset($_POST['masterpassword'])) { $_SESSION['masterpassword'] = $_POST['masterpassword']; }
-    
+        if($row['keyCode']){
+          $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $row['psw']));
+        }
+        
         //check for updates, if core admin
         $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
         $result = $conn->query($sql);
@@ -141,7 +140,6 @@ if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
         <br>
         <div class="col">
           <input type="password" class="form-control" placeholder="Password" name="tester_pass" autofocus /><br>
-          <?php if($masterpsw): ?><input type="password" class="form-control" name="masterpassword" value="" /><?php endif; ?>
           <input type="hidden" name="tester_mail" value="<?php echo $_POST['mail']; ?>" />
           <input type="hidden" name="token" value="<?php echo $login_token; ?>" />
         </div>

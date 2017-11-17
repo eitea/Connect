@@ -94,11 +94,10 @@
 
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['savePAS']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm'])){
-      if(test_input($_POST['password']) != $_POST['password']){
-        die("Malicious Code Injection Detected, please do not use any HTML, SQL or Javascript specific characters.");
-      }
+      if(test_input($_POST['password']) != $_POST['password']){ die('PASSWORDS INVALID'); } //STRIKE
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
+      $newMasterPass = $_POST['passwordMaster'];
       $output = '';
       if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
         $psw = password_hash($password, PASSWORD_BCRYPT);
@@ -106,8 +105,7 @@
         $conn->query($sql);
         $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
       } else {
-        $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        $validation_output .= "<strong>Failed! </strong>Passwords did not match or were invalid. $output".'</div>';
+        $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -313,6 +311,10 @@
             <input type="password" class="form-control" name="password" ><br>
             <?php echo $lang['NEW_PASSWORD_CONFIRM']?>: <br>
             <input type="password" class="form-control" name="passwordConfirm" ><br><br>
+            <?php if($masterPassword): ?>
+            Masterpassword
+            <input type="password" class="form-control" name="passwordMaster"><br>
+            <?php endif; ?>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -753,7 +755,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
       }
     }
   }
-  if($masterPassword && empty($_SESSION['masterpassword'])) echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Sie haben beim Login kein Passwort angegeben. Sie können keine sensiblen Daten hinzufügen, auslesen oder bearbeiten.</div>';
+  //if() echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
   $user_agent =  $_SERVER["HTTP_USER_AGENT"];
   if(strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge') ) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
