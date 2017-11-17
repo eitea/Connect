@@ -191,6 +191,9 @@ $lang_ger['CLIENT'] = 'Kunde';
 $lang_eng['CLIENTS'] = 'Clients';
 $lang_ger['CLIENTS'] = 'Kunden';
 
+$lang_eng['CLIENT_LIST'] = 'Client List';
+$lang_ger['CLIENT_LIST'] = 'Kundenliste';
+
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
 
@@ -521,6 +524,9 @@ $lang_ger['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
 $lang_eng['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
 $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
+$lang_eng['INCOMING_INVOICE'] = 'Incoming Invoice';
+$lang_ger['INCOMING_INVOICE'] = 'Eingangsrechnung';
+
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
 
@@ -736,6 +742,9 @@ $lang_ger['OPTIONS'] = 'Optionen';
 
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
+
+$lang_eng['ORDER'] = 'Order';
+$lang_ger['ORDER'] = 'Bestellung';
 
 $lang_eng['ORDER_CONFIRMATION'] = 'Order Confirmation';
 $lang_ger['ORDER_CONFIRMATION'] = 'Auftragsbestätigung';
@@ -1034,6 +1043,9 @@ $lang_ger['SUPPLIER'] = 'Lieferant';
 $lang_eng['SUPPLIERS'] = 'Suppliers';
 $lang_ger['SUPPLIERS'] = 'Lieferanten';
 
+$lang_eng['SUPPLIER_LIST'] = 'Supplier List';
+$lang_ger['SUPPLIER_LIST'] = 'Lieferantenliste';
+
 $lang_eng['TASK_SCHEDULER'] = 'Task Scheduler';
 $lang_ger['TASK_SCHEDULER'] = 'Taskplaner';
 
@@ -1146,6 +1158,9 @@ $lang_ger['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
 
 $lang_eng['VACATION_REQUESTS'] = 'Vacation Requests';
 $lang_ger['VACATION_REQUESTS'] = 'Urlaubsanträge';
+
+$lang_eng['VACANT_POSITIONS'] = 'Vacant Positions';
+$lang_ger['VACANT_POSITIONS'] = 'Offene Posten';
 
 $lang_eng['VALID_PERIOD'] = 'Validity Period';
 $lang_ger['VALID_PERIOD'] = 'Gültigkeitszeitraum';

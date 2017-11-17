@@ -2055,14 +2055,19 @@ if($row['version'] < 114){
 }
 
 if($row['version'] < 115){
+  $conn->query("DELETE a1 FROM account_journal a1, account_journal a2 WHERE a1.id > a2.id AND a1.userID = a2.userID AND a1.inDate = a2.inDate");
+
   $conn->query("ALTER TABLE account_journal ADD UNIQUE KEY double_submit (userID, inDate)");
   if(!$conn->error){
     echo '<br>Finanzen: Doppelte Buchungen Fix';
-  } else {
-    echo $conn->error;
   }
 
-  $conn->query("DELETE a1 FROM account_journal a1, account_journal a2 WHERE a1.id > a2.id AND a1.userID = a2.userID AND a1.inDate = a2.inDate");
+  $conn->query("ALTER TABLE UserData ADD COLUMN keyCode VARCHAR(100)");
+  if(!$conn->error){
+    echo '<br>Verschlüsselung: Master Passwort aktualisiert';
+  } else {
+    echo '<br>'.$conn->error;
+  }
 }
 
 //------------------------------------------------------------------------------

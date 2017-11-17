@@ -546,7 +546,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimestamps.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
+                <li><a <?php if($this_page =='getTimeprojects.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
                 <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
                 <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
                 <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
@@ -620,8 +620,35 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='offer_proposals.php'){echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESSES']; ?></span></a></li>
+                <li><a id="erpClients" href="#" data-toggle="collapse" data-target="#toggleERPClients" data-parent="#sidenav01" class="collapsed">
+                    <span><?php echo $lang['CLIENTS']; ?></span> <i class="fa fa-caret-down"></i>
+                  </a>
+                  <div class="collapse" id="toggleERPClients">
+                    <ul class="nav nav-list">
+                      <li><a <?php if(isset($_GET['t']) && $_GET['t'] == 'ang') echo $setActiveLink; ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
+                      <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
+                      <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
+                      <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
+                      <li><a <?php if($this_page == 'editCustomers.php'){echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                    </ul>
+                  </div>
+                </li>
+                <li><a id="erpSuppliers" href="#" data-toggle="collapse" data-target="#toggleERPSuppliers" data-parent="#sidenav01" class="collapsed">
+                    <span><?php echo $lang['SUPPLIERS']; ?></span> <i class="fa fa-caret-down"></i>
+                  </a>
+                  <div class="collapse" id="toggleERPSuppliers">
+                    <ul class="nav nav-list">
+                      <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
+                      <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
+                      <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                    </ul>
+                  </div>
+                </li>
+                
                 <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
+                <li><a disabled href=""><span><?php echo $lang['VACANT_POSITIONS']; ?></span></a></li>
+                
                 <li><a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
@@ -632,21 +659,24 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page == 'editPaymentMethods.php'){echo $setActiveLink;}?> href="../erp/payment"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editShippingMethods.php'){echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
                       <li><a <?php if($this_page == 'editRepres.php'){echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
-                      <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
-                      <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIERS']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
-                <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php" || $this_page == "editSuppliers.php" || ($isCoreAdmin == 'FALSE' && ($this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php")) ){
+        if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
+          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+        } elseif($this_page == "editSuppliers.php" ){
+          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+        } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
           echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
           echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
-        } elseif($this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" || $this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
+        } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
           echo "<script>$('#adminOption_ERP').click();";
           echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         }

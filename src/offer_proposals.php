@@ -2,6 +2,10 @@
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
 
+if(isset($_GET['t'])){
+  $filterings['procedures'][0] = array(strtoupper($_GET['t']));
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['delete_proposal'])){
     $conn->query("DELETE FROM proposals WHERE id = ".intval($_POST['delete_proposal']));
@@ -251,10 +255,11 @@ while($result && ($row = $result->fetch_assoc())):
           <div class="col-sm-12"><?php include 'misc/select_client.php'; ?></div>
           <div class="col-sm-6"><br>
             <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
-            <select class="js-example-basic-single" name="nERP">
+            <select class="js-example-basic-single" name="nERP">              
               <option value="ANG"><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></option>
-              <option value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
-              <option value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
+              <option <?php if($_GET['t'] == 'sub') echo "selected"; ?> value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
+              <option <?php if($_GET['t'] == 're') echo "selected"; ?> value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>
+              <option <?php if($_GET['t'] == 'lfs') echo "selected"; ?> value="LFS"><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></option>
             </select>
           </div>
         </div>
