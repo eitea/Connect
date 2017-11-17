@@ -284,9 +284,9 @@ if($result && $result->num_rows > 0):
 <?php endif; ?>
   <div class="container-fluid"><div class="text-right"><a href="requests"><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?></a></div></div>
 <br><hr><br>
+<form method="POST">
 
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
-
   <?php
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.* FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
@@ -334,8 +334,6 @@ if($result && $result->num_rows > 0):
 
   
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
-
-<form method="POST">
   <?php
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
   INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
