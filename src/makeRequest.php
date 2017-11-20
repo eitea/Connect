@@ -45,9 +45,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $from = carryOverAdder_Hours($from, $timeToUTC);
       $to = carryOverAdder_Hours($to, $timeToUTC);
       $conn->query("INSERT INTO $userRequests (userID, fromDate, toDate, requestType, requestID) VALUES($userID, '$from', '$to', 'brk', $insertId)");
-      //update breakCredit
-      $breakDiff = timeDiff_Hours($from, $to);
-      $conn->query("UPDATE $logTable SET breakCredit = (breakCredit + $breakDiff) WHERE indexIM = $timestampID");
+      if($conn->error){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      } else {
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+      }
     }
     echo mysqli_error($conn);
   }
@@ -78,16 +80,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
       }
     } else {
-      echo '<div class="alert alert-danger fade in">';
-      echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      echo '<strong>Falsche Eingabe: </strong>km-Stand Anfang muss kleiner sein als km-Stand Ende.';
-      echo '</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Falsche Eingabe: </strong>km-Stand Anfang muss kleiner sein als km-Stand Ende.</div>';
     }
-  } else {
-    echo '<div class="alert alert-danger fade in">';
-    echo '<a href="userProjecting.php" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-    echo '<strong>Fehler: </strong>Orange Felder dürfen nicht leer oder null sein.';
-    echo '</div>';
+  } elseif(isset($_POST['addDrive'])) {
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Fehler: </strong>Orange Felder dürfen nicht leer sein.</div>';
   }
 }
 ?>

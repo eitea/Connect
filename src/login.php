@@ -51,11 +51,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     }
     redirect('../user/home');
   } else {
-    if($masterpw){
-      $invalidLogin = "Invalid Username/Password/Master Key";
-    } else {
-      $invalidLogin = "Invalid Username/ Password!";
-    }
+    $invalidLogin = "Invalid Username/ Password!";
   }
 }
 

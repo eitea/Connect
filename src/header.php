@@ -47,10 +47,11 @@
   $userPasswordHash = $row['psw'];
   $userKeyCode = $row['keyCode'];
 
-  $result = $conn->query("SELECT masterPassword, enableReadyCheck FROM configurationData");
+  $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
   $row = $result->fetch_assoc();
   $showReadyPlan = $row['enableReadyCheck'];
   $masterPasswordHash = $row['masterPassword'];
+  $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 
   $result = $conn->query("SELECT enableSocialMedia FROM modules");
   if($result && ($row = $result->fetch_assoc())){
@@ -63,7 +64,6 @@
     $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
     $numberOfSocialAlerts = $private+$group;
   }
-
   if($isTimeAdmin){
     $numberOfAlerts = 0;
     //requests
@@ -766,8 +766,10 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
       }
     }
   }
-  //if() echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
-  $user_agent =  $_SERVER["HTTP_USER_AGENT"];
+  if($masterPasswordHash && !empty($_SESSION['masterpassword'])){
+    if(simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
+  }
+  $user_agent = $_SERVER["HTTP_USER_AGENT"];
   if(strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge') ) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
   }

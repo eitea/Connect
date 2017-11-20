@@ -229,7 +229,7 @@ class MasterCrypt{
     }
   }
 
-  function encrypt(string $unencrypted){
+  function encrypt($unencrypted){
     if($this->password && $this->iv && $this->iv2){
         $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
         $encrypted = self::mc_encrypt($unencrypted, $iv);
@@ -339,7 +339,7 @@ function mc_update_values($current, $new, $statement = ''){
     $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
     $mc_new = new MasterCrypt($new);
     $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-    $desc = $mc_new->encrypt($mc_old->decrypt($row["description"]));
+    $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
     $iv = $mc_new->iv;
     $iv2 = $mc_new->iv2;
     $id = $row["id"];
@@ -357,7 +357,7 @@ function mc_update_values($current, $new, $statement = ''){
     $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
     $mc_new = new MasterCrypt($new);
     $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-    $desc = $mc_new->encrypt($mc_old->decrypt($row["description"]));
+    $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
     $iv = $mc_new->iv;
     $iv2 = $mc_new->iv2;
     $id = $row["id"];
@@ -366,16 +366,17 @@ function mc_update_values($current, $new, $statement = ''){
   }
   $stmt->close();
   //bank data
-  $result = $conn->query("SELECT id, iban, bic FROM clientInfoBank");
-  $stmt = $conn->prepare("UPDATE articles SET name = ?, description = ?, iv = ?, iv2 = ? WHERE id = ?");
-  $stmt->bind_param("ssssi", $name, $description, $iv, $iv2, $id);
-  fwrite($logFile, "\t".getCurrentTimestamp()." (UTC): altering articles\r\n");
+  $result = $conn->query("SELECT id, iban, bic, bankName FROM clientInfoBank");
+  $stmt = $conn->prepare("UPDATE clientInfoBank SET bic = ?, iban = ?, bankName = ?, iv = ?, iv2 = ? WHERE id = ?");
+  $stmt->bind_param("sssssi", $bic, $iban, $name, $iv, $iv2, $id);
+  fwrite($logFile, "\t".getCurrentTimestamp()." (UTC): altering bank\r\n");
   while($row = $result->fetch_assoc()){
     $i++;
     $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
     $mc_new = new MasterCrypt($new);
-    $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-    $desc = $mc_new->encrypt($mc_old->decrypt($row["description"]));
+    $bic = $mc_new->encrypt($mc_old->decrypt($row['bic']));
+    $iban = $mc_new->encrypt($mc_old->decrypt($row["iban"]));
+    $name = $mc_new->encrypt($mc_old->decrypt($row["bankName"]));
     $iv = $mc_new->iv;
     $iv2 = $mc_new->iv2;
     $id = $row["id"];
