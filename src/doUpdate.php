@@ -2070,7 +2070,17 @@ if($row['version'] < 115){
   $conn->query("ALTER TABLE configurationData ADD COLUMN checkSum VARCHAR(20)");
 }
 
-$conn->query("ALTER TABLE configurationData MODIFY COLUMN checkSum VARCHAR(40)");
+
+if($row['version'] < 116){
+  //encrypted values need sooo much more SPACE
+  $conn->query("ALTER TABLE configurationData MODIFY COLUMN checkSum VARCHAR(40)");
+
+  $conn->query("ALTER TABLE clientInfoBank MODIFY COLUMN bankName VARCHAR(400)");
+
+  $conn->query("ALTER TABLE clientInfoBank MODIFY COLUMN iban VARCHAR(400)");
+
+  $conn->query("ALTER TABLE accounts ADD COLUMN options VARCHAR(10) DEFAULT 'STAT' ");
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

@@ -37,7 +37,8 @@ function create_tables($conn){
     color VARCHAR(10) DEFAULT 'dark',
     real_email VARCHAR(50),
     erpOption VARCHAR(10) DEFAULT 'TRUE',
-    strikeCount INT(3) DEFAULT 0
+    strikeCount INT(3) DEFAULT 0,
+    keyCode VARCHAR(100)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -208,7 +209,8 @@ function create_tables($conn){
     enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     masterPassword VARCHAR(100),
-    enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    checkSum VARCHAR(40)
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -475,9 +477,9 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE clientInfoBank(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    bic VARCHAR(200),
-    iban VARCHAR(200),
-    bankName VARCHAR(200),
+    bic VARCHAR(300),
+    iban VARCHAR(400),
+    bankName VARCHAR(400),
     parentID INT(6) UNSIGNED,
     iv VARCHAR(150),
     iv2 VARCHAR(50),
@@ -871,6 +873,7 @@ function create_tables($conn){
     num INT(4) UNSIGNED,
     name VARCHAR(50),
     type ENUM('1', '2', '3', '4') DEFAULT '1',
+    options VARCHAR(10) DEFAULT 'STAT',
     UNIQUE KEY (companyID, num),
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE

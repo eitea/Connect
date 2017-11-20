@@ -195,9 +195,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
       $name = test_input($_POST['addFinance_name']);
       $num = intval($_POST['addFinance_num']);
-      $ggk = 'FALSE';
+      $ggk = 'FALSE';      
       if(isset($_POST['addFinance_booking'])) $ggk = 'TRUE';
-      $conn->query("INSERT INTO accounts (companyID, num, name, manualBooking) VALUES('$cmpID', $num, '$name', '$ggk')");
+      $opt = 'STAT';
+      if(isset($_POST['addOption'])) $opt = 'CONT';
+      $conn->query("INSERT INTO accounts (companyID, num, name, manualBooking, options) VALUES('$cmpID', $num, '$name', '$ggk', '$opt')");
       if($conn->error){
         echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
       } else {
@@ -880,6 +882,9 @@ $row = $result->fetch_assoc();
       <div class="col-md-12">
         <label>Name</label>
         <input type="text" name="addFinance_name" class="form-control" maxlength="20" placeholder="Name"/>
+      </div>
+      <div class="col-md-12">
+        <br><label><input type="checkbox" name="addOption" value="true" />Forlaufende Nr.</label>
       </div>
     </div>
     <div class="modal-footer">

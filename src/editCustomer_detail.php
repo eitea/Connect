@@ -182,19 +182,36 @@ if(!empty($_POST['saveAll'])){
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])){
     $activeTab = 'banking';
-    //will be empty and unencrypted if masterpass not specified
     $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $bankName = $mc->encrypt($_POST['bankName']);
     $ibanVal = $mc->encrypt($_POST['iban']);
     $bicVal = $mc->encrypt($_POST['bic']);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-
-    $stmt = $conn->prepare("INSERT INTO $clientDetailBankTable (bankName, iban, bic, iv, iv2, parentID) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO clientInfoBank (bankName, iban, bic, iv, iv2, parentID) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param('sssssi', $bankName, $ibanVal, $bicVal, $iv, $iv2, $detailID);
     $stmt->execute();
     $stmt->close();
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+  } elseif(!empty($_POST['removeBank'])){
+    $activeTab = 'banking';
+    $val = intval($_POST['removeBank']);
+    $conn->query("DELETE FROM clientInfoBank WHERE id = $val");    
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+  } elseif(!empty($_POST['editBankingDetail'])){
+    $activeTab = 'banking';
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
+    $bankName = $mc->encrypt($_POST['edit_bankName']);
+    $ibanVal = $mc->encrypt($_POST['edit_iban']);
+    $bicVal = $mc->encrypt($_POST['edit_bic']);
+    $iv = $mc->iv;
+    $iv2 = $mc->iv2;
+    $val = intval($_POST['editBankingDetail']);
+    $stmt = $conn->prepare("UPDATE clientInfoBank SET bankName = ?, iban = ?, bic = ?, iv = ?, iv2 = ? WHERE id = ?");
+    $stmt->bind_param('sssssi', $bankName, $ibanVal, $bicVal, $iv, $iv2, $val);
+    $stmt->execute();
+    $stmt->close();
+    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
   } elseif(isset($_POST['delete_projects']) && !empty($_POST['delete_projects_index'])){
     $activeTab = 'project';
     foreach($_POST['delete_projects_index'] as $x){
@@ -475,38 +492,57 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
       <hr>
       <table class="table table-hover">
         <thead>
-          <th>Name der Bank</th>
+          <th>Bankname</th>
           <th>Iban</th>
           <th>BIC</th>
+          <th></th>
         </thead>
         <tbody>
           <?php
+          $modals = '';
           while($resultBank && ($rowBank = $resultBank->fetch_assoc())){
             $mc = new MasterCrypt($_SESSION["masterpassword"], $rowBank['iv'], $rowBank['iv2']);
             echo '<tr>';
-            echo '<td>'.$mc->decrypt($rowBank['bankName']).'</td>';            
-            echo '<td>'.$mc->decrypt($rowBank['iban']).'</td>';
-            echo '<td>'.$mc->decrypt($rowBank['bic']).'</td>';
+            echo '<td>'.$mc->getStatus().$mc->decrypt($rowBank['bankName']).'</td>';            
+            echo '<td>'.$mc->getStatus().$mc->decrypt($rowBank['iban']).'</td>';
+            echo '<td>'.$mc->getStatus().$mc->decrypt($rowBank['bic']).'</td>';
+            echo '<td><button type="submit" class="btn btn-default" name="removeBank" value="'.$rowBank['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target=".edit-bank-'.$rowBank['id'].'" title="'.$lang['EDIT'].'" ><i class="fa fa-pencil"></i></button></td>';
             echo '</tr>';
+
+            $modals .= '<div class="modal fade edit-bank-'.$rowBank['id'].'"><div class="modal-dialog modal-content modal-sm">
+            <div class="modal-header h4">'.$lang['EDIT'].'</div><div class="modal-body"><div class="container-fluid">
+            <label><label>Bankname '.mc_status().'</label></label><input type="text" class="form-control" name="edit_bankName" value="'.$mc->decrypt($rowBank['bankName']).'" /><br>
+            <label><label>IBAN '.mc_status().'</label></label><input type="text" class="form-control" name="edit_iban" value="'.$mc->decrypt($rowBank['iban']).'" /><br>
+            <label><label>BIC '.mc_status().'</label></label><input type="text" class="form-control" name="edit_bic" value="'.$mc->decrypt($rowBank['bic']).'" /><br>
+            </div></div><div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name="editBankingDetail" value="'.$rowBank['id'].'" >'.$lang['SAVE'].'</button>
+            </div></div></div>';
           }
           ?>
         </tbody>
       </table>
+      <?php echo $modals; ?>
       <br><br><br>
-      <?php if(!empty($_SESSION['masterpassword'])): ?>
-        <div class="container">
-          <div class="col-md-3">
-            <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />
-          </div>
-          <div class="col-md-5">
-            <input type="text" class="form-control" name="iban" placeholder="Iban" />
-          </div>
-          <div class="col-md-3">
-            <input type="text" class="form-control" name="bic" placeholder="BIC" />
-          </div>
-          <button type="submit" class="btn btn-warning" name="addBankingDetail">+</button>
+      <div class="container">
+        <div class="col-md-3">
+          <label>Bankname <?php echo mc_status(); ?></label>
+          <input type="text" class="form-control" name="bankName" placeholder="Name der Bank" />
         </div>
-      <?php endif; ?>
+        <div class="col-md-4">
+          <label>IBAN <?php echo mc_status(); ?></label>
+          <input type="text" class="form-control" name="iban" placeholder="Iban" />
+        </div>
+        <div class="col-md-3">
+          <label>BIC <?php echo mc_status(); ?></label>
+          <input type="text" class="form-control" name="bic" placeholder="BIC" />
+        </div>
+        <div class="col-md-2">
+          <label style="color:transparent">+</label>
+          <button type="submit" class="btn btn-warning btn-block" name="addBankingDetail"><?php echo $lang['ADD']; ?></button>
+        </div>
+      </div>
     </div>
 
     <div id="menuBilling" class="tab-pane fade <?php if($activeTab == 'billing'){echo 'in active';}?>">

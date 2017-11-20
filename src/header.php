@@ -324,7 +324,7 @@
           <label><?php echo $lang['NEW_PASSWORD_CONFIRM']?></label>
           <input type="password" class="form-control" name="passwordConfirm" ><br><br>
           <?php if($masterPasswordHash): ?>
-          <label><?php echo $lang['MASTER_PASSWORD']?></label>
+          <label><?php echo $lang['MASTER_PASSWORD']?> (Experimentell)</label>
           <input type="password" class="form-control" name="passwordMaster"><br>
           <?php endif; ?>
         </div>

@@ -18,9 +18,11 @@ if(isset($_POST['addFinanceAccount'])){
         $name = test_input($_POST['addFinance_name']);
         $num = intval($_POST['addFinance_num']);
         $type = intval($_POST['addFinance_type']);
-        $conn->query("INSERT INTO accounts (companyID, num, name, type) VALUES('$cmpID', $num, '$name', '$type')");
+        $opt = 'STAT';
+        if(isset($_POST['addOption'])) $opt = 'CONT';
+        $conn->query("INSERT INTO accounts (companyID, num, name, type, options) VALUES('$cmpID', $num, '$name', '$type', '$opt')");
         if($conn->error){
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
         }
@@ -41,7 +43,9 @@ if(isset($_POST['addFinanceAccount'])){
 } elseif(!empty($_POST['saveNameChange']) && !empty("changeName")){
     $val = test_input($_POST['changeName']);
     $id = intval($_POST['saveNameChange']);
-    $conn->query("UPDATE accounts SET name = '$val' WHERE id = $id AND companyID = $cmpID");
+    $opt = 'STAT';
+    if(isset($_POST['changeOpt'])) $opt = 'CONT';
+    $conn->query("UPDATE accounts SET name = '$val', options = '$opt' WHERE id = $id AND companyID = $cmpID");
     if($conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
@@ -55,6 +59,7 @@ if(isset($_POST['addFinanceAccount'])){
     <th>Nr.</th>
     <th>Name</th>
     <th><?php echo $lang['TYPE']; ?></th>
+    <th>Forlaufende Nr</th>
     <th></th>
 </tr></thead>
 <tbody>
@@ -66,6 +71,11 @@ if(isset($_POST['addFinanceAccount'])){
         echo '<td>'.$row['num'].'</td>';
         echo '<td>'.$row['name'].'</td>';
         echo '<td>'.$lang['ACCOUNT_TOSTRING'][$row['type']].'</td>';
+        if($row['options'] == 'CONT'){
+            echo '<td>'.$lang['YES'].'</td>';
+        } else {
+            echo '<td>'.$lang['NO'].'</td>';
+        }
         echo '<td>';
         echo '<form method="POST" style="display:inline"><button type="submit" name="delete" value="'.$row['id'].'" title="'.$lang['DELETE'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></form>';
         echo '<a href="account?v='.$row['id'].'" class="btn btn-default" title="Zum Konto" ><i class="fa fa-arrow-right"></i></a>';
@@ -75,8 +85,9 @@ if(isset($_POST['addFinanceAccount'])){
 
         $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
                     <div class="modal-header"><h3>'.$lang['EDIT'].'</h3></div>
-                    <div class="modal-body"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ></div>
-                    <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <div class="modal-body"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ><br>
+                    <label><input type="checkbox" name="changeOpt" value="true" /> Fortlaufende Nr. </label></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>                    
                     <button type="submit" class="btn btn-warning" name="saveNameChange" value="'.$row['id'].'">'.$lang['SAVE'].'</button></div></form></div></div>';
     }
 ?>
@@ -92,6 +103,9 @@ if(isset($_POST['addFinanceAccount'])){
             <div class="container-fluid">
                 <div class="col-md-6"><label>Nr.</label>
                     <input id="account2" name="addFinance_num" type="number" class="form-control" max="9999"/><br>
+                </div>
+                <div class="col-md-4">
+                    <br><label><input type="checkbox" name="addOption" value="true" />Forlaufende Nr.</label>
                 </div>
             </div>
             <div class="container-fluid">

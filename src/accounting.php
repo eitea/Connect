@@ -17,6 +17,8 @@ if(!$result || $result->num_rows < 1) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Zugriff verweigert</div>';
     include 'footer.php';
     die();
+} else {
+    $account_row = $result->fetch_assoc();
 }
 if(isset($_POST['undo'])){
     $res = $conn->query("SELECT id FROM account_journal WHERE offAccount = $id AND userID = $userID ORDER BY inDate DESC ");
@@ -29,7 +31,7 @@ if(isset($_POST['undo'])){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
     }
 }
-$account_row = $result->fetch_assoc();
+
 if(!empty($_POST['webID']) && !isset($_POST['transferToWEB'])){
     $val = intval($_POST['webID']);
     $result = $conn->query("SELECT * FROM receiptBook WHERE id = $val");
@@ -247,10 +249,9 @@ while($result && ($row = $result->fetch_assoc())){
 </tr></thead>
 <tbody>
 <?php
-$docNum = 1;
 $docDate = getCurrentTimestamp();
 $modals = '';
-$saldo = 0;
+$docNum = $saldo = 0;
 $result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should, r1.id AS receiptID
 FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
 INNER JOIN accounts ON account_journal.account = accounts.id
@@ -273,8 +274,7 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<td style="text-align:right">'.number_format($row['netto_should'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['netto_have'], 2, ',', '.').'</td>';
     echo '<td style="text-align:right">'.number_format($saldo, 2, ',', '.').'</td>';
-    if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>';  }
-    
+    if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>'; }    
     if($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8).'01', $lockedMonths)){
         echo '<td><button type="button" class="btn btn-default" title="Editieren" data-toggle="modal" data-target=".edit-journal-'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
         $modals .= '<div class="modal fade edit-journal-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
@@ -296,6 +296,8 @@ while($result && ($row = $result->fetch_assoc())){
         echo '<td></td>';
     }
 }
+if($account_row['options'] == 'CONT') $docNum++;
+if(!$docNum) $docNum = 1;
 ?>
 </tbody>
 </table>
