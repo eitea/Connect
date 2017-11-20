@@ -14,9 +14,7 @@ require __DIR__ .'/connection.php';
 require __DIR__ .'/utilities.php';
 include __DIR__ .'/version_number.php';
 
-$invalidLogin = $masterpw = "";
-$masterpw_result = $conn->query("SELECT masterPassword FROM $configTable");
-if($masterpw_result)  $masterpw = trim($masterpw_result->fetch_assoc()["masterPassword"]);
+$invalidLogin = "";
 
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['loginButton'])) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";
@@ -24,7 +22,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
   if($result){
     $row = $result->fetch_assoc();
   }
-  if(crypt($_POST['password'], $row['psw']) == $row['psw'] && (empty($_POST['masterpassword']) || crypt($_POST['masterpassword'], $masterpw) == $masterpw)) {
+  if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];
@@ -34,7 +32,9 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     $_SESSION['color'] = $row['color'];
     $_SESSION['masterpassword'] = '';
     
-    if(isset($_POST['masterpassword'])) { $_SESSION['masterpassword'] = $_POST['masterpassword']; }
+    if($row['keyCode']){
+      $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $_POST['password']));
+    }
 
     //check for updates, if core admin
     require __DIR__ ."/language.php";
@@ -78,7 +78,6 @@ if($result && $result->num_rows > 0){
     <form method="POST" style="display:inline-block">
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
       <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><br>
-      <?php if($masterpw): ?><label for="masterpw">Master Password: </label> <input id="masterpw" type="password" name="masterpassword" value="" /><br><?php endif; ?>
       <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="loginButton" value="Submit" /><br>
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>" />
       <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>

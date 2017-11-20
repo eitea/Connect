@@ -377,6 +377,9 @@ $lang_ger['ERROR_DUPLICATE'] = 'Dieser Eintrag existiert bereits. ';
 $lang_eng['ERROR_EXISTING_EMAIL'] = 'Entered e-mail Address already exists.';
 $lang_ger['ERROR_EXISTING_EMAIL'] = 'Die angegebene e-mail Adresse existiert bereits.';
 
+$lang_eng['ERROR_INVALID_CHARACTER'] = 'Input contained invalid characters.';
+$lang_ger['ERROR_INVALID_CHARACTER'] = 'Die Eingabe enthielt ungültige Zeichen.';
+
 $lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
 $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
 
@@ -638,15 +641,6 @@ $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
 $lang_eng['MASTER_PASSWORD'] = 'Master Password';
 $lang_ger['MASTER_PASSWORD'] = 'Master Passwort';
 
-$lang_eng['MASTER_PASSWORD_CURRENT'] = 'Current Password';
-$lang_ger['MASTER_PASSWORD_CURRENT'] = 'Aktuelles Passwort';
-
-$lang_eng['MASTER_PASSWORD_CONFIRM'] = 'Confirm Password';
-$lang_ger['MASTER_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
-
-$lang_eng['MASTER_PASSWORD_NEW'] = 'New Password';
-$lang_ger['MASTER_PASSWORD_NEW'] = 'Neues Passwort';
-
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
 $lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur den Antrag, NICHT die eigentlichen Stunden!';
 
@@ -684,7 +678,7 @@ $lang_eng['NEW_PASSWORD'] = 'New Password';
 $lang_ger['NEW_PASSWORD'] = 'Neues Passwort';
 
 $lang_eng['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
-$lang_ger['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
+$lang_ger['NEW_PASSWORD_CONFIRM'] = 'Neues Passwort bestätigen';
 
 $lang_eng['NEW_PROCESS'] = 'New Process';
 $lang_ger['NEW_PROCESS'] = 'Neuer Vorgang';
@@ -769,6 +763,9 @@ $lang_ger['PARTIAL_SUM'] = 'Zwischensumme';
 
 $lang_eng['PASSWORD'] = 'Password';
 $lang_ger['PASSWORD'] = 'Passwort';
+
+$lang_eng['PASSWORD_CURRENT'] = 'Current Password';
+$lang_ger['PASSWORD_CURRENT'] = 'Aktuelles Passwort';
 
 $lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
 $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
