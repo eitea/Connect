@@ -33,7 +33,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     $_SESSION['masterpassword'] = '';
     
     if($row['keyCode']){
-      $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $row['psw']));
+      $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $_POST['password']));
     }
 
     //check for updates, if core admin

@@ -219,7 +219,7 @@ class MasterCrypt{
   private $password;
 
   function __construct($pass, $iv = '', $iv2 = ''){
-    $this->password = trim($pass);
+    $this->password = base64_decode($pass, true);
     $this->iv = $iv;
     $this->iv2 = $iv2;
     if($this->password && (!$iv || !$iv2)){
@@ -260,7 +260,7 @@ class MasterCrypt{
     return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
   }
 
-  //TODO: mcrypt is deprecated. replace with openssl (_seal and _open)
+  //TODO: mcrypt is deprecated. replace with openssl (try _seal and _open)
   private static function mc_encrypt($encrypt, $key){
     $encrypt = serialize($encrypt);
     $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);

@@ -286,7 +286,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
     }
     if(!mysqli_error($conn)){
-      echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     }
   }
 } //endif post
@@ -309,8 +309,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'active in';}?>">
   <div class="page-header"><h3><?php echo $lang['VIEW_PROJECTS']; ?><div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addProjectBookings" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
-    <button type='submit' class="btn btn-default" name='saveCharged' form="project_table"><i class="fa fa-floppy-o"></i></button>
-    <button type="submit" class="btn btn-default" name="csvDownload" form="csvForm"><i class="fa fa-download"></i></button>
+    <button type='submit' class="btn btn-default" name='saveCharged' form="project_table" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+    <button type="submit" class="btn btn-default" name="csvDownload" form="csvForm" title="CSV Download"><i class="fa fa-download"></i> CSV</button>
     <form action="../project/pdfDownload" method="POST" target='_blank' style="display:inline-block">
       <?php //quess who needs queries.
       $companyQuery = $clientQuery = $projectQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
@@ -326,7 +326,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       AND DATE(DATE_ADD($projectBookingTable.end, INTERVAL $logTable.timeToUTC HOUR)) <= DATE('".$filterings['date'][1]."')
       AND (($projectBookingTable.projectID IS NULL $breakQuery $userQuery) OR ( 1 $userQuery $chargedQuery $companyQuery $clientQuery $projectQuery $driveQuery $breakQuery))"; ?>" />
       <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i> PDF</button>
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="PDF Download"><i class="fa fa-download"></i> PDF</button>
         <ul class="dropdown-menu">
           <?php
           echo "<li><button type='submit' name='templateID' value='-1' class='btn' style='background:none'>".$lang['OVERVIEW']."</button></li>";
@@ -423,9 +423,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $B_charged = carryOverAdder_Hours($row['chargedTimeEnd'],$row['timeToUTC']);
           }
 
-          $csv .= $row['clientName'] .';';
-          $csv .= $row['projectName'] .';';
-          $csv .= str_replace(array("\r", "\n",";"), ' ', $row['infoText']) .';';
+          $csv .= iconv('UTF-8','windows-1252',$row['clientName']) .';';
+          $csv .= iconv('UTF-8','windows-1252',$row['projectName']) .';';
+          $csv .= iconv('UTF-8','windows-1252', str_replace(array("\r", "\n",";"), ' ', $row['infoText'])) .';';
           $csv .= substr($A,0,10) .';';
           $csv .= substr($B,0,10) .';';
           $csv .= substr($A,11,6) .';';
@@ -796,6 +796,7 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade active in'>"; } els
   </div>
 </form>
 
+<script src="plugins/jsCookie/src/js.cookie.js"></script>
 <script>
 $(function () {
   $('[data-toggle="popover"]').popover({html : true});
@@ -907,6 +908,26 @@ function hideMyDiv(o, toShow){
     document.getElementById(toShow).style.display='block';
   }
 }
+
+if(Cookies.get('checkboxValues') !== undefined){
+  var checkboxValues = Cookies.getJSON('checkboxValues');
+  if(checkboxValues){
+    $.each(checkboxValues, function(key, value) {
+      var elem = document.getElementById(key)
+      if(elem){
+        elem.checked = value;
+      }
+    });
+  }
+} else {
+  var checkboxValues = {};
+}
+$(":checkbox").on("change", function(){
+  if(this.id){
+    checkboxValues[this.id] = this.checked;
+  }
+  Cookies.set('checkboxValues', checkboxValues, { expires: 1, path: '' });
+});
 
 function toggle(checkId, uncheckId) {
   checkboxes = document.getElementsByName(checkId + '[]');

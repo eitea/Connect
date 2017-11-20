@@ -207,7 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.intval($prod_row['percentage']).'%</td>';
         echo '<td style="min-width:120px;">';
-        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE' && (!$masterPassword || $_SESSION['masterpassword']))
+        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE' && (!$masterPasswordHash || $_SESSION['masterpassword']))
           echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
         echo '<button type="submit" class="btn btn-default" name="delete_product" value="'.$prod_row['id'].'" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button>';
         echo '</td>';
@@ -289,7 +289,7 @@ $("#sort tbody").sortable({
 </div>
 
 <form method="POST">
-  <?php if(!$masterPassword || $_SESSION['masterpassword']): ?>
+  <?php if(!$masterPasswordHash || $_SESSION['masterpassword']): ?>
   <div class="container-fluid">
     <div class="col-xs-12 text-right">
       <div class="btn-group">

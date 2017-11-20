@@ -1,6 +1,6 @@
 <?php require 'header.php'; enableToCore($userID);?>
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if(isset($_POST['saveButton'])){
   //general
   $length = intval($_POST['passwordLength']);
   $compl = intval($_POST['passwordComplexity']);
@@ -21,24 +21,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   echo mysqli_error($conn);
     
   //masterpassword
-  if(isset($_POST['masterPass_deactivate']) && !empty($_SESSION['masterpassword'])){ //he may only deactivate if he knows the current password
-    mc_update_values($_SESSION['masterpassword'], '', 'removed');    
-    $conn->query("UPDATE $configTable SET masterPassword = ''");
+  if(isset($_POST['masterPass_deactivate']) && !empty($_POST['masterPass_current'])){
+    mc_update_values($_SESSION['masterpassword'], '', 'removed');
+    $conn->query("UPDATE $configTable SET masterPassword = ''"); echo $conn->error;
   } elseif(isset($_POST['masterPass_deactivate'])){
-    //STRIKE
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
-  } elseif(!empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm']) && (isset($_POST['masterPass_current'])||!$masterPassword)){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Aktuelles Passwort fehlt.</div>';
+  } elseif(!empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm']) && $_POST['masterPass_new'] == $_POST['masterPass_newConfirm'] 
+  && (!$masterPasswordHash || crypt($_POST['masterPass_current'], $masterPasswordHash) == $masterPasswordHash)){
     $current = '';
-    if($masterPassword){ $current = $_POST['masterPass_current']; }
-    if($_POST['masterPass_new'] == $_POST['masterPass_newConfirm']  && (!$masterPassword || crypt($_POST['masterPass_current'], $masterPassword) == $masterPassword )){
-      mc_update_values($current, $_POST['masterPass_new'], 'changed'); 
-      $_SESSION['masterpassword'] = $_POST['masterPass_new'];
-      $new_master = password_hash($_POST['masterPass_new'], PASSWORD_BCRYPT);
-      $conn->query("UPDATE $configTable SET masterPassword = '$new_master'");
-      echo $conn->error;
+    if($masterPasswordHash){ $current = $_POST['masterPass_current']; }
+    if($current && crypt($current, $masterPasswordHash) == $masterPasswordHash){
+      mc_update_values($current, $_POST['masterPass_new'], 'changed');
+    } elseif(!$masterPasswordHash) {
+      mc_update_values($current, $_POST['masterPass_new'], 'added');
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Error: </strong>Ungültige Passwort Eingaben</div>';
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPTECTED'].'</div>';
     }
+
+    $_SESSION['masterpassword'] = base64_encode($_POST['masterPass_new']);
+    $new_master = password_hash($_POST['masterPass_new'], PASSWORD_BCRYPT);
+    $conn->query("UPDATE $configTable SET masterPassword = '$new_master'");
+    echo $conn->error;
+    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
   }
 }
 
@@ -46,13 +50,10 @@ $result = $conn->query("SELECT * FROM $policyTable");
 $row = $result->fetch_assoc();
 ?>
 
-
 <form method="POST" id="formPasswordOptions">
   <div class="page-header">
     <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
-      <div class="page-header-button-group">
-        <button type="submit" class="btn btn-default blinking" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button>
-      </div>
+      <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button></div>
     </h3>
   </div>
   <h4><?php echo $lang['ADMIN_CORE_OPTIONS']; ?> <a role="button" data-toggle="collapse" href="#password_info_general"> <i class="fa fa-info-circle"> </i> </a></h4>
@@ -110,7 +111,7 @@ $row = $result->fetch_assoc();
       Art:
     </div>
     <div class="col-md-4">
-      <input type="radio" name="enableTimechange_type" value="ALERT" <?php if($row['expirationType'] == 'ALERT'){echo 'checked';} ?>/> Optional
+      <input type="radio" name="enableTimechange_type" value="ALERT" <?php if($row['expirationType'] != 'FORCE'){echo 'checked';} ?>/> Optional
     </div>
     <div class="col-md-4">
       <input type="radio" name="enableTimechange_type" value="FORCE" <?php if($row['expirationType'] == 'FORCE'){echo 'checked';} ?>/> Zwingend
@@ -119,18 +120,19 @@ $row = $result->fetch_assoc();
 
   <br><hr><br>
 
-  <h4><?php echo mc_status(); ?><?php echo $lang["MASTER_PASSWORD"]; ?> <small><?php if($masterPassword): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
+  <h4><?php echo mc_status(); ?><?php echo $lang["MASTER_PASSWORD"]; ?> <small><?php if($masterPasswordHash): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
   <br>
   <div class="collapse" id="password_info_master">
     <div class="well">
-      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können. Es sind insgesamt <b><?php echo mc_total_row_count(); ?></b> Einträge betroffen.
+      Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
+      Es sind insgesamt <b><?php echo mc_total_row_count(); ?></b> Einträge betroffen.
     </div>
   </div>
   <br>
   <div class="container-fluid">
-    <?php if($masterPassword): ?>
+    <?php if($masterPasswordHash): ?>
       <div class="col-md-4">
-      <?php echo $lang["MASTER_PASSWORD_CURRENT"]; ?>:
+      <?php echo $lang["PASSWORD_CURRENT"]; ?>:
       </div>
       <div class="col-md-8">
         <input type="password" class="form-control" name="masterPass_current" value=""/>
@@ -138,23 +140,21 @@ $row = $result->fetch_assoc();
       <br><br>
     <?php endif; ?>
     <div class="col-md-4">
-    <?php echo $lang["MASTER_PASSWORD_NEW"]; ?>:
+    <?php echo $lang["NEW_PASSWORD"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_new" value=""/>
     </div>
     <br><br>
     <div class="col-md-4">
-    <?php echo $lang["MASTER_PASSWORD_CONFIRM"]; ?>:
+    <?php echo $lang["NEW_PASSWORD_CONFIRM"]; ?>:
     </div>
     <div class="col-md-8">
       <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
     </div>
     <br><br>
-    <?php if(!empty($_SESSION['masterpassword'])): ?>
-      <div class="col-md-4">
-      <?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?>:
-      </div>
+    <?php if($masterPasswordHash): ?>
+      <div class="col-md-4"><?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?>:</div>
       <div class="col-md-8"><button type="submit" class="btn btn-warning" name="masterPass_deactivate" value="true"><?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?></button></div>
       <br><br><br>
     <?php endif; ?>
@@ -166,7 +166,7 @@ $row = $result->fetch_assoc();
 </form>
 <script>
   $("#formPasswordOptions").submit(function(event){
-    if($("input[name='masterPass_deactivate']").is(":checked")){
+    if($("input[name='masterPass_deactivate']").is(":checked") && $("input[name='masterPass_current']").val()){
       alert("<?php echo mc_list_changes(); ?>");
       if (confirm("<?php echo $lang['PASSWORD_REMOVE_PROMPT'];?>") == true) {
         return true;

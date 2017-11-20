@@ -24,7 +24,6 @@ function test_input($data){
   return $data;
 }
 
-
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
   $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
   if($result && ($row = $result->fetch_assoc())){
@@ -48,7 +47,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         $_SESSION['masterpassword'] = '';
 
         if($row['keyCode']){
-          $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $row['psw']));
+          $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $_POST['tester_pass']));
         }
         
         //check for updates, if core admin
