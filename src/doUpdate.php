@@ -2066,6 +2066,9 @@ if($row['version'] < 115){
   if(!$conn->error){
     echo '<br>Verschlüsselung: Master Passwort aktualisiert';
   }
+
+  $conn->query("ALTER TABLE configurationData ADD COLUMN checkSum VARCHAR(20) ");
+
 }
 
 //------------------------------------------------------------------------------
