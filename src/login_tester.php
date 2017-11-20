@@ -31,7 +31,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
       exit;
   }
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
-  $result = $conn->query("SELECT firstname, id, preferredLang, color, psw, keyCode FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
+  $result = $conn->query("SELECT * FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
   if($row = $result->fetch_assoc()){
     session_start();
     echo '<p style="color:white">';
