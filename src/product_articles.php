@@ -52,8 +52,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '<tr>';
         echo '<td>'.$mc->getStatus().$mc->decrypt($row['name']).'</td>';
         echo '<td>'.$mc->getStatus().$mc->decrypt($row['description']).'</td>';
-        echo '<td>'.$row['price'].'</td>';
-        echo '<td>'.$row['purchase'].'</td>';
+        echo '<td>'.number_format($row['price'],2,',','.').'</td>';
+        echo '<td>'.number_format($row['purchase'],2,',','.').'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
         echo '<td>'.$row['taxName'].' '.$row['percentage'].'%</td>';
         echo '<td><button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'" ><i class="fa fa-trash-o"></i></button>';

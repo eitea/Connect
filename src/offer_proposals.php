@@ -43,11 +43,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative)
     VALUES ('$num', $val, '0', '$date', '$date', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative')");
-    $val = mysqli_insert_id($conn);
+    $val = $conn->insert_id;
     if(!$conn->error){
       redirect("edit?val=$val");
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    }
+  } elseif(!empty($_POST['copy_proposal']) && !empty($_POST['copy_transition'])){
+    $val = intval($_POST['copy_proposal']);
+    $result = $conn->query("SELECT id_number, companyID FROM proposals, clientData WHERE proposals.clientID = clientData.id AND proposals.id = $val"); echo $conn->error;
+    $row = $result->fetch_assoc();
+    $num = getNextERP($_POST['copy_transition'], $row['companyID']);
+
+    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative)
+    SELECT '$num', clientID, status, curDate, deliveryDate, paymentMethod, shipmentType, representative FROM proposals WHERE id = $val ");
+    echo $conn->error;
+
+    $id = $conn->insert_id;
+    $conn->query("INSERT INTO products (proposalID, name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2)
+    SELECT $id, name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2 FROM products WHERE proposalID = $val");
+
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
     }
   }
 }
@@ -59,7 +78,7 @@ if(isset($_GET['err'])){
     echo $lang['ERROR_MISSING_SELECTION'];
   } elseif($val == 2){
     echo $lang['ERROR_UNEXPECTED'];
-  }  else {
+  } else {
     echo 'Unknown error';
   }
   echo '</div>';
@@ -98,7 +117,7 @@ $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$
 $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
 
-$result = $conn->query("SELECT proposals.*, clientData.name as clientName, companyData.name as companyName
+$result = $conn->query("SELECT proposals.*, clientData.name as clientName, companyData.name as companyName, companyData.id as companyID
 FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query");
 ?>
@@ -175,8 +194,9 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
           if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
           echo '<td>';
           echo "<a href='download?propID=$i&num=$id_name' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
-          if($transitable){
+          if($transitable){ //==if this is the youngest state
             echo '<a href="edit?val='.$row['id'].'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+            echo '<button type="button" class="btn btn-default" title="Copy" data-toggle="modal" data-target=".copy-'.$row['id'].'" ><i class="fa fa-files-o"></i></button> ';
             if($currentProcess != 'RE') echo '<button type="button" class="btn btn-default" title="'.$lang['WARNING_DELETE_TRANSITION'].'" data-toggle="modal" data-target=".confirm-delete-'.$row['id'].'"><i class="fa fa-trash-o"></i></button> ';
             echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
           }
@@ -244,6 +264,29 @@ while($result && ($row = $result->fetch_assoc())):
       </div>
     </div>
   </form>
+
+  <form method="POST">
+    <div class="modal fade copy-<?php echo $i; ?>" >
+      <div class="modal-dialog modal-sm modal-content">
+        <div class="modal-header"><h4><?php echo $lang['COPY']; ?></h4></div>
+        <div class="modal-body"> Wohin Kopieren? <br><br>        
+          <?php
+            foreach($transitions as $t){
+              $checked = '';
+              $disabled = '';
+              if(in_array($t, $bad)){ $disabled = 'disabled'; }
+              if($current_transition == $t){$checked = 'checked'; $disabled = ''; }
+              echo '<div class="row"><div class="col-xs-6"><label><input type="radio" '.$disabled.' name="copy_transition" '.$checked.' value="'.$t.'" />'.getNextERP($t, $row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
+            }
+          ?>        
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="copy_proposal" value="<?php echo $i; ?>"><?php echo $lang['SAVE']; ?></button>
+        </div>
+      </div>
+    </div>
+  </form>
 <?php endwhile; ?>
 
 <form method="POST">
@@ -255,7 +298,7 @@ while($result && ($row = $result->fetch_assoc())):
           <div class="col-sm-12"><?php include 'misc/select_client.php'; ?></div>
           <div class="col-sm-6"><br>
             <label><?php echo $lang['CHOOSE_PROCESS']; ?></label>
-            <select class="js-example-basic-single" name="nERP">              
+            <select class="js-example-basic-single" name="nERP">
               <option value="ANG"><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></option>
               <option <?php if($_GET['t'] == 'sub') echo "selected"; ?> value="AUB"><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></option>
               <option <?php if($_GET['t'] == 're') echo "selected"; ?> value="RE"><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></option>

@@ -66,15 +66,17 @@ if(isset($_POST['addFinanceAccount'])){
 <?php
     $modals = '';
     $result = $conn->query("SELECT * FROM accounts WHERE companyID = $cmpID ");
-    while($result && ($row = $result->fetch_assoc())){
+    while($result && ($row = $result->fetch_assoc())){        
         echo '<tr>';
         echo '<td>'.$row['num'].'</td>';
         echo '<td>'.$row['name'].'</td>';
         echo '<td>'.$lang['ACCOUNT_TOSTRING'][$row['type']].'</td>';
         if($row['options'] == 'CONT'){
             echo '<td>'.$lang['YES'].'</td>';
+            $checked = 'checked';
         } else {
             echo '<td>'.$lang['NO'].'</td>';
+            $checked = '';
         }
         echo '<td>';
         echo '<form method="POST" style="display:inline"><button type="submit" name="delete" value="'.$row['id'].'" title="'.$lang['DELETE'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></form>';
@@ -82,11 +84,11 @@ if(isset($_POST['addFinanceAccount'])){
         echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target=".editName-'.$row['id'].'" title="'.$lang['EDIT'].'" ><i class="fa fa-pencil"></i></button>';
         echo '</td>';
         echo '</tr>';
-
+        
         $modals .= '<div class="modal fade editName-'.$row['id'].'"><div class="modal-dialog modal-content modal-md"><form method="POST">
                     <div class="modal-header"><h3>'.$lang['EDIT'].'</h3></div>
                     <div class="modal-body"><label>Name</label><br><input type="text" class="form-control" name="changeName" value="'.$row['name'].'" maxlength="20" ><br>
-                    <label><input type="checkbox" name="changeOpt" value="true" /> Fortlaufende Nr. </label></div>
+                    <label><input type="checkbox" name="changeOpt" '.$checked.' value="true" /> Fortlaufende Nr. </label></div>
                     <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>                    
                     <button type="submit" class="btn btn-warning" name="saveNameChange" value="'.$row['id'].'">'.$lang['SAVE'].'</button></div></form></div></div>';
     }

@@ -230,6 +230,9 @@ $lang_ger['CONFIRM_CANCEL'] = 'Nein';
 $lang_eng['CONSUMED'] = 'Consumed';
 $lang_ger['CONSUMED'] = 'Konsumiert';
 
+$lang_eng['COPY'] = 'Copy';
+$lang_ger['COPY'] = 'Kopieren';
+
 $lang_eng['CORE_TIME'] = 'Core Time';
 $lang_ger['CORE_TIME'] = 'Kernzeit';
 
