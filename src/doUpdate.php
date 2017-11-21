@@ -1656,6 +1656,15 @@ if($row['version'] < 102){
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
+    CREATE TABLE dynamicprojectsnotes(
+      projectid VARCHAR(100) NOT NULL,
+      notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
+      notetext VARCHAR(1000),
+      notecreator INT(6),
+      FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+    );
     ");    
   }
 
