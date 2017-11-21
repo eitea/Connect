@@ -205,9 +205,10 @@ if(isset($_POST['transferToWEB']) && $journalID){
     }
 }
 
+include __DIR__ .'/misc/new_supplier_buttonless.php';
 
 $account_select = $tax_select = '';
-$web_select = $supplier_select = '<option value="0">...</option>';
+$web_select = $supplier_select = '<option value="0">...</option><option value="new" >+ Neu</option>';
 $result = $conn->query("SELECT id, num, name, companyID FROM accounts WHERE companyID IN (SELECT companyID FROM accounts WHERE id = $id) ");
 while($result && ($row = $result->fetch_assoc())){
     $account_select .= '<option value="'.$row['id'].'">'.$row['num'].' '.$row['name'].'</option>';
@@ -302,7 +303,7 @@ if(!$docNum) $docNum = 1;
 </tbody>
 </table>
 <hr><br><br>
-<?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; include __DIR__ .'/misc/new_supplier_buttonless.php';  ?>
+<?php if($account_row['manualBooking'] == 'TRUE'): echo $modals; ?>
     <form method="POST" class="well">
         <div class="row form-group">
             <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'].' WEB'; ?></button></div>
@@ -375,6 +376,11 @@ if(!$docNum) $docNum = 1;
 </div>
 
 <script>
+$("select[name=add_supplier]").change(function(){
+  if($(this).val() == 'new'){
+    $('#create_client').modal().toggle();
+  }
+});
 var active_should = true;
 var active_have = true;
 function disenable(xor1, xor2, active){

@@ -260,7 +260,7 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['CLIENT'] .' - '.$rowClient['name']; ?>
+  <h3><?php if(isset($_GET['supID'])){ echo $lang['SUPPLIER']; }else{ echo $lang['CLIENT'];} echo ' - '.$rowClient['name']; ?>
     <div class="page-header-button-group">
       <button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
     </div>
