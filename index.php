@@ -7,7 +7,7 @@ $routes = array(
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/book' => 'userProjecting.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/ready' => 'readyPlan.php',
   
-  'social/home' => 'socialMedia.php',
+  'social/home' => 'socialMedia.php',              
 
   'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
   'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',
@@ -17,12 +17,13 @@ $routes = array(
   'system/designer' => 'templateSelect.php',       'system/clients' => 'editCustomers.php',           'system/clientDetail' => 'editCustomer_detail.php',
   'system/previewTem' => 'templatePreview.php',    'system/downloadTem' => 'templateDownload.php',    'system/editTemp' => 'templateEdit.php',
   'system/downloadSql' => 'sqlDownload.php',       'system/cryptlog'=> 'viewCryptLog.php',            'system/restic' => 'resticBackup.php',
+  'system/checkinLogs' => 'checkinLogs.php',
 
-  'time/view' => 'getTimeprojects.php',              'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
+  'time/view' => 'getTimeprojects.php',            'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
   'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',                  'time/requests' => 'requestOverview.php',
 
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
-  'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',           'project/log' => 'audit_projectBookings.php',
+  'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',             'project/log' => 'audit_projectBookings.php',
 
   'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 

@@ -488,6 +488,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
                       <li><a <?php if($this_page =='register.php'){echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
                       <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
+                      <li><a <?php if($this_page =='checkinLogs.php'){echo $setActiveLink;} ?> href="../system/checkinLogs">Checkin Logs</a></li>
                     </ul>
                   </div>
                 </li>
@@ -751,7 +752,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
     <div class="container-fluid">
       <span><?php echo $validation_output; ?></span>
       <span><?php echo $error_output; ?></span>
-
 
 <?php
   $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
