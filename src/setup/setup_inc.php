@@ -902,6 +902,7 @@ $sql = "CREATE TABLE identification(
     );
     CREATE TABLE dynamicprojectsnotes(
       projectid VARCHAR(100) NOT NULL,
+      noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
       notetext VARCHAR(1000),
       notecreator INT(6),

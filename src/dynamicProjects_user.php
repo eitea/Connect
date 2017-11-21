@@ -14,6 +14,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["note"])){
     $id = $conn->real_escape_string($id);
     $text = $_POST["notetext"]??"error";
     $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
+    echo $conn->error;
+}
+
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
+   $note_id = $_POST["id"] ?? "";
+   $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
 }
 
 ?>

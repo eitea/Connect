@@ -56,14 +56,16 @@ if (!function_exists('stripSymbols')) {
                                     echo "<td>{$modal_row['notetext']}</td>";
                                     echo "<td>{$modal_row['notedate']}</td>";
                                     echo "<td>{$modal_row['notecreator']}</td>";
+                                    if($modal_row["notecreator"] == $userID){
+                                        echo "<td><form method='POST'><input type='hidden' name='id' value='{$modal_row['noteid']}' /><button class='btn btn-link' type='submit' name='deletenote' value='true'><i class='fa fa-times' aria-hidden='true'></i></button></form></td>";                                        
+                                    }
                                     echo "</tr>";
                                 }
                                 ?>
                                 </table>
-                                <form>
+                                <form method="POST">
                                 <input type="hidden" name="id" value="<?php echo $modal_id ?>">
                                     <input type="text" name="notetext" /> <button type="submit" name="note" value="true">Submit</button>
-                                    <button type="submit" name="deletenote" value="true">Delete all</button>
                                 </form>
                                 <!-- /Notes -->
                             </div>
