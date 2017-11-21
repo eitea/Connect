@@ -361,7 +361,7 @@ function mc_update_values($current, $new, $statement = ''){
   }
   $stmt->close();
   //bank data
-  $result = $conn->query("SELECT id, iban, bic, bankName FROM clientInfoBank");
+  $result = $conn->query("SELECT * FROM clientInfoBank");
   $stmt = $conn->prepare("UPDATE clientInfoBank SET bic = ?, iban = ?, bankName = ?, iv = ?, iv2 = ? WHERE id = ?");
   $stmt->bind_param("sssssi", $bic, $iban, $name, $iv, $iv2, $id);
   fwrite($logFile, "\t".getCurrentTimestamp()." (UTC): altering bank\r\n");

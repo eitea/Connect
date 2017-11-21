@@ -63,9 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </tbody>
   </table>
   <div class="text-right"><br>
-    <?php if(!$masterPassword || $_SESSION['masterpassword']): ?>
     <button type="button" class="btn btn-warning" data-toggle="modal" data-target=".add_product"><i class="fa fa-plus"></i> <?php echo $lang['ADD']; ?></button>
-    <?php endif; ?>
   </div>
 </form>
 

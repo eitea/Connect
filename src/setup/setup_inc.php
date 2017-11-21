@@ -1027,10 +1027,12 @@ function create_tables($conn){
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     timestampID INT(10) UNSIGNED,
     remoteAddr VARCHAR(50),
-    userAgent VARCHAR(150)
+    userAgent VARCHAR(150),
+    FOREIGN KEY (timestampID) REFERENCES logs(indexIM)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-
 }

@@ -120,12 +120,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $product_name = test_input($_POST['update_name_'.$x]);
         $product_description = test_input($_POST['update_description_'.$x]);
         $product_quantity = floatval($_POST['update_quantity_'.$x]);
+        $product_purchase = floatval($_POST['update_purchase_'.$x]);
         $product_price = floatval($_POST['update_price_'.$x]);
         $product_tax_id = intval($_POST['update_tax_'.$x]);
         $product_unit = test_input($_POST['update_unit_'.$x]);
         $product_name = $mc->encrypt($product_name);
         $product_description = $mc->encrypt($product_description);
-        $conn->query("UPDATE products SET name='$product_name', description='$product_description', quantity='$product_quantity', price='$product_price', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
+        $product_bar = 'FALSE';
+        if(isset($_POST['update_bar_'.$x])) $product_bar = 'TRUE';
+        $conn->query("UPDATE products SET name='$product_name', cash='$product_bar', description='$product_description', quantity='$product_quantity', price='$product_price', purchase='$product_purchase', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
         if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -289,7 +292,6 @@ $("#sort tbody").sortable({
 </div>
 
 <form method="POST">
-  <?php if(!$masterPasswordHash || $_SESSION['masterpassword']): ?>
   <div class="container-fluid">
     <div class="col-xs-12 text-right">
       <div class="btn-group">
@@ -307,7 +309,6 @@ $("#sort tbody").sortable({
       </div>
     </div>
   </div>
-  <?php endif; ?>
 <?php
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
@@ -318,68 +319,68 @@ while($result && ($prod_row = $result->fetch_assoc())):
 $x = $prod_row['id'];
  ?>
   <div class="modal fade modal_edit_product_<?php echo $x ?>">
-    <div class="modal-dialog modal-lg modal-content" role="document">
-      <div class="modal-header">
-        <h4 class="modal-title"><?php echo $prod_row['name']; ?></h4>
-      </div>
+    <div class="modal-dialog modal-md modal-content" role="document">
+      <div class="modal-header"><h4 class="modal-title"><?php echo $prod_row['name']; ?></h4></div>
       <div class="modal-body">
-        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>
-          <div class="container-fluid">
-            <div class="col-md-12">
-              <label>Text<?php echo mc_status(); ?></label>
-              <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
+        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>        
+          <label>Text<?php echo mc_status(); ?></label>
+          <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
+        <?php else: ?>
+          <label>Name<?php echo mc_status(); ?></label>
+          <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
+          <br>
+            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
+            <textarea class="form-control" rows="3" name="update_description_<?php echo $x ?>"><?php echo $prod_row['description']; ?></textarea>
+          <br>
+          <div class="row">
+            <div class="col-md-4">
+              <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
+              <input type="number" step='0.01' class="form-control" name="update_purchase_<?php echo $x ?>" value="<?php echo $prod_row['purchase']; ?>"/>
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <label><?php echo $lang['PRICE_STK']; ?> (Netto)</label>
+              <input type="text" class="form-control" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
             </div>
           </div>
-        <?php else: ?>
-        <div class="container-fluid">
-          <div class="col-md-6">
-            <label>Name<?php echo mc_status(); ?></label>
-            <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
+          <br>
+          <div class="row">          
+            <div class="col-md-6">
+              <label><?php echo $lang['QUANTITY']; ?></label>
+              <input type="text" class="form-control" name="update_quantity_<?php echo $x ?>" value="<?php echo $prod_row['quantity']; ?>"/>
+            </div>
+            <div class="col-md-6">
+              <label><?php echo $lang['UNIT']; ?></label>
+              <select class="js-example-basic-single" name="update_unit_<?php echo $x ?>">
+                <?php
+                $unit_result = $conn->query("SELECT * FROM units");
+                while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
+                  echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
+                }
+                ?>
+              </select>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label><?php echo $lang['TAXES']; ?></label><br>
-            <select class="js-example-basic-single" name="update_tax_<?php echo $x ?>">
-              <?php
-              $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-              while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                $selected = '';
-                if($tax_row['id'] == $prod_row['taxID']) { $selected = 'selected';}
-                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-              }
-              ?>
-            </select>
+          <br>
+          <div class="row">
+            <div class="col-md-6">
+              <label><?php echo $lang['TAXES']; ?></label><br>
+              <select class="js-example-basic-single" name="update_tax_<?php echo $x ?>">
+                <?php
+                $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+                while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+                  $selected = '';
+                  if($tax_row['id'] == $prod_row['taxID']) { $selected = 'selected';}
+                  echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+                }
+                ?>
+              </select>
+            </div>
+            <div class="col-md-6 checkbox">
+              <label><input type="checkbox" <?php if($prod_row['cash'] == 'TRUE') echo 'checked'; ?> name="update_bar_<?php echo $x ?>" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
+            </div>
           </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-          <div class="col-md-4">
-            <label><?php echo $lang['QUANTITY']; ?></label>
-            <input type="text" class="form-control" name="update_quantity_<?php echo $x ?>" value="<?php echo $prod_row['quantity']; ?>"/>
-          </div>
-          <div class="col-md-4">
-            <label><?php echo $lang['PRICE_STK']; ?></label>
-            <input type="text" class="form-control" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
-          </div>
-          <div class="col-md-4">
-            <label><?php echo $lang['UNIT']; ?></label>
-            <select class="js-example-basic-single" name="update_unit_<?php echo $x ?>">
-              <?php
-              $unit_result = $conn->query("SELECT * FROM units");
-              while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
-                echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
-              }
-              ?>
-            </select>
-          </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-          <div class="col-md-12">
-            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
-            <input type="text" class="form-control" name="update_description_<?php echo $x ?>" value="<?php echo $prod_row['description']; ?>"/>
-          </div>
-        </div>
-      <?php endif; ?>
+        <?php endif; ?>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

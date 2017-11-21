@@ -171,7 +171,7 @@ $row = $result->fetch_assoc();
 
 <script>
   $("#formPasswordOptions").submit(function(event){
-    if($("input[name='masterPass_new']").val() && $("input[name='masterPass_new']").val() == $("input[name='masterPass_newConfirm']").val() || $("input[name='masterPass_current']").val()){
+    if($("input[name='masterPass_new']").val() && $("input[name='masterPass_new']").val() == $("input[name='masterPass_newConfirm']").val()){
       alert("<?php echo mc_list_changes(); ?>");
       if (confirm("<?php echo $lang['PASSWORD_CHANGE_PROMPT'];?>") == true) {
         return true;
