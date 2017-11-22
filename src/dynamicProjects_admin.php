@@ -10,7 +10,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
     $forceCreate = true;
     $id = $id = $_POST["id"] ?? "error - no id";
     $id = $conn->real_escape_string($id);
-    $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'");
+    $conn->query("DELETE FROM dynamicprojectsclients WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsoptionalemployees WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectspictures WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsseries WHERE projectid = '$id'");
+    echo $conn->error;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || $forceCreate)) {
@@ -85,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $end = $conn->real_escape_string($end);
     $status = $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed')");
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed'");
     echo $conn->error;
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
