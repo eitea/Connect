@@ -167,21 +167,17 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
             $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
           }
 
-          $transitable = $isYoungest = false;
+          $transitable = false;
           if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
           if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
           if($current_transition == 'RE') {$transitable = true; $available_transitions = array('LFS', 'GUT');}
 
           echo "<tr>";
-          if(count($available_companies) > 2){ echo '<td></td>';}
+          if(count($available_companies) > 2){ echo '<td></td>'; }
           echo '<td></td>';
           echo '<td>'.$row_history['id_number'].'</td>';
 
-          if($isYoungest){
-            //TODO: are all of the products transited? 
-          } else {
-            echo "<td>-TBC-</td>";
-          }
+          echo "<td></td>";
           
           $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
           if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
@@ -225,7 +221,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
           echo '</td>';
           echo '</tr>';
         } //endwhile each history
-        //TODO: i can only evaluate in here whether a transition is the youngest or if it still has open positions or not 
+        //TODO: i can only evaluate in here whether a transition still has open positions or not 
         //solve this either by a second iteration over questionable entries or... magic
 
       } //endwhile each process

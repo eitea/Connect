@@ -789,16 +789,16 @@ $row = $result->fetch_assoc();
 ?>
 
 <form method="POST" class="page-seperated-section">
-  <h4>ERP <?php echo $lang['REFERENCE_NUMERAL_ROW']; ?></a>
+  <h4>ERP <?php echo $lang['REFERENCE_NUMERAL_ROW']; ?><a role="button" data-toggle="collapse" href="#erp_reference_info"><i class="fa fa-info-circle"></i></a>
     <div class="page-header-button-group">
       <button type="submit" class="btn btn-default blinking" name="save_erp_reference_numrow"><i class="fa fa-floppy-o"></i></button>
     </div>
   </h4>
   <div class="container-fluid">
     <br>
-    <div class="collapse" id="erp_number_info">
+    <div class="collapse" id="erp_reference_info">
       <div class="well">
-        Die Bezugszeichenzeile wird in Aufträgen gedruckt. Ändern sich die Werte hier, ändern Sie sich auch auf allen Aufträgen.
+        Die Bezugszeichenzeile wird in Vorgängen gedruckt. Ändern sich die Werte hier, ändern Sie sich auch in allen Vorgängen.
       </div>
     </div>
     <div class="col-md-6">

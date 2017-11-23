@@ -82,7 +82,7 @@ while($result && ($row = $result->fetch_assoc())){
     $runNumbers = array_fill_keys($available_companies, 0); //let's try something fun
     $result = $conn->query("SELECT receiptBook.*, companyData.name, companyID, percentage, description, clientData.name AS supplierName 
     FROM receiptBook INNER JOIN clientData ON clientData.id = supplierID INNER JOIN companyData ON companyData.id = clientData.companyID INNER JOIN taxRates ON  taxRates.id = taxID
-    WHERE companyID IN (".implode(', ', $available_companies).") $supplierQuery $companyQuery ORDER BY receiptBook.id ASC"); echo $conn->error;
+    WHERE companyID IN (".implode(', ', $available_companies).") AND DATE(invoiceDate) >= '".$filterings['date'][0]."' AND DATE(invoiceDate) <= DATE('".$filterings['date'][1]."') $supplierQuery $companyQuery ORDER BY receiptBook.id ASC"); echo $conn->error;
     while($row = $result->fetch_assoc()){
         $runNumbers[$row['companyID']]++;
         echo '<tr>';

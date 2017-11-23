@@ -13,7 +13,7 @@
  * requestType => type
 **/
 
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
+if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){
   $_SESSION['filterings'] = array();
 }
 if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (THINK)
@@ -100,7 +100,7 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
 }
 
 //read saved filters
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $this_page){
+if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $filterings['savePage']){
   $filterings = $_SESSION['filterings'];
 }
 

@@ -43,7 +43,7 @@ if(!empty($_POST['webID']) && !isset($_POST['transferToWEB'])){
 $journalID = false;
 if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
     $accept = true;
-    //either should or have can be 0
+    //code below is highly sensitive. do not touch.
     if($_POST['add_nr'] > 0 && test_Date($_POST['add_date'], "Y-m-d") && $_POST['add_account'] > 0 && ($_POST['add_should'] == 0 xor $_POST['add_have'] == 0)){
         $addAccount = intval($_POST['add_account']);
         $offAccount = $id;
@@ -54,13 +54,11 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         $have = $temp_have = floatval($_POST['add_have']);
         $tax = 1;
         if(isset($_POST['add_tax'])) $tax = intval($_POST['add_tax']);
-
         $res = $conn->query("SELECT * FROM accountingLocks WHERE YEAR(lockDate) = YEAR('$date') AND MONTH(lockDate) = MONTH('$date') AND companyID = ".$account_row['companyID']);
         if($res && $res->num_rows > 0){
             $accept = false;
             echo '<div class="alert alert-danger" class="close"><a href="#" data-dismiss="alert" class="close">&times;</a>Dieser Monat wurde gesperrt und darf nicht bebucht werden.</div>';
         }
-
         $res = $conn->query("SELECT num FROM accounts WHERE id = $addAccount");
         if($res && ( $rowP = $res->fetch_assoc())) $accNum = $rowP['num']; //else STRIKE
         
@@ -87,7 +85,6 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
                 $journalID = $conn->insert_id;
             }
         }
-            
         if($accept){
             //tax
             $res = $conn->query("SELECT percentage, account2, account3, code FROM taxRates WHERE id = $tax");
@@ -138,7 +135,6 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
             $account = $offAccount;
             $stmt->execute();
         
-        
             //offAccount balance
             $have = $temp_have;
             $should = $temp_should;
@@ -164,7 +160,6 @@ if(isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])){
         $accept = false;
         echo '<div class="alert alert-danger" class="close"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
-
     if(isset($_POST['editJournalEntry']) && $accept){
         $val = intval($_POST['editJournalEntry']);
         $conn->query("DELETE FROM account_journal WHERE id = $val");
@@ -250,6 +245,8 @@ while($result && ($row = $result->fetch_assoc())){
 </tr></thead>
 <tbody>
 <?php
+$dateQuery = '';
+if($filterings['date'][0]) $dateQuery = "AND payDate LIKE '".$filterings['date'][0]."-%'";
 $docDate = getCurrentTimestamp();
 $modals = '';
 $docNum = $saldo = 0;
@@ -257,7 +254,7 @@ $result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.
 FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
 INNER JOIN accounts ON account_journal.account = accounts.id
 LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
-WHERE account_balance.accountID = $id ORDER BY docNum, inDate ");
+WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, inDate ");
 echo $conn->error;
 $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
 $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
