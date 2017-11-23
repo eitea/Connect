@@ -1,9 +1,10 @@
 <?php require 'header.php'; enableToERP($userID);
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$filterings = array('procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
+$filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
 
 if(isset($_GET['t'])){
   $filterings['procedures'][0] = array(strtoupper($_GET['t']));
+  $filterings['savePage'] = $this_page.'?val='.$_GET['t'];
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
