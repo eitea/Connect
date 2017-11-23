@@ -75,7 +75,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($kmStart <= $kmEnd){
       $sql = "INSERT INTO $travelTable (userID, countryID, travelDayStart, travelDayEnd, kmStart, kmEnd, infoText, hotelCosts, hosting10, hosting20, expenses)
       VALUES($userID, $countryID, '$timeStart', '$timeEnd', '$kmStart', '$kmEnd', '$infotext', '$hotel', '$hosting10', '$hosting20', '$expenses')";
-
       if(!$conn->query($sql)){
         echo mysqli_error($conn);
       }
@@ -83,7 +82,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Falsche Eingabe: </strong>km-Stand Anfang muss kleiner sein als km-Stand Ende.</div>';
     }
   } elseif(isset($_POST['addDrive'])) {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Fehler: </strong>Orange Felder dürfen nicht leer sein.</div>';
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Fehler: </strong>Hervorgehobene Felder dürfen nicht leer sein.</div>';
   }
 }
 ?>

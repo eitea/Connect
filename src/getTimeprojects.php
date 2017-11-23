@@ -567,12 +567,11 @@ if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade active in'>"; } els
                 $booking_content .= '<div class="col-sm-1">'.$Ap.'</div>';
                 $booking_content .= '<div class="col-sm-1">'.$Bp.'</div>';
                 $booking_content .= '<div class="col-sm-5">'.$row['infoText'].'</div>';
-                $booking_content .= '<div class="col-sm-1"><button type="submit" class="btn btn-default" value="'.$row['bookingTableID'].'" name="bk_remove"><i class="fa fa-trash-o"></i></button>';
+                $booking_content .= '<div class="col-sm-2"><button type="submit" class="btn btn-default" value="'.$row['bookingTableID'].'" name="bk_remove"><i class="fa fa-trash-o"></i></button>';
                 if($row['booked'] == 'FALSE'){
                   $booking_content .= '<button type="button" onclick="appendModal_proj('.$row['bookingTableID'].', '.$x.');" class="btn btn-default" ><i class="fa fa-pencil"></i></button>';
                 }
-                $booking_content .= '</div>'; 
-                $booking_content .= '</div>';
+                $booking_content .= '</div></div>'; 
               }
               $booking_content .= '</td></tr>';
             }

@@ -237,7 +237,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 $result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
 if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
-  ?>
+?>
 
 <div class="page-seperated-body">
 <div class="page-header page-seperated-section">

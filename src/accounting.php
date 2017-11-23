@@ -293,6 +293,7 @@ while($result && ($row = $result->fetch_assoc())){
     } else {
         echo '<td></td>';
     }
+    echo '</tr>';
 }
 if($account_row['options'] == 'CONT') $docNum++;
 if(!$docNum) $docNum = 1;
