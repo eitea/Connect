@@ -138,7 +138,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
   <tbody>
     <?php
     $modals = '';
-      //each process splits into a history where we need to check 
+      //each process splits into a history
       while($result && ($row = $result->fetch_assoc())){
         $result_process = $conn->query("SELECT * FROM processHistory WHERE processID = ".$row['id']);
         $product_placements = array_fill_keys($transitions, array());

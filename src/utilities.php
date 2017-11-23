@@ -406,7 +406,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
   }
 
   if(strpos($html, "[TIMESTAMPS]") !== false){ //0 = false, but 0 is valid position
-    $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Differenz</th><th>Saldo (Stunden)</th></tr>";
+    $html_bookings = "<h3>Anwesenheit:</h3><table><tr><th>Name</th><th>Status</th><th>Von</th><th>Bis</th><th>Bewertung</th><th>Differenz</th><th>Saldo (Stunden)</th></tr>";
     //select all users and select log from today if exists else log = null
     $result = $conn->query("SELECT * FROM $userTable LEFT JOIN $logTable ON $logTable.userID = $userTable.id AND $logTable.time LIKE '$today %' $userIDs_query");
     echo mysqli_error($conn);
@@ -448,7 +448,13 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
         $saldo_Cell = "<td>$saldo</td>";
       }
 
-      $html_bookings .= '<td>'.$lang['ACTIVITY_TOSTRING'][$row['status']].'</td>'."$time_Cell $timeEnd_Cell $diff_Cell $saldo_Cell</tr>";
+      if($row['emoji']){
+        $emoji_Cell = '<td>'.$lang['EMOJI_TOSTRING'][$row['emoji']].'</td>';
+      } else {
+        $emoji_Cell = "<td> - </td>";
+      }
+      
+      $html_bookings .= '<td>'.$lang['ACTIVITY_TOSTRING'][$row['status']].'</td>'."$time_Cell $timeEnd_Cell $emoji_Cell $diff_Cell $saldo_Cell</tr>";
     }
     $html_bookings .= "</table>";
     //replace

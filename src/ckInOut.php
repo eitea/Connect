@@ -28,20 +28,20 @@ function checkIn($userID) {
     echo mysqli_error($conn);
     $id = $conn->insert_id;
   }
-
   $conn->query("INSERT INTO checkinLogs (timestampID, remoteAddr, userAgent) VALUES($id, '".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['HTTP_USER_AGENT']."')");
 }
 
 //will return empty if all was okay
 function checkOut($userID, $emoji = 0) {
   require 'connection.php';
-  $query = "SELECT time, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
+  $query = "SELECT time, indexIM, emoji FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
   $result= mysqli_query($conn, $query);
   $row = $result->fetch_assoc();
 
   $indexIM = $row['indexIM'];
   $start = $row['time'];
-  $emoji = intval($emoji);
+  if($row['emoji']) $emoji = ($emoji + $row['emoji']) / 2;
+  if(rand(1,2) == 1) { $emoji = floor($emoji); } else { $emoji = ceil($emoji); }
 
   $sql = "UPDATE $logTable SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";
   $conn->query($sql);

@@ -387,12 +387,12 @@ $x = $prod_row['id'];
           <div class="row">
             <div class="col-md-4">
               <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
-              <input type="number" step='0.01' class="form-control" name="update_purchase_<?php echo $x ?>" value="<?php echo $prod_row['purchase']; ?>"/>
+              <input type="number" step='0.01' class="form-control money" name="update_purchase_<?php echo $x ?>" value="<?php echo $prod_row['purchase']; ?>"/>
             </div>
             <div class="col-md-4"></div>
             <div class="col-md-4">
               <label><?php echo $lang['PRICE_STK']; ?> (Netto)</label>
-              <input type="text" class="form-control" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
+              <input type="text" class="form-control money" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
             </div>
           </div>
           <br>
@@ -452,7 +452,7 @@ $x = $prod_row['id'];
       <div class="row">
         <div class="col-md-3">
           <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
-          <input id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
+          <input id="product_purchase" type="number" step='0.01' class="form-control money" name="add_product_purchase" placeholder="EUR" />
         </div>
         <div class="col-md-1"><label>+</label></div>
         <div class="col-md-3">
@@ -462,7 +462,7 @@ $x = $prod_row['id'];
         <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
           <label><?php echo $lang['PRICE_STK']; ?> <small>(Netto)</small></label>
-          <input id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
+          <input id="product_price" type="number" step="0.01" class="form-control required-field money" name="add_product_price" placeholder="EUR" />
         </div>
       </div>
       <br>
@@ -617,7 +617,7 @@ $x = $prod_row['id'];
       <div class="container-fluid">
         <div class="col-xs-2">Porto: (EUR)</div>
         <div class="col-xs-4">
-          <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $proposal_row['porto']; ?>" />
+          <input type="number" step="0.01" class="form-control money" name="meta_porto" value="<?php echo $proposal_row['porto']; ?>" />
         </div>
         <div class="col-xs-2 text-center">Porto Steuer: (%)</div>
         <div class="col-xs-4">
