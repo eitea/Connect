@@ -6,15 +6,19 @@ $meta_porto = $meta_porto_percentage = 0;
 $meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_header = '';
 
 if(!empty($_GET['val'])){
-  $proposalID = intval($_GET['val']);
+  $historyID = intval($_GET['val']);
 } else {
   redirect('view?err=1');
 }
 
-$result = $conn->query("SELECT proposals.*, companyID FROM proposals, clientData WHERE proposals.clientID = clientData.id AND proposals.id = $proposalID ");
+$result = $conn->query("SELECT proposals.*, companyID, id_number FROM proposals, processHistory, clientData 
+WHERE proposals.clientID = clientData.id AND proposals.id = processHistory.processID AND processHistory.id = $historyID");
 if($result && $result->num_rows > 0){
   $proposal_row = $result->fetch_assoc();
 } else {
+  redirect('view?err=2'); //STRIKE
+}
+if(!in_array($proposal_row['companyID'], $available_companies)){
   redirect('view?err=2'); //STRIKE
 }
 
@@ -45,10 +49,53 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 
   if(isset($_POST['translate'])){
-    if(!empty($_POST['transit'])){
-      $num = getNextERP($_POST['transit'], $proposal_row['companyID']);
-      $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '$num' WHERE id = $proposalID"); echo $conn->error;
-      $proposal_row['id_number'] = $num;
+    if(!empty($_POST['copy_transition'])){
+      $transit = $_POST['copy_transition'];
+      $prod_list = array();
+      //step1 - get all products (id quantity and origin) from current history
+      $res = $conn->query("SELECT * FROM products WHERE historyID = $historyID");
+      while($row = $res->fetch_assoc()){
+        if($row['origin']){
+          $prod_list[$row['origin']] = $row;
+        } else {  //origins can be empty... what to do then?
+          $prod_list[$row['id']] = $row;
+        }
+      }
+      //step2 - reduce by all products which are same as transit
+      $res = $conn->query("SELECT quantity, origin FROM products INNER JOIN processHistory ON products.historyID = processHistory.id 
+      WHERE processHistory.processID = ".$proposal_row['id']." AND id_number LIKE '$transit%'"); echo $conn->error;
+      while($row = $res->fetch_assoc()){
+        if(isset($prod_list[$row['origin']])){
+          $prod_list[$row['origin']]['quantity'] -= $row['quantity'];
+        }
+      }
+      //step3 - create new history and enter products with quantities
+      $num = getNextERP($transit, $proposal_row['companyID']);
+      $conn->query("INSERT INTO processHistory (id_number, processID) VALUES('$num', ".$proposal_row['id'].")"); echo $conn->error;
+      $historyID = $conn->insert_id;
+      $stmt = $conn->prepare("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt->bind_param("isisddsidsdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
+      foreach($prod_list as $p){
+        if($p['quantity'] > 0 || !$p['origin']){
+          $origin = $p['origin'];
+          $pos = $p['position'];
+          $name = $p['name'];
+          $price = $p['price'];
+          $quantity = $p['quantity'];
+          $desc = $p['description'];
+          $taxID = $p['taxID'];
+          $cash = $p['cash'];
+          $unit = $p['unit'];
+          $purchase = $p['purchase'];
+          $iv = $p['iv'];
+          $iv2 = $p['iv2'];
+          $stmt->execute();
+        }
+        if($stmt->error) echo $stmt->error;
+      }
+      $stmt->close();
+      redirect("edit?val=$historyID");
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
     }
@@ -57,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES($proposalID, $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
@@ -66,14 +113,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $txt = $mc->encrypt($txt);
-    $conn->query("INSERT INTO products (proposalID, position, name, description, iv, iv2) VALUES($proposalID, $LAST_POSITION, '".$mc->encrypt("CLEAR_TEXT")."', '$txt', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, description, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("CLEAR_TEXT")."', '$txt', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
     $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES($proposalID, $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_product'])){
     $LAST_POSITION = intval($_POST['add_product']) +1;
@@ -89,19 +136,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if(!empty($_POST['add_product_as_bar'])){
         $product_is_cash = 'TRUE';
       }
+      $product_origin = randomPassword(16);
       $mc = new MasterCrypt($_SESSION["masterpassword"]);
       $iv = $mc->iv;
       $iv2 = $mc->iv2;
       $product_name = $mc->encrypt($product_name);
       $product_description = $mc->encrypt($product_description);
-      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
-      VALUES($proposalID, $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '$product_tax_id', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
+      $conn->query("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
+      VALUES($historyID, '$product_origin', $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '$product_tax_id', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
-  } elseif(isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
   } elseif(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
     $conn->query("DELETE FROM products WHERE id = $i");
@@ -136,7 +182,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['save_positions']) && !empty($_POST['positions']) && !empty($_POST['positions_id'])){
     if(count($_POST['positions']) == count($_POST['positions_id'])){
-      $conn->query("UPDATE products SET position = NULL WHERE proposalID = $proposalID");
+      $conn->query("UPDATE products SET position = NULL WHERE historyID = $historyID");
       $stmt = $conn->prepare("UPDATE products SET position = ? WHERE id = ?");
       $stmt->bind_param("ii", $position, $id);
       for($i = 0; $i < count($_POST['positions']); $i++){
@@ -148,17 +194,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['update_articles'])){
     $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxID = a.taxID, p.purchase = a.purchase, p.cash = a.cash
-    WHERE a.name = p.name AND p.proposalID = $proposalID");
+    WHERE a.name = p.name AND p.historyID = $historyID");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   } elseif(isset($_POST['update_clientData'])){
     $conn->query("UPDATE proposals p, clientInfoData c
       SET p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
-      WHERE p.clientID = c.clientID AND p.id = $proposalID");
+      WHERE p.clientID = c.clientID AND p.id = ".$proposal_row['id']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
   if(isset($_POST['meta_save'])){
     $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', 
-    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id = $proposalID");
+    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id ".$proposal_row['id']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 } //END POST
@@ -176,10 +222,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
         </ul>
       </div>
-      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
+      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
       <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
       <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
-      <a href="download?propID=<?php echo $proposalID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a href="download?proc=<?php echo $historyID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
     </div>
   </h3>
 </div>
@@ -197,7 +243,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <tbody>
       <?php
       $LAST_POSITION = 0;
-      $result = $conn->query("SELECT products.*, percentage FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE proposalID = $proposalID ORDER BY position ASC");
+      $result = $conn->query("SELECT products.*, percentage FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE historyID = $historyID ORDER BY position ASC");
       while($result && ($prod_row = $result->fetch_assoc())){
         $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
         $prod_row["name"] = $mc->decrypt($prod_row["name"]);
@@ -310,6 +356,12 @@ $("#sort tbody").sortable({
     </div>
   </div>
 <?php
+$unit_select = '';
+$unit_result = $conn->query("SELECT * FROM units");
+while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
+  $unit_select .= '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
+}
+
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
   $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
@@ -352,12 +404,7 @@ $x = $prod_row['id'];
             <div class="col-md-6">
               <label><?php echo $lang['UNIT']; ?></label>
               <select class="js-example-basic-single" name="update_unit_<?php echo $x ?>">
-                <?php
-                $unit_result = $conn->query("SELECT * FROM units");
-                while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
-                  echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
-                }
-                ?>
+                <?php echo str_replace('value="'.$prod_row['unit'], 'selected value="'.$prod_row['unit'], $unit_select); ?>
               </select>
             </div>
           </div>
@@ -604,24 +651,14 @@ $x = $prod_row['id'];
       <div class="modal-body">
         <div class="radio">
           <?php
-          //Backward transitions are not possible, as are transitions into same state
+          $transitable = false;
           $current_transition = preg_replace('/\d/', '', $proposal_row['id_number']);
-          $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-          $bad = array_slice($transitions, 0, array_search($current_transition, $transitions));
-          $bad[] = $current_transition;
-          
-          $checked = '';
-          foreach($transitions as $t){
-            $disabled = '';
-            if(in_array($t, $bad)){
-              $disabled = 'disabled';
-            }
-            echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
-            if($current_transition == $t){
-              $checked = 'checked'; //enable the next transition
-            } else {
-              $checked = '';
-            }
+          if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
+          if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
+          if($current_transition == 'RE') {$transitable = true; $available_transitions = array('LFS', 'GUT');}
+
+          foreach($available_transitions as $t){
+            echo '<div class="row"><div class="col-xs-6"><label><input type="radio" name="copy_transition" value="'.$t.'" />'.getNextERP($t, $proposal_row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
           }
           ?>
         </div>

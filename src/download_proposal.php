@@ -1,16 +1,12 @@
 <?php
-if(isset($_GET['propID'])){
-  $proposalID = intval($_GET['propID']);
+if(isset($_GET['proc'])){
+  $processID = intval($_GET['proc']);
 } else {
   die("Access denied.");
 }
 
 session_start();
 
-$proposal_number = '';
-if(isset($_GET['num'])){
-  $proposal_number = preg_replace("~[^A-Za-z0-9]~", "", $_GET['num']);
-}
 
 require dirname(__DIR__)."/plugins/fpdf/fpdf.php";
 
@@ -49,16 +45,17 @@ require "connection.php";
 require "language.php";
 require "utilities.php";
 
-$result = $conn->query("SELECT proposals.*, proposals.id AS proposalID, companyData.*, clientData.*, clientData.name AS clientName, companyData.name AS companyName,
+$result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, clientData.*, proposals.id AS proposalID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
   erpNumbers.yourSign, erpNumbers.yourOrder, erpNumbers.ourSign, erpNumbers.ourMessage
-  FROM proposals
+  FROM processHistory
+  INNER JOIN proposals ON processHistory.processID = proposals.id
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
   INNER JOIN erpNumbers ON erpNumbers.companyID = companyData.id
-  WHERE proposals.id = $proposalID");
+  WHERE processHistory.id = $processID");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);
   die();
@@ -125,9 +122,8 @@ if($row['address_Street'] && $row['address_Country_Postal'] && $row['address_Cou
 $pdf->Ln(5);
 //client proposal data
 $pdf->SetFontSize(14);
-if(!$proposal_number){
-  $proposal_number = $row['id_number'];
-}
+
+$proposal_number = $row['id_number'];
 $proposal_mark = preg_replace('/\d/', '', $proposal_number);
 
 $col = iconv('UTF-8', 'windows-1252',$lang['DATE'].": \n".$lang['EXPIRATION_DATE'].": \n".$lang['CLIENTS'].strtolower($lang['NUMBER']).": \n".$lang['VAT']." ID: ");
@@ -171,7 +167,7 @@ $i = 1;
 $netto_value = $vat_value = $cash_value = $part_sum_netto = 0;
 $pdf->SetFontSize(10);
 $prod_res = $conn->query("SELECT products.*, (quantity * price) AS total, percentage AS taxPercentage
-FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE proposalID = ".$row['proposalID'] .' ORDER BY position ASC');
+FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE historyID = ".$row['historyID'] .' ORDER BY position ASC');
 echo $conn->error;
 if($prod_res && $prod_res->num_rows > 0){
   $pdf->Ln(5);

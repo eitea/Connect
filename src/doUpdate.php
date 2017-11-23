@@ -2080,7 +2080,80 @@ if($row['version'] < 116){
   $conn->query("ALTER TABLE clientInfoBank MODIFY COLUMN iban VARCHAR(400)");
 
   $conn->query("ALTER TABLE accounts ADD COLUMN options VARCHAR(10) DEFAULT 'STAT' ");
+
+  $conn->query("CREATE TABLE processHistory(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_number VARCHAR(12) NOT NULL,
+    processID INT(6) UNSIGNED,
+    FOREIGN KEY (processID) REFERENCES proposals(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )");
+  echo $conn->error;
+
+  $stmt = $conn->prepare("INSERT INTO processHistory (id_number, processID) VALUES(?, ?) ");
+  $stmt->bind_param("si", $id_number, $processID);
+
+  $result = $conn->query("SELECT id, id_number, history FROM proposals");
+  while($row = $result->fetch_assoc()){
+    $processID = $row['id'];
+    $id_number = $row['id_number'];
+    $stmt->execute();
+    if($row['history']){
+      $arr = explode(' ', $row['history']);
+      foreach($arr as $a){
+        $id_number = $a;
+        $stmt->execute();
+      }
+    }
+  }
+  $stmt->close();
+  echo $conn->error;
+
+  $conn->query("ALTER TABLE proposals DROP COLUMN id_number");
+  $conn->query("ALTER TABLE proposals DROP COLUMN history");
+  echo $conn->error;
+
+  $conn->query("ALTER TABLE products DROP FOREIGN KEY products_ibfk_1"); echo $conn->error;
+  $conn->query("ALTER TABLE products DROP COLUMN proposalID");
+  $conn->query("ALTER TABLE products DROP INDEX position");
+
+  $conn->query("ALTER TABLE products ADD COLUMN historyID INT(6) UNSIGNED");
+  $conn->query("ALTER TABLE products ADD COLUMN origin VARCHAR(16)");
+  $conn->query("ALTER TABLE products ADD FOREIGN KEY (historyID) REFERENCES processHistory(id) ON UPDATE CASCADE ON DELETE CASCADE");
+  echo $conn->error;
+
+  $result = $conn->query("SELECT * FROM products");
+  $conn->query("DELETE FROM products");
+  $stmt = $conn->prepare("INSERT INTO products (name, description, historyID, origin, price, quantity, unit, taxID, cash, purchase, position, iv, iv2) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("ssisddsiddiss", $name, $desc, $historyID, $origin, $price, $quantity, $unit, $taxID, $cash, $purchase, $pos, $iv, $iv2);
+  echo $stmt->error;
+  while($row = $result->fetch_assoc()){
+    $name = $row['name'];
+    $desc = $row['description'];
+    $price = $row['price'];
+    $quantity = $row['quantity'];
+    $unit = $row['unit'];
+    $taxID = $row['taxID'];
+    $cash = $row['cash'];
+    $purchase = $row['purchase'];
+    $pos = $row['position'];
+    $iv = $row['iv'];
+    $iv2 = $row['iv2'];
+    $origin = randomPassword(16);
+  
+    $processRes = $conn->query("SELECT id FROM processHistory WHERE processID = ".$row['proposalID']); echo $conn->error;
+    while($processRes && ($processRow = $processRes->fetch_assoc())){
+      $historyID = $processRow['id'];
+      $stmt->execute();
+    }
+  }
+  echo $conn->error;
+  
+  $conn->query("ALTER TABLE products DROP COLUMN proposalID");
+  echo $conn->error;
 }
+
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

@@ -649,7 +649,6 @@ function create_tables($conn){
 
   $sql = "CREATE TABLE proposals(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_number VARCHAR(10) NOT NULL,
     clientID INT(6) UNSIGNED,
     status INT(2),
     curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -664,7 +663,6 @@ function create_tables($conn){
     representative VARCHAR(50),
     porto DECIMAL(8,2),
     portoRate INT(3),
-    history VARCHAR(100),
     header VARCHAR(400),
     referenceNumrow VARCHAR(10),
     FOREIGN KEY (clientID) REFERENCES clientData(id)
@@ -675,6 +673,41 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE processHistory(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_number VARCHAR(12) NOT NULL,
+    processID INT(6) UNSIGNED,
+    FOREIGN KEY (processID) REFERENCES proposals(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE products(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    taxID INT(4),
+    historyID INT(6) UNSIGNED,
+    position INT(4),
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(400),
+    price DECIMAL(10,2),
+    unit VARCHAR(20),
+    quantity DECIMAL(8,2),
+    purchase DECIMAL(10,2),    
+    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    iv VARCHAR(255),
+    iv2 VARCHAR(255),
+    origin VARCHAR(16),
+    FOREIGN KEY (historyID) REFERENCES processHistory(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  
   /* IMPORTANT:
   Tax IDs must always correspond to their current positon in place.
   Taxes may only be altered under supervision of an accountant
@@ -686,29 +719,6 @@ function create_tables($conn){
     code INT(2),
     account2 INT(4),
     account3 INT(4)
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "CREATE TABLE products(
-    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    taxID INT(4),
-    proposalID INT(6) UNSIGNED,
-    position INT(4),
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(400),
-    price DECIMAL(10,2),
-    unit VARCHAR(20),
-    quantity DECIMAL(8,2),
-    purchase DECIMAL(10,2),    
-    cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    iv VARCHAR(255),
-    iv2 VARCHAR(255),
-    UNIQUE KEY (proposalID, position),
-    FOREIGN KEY (proposalID) REFERENCES proposals(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

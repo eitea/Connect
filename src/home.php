@@ -258,7 +258,7 @@ if($result && ($row = $result->fetch_assoc())){
   if($result && ($row = $result->fetch_assoc())){
     $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffa4a4');
     do {
-      if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //chain
+      if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
         $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
         $color = $colors[$prev_row['status']];
         $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
@@ -267,6 +267,10 @@ if($result && ($row = $result->fetch_assoc())){
       }
       $prev_row = $row;
     } while($row = $result->fetch_assoc());
+    $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+    $color = $colors[$prev_row['status']];
+    $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+    $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
   }
 } else {
   $conn->error;

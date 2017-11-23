@@ -634,6 +634,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+                <li><a <?php if($this_page =='offer_proposal_edit.php'){echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESS']; ?></span></a></li>
                 <li><a id="erpClients" href="#" data-toggle="collapse" data-target="#toggleERPClients" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['CLIENTS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>

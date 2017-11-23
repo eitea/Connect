@@ -134,7 +134,6 @@ function match_passwordpolicy($p, &$out = ''){
 
 function getNextERP($identifier, $companyID, $offset = 0){
   require "connection.php";
-  if(!$companyID){$companyID = $available_companies[1]; }
   $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $companyID"); echo $conn->error;
   if($row = $result->fetch_assoc()){
     $offset = $row['erp_'.strtolower($identifier)];
@@ -142,17 +141,10 @@ function getNextERP($identifier, $companyID, $offset = 0){
     if($offset < 0) $offset = 0;
   }
   $vals = array($offset);
-
-  //get all the little shits which contain my shit
-  $result = $conn->query("SELECT id_number, history FROM proposals, clientData WHERE clientID = clientData.id AND companyID = $companyID AND (id_number LIKE '$identifier%' OR history LIKE '%$identifier%')");
+  $result = $conn->query("SELECT id_number FROM processHistory, proposals, clientData WHERE processID = proposals.id AND clientID = clientData.id AND companyID = $companyID AND id_number LIKE '$identifier%'");
+  echo $conn->error;
   while($result && ($row = $result->fetch_assoc())){
-    $history = explode(' ', $row['history']);
-    $history[] = $row['id_number'];
-    foreach($history as $h){
-      if(substr($h, 0, strlen($identifier)) == $identifier){
-        $vals[] = intval(substr($h, strlen($identifier))); //trim 0s
-      }
-    }
+    $vals[] = intval(substr($row['id_number'], strlen($identifier)));
   }
   return $identifier . sprintf('%0'.(10-strlen($identifier)).'d', max($vals) +1);
 }

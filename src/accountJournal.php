@@ -47,7 +47,7 @@ LEFT JOIN receiptBook r1 ON r1.journalID = account_journal.id
 WHERE a1.companyID = $cmpID $userQuery $dateQuery ORDER BY docNum, inDate");
 echo $conn->error;
 $csv = "belegnr;konto;gkto;belegdat;text;buchdat;bucod;betrag;steuer;steucod;mwst;symbol;periode;gegenbuchkz;verbuchkz\n";
-while($result && ($row = $result->fetch_assoc())){    
+while($result && ($row = $result->fetch_assoc())){
     if($row['account2'] && $row['account3']){
         if($row['should'] != 0) $t = $row['should'] * $row['percentage'] / 100;
         if($row['have'] != 0) $t = $row['have'] * $row['percentage'] / 100;
@@ -74,6 +74,7 @@ while($result && ($row = $result->fetch_assoc())){
     //### CSV ####
     if($row['should'] != 0) { $val = $row['should']; $code = 1; } else { $val = $row['have'] * -1; $code = 2; $t *= -1; }
     if($row['offNum'] >= 2800){ $sym = 'bk'; } else { $sym = 'ka'; }
+    if($row['code'] == 19 || $row['code'] == 9){ $t *= -1; }
     //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
     $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info']).';'
     .date('Ymd', strtotime($row['payDate'])).';'.$code.';'.number_format($val, 2, ',','.').';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage']
