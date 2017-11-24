@@ -834,12 +834,12 @@ $row = $result->fetch_assoc();
   <div class="container-fluid">
   <br><br>
   <div class="row">
-      <div class="col-sm-2 radio"><label><strong><?php echo $lang['VAT']; ?>:</strong></label></div>
-      <div class="col-sm-8 radio">
-        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="1" <?php if($companyRow['istVersteuerer'] == 'TRUE') echo 'checked'; ?>> Ist-Versteuerer</label>
-        <br>
-        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="0" <?php if($companyRow['istVersteuerer'] != 'TRUE') echo 'checked' ?>> Soll-Versteuerer</label>
-      </div>
+    <div class="col-sm-2 radio"><label><strong><?php echo $lang['VAT']; ?>:</strong></label></div>
+    <div class="col-sm-8 radio">
+      <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="1" <?php if($companyRow['istVersteuerer'] == 'TRUE') echo 'checked'; ?>> Ist-Versteuerer</label>
+      <br>
+      <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="0" <?php if($companyRow['istVersteuerer'] != 'TRUE') echo 'checked' ?>> Soll-Versteuerer</label>
+    </div>
   </div><br>
     <table class="table table-hover">
     <thead><tr>
@@ -895,18 +895,29 @@ $row = $result->fetch_assoc();
 </div>
 
 <script>
-  $('#account2').mask("0000");
+$('#account2').mask("0000");
 function startBlinker(){
   var blink = $('#blinker');
-    blink.attr('class', 'btn btn-warning blinking');
-    setInterval(function() {
-      blink.fadeOut(500, function() {
-        blink.fadeIn(500);
-      });
-    }, 1000);
+  blink.attr('class', 'btn btn-warning blinking');
+  setInterval(function() {
+    blink.fadeOut(500, function() {
+      blink.fadeIn(500);
+    });
+  }, 1000);
 }
-</script>
 
+$(document).ready(function(){
+  $('.table').DataTable({
+    order: [],
+    ordering: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    responsive: true,
+    autoWidth: false
+  });
+});
+</script>
 
 <?php endif;?>
 </div> <!-- /page-seperated-body -->

@@ -223,7 +223,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
         } //endwhile each history
         //TODO: i can only evaluate in here whether a transition still has open positions or not 
         //solve this either by a second iteration over questionable entries or... magic
-
+        
       } //endwhile each process
       echo $conn->error;
     ?>

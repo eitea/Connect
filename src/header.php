@@ -421,11 +421,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
     <div class="modal-header h4">Bewerte deinen Tag!</div>
     <div class="modal-body">Bevor du ausstempelst, kannst du dabei auch gleichzeitig ein kurzes Feedback abgeben.<br><br>
     <div class="btn-group btn-group-xs" style="padding-left:25%">
-  <button type="button" class="btn btn-emji emji1" title="Schrecklich">1</button>
-  <button type="button" class="btn btn-emji emji2" title="Enttäuschend">2</button>
-  <button type="button" class="btn btn-emji emji3" title="Neutral">3</button>
-  <button type="button" class="btn btn-emji emji4" title="Gut">4</button>
-  <button type="button" class="btn btn-emji emji5" title="Exzellent">5</button></div>
+    <button type="button" class="btn btn-emji emji1" title="Schrecklich">1</button>
+    <button type="button" class="btn btn-emji emji2" title="Enttäuschend">2</button>
+    <button type="button" class="btn btn-emji emji3" title="Neutral">3</button>
+    <button type="button" class="btn btn-emji emji4" title="Gut">4</button>
+    <button type="button" class="btn btn-emji emji5" title="Exzellent">5</button></div>
     <br><br> Drücke dafür statt "Ausstempeln" einfach auf eine Zahl von 1 für "Schrecklich" bis 5 für "Ausgezeichnet".
     <br><br>Damit wirst du ausgestempelt und lässt den Admin wissen, wie dein Tag war.
     <br><br>Bewertest du deinen Tag öfters, wird der Mittelwert deiner Bewertungen herangezogen.
