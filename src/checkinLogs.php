@@ -21,4 +21,10 @@
     ?>
     </tbody>
 </table>
+
+<?php
+while (list($var,$value) = each ($_SERVER)) {
+    echo "$var => $value <br />";
+ }
+?>
 <?php require __DIR__.'/footer.php'; ?>
