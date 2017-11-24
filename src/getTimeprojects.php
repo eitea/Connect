@@ -292,8 +292,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif post
 ?>
 
+
 <ul class="nav nav-tabs">
-  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
   <?php foreach($filterings['users'] as $u){
     $active = '';
     if($u == $activeTab) $active = 'class="active"';
@@ -305,7 +306,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <div class="tab-content">
   <!-- ############################### Projects ################################### -->
-  
   <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'active in';}?>">
   <div class="page-header"><h3><?php echo $lang['VIEW_PROJECTS']; ?><div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addProjectBookings" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
@@ -496,7 +496,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!-- ############################### UserData ################################### -->
 
 <?php foreach($filterings['users'] as $x): 
-if($activeTab == $x) {echo "<div id='$x' class'tab-pane fade active in'>"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
+if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
 ?>
 <div class="page-header"><h3><?php echo $lang['TIMESTAMPS']; ?>
 <div class="page-header-button-group">
