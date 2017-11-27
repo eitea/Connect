@@ -161,6 +161,7 @@ $modal_owner = "";
 $modal_employees = array();
 $modal_optional_employees = array();
 $modal_series = new ProjectSeries("","","");
+$modal_isAdmin = true;
 require "dynamicProjects_template.php";
 
 

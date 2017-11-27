@@ -73,7 +73,20 @@ if (!function_exists('stripSymbols')) {
                         <div id="dynamicCommentsSection2<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
                             <div class="modal-body">
                                 <!-- s2 -->
-                              s2
+                                <?php
+                                 $modal_result = $conn->query("SELECT picture FROM dynamicprojectspictures WHERE projectid='$modal_id'");
+                                while ($modal_row = $modal_result->fetch_assoc()) {
+                                    $picture = $modal_row["picture"];
+                                    array_push($pictures, $picture);
+                                    echo "<img  width='100%' src='$picture'>";
+                                }
+                                ?>
+                                <form method="post" id="commentsImageForm<?php echo stripSymbols($modal_id) ?>">
+                                 <label class="btn btn-default" role="button">Durchsuchen...
+                                        <input type="file" name="images" multiple class="form-control" style="display:none;" id="commentsImageUpload<?php echo stripSymbols($modal_id) ?>"
+                                            accept=".jpg,.jpeg,.png">
+                                    </label>
+                                    </form>
                                 <!-- /s2 -->
                             </div>
                         </div>
@@ -91,4 +104,11 @@ if (!function_exists('stripSymbols')) {
             </div>
         </div>
     </form>
+
+    <script>
+        $("#commentsImageUpload<?php echo stripSymbols($modal_id) ?>").change(function (event) {
+           $("#commentsImageForm<?php echo stripSymbols($modal_id) ?>").submit();
+        });
+
+    </script>
     <!-- /new dynamic project modal -->

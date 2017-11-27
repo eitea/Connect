@@ -22,6 +22,142 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
    $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
 }
 
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    $images = $_FILES;// ?? $_POST["images"];
+}
+
+
+
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
+    //edit deletes the project and recreates it
+    $forceCreate = true;
+    $id = $id = $_POST["id"] ?? "error - no id";
+    $id = $conn->real_escape_string($id);
+    $conn->query("DELETE FROM dynamicprojectsclients WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsoptionalemployees WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectspictures WHERE projectid = '$id'");
+    echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsseries WHERE projectid = '$id'");
+    echo $conn->error;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || $forceCreate)) {
+    $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
+    $id = $_POST["id"] ?? "";
+    $name = $_POST["name"] ?? "missing name";
+    $description = $_POST["description"] ?? "missing description";
+    $company = $_POST["company"] ?? false;
+    $color = $_POST["color"] ?? "#FFFFFF";
+    $start = $_POST["start"] ?? date("Y-m-d");
+    $end = $_POST["endradio"] ?? "";
+    $status = $_POST["status"] ?? 'DRAFT';
+    $priority = intval($_POST["priority"] ?? "3") ?? 3;
+    $parent = $_POST["parent"] ?? "";
+    $pictures = $_POST["imagesbase64"] ?? false;
+    $owner = $_POST["owner"] ?? $userID + "";
+    $clients = $_POST["clients"] ?? array();
+    $employees = $_POST["employees"] ?? array();
+    $optional_employees = $_POST["optionalemployees"] ?? array();
+    $completed = (int)$_POST["completed"] ?? 0;
+    //series one of: once daily_every_nth daily_every_weekday weekly monthly_day_of_month monthly_nth_day_of_week yearly_nth_day_of_month yearly_nth_day_of_week
+    $series = $_POST["series"] ?? "once";
+    if ($end == "no") {
+        $end = "";
+    }
+    else if ($end == "number") {
+        $end = $_POST["endnumber"] ?? "";
+    }
+    else if ($end == "date") {
+        $end = $_POST["enddate"] ?? "";
+    }
+    $series = new ProjectSeries($series, $start, $end);
+    $series->daily_days = (int)$_POST["daily_days"] ?? 1;
+    $series->weekly_weeks = (int)$_POST["weekly_weeks"] ?? 1;
+    $series->weekly_day = $_POST["weekly_day"] ?? "monday";
+    $series->monthly_day_of_month_day = (int)$_POST["monthly_day_of_month_day"] ?? 1;
+    $series->monthly_day_of_month_month = (int)$_POST["monthly_day_of_month_month"] ?? 1;
+    $series->monthly_nth_day_of_week_nth = (int)$_POST["monthly_nth_day_of_week_nth"] ?? 1;
+    $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] ?? "monday";
+    $series->monthly_nth_day_of_week_month = (int)$_POST["monthly_nth_day_of_week_month"] ?? 1;
+    $series->yearly_nth_day_of_month_nth = (int)$_POST["yearly_nth_day_of_month_nth"] ?? 1;
+    $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] ?? "JAN";
+    $series->yearly_nth_day_of_week_nth = (int)$_POST["yearly_nth_day_of_week_nth"] ?? 1;
+    $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] ?? "monday";
+    $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
+    // var_dump($series);
+    echo "<br><br><br>";
+    if ($parent == "none") {
+        $parent = "";
+    }
+    if (empty($company) || !is_numeric($company)) {
+        echo "Company not set";
+    }
+    if ($id == "") {
+        $id = uniqid($connectIdentification);
+        while ($conn->query("SELECT * FROM dynamicprojects WHERE projectid = 'asdf'")->num_rows != 0) {
+            $id = uniqid($connectIdentification);
+        }
+    }
+    $owner = intval($owner) ?? $userID;
+    $nextDate = $series->get_next_date();
+    // var_dump($series);
+    $series = serialize($series);
+    $series = base64_encode($series);
+
+
+    $description = $conn->real_escape_string($description);
+    $id = $conn->real_escape_string($id);
+    $name = $conn->real_escape_string($name);
+    $color = $conn->real_escape_string($color);
+    $start = $conn->real_escape_string($start);
+    $end = $conn->real_escape_string($end);
+    $status = $conn->real_escape_string($status);
+    $parent = $conn->real_escape_string($parent);
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed'");
+    echo $conn->error;
+    // series
+    $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
+    echo $conn->error;
+    $null = NULL;
+    $stmt->bind_param("b", $null);
+    $stmt->send_long_data(0, $series);
+    $stmt->execute();
+    echo $stmt->error;
+    // /series
+    if ($pictures) {
+        foreach ($pictures as $picture) {
+            // $conn->query("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id','$picture')");
+            $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
+            echo $conn->error;
+            $null = NULL;
+            $stmt->bind_param("b", $null);
+            $stmt->send_long_data(0, $picture);
+            $stmt->execute();
+            echo $stmt->error;
+        }
+    }
+    foreach ($clients as $client) {
+        $client = intval($client);
+        $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid) VALUES ('$id',$client)");
+    }
+    foreach ($employees as $employee) {
+        $employee = intval($employee);
+        $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
+    }
+    foreach ($optional_employees as $optional_employee) {
+        $optional_employee = intval($optional_employee);
+        $conn->query("INSERT INTO dynamicprojectsoptionalemployees (projectid, userid) VALUES ('$id',$optional_employee)");
+    }
+}
+
+
+
+
+
 ?>
 <!-- BODY -->
 <table class="table">
@@ -134,6 +270,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
         $modal_employees = $employees;
         $modal_optional_employees = $optional_employees;
         $modal_series = $series;
+        $modal_isAdmin = false;        
         $modal_completed = $completed;
         require "dynamicProjects_template.php";
         $modal_title = "Notes";
