@@ -24,6 +24,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     $images = $_FILES;// ?? $_POST["images"];
+
+
+
 }
 
 
@@ -172,7 +175,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
 </thead>
 <tbody>
     <?php
-    $result = $conn->query("SELECT * FROM dynamicprojects");
+    $dateNow = date('Y-m-d');
+    echo $dateNow;
+    $result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.* 
+    FROM dynamicprojects,dynamicprojectsemployees, dynamicprojectsoptionalemployees 
+    WHERE dynamicprojects.projectid = dynamicprojectsemployees.projectid 
+    AND dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid
+    AND ( dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID )
+    AND dynamicprojects.projectstatus = 'ACTIVE'
+    AND dynamicprojects.projectstart <= '$dateNow' 
+    AND (dynamicprojects.projectend = '' OR dynamicprojects.projectend > 0 OR dynamicprojects.projectend <= '$dateNow')
+    GROUP BY dynamicprojects.projectid
+    ORDER BY dynamicprojects.projectstart
+    ");
     while ($row = $result->fetch_assoc()) {
         $id = $row["projectid"];
         $name = $row["projectname"];
