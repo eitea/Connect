@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $priority = intval($_POST["priority"] ?? "3") ?? 3;
     $parent = $_POST["parent"] ?? "";
     $pictures = $_POST["imagesbase64"] ?? false;
-    $owner = $_POST["owner"] ?? $userID + "";
+    $owner = $_POST["owner"] ?? $userID ?? "";
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();

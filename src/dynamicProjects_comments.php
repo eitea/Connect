@@ -18,7 +18,6 @@ if (!function_exists('stripSymbols')) {
 
     
     <!-- new dynamic project modal -->
-    <form method="post" autocomplete="off" id="projectForm<?php echo stripSymbols($modal_id) ?>">
         <input type="hidden" name="id" value="<?php echo $modal_id ?>">
         <div class="modal fade" id="dynamicComments<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicCommentsLabel<?php echo stripSymbols($modal_id) ?>">
             <div class="modal-dialog" role="form">
@@ -81,10 +80,11 @@ if (!function_exists('stripSymbols')) {
                                     echo "<img  width='100%' src='$picture'>";
                                 }
                                 ?>
-                                <form method="post" id="commentsImageForm<?php echo stripSymbols($modal_id) ?>">
+                                <form enctype="multipart/form-data" method="POST" id="commentsImageForm<?php echo stripSymbols($modal_id) ?>">
+                                <input type="hidden" name="id" value="<?php echo $modal_id ?>">
+                                <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
                                  <label class="btn btn-default" role="button">Durchsuchen...
-                                        <input type="file" name="images" multiple class="form-control" style="display:none;" id="commentsImageUpload<?php echo stripSymbols($modal_id) ?>"
-                                            accept=".jpg,.jpeg,.png">
+                                        <input type="file" name="image" class="form-control" style="display:none;" id="commentsImageUpload<?php echo stripSymbols($modal_id) ?>">
                                     </label>
                                     </form>
                                 <!-- /s2 -->
@@ -103,7 +103,6 @@ if (!function_exists('stripSymbols')) {
                 </div>
             </div>
         </div>
-    </form>
 
     <script>
         $("#commentsImageUpload<?php echo stripSymbols($modal_id) ?>").change(function (event) {

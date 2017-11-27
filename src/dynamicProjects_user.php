@@ -2,7 +2,7 @@
 enableToDynamicProjects($userID); 
 require "dynamicProjects_classes.php";
 
-
+$forceCreate = false;
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
     $id = $_POST["id"] ?? "";
     $id = $conn->real_escape_string($id);
@@ -22,11 +22,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
    $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $images = $_FILES;// ?? $_POST["images"];
-
-
-
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])){
+    require_once __DIR__. "/utilities.php";
+    $project = $_POST["id"];
+    $picture = uploadFile("image", 1, 0, 1);
+    $picture = "data:image/jpeg;base64,".base64_encode( $picture );
+    $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
+    echo $conn->error;
+    $null = NULL;
+    $stmt->bind_param("b", $null);
+    $stmt->send_long_data(0, $picture);
+    $stmt->execute();
+    echo $stmt->error;
 }
 
 
@@ -53,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $id = $_POST["id"] ?? "";
     $name = $_POST["name"] ?? "missing name";
     $description = $_POST["description"] ?? "missing description";
-    $company = $_POST["company"] ?? false;
+    $company = $_POST["company"] ?? "";
     $color = $_POST["color"] ?? "#FFFFFF";
     $start = $_POST["start"] ?? date("Y-m-d");
     $end = $_POST["endradio"] ?? "";
@@ -61,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $priority = intval($_POST["priority"] ?? "3") ?? 3;
     $parent = $_POST["parent"] ?? "";
     $pictures = $_POST["imagesbase64"] ?? false;
-    $owner = $_POST["owner"] ?? $userID + "";
+    $owner = $_POST["owner"] ?? $userID ?? "";
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();
@@ -176,7 +183,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
 <tbody>
     <?php
     $dateNow = date('Y-m-d');
-    echo $dateNow;
     $result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.* 
     FROM dynamicprojects,dynamicprojectsemployees, dynamicprojectsoptionalemployees 
     WHERE dynamicprojects.projectid = dynamicprojectsemployees.projectid 
