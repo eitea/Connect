@@ -258,7 +258,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         warning1, warning2, warning3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ");
         if(!$conn->error && !$stmt_client->error && !$stmt_client_detail->error){
           $stmt_client->bind_param("ss", $name, $num);
-          $stmt_client_detail->bind_param("isssssssssssssssssssssiddd", $clientID, $lastname, $firstname, $title, $nameAddition, $gender, $street, $country, $postal, $city, $addressAddition, $phone, $fax, $debit, $datev, $accountName, $taxNum, $taxArea, $uid, $customerGroup, $creditLimit, $faktura, $karenztage, $warn1, $warn2, $warn3);
+          $stmt_client_detail->bind_param("issssssssssssiisssssdsiddd", $clientID, $lastname, $firstname, $title, $nameAddition, $gender, $street, $country, $postal, $city, $addressAddition, $phone, $fax, $debit, $datev, $accountName, $taxNum, $taxArea, $uid, $customerGroup, $creditLimit, $faktura, $karenztage, $warn1, $warn2, $warn3);
         } else {
           echo $conn->error .' err1<br>';
           echo $stmt_client->error .' err2<br>';
@@ -293,19 +293,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $addressAddition = convSet($line[11]);
           $phone = $line[12];
           $fax = $line[13];
-          $debit = $line[14];
-          $datev = $line[15];
+          $debit = intval($line[14]);
+          $datev = intval($line[15]);
           $accountName = convSet($line[16]);
           $taxNum = $line[17];
           $taxArea = convSet($line[18]);
           $uid = $line[19];
           $customerGroup = $line[20];
-          $creditLimit = $line[21];
+          $creditLimit = floatval($line[21]);
           $faktura = $line[22];
-          $karenztage = $line[23];
-          $warn1 = $line[24];
-          $warn2 = $line[25];
-          $warn3 = $line[26];
+          $karenztage = intval($line[23]);
+          $warn1 = floatval($line[24]);
+          $warn2 = floatval($line[25]);
+          $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
         }
         echo $stmt_client->error;
