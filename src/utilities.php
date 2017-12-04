@@ -536,7 +536,6 @@ function uploadFile($file_field, $check_image = true,$crop_square = false,$resiz
   if((!empty($_FILES[$file_field])) && ($_FILES[$file_field]['error'] == 0)) {
     // Get filename
     $file_info = pathinfo($_FILES[$file_field]['name']);
-    $name = $file_info['filename'];
     $ext = strtolower($file_info['extension']);
 
     //Check file has the right extension

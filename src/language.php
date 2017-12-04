@@ -197,6 +197,9 @@ $lang_ger['CLIENT_LIST'] = 'Kundenliste';
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
 
+$lang_eng['CONTACT_PERSON'] = 'Contact Person';
+$lang_ger['CONTACT_PERSON'] = 'Ansprechpartner';
+
 $lang_eng['CONTINUE'] = 'Continue';
 $lang_ger['CONTINUE'] = 'Weiter';
 
@@ -322,6 +325,9 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
+
+$lang_eng['DOCUMENTS'] = 'Documents';
+$lang_ger['DOCUMENTS'] = 'Dokumente';
 
 $lang_eng['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
 $lang_ger['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
@@ -1120,6 +1126,9 @@ $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
 
 $lang_eng['UPTODATE'] = 'Version is up tp date. ';
 $lang_ger['UPTODATE'] = 'Version ist aktuell. ';
+
+$lang_eng['UPLOAD'] ='Upload';
+$lang_ger['UPLOAD'] = 'Hochladen';
 
 $lang_eng['USED_DAYS'] ='Used Days';
 $lang_ger['USED_DAYS'] ='Verbrauchte Tage';

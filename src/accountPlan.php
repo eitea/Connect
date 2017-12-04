@@ -1,4 +1,4 @@
-<?php require 'header.php'; ?>
+<?php require 'header.php'; enableToFinance($userID); ?>
 
 <div class="page-header"><h3><?php echo $lang['ACCOUNT_PLAN']; ?><div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-finance-account" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>

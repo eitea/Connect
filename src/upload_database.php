@@ -1,4 +1,4 @@
-<?php require 'header.php'; enableToCore($userID); denyToContainer(); ?>
+<?php require 'header.php'; enableToCore($userID); ?>
 <?php
 if(isset($_POST['accept'])){
   $accept = true;
@@ -36,7 +36,14 @@ if($error_output){
 <?php echo $lang['WARNING_RESTORE']; ?>
 <br><br>
 
-<?php if(isset($_POST['letsAccept'])):  ?>
+<?php
+$accept = true;
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+  $accept = false;
+  $hash = '$2y$10$UsylMC44RCq73448jLFhU.SMzSBpFGK5d0uRSgh.7rLmo.f2gOvyO';
+  if(crypt($_POST['restore_password'], $hash) == $hash){ $accept = true; }
+}
+if($accept && isset($_POST['letsAccept'])):  ?>
   <form method="post" enctype="multipart/form-data">
     <div class="container-fluid">
       <br>
@@ -48,7 +55,10 @@ if($error_output){
   </form>
 <?php else: ?>
   <form method="post">
-    <button class="btn btn-warning" type="submit" name="letsAccept"><i class='fa fa-upload'></i> <?php echo $lang['YES_I_WILL']; ?></button>
+    <?php if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])): ?>
+      <div class="col-sm-2"><input type="text" name="restore_password" placeholder="password" class="form-control" /></div>
+    <?php endif; ?>
+    <div class="col-sm-3"><button class="btn btn-warning" type="submit" name="letsAccept"><i class='fa fa-upload'></i> <?php echo $lang['YES_I_WILL']; ?></button></div>
   </form>
 <?php endif; ?>
 

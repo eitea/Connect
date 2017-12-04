@@ -7,7 +7,7 @@ $routes = array(
   'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/book' => 'userProjecting.php',
   'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/ready' => 'readyPlan.php',
   
-  'social/home' => 'socialMedia.php',              
+  'social/home' => 'socialMedia.php',
 
   'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
   'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',
@@ -32,13 +32,17 @@ $routes = array(
   'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
   'erp/receipts' => 'receiptBook.php',             'erp/suppliers' => 'editSuppliers.php',
 
-  'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php'
+  'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php',
+  
+  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/display' => 'dsgvo_display.php',            'dsgvo/templates' => 'dsgvo_mail.php',
+  'dsgvo/edit' => 'dsgvo_edit.php'
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
   '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif",                '.woff' => "application/font-woff"
- );
+  '.gif' => "image/gif",                '.woff' => "application/font-woff", '.ttf' => "font/opentype"
+);
+
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -49,7 +53,7 @@ if($l > 1){
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
-  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.gif)$/", $url, $matches)){
+  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
     }

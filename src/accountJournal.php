@@ -1,5 +1,7 @@
 <?php
 require 'header.php';
+enableToFinance($userID);
+
 if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
     $cmpID = $_GET['n'];
 } else {

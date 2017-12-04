@@ -2149,10 +2149,94 @@ if($row['version'] < 116){
     }
   }
   echo $conn->error;
-  
   $conn->query("ALTER TABLE products DROP COLUMN proposalID");
   echo $conn->error;
 }
+
+
+if($row['version'] < 117){
+  $sql = "CREATE TABLE documents(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    name VARCHAR(50) NOT NULL,
+    txt MEDIUMTEXT NOT NULL,
+    version VARCHAR(15) NOT NULL DEFAULT 'latest',
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>DSGVO: Dokumente erstellt';
+  }
+
+  $conn->query("ALTER TABLE templateData ADD COLUMN type VARCHAR(10) NOT NULL DEFAULT 'report' ");
+  if(!$conn->error){
+    echo '<br>Vorlagen: E-Mail Templates erweitert';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+
+  $sql = "CREATE TABLE contactPersons (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    clientID INT(6) UNSIGNED,
+    firstname VARCHAR(150),
+    lastname VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    position VARCHAR(250),
+    responsibility VARCHAR(250),
+    FOREIGN KEY (clientID) REFERENCES clientData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>Kundenstamm: Ansprechpartner';
+  }
+  
+  $sql = "CREATE TABLE documentProcess(
+    id VARCHAR(16) NOT NULL PRIMARY KEY,
+    docID INT(6) UNSIGNED,
+    personID INT(6) UNSIGNED,
+    password VARCHAR(60) NOT NULL,
+    FOREIGN KEY (docID) REFERENCES documents(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY (personID) REFERENCES contactPersons(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>DSGVO: Dokument Sendevorgänge';
+  }
+  
+  $sql = "CREATE TABLE documentProcessHistory(
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    processID VARCHAR(16),
+    logDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    activity VARCHAR(20) NOT NULL,
+    info VARCHAR(450),
+    userAgent VARCHAR(150)
+  )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } else {
+    echo '<br>DSGVO: Prozess Logs erstellt';
+  }
+
+  $sql = "ALTER TABLE roles ADD COLUMN isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+  if($conn->query($sql)){
+    echo '<br>DSGVO Admin Rolle';
+  } else {
+    echo '<br>'.$conn->error;
+  }
+}
+
+
 
 
 //------------------------------------------------------------------------------

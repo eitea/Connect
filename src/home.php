@@ -281,7 +281,7 @@ if($result && ($row = $result->fetch_assoc())){
 $(document).ready(function(){
   setTimeout(function () {
     $("#calendar").fullCalendar({
-      height: 430,
+      height: 500,
       firstDay: 1,
       header: {
         left: 'prev, next today',
