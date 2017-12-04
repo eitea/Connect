@@ -10,9 +10,12 @@ function clean($string) {
 $processID = clean($_GET['n']);
 $proc_agent = $_SERVER['HTTP_USER_AGENT'];
 
-$stmt = $conn->query("INSERT INTO documentProcessHistory(processID, activity, info, userAgent) VALUES('$processID', ?, ?, '$proc_agent')");
+$stmt = $conn->prepare("INSERT INTO documentProcessHistory (processID, activity, info, userAgent) VALUES('$processID', ?, ?, '$proc_agent')");
 $stmt->bind_param("ss", $proc_activity, $proc_info);
 
+$proc_activity = 'visit';
+$proc_info = '';
+//$stmt->execute();
 
 $result = $conn->query("SELECT password, txt, documentProcess.id, documents.name AS docName, companyData.* FROM documentProcess
 LEFT JOIN documents ON documents.id = docID
@@ -20,10 +23,18 @@ LEFT JOIN companyData ON companyID = companyData.id
 WHERE documentProcess.id = '$processID'");
 
 if(!$result || $result->num_rows < 1){
-    
+    $proc_activity = 'invalid access';
+    $proc_info = 'ID in Link is invalid';
+    $stmt->execute();
+    echo "Invalid Access.";
+    die();
 }
+$stmt->close();
+$document_row = $result->fetch_assoc();
 
-$row = $result->fetch_assoc();
+if($document_row['password']){
+    //TODO: we want a password and an access denial
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,26 +53,30 @@ $row = $result->fetch_assoc();
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-4">
-                <?php if($row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $row['logo'] ).'"/>';} ?>
+                <?php if($document_row['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $document_row['logo'] ).'"/>';} ?>
             </div>
             <div class="col-sm-4 h2">
-                <?php echo $row['docName']; ?>
+                <?php echo $document_row['docName']; ?>
             </div>
             <div class="col-sm-4 text-right">
-                <p style="margin:0"><?php echo $row['cmpDescription']; ?></p>
-                <p style="margin:0"><?php echo $row['address']; ?></p>
-                <p style="margin:0"><?php echo $row['companyPostal'].' '.$row['companyCity']; ?></p>
-                <p style="margin:0"><?php echo $row['phone']; ?></p>
-                <p style="margin:0"><?php echo $row['homepage']; ?></p>
-                <p style="margin:0"><?php echo $row['mail']; ?></p>
+                <p style="margin:0"><?php echo $document_row['cmpDescription']; ?></p>
+                <p style="margin:0"><?php echo $document_row['address']; ?></p>
+                <p style="margin:0"><?php echo $document_row['companyPostal'].' '.$document_row['companyCity']; ?></p>
+                <p style="margin:0"><?php echo $document_row['phone']; ?></p>
+                <p style="margin:0"><?php echo $document_row['homepage']; ?></p>
+                <p style="margin:0"><?php echo $document_row['mail']; ?></p>
             </div>
         </div>
         <hr>
-        <div class="col-md-8 col-md-offset-2" style="overflow:auto; max-height:60vh;"><?php echo $row['txt'];?></div>
+        <div class="col-md-8 col-md-offset-2" style="overflow:auto; max-height:60vh;"><?php echo $document_row['txt'];?></div>
     </div>
 
     <?php
-
+        $processHistory = array();
+        $result = $conn->query("SELECT activity, info FROM documentProcessHistory WHERE processID = '$processID'");
+        while($row = $result->fetch_assoc()){
+            $processHistory[$row['activity']][] = $row['info'];
+        }
     ?>
 
 </body>

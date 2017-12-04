@@ -308,8 +308,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
         }
-        echo $stmt_client->error;
-        echo $stmt_client_detail->error;
         $stmt_client->close();
         $stmt_client_detail->close();
       } elseif(isset($_POST['uploadArticles'])){
@@ -329,7 +327,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->execute();
           }
         }
-        echo $stmt->error;
         $stmt->close();
       } else {
         echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
@@ -1004,8 +1001,8 @@ $row = $result->fetch_assoc();
 <!-- IMPORT -->
 <div class="page-seperated-section">
   <?php
-  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;23.11.2017 09:55;5;100;150;300");
-  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;23.11.2017 09:55;5;100;150;300");
+  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
+  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
   $csv_articles = iconv('UTF-8','windows-1252', "NAME;beschreibung;PREIS;einheit;barauslage;einkaufspreis;steuerID\nApfel;Eine Beschreibung von Apfel;100;Pkg;FALSE;80;3");
   ?>
   <h4>Import</h4>

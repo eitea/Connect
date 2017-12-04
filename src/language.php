@@ -1256,8 +1256,8 @@ $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau');
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
 
-$lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cencellation');
-$lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Storniernug');
+$lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cancellation');
+$lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');
 
 $lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education","spl" => "Special Leave",
   "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak");
