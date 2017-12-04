@@ -246,6 +246,28 @@ if(!empty($_POST['saveAll'])){
 
     $conn->query("UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+  } elseif(!empty($_POST['deleteContact'])){
+    $val = intval($_POST['deleteContact']);
+    $conn->query("DELETE FROM contactPersons WHERE id = $val");
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+    }
+  }
+}
+
+if(!empty($_POST['contacts_firstname']) && !empty($_POST['contacts_lastname']) && !empty($_POST['contacts_email'])){
+  $firstname = test_input($_POST['contacts_firstname']);
+  $lastname = test_input($_POST['contacts_lastname']);
+  $mail = test_input($_POST['contacts_email']);
+  $position = test_input($_POST['contacts_position']);
+  $resp = test_input($_POST['contacts_responsibility']);
+  $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility) VALUES ($filterClient, '$firstname', '$lastname', '$mail', '$position', '$resp')");
+  if($conn->error){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+  } else {
+    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
   }
 }
 
@@ -257,6 +279,7 @@ $row = $result->fetch_assoc();
 
 $resultNotes = $conn->query("SELECT * FROM $clientDetailNotesTable WHERE parentID = $detailID");
 $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID = $detailID");
+$resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $filterClient");
 ?>
 
 <div class="page-header">
@@ -397,7 +420,58 @@ $resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID 
           <input type="text" class="form-control" name="fax_number" value="<?php echo $row['fax_number']; ?>"  placeholder="Fax" />
         </div>
       </div>
+      <br><br>
+      <div class="row form-group">
+        <div class="col-xs-2 text-right">Ansprechpartner</div>
+        <div class="col-sm-10">
+          <table class="table">
+          <thead><tr>
+          <th>Name</th>
+          <th>E-Mail</th>
+          <th>Position</th>
+          <th>Verantwortung</th>
+          <th></th>
+          </tr></thead>
+          <tbody>
+          <?php
+          while($contactRow = $resultContacts->fetch_assoc()){
+            echo '<tr>';
+            echo '<td>'.$contactRow['firstname'].' '.$contactRow['lastname'].'</td>';
+            echo '<td>'.$contactRow['email'].'</td>';
+            echo '<td>'.$contactRow['position'].'</td>';
+            echo '<td>'.$contactRow['responsibility'].'</td>';
+            echo '<td><button type="submit" name="deleteContact" value="'.$contactRow['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+            echo '</tr>';
+          }
+          ?>
+          </tbody>
+          </table>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+        </div>
+      </div>
     </div>
+
+    
+<div id="add-contact-person" class="modal fade">
+  <div class="modal-dialog modal-content modal-md">
+    <div class="modal-header h4">Ansprechpartner Hinzufügen</div>
+    <div class="modal-body">
+      <div class="row form-group">
+          <div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>          
+          <div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
+      </div>
+      <div class="row form-group">
+        <div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
+        <div class="col-md-4"><label>Position</label><input type="text" name="contacts_position" placeholder="Position" class="form-control"/></div>
+        <div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+    </div>
+  </div>
+</div>
 
     <div id="menuTaxes" class="tab-pane fade <?php if($activeTab == 'taxes'){echo 'in active';}?>">
       <div class="row checkbox">

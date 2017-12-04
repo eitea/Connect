@@ -61,6 +61,4 @@ if($accept && isset($_POST['letsAccept'])):  ?>
     <div class="col-sm-3"><button class="btn btn-warning" type="submit" name="letsAccept"><i class='fa fa-upload'></i> <?php echo $lang['YES_I_WILL']; ?></button></div>
   </form>
 <?php endif; ?>
-
-
 <?php include 'footer.php'; ?>

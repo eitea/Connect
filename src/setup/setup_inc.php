@@ -426,6 +426,7 @@ function create_tables($conn){
     address_Country VARCHAR(50),
     address_Country_Postal VARCHAR(20),
     address_Country_City VARCHAR(50),
+    address_Addition VARCHAR(150),
     phone VARCHAR(20),
     fax_number VARCHAR(30),
     debitNumber INT(10),

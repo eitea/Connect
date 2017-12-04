@@ -107,6 +107,17 @@ function enableToFinance($userID){
   }
 }
 
+function enableToDSGVO($userID){
+  require 'connection.php';
+  $sql = "SELECT isFinanceAdmin FROM $roleTable WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
+  $result = $conn->query($sql);
+  if($userID != 1 && (!$result || $result->num_rows <= 0)){
+    echo 'Access denied. <a href="../user/logout"> logout</a>';
+    include 'footer.php';
+    die();
+  }
+}
+
 function enableToClients($userID){
   require 'connection.php';
   $sql = "SELECT isERPAdmin, isCoreAdmin FROM $roleTable WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE')";
@@ -140,5 +151,4 @@ function enableToSocialMedia($userID){
     die();
   }
 }
-
 ?>

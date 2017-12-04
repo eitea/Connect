@@ -27,17 +27,18 @@
     $isReportAdmin = $row['isReportAdmin'];
     $isERPAdmin = $row['isERPAdmin'];
     $isFinanceAdmin = $row['isFinanceAdmin'];
+    $isDSGVOAdmin = $row['isDSGVOAdmin'];
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
   } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
   }
 
   if($userID == 1){ //superuser
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = 'TRUE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'TRUE';
     $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
   }
 
@@ -95,6 +96,10 @@
   $validation_output = $error_output = '';
 
   if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2){
+        $_POST = array();
+    }
+    $_SESSION['posttimer'] = time();
     if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
@@ -736,6 +741,42 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           echo "<script>$('#adminOption_FINANCE').click();";
           if(isset($_GET['n'])){
             echo "$('#finance-click-".$_GET['n']."').click();";
+          }
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
+          echo '</script>';
+        }
+        ?>
+      <?php endif; ?>
+      <!-- Section Six: DSGVO -->
+      <?php if($isDSGVOAdmin == 'TRUE'): ?>
+        <div class="panel panel-default panel-borderless">
+          <div class="panel-heading">
+            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><strong style="padding: 0px 6px;"> § </strong>DSGVO<i class="fa fa-caret-down pull-right"></i></a>
+          </div>
+          <div id="collapse-dsgvo" class="panel-collapse collapse">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+                <?php
+                $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                while($result && ($row = $result->fetch_assoc())){
+                  echo '<li>';
+                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                  echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
+                  echo '<ul class="nav nav-list">';
+                  echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+                  echo '</ul></div></li>';
+                }
+                ?>
+              </ul>
+            </div>
+          </div>          
+        </div>
+        <?php
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page = "dsgvo_mail.php"){
+          echo "<script>$('#adminOption_DSGVO').click();";
+          if(isset($_GET['n'])){
+            echo "$('#tdsgvo-".$_GET['n']."').toggle();";
           }
           echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';

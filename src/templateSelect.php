@@ -51,7 +51,7 @@ if(isset($_POST['addRecipient'])){
     </thead>
     <tbody>
       <?php
-      $result = $conn->query("SELECT * FROM $pdfTemplateTable"); //IMPORTANT: changes to this query must also be applied to modal query!
+      $result = $conn->query("SELECT * FROM templateData WHERE type = 'report' "); //IMPORTANT: changes to this query must also be applied to modal query!
       while($result && ($row = $result->fetch_assoc())){
         $templID = $row['id'];
 
@@ -98,7 +98,7 @@ if(isset($_POST['modifyUserIDs'])){
   $conn->query("UPDATE $pdfTemplateTable SET userIDs = '$userIDs' WHERE id = ".$_POST['modifyUserIDs']);
   echo $conn->error;
 }
-$result = $conn->query("SELECT * FROM $pdfTemplateTable"); //CARE: changes to this query must also be applied to above query!
+$result = $conn->query("SELECT * FROM templateData WHERE type = 'report' "); //CARE: changes to this query must also be applied to above query!
 while($result && ($row = $result->fetch_assoc())):  //create a modal for every table above. So don't mess it up.
   ?>
   <!-- Modal: DELETE USERS -->
@@ -106,14 +106,14 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
     <div class="modal-dialog modal-sm" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Do you really wish to delete <?php echo $row['name']; ?> ?</h4>
+          <h4 class="modal-title"><?php echo $lang['DELETE']; ?></h4>
         </div>
         <form method="post">
           <div class="modal-body">
-            You can still go back and download a safe copy.
+          <?php echo sprintf($lang['ASK_DELETE'], $row['name']); ?>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-danger" name='removeTemplate' value="<?php echo $row['id']; ?>"><?php echo $lang['DELETE']; ?></button>
           </div>
         </form>
@@ -182,7 +182,6 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
     </form>
   </div>
 </div>
-
 
 <hr><h4 style="color:grey; font-weight:bold;"><?php echo $lang['PREVIEW']; ?>:</h4><hr>
 

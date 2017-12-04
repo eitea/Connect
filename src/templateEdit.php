@@ -1,7 +1,5 @@
-<?php include 'header.php'; ?>
-<?php enableToTemplate($userID); //template = core || reports ?>
+<?php include 'header.php'; enableToTemplate($userID); ?>
 
-<script src='../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <div class="page-header">
@@ -45,17 +43,6 @@ if($templateName == 'Main_Report'){
   die("Cannot edit Main Report");
 }
 ?>
-<style>
-.draggable {
-  border:none;
-  background:none;
-  background-color: #e9a954;
-  color:white;
-  margin-bottom: 1em;
-  padding: 10px;
-  width: 150px;
-}
-</style>
 
 <form method="POST">
   <div class="container-fluid">
@@ -73,12 +60,13 @@ if($templateName == 'Main_Report'){
     </div>
     <div class="col-sm-2">
       <br><br>Click to Insert: <br><br>
-      <button type="button" class="draggable" value='[BOOKINGS]' onclick="addText(this);"><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
-      <button type="button" class="draggable" value='[TIMESTAMPS]' onclick="addText(this);"><?php echo $lang['TIMESTAMPS']; ?></button>
+      <button type="button" class="btn btn-warning btn-block" value='[BOOKINGS]' onclick="addText(this);"><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
+      <button type="button" class="btn btn-warning btn-block" value='[TIMESTAMPS]' onclick="addText(this);"><?php echo $lang['TIMESTAMPS']; ?></button>
     </div>
   </form>
 </div>
 
+<script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
 tinymce.init({
   selector: 'textarea',

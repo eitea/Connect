@@ -1935,15 +1935,6 @@ if($row['version'] < 111){
   }
 }
 
-if($row['version'] < 112){
-  $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
-  if(!$conn->error){
-    echo '<br>Kunden und Lieferanten: Adresszusatz';
-  } else {
-    echo $conn->error;
-  }
-}
-
 if($row['version'] < 113){
   $conn->query("CREATE TABLE checkinLogs(
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -2236,7 +2227,9 @@ if($row['version'] < 117){
   }
 }
 
-
+if($row['version'] < 118){
+  $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
+}
 
 
 //------------------------------------------------------------------------------
