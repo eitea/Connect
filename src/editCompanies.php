@@ -238,7 +238,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //validate uploaded file
     function convSet($s){
       $s = test_input($s);
-      return trim(iconv(mb_detect_encoding($s, mb_detect_order(), true), "UTF-8", $s));
+      return trim(iconv(mb_detect_encoding($s), "UTF-8", $s));
     }
     $error = '';
     $file_info = pathinfo($_FILES['csvUpload']['name']);
@@ -285,7 +285,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $lastname = convSet($line[3]);
           $title = convSet($line[4]);
           $nameAddition = convSet($line[5]);
-          $gender = $line[6];
+          $gender = in_array($line[6], array('male', 'female')) ? $line[6] : 'male';
           $street = convSet($line[7]);
           $postal = $line[8];
           $city = convSet($line[9]);
