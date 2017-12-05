@@ -770,10 +770,10 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 ?>
               </ul>
             </div>
-          </div>          
+          </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page = "dsgvo_mail.php"){
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php"){
           echo "<script>$('#adminOption_DSGVO').click();";
           if(isset($_GET['n'])){
             echo "$('#tdsgvo-".$_GET['n']."').toggle();";

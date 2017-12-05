@@ -2227,10 +2227,6 @@ if($row['version'] < 117){
   }
 }
 
-if($row['version'] < 118){
-  $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
-}
-
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

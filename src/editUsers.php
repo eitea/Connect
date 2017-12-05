@@ -201,11 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['isCoreAdmin'.$x])){
       $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
     } else {
-      if($x != 1){
-        $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
-      } else {
-        $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
-      }
+      $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
     }
     $conn->query($sql);
 
@@ -238,6 +234,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
       $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
+    }$conn->query($sql);
+    if(isset($_POST['isDSGVOAdmin'.$x])){
+      $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
     if(isset($_POST['canStamp'.$x])){
@@ -402,6 +403,7 @@ $(document).ready(function(){
       $isReportAdmin = $row['isReportAdmin'];
       $isERPAdmin = $row['isERPAdmin'];
       $isFinanceAdmin = $row['isFinanceAdmin'];
+      $isDSGVOAdmin = $row['isDSGVOAdmin'];
       $canBook = $row['canBook'];
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
@@ -529,7 +531,10 @@ $(document).ready(function(){
                     </label><br>
                     <label>
                       <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
-                    </label>                    
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isDSGVOAdmin<?php echo $x; ?>" <?php if($isDSGVOAdmin == 'TRUE'){echo 'checked';} ?> />DSGVO
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-4">

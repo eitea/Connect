@@ -8,8 +8,6 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   redirect("../user/logout");
 }
 
-echo filter_var('szaradbs@mail.uc.edu', FILTER_VALIDATE_EMAIL);
-
 //get corresponding id from detailTable
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
 if($result && ($row = $result->fetch_assoc())){
@@ -776,6 +774,84 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
       <div class="container-fluid text-right">
         <button type="submit" class="btn btn-warning" name="addNotes">Hinzufügen</button> <button type="submit" class="btn btn-danger" name="deleteNotes">Löschen</button>
       </div>
+    </div>
+
+    <div id="menuDocs" class="tab-pane fade <?php if($activeTab == 'docs'){echo 'in active';}?>">
+      <h3>Vertrauliche Dokumente</h3>
+      <hr>
+      <table class="table table-hover">
+      <thead><tr>
+      <th>Ansprechpartner</th>
+      <th>Dokument</th>
+      <th>Passwort</th>
+      <th></th>
+      <th></th>
+      </tr></thead>
+      <tbody>
+      <?php
+      $resultProc = $conn->query("SELECT name, password, firstname, lastname, documentProcess.id FROM documents, documentProcess, contactPersons WHERE clientID = $filterClient AND personID = contactPersons.id AND docID = documents.id");
+      while($rowProc = $resultProc->fetch_assoc()){
+        echo '<tr style="background-color:#dedede">';
+        echo '<td>'.$rowProc['firstname'].' '.$rowProc['lastname'].'</td>';
+        echo '<td>'.$rowProc['name'].'</td>';
+        echo $rowProc['password'] ? '<td>Ja</td>' : '<td>Nein</td>';
+        echo '<td></td>';
+        echo '<td></td>';
+        echo '</tr>';
+
+        $processHistory = array();
+        $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '".$rowProc['id']."'");
+        while($row = $result->fetch_assoc()){
+          if(isset($processHistory[$row['activity']])){
+            $processHistory[$row['activity']]['count'] += 1;
+          } else {
+            $processHistory[$row['activity']]['info'] = $row['info'];
+            $processHistory[$row['activity']]['userAgent'] = $row['userAgent'];
+            $processHistory[$row['activity']]['logDate'] = $row['logDate'];
+            $processHistory[$row['activity']]['count'] = 1;
+          }
+        }
+        if(isset($processHistory['ENABLE_READ'])){
+          $val_stat = 'Ausstehend';
+          $val_date = $val_head = '';
+          if(isset($processHistory['action_read'])){
+            $val_stat = 'Ja';
+            $val_date = $processHistory['ENABLE_READ']['logDate'];
+            $val_head = $processHistory['ENABLE_READ']['userAgent'];
+          }
+          echo '<tr><td></td> <td>Als Gelesen markiert</td> <td>'.$val_stat.'</td> <td>'.$val_date.'</td> <td>'.$val_head.'</td></tr>';
+        }
+        if(isset($processHistory['ENABLE_SIGN'])){
+          $val_stat = 'Ausstehend';
+          $val_date = $val_head = '';
+          if(isset($processHistory['action_sign'])){
+            $val_stat = $processHistory['action_sign']['info'];
+            $val_date = $processHistory['action_sign']['logDate'];
+            $val_head = $processHistory['action_sign']['userAgent'];
+          }
+          echo '<tr><td></td> <td>Unterschrieben</td> <td>'.$val_stat.'</td> <td>'.$val_date.'</td> <td>'.$val_head.'</td></tr>';
+        }
+        if(isset($processHistory['ENABLE_ACCEPT'])){
+          $val_stat = 'Ausstehend';
+          $val_date = $val_head = '';
+          if(isset($processHistory['action_accept'])){
+            $val_stat = $processHistory['action_accept'] == 'DECLINED' ? 'Nein' : 'Ja';
+            $val_date = $processHistory['action_accept']['logDate'];
+            $val_head = $processHistory['action_accept']['userAgent'];
+          }
+          echo '<tr><td></td> <td>Akzeptiert</td> <td>'.$val_stat.'</td> <td>'.$val_date.'</td> <td>'.$val_head .'</td></tr>';
+        }
+        if($rowProc['password'] && isset($processHistory['password_denied'])){
+          $val_stat = $processHistory['password_denied']['count'];
+          $val_date = $processHistory['password_denied']['logDate'];
+          $val_head = $processHistory['password_denied']['userAgent'];
+          
+          echo '<tr><td></td> <td>Passwort Falscheingaben</td> <td>'.intval($val_stat).'x Mal</td> <td>'.$val_date.'</td> <td>'.$val_head.'</td></tr>';
+        }
+      }
+      ?>
+      </tbody>
+      </table>
     </div>
   </div>
 </form>
