@@ -8,6 +8,8 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
   redirect("../user/logout");
 }
 
+echo filter_var('szaradbs@mail.uc.edu', FILTER_VALIDATE_EMAIL);
+
 //get corresponding id from detailTable
 $result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
 if($result && ($row = $result->fetch_assoc())){
@@ -298,6 +300,7 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
   <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling" onclick="$('#sav').val('billing');"><?php echo $lang['BILLING']; ?></a></li>
   <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment" onclick="$('#sav').val('payment');"><?php echo $lang['PAYMENT']; ?></a></li>
   <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact" onclick="$('#sav').val('notes');"><?php echo $lang['NOTES']; ?></a></li>
+  <li <?php if($activeTab == 'docs'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuDocs" onclick="$('#sav').val('docs');"><?php echo $lang['DOCUMENTS']; ?></a></li>
 </ul>
 <form id="mainForm" method="POST">
   <div class="tab-content">

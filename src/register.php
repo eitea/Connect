@@ -7,6 +7,7 @@
 </div>
 
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
 $step = 1;
 $firstname = $lastname = "";
 
@@ -118,8 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if($accept){
         //send accessdata if user gets created
         if(!empty($_POST['real_email']) && filter_var($_POST['real_email'], FILTER_VALIDATE_EMAIL)){
-          require_once dirname(__DIR__)."/plugins/phpMailer/class.phpmailer.php";
-          require_once dirname(__DIR__)."/plugins/phpMailer/class.smtp.php";
+          require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
           $recipients = $_POST['real_email'];
           $mail = new PHPMailer();
           $mail->CharSet = 'UTF-8';

@@ -25,27 +25,35 @@ if(!in_array($proposal_row['companyID'], $available_companies)){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'].' 12:00:00')){
     $meta_curDate = test_input($_POST['meta_curDate'].' 12:00:00');
+    $proposal_row['curDate'] = $meta_curDate;
   }
   if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'].' 12:00:00')){
     $meta_deliveryDate = test_input($_POST['meta_deliveryDate'].' 12:00:00');
+    $proposal_row['deliveryDate'] =  $meta_deliveryDate;
   }
   if(isset($_POST['meta_paymentMethod'])){
     $meta_paymentMethod = test_input($_POST['meta_paymentMethod']);
+    $proposal_row['paymentMethod'] =  $meta_paymentMethod;
   }
   if(isset($_POST['meta_shipmentType'])){
     $meta_shipmentType = test_input($_POST['meta_shipmentType']);
+    $proposal_row['shipmentType'] =  $meta_shipmentType;
   }
   if(isset($_POST['meta_representative'])){
     $meta_representative = test_input($_POST['meta_representative']);
+    $proposal_row['representative'] =  $meta_representative;
   }
   if(isset($_POST['meta_porto'])){
     $meta_porto = floatval($_POST['meta_porto']);
+    $proposal_row['porto'] =  $meta_porto;
   }
   if(isset($_POST['meta_header'])){
     $meta_header = test_input($_POST['meta_header']);
+    $proposal_row['header'] =  $meta_header;
   }
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
+    $proposal_row['portoRate'] =  $meta_porto_percentage;
   }
 
   if(isset($_POST['translate'])){
@@ -204,7 +212,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   if(isset($_POST['meta_save'])){
     $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', 
-    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id ".$proposal_row['id']);
+    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id = ".$proposal_row['id']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 } //END POST

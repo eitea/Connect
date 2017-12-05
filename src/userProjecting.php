@@ -312,7 +312,7 @@ endif;
     <div id="mySelections"><br>
       <?php if(count($available_companies) > 2): ?>
         <div class="col-sm-2">
-          <select name="filterCompany"  class="js-example-basic-single" class="" onchange="showClients(this.value, 0)">
+          <select id="companyHint" name="filterCompany" class="js-example-basic-single" class="" onchange="showClients(this.value, 0)">
             <option value="0"><?php echo $lang['COMPANY']; ?>...</option>
             <?php
             $query = "SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).") ";
@@ -401,7 +401,7 @@ function textAreaAdjust(o) {
   o.style.height = "90px";
   o.style.height = (o.scrollHeight)+"px";
 }
-function showClients(company, client){
+function showClients(company, client, project){
   $.ajax({
     url:'ajaxQuery/AJAX_getClient.php',
     data:{companyID:company, clientID:client},
@@ -411,7 +411,11 @@ function showClients(company, client){
     },
     error : function(resp){},
     complete : function(resp){
-      showProjects($("#clientHint").val(), 0);
+      if(project){
+        showProjects($("#clientHint").val(), project);
+      } else {
+        showProjects($("#clientHint").val(), 0);
+      }
     }
   });
 }
@@ -437,7 +441,10 @@ function showProjectfields(project){
     success : function(resp){
       $("#project_fields").html(resp);
     },
-    error : function(resp){}
+    error : function(resp){},
+    complete : function(resp){
+      fill_keepFields();
+    }
   });
 }
 function showMyDiv(o, toShow){
@@ -447,19 +454,27 @@ function showMyDiv(o, toShow){
     document.getElementById(toShow).style.display='none';
   }
 }
+
+function fill_keepFields(){}
 </script>
 
-<?php if($keepFields && isset($_POST['filterClient']) && isset($_POST['filterProject'])){
-  //instead of the wait you COULD set a callback function in showProjectfields() "complete: "
-  echo '<script>
-        showProjects('.$_POST['filterClient'].', '.$_POST['filterProject'].');
-        showProjectfields('.$_POST['filterProject'].');
-        setTimeout(function() {
-          $("#pro_field_1").val("'.substr($field_1,1,-1).'");
-          $("#pro_field_2").val("'.substr($field_2,1,-1).'");
-          $("#pro_field_3").val("'.substr($field_3,1,-1).'");
-        }, 1000);
-        </script>';
+<?php
+if($keepFields){
+  echo '<script>';
+  if(isset($_POST['filterCompany'])){
+    echo '$("#companyHint").val("'.$_POST['filterCompany'].'");';
+  }
+  if(isset($_POST['filterCompany']) && isset($_POST['filterClient'])){
+    echo 'showClients('.$_POST['filterCompany'].', '.$_POST['filterClient'].', '.$_POST['filterProject'].');';
+  }
+  if(isset($_POST['filterClient']) && isset($_POST['filterProject'])){
+    echo 'fill_keepFields = function() {
+      $("#pro_field_1").val("'.substr($field_1,1,-1).'");
+      $("#pro_field_2").val("'.substr($field_2,1,-1).'");
+      $("#pro_field_3").val("'.substr($field_3,1,-1).'");
+    };';
+  }
+  echo '</script>';
 }
 ?>
 

@@ -8,6 +8,8 @@ if(!empty($_POST['captcha'])){
   include 'utilities.php';
 }
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 $proceed = false;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $result = $conn->query("SELECT email FROM UserData");
@@ -107,8 +109,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("INSERT INTO $userRequests(userID, fromDate, status, requestType) VALUES($curID, UTC_TIMESTAMP, '0', 'acc')");
 
         //send accessdata
-        require_once dirname(__DIR__)."/plugins/phpMailer/class.phpmailer.php";
-        require_once dirname(__DIR__)."/plugins/phpMailer/class.smtp.php";
+        require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
         $mail = new PHPMailer();
         $mail->CharSet = 'UTF-8';
         $mail->Encoding = "base64";
