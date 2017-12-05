@@ -455,9 +455,9 @@ function showMyDiv(o, toShow){
         showProjects('.$_POST['filterClient'].', '.$_POST['filterProject'].');
         showProjectfields('.$_POST['filterProject'].');
         setTimeout(function() {
-          $("#pro_field_1").val("'.$field_1.'");
-          $("#pro_field_2").val("'.$field_2.'");
-          $("#pro_field_3").val("'.$field_3.'");
+          $("#pro_field_1").val("'.substr($field_1,1,-1).'");
+          $("#pro_field_2").val("'.substr($field_2,1,-1).'");
+          $("#pro_field_3").val("'.substr($field_3,1,-1).'");
         }, 1000);
         </script>';
 }
