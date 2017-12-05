@@ -2,6 +2,19 @@
 enableToDynamicProjects($userID); 
 require "dynamicProjects_classes.php";
 
+if (!function_exists('stripSymbols')) {
+    function stripSymbols($s)
+    {
+        $result = "";
+        foreach (str_split($s) as $char) {
+            if (ctype_alnum($char)) {
+                $result = $result . $char;
+            }
+        }
+        return $result;
+    }
+}
+
 $forceCreate = false;
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
     $id = $_POST["id"] ?? "";
@@ -164,6 +177,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
 }
 
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    // CREATE TABLE dynamicprojectsbookings(
+    //     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    //     bookingstart DATETIME,
+    //     bookingend DATETIME,
+    //     userid INT(6) UNSIGNED,
+    //     bookingtext VARCHAR(1000)
+    //   );
+    $projectID = $_POST["id"] ?? "";
+    if(isset($_POST["play"])){
+        $conn->query("INSERT INTO dynamicprojectsbookings (projectid, userid) VALUES ('$projectID', $userID)");
+    }else if(isset($_POST["pause"])){
+        $bookingtext = $_POST["description"];
+        $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
+        echo $conn->error;
+    }else if(isset($_POST["stop"])){
+        echo "stop not implemented";
+        //insert into bookings with text
+    }
+}
 
 
 
@@ -272,8 +305,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
             echo "$optional_employee, ";
         }
         echo "</td>";
-
-        echo "<td>";
         $modal_title = "Edit Dynamic Project";
         $modal_name = $name;
         $modal_company = $company;
@@ -293,11 +324,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         $modal_series = $series;
         $modal_isAdmin = false;        
         $modal_completed = $completed;
+        echo "<td><form method='post'>";
+            echo "<input type='hidden' name='id' value='$id'/>";        
+            $bookingActive = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL")->num_rows > 0;
+            if(!$bookingActive){
+                echo "<button class='btn btn-default' type='submit' name='play'  value='true'><i class='fa fa-play' ></i></button>";                
+            }else{
+                $strippedID = stripSymbols($id);
+                echo $conn->error;
+                echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
+                echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
+            }
+            ?>
+
+            <!-- group settings modal -->
+                <div class="modal fade" id="bookDynamicProject<?php echo stripSymbols($modal_id); ?>" tabindex="-1" role="dialog" aria-labelledby="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
+                    <div class="modal-dialog" role="form">
+                        <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
+                                        What did you do?
+                                    </h4>
+                                </div>
+                                <br>
+                                <div class="modal-body">
+                                    <!-- modal body -->
+                                        <textarea name="description" required>
+
+                                        </textarea>
+
+                                    </form>
+                                    <!-- /modal body -->
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary" name="pause" value="true"><?php echo $lang['SAVE']; ?></button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- /group settings modal -->
+
+            <?php
+
+        echo "</form></td>";
+
+        echo "<td>";
+       
         require "dynamicProjects_template.php";
         $modal_title = "Notes";
         require "dynamicProjects_comments.php";
         echo "</td>";
         echo "</tr>";
+
+        ?>
+        <!--<button data-toggle="modal" data-target='#bookDynamicProject<?php echo stripSymbols($modal_id); ?>' >Toggle_</button>-->
+          
+
+        <?php
     }
     ?>
 </tbody>

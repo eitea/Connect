@@ -1666,6 +1666,14 @@ if($row['version'] < 102){
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
+    CREATE TABLE dynamicprojectsbookings(
+      projectid VARCHAR(100) NOT NULL,
+      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
+      bookingend DATETIME,
+      userid INT(6) UNSIGNED,
+      bookingtext VARCHAR(1000)
+    );
     ");    
   }
 
