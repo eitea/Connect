@@ -450,10 +450,10 @@ $lang_eng['FINANCES'] = 'Finances';
 $lang_ger['FINANCES'] = 'Finanzen';
 
 $lang_eng['FINANCE_CREDIT'] = 'Credit';
-$lang_ger['FINANCE_CREDIT'] = 'Haben';
+$lang_ger['FINANCE_CREDIT'] = 'Einnahme';
 
 $lang_eng['FINANCE_DEBIT'] = 'Debit';
-$lang_ger['FINANCE_DEBIT'] = 'Soll';
+$lang_ger['FINANCE_DEBIT'] = 'Ausgabe';
 
 $lang_eng['FIRSTNAME'] = 'First Name';
 $lang_ger['FIRSTNAME'] = 'Vorname';
