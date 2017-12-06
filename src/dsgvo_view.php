@@ -12,6 +12,15 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 }
 $cmpID = intval($_GET['n']);
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  if(isset($_POST['addDocument']) && !empty($_POST['add_docName'])){
+    $val = test_input($_POST['add_docName']);
+    $conn->query("INSERT INTO documents(name, txt, companyID, version) VALUES('$val', ' ', $cmpID, '1.0') ");
+    if($conn->error){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    } else {
+      redirect("edit?d=".$conn->insert_id);
+    }
+  }
   if(isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])){
     $processID = uniqid();
     $docID = intval($_POST['send_document']);
