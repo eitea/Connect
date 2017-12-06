@@ -1,4 +1,3 @@
-
 <?php require 'header.php'; enableToDSGVO($userID); ?>
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?><div class="page-header-button-group">
   <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></a>
