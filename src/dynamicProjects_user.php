@@ -326,15 +326,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $modal_completed = $completed;
         echo "<td><form method='post'>";
             echo "<input type='hidden' name='id' value='$id'/>";        
-            $bookingActive = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL")->num_rows > 0;
+            $bookingActive = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id' AND bookingend IS NULL")->num_rows > 0;
             if(!$bookingActive){
-                echo "<button class='btn btn-default' type='submit' name='play'  value='true'><i class='fa fa-play' ></i></button>";                
+                echo "<button class='btn btn-default' type='submit' name='play' value='true'><i class='fa fa-play' ></i></button>";                
             }else{
                 $strippedID = stripSymbols($id);
                 echo $conn->error;
                 echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
-                echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
-            }
+                //echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
             ?>
 
             <!-- group settings modal -->
@@ -350,10 +349,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <br>
                                 <div class="modal-body">
                                     <!-- modal body -->
-                                        <textarea name="description" required>
-
-                                        </textarea>
-
+                                        <textarea name="description" required class="form-control"></textarea>
                                     </form>
                                     <!-- /modal body -->
                                 </div>
@@ -366,6 +362,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <!-- /group settings modal -->
 
             <?php
+            }
 
         echo "</form></td>";
 

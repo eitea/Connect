@@ -13,7 +13,7 @@ if (!function_exists('stripSymbols')) {
 }
 ?>
     <button class="btn btn-default" data-toggle="modal" data-target="#dynamicComments<?php echo stripSymbols($modal_id) ?>" type="button">
-        <i class="fa fa-comment"></i>
+        <i class="fa fa-bookmark"></i>
     </button>
 
     
@@ -37,7 +37,10 @@ if (!function_exists('stripSymbols')) {
                             <a data-toggle="tab" href="#dynamicCommentsSection1<?php echo stripSymbols($modal_id) ?>">Notizen</a>
                         </li>
                         <li>
-                            <a data-toggle="tab" href="#dynamicCommentsSection2<?php echo stripSymbols($modal_id) ?>">Section 2</a>
+                            <a data-toggle="tab" href="#dynamicCommentsSection2<?php echo stripSymbols($modal_id) ?>">Bilder</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#dynamicCommentsSection3<?php echo stripSymbols($modal_id) ?>">Buchungen</a>
                         </li>
                     </ul>
                     <!-- /tab buttons -->
@@ -88,6 +91,34 @@ if (!function_exists('stripSymbols')) {
                                     </label>
                                     </form>
                                 <!-- /s2 -->
+                            </div>
+                        </div>
+                        <div id="dynamicCommentsSection3<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
+                            <div class="modal-body">
+                                <!-- s3 -->
+                                <?php //
+                                $modal_result = $conn->query("SELECT sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id'");
+                                echo $conn->error;
+                                $overall_hours = $modal_result->fetch_assoc()["timediff"];
+                                $overall_hours = round(floatval($overall_hours),2);
+                                echo "Insgesamt: $overall_hours Stunden";
+                                $modal_result = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id'");
+                                echo "<table class='table'>";
+                                while($modal_row = $modal_result->fetch_assoc()){
+                                    echo "<tr>";
+                                    echo "<td>${modal_row['bookingstart']}</td>";
+                                    if($modal_row["bookingend"]){
+                                        echo "<td>${modal_row['bookingend']}</td>";
+                                        echo "<td>${modal_row['bookingtext']}</td>";
+                                    }else{
+                                        echo "<td>Jetzt</td><td>Noch kein Text</td>";
+                                    }
+                                    echo "</tr>";
+                                }
+                                echo "</table>";
+
+                                ?>
+                                <!-- /s3 -->
                             </div>
                         </div>
                     </div>
