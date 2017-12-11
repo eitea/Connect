@@ -36,6 +36,8 @@ $routes = array(
   
   'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',            'dsgvo/templates' => 'dsgvo_mail.php',
   'dsgvo/edit' => 'dsgvo_edit.php',
+
+  's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",

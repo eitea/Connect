@@ -1052,7 +1052,7 @@ function create_tables($conn){
   $sql = "CREATE TABLE documents(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     companyID INT(6) UNSIGNED,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     txt MEDIUMTEXT NOT NULL,
     version VARCHAR(15) NOT NULL DEFAULT 'latest',
     FOREIGN KEY (companyID) REFERENCES companyData(id)

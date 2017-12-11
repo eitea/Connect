@@ -2227,6 +2227,12 @@ if($row['version'] < 117){
   }
 }
 
+if($row['version'] < 118){
+	$sql = "ALTER TABLE documents MODIFY COLUMN name VARCHAR(100) NOT NULL";
+	if(!$conn->query($sql)){
+		echo '<br>'.$conn->error;
+	}
+}
 
 //------------------------------------------------------------------------------
 require 'version_number.php';

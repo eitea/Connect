@@ -50,7 +50,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     //contactPerson
     $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
     $contact_row = $result->fetch_assoc();
-
+    
     //build the content
     if($_POST['send_template']){
       $val = intval($_POST['send_template']);

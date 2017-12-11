@@ -21,7 +21,7 @@ if(isset($_POST['newDate'])){
 $display_all = true;
 $sql = "SELECT isTimeAdmin FROM $roleTable WHERE userID = $userID AND isTimeAdmin = 'TRUE'";
 $result = $conn->query($sql);
-if(!$result || $result->num_rows <= 0){
+if($userID != 1 && (!$result || $result->num_rows <= 0)){
   $display_all = false;
   $curID = $userID; //do not let him change this via url
 }

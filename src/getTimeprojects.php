@@ -73,7 +73,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $days = (timeDiff_Hours($i, $_POST['add_multiple_end'].' 08:00:00')/24) + 1; //days
       for($j = 0; $j < $days; $j++){
         //get the expected Hours for currenct day (read the latest interval which matches criteria)
-        $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) < DATE('$i') ORDER BY startDate DESC");
+        $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) <= DATE('$i') ORDER BY startDate DESC");
         if ($result && ($row = $result->fetch_assoc())) {
           $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
           if($expected != 0){
@@ -590,7 +590,7 @@ if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; 
             echo '<td>' . displayAsHoursMins($saldo_month + $calculator->prev_saldo) . '</td>';
             echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
             echo '<td>';
-            if(strtotime($calculator->date[$i]) >= strtotime($calculator->beginDate)){
+            if(strtotime($calculator->date[$i].' 23:59:59') >= strtotime($calculator->beginDate)){
               echo '<button type="button" class="btn btn-default" title="'.$lang['EDIT'].'" onclick="appendModal_time('.$calcIndexIM.', '.$i.', \''.$calculator->date[$i].'\', '.$x.')"><i class="fa fa-pencil"></i></button> ';
             }
             if($calculator->indecesIM[$i] != 0){ echo '<button type="submit" class="btn btn-default" title="'.$lang['DELETE'].'" name="ts_remove" value="'.$calcIndexIM.'"><i class="fa fa-trash-o"></i></button>';}
