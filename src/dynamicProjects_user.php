@@ -192,12 +192,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $bookingtext = $_POST["description"];
         $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
         echo $conn->error;
+        $insertInfoText = "info";
+        $insertInternInfoText = "intern info";
+        $startDate = date("Y-m-d H:i:s");
+        $endDate = date("Y-m-d H:i:s");
+
+        $bookingStart = $conn->query("SELECT bookingstart FROM dynamicprojectsbookings WHERE 
+        bookingend >= ALL (SELECT bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID)")->fetch_assoc()["bookingstart"];
+        echo $conn->error;
+        $conn->query("INSERT INTO logs (time,timeEnd,userID) VALUES ('$bookingStart','$endDate',$userID)");
+        echo $conn->error;
+        $indexIM /* log id */ = $conn->query("SELECT indexIM FROM logs WHERE timeEnd = '$endDate' AND userID = $userID")->fetch_assoc()["indexIM"];
+        echo $conn->error;
+        $conn->query("INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType)
+        VALUES('$startDate', '$endDate', NULL, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project' )");
+        echo $conn->error;
+
+
     }else if(isset($_POST["stop"])){
         echo "stop not implemented";
         //insert into bookings with text
     }
 }
-
 
 
 
