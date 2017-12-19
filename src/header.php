@@ -43,16 +43,22 @@
   }
 
   $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
-  $row = $result->fetch_assoc();
-  $lastPswChange = $row['lastPswChange'];
-  $userPasswordHash = $row['psw'];
-  $userKeyCode = $row['keyCode'];
+  if($result){
+    $row = $result->fetch_assoc();
+    $lastPswChange = $row['lastPswChange'];
+    $userPasswordHash = $row['psw'];
+    $userKeyCode = $row['keyCode'];
+  }
+
 
   $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
-  $row = $result->fetch_assoc();
-  $showReadyPlan = $row['enableReadyCheck'];
-  $masterPasswordHash = $row['masterPassword'];
-  $masterPass_checkSum = $row['checkSum']; //ABCabc123!
+  if($result){
+    $row = $result->fetch_assoc();
+    $showReadyPlan = $row['enableReadyCheck'];
+    $masterPasswordHash = $row['masterPassword'];
+    $masterPass_checkSum = $row['checkSum']; //ABCabc123!
+  }
+
 
   $result = $conn->query("SELECT enableSocialMedia FROM modules");
   if($result && ($row = $result->fetch_assoc())){
@@ -196,6 +202,8 @@
   } else {
     $css_file = '';
   }
+  
+  //TODO: we should really prepend every name attr with i.e. "header_" or something even more unique, so nothing triggers accidentally
 ?>
 <!DOCTYPE html>
 <html>
@@ -764,7 +772,9 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                   echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';                  
                   echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+                  echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
                   echo '</ul></div></li>';
                 }
                 ?>
@@ -773,7 +783,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php"){
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page = "dsgvo_vv_templates.php"){
           echo "<script>$('#adminOption_DSGVO').click();";
           if(isset($_GET['n'])){
             echo "$('#tdsgvo-".$_GET['n']."').toggle();";

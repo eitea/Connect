@@ -1,6 +1,6 @@
 <?php require 'header.php'; enableToERP($userID);
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, 'checked'), 'company' => 0, 'client' => 0);
+$filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, ''), 'company' => 0, 'client' => 0);
 
 if(isset($_GET['t'])){
   $filterings['procedures'][0] = array(strtoupper($_GET['t']));
@@ -139,10 +139,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
   <tbody>
     <?php
     $modals = '';
-      //each process splits into a history
       while($result && ($row = $result->fetch_assoc())){
-        $result_process = $conn->query("SELECT * FROM processHistory WHERE processID = ".$row['id']);
-        $product_placements = array_fill_keys($transitions, array());
         echo '<tr style="background-color:#e4e4e4">';
         if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>';}
         echo '<td>'.$row['clientName'].'</td><td></td>';
@@ -154,6 +151,10 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
         if($showBalance == 'TRUE') echo '<td></td>';
         echo '<td></td>';
         echo '</tr>';
+
+        $filterings['procedures'][2];
+        $result_process = $conn->query("SELECT * FROM processHistory WHERE processID = ".$row['id']);
+        $product_placements = array_fill_keys($transitions, array());
         while($row_history = $result_process->fetch_assoc()){
           $i = $row_history['id'];
           $current_transition = preg_replace('/\d/', '', $row_history['id_number']);
@@ -256,19 +257,4 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     </div>
   </div>
 </form>
-
-<script type="text/javascript">
-$('.table').DataTable({
-  order: [],
-  ordering: false,
-  responsive: true,
-  autoWidth: false,
-  dom: 'f',
-  paginate: false,
-  language: {
-    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-  }
-});
-</script>
-
 <?php include 'footer.php'; ?>

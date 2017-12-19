@@ -256,7 +256,7 @@ if($result && ($row = $result->fetch_assoc())){
   $start = substr($row['time'], 0, 10);
   $prev_row = $row;
   if($result && ($row = $result->fetch_assoc())){
-    $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffa4a4');
+    $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffb9b9');
     do {
       if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
         $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];

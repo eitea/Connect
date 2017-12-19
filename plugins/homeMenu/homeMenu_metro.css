@@ -74,9 +74,7 @@ input[type="checkbox"]:checked {
   border-color:#33C7D5;
 }
 input[type="radio"]:checked {
-  border: 1px solid #33C7D5;
-  background-color: white;
-  box-shadow: inset 0px 0px 0 3px #33C7D5;
+  border: 4px solid #33C7D5;
 }
 
 /* Datatables pagination */
@@ -152,7 +150,7 @@ input[type="radio"]:checked {
   color:#B4BCC8;
 }
 
-.form-control, .btn, span{
+.form-control, .btn, span, .panel{
   -webkit-border-radius: 0!important;
   -moz-border-radius: 0!important;
   border-radius: 0!important;

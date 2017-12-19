@@ -815,6 +815,9 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
+$lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
+
 $lang_eng['PROCESS'] = 'Process';
 $lang_ger['PROCESS'] = 'Vorgang';
 

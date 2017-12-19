@@ -34,17 +34,17 @@ $routes = array(
 
   'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php',
   
-  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',            'dsgvo/templates' => 'dsgvo_mail.php',
-  'dsgvo/edit' => 'dsgvo_edit.php',
+  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',              'dsgvo/templates' => 'dsgvo_mail.php',
+  'dsgvo/edit' => 'dsgvo_edit.php',                'dsgvo/vv' => 'dsgvo_vv.php',                      'dsgvo/vtemplates' =>'dsgvo_vv_templates.php',
+  'dsgvo/vDetail' => 'dsgvo_vv_detail.php',        'dsgvo/editTemplate' => 'dsgvo_vv_template_edit.php',
 
-  's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
+  's3/buckets' => 's3_buckets.php',                's3/download' => 's3_download.php'
 );
 $mime_types = array(
-  '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif",                '.woff' => "application/font-woff", '.ttf' => "font/opentype"
+  '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",                    '.woff2' => "application/font-woff2",
+  '.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
 );
-
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');

@@ -23,7 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     require_once __DIR__ . "/utilities.php";
     $logo = uploadFile("fileToUpload", 1); //returns array on false
     if(!is_array($logo)){
-      $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID"); 
+      $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID");
       $null = NULL;
       $stmt->bind_param("b", $null);
       $stmt->send_long_data(0, $logo);
@@ -194,7 +194,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
       $name = test_input($_POST['addFinance_name']);
       $num = intval($_POST['addFinance_num']);
-      $ggk = 'FALSE';      
+      $ggk = 'FALSE';
       if(isset($_POST['addFinance_booking'])) $ggk = 'TRUE';
       $opt = 'STAT';
       if(isset($_POST['addOption'])) $opt = 'CONT';
@@ -254,7 +254,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['uploadClients'])) $isSupplier = 'FALSE';
         $stmt_client = $conn->prepare("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES (?, $cmpID, ?, '$isSupplier')");
         $stmt_client_detail = $conn->prepare("INSERT INTO clientInfoData (clientID, name, firstname, title, nameAddition, gender, address_Street, address_Country, address_Country_Postal,
-        address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxNumber,    taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
+        address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxnumber, taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
         warning1, warning2, warning3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ");
         if(!$conn->error && !$stmt_client->error && !$stmt_client_detail->error){
           $stmt_client->bind_param("ss", $name, $num);
@@ -431,7 +431,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
       <div class="col-sm-9">
         <input type="text" class="form-control" name="general_uid" value="<?php echo $companyRow['uid'];?>" />
       </div>
-    </div>  
+    </div>
     <div class="row">
       <div class="col-sm-3"><label><?php echo $lang['PHONE_NUMBER']; ?></label></div>
       <div class="col-sm-9">
@@ -1001,9 +1001,9 @@ $row = $result->fetch_assoc();
 <!-- IMPORT -->
 <div class="page-seperated-section">
   <?php
-  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
-  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
-  $csv_articles = iconv('UTF-8','windows-1252', "NAME;beschreibung;PREIS;einheit;barauslage;einkaufspreis;steuerID\nApfel;Eine Beschreibung von Apfel;100;Pkg;FALSE;80;3");
+  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3");
+  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3");
+  $csv_articles = iconv('UTF-8','windows-1252', "NAME;beschreibung;PREIS;einheit;barauslage;einkaufspreis;steuerID");
   ?>
   <h4>Import</h4>
   <div class="container-fluid">
@@ -1016,9 +1016,10 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadClients" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Kunden_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_clients); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_clients."\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <div class="col-sm-4">
       <h5><?php echo $lang['SUPPLIERS']; ?></h5>
@@ -1029,9 +1030,10 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadSuppliers" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Lieferanten_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_suppliers); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_suppliers."\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <div class="col-sm-4">
       <h5><?php echo $lang['ARTICLE']; ?></h5>
@@ -1042,15 +1044,130 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadArticles" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Artikel_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_articles); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_articles."\nApfel;Eine Beschreibung von Apfel;100;Pkg;FALSE;80;3"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <br>
     <small>*Die 1. Zeile wird ignoriert. Beim befüllen bitte auf die Reihenfolge achten. Pflichtfelder sind in Großbuchstaben angeführt.</small>
   </div>
 </div>
+<br>
+<div class="page-seperated-section">
+  <h4>Export</h4>
+  <div class="container-fluid">
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Kunden_Export">
+        <?php
+        $csv = $csv_clients . "\n";
+        $result = $conn->query("SELECT *, clientData.name AS clientName FROM clientData LEFT JOIN clientInfoData ON clientID = clientData.id WHERE companyID = $cmpID AND isSupplier = 'FALSE'"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['clientName'] .';';
+          $line.= $row['clientNumber'] .';';
+          $line.= $row['firstname'] .';';
+          $line.= $row['name'] .';';
+          $line.= $row['title'] .';';
+          $line.= $row['nameAddition'] .';';
+          $line.= $row['gender'] .';';
+          $line.= $row['address_Street'] .';';
+          $line.= $row['address_Country_Postal'] .';';
+          $line.= $row['address_Country_City'] .';';
+          $line.= $row['address_Country'] .';';
+          $line.= $row['address_Addition'] .';';
+          $line.= $row['phone'] .';';
+          $line.= $row['fax_number'] .';';
+          $line.= $row['debitNumber'] .';';
+          $line.= $row['datev'] .';';
+          $line.= $row['accountName'] .';';
+          $line.= $row['taxnumber'] .';';
+          $line.= $row['taxArea'] .';';
+          $line.= $row['vatnumber'] .';';
+          $line.= $row['customerGroup'] .';';
+          $line.= $row['creditLimit'] .';';
+          $line.= $row['lastFaktura'] .';';
+          $line.= $row['karenztage'] .';';
+          $line.= $row['warning1'] .';';
+          $line.= $row['warning2'] .';';
+          $line.= $row['warning3'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Kunden Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Lieferanten_Export">
+        <?php
+        $csv = $csv_suppliers . "\n";
+        $result = $conn->query("SELECT *, clientData.name AS clientName FROM clientData LEFT JOIN clientInfoData ON clientID = clientData.id WHERE companyID = $cmpID AND isSupplier = 'TRUE'"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['clientName'] .';';
+          $line.= $row['clientNumber'] .';';
+          $line.= $row['firstname'] .';';
+          $line.= $row['name'] .';';
+          $line.= $row['title'] .';';
+          $line.= $row['nameAddition'] .';';
+          $line.= $row['gender'] .';';
+          $line.= $row['address_Street'] .';';
+          $line.= $row['address_Country_Postal'] .';';
+          $line.= $row['address_Country_City'] .';';
+          $line.= $row['address_Country'] .';';
+          $line.= $row['address_Addition'] .';';
+          $line.= $row['phone'] .';';
+          $line.= $row['fax_number'] .';';
+          $line.= $row['debitNumber'] .';';
+          $line.= $row['datev'] .';';
+          $line.= $row['accountName'] .';';
+          $line.= $row['taxnumber'] .';';
+          $line.= $row['taxArea'] .';';
+          $line.= $row['vatnumber'] .';';
+          $line.= $row['customerGroup'] .';';
+          $line.= $row['creditLimit'] .';';
+          $line.= $row['lastFaktura'] .';';
+          $line.= $row['karenztage'] .';';
+          $line.= $row['warning1'] .';';
+          $line.= $row['warning2'] .';';
+          $line.= $row['warning3'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Lieferanten Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Artikel_Export">
+        <?php
+        $csv = $csv_articles . "\n";
+        $result = $conn->query("SELECT * FROM articles"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['name'] .';';
+          $line.= $row['description'] .';';
+          $line.= $row['price'] .';';
+          $line.= $row['unit'] .';';
+          $line.= $row['cash'] .';';
+          $line.= $row['purchase'] .';';
+          $line.= $row['taxID'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Artikel Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+  </div>
+  <br>
+</div>
 
+<br><br>
 <script>
 $('#account2').mask("0000");
 function startBlinker(){

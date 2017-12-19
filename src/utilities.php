@@ -116,7 +116,7 @@ function match_passwordpolicy($p, &$out = ''){
     $out = "Password must be at least " . $row['passwordLength'] . " Characters long.";
     return false;
   }
-  if($row['complexity'] === '0'){ //whatever
+  if($row['complexity'] === '0'){
     return true;
   } elseif($row['complexity'] === '1'){
     if(!preg_match('/[A-Z]/', $p) || !preg_match('/[0-9]/', $p)){
