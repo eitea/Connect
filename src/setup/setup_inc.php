@@ -250,7 +250,7 @@ function create_tables($conn) {
     isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',

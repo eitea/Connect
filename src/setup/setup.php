@@ -333,8 +333,6 @@ ignore_user_abort(1);
               }
               $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
 
-
-
               //INSERT DEFAULT TEMPLATES
 	$base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement','Awarness: Risikoanalyse','Awarness: Datenschutz-Folgeabschätzung',
 	'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage','Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',
@@ -357,114 +355,114 @@ ignore_user_abort(1);
 	'Vertraglich (bei externer Betreuung): Gib eine schriftliche Übereinkunft der Leistung und Verpflichtung mit dem entsprechenden Dienstleister der Software?',
 	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
 
-	$stmt_vv = $conn->prepare("INSERT INTO dsgvo_vv(templateID, name) VALUES(?, 'Basis')");
-	$stmt_vv->bind_param("i", $templateID);
-	$stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
-	$stmt->bind_param("iss", $templateID, $opt, $descr);
-	$result = $conn->query("SELECT id FROM companyData");
-	while($row = $result->fetch_assoc()){
-		$cmpID = $row['id'];
-		$conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')"); 
-		$templateID = $conn->insert_id;
-		$stmt_vv->execute();
-		//BASE
-		$descr = '';
-		$opt = 'DESCRIPTION';
-		$stmt->execute();
-		$descr = 'Leiter der Datenverarbeitung (IT Leitung)';
-		$opt = 'GEN_1';
-		$stmt->execute();
-		$descr = 'Inhaber, Vorstände, Geschäftsführer oder sonstige gesetzliche oder nach der Verfassung des Unternehmens berufene Leiter';
-		$opt = 'GEN_2';
-		$stmt->execute();
-		$descr = 'Rechtsgrundlage(n) für die Verwendung von Daten';
-		$opt = 'GEN_3';
-		$stmt->execute();
-		$i = 1;
-		while($i < 24){
-			$opt = 'MULT_OPT_'.$i;
-			$descr = $base_opts[$i];
-			$stmt->execute();
-			$i++;
-		}
+            $stmt_vv = $conn->prepare("INSERT INTO dsgvo_vv(templateID, name) VALUES(?, 'Basis')");
+            $stmt_vv->bind_param("i", $templateID);
+            $stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
+            $stmt->bind_param("iss", $templateID, $opt, $descr);
+            $result = $conn->query("SELECT id FROM companyData");
+            while($row = $result->fetch_assoc()){
+              $cmpID = $row['id'];
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')"); 
+              $templateID = $conn->insert_id;
+              $stmt_vv->execute();
+              //BASE
+              $descr = '';
+              $opt = 'DESCRIPTION';
+              $stmt->execute();
+              $descr = 'Leiter der Datenverarbeitung (IT Leitung)';
+              $opt = 'GEN_1';
+              $stmt->execute();
+              $descr = 'Inhaber, Vorstände, Geschäftsführer oder sonstige gesetzliche oder nach der Verfassung des Unternehmens berufene Leiter';
+              $opt = 'GEN_2';
+              $stmt->execute();
+              $descr = 'Rechtsgrundlage(n) für die Verwendung von Daten';
+              $opt = 'GEN_3';
+              $stmt->execute();
+              $i = 1;
+              while($i < 24){
+                $opt = 'MULT_OPT_'.$i;
+                $descr = $base_opts[$i];
+                $stmt->execute();
+                $i++;
+              }
 
-		$conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
-		$templateID = $conn->insert_id;
-		//APPS
-		$descr = '';
-		$opt = 'DESCRIPTION';
-		$stmt->execute();
-		$i = 1;
-		while($i < 8){
-			$opt = 'GEN_'.$i;
-			$descr = $app_opt_1[$i];
-			$stmt->execute();
-			$i++;
-		}
-		$i = 1;
-		while($i < 8){
-			$opt = 'MULT_OPT_'.$i;
-			$descr = $app_opt_2[$i];
-			$stmt->execute();
-			$i++;
-		}
-		$descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
-		$opt = 'EXTRA_DVR';
-		$stmt->execute();
-		$descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
-		$opt = 'EXTRA_FOLGE';
-		$stmt->execute();
-		$descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
-		$opt = 'EXTRA_DOC';
-    $stmt->execute();
-    
-		$opt = 'APP_MATR_DESCR';
-		$stmt->execute();
-		$opt = 'APP_GROUP_1';
-		$descr = 'Kunde';
-		$stmt->execute();
-		$opt = 'APP_GROUP_2';
-		$descr = 'Lieferanten und Partner';
-		$stmt->execute();
-		$opt = 'APP_GROUP_3';
-		$descr = 'Mitarbeiter';
-		$stmt->execute();
-		$i = 1;
-		$cat_descr = array('', 'Firmenname', 'Ansprechpartner, E-Mail, Telefon', 'Straße', 'Ort', 'Bankverbindung', 'Zahlungsdaten', 'UID', 'Firmenbuchnummer');
-		while($i < 9){ //Kunde
-			$opt = 'APP_CAT_1_'.$i;
-			$descr = $cat_descr[$i];
-			$stmt->execute();
-			$i++;
-		}
-		$i = 1;
-		while($i < 9){ //Lieferanten und Partner
-			$opt = 'APP_CAT_2_'.$i;
-			$descr = $cat_descr[$i];
-			$stmt->execute();
-			$i++;
-		}
-		$cat_descr = array('', 'Nachname', 'Vorname', 'PLZ', 'Ort', 'Telefon', 'Geb. Datum', 'Lohn und Gehaltsdaten', 'Religion', 'Gewerkschaftszugehörigkeit', 'Familienstand',
-		'Anwesenheitsdaten', 'Bankverbindung', 'Sozialversicherungsnummer', 'Beschäftigt als', 'Staatsbürgerschaft', 'Geschlecht', 'Name, Geb. Datum und Sozialversicherungsnummer des Ehegatten',
-		'Name, Geb. Datum und Sozialversicherungsnummer der Kinder', 'Personalausweis, Führerschein', 'Abwesenheitsdaten', 'Kennung');
-		$i = 1;
-		while($i < 22){ //Mitarbeiter
-			$opt = 'APP_CAT_3_'.$i;
-			$descr = $cat_descr[$i];
-			$stmt->execute();
-			$i++;
-		}
-		$descr = '';
-		$i = 1;
-		while($i < 21){ //20 App Spaces
-			$opt = 'APP_HEAD_'.$i;
-			$descr = $cat_descr[$i];
-			$stmt->execute();
-			$i++;
-		}
-	}
-	$stmt->close();
-  $stmt_vv->close();
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
+              $templateID = $conn->insert_id;
+              //APPS
+              $descr = '';
+              $opt = 'DESCRIPTION';
+              $stmt->execute();
+              $i = 1;
+              while($i < 8){
+                $opt = 'GEN_'.$i;
+                $descr = $app_opt_1[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $i = 1;
+              while($i < 8){
+                $opt = 'MULT_OPT_'.$i;
+                $descr = $app_opt_2[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
+              $opt = 'EXTRA_DVR';
+              $stmt->execute();
+              $descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
+              $opt = 'EXTRA_FOLGE';
+              $stmt->execute();
+              $descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
+              $opt = 'EXTRA_DOC';
+              $stmt->execute();
+              
+              $opt = 'APP_MATR_DESCR';
+              $stmt->execute();
+              $opt = 'APP_GROUP_1';
+              $descr = 'Kunde';
+              $stmt->execute();
+              $opt = 'APP_GROUP_2';
+              $descr = 'Lieferanten und Partner';
+              $stmt->execute();
+              $opt = 'APP_GROUP_3';
+              $descr = 'Mitarbeiter';
+              $stmt->execute();
+              $i = 1;
+              $cat_descr = array('', 'Firmenname', 'Ansprechpartner, E-Mail, Telefon', 'Straße', 'Ort', 'Bankverbindung', 'Zahlungsdaten', 'UID', 'Firmenbuchnummer');
+              while($i < 9){ //Kunde
+                $opt = 'APP_CAT_1_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $i = 1;
+              while($i < 9){ //Lieferanten und Partner
+                $opt = 'APP_CAT_2_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $cat_descr = array('', 'Nachname', 'Vorname', 'PLZ', 'Ort', 'Telefon', 'Geb. Datum', 'Lohn und Gehaltsdaten', 'Religion', 'Gewerkschaftszugehörigkeit', 'Familienstand',
+              'Anwesenheitsdaten', 'Bankverbindung', 'Sozialversicherungsnummer', 'Beschäftigt als', 'Staatsbürgerschaft', 'Geschlecht', 'Name, Geb. Datum und Sozialversicherungsnummer des Ehegatten',
+              'Name, Geb. Datum und Sozialversicherungsnummer der Kinder', 'Personalausweis, Führerschein', 'Abwesenheitsdaten', 'Kennung');
+              $i = 1;
+              while($i < 22){ //Mitarbeiter
+                $opt = 'APP_CAT_3_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $descr = '';
+              $i = 1;
+              while($i < 21){ //20 App Spaces
+                $opt = 'APP_HEAD_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+            }
+            $stmt->close();
+            $stmt_vv->close();
   
 
               //-------------------------------- GIT -----------------------------------------

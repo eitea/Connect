@@ -117,6 +117,11 @@ function onPageLoad(){
     }
   });
 }
+$('.money').blur(function(e){
+  var number = this.value;
+  if(number == "") return;
+  this.value = parseFloat(number).toFixed(2);
+});
 
 $(document).ready(function() {
   onPageLoad();
@@ -136,21 +141,14 @@ $(document).ready(function() {
   $(':submit').click(function() {
     isDirty = false;
   });
-  function unloadPage(){
-    if(isDirty){
-      return "You have unsaved changes on this page. Discard your changes?";
-    }
-  }
-  window.onbeforeunload = unloadPage;
+
+  window.onbeforeunload = function() { 
+    if(isDirty){ return "You have unsaved changes on this page. Discard your changes?"; }
+    document.getElementById("loader").style.display = "block";
+  };
 
   document.getElementById("loader").style.display = "none";
-  document.getElementById("bodyContent").style.display = "block";
-});
-
-$('.money').blur(function(e){
-  var number = this.value;
-  if(number == "") return;
-  this.value = parseFloat(number).toFixed(2);
+  document.getElementById("bodyContent").style.display = "block";  
 });
 
 

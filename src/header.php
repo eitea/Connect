@@ -698,16 +698,12 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
         <?php
         if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
           echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "editSuppliers.php" ){
           echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
           echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
           echo "<script>$('#adminOption_ERP').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         }
         ?>
       <?php endif; ?>
@@ -750,7 +746,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           if(isset($_GET['n'])){
             echo "$('#finance-click-".$_GET['n']."').click();";
           }
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';
         }
         ?>
@@ -772,9 +767,16 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                   echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';                  
+                  echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
+                  
+                  echo '<li>';
+                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
+                  echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
+                  echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
+                  echo '</ul></div></li>';
+                  
                   echo '</ul></div></li>';
                 }
                 ?>
@@ -783,12 +785,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page = "dsgvo_vv_templates.php"){
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php"  || $this_page == "dsgvo_vv_templates.php" ||$this_page == "dsgvo_vv_template_edit.php"){
           echo "<script>$('#adminOption_DSGVO').click();";
           if(isset($_GET['n'])){
             echo "$('#tdsgvo-".$_GET['n']."').toggle();";
           }
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
+          if($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php"){
+            echo "$('#tdsgvo-sets-".$_GET['n']."').toggle();";
+          }
           echo '</script>';
         }
         ?>
