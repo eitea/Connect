@@ -2385,9 +2385,10 @@ if ($row['version'] < 118) {
 		$descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
 		$opt = 'EXTRA_DVR';
 		$stmt->execute();
-		$descr = '';
+		$descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
 		$opt = 'EXTRA_FOLGE';
 		$stmt->execute();
+		$descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
 		$opt = 'EXTRA_DOC';
 		$stmt->execute();
 

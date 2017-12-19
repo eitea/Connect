@@ -411,12 +411,13 @@ ignore_user_abort(1);
 		$descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
 		$opt = 'EXTRA_DVR';
 		$stmt->execute();
-		$descr = '';
+		$descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
 		$opt = 'EXTRA_FOLGE';
 		$stmt->execute();
+		$descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
 		$opt = 'EXTRA_DOC';
-		$stmt->execute();
-
+    $stmt->execute();
+    
 		$opt = 'APP_MATR_DESCR';
 		$stmt->execute();
 		$opt = 'APP_GROUP_1';

@@ -168,7 +168,7 @@ if(isset($settings['EXTRA_DVR'])){
 if(isset($settings['EXTRA_FOLGE'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">Wurde eine Datenschutz-Folgeabschätzung durchgeführt?</div>';    
+    echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].'</div>';    
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Ja, wann?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_DATE" class="form-control datepicker"></div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Nein, warum?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_REASON" class="form-control"></div></div>';
@@ -177,7 +177,7 @@ if(isset($settings['EXTRA_FOLGE'])){
 if(isset($settings['EXTRA_DOC'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">Gibt es eine aktuelle Dokumentation dieser Applikation?</div>';  
+    echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].'</div>';  
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control"></div></div>';
     echo '</div></div>';
@@ -215,7 +215,7 @@ if(isset($settings['EXTRA_DOC'])){
                 }
             } elseif(!$space){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Kein Platz mehr.</div>';
-            }            
+            }
             ?>
             <table class="table table-condensed">
             <thead><tr>
@@ -309,6 +309,5 @@ if(isset($settings['EXTRA_DOC'])){
   </div>
 </div>
 <?php endif;?>
-
 </form>
 <?php require 'footer.php'; ?>
