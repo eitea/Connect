@@ -64,7 +64,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     //build link
-    $link = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    $link_id = '';
+    if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+      $link_id = '/'.substr($servername,0,8);
+    }
+    $link = "https://".$_SERVER['HTTP_HOST'].$link_id .$_SERVER['REQUEST_URI'];
     $link = explode('/', $link);
     array_pop($link);
     $link = implode('/', $link) . "/access?n=$processID";
