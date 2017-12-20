@@ -1,4 +1,6 @@
 src/connection_config.php
+src/s3_buckets.php
+src/s3_download.php
 template.php
 images/ups/*
 !images/ups/.gitkeep

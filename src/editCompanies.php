@@ -249,6 +249,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if(!$file) {$error = 'Could not open file'; }
     }
     if(!$error){
+      $i = 0;
       if(isset($_POST['uploadClients']) || isset($_POST['uploadSuppliers'])){
         $isSupplier = 'TRUE';
         if(isset($_POST['uploadClients'])) $isSupplier = 'FALSE';
@@ -265,17 +266,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo $stmt_client_detail->error .' err3<br>';
         }
         fgetcsv($file); //skip 1st line
-        while(($line = fgetcsv($file, 0, ';')) !== false){
+        while(($line = fgetcsv($file, 0, ";")) !== false){
           if(empty($line)) continue;
           if(empty($line[0])) continue;
+          print_r($line);
           $name = convSet($line[0]);
           $num = $line[1];
-          $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' ");
+          $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' "); echo $conn->error;
           if($res && $res->num_rows > 0){
             $row = $res->fetch_assoc();
             $clientID = $row['id'];
-            $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID");
-            echo $conn->error;
+            $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID"); echo $conn->error;
             $conn->query("DELETE FROM clientInfoData WHERE clientID = $clientID"); echo $conn->error;
           } else {
             $stmt_client->execute();
@@ -307,6 +308,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $warn2 = floatval($line[25]);
           $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
+          $i++;
         }
         $stmt_client->close();
         $stmt_client_detail->close();
@@ -324,6 +326,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $purchase = floatval($line[5]);
           $taxID = intval($line[6]);
           if($name && $price){
+            $i++;
             $stmt->execute();
           }
         }
@@ -331,7 +334,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       } else {
         echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
       }
-      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      if($conn->error){
+        echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      } else {
+        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$i.' '.$lang['OK_SAVE'].'</div>';
+      }
     } else {
       echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
     }

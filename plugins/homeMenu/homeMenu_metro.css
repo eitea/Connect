@@ -128,7 +128,7 @@ input[type="radio"]:checked {
 .alert{
   border-radius:0;
   border-left-width: 6px;
-  background-color: transparent;
+  background-color: white;
   color: #2E2E2E;
 }
 .alert.alert-info{
