@@ -522,11 +522,11 @@ function getFilledOutTemplate($templateID, $bookingQuery = ""){
   return $html;
 }
 
-function uploadFile($file_field, $check_image = true,$crop_square = false,$resize = false) { //should be named uploadImage
+function uploadImage($file_field, $crop_square = false,$resize = true) { //should be named uploadImage
   //bytes
   $max_size = 5000000;
   //whitelist
-  $whitelist_ext = array('jpeg','jpg','png');
+  $whitelist_ext = array('jpeg','jpg','png', 'gif');
   $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
 
   //Validation
@@ -553,10 +553,8 @@ function uploadFile($file_field, $check_image = true,$crop_square = false,$resiz
       $out['error'][] = "File is too big";
     }
 
-    if($check_image) {
-      if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
-        $out['error'][] = "Uploaded file is not a valid image";
-      }
+    if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
+      $out['error'][] = "Uploaded file is not a valid image";
     }
 
     if(count($out['error']) > 0) {
@@ -569,30 +567,36 @@ function uploadFile($file_field, $check_image = true,$crop_square = false,$resiz
     if(!$im){
       return file_get_contents($_FILES[$file_field]['tmp_name']);
     }
-    if($crop_square){
-      $size = min(imagesx($im), imagesy($im));
-      $middlex = imagesx($im)/2;
-      $middley = imagesy($im)/2;
+
+    $corx = imagesx($im);
+    $cory = imagesy($im);
+
+    if($crop_square && $corx != $cory){
+      $size = min($corx, $cory);
+      $middlex = $corx/2;
+      $middley = $cory/2;
       $im = imagecrop($im, ['x' => floor($middlex-($size/2)), 'y' => floor($middley-($size/2)), 'width' => $size, 'height' => $size]);
     }
-    if($resize){
-      $aspect_ratio = imagesx($im) / imagesy($im);
+    if($resize && ($corx > 350 || $cory > 200)){
+      $aspect_ratio = $corx / $cory;
       if($aspect_ratio>1){
-        $y = 300;
-        $x = 300*$aspect_ratio;
-      }else{
-        $x = 300;
-        $y = 300* (imagesy($im) / imagesx($im));
+        $x = 350;
+        $y = 350 / $aspect_ratio;
+      } else {
+        $x = 200 / ($cory / $corx);
+        $y = 200;
       }
       $im2 = imagecreatetruecolor($x,$y);
-      imagecopyresized($im2,$im,0,0,0,0,$x,$y,imagesx($im),imagesy($im));
+      imagecopyresampled($im2,$im,0,0,0,0,$x,$y,$corx,$cory); //much better quality than copyresized
       $im = $im2;
     }
     imageinterlace($im, 0);
     if($_FILES[$file_field]["type"] == $whitelist_type[0] || $_FILES[$file_field]["type"] == $whitelist_type[1]){
-      imagejpeg($im, $_FILES[$file_field]['tmp_name']);
-    } else {
+      imagejpeg($im, $_FILES[$file_field]['tmp_name'],90);
+    } elseif($_FILES[$file_field]["type"] == $whitelist_type[2]) {
       imagepng($im, $_FILES[$file_field]['tmp_name']);
+    } else {
+      imagegif($im, $_FILES[$file_field]['tmp_name']);
     }
     if(count($out['error']) > 0) {
       return $out;

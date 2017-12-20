@@ -21,7 +21,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
     require_once __DIR__ . "/utilities.php";
-    $logo = uploadFile("fileToUpload", 1); //returns array on false
+    $logo = uploadImage("fileToUpload", 0, 1); //returns array on false
     if(!is_array($logo)){
       $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID");
       $null = NULL;
@@ -237,7 +237,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
     //validate uploaded file
     function convSet($s){
-      $s = test_input($s);
+      $s = preg_replace("~[^A-Za-z0-9\-!:.,$()+öäüÖÄÜß ]~", "", $s);
       return trim(iconv(mb_detect_encoding($s), "UTF-8", $s));
     }
     $error = '';
@@ -307,7 +307,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $warn2 = floatval($line[25]);
           $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
-          echo $stmt_client_detail->error;
           $i++;
         }
         $stmt_client->close();
@@ -391,11 +390,12 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
   </div>
   <div class="container-fluid">
-    <div class="col-sm-4">
-      <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
+    <div class="col-sm-4">    
+      <?php if($companyRow['logo']){echo '<img src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-8">      
       <input type="file" name="fileToUpload"/>
+      <small>Max. 5MB</small>
     </div>
   </div>
 </form>

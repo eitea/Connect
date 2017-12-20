@@ -325,7 +325,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['saveProfilePicture'])){
     $x = intval($_POST['saveProfilePicture']);
     require_once __DIR__ . "/utilities.php";
-    $pp = uploadFile('profilePicture', 1, 1, 1);
+    $pp = uploadImage('profilePicture', 1, 1);
     if(!is_array($pp)) {
       $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
       echo $conn->error;
