@@ -269,7 +269,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         while(($line = fgetcsv($file, 0, ";")) !== false){
           if(empty($line)) continue;
           if(empty($line[0])) continue;
-          print_r($line);
           $name = convSet($line[0]);
           $num = $line[1];
           $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' "); echo $conn->error;
@@ -308,6 +307,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $warn2 = floatval($line[25]);
           $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
+          echo $stmt_client_detail->error;
           $i++;
         }
         $stmt_client->close();
