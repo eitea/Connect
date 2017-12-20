@@ -301,7 +301,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $uid = $line[19];
           $customerGroup = $line[20];
           $creditLimit = floatval($line[21]);
-          $faktura = $line[22] ? '0000-00-00 00:00:00' : $line[22];
+          $faktura = empty(trim($line[22])) ? '0000-00-00 00:00:00' : $line[22];
           $karenztage = intval($line[23]);
           $warn1 = floatval($line[24]);
           $warn2 = floatval($line[25]);
