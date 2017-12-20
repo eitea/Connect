@@ -697,13 +697,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
         </div>
         <?php
         if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();";
+          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
         } elseif($this_page == "editSuppliers.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();";
+          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
         } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
+          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
-          echo "<script>$('#adminOption_ERP').click();";
+          echo "<script>$('#adminOption_ERP').click();</script>";
         }
         ?>
       <?php endif; ?>

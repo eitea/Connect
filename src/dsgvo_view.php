@@ -11,13 +11,6 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
     die();
 }
 
-$link = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-$link = explode('/', $link);
-array_pop($link);
-$link = implode('/', $link) . "/access";
-echo $link;
-
-
 $cmpID = intval($_GET['n']);
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['addDocument']) && !empty($_POST['add_docName'])){
