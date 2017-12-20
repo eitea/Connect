@@ -142,15 +142,13 @@ $(document).ready(function() {
     isDirty = false;
   });
 
-  window.onbeforeunload = function() { 
+  window.onbeforeunload = function() {
     if(isDirty){ return "You have unsaved changes on this page. Discard your changes?"; }
     document.getElementById("loader").style.display = "block";
   };
-
   document.getElementById("loader").style.display = "none";
   document.getElementById("bodyContent").style.display = "block";  
 });
-
 
 $(window).scroll(function() {
   sessionStorage.scrollTop = $(this).scrollTop();

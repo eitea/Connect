@@ -349,336 +349,143 @@ $resultContacts = $conn->query ( "SELECT * FROM contactPersons WHERE clientID = 
 ?>
 
 <div class="page-header">
-  <h3><?php
-		
-if (isset ( $_GET ['supID'] )) {
-			echo $lang ['SUPPLIER'];
-		} else {
-			echo $lang ['CLIENT'];
-		}
-		echo ' - ' . $rowClient ['name'];
-		?>
-    <div class="page-header-button-group">
-      <button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php
-						
-echo $lang ['SAVE'];
-						?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
-    </div>
-  </h3>
+<h3><?php if(isset($_GET['supID'])){ echo $lang['SUPPLIER']; }else{ echo $lang['CLIENT'];} echo ' - '.$rowClient['name']; ?>
+	<div class="page-header-button-group">
+		<button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
+	</div>
+</h3>
 </div>
 
+
 <ul class="nav nav-tabs">
-  <li <?php
-		
-if ($activeTab == 'project') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#project" onclick="$('#sav').val('project');"><?php
-		
-echo $lang ['VIEW_PROJECTS'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'home') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php
-		
-echo $lang ['RECORD'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'taxes') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuTaxes" onclick="$('#sav').val('taxes');"><?php
-		
-echo $lang ['TAXES'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'banking') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuBank" onclick="$('#sav').val('banking');">Banking</a></li>
-  <li <?php
-		
-if ($activeTab == 'billing') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuBilling" onclick="$('#sav').val('billing');"><?php
-		
-echo $lang ['BILLING'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'payment') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuPayment" onclick="$('#sav').val('payment');"><?php
-		
-echo $lang ['PAYMENT'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'notes') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuContact" onclick="$('#sav').val('notes');"><?php
-		
-echo $lang ['NOTES'];
-		?></a></li>
-  <li <?php
-		
-if ($activeTab == 'docs') {
-			echo 'class="active"';
-		}
-		?>><a data-toggle="tab" href="#menuDocs" onclick="$('#sav').val('docs');"><?php
-		
-echo $lang ['DOCUMENTS'];
-		?></a></li>
+  <li <?php if($activeTab == 'project'){echo 'class="active"';}?>><a data-toggle="tab" href="#project" onclick="$('#sav').val('project');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home" onclick="$('#sav').val('home');"><?php echo $lang['RECORD']; ?></a></li>
+  <li <?php if($activeTab == 'taxes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuTaxes" onclick="$('#sav').val('taxes');"><?php echo $lang['TAXES']; ?></a></li>
+  <li <?php if($activeTab == 'banking'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBank" onclick="$('#sav').val('banking');">Banking</a></li>
+  <li <?php if($activeTab == 'billing'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuBilling" onclick="$('#sav').val('billing');"><?php echo $lang['BILLING']; ?></a></li>
+  <li <?php if($activeTab == 'payment'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuPayment" onclick="$('#sav').val('payment');"><?php echo $lang['PAYMENT']; ?></a></li>
+  <li <?php if($activeTab == 'notes'){echo 'class="active"';}?>><a data-toggle="tab" href="#menuContact" onclick="$('#sav').val('notes');"><?php echo $lang['NOTES']; ?></a></li>
+	<li <?php if ($activeTab == 'docs') { echo 'class="active"'; } ?>><a data-toggle="tab" href="#menuDocs" onclick="$('#sav').val('docs');"><?php echo $lang ['DOCUMENTS']; ?></a></li>
 </ul>
+
 <form id="mainForm" method="POST">
   <div class="tab-content">
-    <div id="project" class="tab-pane fade <?php
-				
-if ($activeTab == 'project') {
-					echo 'in active';
-				}
-				?>">
-      <h3><?php
-						
-echo $lang ['VIEW_PROJECTS'];
-						?>
+    <div id="project" class="tab-pane fade <?php if ($activeTab == 'project') { echo 'in active'; } ?>"> <h3><?php echo $lang ['VIEW_PROJECTS']; ?>
         <div class="page-header-button-group">
-          <button type="submit" class="btn btn-default" name='delete_projects' title="<?php
-										
-echo $lang ['DELETE'];
-										?>" ><i class="fa fa-trash-o"></i></button>
-          <button type="button" class="btn btn-default" title="<?php
-										
-echo $lang ['ADD'];
-										?>" data-toggle="modal" data-target=".add-project"><i class="fa fa-plus"></i></button>
+          <button type="submit" class="btn btn-default" name='delete_projects' title="<?php echo $lang ['DELETE']; ?>" ><i class="fa fa-trash-o"></i></button>
+          <button type="button" class="btn btn-default" title="<?php echo $lang ['ADD']; ?>" data-toggle="modal" data-target=".add-project"><i class="fa fa-plus"></i></button>
         </div>
       </h3>
       <hr>
       <table class="table table-hover">
-        <thead>
-          <th><?php
-										
-echo $lang ['DELETE'];
-										?></th>
-          <th></th>
-          <th>Name</th>
-          <th><?php
-										
-echo $lang ['ADDITIONAL_FIELDS'];
-										?></th>
-          <th><?php
-										
-echo $lang ['HOURS'];
-										?></th>
-          <th><?php
-										
-echo $lang ['HOURLY_RATE'];
-										?></th>
-          <th></th>
-        </thead>
+			<thead>
+				<th><?php echo $lang['DELETE']; ?></th>
+				<th></th>
+				<th>Name</th>
+				<th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
+				<th><?php echo $lang['HOURS']; ?></th>
+				<th><?php echo $lang['HOURLY_RATE']; ?></th>
+				<th></th>
+			</thead>
         <tbody>
           <?php
-										$result_p = $conn->query ( "SELECT * FROM $projectTable WHERE clientID = $filterClient" );
-										while ( $row_p = $result_p->fetch_assoc () ) {
-											$productive = $row_p ['status'] ? '<i class="fa fa-tags"></i>' : '';
-											echo '<tr>';
-											echo '<td><input type="checkbox" name="delete_projects_index[]" value=' . $row_p ['id'] . ' /></td>';
-											echo '<td>' . $productive . '</td>';
-											echo '<td>' . $row_p ['name'] . '</td>';
-											echo '<td>';
-											$resF = $conn->query ( "SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient ['companyID'] . " ORDER BY id ASC" );
-											if ($resF->num_rows > 0) {
-												$rowF = $resF->fetch_assoc ();
-												if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_1'] == 'TRUE') {
-													echo $rowF ['name'];
-												}
-											}
-											if ($resF->num_rows > 1) {
-												$rowF = $resF->fetch_assoc ();
-												if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_2'] == 'TRUE') {
-													echo $rowF ['name'];
-												}
-											}
-											if ($resF->num_rows > 2) {
-												$rowF = $resF->fetch_assoc ();
-												if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_3'] == 'TRUE') {
-													echo $rowF ['name'];
-												}
-											}
-											echo '</td>';
-											echo '<td>' . $row_p ['hours'] . '</td>';
-											echo '<td>' . $row_p ['hourlyPrice'] . '</td>';
-											echo '<td><button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingProjectsModal-' . $row_p ['id'] . '"><i class="fa fa-pencil"></i></td>';
-											echo '</tr>';
-										}
-										?>
+					$result_p = $conn->query ( "SELECT * FROM $projectTable WHERE clientID = $filterClient" );
+					while ( $row_p = $result_p->fetch_assoc () ) {
+						$productive = $row_p ['status'] ? '<i class="fa fa-tags"></i>' : '';
+						echo '<tr>';
+						echo '<td><input type="checkbox" name="delete_projects_index[]" value=' . $row_p ['id'] . ' /></td>';
+						echo '<td>' . $productive . '</td>';
+						echo '<td>' . $row_p ['name'] . '</td>';
+						echo '<td>';
+						$resF = $conn->query ( "SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient ['companyID'] . " ORDER BY id ASC" );
+						if ($resF->num_rows > 0) {
+							$rowF = $resF->fetch_assoc ();
+							if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_1'] == 'TRUE') {
+								echo $rowF ['name'];
+							}
+						}
+						if ($resF->num_rows > 1) {
+							$rowF = $resF->fetch_assoc ();
+							if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_2'] == 'TRUE') {
+								echo $rowF ['name'];
+							}
+						}
+						if ($resF->num_rows > 2) {
+							$rowF = $resF->fetch_assoc ();
+							if ($rowF ['isActive'] == 'TRUE' && $row_p ['field_3'] == 'TRUE') {
+								echo $rowF ['name'];
+							}
+						}
+						echo '</td>';
+						echo '<td>' . $row_p ['hours'] . '</td>';
+						echo '<td>' . $row_p ['hourlyPrice'] . '</td>';
+						echo '<td><button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingProjectsModal-' . $row_p ['id'] . '"><i class="fa fa-pencil"></i></td>';
+						echo '</tr>';
+					}
+					?>
         </tbody>
       </table>
     </div>
 
-    <div id="home" class="tab-pane fade <?php
-				
-if ($activeTab == 'home') {
-					echo 'in active';
-				}
-				?>">
-      <h3><?php
-						
-echo $lang ['GENERAL_INFORMATION'];
-						?></h3>
+		<div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
+      <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
       <hr>
       <div class="row checkbox">
-        <div class="col-xs-2 text-right"><?php
-								
-echo $lang ['ADDRESS_FORM'];
-								?></div>
-        <div class="col-sm-2">
-          <label><input type="radio" value="male" name="gender" <?php
-										
-if ($row ['gender'] == 'male') {
-											echo 'checked';
-										}
-										?> /> <?php
-										
-echo $lang ['GENDER_TOSTRING'] ['male'];
-										?></label>
-        </div>
-        <div class="col-sm-2">
-          <label><input type="radio" value="female" name="gender" <?php
-										
-if ($row ['gender'] == 'female') {
-											echo 'checked';
-										}
-										?> /> <?php
-										
-echo $lang ['GENDER_TOSTRING'] ['female'];
-										?></label>
-        </div>
-        <div class="col-sm-3">
-          <label><input type="checkbox" value="company" name="contactType" <?php
-										
-if ($row ['contactType'] == 'company') {
-											echo 'checked';
-										}
-										?> /> <?php
-										
-echo $lang ['COMPANY_2'];
-										?></label>
-        </div>
-      </div>
+			<div class="col-xs-2 text-right"><?php echo $lang['ADDRESS_FORM']; ?></div>
+			<div class="col-sm-2">
+				<label><input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?></label>
+			</div>
+			<div class="col-sm-2">
+				<label><input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?></label>
+			</div>
+			<div class="col-sm-3">
+				<label><input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?></label>
+			</div>
+		</div>
       <br>
       <div class="row form-group">
         <div class="col-xs-2 text-right">Name</div>
         <div class="col-sm-2">
-          <input type="text" class="form-control" name="title" value="<?php
-										
-echo $row ['title'];
-										?>" placeholder="Title"/>
+					<input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" placeholder="Title"/>
         </div>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="firstname" value="<?php
-										
-echo $row ['firstname'];
-										?>" placeholder="<?php
-										
-echo $lang ['FIRSTNAME'];
-										?>" />
+					<input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" placeholder="<?php echo $lang['FIRSTNAME']; ?>" />
         </div>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="name" value="<?php
-										
-echo $row ['name'];
-										?>" placeholder="<?php
-										
-echo $lang ['LASTNAME'];
-										?>" />
-        </div>
+					<input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" placeholder="<?php echo $lang['LASTNAME']; ?>" />
+         </div>
         <div class="col-sm-2">
-          <input type="text" class="form-control" name="nameAddition" value="<?php
-										
-echo $row ['nameAddition'];
-										?>" placeholder="Addition <?php
-										
-if (! isset ( $_SESSION ['language'] ) || $_SESSION ['language'] == 'GER')
-											echo "/Zusatz";
-										?>"/>
+					<input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" placeholder="Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>"/>
         </div>
       </div>
       <div class="row form-group">
         <div class="col-xs-2 text-right">Anschrift</div>
+				<div class="col-sm-5">
+				<input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" placeholder="<?php echo $lang['STREET']; ?>"/>
+			</div>
         <div class="col-sm-5">
-          <input type="text" class="form-control" name="address_Street" value="<?php
-										
-echo $row ['address_Street'];
-										?>" placeholder="<?php
-										
-echo $lang ['STREET'];
-										?>"/>
-        </div>
-        <div class="col-sm-5">
-          <input type="text" class="form-control" name="address_Country" value="<?php
-										
-echo $row ['address_Country'];
-										?>" placeholder="<?php
-										
-echo $lang ['COUNTRY'];
-										?>"/>
+				<input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" placeholder="<?php echo $lang['COUNTRY']; ?>"/>
         </div>
       </div>
       <div class="row form-group">
         <div class="col-sm-2"></div>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="address_Country_City" value="<?php
-										
-echo $row ['address_Country_City'];
-										?>" placeholder="<?php
-										
-echo $lang ['CITY'];
-										?>" />
-        </div>
+          <input type="text" class="form-control" name="address_Country_City" value="<?php echo $row ['address_Country_City']; ?>" placeholder="<?php echo $lang ['CITY']; ?>" />
+				</div>
         <div class="col-sm-2">
-          <input type="text" class="form-control" name="address_Country_Postal" value="<?php
-										
-echo $row ['address_Country_Postal'];
-										?>" placeholder="<?php
-										
-echo $lang ['PLZ'];
-										?>" />
-        </div>
-        <div class="col-sm-5">
-          <input type="text" class="form-control" name="address_Addition" value="<?php
-										
-echo $row ['address_Addition'];
-										?>" placeholder="<?php
-										
-echo $lang ['ADDITION'];
-										?>"/>
-        </div>
+				<input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" placeholder="<?php echo $lang['PLZ']; ?>" />
+			</div>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" name="address_Addition" value="<?php echo $row['address_Addition']; ?>" placeholder="<?php echo $lang['ADDITION']; ?>"/>
+			</div>
       </div>
       <div class="row form-group">
         <div class="col-xs-2 text-right">Kontakt</div>
         <div class="col-sm-5">
-          <input type="text" class="form-control" name="phone" value="<?php
-										
-echo $row ['phone'];
-										?>" placeholder="<?php
-										
-echo $lang ['PHONE_NUMBER'];
-										?>" />
+          <input type="text" class="form-control" name="phone" value="<?php echo $row ['phone']; ?>" placeholder="<?php echo $lang ['PHONE_NUMBER']; ?>" />
         </div>
         <div class="col-sm-5">
-          <input type="text" class="form-control" name="fax_number" value="<?php
-										
-echo $row ['fax_number'];
-										?>"  placeholder="Fax" />
+          <input type="text" class="form-control" name="fax_number" value="<?php echo $row ['fax_number']; ?>"  placeholder="Fax" />
         </div>
       </div>
       <br><br>
@@ -695,27 +502,23 @@ echo $row ['fax_number'];
           </tr></thead>
           <tbody>
           <?php
-										while ( $contactRow = $resultContacts->fetch_assoc () ) {
-											echo '<tr>';
-											echo '<td>' . $contactRow ['firstname'] . ' ' . $contactRow ['lastname'] . '</td>';
-											echo '<td>' . $contactRow ['email'] . '</td>';
-											echo '<td>' . $contactRow ['position'] . '</td>';
-											echo '<td>' . $contactRow ['responsibility'] . '</td>';
-											echo '<td><button type="submit" name="deleteContact" value="' . $contactRow ['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
-											echo '</tr>';
-										}
-										?>
+					while ( $contactRow = $resultContacts->fetch_assoc () ) {
+						echo '<tr>';
+						echo '<td>' . $contactRow ['firstname'] . ' ' . $contactRow ['lastname'] . '</td>';
+						echo '<td>' . $contactRow ['email'] . '</td>';
+						echo '<td>' . $contactRow ['position'] . '</td>';
+						echo '<td>' . $contactRow ['responsibility'] . '</td>';
+						echo '<td><button type="submit" name="deleteContact" value="' . $contactRow ['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+						echo '</tr>';
+					}
+					?>
           </tbody>
           </table>
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php
-										
-echo $lang ['ADD'];
-										?>" ><i class="fa fa-plus"></i></button>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php echo $lang ['ADD']; ?>" ><i class="fa fa-plus"></i></button>
         </div>
       </div>
     </div>
 
-    
 <div id="add-contact-person" class="modal fade">
   <div class="modal-dialog modal-content modal-md">
     <div class="modal-header h4">Ansprechpartner Hinzufügen</div>
@@ -732,10 +535,7 @@ echo $lang ['ADD'];
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      <button type="submit" name="addContact" class="btn btn-warning"><?php
-						
-echo $lang ['SAVE'];
-						?></button>
+      <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang ['SAVE']; ?></button>
     </div>
   </div>
 </div>
@@ -747,57 +547,27 @@ if ($activeTab == 'taxes') {
 				}
 				?>">
       <div class="row checkbox">
-        <div class="col-sm-9">
-          <h3>Steuerinformationen</h3>
-        </div>
+        <div class="col-sm-9"> <h3>Steuerinformationen</h3> </div>
         <br>
         <div class="col-sm-3">
-          <input type="checkbox" name="blockDelivery" <?php
-										
-if ($row ['blockDelivery'] == 'true') {
-											echo 'checked';
-										}
-										?> />
-          Liefersperre
-        </div>
+				<input type="checkbox" name="blockDelivery" <?php if($row['blockDelivery'] == 'true'){echo 'checked';} ?> /> Liefersperre
+			</div>
       </div>
       <hr>
       <div class="row form-group">
-        <div class="col-xs-2 text-right">
-          <?php
-										
-if (isset ( $_GET ['supID'] )) {
-											echo "Credit Nr.";
-										} else {
-											echo "Debit Nr.";
-										}
-										?>
-        </div>
-        <div class="col-sm-4">
-          <input type="number" class="form-control" name="debitNumber" value="<?php
-										
-echo $row ['debitNumber'];
-										?>" />
-        </div>
+        <div class="col-xs-2 text-right"><?php if(isset($_GET['supID'])){ echo "Credit Nr."; } else { echo "Debit Nr."; } ?></div>
+        <div class="col-sm-4"><input type="number" class="form-control" name="debitNumber" value="<?php echo $row['debitNumber']; ?>" /></div>
         <div class="col-xs-2 text-center">
           DATEV
         </div>
-        <div class="col-sm-4">
-          <input type="number" class="form-control" name="datev" value="<?php
-										
-echo $row ['datev'];
-										?>" />
-        </div>
+        <div class="col-sm-4"><input type="number" class="form-control" name="datev" value="<?php echo $row['datev']; ?>" /></div>
       </div>
       <div class="row form-group">
         <div class="col-xs-2 text-right">
           Kontobezeichnung
         </div>
         <div class="col-sm-10">
-          <input type="text" class="form-control" name="accountName" value="<?php
-										
-echo $row ['accountName'];
-										?>" />
+          <input type="text" class="form-control" name="accountName" value="<?php echo $row['accountName']; ?>" />
         </div>
       </div>
       <hr>

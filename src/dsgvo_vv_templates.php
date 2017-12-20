@@ -31,7 +31,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
-        }        
+        }
     }
     if(isset($_POST['add_template']) && !empty($_POST['add_name']) && $_POST['add_name'] != 'Default' && !empty($_POST['add_type'])){
         $type = ($_POST['add_type']);
