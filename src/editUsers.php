@@ -109,7 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
       $sun = test_input($_POST['sun'.$x]);
     }
-
     //close up the old one
     $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
       vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest', endDate='$intervalEnd'
@@ -144,6 +143,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!empty($_POST['coreTime'.$x])) {
       $coreTime = test_input($_POST['coreTime'.$x]);
       $conn->query("UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$x'");
+    }
+
+    if (!empty($_POST['supervisor'.$x])){
+      $supervisor = intval($_POST['supervisor'.$x]);
+      $conn->query("UPDATE $userTable SET supervisor = $supervisor WHERE id = $x");
     }
 
     if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
@@ -480,6 +484,23 @@ $(document).ready(function(){
                     <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="* * * *">
                   </div>
                 </div>
+                <div class="form-group">
+                  <div class="col-md-2">
+                    <?php echo $lang['SUPERVISOR']; ?>:
+                  </div>
+                  <div class="col-md-3">
+                    <select name="supervisor<?php echo $x; ?>" class="js-example-basic-single" >
+                    <option value="0"> ... </option>
+                    <?php
+                    $sup_result = $conn->query("SELECT id, firstname, lastname FROM UserData");
+                    while($sup_row = $sup_result->fetch_assoc()){
+                      $selected = ($row['supervisor'] == $sup_row['id']) ? 'selected' : '';
+                      echo '<option '.$selected.' value="'.$sup_row['id'].'" >'.$sup_row['firstname'].' '.$sup_row['lastname'].'</option>';
+                    }
+                    ?>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="container-fluid radio">
                 <div class="col-md-2">
@@ -487,12 +508,12 @@ $(document).ready(function(){
                 </div>
                 <div class="col-md-2">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
+                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
                   </label>
                 </div>
                 <div class="col-md-8">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
+                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
                   </label>
                 </div>
               </div>

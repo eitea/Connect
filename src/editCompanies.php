@@ -118,7 +118,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    $erp_lfs = abs(intval($_POST['erp_lfs']));
    $erp_gut = abs(intval($_POST['erp_gut']));
    $erp_stn = abs(intval($_POST['erp_stn']));
-   $conn->query("UPDATE erpNumbers SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn WHERE companyID = $cmpID");
+   $clientNum = test_input($_POST['erp_clientNum']);
+   $clientStep = abs(intval($_POST['erp_clientStep']));
+   $supplierNum = test_input($_POST['erp_supplierNum']);
+   $supplierStep = abs(intval($_POST['erp_supplierStep']));
+
+   $conn->query("UPDATE erp_settings SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn,
+    clientNum = '$clientNum', clientStep = $clientStep, supplierNum = '$supplierNum', supplierStep = $supplierStep WHERE companyID = $cmpID");
    if($conn->error){ echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; } else {
      echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
    }
@@ -127,7 +133,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $ourMessage = test_input($_POST['erp_ourMessage']);
     $yourSign = test_input($_POST['erp_yourSign']);
     $yourOrder = test_input($_POST['erp_yourOrder']);
-    $stmt = $conn->prepare("UPDATE erpNumbers SET ourSign = ?, ourMessage = ?, yourSign = ?, yourOrder = ? WHERE companyID = $cmpID");
+    $stmt = $conn->prepare("UPDATE erp_settings SET ourSign = ?, ourMessage = ?, yourSign = ?, yourOrder = ? WHERE companyID = $cmpID");
     echo $conn->error;
     $stmt->bind_param("ssss", $ourSign, $ourMessage, $yourSign, $yourOrder);
     $stmt->execute();
@@ -390,12 +396,12 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
   </div>
   <div class="container-fluid">
-    <div class="col-sm-4">    
+    <div class="col-sm-4">
       <?php if($companyRow['logo']){echo '<img src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
     </div>
-    <div class="col-sm-8">      
+    <div class="col-sm-8">
       <input type="file" name="fileToUpload"/>
-      <small>Max. 5MB</small>
+      <small>Empfohlen 350x200px; Max. 5MB</small>
     </div>
   </div>
 </form>
@@ -721,7 +727,6 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 </form>
 <br>
 
-
 <!-- ADDITIONAL BOOKING FIELDS -->
 <?php $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); $i = 1; ?>
 <form method="POST" class="page-seperated-section">
@@ -845,7 +850,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 
 <!-- ERP NUMBERS -->
 <?php
-$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID");
 $row = $result->fetch_assoc();
 ?>
 <form method="POST" class="page-seperated-section">
@@ -865,37 +870,47 @@ $row = $result->fetch_assoc();
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></label>
-        <input type="number" class="form-control" name="erp_ang" value="<?php echo $row['erp_ang']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_ang" value="<?php echo $row['erp_ang']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></label>
-        <input type="number" class="form-control" name="erp_aub" value="<?php echo $row['erp_aub']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_aub" value="<?php echo $row['erp_aub']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></label>
-        <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
     </div>
   </div>
   <br>
   <div class="container-fluid">
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></label>
-        <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['GUT']; ?></label>
-        <input type="number" class="form-control" name="erp_gut" value="<?php echo $row['erp_gut']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_gut" value="<?php echo $row['erp_gut']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['STN']; ?></label>
-        <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
     </div>
   </div><br>
+  <br>
+  <div class="container-fluid">
+    <div class="col-md-4"><label>Kundennummernkreis</label><input type="text" name="erp_clientNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['clientNum']; ?>"/></div>
+    <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_clientStep" class="form-control" value="<?php echo $row['clientStep']; ?>"/></div>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <div class="col-md-4"><label>Lieferantennummernkreis</label><input type="text" name="erp_supplierNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['supplierNum']; ?>"/></div>
+    <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_supplierStep" class="form-control" value="<?php echo $row['supplierStep']; ?>"/></div>
+  </div>
 </form><br>
 
-<!-- ERP REFERENCE NUMERAL ROW -->
+<!-- ERP REFERENCE ROW -->
 <?php
-$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID");
 $row = $result->fetch_assoc();
 ?>
 

@@ -102,8 +102,19 @@
   $validation_output = $error_output = '';
 
   if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
+      require __DIR__ ."/ckInOut.php";
+      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      if(isset($_POST['stampIn'])){
+        checkIn($userID);
+        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
+      } elseif(isset($_POST['stampOut'])){
+        $error_output = checkOut($userID, intval($_POST['stampOut']));
+        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
+      }
+    }
     if(isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2){
-        $_POST = array();
+      $_POST = array();
     }
     $_SESSION['posttimer'] = time();
     if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
@@ -131,16 +142,6 @@
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
-    } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-      require __DIR__ ."/ckInOut.php";
-      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      if(isset($_POST['stampIn'])){
-        checkIn($userID);
-        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
-      } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, intval($_POST['stampOut']));
-        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
-      }
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
@@ -152,6 +153,7 @@
       $_SESSION['language'] = 'ENG';
       $validation_output = mysqli_error($conn);
     }
+
     if(isset($_POST['set_skin'])){
       $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
       $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
@@ -696,7 +698,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
+        if(isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php" ){
           echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
         } elseif($this_page == "editSuppliers.php" ){
           echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";

@@ -1046,6 +1046,9 @@ $lang_ger['STREET'] ='Straße';
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';
 
+$lang_eng['SUPERVISOR'] = 'Supervisor';
+$lang_ger['SUPERVISOR'] = 'Vorgesetzter';
+
 $lang_eng['SUPPLIER'] = 'Supplier';
 $lang_ger['SUPPLIER'] = 'Lieferant';
 

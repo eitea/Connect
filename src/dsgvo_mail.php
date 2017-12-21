@@ -68,7 +68,6 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
 <br><hr><br>
 <?php if($action): ?>
 <form method="POST">
-
 <?php
 if($action == 'edit'){
     echo '<input type="hidden" name="edit_report" value="'.$action_id.'" />';

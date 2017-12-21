@@ -110,7 +110,7 @@ function create_tables($conn) {
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     companyID INT(6) UNSIGNED,
-    clientNumber VARCHAR(12),
+    clientNumber VARCHAR(15),
     isSupplier VARCHAR(10) DEFAULT 'FALSE',
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
@@ -548,7 +548,20 @@ function create_tables($conn) {
   )";
 	if (! $conn->query ( $sql )) {
 		echo mysqli_error ( $conn );
-	}
+  }
+  
+  $sql = "CREATE TABLE mailRecipients(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reportID INT(6) UNSIGNED,
+    email VARCHAR(50) NOT NULL,
+    name VARCHAR(50),
+    FOREIGN KEY (reportID) REFERENCES templateData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  	)";
+	if (! $conn->query ( $sql )) {
+    echo mysqli_error ( $conn );
+  }
 	
 	/*
 	 * cOnDate is Date this correction was created On
@@ -796,8 +809,8 @@ function create_tables($conn) {
 	if (! $conn->query ( $sql )) {
 		echo mysqli_error ( $conn );
 	}
-	
-	$sql = "CREATE TABLE erpNumbers(
+  
+	$sql = "CREATE TABLE erp_settings(
     companyID INT(6) UNSIGNED,
     erp_ang INT(5) DEFAULT 1,
     erp_aub INT(5) DEFAULT 1,

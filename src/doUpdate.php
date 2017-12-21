@@ -144,7 +144,7 @@ if ($row ['version'] < 54) {
     FOREIGN KEY (reportID) REFERENCES $pdfTemplateTable(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  )";
+  	)";
 	if (! $conn->query ( $sql )) {
 		echo '<br>' . $conn->error;
 	} else {
@@ -2363,7 +2363,7 @@ if ($row['version'] < 118) {
 			$stmt->execute();
 			$i++;
 		}
-
+		
 		$conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
 		$templateID = $conn->insert_id;
 		//APPS
@@ -2441,6 +2441,65 @@ if ($row['version'] < 118) {
 	}
 	$stmt->close();
 	$stmt_vv->close();
+}
+
+if($row['version'] < 119) {
+	$conn->query("CREATE TABLE erp_settings(
+	companyID INT(6) UNSIGNED,
+	erp_ang INT(5) DEFAULT 1,
+	erp_aub INT(5) DEFAULT 1,
+	erp_re INT(5) DEFAULT 1,
+	erp_lfs INT(5) DEFAULT 1,
+	erp_gut INT(5) DEFAULT 1,
+	erp_stn INT(5) DEFAULT 1,
+	yourSign VARCHAR(30),
+	yourOrder VARCHAR(30),
+	ourSign VARCHAR(30),
+	ourMessage VARCHAR(30),
+	clientNum VARCHAR(12),
+	clientStep INT(2),
+	supplierNum VARCHAR(12),
+	supplierStep INT(2),
+	FOREIGN KEY (companyID) REFERENCES companyData(id)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Zähleinstellungen: Lieferanten und Kunden';
+	}
+	$conn->query("INSERT INTO erp_settings (companyID, erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, yourSign, yourOrder, ourSign, ourMessage, clientNum, clientStep, supplierNum, supplierStep)
+	SELECT companyID, erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, yourSign, yourOrder, ourSign, ourMessage, '1000', '1', '1000', '1' FROM erpNumbers");
+	echo $conn->error;
+	$conn->query("DROP TABLE erpNumbers");echo $conn->error;
+
+	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Benutzer: Vorgesetzter';
+	}
+
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN homepage VARCHAR(100)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Datenstamm: Homepage';
+	}
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN mail VARCHAR(100)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Datenstamm: Allgemeine E-Mails';
+	}
+
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN billDelivery VARCHAR(60)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Kundendetails: Rechnungsversand';
+	}
 }
 
 // ------------------------------------------------------------------------------

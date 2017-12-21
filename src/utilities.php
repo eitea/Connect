@@ -57,7 +57,7 @@ function isHoliday($ts){|
 */
 
 function test_input($data){
-  $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§$%()+*öäüÖÄÜß_ ]~", "", $data);
+  $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
   $data = trim($data);
   return $data;
 }
@@ -134,7 +134,7 @@ function match_passwordpolicy($p, &$out = ''){
 
 function getNextERP($identifier, $companyID, $offset = 0){
   require "connection.php";
-  $result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $companyID"); echo $conn->error;
+  $result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $companyID"); echo $conn->error;
   if($row = $result->fetch_assoc()){
     $offset = $row['erp_'.strtolower($identifier)];
     $offset--;
