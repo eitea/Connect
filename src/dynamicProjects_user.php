@@ -71,6 +71,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
 if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || $forceCreate)) {
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
     $id = $_POST["id"] ?? "";
+    $projectDataId = $_POST["projectdataid"] ?? "";
     $name = $_POST["name"] ?? "missing name";
     $description = $_POST["description"] ?? "missing description";
     $company = $_POST["company"] ?? "";
@@ -140,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $end = $conn->real_escape_string($end);
     $status = $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed'");
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted, projectdataid) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed', '$projectDataId') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed', projectdataid='$projectDataId'");
     echo $conn->error;
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
@@ -189,29 +190,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST["play"])){
         $conn->query("INSERT INTO dynamicprojectsbookings (projectid, userid) VALUES ('$projectID', $userID)");
     }else if(isset($_POST["pause"])){
-        $bookingtext = $_POST["description"];
+        $bookingtext = $_POST["description"] ?? "no description";
         $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
         echo $conn->error;
-        $insertInfoText = "info";
-        $insertInternInfoText = "intern info";
-        $startDate = date("Y-m-d H:i:s");
-        $endDate = date("Y-m-d H:i:s");
-
-        $bookingStart = $conn->query("SELECT bookingstart FROM dynamicprojectsbookings WHERE 
-        bookingend >= ALL (SELECT bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID)")->fetch_assoc()["bookingstart"];
+        //$endDate = date("Y-m-d H:i:s");
+        $projectDataId = $conn->query("SELECT projectdataid FROM dynamicprojects WHERE projectid = '$projectID'")->fetch_assoc()["projectdataid"];
+        $startEndArray = $conn->query("SELECT bookingstart, bookingend FROM dynamicprojectsbookings WHERE 
+        bookingend >= ALL (SELECT bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID)")->fetch_assoc();
+        $bookingStart = $startEndArray["bookingstart"];
+        $bookingEnd = $startEndArray["bookingend"];
         echo $conn->error;
-        $conn->query("INSERT INTO logs (time,timeEnd,userID) VALUES ('$bookingStart','$endDate',$userID)");
-        echo $conn->error;
-        $indexIM /* log id */ = $conn->query("SELECT indexIM FROM logs WHERE timeEnd = '$endDate' AND userID = $userID")->fetch_assoc()["indexIM"];
+        echo "End[{$bookingEnd}] Start[{$bookingStart}]";
+        //$conn->query("INSERT INTO logs (time,timeEnd,userID) VALUES ('$bookingStart','$endDate',$userID)");
+        //$indexIM  = $conn->query("SELECT indexIM FROM logs WHERE timeEnd = '$endDate' AND userID = $userID")->fetch_assoc()["indexIM"]; //log id
+        $indexIM = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'")->fetch_assoc()["indexIM"];
         echo $conn->error;
         $conn->query("INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType)
-        VALUES('$startDate', '$endDate', NULL, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project' )");
+        VALUES('$bookingStart', CURRENT_TIMESTAMP, $projectDataId, $indexIM, '$bookingtext', NULL, 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
         echo $conn->error;
-
-
     }else if(isset($_POST["stop"])){
         echo "stop not implemented";
-        //insert into bookings with text
     }
 }
 
@@ -245,6 +243,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     ");
     while ($row = $result->fetch_assoc()) {
         $id = $row["projectid"];
+        $projectDataId = $row["projectdataid"];
         $name = $row["projectname"];
         $description = $row["projectdescription"];
         $company = $row["companyid"];
@@ -331,6 +330,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $modal_status = $status; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
         $modal_priority = $priority;
         $modal_id = $id;
+        $modal_project_data_id = $projectDataId;        
         $modal_pictures = $pictures;
         $modal_parent = $parent; //default: "none" or ""
         $modal_clients = $clients; //array of ids

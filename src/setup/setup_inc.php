@@ -851,6 +851,7 @@ $sql = "CREATE TABLE identification(
 
   $conn->multi_query("CREATE TABLE dynamicprojects(
       projectid VARCHAR(100) NOT NULL,
+      projectdataid INT(6) UNSIGNED,
       projectname VARCHAR(60) NOT NULL,
       projectdescription VARCHAR(500) NOT NULL,
       companyid INT(6),
