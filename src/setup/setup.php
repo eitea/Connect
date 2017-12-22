@@ -60,7 +60,7 @@ ignore_user_abort(1);
     }
     return implode($psw); //turn the array into a string
   }
-  function match_passwordpolicy($p, &$out = ''){
+  function match_passwordpolicy_setup($p, &$out = ''){
     if(strlen($p) < 6){
       $out = "Password must be at least 6 Characters long.";
       return false;
@@ -123,7 +123,7 @@ ignore_user_abort(1);
             $domainname = clean($_POST['domainPart']);
             $loginname = clean($_POST['localPart']) .'@'.$domainname;
 
-            if(match_passwordpolicy(test_input($_POST['adminPass']), $out)){
+            if(match_passwordpolicy_setup(test_input($_POST['adminPass']), $out)){
               $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
               //create connection file
               $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
@@ -201,8 +201,8 @@ ignore_user_abort(1);
               $sql = "INSERT INTO intervalData (userID) VALUES (2);";
               $conn->query($sql);
               //insert roletable
-              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
+              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
               $conn->query($sql);
               //insert company-client relationship
               $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";

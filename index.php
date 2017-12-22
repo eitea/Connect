@@ -1,5 +1,6 @@
 <?php
 $routes = array(
+
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
   'login/access' => 'login_tester.php',
@@ -25,7 +26,9 @@ $routes = array(
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
   'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',             'project/log' => 'audit_projectBookings.php',
 
-  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
+  'dynamic-projects/user' => 'dynamicProjects_user.php', 'dynamic-projects/admin' => 'dynamicProjects_admin.php',
+
+  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',       'report/autotask' => 'autotask.php',
 
   'erp/view' => 'erp_view.php',                    'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',

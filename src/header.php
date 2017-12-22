@@ -28,17 +28,18 @@
     $isERPAdmin = $row['isERPAdmin'];
     $isFinanceAdmin = $row['isFinanceAdmin'];
     $isDSGVOAdmin = $row['isDSGVOAdmin'];
+    $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
-    $canUseSocialMedia = $row['canUseSocialMedia'];
+    $canUseSocialMedia = $row['canUseSocialMedia'];    
   } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
   }
 
   if($userID == 1){ //superuser
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'TRUE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
     $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
   }
 
@@ -60,11 +61,13 @@
   }
 
 
-  $result = $conn->query("SELECT enableSocialMedia FROM modules");
+  $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
   if($result && ($row = $result->fetch_assoc())){
     $enableSocialMedia = $row['enableSocialMedia'];
+    $enableDynamicProjects = $row['enableDynamicProjects'];
   } else {
     $enableSocialMedia = 'FALSE';
+    $enableDynamicProjects = 'FALSE';
   }
   if($enableSocialMedia == 'TRUE'){
     $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
@@ -477,7 +480,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
+            <?php if($enableDynamicProjects == 'TRUE'):?>
+              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
+            <?php endif; //dynamicProjects ?> 
+          <?php endif; ?>
+
+          <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
+              <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;} ?> href="../dynamic-projects/admin"><i class="fa fa-gavel"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
       </ul>

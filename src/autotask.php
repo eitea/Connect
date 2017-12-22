@@ -47,3 +47,6 @@ while($result && ($row = $result->fetch_assoc())){
     }
   }
 }
+
+
+require "dynamicProjects_seriesAutoAdvancer.php";
