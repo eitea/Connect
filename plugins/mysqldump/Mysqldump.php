@@ -115,10 +115,10 @@ class MySQLDump
 	 * @param  resource
 	 * @return void
 	 */
-	public function dumpTable($handle, $table)
-	{
+	public function dumpTable($handle, $table){
 		$delTable = $this->delimite($table);
 		$res = $this->connection->query("SHOW CREATE TABLE $delTable");
+		echo $this->connection->error;
 		$row = $res->fetch_assoc();
 		$res->close();
 

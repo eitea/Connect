@@ -397,7 +397,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
   </div>
   <div class="container-fluid">
     <div class="col-sm-4">
-      <?php if($companyRow['logo']){echo '<img src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
+      <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
     </div>
     <div class="col-sm-8">
       <input type="file" name="fileToUpload"/>
