@@ -37,13 +37,12 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
     exit("cannot open $zip_name \n");
   }
   $zip->addFromString($backup_name, $content);
-  $zip->close();
-
   if($password){
     $zip->setPassword($password);
     $zip->setEncryptionName($backup_name, ZipArchive::EM_AES_256); //php 7.2. update
     //system("zip -P $password $zip_name $zip_name");
   }
+  $zip->close();
 
   header('Content-Type: application/octet-stream');
   header("Content-Transfer-Encoding: Binary");

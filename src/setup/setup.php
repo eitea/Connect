@@ -170,6 +170,7 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
               $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+              echo $conn->error;
               $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
               $stmt->execute();
               $stmt->close();
