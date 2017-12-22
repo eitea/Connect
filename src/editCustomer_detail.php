@@ -84,6 +84,14 @@ if (! empty ( $_POST ['saveAll'] )) {
 		$val = test_input ( $_POST ['fax_number'] );
 		$conn->query ( "UPDATE $clientDetailTable SET fax_number = '$val' WHERE id = $detailID" );
 	}
+	if (isset ( $_POST ['homepage'] )) {
+		$val = test_input ( $_POST ['homepage'] );
+		$conn->query ( "UPDATE $clientDetailTable SET homepage = '$val' WHERE id = $detailID" );
+	}
+	if (isset ( $_POST ['mail'] ) && filter_var ( $_POST ['mail'], FILTER_VALIDATE_EMAIL )) {
+		$val = test_input ( $_POST ['mail'] );
+		$conn->query ( "UPDATE $clientDetailTable SET mail = '$val' WHERE id = $detailID" );
+	}
 	if (isset ( $_POST ['debitNumber'] )) {
 		$val = intval ( $_POST ['debitNumber'] );
 		$conn->query ( "UPDATE $clientDetailTable SET debitNumber = '$val' WHERE id = $detailID" );
@@ -145,6 +153,10 @@ if (! empty ( $_POST ['saveAll'] )) {
 	if (isset ( $_POST ['billingMailAddress'] ) && filter_var ( $_POST ['billingMailAddress'], FILTER_VALIDATE_EMAIL )) {
 		$val = test_input ( $_POST ['billingMailAddress'] );
 		$conn->query ( "UPDATE $clientDetailTable SET billingMailAddress = '$val' WHERE id = $detailID" );
+	}
+	if (isset ( $_POST ['billDelivery'] )) {
+		$val = test_input ( $_POST ['billDelivery'] );
+		$conn->query ( "UPDATE $clientDetailTable SET billDelivery = '$val' WHERE id = $detailID" );
 	}
 	if (isset ( $_POST ['warningEnabled'] )) {
 		$conn->query ( "UPDATE $clientDetailTable SET warningEnabled = 'true' WHERE id = $detailID" );
@@ -520,7 +532,7 @@ $resultContacts = $conn->query ( "SELECT * FROM contactPersons WHERE clientID = 
 		<div class="row form-group">
 			<div class="col-xs-2 text-right">E-Mail</div>
 			<div class="col-sm-5">
-				<input type="text" class="form-control" name="mail" value="<?php echo $row ['mail']; ?>" placeholder="E-Mail" />
+				<input type="email" class="form-control" name="mail" value="<?php echo $row ['mail']; ?>" placeholder="E-Mail" />
 			</div>
 		</div>
 		<br><br>
@@ -759,12 +771,22 @@ $resultContacts = $conn->query ( "SELECT * FROM contactPersons WHERE clientID = 
 			</div>
 		</div>
 	<br><hr><br>
-	<div class="row form-group">
+		<div class="row form-group">
 			<div class="col-xs-2 text-right">
 				Rechnungsadresse (E-Mail)
 			</div>
 			<div class="col-sm-3">
 				<input type="email" name="billingMailAddress" class="form-control" value="<?php echo $row ['billingMailAddress']; ?>" />
+			</div>
+			<div class="col-xs-2 text-center">
+				Rechnungsversand
+			</div>
+			<div class="col-sm-3">
+				<select name="billDelivery" class="js-example-basic-single">
+					<option <?php if($row['billDelivery'] == 'Fax') echo 'selected'; ?> value="Fax">Fax</option>
+					<option <?php if($row['billDelivery'] == 'Post') echo 'selected'; ?> value="Post">Post</option>
+					<option <?php if($row['billDelivery'] == 'E-Mail') echo 'selected'; ?> value="E-Mail">E-Mail</option>
+				</select>
 			</div>
 		</div>
 	</div>
