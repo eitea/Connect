@@ -6,7 +6,6 @@ require "dynamicProjects_classes.php";
 
 $forceCreate = false;
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
-    //edit deletes the project and recreates it
     $forceCreate = true;
     $id = $id = $_POST["id"] ?? "error - no id";
     $id = $conn->real_escape_string($id);
@@ -144,7 +143,10 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST["deleteDynamicProject"])){
         $id = $id = $_POST["id"] ?? "error - no id";
         $id = $conn->real_escape_string($id);
+        $projectDataId = $conn->query("SELECT projectdataid FROM dynamicprojects WHERE projectid = '$id'")->fetch_assoc()["projectdataid"];
         $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'");
+        //also delete the static project
+        $conn->query("DELETE FROM projectData WHERE id = '$projectDataId'");
     }
 }
 ?>

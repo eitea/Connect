@@ -200,7 +200,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $bookingStart = $startEndArray["bookingstart"];
         $bookingEnd = $startEndArray["bookingend"];
         echo $conn->error;
-        echo "End[{$bookingEnd}] Start[{$bookingStart}]";
         //$conn->query("INSERT INTO logs (time,timeEnd,userID) VALUES ('$bookingStart','$endDate',$userID)");
         //$indexIM  = $conn->query("SELECT indexIM FROM logs WHERE timeEnd = '$endDate' AND userID = $userID")->fetch_assoc()["indexIM"]; //log id
         $indexIM = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'")->fetch_assoc()["indexIM"];

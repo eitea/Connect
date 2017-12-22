@@ -399,7 +399,7 @@ $disabled = $modal_isAdmin ? "": "disabled";
                     </div>
                     <!-- /modal body -->
                     <div class="modal-footer">
-                        <?php if ($modal_id):?>
+                        <?php if ($modal_id && $modal_isAdmin):?>
                         <button type="submit" class="btn btn-danger ask-before-submit<?php echo stripSymbols($modal_id) ?> disable-required-fields<?php echo stripSymbols($modal_id) ?>" name="deleteDynamicProject">
                             <?php echo $lang["DELETE"]; ?>
                         </button>
