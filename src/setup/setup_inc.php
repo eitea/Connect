@@ -1179,7 +1179,7 @@ function create_tables($conn) {
 		echo $conn->error;
   }
   
-  $conn->multi_query("CREATE TABLE dynamicprojects(
+  $sql = "CREATE TABLE dynamicprojects(
     projectid VARCHAR(100) NOT NULL,
     projectdataid INT(6) UNSIGNED,
     projectname VARCHAR(60) NOT NULL,
@@ -1194,44 +1194,68 @@ function create_tables($conn) {
     projectowner INT(6),
     projectcompleted INT(6),
     PRIMARY KEY (`projectid`)
-  );
-  CREATE TABLE dynamicprojectsclients(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsclients(
     projectid VARCHAR(100) NOT NULL,
     clientid INT(6),
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsemployees(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsemployees(
     projectid VARCHAR(100) NOT NULL,
     userid INT(6),
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsoptionalemployees(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
     projectid VARCHAR(100) NOT NULL,
     userid INT(6),
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectspictures(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectspictures(
     projectid VARCHAR(100) NOT NULL,
     picture MEDIUMBLOB,
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsseries(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsseries(
     projectid VARCHAR(100) NOT NULL,
     projectnextdate VARCHAR(12),
     projectseries MEDIUMBLOB,
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsnotes(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsnotes(
     projectid VARCHAR(100) NOT NULL,
     noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -1240,18 +1264,21 @@ function create_tables($conn) {
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsbookings(
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsbookings(
     projectid VARCHAR(100) NOT NULL,
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
     bookingend DATETIME,
     userid INT(6) UNSIGNED,
     bookingtext VARCHAR(1000)
-  );
-  ");
-  if ($conn->error) {
-    echo $conn->error;
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
   }
 
 }
