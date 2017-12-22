@@ -1,103 +1,136 @@
 <?php require 'header.php'; enableToERP($userID); ?>
-<script src="../plugins/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="../plugins/jQuery/jquery-ui/jquery-ui.min.js"></script>
 <?php
 $meta_curDate = $meta_deliveryDate = getCurrentTimestamp();
-$meta_skonto1 = $meta_skonto1Days = $meta_daysNetto = $meta_porto = $meta_porto_percentage = 0;
-$meta_yourSign = $meta_yourOrder = $meta_ourSign = $meta_ourMessage = $meta_paymentMethod = $meta_shipmentType = $meta_representative = '';
+$meta_porto = $meta_porto_percentage = 0;
+$meta_paymentMethod = $meta_shipmentType = $meta_representative = $meta_header = '';
 
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
-  $_SESSION['filterings'] = array(); //clear filterings if they come from another page
+if(!empty($_GET['val'])){
+  $historyID = intval($_GET['val']);
+} else {
+  redirect('view?err=1');
 }
 
-$filterings = array('savePage' => $this_page, 'proposal' => 0, 'client' => 0, 'number' => '');
-//first visit of page
-if(!empty($_POST['proposalID'])){
-  $filterings['proposal'] = intval($_POST['proposalID']);
-} elseif(!empty($_POST['nERP']) && array_key_exists($_POST['nERP'], $lang['PROPOSAL_TOSTRING']) && !empty($_POST['filterClient'])) {
-  $filterings['client'] = intval($_POST['filterClient']);
-  $process = $_POST['nERP'];
-  $result = $conn->query("SELECT companyID FROM clientData WHERE id = ".$filterings['client']);
-  if($row = $result->fetch_assoc()){
-    $filterings['number'] = getNextERP($process, $row['companyID']);
-  }
-} else { //other visits
-  $filterings = $_SESSION['filterings'];
+$result = $conn->query("SELECT proposals.*, companyID, id_number FROM proposals, processHistory, clientData 
+WHERE proposals.clientID = clientData.id AND proposals.id = processHistory.processID AND processHistory.id = $historyID");
+if($result && $result->num_rows > 0){
+  $proposal_row = $result->fetch_assoc();
+} else {
+  redirect('view?err=2'); //STRIKE
+}
+if(!in_array($proposal_row['companyID'], $available_companies)){
+  redirect('view?err=2'); //STRIKE
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['meta_curDate']) && test_Date($_POST['meta_curDate'].' 12:00:00')){
     $meta_curDate = test_input($_POST['meta_curDate'].' 12:00:00');
+    $proposal_row['curDate'] = $meta_curDate;
   }
   if(isset($_POST['meta_deliveryDate']) && test_Date($_POST['meta_deliveryDate'].' 12:00:00')){
     $meta_deliveryDate = test_input($_POST['meta_deliveryDate'].' 12:00:00');
-  }
-  if(isset($_POST['meta_yourSign'])){
-    $meta_yourSign = test_input($_POST['meta_yourSign']);
-  }
-  if(isset($_POST['meta_yourOrder'])){
-    $meta_yourOrder = test_input($_POST['meta_yourOrder']);
-  }
-  if(isset($_POST['meta_ourSign'])){
-    $meta_ourSign = test_input($_POST['meta_ourSign']);
-  }
-  if(isset($_POST['meta_ourMessage'])){
-    $meta_ourMessage = test_input($_POST['meta_ourMessage']);
-  }
-  if(isset($_POST['meta_daysNetto'])){
-    $meta_daysNetto = intval($_POST['meta_daysNetto']);
-  }
-  if(isset($_POST['meta_skonto1'])){
-    $meta_skonto1 = floatval($_POST['meta_skonto1']);
-  }
-  if(isset($_POST['meta_skonto1Days'])){
-    $meta_skonto1Days = intval($_POST['meta_skonto1Days']);
+    $proposal_row['deliveryDate'] =  $meta_deliveryDate;
   }
   if(isset($_POST['meta_paymentMethod'])){
     $meta_paymentMethod = test_input($_POST['meta_paymentMethod']);
+    $proposal_row['paymentMethod'] =  $meta_paymentMethod;
   }
   if(isset($_POST['meta_shipmentType'])){
     $meta_shipmentType = test_input($_POST['meta_shipmentType']);
+    $proposal_row['shipmentType'] =  $meta_shipmentType;
   }
   if(isset($_POST['meta_representative'])){
     $meta_representative = test_input($_POST['meta_representative']);
+    $proposal_row['representative'] =  $meta_representative;
   }
   if(isset($_POST['meta_porto'])){
     $meta_porto = floatval($_POST['meta_porto']);
+    $proposal_row['porto'] =  $meta_porto;
+  }
+  if(isset($_POST['meta_header'])){
+    $meta_header = test_input($_POST['meta_header']);
+    $proposal_row['header'] =  $meta_header;
   }
   if(isset($_POST['meta_porto_percentage'])){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
+    $proposal_row['portoRate'] =  $meta_porto_percentage;
   }
-  if(!$filterings['proposal'] && $filterings['client']){ //new proposal
-    $conn->query("INSERT INTO proposals (id_number, clientID, status, curDate, deliveryDate, yourSign, yourOrder, ourSign, ourMessage, daysNetto, skonto1, skonto1Days, paymentMethod, shipmentType, representative, porto, portoRate)
-    VALUES ('".$filterings['number']."', ".$filterings['client'].", '0', '$meta_curDate', '$meta_deliveryDate', '$meta_yourSign', '$meta_yourOrder', '$meta_ourSign', '$meta_ourMessage', '$meta_daysNetto',
-    '$meta_skonto1', '$meta_skonto1Days', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative', '$meta_porto', '$meta_porto_percentage')");
-    $filterings['proposal'] = mysqli_insert_id($conn);
-    echo $conn->error;
-  }
-  if(isset($_POST['add_position_sum'])){
+
+  if(isset($_POST['translate'])){
+    if(!empty($_POST['copy_transition'])){
+      $transit = $_POST['copy_transition'];
+      $prod_list = array();
+      //step1 - get all products (id quantity and origin) from current history
+      $res = $conn->query("SELECT * FROM products WHERE historyID = $historyID");
+      while($row = $res->fetch_assoc()){
+        if($row['origin']){
+          $prod_list[$row['origin']] = $row;
+        } else {  //origins can be empty... what to do then?
+          $prod_list[$row['id']] = $row;
+        }
+      }
+      //step2 - reduce by all products which are same as transit
+      $res = $conn->query("SELECT quantity, origin FROM products INNER JOIN processHistory ON products.historyID = processHistory.id 
+      WHERE processHistory.processID = ".$proposal_row['id']." AND id_number LIKE '$transit%'"); echo $conn->error;
+      while($row = $res->fetch_assoc()){
+        if(isset($prod_list[$row['origin']])){
+          $prod_list[$row['origin']]['quantity'] -= $row['quantity'];
+        }
+      }
+      //step3 - create new history and enter products with quantities
+      $num = getNextERP($transit, $proposal_row['companyID']);
+      $conn->query("INSERT INTO processHistory (id_number, processID) VALUES('$num', ".$proposal_row['id'].")"); echo $conn->error;
+      $historyID = $conn->insert_id;
+      $stmt = $conn->prepare("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      $stmt->bind_param("isisddsidsdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
+      foreach($prod_list as $p){
+        if($p['quantity'] > 0 || !$p['origin']){
+          $origin = $p['origin'];
+          $pos = $p['position'];
+          $name = $p['name'];
+          $price = $p['price'];
+          $quantity = $p['quantity'];
+          $desc = $p['description'];
+          $taxID = $p['taxID'];
+          $cash = $p['cash'];
+          $unit = $p['unit'];
+          $purchase = $p['purchase'];
+          $iv = $p['iv'];
+          $iv2 = $p['iv2'];
+          $stmt->execute();
+        }
+        if($stmt->error) echo $stmt->error;
+      }
+      $stmt->close();
+      redirect("edit?val=$historyID");
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
+    }
+  } elseif(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("PARTIAL_SUM")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
     $txt = $mc->encrypt($txt);
-    $conn->query("INSERT INTO products (proposalID, position, name, description, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("CLEAR_TEXT")."', '$txt', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, description, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("CLEAR_TEXT")."', '$txt', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
-    $mc = mc();
+    $mc = new MasterCrypt($_SESSION["masterpassword"]);
     $iv = $mc->iv;
     $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO products (proposalID, position, name, iv, iv2) VALUES(".$filterings['proposal'].", $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
+    $conn->query("INSERT INTO products (historyID, position, name, iv, iv2) VALUES($historyID, $LAST_POSITION, '".$mc->encrypt("NEW_PAGE")."', '$iv', '$iv2')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
-  } elseif(isset($_POST['add_product']) && ($filterings['proposal'] || $filterings['client'])){
+  } elseif(isset($_POST['add_product'])){
     $LAST_POSITION = intval($_POST['add_product']) +1;
     if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity']) && !empty($_POST['add_product_price'])){
       $product_name = test_input($_POST['add_product_name']);
@@ -111,21 +144,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if(!empty($_POST['add_product_as_bar'])){
         $product_is_cash = 'TRUE';
       }
-      $result_tax = $conn->query("SELECT percentage FROM taxRates WHERE id = $product_tax_id");
-      $row_tax = $result_tax->fetch_assoc();
-      $mc = mc();
+      $product_origin = randomPassword(16);
+      $mc = new MasterCrypt($_SESSION["masterpassword"]);
       $iv = $mc->iv;
       $iv2 = $mc->iv2;
       $product_name = $mc->encrypt($product_name);
       $product_description = $mc->encrypt($product_description);
-      $conn->query("INSERT INTO products (proposalID, position, name, price, quantity, description, taxPercentage, cash, unit, purchase, iv, iv2)
-      VALUES(".$filterings['proposal'].", $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '".$row_tax['percentage']."', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
+      $conn->query("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
+      VALUES($historyID, '$product_origin', $LAST_POSITION, '$product_name', '$product_price', '$product_quantity', '$product_description', '$product_tax_id', '$product_is_cash', '$product_unit', '$product_purchase', '$iv', '$iv2')");
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
-  } elseif(isset($_POST['add_product'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
   } elseif(!empty($_POST['delete_product'])){
     $i = intval($_POST['delete_product']);
     $conn->query("DELETE FROM products WHERE id = $i");
@@ -134,7 +164,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $x = intval($_POST['update_product']);
     $check_result = $conn->query("SELECT name,iv,iv2 FROM products WHERE id = $x");
     if($check_row = $check_result->fetch_assoc()){
-      $mc = mc($check_row["iv"],$check_row["iv2"]);
+      $mc = new MasterCrypt($_SESSION["masterpassword"],$check_row["iv"],$check_row["iv2"]);
       if($mc->decrypt($check_row['name']) == 'CLEAR_TEXT'){
         $product_description = test_input($_POST['update_description_'.$x]);
         $product_description = $mc->encrypt($product_description);
@@ -144,12 +174,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $product_name = test_input($_POST['update_name_'.$x]);
         $product_description = test_input($_POST['update_description_'.$x]);
         $product_quantity = floatval($_POST['update_quantity_'.$x]);
+        $product_purchase = floatval($_POST['update_purchase_'.$x]);
         $product_price = floatval($_POST['update_price_'.$x]);
         $product_tax_id = intval($_POST['update_tax_'.$x]);
         $product_unit = test_input($_POST['update_unit_'.$x]);
         $product_name = $mc->encrypt($product_name);
         $product_description = $mc->encrypt($product_description);
-        $conn->query("UPDATE products SET name='$product_name', description='$product_description', quantity='$product_quantity', price='$product_price', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
+        $product_bar = 'FALSE';
+        if(isset($_POST['update_bar_'.$x])) $product_bar = 'TRUE';
+        $conn->query("UPDATE products SET name='$product_name', cash='$product_bar', description='$product_description', quantity='$product_quantity', price='$product_price', purchase='$product_purchase', taxID=$product_tax_id, unit='$product_unit' WHERE id = $x");
         if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -157,7 +190,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['save_positions']) && !empty($_POST['positions']) && !empty($_POST['positions_id'])){
     if(count($_POST['positions']) == count($_POST['positions_id'])){
-      $conn->query("UPDATE products SET position = NULL WHERE proposalID = ".$filterings['proposal']);
+      $conn->query("UPDATE products SET position = NULL WHERE historyID = $historyID");
       $stmt = $conn->prepare("UPDATE products SET position = ? WHERE id = ?");
       $stmt->bind_param("ii", $position, $id);
       for($i = 0; $i < count($_POST['positions']); $i++){
@@ -167,54 +200,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     }
-  } elseif(!empty($_POST['translate']) && !empty($_POST['transit'])){
-    $filterings['proposal'] = intval($_POST['translate']);
-    $result = $conn->query("SELECT companyID FROM proposals, clientData WHERE proposals.clientID = clientData.id AND proposals.id = ".$filterings['proposal']);
-    if($row = $result->fetch_assoc()){
-      $filterings['number'] = getNextERP($_POST['nERP'], $row['companyID']);
-    }
-    $filterings['number'] = getNextERP(test_input($_POST['transit']));
-    $conn->query("UPDATE proposals SET history = CONCAT_WS(' ', history , id_number), id_number = '".$filterings['number']."' WHERE id = ".$filterings['proposal']);
-  } elseif(isset($_POST['translate'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_DATA'].'</div>';
-  } elseif(isset($_POST['update_articles']) && $filterings['proposal']){
-    $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxPercentage = a.taxPercentage, p.purchase = a.purchase, p.cash = a.cash
-    WHERE a.name = p.name AND p.proposalID = ".$filterings['proposal']);
+  } elseif(isset($_POST['update_articles'])){
+    $conn->query("UPDATE products p, articles a SET p.description = a.description, p.price = a.price, p.unit = a.unit, p.taxID = a.taxID, p.purchase = a.purchase, p.cash = a.cash
+    WHERE a.name = p.name AND p.historyID = $historyID");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
-  } elseif(isset($_POST['update_clientData']) && $filterings['client']){
+  } elseif(isset($_POST['update_clientData'])){
     $conn->query("UPDATE proposals p, clientInfoData c
-      SET p.daysNetto = c.daysNetto, p.skonto1 = c.skonto1, p.skonto1Days = c.skonto1Days, p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
-      WHERE p.clientID = c.clientID AND p.id = ".$filterings['proposal']);
+      SET p.paymentMethod = c.paymentMethod, p.shipmentType = c.shipmentType, p.representative = c.representative
+      WHERE p.clientID = c.clientID AND p.id = ".$proposal_row['id']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
   if(isset($_POST['meta_save'])){
-    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', yourSign = '$meta_yourSign', yourOrder = '$meta_yourOrder', ourSign = '$meta_ourSign',
-      ourMessage = '$meta_ourMessage', daysNetto = '$meta_daysNetto', skonto1 = '$meta_skonto1', skonto1Days = '$meta_skonto1Days',
-      paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage'
-      WHERE id =".$filterings['proposal']);
-    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
+    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', 
+    representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id = ".$proposal_row['id']);
+    if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
 } //END POST
-
-if($filterings['proposal']){
-  $result = $conn->query("SELECT * FROM proposals WHERE id = ".$filterings['proposal']);
-  $row = $result->fetch_assoc();
-  $filterings['number'] = $row['id_number'];
-  $filterings['client'] = $row['clientID'];
-} elseif ($filterings['client'] && $filterings['number']) {
-  $result = $conn->query("SELECT * FROM clientInfoData WHERE clientId = ".$filterings['client']);
-  $row = $result->fetch_assoc();
-  $row['yourSign'] = $row['ourSign'] = $row['yourOrder'] = $row['ourMessage'] = $row['porto'] = '';
-  $row['curDate'] = $row['deliveryDate'] = getCurrentTimestamp();
-} else {
-  redirect('view?err=1');
-}
-
-$_SESSION['filterings'] = $filterings; //save your filterings
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$filterings['number'].'</small>'; ?>
+  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$proposal_row['id_number'].'</small>'; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
       <a href="../system/clientDetail?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
@@ -225,10 +230,10 @@ $_SESSION['filterings'] = $filterings; //save your filterings
           <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
         </ul>
       </div>
-      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['TRANSITION']; ?>"><i class="fa fa-arrow-right"></i></a>
+      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
       <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
       <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
-      <a href="download?propID=<?php echo $filterings['proposal']; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a href="download?proc=<?php echo $historyID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
     </div>
   </h3>
 </div>
@@ -246,20 +251,20 @@ $_SESSION['filterings'] = $filterings; //save your filterings
     <tbody>
       <?php
       $LAST_POSITION = 0;
-      $result = $conn->query("SELECT * FROM products WHERE proposalID = ".$filterings['proposal'] .' ORDER BY position ASC');
+      $result = $conn->query("SELECT products.*, percentage FROM products LEFT JOIN taxRates ON taxRates.id = taxID WHERE historyID = $historyID ORDER BY position ASC");
       while($result && ($prod_row = $result->fetch_assoc())){
-        $mc = mc($prod_row['iv'],$prod_row['iv2']);
+        $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
         $prod_row["name"] = $mc->decrypt($prod_row["name"]);
         $prod_row["description"] = $mc->decrypt($prod_row["description"]);
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
-        echo '<td>'.mc_status().$prod_row['name'].'</td>';
-        echo '<td style="max-width:500px;">'.mc_status().$prod_row['description'].'</td>';
+        echo '<td>'.$mc->getStatus().$prod_row['name'].'</td>';
+        echo '<td style="max-width:500px;">'.$mc->getStatus().$prod_row['description'].'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
-        echo '<td>'.intval($prod_row['taxPercentage']).'%</td>';
+        echo '<td>'.intval($prod_row['percentage']).'%</td>';
         echo '<td style="min-width:120px;">';
-        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE')
+        if($prod_row['name'] != 'PARTIAL_SUM' && $prod_row['name'] != 'NEW_PAGE' && (!$masterPasswordHash || $_SESSION['masterpassword']))
           echo '<a class="btn btn-default" data-toggle="modal" data-target=".modal_edit_product_'.$prod_row['id'].'" ><i class="fa fa-pencil"></i></a> ';
         echo '<button type="submit" class="btn btn-default" name="delete_product" value="'.$prod_row['id'].'" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button>';
         echo '</td>';
@@ -307,7 +312,7 @@ $("#sort tbody").sortable({
           if($result){  $result->data_seek(0); }
           $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
-            $mc = mc($prod_row['iv'],$prod_row['iv2']);
+            $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
             $prod_row["name"] = $mc->decrypt($prod_row["name"]);
             $prod_row["description"] = $mc->decrypt($prod_row["description"]);
             if($prod_row['name'] != 'CLEAR_TEXT' && $prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'){
@@ -359,77 +364,78 @@ $("#sort tbody").sortable({
     </div>
   </div>
 <?php
+$unit_select = '';
+$unit_result = $conn->query("SELECT * FROM units");
+while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
+  $unit_select .= '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
+}
+
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
-  $mc = mc($prod_row['iv'],$prod_row['iv2']);
+  $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
   $prod_row["name"] = $mc->decrypt($prod_row["name"]);
   $prod_row["description"] = $mc->decrypt($prod_row["description"]);
   if($prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'):
 $x = $prod_row['id'];
  ?>
   <div class="modal fade modal_edit_product_<?php echo $x ?>">
-    <div class="modal-dialog modal-lg modal-content" role="document">
-      <div class="modal-header">
-        <h4 class="modal-title"><?php echo $prod_row['name']; ?></h4>
-      </div>
+    <div class="modal-dialog modal-md modal-content" role="document">
+      <div class="modal-header"><h4 class="modal-title"><?php echo $prod_row['name']; ?></h4></div>
       <div class="modal-body">
-        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>
-          <div class="container-fluid">
-            <div class="col-md-12">
-              <label>Text<?php echo mc_status(); ?></label>
-              <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
+        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>        
+          <label>Text<?php echo mc_status(); ?></label>
+          <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
+        <?php else: ?>
+          <label>Name<?php echo mc_status(); ?></label>
+          <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
+          <br>
+            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
+            <textarea class="form-control" rows="3" name="update_description_<?php echo $x ?>"><?php echo $prod_row['description']; ?></textarea>
+          <br>
+          <div class="row">
+            <div class="col-md-4">
+              <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
+              <input type="number" step='0.01' class="form-control money" name="update_purchase_<?php echo $x ?>" value="<?php echo $prod_row['purchase']; ?>"/>
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <label><?php echo $lang['PRICE_STK']; ?> (Netto)</label>
+              <input type="text" class="form-control money" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
             </div>
           </div>
-        <?php else: ?>
-        <div class="container-fluid">
-          <div class="col-md-6">
-            <label>Name<?php echo mc_status(); ?></label>
-            <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
+          <br>
+          <div class="row">          
+            <div class="col-md-6">
+              <label><?php echo $lang['QUANTITY']; ?></label>
+              <input type="text" class="form-control" name="update_quantity_<?php echo $x ?>" value="<?php echo $prod_row['quantity']; ?>"/>
+            </div>
+            <div class="col-md-6">
+              <label><?php echo $lang['UNIT']; ?></label>
+              <select class="js-example-basic-single" name="update_unit_<?php echo $x ?>">
+                <?php echo str_replace('value="'.$prod_row['unit'], 'selected value="'.$prod_row['unit'], $unit_select); ?>
+              </select>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label><?php echo $lang['TAXES']; ?></label><br>
-            <select class="js-example-basic-single" name="update_tax_<?php echo $x ?>">
-              <?php
-              $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
-              while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                $selected = '';
-                if($tax_row['id'] == $prod_row['taxID']) { $selected = 'selected';}
-                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
-              }
-              ?>
-            </select>
+          <br>
+          <div class="row">
+            <div class="col-md-6">
+              <label><?php echo $lang['TAXES']; ?></label><br>
+              <select class="js-example-basic-single" name="update_tax_<?php echo $x ?>">
+                <?php
+                $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+                while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+                  $selected = '';
+                  if($tax_row['id'] == $prod_row['taxID']) { $selected = 'selected';}
+                  echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+                }
+                ?>
+              </select>
+            </div>
+            <div class="col-md-6 checkbox">
+              <label><input type="checkbox" <?php if($prod_row['cash'] == 'TRUE') echo 'checked'; ?> name="update_bar_<?php echo $x ?>" value="TRUE" /><?php echo $lang['CASH_EXPENSE']; ?></label>
+            </div>
           </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-          <div class="col-md-4">
-            <label><?php echo $lang['QUANTITY']; ?></label>
-            <input type="text" class="form-control" name="update_quantity_<?php echo $x ?>" value="<?php echo $prod_row['quantity']; ?>"/>
-          </div>
-          <div class="col-md-4">
-            <label><?php echo $lang['PRICE_STK']; ?></label>
-            <input type="text" class="form-control" name="update_price_<?php echo $x ?>" value="<?php echo $prod_row['price']; ?>"/>
-          </div>
-          <div class="col-md-4">
-            <label><?php echo $lang['UNIT']; ?></label>
-            <select class="js-example-basic-single" name="update_unit_<?php echo $x ?>">
-              <?php
-              $unit_result = $conn->query("SELECT * FROM units");
-              while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
-                echo '<option value="'.$unit_row['unit'].'" >'.$unit_row['name'].'</option>';
-              }
-              ?>
-            </select>
-          </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-          <div class="col-md-12">
-            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
-            <input type="text" class="form-control" name="update_description_<?php echo $x ?>" value="<?php echo $prod_row['description']; ?>"/>
-          </div>
-        </div>
-      <?php endif; ?>
+        <?php endif; ?>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -449,12 +455,12 @@ $x = $prod_row['id'];
       <input type="text" class="form-control required-field" name="add_product_name" maxlength="48"/>
       <br>
       <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
-      <input type="text" class="form-control" name="add_product_description" maxlength="190"/>
+      <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"></textarea>
       <br>
       <div class="row">
         <div class="col-md-3">
           <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
-          <input id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
+          <input id="product_purchase" type="number" step='0.01' class="form-control money" name="add_product_purchase" placeholder="EUR" />
         </div>
         <div class="col-md-1"><label>+</label></div>
         <div class="col-md-3">
@@ -463,15 +469,15 @@ $x = $prod_row['id'];
         </div>
         <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
-          <label><?php echo $lang['PRICE_STK']; ?></label>
-          <input id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
+          <label><?php echo $lang['PRICE_STK']; ?> <small>(Netto)</small></label>
+          <input id="product_price" type="number" step="0.01" class="form-control required-field money" name="add_product_price" placeholder="EUR" />
         </div>
       </div>
       <br>
       <div class="row">
         <div class="col-md-6">
           <label><?php echo $lang['QUANTITY']; ?></label>
-          <input type="number" class="form-control required-field" name="add_product_quantity" value="1" />
+          <input type="number" step="0.01" class="form-control required-field" name="add_product_quantity" value="1" />
         </div>
         <div class="col-md-6">
           <label><?php echo $lang['UNIT']; ?></label>
@@ -491,9 +497,11 @@ $x = $prod_row['id'];
           <label><?php echo $lang['TAXES']; ?></label>
           <select class="js-example-basic-single btn-block" name="add_product_taxes">
             <?php
-            $tax_result = $conn->query("SELECT * FROM taxRates WHERE percentage IS NOT NULL");
+            $tax_result = $conn->query("SELECT * FROM taxRates");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              echo '<option value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+              $selected = '';
+              if($tax_row['id'] == 3) $selected = 'selected'; 
+              echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
             }
             ?>
           </select>
@@ -521,7 +529,7 @@ $x = $prod_row['id'];
         <?php
         $result = $conn->query("SELECT * FROM articles");
         while($result && ($prod_row = $result->fetch_assoc())){
-          $mc = mc($prod_row['iv'],$prod_row['iv2']);
+          $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row['iv'],$prod_row['iv2']);
           echo "<option value='".$prod_row['id']."'>".$mc->decrypt($prod_row['name'])."</option>";
         }
         ?>
@@ -552,85 +560,39 @@ $x = $prod_row['id'];
 
 <div class="modal fade proposal_details">
   <div class="modal-dialog modal-lg modal-content" role="document">
-    <div class="modal-header">
-      <h5>META</h5>
-    </div>
+    <div class="modal-header"><h5>META</h5></div>
     <div class="modal-body">
       <div class="container-fluid">
         <div class="col-md-2"><?php echo $lang['DATE']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($row['curDate'],0,10); ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['DATE_DELIVERY']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($row['deliveryDate'],0,10); ?>" />
-        </div>
+        <div class="col-md-4"><input type="text" class="form-control datepicker" name="meta_curDate" value="<?php echo substr($proposal_row['curDate'],0,10); ?>"/></div>
+        <div class="col-md-2 text-center"><?php echo $lang['EXPIRATION_DATE']; ?>:</div>
+        <div class="col-md-4"><input type="text" class="form-control datepicker" name="meta_deliveryDate" value="<?php echo substr($proposal_row['deliveryDate'],0,10); ?>" /></div>
       </div>
       <br>
       <div class="container-fluid">
-        <div class="col-md-2"><?php echo $lang['PROP_YOUR_SIGN']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_yourSign" value="<?php echo $row['yourSign']; ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['PROP_YOUR_ORDER']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_yourOrder" value="<?php echo $row['yourOrder']; ?>"/>
-        </div>
-      </div>
-      <br>
-      <div class="container-fluid">
-        <div class="col-md-2"><?php echo $lang['PROP_OUR_SIGN']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_ourSign" value="<?php echo $row['ourSign']; ?>"/>
-        </div>
-        <div class="col-md-2 text-center"><?php echo $lang['PROP_OUR_MESSAGE']; ?>:</div>
-        <div class="col-md-4">
-          <input type="text" maxlength="25" class="form-control" name="meta_ourMessage" value="<?php echo $row['ourMessage']; ?>" />
-        </div>
+        <div class="col-md-2">Kopftext</div>
+        <div class="col-md-10"><textarea rows="4" class="form-control" maxlength="400" style="resize: none;" name="meta_header"><?php echo $proposal_row['header']; ?></textarea></div>
       </div>
     </div>
-    <div class="modal-header">
-      <h5>Zahlungsdaten</h5>
-    </div>
+    <div class="modal-header"><h5>Zahlungsdaten</h5></div>
     <div class="modal-body">
       <div class="container-fluid">
-        <div class="col-xs-2">Tage Netto:</div>
-        <div class="col-xs-4">
-          <input type="number" class="form-control" name="meta_daysNetto" value="<?php echo $row['daysNetto']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">Zahlungsweise:</div>
-        <div class="col-xs-4">
+        <div class="col-xs-2">Zahlungsweise:</div>
+        <div class="col-xs-6">
           <select class="js-example-basic-single" name="meta_paymentMethod">
             <option value="">...</option>
             <?php
             $tax_result = $conn->query("SELECT * FROM paymentMethods");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              $selected = $tax_row['name'] == $row['paymentMethod'] ? 'selected' : '';
+              $selected = $tax_row['name'] == $proposal_row['paymentMethod'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
             }
             ?>
           </select>
         </div>
+        <div class="col-xs-4"><a href="payment" class="btn btn-block btn-warning">Zahlungsarten verwalten</a></div>
       </div>
-      <br>
-      <div class="container-fluid">
-        <div class="col-xs-2">
-          Skonto 1: (%)
-        </div>
-        <div class="col-xs-4">
-          <input type="number" step="0.01" class="form-control" name="meta_skonto1" value="<?php echo $row['skonto1']; ?>" />
-        </div>
-        <div class="col-xs-2 text-center">
-          Innerhalb von
-        </div>
-        <div class="col-xs-3">
-          <input type="number" class="form-control" name="meta_skonto1Days" value="<?php echo $row['skonto1Days']; ?>" />
-        </div>
-        <div class="col-xs-1">
-          Tagen
-        </div>
-      </div>
-      <br>
+      <hr>
       <div class="container-fluid">
         <div class="col-xs-2">Versandart:</div>
         <div class="col-xs-4">
@@ -639,7 +601,7 @@ $x = $prod_row['id'];
             <?php
             $tax_result = $conn->query("SELECT * FROM shippingMethods");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              $selected = $tax_row['name'] == $row['shipmentType'] ? 'selected' : '';
+              $selected = $tax_row['name'] == $proposal_row['shipmentType'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
             }
             ?>
@@ -652,7 +614,7 @@ $x = $prod_row['id'];
             <?php
             $tax_result = $conn->query("SELECT * FROM representatives");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              $selected = $tax_row['name'] == $row['representative'] ? 'selected' : '';
+              $selected = $tax_row['name'] == $proposal_row['representative'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
             }
             ?>
@@ -663,7 +625,7 @@ $x = $prod_row['id'];
       <div class="container-fluid">
         <div class="col-xs-2">Porto: (EUR)</div>
         <div class="col-xs-4">
-          <input type="number" step="0.01" class="form-control" name="meta_porto" value="<?php echo $row['porto']; ?>" />
+          <input type="number" step="0.01" class="form-control money" name="meta_porto" value="<?php echo $proposal_row['porto']; ?>" />
         </div>
         <div class="col-xs-2 text-center">Porto Steuer: (%)</div>
         <div class="col-xs-4">
@@ -672,7 +634,7 @@ $x = $prod_row['id'];
             <?php
             $tax_result = $conn->query("SELECT DISTINCT percentage FROM taxRates WHERE percentage IS NOT NULL");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-              $selected = $tax_row['percentage'] == $row['portoRate'] ? 'selected' : '';
+              $selected = $tax_row['percentage'] == $proposal_row['portoRate'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['percentage'].'" >'.$tax_row['percentage'].'% </option>';
             }
             ?>
@@ -688,15 +650,7 @@ $x = $prod_row['id'];
 </div>
 </form>
 
-<?php
-$current_transition = preg_replace('/\d/', '', $filterings['number']);
-//Backward transitions are not possible, as are transitions into same state
-$transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
-$pos = array_search($current_transition, $transitions);
-$bad = array_slice($transitions, 0, $pos);
-$bad[] = $transitions[$pos];
-?>
-<form method="POST" action="view">
+<form method="POST">
   <div class="modal fade choose-transition">
     <div class="modal-dialog modal-sm modal-content">
       <div class="modal-header">
@@ -705,32 +659,27 @@ $bad[] = $transitions[$pos];
       <div class="modal-body">
         <div class="radio">
           <?php
-          $checked = '';
-          foreach($transitions as $t){
-            $disabled = '';
-            if(in_array($t, $bad)){
-              $disabled = 'disabled';
-            }
-            echo "<label><input type='radio' $disabled $checked value='$t' name='transit' /> ".$lang['PROPOSAL_TOSTRING'][$t]."</label><br>";
-            if($current_transition == $t){
-              $checked = 'checked'; //enable the next transition
-            } else {
-              $checked = '';
-            }
+          $transitable = false;
+          $current_transition = preg_replace('/\d/', '', $proposal_row['id_number']);
+          if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
+          if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
+          if($current_transition == 'RE') {$transitable = true; $available_transitions = array('LFS', 'GUT');}
+
+          foreach($available_transitions as $t){
+            echo '<div class="row"><div class="col-xs-6"><label><input type="radio" name="copy_transition" value="'.$t.'" />'.getNextERP($t, $proposal_row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
           }
           ?>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="translate" value="<?php echo $filterings['proposal']; ?>">OK</button>
+        <button type="submit" class="btn btn-warning" name="translate">OK</button>
       </div>
     </div>
   </div>
 </form>
 
 <script type="text/javascript">
-
 function displayArticle(i){
   if(i != ""){
     $.ajax({
@@ -739,11 +688,11 @@ function displayArticle(i){
       type: 'get',
       success : function(resp){
         var res = resp.split("; ");
-        $("[name='add_product_name']").val(res[1]);
-        $("[name='add_product_description']").val(res[2]);
-        $("[name='add_product_price']").val(res[3]);
-        $("[name='add_product_unit']").val(res[4]).trigger('change');
-        $("[name='add_product_taxes']").val(res[5]).trigger('change');
+        $("[name='add_product_name']").val(res[0]);
+        $("[name='add_product_description']").val(res[1]);
+        $("[name='add_product_price']").val(res[2]);
+        $("[name='add_product_unit']").val(res[3]).trigger('change');
+        $("[name='add_product_taxes']").val(res[4]).trigger('change');
         if(res[6] == 'TRUE'){
           $("[name='add_product_as_bar']").prop('checked', true);
         } else {
@@ -788,7 +737,5 @@ $("#product_purchase").on("keyup", function(){
     $("#salePercent").val(Math.round((-1 + v/e) * 10000) / 100);
   }
 });
-
 </script>
-
 <?php require 'footer.php';?>

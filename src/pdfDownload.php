@@ -1,19 +1,20 @@
 <?php
 if($_SERVER['REQUEST_METHOD'] != 'POST'){
-  header("Location: getProjects.php");
+  header("Location: bookings");
 }
 require "connection.php";
-require_once "createTimestamps.php";
 require_once 'utilities.php';
-require "Calculators/LogCalculator.php";
+require "Calculators/IntervalCalculator.php";
 
 $filterQuery = $_POST['filterQuery'];
 $templateID = $_POST['templateID'];
 
+if($templateID < 0) include __DIR__ . "/download_overview.php";
+
 $html = getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause
 
 //prepend css
-$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="../plugins/homeMenu/template.css" rel="stylesheet" /></head>' .$html;
+$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="plugins/homeMenu/template.css" rel="stylesheet" /></head>' .$html;
 
 //replace all occuring relative paths with absolute paths in the html
 $doc = new DOMDocument();

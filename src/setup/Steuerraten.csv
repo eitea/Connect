@@ -1,0 +1,18 @@
+Keine Steuer;0;;;
+Umsatzsteuer;10;;3500;1
+Umsatzsteuer;20;;3500;1
+Umsatzsteuer;13;;3500;1
+Vorsteuer;10;2500;;2
+Vorsteuer;20;2500;;2
+Vorsteuer;13;2500;;2
+ig. Lieferung;0;;;7
+Umsätze aus Bauleistung;0;;;17
+Sonstige Leistungen EU;0;;;77
+ig.Erwerb mit VST-Abzug;10;2501;3501;9
+ig.Erwerb mit VST-Abzug;20;2501;3501;9
+ig.Erwerb mit VST-Abzug;13;2501;3501;9
+Reverse Charge mit VST-Abzug;10;2502;3502;19
+Reverse Charge mit VST-Abzug;20;2502;3502;19
+Reverse Charge mit VST-Abzug;13;2502;3502;19
+Empf.Bauleist. Mit VST-Abzug;20;2504;3504;29
+Aufw. Par.19/1d mit VST-Abzug;20;2506;3506;59

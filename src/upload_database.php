@@ -6,7 +6,7 @@ if(isset($_POST['accept'])){
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["size"] <= 0) {
     $accept = false;
-  } elseif ($_FILES["fileToUpload"]["size"] > 10000000) { //10mb
+  } elseif ($_FILES["fileToUpload"]["size"] > 15000000) { //15mb
     $accept = false;
   } elseif ($_FILES["fileToUpload"]["type"] != "application/octet-stream") {
     $accept = false;
@@ -14,39 +14,24 @@ if(isset($_POST['accept'])){
 
   if($accept){
     $file = fopen($_FILES['fileToUpload']['tmp_name'], 'rb');
-
-    if($conn->query("DROP DATABASE $dbName")){
-      $conn->query("CREATE DATABASE $dbName");
-    } else {
-      die(mysqli_error($conn));
+    if(!$file){
+      $accept = false;
     }
+  }
+
+  if($accept){
+    //changes here have to be copied to resticBackup.php 
+    require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
     $conn->close();
-    $conn = new mysqli($servername, $username, $password, $dbName);
-    $conn->query("SET NAMES 'utf8';");
-    $conn->query("SET CHARACTER SET 'utf8';");
+    $conn = new mysqli($servername,$username,$password);
+    $conn->query("DROP DATABASE $dbName");
+    $conn->query("CREATE DATABASE $dbName");
+    $conn->close();
+    $conn = new mysqli($servername,$username,$password,$dbName);
+    $import = new MySQLImport($conn);
+    $import->load($file);
+    //redirect("../user/logout");
 
-    $conn->query("SET FOREIGN_KEY_CHECKS=0;");
-    $templine = '';
-    while(($line = fgets($file)) !== false){
-      $conv = iconv(mb_detect_encoding($line, mb_detect_order(), true), "UTF-8", $line);
-      if($conv) $line = $conv;
-      
-      //Skip comments
-      if (substr($line, 0, 2) == '--' || $line == '') continue;
-
-      $templine .= $line;
-      //semicolon at the end = end of the query
-      if(substr(trim($line), -1, 1) == ';'){
-        $conn->query($templine) or print($conn->error);
-        $templine = '';
-      }
-    }
-    if(!mysqli_error($conn)){
-      $conn->query("SET FOREIGN_KEY_CHECKS=1;");
-      //redirect("../user/logout");
-    } else {
-      $error_output = mysqli_error($conn);
-    }
   } else {
     $error_output = $lang['ERROR_INVALID_UPLOAD'];
   }
@@ -64,7 +49,14 @@ if($error_output){
 <?php echo $lang['WARNING_RESTORE']; ?>
 <br><br>
 
-<?php if(isset($_POST['letsAccept'])):  ?>
+<?php
+$accept = true;
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+  $accept = false;
+  $hash = '$2y$10$UsylMC44RCq73448jLFhU.SMzSBpFGK5d0uRSgh.7rLmo.f2gOvyO';
+  if(crypt($_POST['restore_password'], $hash) == $hash){ $accept = true; }
+}
+if($accept && isset($_POST['letsAccept'])):  ?>
   <form method="post" enctype="multipart/form-data">
     <div class="container-fluid">
       <br>
@@ -76,9 +68,10 @@ if($error_output){
   </form>
 <?php else: ?>
   <form method="post">
-    <button class="btn btn-warning" type="submit" name="letsAccept"><i class='fa fa-upload'></i> <?php echo $lang['YES_I_WILL']; ?></button>
+    <?php if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])): ?>
+      <div class="col-sm-2"><input type="text" name="restore_password" placeholder="password" class="form-control" /></div>
+    <?php endif; ?>
+    <div class="col-sm-3"><button class="btn btn-warning" type="submit" name="letsAccept"><i class='fa fa-upload'></i> <?php echo $lang['YES_I_WILL']; ?></button></div>
   </form>
 <?php endif; ?>
-
-
 <?php include 'footer.php'; ?>

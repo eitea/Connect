@@ -11,14 +11,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
       $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
-      if($result && ($row = $result->fetch_assoc())){
-
+      if($result && ($row = $result->fetch_assoc())){        
         $result_book = $conn->query("SELECT end FROM projectBookingData WHERE timestampID = $indexIM ORDER BY start DESC");
         if($result_book && ($row_book = $result_book->fetch_assoc())){
+          //grab last booking
           $row_break['breakCredit'] = 0;
           $result_break = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = $indexIM");
           if($result_break && $result_break->num_rows > 0) $row_break = $result_break->fetch_assoc();
           $missingBreak = intval($row['hoursOfRest'] * 60 - $row_break['breakCredit']);
+          //unexpected missing break error
           if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) {echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].": $missingBreak $indexIM </div>"; break;}
           $break_begin = $row_book['end'];
           $break_end = carryOverAdder_Minutes($break_begin, $missingBreak);
@@ -283,56 +284,9 @@ if($result && $result->num_rows > 0):
 <?php endif; ?>
   <div class="container-fluid"><div class="text-right"><a href="requests"><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?></a></div></div>
 <br><hr><br>
-
-<!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
-
 <form method="POST">
-  <?php
-  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
-  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
-  AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
-
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0):
-  ?>
-    <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
-    <div class="h4 text-right">
-      <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
-        <i class="fa fa-info-circle"></i>
-      </a>
-    </div>
-    <div class="collapse" id="illegal_lunchbreak_info">
-      <div class="well">
-        <?php echo $lang['INFO_ILLEGAL_LUNCHBREAK']; ?>
-      </div>
-    </div>
-
-    <table class="table table-hover">
-      <th>Name</th>
-      <th><?php echo $lang['TIME']; ?></th>
-      <th><?php echo $lang['HOURS']; ?></th>
-      <th><input type="checkbox" onchange="toggle(this, 'lunchbreakIndeces[]');" /></th>
-      <tbody>
-        <?php
-        while($row = $result->fetch_assoc()){
-          echo '<tr>';
-          echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
-          echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
-          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
-          echo '<td><input type="checkbox" name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';
-          echo '</tr>';
-        }
-        ?>
-      </tbody>
-    </table>
-    <br>
-    <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Autocorrect</button>
-    <br><hr><br>
-  <?php endif; echo mysqli_error($conn);?>
 
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
-
   <?php
   $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.* FROM $logTable
   INNER JOIN $userTable ON $userTable.id = $logTable.userID
@@ -377,6 +331,52 @@ if($result && $result->num_rows > 0):
     <button type='submit' class="btn btn-warning" name='autoCorrect'>Autocorrect</button>
     <br><hr><br>
   <?php endif;  ?>
+
+  
+<!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
+  <?php
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
+
+  $result = $conn->query($sql);
+  if($result && $result->num_rows > 0):
+  ?>
+    <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
+    <div class="h4 text-right">
+      <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
+        <i class="fa fa-info-circle"></i>
+      </a>
+    </div>
+    <div class="collapse" id="illegal_lunchbreak_info">
+      <div class="well">
+        <?php echo $lang['INFO_ILLEGAL_LUNCHBREAK']; ?>
+      </div>
+    </div>
+
+    <table class="table table-hover">
+      <th>Name</th>
+      <th><?php echo $lang['TIME']; ?></th>
+      <th><?php echo $lang['HOURS']; ?></th>
+      <th><input type="checkbox" onchange="toggle(this, 'lunchbreakIndeces[]');" /></th>
+      <tbody>
+        <?php
+        while($row = $result->fetch_assoc()){
+          echo '<tr>';
+          echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
+          echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
+          echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
+          echo '<td><input type="checkbox" name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';
+          echo '</tr>';
+        }
+        ?>
+      </tbody>
+    </table>
+    <br>
+    <button type='submit' class="btn btn-warning" name='saveNewBreaks' >Autocorrect</button>
+    <br><hr><br>
+  <?php endif; echo mysqli_error($conn);?>
 
   <!--GEMINI -------------------------------------------------------------------------->
 

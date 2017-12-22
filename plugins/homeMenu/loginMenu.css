@@ -40,10 +40,10 @@ input[name="cancelButton"]{
 input[name="cancelButton"]:hover{
   background-color:#bf2156;
 }
-input[name="login"]{
+input[name="loginButton"]{
   background-color:#51a33c;
 }
-input[name=login]:hover{
+input[name=loginButton]:hover{
   background-color:#4dbe30;
 }
 input[type=submit]{

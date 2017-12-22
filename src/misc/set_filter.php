@@ -1,18 +1,19 @@
 <?php
-/**
-* company => id
-* client  => id
-* project  => id
-* user => id
-* bookings => [charged, break, drive]
-* logs => [activity, hideAll]
-* date => [fromDate, toDate]
-* procedures => [transitions[id], status, hideAll]
-* acceptance => status
-* requestType => type
+/** 
+ * company => id
+ * client  => id
+ * project  => id
+ * user => id
+ * users => [id1, id2, ...]
+ * bookings => [charged, break, drive]
+ * logs => [activity, hideAll]
+ * date => [fromDate, toDate] || [month]
+ * procedures => [transitions[id], status, hideAll]
+ * acceptance => status
+ * requestType => type
 **/
 
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $this_page){
+if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){
   $_SESSION['filterings'] = array();
 }
 if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (THINK)
@@ -22,11 +23,17 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   if(isset($_POST['searchClient'])){
     $filterings['client'] = intval($_POST['searchClient']);
   }
+  if(isset($_POST['searchSupplier'])){
+    $filterings['supplier'] = intval($_POST['searchSupplier']);
+  }
   if(isset($_POST['searchProject'])){
     $filterings['project'] = intval($_POST['searchProject']);
   }
   if(isset($_POST['searchUser'])){
     $filterings['user'] = intval($_POST['searchUser']);
+  }
+  if(isset($_POST['searchUsers'])){
+    $filterings['users'] = array_map("intval", $_POST['searchUsers']);
   }
   if(isset($_POST['searchCharged'])){
     $filterings['bookings'][0] = intval($_POST['searchCharged']);
@@ -61,6 +68,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(!empty($_POST['searchDateTo'])){
     $filterings['date'][1] = test_input($_POST['searchDateTo']);
+    if(strtotime($filterings['date'][0]) > strtotime($filterings['date'][1])){
+      $filterings['date'][1] = $filterings['date'][0];
+    }
   }
 
   if(isset($_POST['searchTransitions'])){
@@ -69,12 +79,8 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   if(isset($_POST['searchProcessStatus'])){
     $filterings['procedures'][1] = intval($_POST['searchProcessStatus']);
   }
-  if(isset($filterings['procedures'][2])){
-    if(isset($_POST['searchAllProcesses'])){
-      $filterings['procedures'][2] = 'checked';
-    } else {
-      $filterings['procedures'][2] = '';
-    }
+  if(isset($_POST['searchProcessNumber'])){
+      $filterings['procedures'][2] = intval($_POST['searchProcessNumber']);
   }
   if(isset($_POST['searchRequestType'])){
     $filterings['requestType'] = test_input($_POST['searchRequestType']);
@@ -90,13 +96,13 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
 }
 
 //read saved filters
-if(!empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $this_page){
+if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] == $filterings['savePage']){
   $filterings = $_SESSION['filterings'];
 }
 
 $scale = 0;
-if(isset($filterings['date'])){$scale++;}
-if(isset($filterings['user']) || isset($filterings['logs'])){$scale++;}
+if(isset($filterings['date']) || isset($filterings['logs'])){$scale++;}
+if(isset($filterings['user']) || isset($filterings['users'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
 $styles = array(20, 90);
@@ -128,6 +134,8 @@ if($scale > 2){ //3 columns
               echo '<label>'.$lang['COMPANY'].'</label>';
               if(isset($filterings['client'])){
                 echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showClients(this.value, \''.$filterings['client'].'\');" >';
+              } elseif(isset($filterings['supplier'])){
+                echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showSupplier(this.value, \''.$filterings['supplier'].'\');" >';
               } else {
                 echo '<select class="js-example-basic-single" name="searchCompany">';
               }
@@ -142,6 +150,20 @@ if($scale > 2){ //3 columns
               echo '</select><br><br>';
             }
           }
+          if(isset($filterings['supplier'])){
+            echo '<label>'.$lang['SUPPLIER'].'</label>';
+            echo '<select id="searchSupplierHint" class="js-example-basic-single" name="searchSupplier">';
+            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE isSupplier = 'TRUE' AND companyID IN (".implode(', ', $available_companies).")");
+            echo '<option value="0">...</option>';
+            while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+              $checked = '';
+              if($filterings['supplier'] == $row_fc['id']) {
+                $checked = 'selected';
+              }
+              echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+            }
+            echo '</select><br><br>';
+          }
           if(isset($filterings['client'])){
             echo '<label>'.$lang['CLIENT'].'</label>';
             if(isset($filterings['project'])){
@@ -149,7 +171,7 @@ if($scale > 2){ //3 columns
             } else {
               echo '<select id="searchClientHint" class="js-example-basic-single" name="searchClient">';
             }
-            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE companyID IN (".implode(', ', $available_companies).")");
+            $result_fc = mysqli_query($conn, "SELECT * FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
             echo '<option value="0">...</option>';
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
@@ -172,11 +194,21 @@ if($scale > 2){ //3 columns
             echo '<label>'.$lang['USERS'].'</label>';
             echo '<select class="js-example-basic-single" name="searchUser" >';
             echo '<option value="0">...</option>';
-            $result_fc = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).")");
+            $result_fc = mysqli_query($conn, "SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
             while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
               $checked = '';
               if($filterings['user'] == $row_fc['id']) { $checked = 'selected'; }
               echo "<option $checked value='".$row_fc['id']."' >".$row_fc['firstname'].' '.$row_fc['lastname']."</option>";
+            }
+            echo '</select><br><br>';
+          } elseif(isset($filterings['users'])){
+            echo '<label>'.$lang['USERS'].'</label>';
+            echo '<select class="js-example-basic-single" name="searchUsers[]" multiple="multiple">';
+            $result_fc = mysqli_query($conn, "SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
+            while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+              $selected = '';
+              if(in_array($row_fc['id'], $filterings['users'])) { $selected = 'selected'; }
+              echo "<option $selected value='".$row_fc['id']."'>".$row_fc['firstname'].' '.$row_fc['lastname'].'</option>';
             }
             echo '</select><br><br>';
           }
@@ -193,18 +225,6 @@ if($scale > 2){ //3 columns
               <label><input type="checkbox" name="searchBreaks" <?php echo $filterings['bookings'][1]; ?> /><?php echo $lang['BREAKS']; ?></label>
               <label><input type="checkbox" name="searchDrives" <?php echo $filterings['bookings'][2]; ?> /><?php echo $lang['DRIVES']; ?></label>
             </div>
-            <br><br>
-          <?php endif; ?>
-          <?php if(isset($filterings['logs'])): ?>
-            <label><?php echo $lang['ACTIVITY']; ?></label>
-              <select name="searchActivity" class="js-example-basic-single">
-                <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
-                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
-                <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
-                <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
-                <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
-              </select>
-              <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
           <?php endif; ?>
           <?php if(isset($filterings['requestType'])): ?>
             <label><?php echo $lang['REQUEST_TYPE']; ?></label>
@@ -231,29 +251,42 @@ if($scale > 2){ //3 columns
           <?php endif; ?>
         </div>
 
-        <?php if(isset($filterings['date'])): ?>
+        <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
           <div class="filter_column">
             <?php if(isset($filterings['date'][1])): ?>
               <label><?php echo $lang['FROM']; ?></label>
               <div class="input-group">
-                <input id="searchDateFrom" type="text" class="form-control datepicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
+                <input type="text" maxlength="10" id="searchDateFrom" class="form-control datepicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" />
                 <span class="input-group-btn">
                   <button id="putDate" type="button" class="btn btn-default" title="Bis Monatsende"><i class="fa fa-arrow-down"></i></button>
                 </span>
               </div>
               <br><label><?php echo $lang['TO']; ?></label>
               <div class="input-group">
-                <input type="text" id="searchDateTo" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
+                <input type="text" maxlength="10" id="searchDateTo" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][1]; ?>" />
                 <span class="input-group-btn">
                   <button id="putDateUp" type="button" class="btn btn-default" title="Ab Monatsanfang"><i class="fa fa-arrow-up"></i></button>
                 </span>
-              </div>
+              </div><br>
             <?php else: ?>
               <label><?php echo $lang['DATE']; ?></label>
-              <input type="text" class="form-control datepicker" name="searchDateTo" value="<?php echo $filterings['date'][0]; ?>" />
+              <input type="text" maxlength="7" class="form-control monthpicker" name="searchDateFrom" value="<?php echo $filterings['date'][0]; ?>" /><br>
+            <?php endif; ?>
+
+            <?php if(isset($filterings['logs'])): ?>
+            <label><?php echo $lang['ACTIVITY']; ?></label>
+              <select name="searchActivity" class="js-example-basic-single">
+                <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
+                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
+                <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
+                <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
+                <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+              </select>
+              <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['logs'][1]; ?> name="searchAllTimestamps"/><?php echo $lang['HIDE_ZEROE_VALUE']; ?></label></div>
             <?php endif; ?>
           </div>
         <?php endif; ?>
+
 
         <?php if(isset($filterings['procedures'])): ?>
           <div class="filter_column">
@@ -282,8 +315,11 @@ if($scale > 2){ //3 columns
                 echo '<option value="'.$i.'" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
               }
               ?>
-            </select>
-            <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['procedures'][2]; ?> name="searchAllProcesses"/><?php echo $lang['HIDE_PROCESSED_DATA']; ?></label></div>
+            </select><br>
+            <?php if(isset($filterings['procedures'][2])){
+              echo '<br><label>Nummer</label>';
+              echo '<input type="number" name="searchProcessNumber" class="form-control" value="'.$filterings['procedures'][2].'" />';
+            } ?>
           </div>
         <?php endif; ?>
         <div class="container-fluid text-right">
@@ -337,6 +373,17 @@ $('#filterings_dropdown .dropdown-menu').on({
       error : function(resp){}
     });
   };
+  set_filter.showSupplier = function(company, supplier){
+    $.ajax({
+      url:'ajaxQuery/AJAX_getSupplier.php',
+      data:{companyID:company, supplierID:supplier},
+      type: 'get',
+      success : function(resp){
+        $("#searchSupplierHint").html(resp);
+      },
+      error : function(resp){}
+    });
+  };
   set_filter.changeValue = function(cVal, id, val){
     if(cVal == ''){
       document.getElementById(id).selectedIndex = val;
@@ -349,12 +396,14 @@ $('#filterings_dropdown .dropdown-menu').on({
 <?php
 echo '<script>';
 if(!empty($filterings['company'])){
-  if(!empty($filterings['client'])){
+  if(isset($filterings['client'])){
     $nextID = $filterings['client'];
-  } else {
-    $nextID = 0;
+    echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
   }
-  echo 'set_filter.showClients('.$filterings['company'].', '.$nextID.');';
+  if(isset($filterings['supplier'])){
+    $nextID = $filterings['supplier'];
+    echo 'set_filter.showSupplier('.$filterings['company'].', '.$nextID.');';
+  }
 }
 if(!empty($filterings['client'])){
   if(!empty($filterings['project'])){

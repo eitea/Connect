@@ -20,7 +20,7 @@
     $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
     LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
     LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-    WHERE $projectBookingTable.timestampID = $request_addendum ORDER BY end ASC;";
+    WHERE $projectBookingTable.timestampID = $request_addendum ORDER BY start ASC;";
     $res_b = $conn->query($sql);
     if($res_b && ($row_b = $res_b->fetch_assoc())){
       $B = $row_b['start']; //first booking of the day

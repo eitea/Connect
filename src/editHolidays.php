@@ -46,7 +46,7 @@ if(isset($_POST['holidayDelete']) && isset($_POST['checkingIndeces'])) {
       while ($row = $result->fetch_assoc()) {
         echo "<tr>";
         echo "<td><input type=checkbox name='checkingIndeces[]' value='".$row['begin']."' /></td>";
-        echo "<td> ".$row['name']."</td><td> ". substr($row['begin'],0,10)."</td>";
+        echo "<td>".$row['name']."</td><td> ". substr($row['begin'],0,10)."</td>";
         echo "</tr>";
       }
       ?>
@@ -80,7 +80,7 @@ $('.table').DataTable({
   order: [[ 2, "asc" ]],
   columns: [{orderable: false}, null, null],
   responsive: true,
-   colReorder: true,
+  colReorder: true,
   language: {
     <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
   },

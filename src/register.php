@@ -7,6 +7,7 @@
 </div>
 
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
 $step = 1;
 $firstname = $lastname = "";
 
@@ -85,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $accept = false;
     }
 
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'FALSE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'FALSE';
     $canBook = $canStamp = $canEdit = $canUseSocialMedia = 'FALSE';
     if(isset($_POST['isCoreAdmin'])){
       $isCoreAdmin = 'TRUE';
@@ -101,6 +102,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if(isset($_POST['isERPAdmin'])){
       $isERPAdmin = 'TRUE';
+    }
+    if(isset($_POST['isFinanceAdmin'])){
+      $isFinanceAdmin = 'TRUE';
+    }
+    if(isset($_POST['isDSGVOAdmin'])){
+      $isDSGVOAdmin = 'TRUE';
     }
     if(isset($_POST['canStamp'])){
       $canStamp = 'TRUE';
@@ -118,8 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if($accept){
         //send accessdata if user gets created
         if(!empty($_POST['real_email']) && filter_var($_POST['real_email'], FILTER_VALIDATE_EMAIL)){
-          require_once dirname(__DIR__)."/plugins/phpMailer/class.phpmailer.php";
-          require_once dirname(__DIR__)."/plugins/phpMailer/class.smtp.php";
+          require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
           $recipients = $_POST['real_email'];
           $mail = new PHPMailer();
           $mail->CharSet = 'UTF-8';
@@ -168,8 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
           echo mysqli_error($conn);
           //create roletable
-          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
-          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
+          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
+          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$isFinanceAdmin', '$isDSGVOAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create socialprofile
@@ -277,7 +283,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <label><input type="checkbox" name="isTimeAdmin" /><?php echo $lang['ADMIN_TIME_OPTIONS']; ?></label><br>
           <label><input type="checkbox" name="isProjectAdmin" /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></label><br>
           <label><input type="checkbox" name="isReportAdmin" /><?php echo $lang['REPORTS']; ?></label><br>
-          <label><input type="checkbox" name="isERPAdmin" />ERP</label>
+          <label><input type="checkbox" name="isERPAdmin" />ERP</label><br>
+          <label><input type="checkbox" name="isFinanceAdmin" /><?php echo $lang['FINANCES']; ?></label><br>
+          <label><input type="checkbox" name="isDSGVOAdmin" checked />DSGVO</label>
         </div>
       </div>
       <div class="col-md-3">

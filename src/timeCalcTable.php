@@ -1,6 +1,6 @@
 <?php include 'header.php'; enableToStamps($userID);?>
 <?php
-$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,8).'01'));
+$filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,7)));
 
 require 'Calculators/IntervalCalculator.php';
 if(isset($_POST['request_submit'])){
@@ -16,6 +16,7 @@ if(isset($_POST['request_submit'])){
         $endTime = $arr[1] .' '. test_input($_POST['request_end']).':00';
         if(timeDiff_Hours($startTime, $endTime) < 0){
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
+          include 'footer.php';
           die(); //still better than a goto.
         }
       }
@@ -79,25 +80,19 @@ if(isset($_POST['request_submit'])){
     <th><?php echo $lang['DIFFERENCE']?></th>
     <th>Saldo</th>
     <th></th>
+    <th></th>
   </thead>
   <tbody>
     <?php
     $now = $filterings['date'][0];
-    $calculator = new Interval_Calculator($now, carryOverAdder_Hours(date('Y-m-d H:i:s',strtotime('+1 month', strtotime($now))), -24), $userID);
-    if(!empty($calculator->monthly_correctionHours[0])){
-      $corrections = array_sum($calculator->monthly_correctionHours);
-      echo "<tr style='font-weight:bold;'>";
-      echo "<td>".$lang['CORRECTION']." </td>";
-      echo "<td>".$lang['MONTH_TOSTRING'][intval(substr($calculator->date[0],5,2))]."</td><td></td><td>-</td><td></td><td>-</td><td></td><td></td><td></td>";
-      echo "<td>".displayAsHoursMins($corrections)."</td><td></td>";
-      echo "</tr>";
-    } else {
-      $corrections = 0;
-    }
-    $accumulatedSaldo = $corrections;
+    $end = date('Y-m-d', strtotime('+1 month', strtotime($now)));
+    $calculator = new Interval_Calculator($userID, $now .'-01', $end);
+    
+    $accumulatedSaldo = 0;
     for($i = 0; $i < $calculator->days; $i++){
       if($filterings['logs'][0] && $calculator->activity[$i] != $filterings['logs'][0]) continue;
       if($filterings['logs'][1] == 'checked' && $calculator->shouldTime[$i] == 0 && $calculator->absolvedTime[$i] == 0) continue;
+
       if($calculator->start[$i]){
         $A = carryOverAdder_Hours($calculator->start[$i], $calculator->timeToUTC[$i]);
       } else {
@@ -131,6 +126,7 @@ if(isset($_POST['request_submit'])){
       echo "<td>" . displayAsHoursMins($calculator->absolvedTime[$i] - $calculator->lunchTime[$i]) . "</td>";
       echo "<td $saldoStyle>" . displayAsHoursMins($theSaldo) . "</td>";
       echo "<td><small>" . displayAsHoursMins($accumulatedSaldo) . "</small></td>";
+      echo '<td>'.$lang['EMOJI_TOSTRING'][$calculator->feeling[$i]].'</td>';
       echo '<td>';
       echo "<button type='button' class='btn btn-default' data-toggle='modal' data-target='.my-request-$i' ><i class='fa fa-pencil'></i></button>";
       if($calculator->indecesIM[$i]){
@@ -146,7 +142,7 @@ if(isset($_POST['request_submit'])){
   </tbody>
 </table>
 
-<?php for($i = 0; $i < $calculator->days; $i++): ?>
+<?php for($i = 0; $i < $calculator->days; $i++): ?> 
   <form method="POST">
     <div class="modal fade my-request-<?php echo $i; ?>">
       <div class="modal-dialog modal-md modal-content">
@@ -175,7 +171,8 @@ if(isset($_POST['request_submit'])){
             <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
-              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Sonderzeichen werden immer entfernt.</small>
+              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Leere Felder sind ungültig.
+              Die Uhrzeit wird bei Bewilligung exakt auf die angegebenen Daten <u>ausgebessert</u>.  Sonderzeichen werden automatisch entfernt.</small>
             </div>
           </div>
         </div>
@@ -241,7 +238,7 @@ if(isset($_POST['request_submit'])){
                     echo "<td>$A</td>";
                     echo "<td>$B</td>";
                     echo "<td style='text-align:left'>$C</td>";
-                    echo '<td></td></tr>';
+                    echo '<td></td><td></td></tr>';
                     if($row['bookingType'] == 'break'){
                       $x = $row['bookingTableID'];
                       echo '<tr style="background-color:#f0f0f0">';
@@ -255,7 +252,7 @@ if(isset($_POST['request_submit'])){
                       }
                       echo "</select>";
                       echo '</td>';
-                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td>';
+                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td><td></td>';
                       echo '</tr>';
                     }
                   }
@@ -275,7 +272,7 @@ if(isset($_POST['request_submit'])){
   <script>
   $('.datatable').DataTable({
   order: [[ 1, "desc" ]],
-  columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}],
+  columns: [{orderable: false}, null, {orderable: false}, null, {orderable: false}, {orderable: false}, {orderable: false}, null, null, null, {orderable: false}, {orderable: false}],
   deferRender: true,
   responsive: true,
   autoWidth: false,

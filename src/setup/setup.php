@@ -1,8 +1,8 @@
 <?php
-if(file_exists(dirname(__DIR__) . '/connection_config.php')){
+if(file_exists(dirname(__DIR__) . '/connection_config.php') || getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
   header("Location: ../login/auth");
 }
-require_once dirname(__DIR__) . "/createTimestamps.php";
+ignore_user_abort(1);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +12,7 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
 
-  <script src="plugins/jQuery/jquery-3.2.1.min.js"></script>
+  <script src="plugins/jQuery/jquery.min.js"></script>
 
   <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
@@ -22,29 +22,13 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
 
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <title>Setup Connect</title>
-  <script>
-  document.onreadystatechange = function() {
-    var state = document.readyState
-    if(state == 'complete') {
-      document.getElementById("loader").style.display = "none";
-      document.getElementById("bodyContent").style.display = "block";
-    }
-  }
-  $(document).ready(function() {
-    if($(".js-example-basic-single")[0]){
-      $(".js-example-basic-single").select2();
-    }
-  });
-  </script>
 </head>
 <body id="body_container" class="is-table-row">
-  <div id="loader"></div>
+<div id="loader" style="display:none"></div>
   <!-- navbar -->
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
-      <div class="navbar-header hidden-xs">
-        <a class="navbar-brand" >Connect</a>
-      </div>
+      <div class="navbar-header hidden-xs"><a class="navbar-brand" >Connect</a></div>
       <div class="navbar-right">
         <a class="btn navbar-btn navbar-link" data-toggle="collapse" href="#infoDiv_collapse"><strong>info</strong></a>
       </div>
@@ -59,8 +43,22 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
   </div>
   <!-- /navbar -->
   <?php
+  function test_input($data) {
+    $data = preg_replace("~[^A-Za-z0-9\-.öäüÖÄÜ_ ]~", "", $data);
+    $data = trim($data);
+    return $data;
+  }
   function clean($string) {
-    return preg_replace('/[^\.A-Za-z0-9\-]/', '', $string);
+    return trim(preg_replace('/[^\.A-Za-z0-9\-]/', '', $string));
+  }
+  function randomPassword(){
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $psw = array();
+    for ($i = 0; $i < 8; $i++) {
+      $n = rand(0, strlen($alphabet) - 1);
+      $psw[] = $alphabet[$n];
+    }
+    return implode($psw); //turn the array into a string
   }
   function match_passwordpolicy_setup($p, &$out = ''){
     if(strlen($p) < 6){
@@ -94,7 +92,7 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
     return $icsDates;
   }
   ?>
-  <div id="bodyContent" style="display:none;" >
+  <div id="bodyContent">
     <div class="affix-content">
       <div class="container-fluid">
 
@@ -102,9 +100,20 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
         if(!function_exists('mysqli_init') && !extension_loaded('mysqli')) {
           die('Mysqli not available.');
         }
-        $firstname = $lastname = $companyName = $companyType = $localPart = $domainpart = $out = "";
+        $firstname = $lastname = $companyName = $companyType = $localPart = $domainname = $out = "";
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){          
+          $cmpDescription = $uid = $postal = $city = $address = $phone = $homepage = $email = '';
+          if(isset($_POST['cmpDescription'])){
+            $cmpDescription = $_POST['cmpDescription'];
+            $uid = $_POST['uid'];
+            $postal = $_POST['postal'];
+            $city = $_POST['city'];
+            $address = $_POST['address'];
+            $phone = $_POST['phone'];
+            $homepage = $_POST['homepage'];
+            $email = $_POST['mail'];
+          }
           if(!empty($_POST['companyName']) && !empty($_POST['adminPass']) && !empty($_POST['firstname']) && !empty($_POST['type']) && !empty($_POST['localPart']) && !empty($_POST['domainPart'])){
             $psw = $_POST['adminPass'];
             $companyName = test_input($_POST['companyName']);
@@ -126,7 +135,7 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
               fwrite($myfile, $txt);
               fclose($myfile);
               if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="/setup/run">Next</a></div>';
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fatal Error: Please grant PHP permission to create files first. Click Next to proceed. <a href="../login/auth">Next</a></div>';
               }
               require dirname(__DIR__) .'/connection_config.php';
               //establish connection
@@ -136,110 +145,132 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
                 die("<br>Connection Error: Could not Connect.<br>");
               }
 
-              if($conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
-                echo "Database was created. <br>";
-              } else {
+              if(!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")){
                 echo mysqli_error($conn);
                 unlink(dirname(__DIR__) .'/connection_config.php');
-                die("<br>Invalid Database name: Could not instantiate a database.<a href='run'>Return</a><br>");
+                die("<br>Invalid DB Connection: Could not instantiate a database.<a href='run'>Return</a><br>");
               }
 
-      //reconnect to database
-      $conn->close();
-      $conn = new mysqli($servername, $username, $password, $dbName);
+              //reconnect to database
+              $conn->close();
+              $conn = new mysqli($servername, $username, $password, $dbName);
 
-      $conn->query("SET NAMES 'utf8';");
-      $conn->query("SET CHARACTER SET 'utf8';");
+              $conn->query("SET NAMES 'utf8';");
+              $conn->query("SET CHARACTER SET 'utf8';");
 
-      echo "<br><br><br> Your Login E-Mail: $loginname <br><br><br>";
+              set_time_limit(0); //setup takes longer with a laptop in energy saving mode
+              //create all tables
+              require __DIR__ . "/setup_inc.php";
+              create_tables($conn);
 
-      //create all tables
-      set_time_limit(0); //fix for slow computers
-      require __DIR__ . "/setup_inc.php";
-      create_tables($conn);
+              require_once dirname(__DIR__) . "/version_number.php";
+              //------------------------------ INSERTS ---------------------------------------
+              //insert identification
+              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
+              $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
+              //insert main company
+              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+              $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
+              $stmt->execute();
+              $stmt->close();
+              //insert password policy
+              $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
+              //insert module en/disable
+              $conn->query("INSERT INTO modules (enableTime, enableProject, enableSocialMedia) VALUES('TRUE', 'TRUE', 'TRUE')");
 
-      require_once dirname(__DIR__) . "/version_number.php";
-      //------------------------------ INSERTS ---------------------------------------
+              //insert ADMIN bogus
+              $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
+              $conn->query($sql);
+              //interval
+              $sql = "INSERT INTO intervalData (userID) VALUES (1);";
+              $conn->query($sql);
+              //role
+              $sql = "INSERT INTO roles (userID) VALUES(1);";
+              $conn->query($sql);
+              //insert company-client relationship
+              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1, 1)";
+              $conn->query($sql);
+              //socialprofile
+              $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
+              $conn->query($sql);
 
-      //insert identification
-      $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
-      $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
+              //insert core user
+              $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
+              $conn->query($sql);
+              //insert intervaltable
+              $sql = "INSERT INTO intervalData (userID) VALUES (2);";
+              $conn->query($sql);
+              //insert roletable
+              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
+              $conn->query($sql);
+              //insert company-client relationship
+              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
+              $conn->query($sql);
+              //socialprofile
+              $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
+              $conn->query($sql);
 
-      //insert main company
-      $sql = "INSERT INTO companyData (name, companyType) VALUES ('$companyName', '$companyType')";
-      $conn->query($sql);
-      //insert password policy
-      $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
-      //insert module en/disable
-      $conn->query("INSERT INTO modules (enableTime, enableProject, enableSocialMedia, enableDynamicProjects) VALUES('TRUE', 'TRUE', 'TRUE', 'FALSE')");
+              //insert configs
+              $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
+              $conn->query($sql);
+              //insert ldap config
+              $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
+              $conn->query($sql);
+              //insert ERP numbers
+              $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+              //insert mail options
+              $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
+              //insert restic backup configuration
+              $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 
-      //insert ADMIN
-      $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
-      $conn->query($sql);
-      //interval
-      $sql = "INSERT INTO intervalData (userID) VALUES (1);";
-      $conn->query($sql);
-      //role
-      $sql = "INSERT INTO roles (userID, isCoreAdmin, canStamp, canBook, canUseSocialMedia, isDynamicProjectsAdmin) VALUES(1, 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
-      $conn->query($sql);
-      //insert company-client relationship
-      $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,1)";
-      $conn->query($sql);
-      //socialprofile
-      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
-      $conn->query($sql);
-
-      //insert core user
-      $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
-      $conn->query($sql);
-      //insert intervaltable
-      $sql = "INSERT INTO intervalData (userID) VALUES (2);";
-      $conn->query($sql);
-      //insert roletable
-      $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canUseSocialMedia, isDynamicProjectsAdmin) VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE');";
-      $conn->query($sql);
-      //insert company-client relationship
-      $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
-      $conn->query($sql);
-      //socialprofile
-      $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
-      $conn->query($sql);
-
-      //insert configs
-      $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
-      $conn->query($sql);
-      //insert ldap config
-      $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
-      $conn->query($sql);
-      //insert ERP numbers
-      $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
-      //insert mail options
-      $conn->query("INSERT INTO mailingOptions (host, port) VALUES('localhost', '80')");
-      //insert restic backup configuration
-      $conn->query("INSERT INTO resticconfiguration () VALUES ()");
-
-      //insert holidays
-      $holidayFile = __DIR__ . '/Feiertage.txt';
-      $holidayFile = icsToArray($holidayFile);
-      for($i = 1; $i < count($holidayFile); $i++){
-        if(trim($holidayFile[$i]['BEGIN']) == 'VEVENT'){
-          $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
-          $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
-          $n = $holidayFile[$i]['SUMMARY'];
-          $conn->query("INSERT INTO holidays(begin, end, name) VALUES ('$start', '$end', '$n');");
-        }
-      }
-      echo mysqli_error($conn);
-
+              //insert holidays
+              $holidayFile = icsToArray(__DIR__ . '/Feiertage.txt');
+              $stmt = $conn->prepare("INSERT INTO holidays(begin, end, name) VALUES(?, ?, ?)");
+              echo mysqli_error($conn);
+              $stmt->bind_param("sss", $start, $end, $n);
+              for($i = 1; $i < count($holidayFile); $i++){
+                if(trim($holidayFile[$i]['BEGIN']) == 'VEVENT'){
+                  $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
+                  $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
+                  $n = $holidayFile[$i]['SUMMARY'];
+                  $stmt->execute();              
+                }
+              }
               //insert github options
-              $sql = "INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')";
-              if (!$conn->query($sql)) {
-                echo mysqli_error($conn);
+              $conn->query("INSERT INTO gitHubConfigTab (sslVerify) VALUES('FALSE')");
+
+              //insert main report
+              $exampleTemplate = "<h1>Main Report</h1> \n [TIMESTAMPS] \n <br> [BOOKINGS] ";
+              $conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
+
+              //insert taxRates
+              $i = 1;
+              $file = fopen(__DIR__.'/Steuerraten.csv', 'r');
+              if($file){
+                $stmt = $conn->prepare("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("isiiii", $i, $name, $percentage, $account2, $account3, $code);
+                while($line = fgetcsv($file, 100, ';')){
+                  $name = trim($line[0]);
+                  $percentage = $line[1];
+                  $account2 = $line[2] ? $line[2] : NULL;
+                  $account3 = $line[3] ? $line[3] : NULL;
+                  $code = $line[4] ? $line[4] : NULL;
+                  $stmt->execute();
+                  $i++;
+                }
+                $stmt->close();
+                fclose($file);
+              } else {
+                echo "<br>Error Steuerraten File";
               }
 
               //insert travelling expenses
               $travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
               if ($travellingFile) {
+                $stmt = $conn->prepare("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES(?, ?, ?, ?)");
+                echo mysqli_error($conn);
+                $stmt->bind_param("ssdd", $short, $name, $dayPay, $nightPay);
                 while (($line = fgets($travellingFile)) !== false) {
                   $line = iconv('UTF-8', 'windows-1252', $line);
                   $thisLineIsNotOK = true;
@@ -251,48 +282,20 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
                       $name = test_input($data[1]);
                       $dayPay = floatval($data[2]);
                       $nightPay = floatval($data[3]);
-                      $conn->query("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES('$short', '$name', '$dayPay' , '$nightPay')");
+                      $stmt->execute();
                       $thisLineIsNotOK = false;
                     } elseif(count($data) > 4) {
                       $line = substr_replace($line, '_', strlen($data[0].' '.$data[1]), 1);
                     } else {
-                      echo 'Ups! Something went wrong with that file. <br>';
+                      echo 'Error Inside Laender File <br>';
                       print_r ($data);
-                      die();
                     }
                   }
                 }
                 fclose($travellingFile);
               } else {
-                echo "File with Country Data not found!";
-              }
-              echo mysqli_error($conn);
-
-              //insert main report
-              $exampleTemplate = "<h1>Main Report</h1> \n [TIMESTAMPS] \n <br> [BOOKINGS] ";
-              $conn->query("INSERT INTO templateData(name, htmlCode, repeatCount) VALUES('Example_Report', '$exampleTemplate', 'TRUE')");
-
-              //insert taxRates
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftlicher Erwerb steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Reverse Charge Ermäßigter Satz', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Bewirtung', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschaftliche Leistungen', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Innergemeinschatliche Lieferungen steuerfrei', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Ermäßigter Satz', 13)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Sonder Ermäßigter Satz', 12)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zollausschulssgebiet', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 10)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Zusatzsteuer LuF', 8)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('KFZ Normalsatz', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('UStBBKV', 20)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Keine Steuer', NULL)");
-              $conn->query("INSERT INTO taxRates(description, percentage) VALUES('Steuerfrei', 0)");
+                echo "Error Laender File <br>";
+              }            
 
               //insert sum units
               $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
@@ -311,7 +314,156 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
               //insert shippign method
               $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
               $conn->query($sql);
+              //insert accounts
+              $file = fopen(__DIR__.'/Kontoplan.csv', 'r');
+              if($file){
+                $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
+                $stmt->bind_param("iss", $num, $name, $type);
+                while(($line= fgetcsv($file, 300, ';')) !== false){
+                  $num = $line[0];
+                  $name = trim(iconv(mb_detect_encoding($line[1], mb_detect_order(), true), "UTF-8", $line[1]));
+                  if(!$name) $name = trim(iconv('MS-ANSI', "UTF-8", $line[1]));
+                  if(!$name) $name = $line[1];
+                  $type = trim($line[2]);
+                  $stmt->execute();
+                }
+                $stmt->close();
+              } else {
+                echo "<br>Error Opening csv File";
+              }
+              $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
 
+              //INSERT DEFAULT TEMPLATES
+	$base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement','Awarness: Risikoanalyse','Awarness: Datenschutz-Folgeabschätzung',
+	'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage','Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',
+	'Zugangskontrolle: regelmäßige Passwortänderung der Benutzerpasswörter per Policy (mind. Alle 180 Tage)','Zugangskontrolle: regelmäßige Passwortänderung der administrativen Zugänge, 
+	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automaischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
+	'Wechseldatenträger: Sperre oder zumindest Einschränkung von Wechseldatenträger (USB-Stick, SD Karte, USB Geräte mit Speichermöglichkeiten…)',
+	'Infrastruktur: Verschlüsselung der gesamten Festplatte in PC und Notebooks','Infrastruktur: Network Access Control (NAC) im Netzwerk aktiv',
+	'Infrastruktur: Protokollierung der Verbindungen über die Firewall (mind. 180 Tage)','Infrastruktur: Einsatz einer Applikationsbasierter Firewall (next Generation Firewall)', 'Infrastruktur: Backup-Strategie, die mind. Alle 180 Tage getestet wird','Infrastruktur: Virenschutz (advanced Endpoint Protection)',
+	'Infrastruktur: Regelmäßige Failover Tests, falls ein zweites Rechenzentrum vorhanden ist','Infrastruktur: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
+	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
+	'Drucker und MFP Geräte: Verschlüsselung der eingebauten Datenträger.','Drucker und MFP Geräte: Secure Printing bei personenbezogenen Daten. Unter "secure printing" versteht man die zusätzliche Authentifizierung direkt am Drucker, um den Ausdruck zu erhalten.',
+	'Drucker und MFP Geräte: Bei Leasinggeräten, oder pay per Page Verträgen muss der Datenschutz zwischen den Vertragspartner genau geregelt werden (Vertrag).',
+	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
+	$app_opt_1 = array('', 'Name der verantwortlichen Stelle für diese Applikation', 'Beschreibung der betroffenen Personengruppen und der diesbezüglichen Daten oder Datenkategorien',
+	'Zweckbestimmung der Datenerhebung, Datenverarbeitung und Datennutzung', 'Regelfristen für die Löschung der Daten', 'Datenübermittlung in Drittländer', 'Einführungsdatum der Applikation','Liste der zugriffsberechtigten Personen');
+	$app_opt_2 = array('', 'Pseudonymisierung: Falls die jeweilige Datenanwendung eine Pseudonymisierung unterstützt, wird diese aktiviert. Bei einer Pseudonymisierung werden personenbezogene Daten in der Anwendung entfernt und gesondert aufbewahrt.',
+	'Verschlüsselung der Daten: Sofern von der jeweiligen Datenverarbeitung möglich, werden die personenbezogenen Daten verschlüsselt und nicht als Plain-Text Daten gespeichert',
+	'Applikation: Backup-Strategie, die mind. Alle 180 Tage getestet wird', 'Applikation: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
+	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
+	'Vertraglich (bei externer Betreuung): Gib eine schriftliche Übereinkunft der Leistung und Verpflichtung mit dem entsprechenden Dienstleister der Software?',
+	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
+
+            $stmt_vv = $conn->prepare("INSERT INTO dsgvo_vv(templateID, name) VALUES(?, 'Basis')");
+            $stmt_vv->bind_param("i", $templateID);
+            $stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
+            $stmt->bind_param("iss", $templateID, $opt, $descr);
+            $result = $conn->query("SELECT id FROM companyData");
+            while($row = $result->fetch_assoc()){
+              $cmpID = $row['id'];
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')"); 
+              $templateID = $conn->insert_id;
+              $stmt_vv->execute();
+              //BASE
+              $descr = '';
+              $opt = 'DESCRIPTION';
+              $stmt->execute();
+              $descr = 'Leiter der Datenverarbeitung (IT Leitung)';
+              $opt = 'GEN_1';
+              $stmt->execute();
+              $descr = 'Inhaber, Vorstände, Geschäftsführer oder sonstige gesetzliche oder nach der Verfassung des Unternehmens berufene Leiter';
+              $opt = 'GEN_2';
+              $stmt->execute();
+              $descr = 'Rechtsgrundlage(n) für die Verwendung von Daten';
+              $opt = 'GEN_3';
+              $stmt->execute();
+              $i = 1;
+              while($i < 24){
+                $opt = 'MULT_OPT_'.$i;
+                $descr = $base_opts[$i];
+                $stmt->execute();
+                $i++;
+              }
+
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
+              $templateID = $conn->insert_id;
+              //APPS
+              $descr = '';
+              $opt = 'DESCRIPTION';
+              $stmt->execute();
+              $i = 1;
+              while($i < 8){
+                $opt = 'GEN_'.$i;
+                $descr = $app_opt_1[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $i = 1;
+              while($i < 8){
+                $opt = 'MULT_OPT_'.$i;
+                $descr = $app_opt_2[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
+              $opt = 'EXTRA_DVR';
+              $stmt->execute();
+              $descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
+              $opt = 'EXTRA_FOLGE';
+              $stmt->execute();
+              $descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
+              $opt = 'EXTRA_DOC';
+              $stmt->execute();
+              
+              $opt = 'APP_MATR_DESCR';
+              $stmt->execute();
+              $opt = 'APP_GROUP_1';
+              $descr = 'Kunde';
+              $stmt->execute();
+              $opt = 'APP_GROUP_2';
+              $descr = 'Lieferanten und Partner';
+              $stmt->execute();
+              $opt = 'APP_GROUP_3';
+              $descr = 'Mitarbeiter';
+              $stmt->execute();
+              $i = 1;
+              $cat_descr = array('', 'Firmenname', 'Ansprechpartner, E-Mail, Telefon', 'Straße', 'Ort', 'Bankverbindung', 'Zahlungsdaten', 'UID', 'Firmenbuchnummer');
+              while($i < 9){ //Kunde
+                $opt = 'APP_CAT_1_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $i = 1;
+              while($i < 9){ //Lieferanten und Partner
+                $opt = 'APP_CAT_2_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $cat_descr = array('', 'Nachname', 'Vorname', 'PLZ', 'Ort', 'Telefon', 'Geb. Datum', 'Lohn und Gehaltsdaten', 'Religion', 'Gewerkschaftszugehörigkeit', 'Familienstand',
+              'Anwesenheitsdaten', 'Bankverbindung', 'Sozialversicherungsnummer', 'Beschäftigt als', 'Staatsbürgerschaft', 'Geschlecht', 'Name, Geb. Datum und Sozialversicherungsnummer des Ehegatten',
+              'Name, Geb. Datum und Sozialversicherungsnummer der Kinder', 'Personalausweis, Führerschein', 'Abwesenheitsdaten', 'Kennung');
+              $i = 1;
+              while($i < 22){ //Mitarbeiter
+                $opt = 'APP_CAT_3_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+              $descr = '';
+              $i = 1;
+              while($i < 21){ //20 App Spaces
+                $opt = 'APP_HEAD_'.$i;
+                $descr = $cat_descr[$i];
+                $stmt->execute();
+                $i++;
+              }
+            }
+            $stmt->close();
+            $stmt_vv->close();
+  
 
               //-------------------------------- GIT -----------------------------------------
 
@@ -336,8 +488,8 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
               exec($command, $output, $returnValue);
 
               //------------------------------------------------------------------------------
-              die('<br><br> Setup Finished. Click Next after writing down your Login E-Mail: <a href="../login/auth">Next</a>');
-
+              die('<br><br> Setup Finished. Click Next: <a href="../login/auth">Next</a>');
+              
             } else {
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
             }
@@ -347,7 +499,7 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
         }
         ?>
 
-        <form method='post'>
+        <form id="inputform" method='post'>
           <h1>Login Data</h1><br><br>
           <div class="row">
             <div class="col-sm-8 col-lg-4">
@@ -409,17 +561,14 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
                 <div class="input-group">
                   <input type='text' class="form-control" name='localPart' placeholder='name' value="<?php echo $localPart ?>" />
                   <span class="input-group-addon text-warning"> @ </span>
-                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainPart ?>" />
+                  <input type='text' class="form-control" name='domainPart' placeholder="domain.com" value="<?php echo $domainname ?>" />
                 </div>
               </div>
               <small> * The Domain will be used for every login adress that will be created. Cannot be changed afterwards.<br><b> May not contain any special characters! </b></small>
             </div>
           </div>
           <br><hr><br>
-
-          <?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
             <h1>MySQL Database Connection</h1><br><br>
-
             <div class="row">
               <div class="col-sm-8">
                 <div class="form-group">
@@ -427,7 +576,7 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
                     <span class="input-group-addon" style="min-width:150px">
                       Server Address
                     </span>
-                    <input type="text" class="form-control" name="serverName" value = "localhost" />
+                    <input type="text" class="form-control" name="serverName" value = "127.0.0.1" />
                   </div>
                 </div>
               </div>
@@ -469,20 +618,26 @@ require_once dirname(__DIR__) . "/createTimestamps.php";
               </div>
             </div>
             <br><hr><br>
-          <?php else: ?>
-            <input type="hidden" name='serverName' value = "<?php echo getenv('MYSQL_SERVICE', true); ?>">
-            <input type="hidden" name='mysqlUsername' value = 'connect' />
-            <input type="hidden" name='pass' value = 'Uforonudi499' />
-            <input type="hidden" name='dbName' value = 'connect' />
-          <?php endif; ?>
 
           <div class="container-fluid text-right">
-            <button id="continueButton" type='submit' name'submitInput' class="btn btn-warning">Continue</button>
+            <button type='submit' name'submitInput' class="btn btn-warning">Continue</button>
           </div>
         </form>
 
       </div>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function() {
+      if($(".js-example-basic-single")[0]){
+        $(".js-example-basic-single").select2();
+      }
+    });
+    $('#inputform').submit(function(ev) {
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("bodyContent").style.display = "none";
+    });
+  </script>
 </body>
 </html>

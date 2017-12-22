@@ -1,5 +1,6 @@
 <?php
-//check if this is the first time this app runs
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) header("Location: /login");
+
 if(file_exists(__DIR__.'/connection_config.php')){
   session_start();
 } else {
@@ -7,31 +8,21 @@ if(file_exists(__DIR__.'/connection_config.php')){
 }
 
 //TODO: put a brute-force stopper somwhere here too
-if(!empty($_POST['captcha'])){
-  die("");
-}
+if(!empty($_POST['captcha']))  die("mep.");
 
 require __DIR__ .'/connection.php';
-require __DIR__ .'/createTimestamps.php';
+require __DIR__ .'/utilities.php';
 include __DIR__ .'/version_number.php';
-require __DIR__ .'/encryption_functions.php';
 
 $invalidLogin = "";
-$masterpw_result = $conn->query("SELECT masterPassword FROM $configTable");
-$masterpw = false;
-$masterpwset = false;
-if($masterpw_result){
-  $masterpw = $masterpw_result->fetch_assoc()["masterPassword"];
-  $masterpwset = strlen($masterpw) != 0;
-}
 
-if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['cancelButton']) && (!empty($_POST['masterpassword']) || !$masterpwset)) {
+if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['loginButton'])) {
   $query = "SELECT * FROM  $userTable  WHERE email = '" . test_input($_POST['loginName']) . "' ";
   $result = mysqli_query($conn, $query);
   if($result){
     $row = $result->fetch_assoc();
   }
-  if(crypt($_POST['password'], $row['psw']) == $row['psw'] && ( !$masterpwset || crypt($_POST['masterpassword'], $masterpw) == $masterpw)) {
+  if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];
@@ -39,14 +30,18 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     $_SESSION['timeToUTC'] = $timeZone;
     $_SESSION['filterings'] = array();
     $_SESSION['color'] = $row['color'];
-    $_SESSION['masterpassword'] = $_POST['masterpassword'];
-
+    $_SESSION['masterpassword'] = '';
+    
+    if($row['keyCode']){
+      $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $_POST['password']));
+    }
+    
     //check for updates, if core admin
     require __DIR__ ."/language.php";
-    $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
+    $sql = "SELECT userID FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
     $result = $conn->query($sql);
-    if($result && $result->num_rows > 0){
-      $sql = "SELECT * FROM $adminLDAPTable;";
+    if($row['id'] == 1 || ($result && $result->num_rows > 0)){
+      $sql = "SELECT version FROM $adminLDAPTable;";
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();
       if($row['version'] < $VERSION_NUMBER){
@@ -56,11 +51,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && !isset($_POST['c
     }
     redirect('../user/home');
   } else {
-    if($masterpwset){
-      $invalidLogin = "Invalid Username/Password/Master Key";
-    } else {
-      $invalidLogin = "Invalid Username/ Password!";
-    }
+    $invalidLogin = "Invalid Username/ Password!";
   }
 }
 
@@ -82,9 +73,8 @@ if($result && $result->num_rows > 0){
   <div id="footer">
     <form method="POST" style="display:inline-block">
       <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
-      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><input type="submit" name="textEnterSubmitsThis" style="visibility:hidden; display:none;" value="Cancel" /><br>
-      <?php if($masterpwset): ?><label for="masterpw">Master Password: </label> <input id="masterpw" type="password" name="masterpassword" value="" /><br><?php endif; ?>
-      <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="login" value="Submit" /><br>
+      <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><br>
+      <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="loginButton" value="Submit" /><br>
       <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>" />
       <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>
     </form>

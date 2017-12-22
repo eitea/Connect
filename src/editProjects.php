@@ -47,8 +47,7 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
 }
 ?>
 <div class="page-header">
-  <h3>
-    <?php echo $lang['PROJECT']; ?>
+  <h3><?php echo $lang['PROJECT']; ?>
     <div class="page-header-button-group">
       <?php include 'misc/set_filter.php'; ?>
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
@@ -62,8 +61,9 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
-  include "misc/new_client.php";
+  echo '<a class="btn btn-warning" data-toggle="modal" data-target="#create_client">'.$lang['NEW_CLIENT_CREATE'].'</a>';
   echo '</div>';
+  include "misc/new_client_buttonless.php";
 }
 ?>
 <form id="mainForm" method="post">

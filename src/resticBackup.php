@@ -6,90 +6,24 @@ $exec_modifier = ""; //modifier to execute file in current directory
 if(stripos(php_uname("s"),"Windows") === false){
     $exec_modifier = "./";
 }
+// changes here have to be copied to sqlDownload.php
 function get_database($tables = false){
-    // changes here have to be copied to sqlDownload.php
     require 'connection_config.php';
-    $mysqli = new mysqli($servername,$username,$password,$dbName);
-    $mysqli->select_db($dbName);
-    $mysqli->query("SET NAMES 'utf8'");
-    $queryTables    = $mysqli->query("SHOW TABLES");
-    while($row = $queryTables->fetch_row()){
-        $target_tables[] = $row['0']; //put each table name into array
-    }
-    if($tables){
-        $target_tables = array_intersect($target_tables, $tables);
-    }
-    foreach($target_tables as $table){
-        $result         =   $mysqli->query('SELECT * FROM '.$table);
-        $fields_amount  =   $result->field_count;
-        $rows_num       =   $mysqli->affected_rows;
-        $res            =   $mysqli->query('SHOW CREATE TABLE '.$table);
-        $TableMLine     =   $res->fetch_row();
-        $content        = (!isset($content) ?  '' : $content) . "\n".$TableMLine[1].";\n";
-        for ($i = 0, $st_counter = 0; $i < $fields_amount;   $i++, $st_counter=0){
-        while($row = $result->fetch_row()){
-            //when started (and every after 100 command cycle):
-            if ($st_counter%100 == 0 || $st_counter == 0 ){
-            $content .= "\nINSERT INTO ".$table." VALUES";
-            }
-            $content .= "\n(";
-            for($j=0; $j<$fields_amount; $j++){
-            $row[$j] = str_replace("\n","\\n", addslashes($row[$j]) );
-            if ($row[$j] || $row[$j] === "0"){
-                $content .= '"'.$row[$j].'"' ;
-            } else {
-                $content .= 'NULL';
-            }
-            if ($j<($fields_amount-1)){
-                $content.= ',';
-            }
-            }
-            $content .=")";
-            //every after 100 command cycle [or at last line] ....p.s. but should be inserted 1 cycle eariler
-            if ( (($st_counter+1)%100==0 && $st_counter!=0) || $st_counter+1==$rows_num){
-            $content .= ";";
-            } else {
-            $content .= ",";
-            }
-            $st_counter=$st_counter+1;
-        }
-        } 
-        $content .="\n\n";
-    }
+    require dirname(__DIR__).'/plugins/mysqldump/Mysqldump.php';
+    $dump = new MySQLDump(new mysqli($servername,$username,$password,$dbName));
+    $dump->save($backup_name);
+    $content = file_get_contents($backup_name);
+    unlink($backup_name);
     return $content;
 }
+// changes here have to be copied to upload_database.php
 function set_database($filename){
     require 'connection_config.php';
     global $conn;
     $file = fopen($filename, 'rb');
-    if($conn->query("DROP DATABASE $dbName")){
-        $conn->query("CREATE DATABASE $dbName");
-    } else {
-        die(mysqli_error($conn));
-    }
-    $conn->close();
-    $conn = new mysqli($servername, $username, $password, $dbName);
-
-    $conn->query("SET FOREIGN_KEY_CHECKS=0;");
-    $templine = '';
-    while(($line = fgets($file)) !== false){
-        $line = utf8_decode($line);
-        //Skip comments
-        if (substr($line, 0, 2) == '--' || $line == '') continue;
-
-        $templine .= $line;
-        //semicolon at the end = end of the query
-        if(substr(trim($line), -1, 1) == ';'){
-        $conn->query($templine) or print(mysqli_error($conn));
-        $templine = '';
-        }
-    }
-    $conn->query("SET FOREIGN_KEY_CHECKS=1;");
-    if(!mysqli_error($conn)){
-        
-    } else {
-        $error_output = mysqli_error($conn);
-    }
+    require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
+    $import = new MySQLImport(new mysqli($servername,$username,$password,$dbName));
+    $import->load($file);
     fclose($file);
 }
 function check_repo(){

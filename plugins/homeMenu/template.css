@@ -1,16 +1,10 @@
-body {
-    /* Serif options */
-    /*font-family: "Times New Roman", Times, serif;*/
-    /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif    */
+@font-face{
+    font-family: "Open Sans";
+    src: url("OpenSans/OpenSans-Light.ttf")
+  }
 
-    /*Sans Serif options */
-    font-family: "Helvetica", Arial, Freesans, clean, sans-serif;
-    /*font-family: "Helvetica Neue", Arial, Freesans, clean, sans-serif;*/
-    /*font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;*/
-    /*font-family: "Trebuchet MS", Helvetica, sans-serif;*/
-    /*font-family: Verdana, Geneva, sans-serif;*/
-    /*font-family: Tahoma, Geneva, sans-serif;*/
-    /*font-family: Baskerville, 'Times New Roman', Times, serif;*/
+body {
+    font-family: "Open Sans", "Lucida Sans", Verdana, sans-serif;
 
     padding:25px;
     font-size: 14px;
@@ -71,9 +65,6 @@ hr {
     background-color: #CCCCCC;
 }
 
-p, blockquote, ul, ol, dl, li {
+blockquote, ul, ol, dl, li {
     margin: 15px 0;
 }
-
-Contact GitHub API Training Shop Blog About
-© 2017 GitHub, Inc. Terms Privacy Security Status Help

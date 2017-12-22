@@ -74,9 +74,7 @@ input[type="checkbox"]:checked {
   border-color:#33C7D5;
 }
 input[type="radio"]:checked {
-  border: 1px solid #33C7D5;
-  background-color: white;
-  box-shadow: inset 0px 0px 0 3px #33C7D5;
+  border: 4px solid #33C7D5;
 }
 
 /* Datatables pagination */
@@ -99,7 +97,7 @@ input[type="radio"]:checked {
 .active-link{
   color: white !important;
   background-color: #33C7D5;
-  margin: 0px -40px;
+  margin-left: -40px;
   padding-left: 55px !important;
 }
 .active-link:hover{
@@ -130,7 +128,7 @@ input[type="radio"]:checked {
 .alert{
   border-radius:0;
   border-left-width: 6px;
-  background-color: transparent;
+  background-color: white;
   color: #2E2E2E;
 }
 .alert.alert-info{
@@ -145,15 +143,19 @@ input[type="radio"]:checked {
 .badge.alert-badge{
   background-color: #33C7D5;
 }
-a, button, code, div, img, input, label, li, p, pre, select, span, svg, table, td, textarea, th, ul {
+.page-header{
+  background-color:transparent;
+}
+.clock-counter{
+  color:#B4BCC8;
+}
+
+.form-control, .btn, span, .panel{
   -webkit-border-radius: 0!important;
   -moz-border-radius: 0!important;
   border-radius: 0!important;
 }
-.page-header{
-  background-color:transparent;
-}
-
-.clock-counter{
-  color:#B4BCC8;
+.charged{
+  text-align:center;
+  background-color:#dcf2f7;
 }

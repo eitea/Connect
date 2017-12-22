@@ -8,7 +8,7 @@ if(isset($_GET['clientID'])){
 } else {
   $p = 0;
 }
-$result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID");
+$result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID AND isSupplier = 'FALSE' ORDER BY name ASC ");
 if($result && $result->num_rows > 1){
   echo "<option name='clnt' value=0 >...</option>";
 }

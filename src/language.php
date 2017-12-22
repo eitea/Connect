@@ -23,6 +23,18 @@ $lang_ger['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
 $lang_eng['ACCUMULATED_DAYS'] = 'Accumulated Days';
 $lang_ger['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
 
+$lang_eng['ABSOLVED'] = 'Absolved';
+$lang_ger['ABSOLVED'] = 'Absolviert';
+
+$lang_eng['ACCOUNT'] = 'Account';
+$lang_ger['ACCOUNT'] = 'Konto';
+
+$lang_eng['ACCOUNT_JOURNAL'] = 'Accounting Journal';
+$lang_ger['ACCOUNT_JOURNAL'] = 'Buchungsjournal';
+
+$lang_eng['ACCOUNT_PLAN'] = 'Account Plan';
+$lang_ger['ACCOUNT_PLAN'] = 'Kontenplan';
+
 $lang_eng['ADD'] = 'Add';
 $lang_ger['ADD'] = 'Hinzufügen';
 
@@ -110,6 +122,12 @@ $lang_ger['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
 $lang_eng['BOOK_PROJECTS'] = 'Book Projects';
 $lang_ger['BOOK_PROJECTS'] = 'Projekte Buchen';
 
+$lang_eng['BOOKED'] = 'Booked';
+$lang_ger['BOOKED'] = 'Verbucht';
+
+$lang_eng['BOOKED_NOT'] = 'Not Booked';
+$lang_ger['BOOKED_NOT'] = 'Nicht Verbucht';
+
 $lang_eng['BOOKINGS'] = 'Bookings';
 $lang_ger['BOOKINGS'] = 'Buchungen';
 
@@ -167,14 +185,23 @@ $lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
 $lang_eng['CITY'] = 'City';
 $lang_ger['CITY'] = 'Ort';
 
+$lang_eng['CLASS'] = 'Class';
+$lang_ger['CLASS'] = 'Klasse';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
 $lang_eng['CLIENTS'] = 'Clients';
 $lang_ger['CLIENTS'] = 'Kunden';
 
+$lang_eng['CLIENT_LIST'] = 'Client List';
+$lang_ger['CLIENT_LIST'] = 'Kundenliste';
+
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
+
+$lang_eng['CONTACT_PERSON'] = 'Contact Person';
+$lang_ger['CONTACT_PERSON'] = 'Ansprechpartner';
 
 $lang_eng['CONTINUE'] = 'Continue';
 $lang_ger['CONTINUE'] = 'Weiter';
@@ -201,19 +228,22 @@ $lang_eng['COMPLEXITY'] = 'Complexity';
 $lang_ger['COMPLEXITY'] = 'Komplexität';
 
 $lang_eng['CONFIRM'] = 'Confirm';
-$lang_ger['CONFIRM'] = 'Bestätigen';
+$lang_ger['CONFIRM'] = 'Ja';
 
-$lang_eng['CONFIRM_CANCEL'] = 'No, I\'m sorry.';
-$lang_ger['CONFIRM_CANCEL'] = 'Nein, tut mir leid.';
+$lang_eng['CONFIRM_CANCEL'] = 'No';
+$lang_ger['CONFIRM_CANCEL'] = 'Nein';
 
 $lang_eng['CONSUMED'] = 'Consumed';
 $lang_ger['CONSUMED'] = 'Konsumiert';
 
+$lang_eng['COPY'] = 'Copy';
+$lang_ger['COPY'] = 'Kopieren';
+
 $lang_eng['CORE_TIME'] = 'Core Time';
 $lang_ger['CORE_TIME'] = 'Kernzeit';
 
-$lang_eng['CORRECTION'] = 'Correction';
-$lang_ger['CORRECTION'] = 'Korrektur';
+$lang_eng['CORRECTION'] = 'Correction Hours';
+$lang_ger['CORRECTION'] = 'Korrekturstunden';
 
 $lang_eng['CREATE_NEW_COMPANY'] = 'Create New Company';
 $lang_ger['CREATE_NEW_COMPANY'] = 'Neuer Mandant';
@@ -299,6 +329,9 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
+$lang_eng['DOCUMENTS'] = 'Documents';
+$lang_ger['DOCUMENTS'] = 'Dokumente';
+
 $lang_eng['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
 $lang_ger['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
 
@@ -326,6 +359,9 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 
+$lang_eng['EMPLOYEE'] = 'Employee';
+$lang_ger['EMPLOYEE'] = 'Mitarbeiter';
+
 $lang_eng['ENCRYPTION_ACTIVE'] = 'Encryption active';
 $lang_ger['ENCRYPTION_ACTIVE'] = 'Verschlüsselung aktiviert';
 
@@ -350,11 +386,20 @@ $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Ange
 $lang_eng['ERROR_DELETE_COMPANY'] = 'ERROR: You cannot delete the first company.';
 $lang_ger['ERROR_DELETE_COMPANY'] = 'Die erste Firma darf nicht gelöscht werden.';
 
+$lang_eng['ERROR_DELETE_ACCOUNT'] = 'ERROR: You cannot delete charged accounts.';
+$lang_ger['ERROR_DELETE_ACCOUNT'] = 'Belastete Konten können nicht gelöscht werden.';
+
 $lang_eng['ERROR_EMAIL'] = 'Invalid e-mail address.';
 $lang_ger['ERROR_EMAIL'] = 'Ungültige e-mail Adresse.';
 
+$lang_eng['ERROR_DUPLICATE'] = 'Entry already exists. ';
+$lang_ger['ERROR_DUPLICATE'] = 'Dieser Eintrag existiert bereits. ';
+
 $lang_eng['ERROR_EXISTING_EMAIL'] = 'Entered e-mail Address already exists.';
 $lang_ger['ERROR_EXISTING_EMAIL'] = 'Die angegebene e-mail Adresse existiert bereits.';
+
+$lang_eng['ERROR_INVALID_CHARACTER'] = 'Input contained invalid characters.';
+$lang_ger['ERROR_INVALID_CHARACTER'] = 'Die Eingabe enthielt ungültige Zeichen.';
 
 $lang_eng['ERROR_INVALID_UPLOAD'] = 'Uploaded File was Invalid! Try again with a smaller or different file.';
 $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bitte auf Größe und Endung achten.';
@@ -379,6 +424,9 @@ $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 
 $lang_eng['ERROR_UNEXPECTED'] = 'An unexpected error has occured. Please try again. If this message continues to be displayed, please contact support.'; //we dont have a support.
 $lang_ger['ERROR_UNEXPECTED'] = 'Ein unerwarteter Fehler ist aufgetaucht. Bitte versuchen Sie es erneut. Wird diese Nachricht weiterhin angezeigt, wenden Sie sich an den Support.';
+
+$lang_eng['EVALUATION'] = 'Evaluation';
+$lang_ger['EVALUATION'] = 'Bewertung';
 
 $lang_eng['EXISTING'] = 'Existing';
 $lang_ger['EXISTING'] = 'Existierend';
@@ -409,6 +457,15 @@ $lang_ger['FORWARDED'] = 'Weitergeleitet';
 
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
+
+$lang_eng['FINANCES'] = 'Finances';
+$lang_ger['FINANCES'] = 'Finanzen';
+
+$lang_eng['FINANCE_CREDIT'] = 'Credit';
+$lang_ger['FINANCE_CREDIT'] = 'Einnahme';
+
+$lang_eng['FINANCE_DEBIT'] = 'Debit';
+$lang_ger['FINANCE_DEBIT'] = 'Ausgabe';
 
 $lang_eng['FIRSTNAME'] = 'First Name';
 $lang_ger['FIRSTNAME'] = 'Vorname';
@@ -491,6 +548,9 @@ $lang_ger['ILLEGAL_LUNCHBREAK'] = 'Ungültige Pausen';
 $lang_eng['ILLEGAL_TIMESTAMPS'] = 'Invalid Timestamps';
 $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
+$lang_eng['INCOMING_INVOICE'] = 'Incoming Invoice';
+$lang_ger['INCOMING_INVOICE'] = 'Eingangsrechnung';
+
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
 
@@ -520,10 +580,11 @@ $lang_ger['INFO_GEMINI'] = "Es existiert mehr als nur ein Zeitstempel für einen
 $lang_eng['INFO_HOLIDAY'] = 'National Holidays have to end with (§).';
 $lang_ger['INFO_HOLIDAY'] = 'Gesetzliche Feiertage müssen mit einem (§) Enden.';
 
-$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have no lunchbreaks. <br>
-                                        Autocorrecting them appends the rest of the lunchbreak to the end of the day. (This break will be added)';
-$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine vollständige Mittagspause gefunden.<br>
-                                        Die Korrektur trägt eine vollständige Mittagspause zur Mitte des Tages nach. (Diese Pause wird dazugerechnet)';
+$lang_eng['INFO_ILLEGAL_LUNCHBREAK'] = 'The timestamps listed below have insufficient lunchbreaks. <br>
+                                        Autocorrecting them appends the rest of the lunchbreak to the last booking (if found), or to the middle of the day to avoid overlappings';
+$lang_ger['INFO_ILLEGAL_LUNCHBREAK'] = 'Für die gelisteten Zeitstempel wurde keine Mittagspause gefunden. Die automatische Korrektur trägt die fehlende Zeit nach.<br>
+                                        Sind bereits Buchungen vorhanden wird die Pause an die letzte Buchung des Tages angehängt, um Überschneidungen zu vermeiden.<br>
+                                        Sonst wird die Pause exakt nach Ablauf der Mindestzeit (normal 6h) hinzugefügt.';
 
 $lang_eng['INFO_INTERVALS_AS_EXPECTED'] = 'Days without expected hours (like holidays) will be left out automatically.';
 $lang_ger['INFO_INTERVALS_AS_EXPECTED'] = 'Tage ohne erwartete Stunden (wie Feiertage) werden automatisch ausgelassen';
@@ -533,7 +594,7 @@ $lang_eng['INFO_LUNCHBREAK_TASK'] = 'This task will validate all checked in user
                                      This task will be run exceptionally often. Make sure to deactivate this if you have a lot of active users and are experiencing performance issues. <br>';
 $lang_ger['INFO_LUNCHBREAK_TASK'] = 'Dieser Task überprüft die Mittagspauser aller eingestempelten Benutzer und bucht, falls notwendig, Korrekturen. <br>
                                      Die Validierung erfolgt durch die individuellen Pause-Einstellungen eines jeden Benutzers. <br>
-                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie diesen Task falls sie viele aktive Benutzer haben und Performance Porbleme mitbekommen.';
+                                     Die Überprüfung erfolgt täglich in sehr kurzen Abständen. Deaktivieren Sie daher diesen Task, falls sie viele aktive Benutzer haben und Probleme in der Performance mitbekommen.';
 
 $lang_eng['INFO_TASKS'] = 'Set the status and times for Tasks to run. Inactive Tasks will not be run at all. Setting a status other than "Inactive" will activate the task. <br>
                            Active tasks will only run once the 1st runtime has expired. Setting a task to run in the future is possible. <br>
@@ -574,6 +635,9 @@ $lang_ger['LAST_BOOKING'] = 'Letzte Buchung';
 $lang_eng['LASTNAME'] = 'Lastname';
 $lang_ger['LASTNAME'] = 'Nachname';
 
+$lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
+$lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
+
 $lang_eng['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
 $lang_ger['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
 
@@ -582,6 +646,9 @@ $lang_ger['LUNCHBREAK'] = 'Mittagspause';
 
 $lang_eng['LUNCHBREAK_REPAIR'] = 'Lunchbreak Repair';
 $lang_ger['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
+
+$lang_eng['MAKE_REQUEST'] = 'File Application';
+$lang_ger['MAKE_REQUEST'] = 'Antrag Stellen';
 
 $lang_eng['MANDATORY_SETTINGS'] = 'Mandatory Settings';
 $lang_ger['MANDATORY_SETTINGS'] = 'Pflichtfelder';
@@ -595,17 +662,8 @@ $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
 $lang_eng['MASTER_PASSWORD'] = 'Master Password';
 $lang_ger['MASTER_PASSWORD'] = 'Master Passwort';
 
-$lang_eng['MASTER_PASSWORD_CURRENT'] = 'Current Password';
-$lang_ger['MASTER_PASSWORD_CURRENT'] = 'Aktuelles Passwort';
-
-$lang_eng['MASTER_PASSWORD_CONFIRM'] = 'Confirm Password';
-$lang_ger['MASTER_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
-
-$lang_eng['MASTER_PASSWORD_NEW'] = 'New Password';
-$lang_ger['MASTER_PASSWORD_NEW'] = 'Neues Passwort';
-
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
-$lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur die Anfrage, NICHT die eigentlichen Stunden!';
+$lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur den Antrag, NICHT die eigentlichen Stunden!';
 
 $lang_eng['MINUTES'] = 'Minutes';
 $lang_ger['MINUTES'] = 'Minuten';
@@ -620,7 +678,7 @@ $lang_eng['MONTHLY_REPORT'] ='Monthly Report';
 $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 
 $lang_eng['MY_REQUESTS'] = 'My Requests';
-$lang_ger['MY_REQUESTS'] = 'Meine Anfragen';
+$lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
@@ -641,7 +699,7 @@ $lang_eng['NEW_PASSWORD'] = 'New Password';
 $lang_ger['NEW_PASSWORD'] = 'Neues Passwort';
 
 $lang_eng['NEW_PASSWORD_CONFIRM'] = 'Confirm New Password';
-$lang_ger['NEW_PASSWORD_CONFIRM'] = 'Passwort bestätigen';
+$lang_ger['NEW_PASSWORD_CONFIRM'] = 'Neues Passwort bestätigen';
 
 $lang_eng['NEW_PROCESS'] = 'New Process';
 $lang_ger['NEW_PROCESS'] = 'Neuer Vorgang';
@@ -676,6 +734,9 @@ $lang_ger['OFFER'] = 'Angebot';
 $lang_eng['OFFERS'] = 'Offers';
 $lang_ger['OFFERS'] = 'Angebote';
 
+$lang_eng['OFFSET_ACCOUNT'] = 'Offset Account';
+$lang_ger['OFFSET_ACCOUNT'] = 'Gegenkonto';
+
 $lang_eng['OK_CREATE'] = 'New entry was successfully created.';
 $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
 
@@ -696,6 +757,9 @@ $lang_ger['OPTIONS'] = 'Optionen';
 
 $lang_eng['OPEN'] = 'Open';
 $lang_ger['OPEN'] = 'Offen';
+
+$lang_eng['ORDER'] = 'Order';
+$lang_ger['ORDER'] = 'Bestellung';
 
 $lang_eng['ORDER_CONFIRMATION'] = 'Order Confirmation';
 $lang_ger['ORDER_CONFIRMATION'] = 'Auftragsbestätigung';
@@ -720,6 +784,9 @@ $lang_ger['PARTIAL_SUM'] = 'Zwischensumme';
 
 $lang_eng['PASSWORD'] = 'Password';
 $lang_ger['PASSWORD'] = 'Passwort';
+
+$lang_eng['PASSWORD_CURRENT'] = 'Current Password';
+$lang_ger['PASSWORD_CURRENT'] = 'Aktuelles Passwort';
 
 $lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
 $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
@@ -760,14 +827,17 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
+$lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
+
 $lang_eng['PROCESS'] = 'Process';
-$lang_ger['PROCESS'] = 'Auftrag';
+$lang_ger['PROCESS'] = 'Vorgang';
 
 $lang_eng['PROCESS_STATUS'] = 'Process Status';
 $lang_ger['PROCESS_STATUS'] = 'Prozessstatus';
 
 $lang_eng['PROCESSES'] = 'Processes';
-$lang_ger['PROCESSES'] = 'Aufträge';
+$lang_ger['PROCESSES'] = 'Vorgänge';
 
 $lang_eng['PRODUCTIVE'] = 'Productive';
 $lang_ger['PRODUCTIVE'] = 'Produktiv';
@@ -790,6 +860,9 @@ $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';
 $lang_eng['PROJECT_INFORMATION'] = 'Reports';
 $lang_ger['PROJECT_INFORMATION'] = 'Reports';
 
+$lang_eng['PROJECT_LOGS'] = 'Project Logs';
+$lang_ger['PROJECT_LOGS'] = 'Buchungsprotokoll ';
+
 $lang_eng['PROP_OUR_SIGN'] = 'Our Sign';
 $lang_ger['PROP_OUR_SIGN'] = 'Unser Zeichen';
 
@@ -811,8 +884,8 @@ $lang_ger['PURCHASE_PRICE'] = 'Einkaufspreis';
 $lang_eng['QUANTITY'] = 'Quantity';
 $lang_ger['QUANTITY'] = 'Menge';
 
-$lang_eng['READY_STATUS'] = 'Ready Status';
-$lang_ger['READY_STATUS'] = 'Bereitschaftsstatus';
+$lang_eng['READY_STATUS'] = 'Present';
+$lang_ger['READY_STATUS'] = 'Anwesend';
 
 $lang_eng['REASON'] = 'Reason';
 $lang_ger['REASON'] = 'Grund';
@@ -825,6 +898,18 @@ $lang_ger['RECEIPT'] = 'Rechnung';
 
 $lang_eng['RECEIPTS'] = 'Receipts';
 $lang_ger['RECEIPTS'] = 'Rechnungen';
+
+$lang_eng['RECEIPT_DATE'] = 'Receipt Date';
+$lang_ger['RECEIPT_DATE'] = 'Rechnungsdatum';
+
+$lang_eng['RECEIPT_BOOK'] = 'Receipt Book';
+$lang_ger['RECEIPT_BOOK'] = 'Wareneingangsbuch';
+
+$lang_eng['RECORD'] = 'Record';
+$lang_ger['RECORD'] = 'Datenstamm';
+
+$lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
+$lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
 
 $lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';
@@ -854,16 +939,22 @@ $lang_eng['RETURN'] = 'Return';
 $lang_ger['RETURN'] = 'Zurück';
 
 $lang_eng['REQUESTS'] = "Request";
-$lang_ger['REQUESTS'] = "Anfragen";
+$lang_ger['REQUESTS'] = "Anträge";
 
 $lang_eng['REQUEST_TYPE'] = "Request Type";
-$lang_ger['REQUEST_TYPE'] = "Art der Anfrage";
+$lang_ger['REQUEST_TYPE'] = "Art des Antrags";
 
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 
+$lang_eng['RUNTIME'] = 'Runtime';
+$lang_ger['RUNTIME'] = 'Laufzeit';
+
 $lang_eng['SAVE'] = 'Save';
 $lang_ger['SAVE'] = 'Speichern';
+
+$lang_eng['SAVE_PICTURE'] = 'Save Picture';
+$lang_ger['SAVE_PICTURE'] = 'Bild Speichern';
 
 $lang_eng['SALDO_DAY'] = 'Daily Saldo';
 $lang_ger['SALDO_DAY'] = 'Tagessaldo';
@@ -910,7 +1001,7 @@ $lang_ger['SOCIAL_STATUS_EXAMPLE'] = 'Arbeite gerade an meinem Projekt';
 $lang_eng['SOCIAL_UPLOAD_PICTURE'] = 'Upload Picture';
 $lang_ger['SOCIAL_UPLOAD_PICTURE'] = 'Bild hochladen';
 
-$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Can\' delete group';
+$lang_eng['SOCIAL_CANNOT_DELETE_GROUP'] = 'Cannot delete group';
 $lang_ger['SOCIAL_CANNOT_DELETE_GROUP'] = 'Gruppe kann nicht gelöscht werden';
 
 $lang_eng['SOCIAL_NAME'] = 'Name';
@@ -966,6 +1057,18 @@ $lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';
+
+$lang_eng['SUPERVISOR'] = 'Supervisor';
+$lang_ger['SUPERVISOR'] = 'Vorgesetzter';
+
+$lang_eng['SUPPLIER'] = 'Supplier';
+$lang_ger['SUPPLIER'] = 'Lieferant';
+
+$lang_eng['SUPPLIERS'] = 'Suppliers';
+$lang_ger['SUPPLIERS'] = 'Lieferanten';
+
+$lang_eng['SUPPLIER_LIST'] = 'Supplier List';
+$lang_ger['SUPPLIER_LIST'] = 'Lieferantenliste';
 
 $lang_eng['TASK_SCHEDULER'] = 'Task Scheduler';
 $lang_ger['TASK_SCHEDULER'] = 'Taskplaner';
@@ -1028,7 +1131,7 @@ $lang_eng['UNDO'] ='Undo';
 $lang_ger['UNDO'] = 'Rückgängig';
 
 $lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
-$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anfragen';
+$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anträge';
 
 $lang_eng['UNIT'] ='Unit';
 $lang_ger['UNIT'] = 'Einheit';
@@ -1041,6 +1144,9 @@ $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
 
 $lang_eng['UPTODATE'] = 'Version is up tp date. ';
 $lang_ger['UPTODATE'] = 'Version ist aktuell. ';
+
+$lang_eng['UPLOAD'] ='Upload';
+$lang_ger['UPLOAD'] = 'Hochladen';
 
 $lang_eng['USED_DAYS'] ='Used Days';
 $lang_ger['USED_DAYS'] ='Verbrauchte Tage';
@@ -1078,7 +1184,10 @@ $lang_eng['VACATION_REPAIR'] = 'Repair Vacations';
 $lang_ger['VACATION_REPAIR'] = 'Urlaub Autokorrektur';
 
 $lang_eng['VACATION_REQUESTS'] = 'Vacation Requests';
-$lang_ger['VACATION_REQUESTS'] = 'Urlaubsanfragen';
+$lang_ger['VACATION_REQUESTS'] = 'Urlaubsanträge';
+
+$lang_eng['VACANT_POSITIONS'] = 'Vacant Positions';
+$lang_ger['VACANT_POSITIONS'] = 'Offene Posten';
 
 $lang_eng['VALID_PERIOD'] = 'Validity Period';
 $lang_ger['VALID_PERIOD'] = 'Gültigkeitszeitraum';
@@ -1095,8 +1204,8 @@ $lang_ger['VIEW'] = 'Ansehen';
 $lang_eng['VIEW_PROJECTS'] = 'View Projects';
 $lang_ger['VIEW_PROJECTS'] = 'Projekte';
 
-$lang_eng['VIEW_TIMESTAMPS'] = 'View Timestamps';
-$lang_ger['VIEW_TIMESTAMPS'] = 'Zeitstempel Ansehen';
+$lang_eng['VIEW_TIMESTAMPS'] = 'My Times';
+$lang_ger['VIEW_TIMESTAMPS'] = 'Meine Zeiten';
 
 $lang_eng['VIEW_USER'] = 'View Users';
 $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
@@ -1142,10 +1251,16 @@ $lang_ger['YES'] = 'Ja';
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
 
+$lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
+$lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');
+
 $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Vacation","2" => "Special Leave",
   "3" => "Sick","4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");
 $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
   "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
+
+$lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
+$lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");
 
 $lang_eng['MONTH_TOSTRING'] = array("", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 $lang_ger['MONTH_TOSTRING'] = array("", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
@@ -1159,8 +1274,8 @@ $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau');
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
 
-$lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cencellation');
-$lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Storniernug');
+$lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cancellation');
+$lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');
 
 $lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education","spl" => "Special Leave",
   "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak");

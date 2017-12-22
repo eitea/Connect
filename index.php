@@ -1,49 +1,53 @@
 <?php
 $routes = array(
-  'php/info' => 'phpinfo.php',                            'php/test' => 'template.php',                           'setup/run' => 'setup/setup.php',
-  'login/auth' => 'login.php',                            'login/register' => 'selfregistration.php',             'login/update' => 'doUpdate.php',
-   
-  'user/home' => 'home.php',                              'user/time' => 'timeCalcTable.php',                     'user/calendar' => 'calendar.php',
-  'user/logout' => 'logout.php',                          'user/request' => 'makeRequest.php',                    'user/travel' => 'travelingForm.php',
-  'user/ready' => 'readyPlan.php',                        'user/book' => 'userProjecting.php',
 
+  'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
+  'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
+  'login/access' => 'login_tester.php',
+
+  'user/home' => 'home.php',                       'user/time' => 'timeCalcTable.php',                'user/book' => 'userProjecting.php',
+  'user/logout' => 'logout.php',                   'user/request' => 'makeRequest.php',               'user/ready' => 'readyPlan.php',
+  
   'social/home' => 'socialMedia.php',
 
-  'system/users' => 'editUsers.php',                      'system/saldo' => 'admin_saldoview.php',                'system/register' => 'register.php',
-  'system/deactivated' => 'deactivatedUsers.php',         'system/company' => 'editCompanies.php',                'system/new' => 'new_Companies.php',
-  'system/teams' => 'teamConfig.php',                     'system/holidays' => 'editHolidays.php',                'system/advanced' => 'advancedOptions.php',
-  'system/password' => 'passwordOptions.php',             'system/email' => 'reportOptions.php',                  'system/tasks' => 'taskScheduler.php',
-  'system/update' => 'pullGitRepo.php',                   'system/backup' => 'download_sql.php',                  'system/restore' => 'upload_database.php',
-  'system/designer' => 'templateSelect.php',              'system/clients' => 'editCustomers.php',                'system/clientDetail' => 'editCustomer_detail.php',
-  'system/previewTem' => 'templatePreview.php',           'system/downloadTem' => 'templateDownload.php',         'system/editTemp' => 'templateEdit.php',
-  'system/downloadSql' => 'sqlDownload.php',              'system/cryptlog'=> 'viewCryptLog.php',                 'system/restic' => 'resticBackup.php',
+  'system/users' => 'editUsers.php',               'system/saldo' => 'admin_saldoview.php',           'system/register' => 'register.php',
+  'system/deactivated' => 'deactivatedUsers.php',  'system/company' => 'editCompanies.php',           'system/new' => 'new_Companies.php',
+  'system/teams' => 'teamConfig.php',              'system/holidays' => 'editHolidays.php',           'system/advanced' => 'advancedOptions.php',
+  'system/password' => 'passwordOptions.php',      'system/email' => 'reportOptions.php',             'system/tasks' => 'taskScheduler.php',
+  'system/update' => 'pullGitRepo.php',            'system/backup' => 'download_sql.php',             'system/restore' => 'upload_database.php',
+  'system/designer' => 'templateSelect.php',       'system/clients' => 'editCustomers.php',           'system/clientDetail' => 'editCustomer_detail.php',
+  'system/previewTem' => 'templatePreview.php',    'system/downloadTem' => 'templateDownload.php',    'system/editTemp' => 'templateEdit.php',
+  'system/downloadSql' => 'sqlDownload.php',       'system/cryptlog'=> 'viewCryptLog.php',            'system/restic' => 'resticBackup.php',
+  'system/checkinLogs' => 'checkinLogs.php',
 
-  'time/view' => 'getTimestamps.php',                     'time/corrections' => 'bookAdjustments.php',            'time/travels' => 'getTravellingExpenses.php',
-  'time/vacations' => 'display_vacation.php',             'time/check' => 'adminTodos.php',                       'time/requests' => 'requestOverview.php',
+  'time/view' => 'getTimeprojects.php',            'time/corrections' => 'bookAdjustments.php',       'time/travels' => 'getTravellingExpenses.php',
+  'time/vacations' => 'display_vacation.php',      'time/check' => 'adminTodos.php',                  'time/requests' => 'requestOverview.php',
 
-  'project/bookings' => 'getProjects.php',                'project/view' => 'editProjects.php',                   'project/csvDownload' => 'csvDownload.php',
-  'project/pdfDownload' => 'pdfDownload.php',      
+  'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
+  'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',             'project/log' => 'audit_projectBookings.php',
 
-  'dynamic-projects/admin' => 'dynamicProjects_admin.php','dynamic-projects/user' => 'dynamicProjects_user.php',
+  'dynamic-projects/user' => 'dynamicProjects_user.php', 'dynamic-projects/admin' => 'dynamicProjects_admin.php',
 
-  'report/send' => 'sendMailReport.php',                  'report/productivity'=>'report_productivity.php',       'report/autotask' => 'autotask.php',
+  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',       'report/autotask' => 'autotask.php',
 
-  'erp/view' => 'offer_proposals.php',                    'erp/articles' => 'product_articles.php',               'erp/taxes' => 'editTaxes.php',
-  'erp/units' => 'editUnits.php',                         'erp/payment' => 'editPaymentMethods.php',              'erp/shipping' => 'editShippingMethods.php',
-  'erp/representatives' => 'editRepres.php',              'erp/download' => 'download_proposal.php',              'erp/edit' => 'offer_proposal_edit.php'
+  'erp/view' => 'erp_view.php',                    'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
+  'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
+  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'erp_process.php',
+  'erp/receipts' => 'receiptBook.php',             'erp/suppliers' => 'editSuppliers.php',
+
+  'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php',
+  
+  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',              'dsgvo/templates' => 'dsgvo_mail.php',
+  'dsgvo/edit' => 'dsgvo_edit.php',                'dsgvo/vv' => 'dsgvo_vv.php',                      'dsgvo/vtemplates' =>'dsgvo_vv_templates.php',
+  'dsgvo/vDetail' => 'dsgvo_vv_detail.php',        'dsgvo/editTemplate' => 'dsgvo_vv_template_edit.php',
+
+  's3/buckets' => 's3_buckets.php',                's3/download' => 's3_download.php'
 );
 $mime_types = array(
-  '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif"
- );
-
-//kill internet explorer
-if (strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64') || strpos($_SERVER["HTTP_USER_AGENT"], 'WOW64')) {
-  include 'msie.html';
-  die();
-}
-
+  '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",                    '.woff2' => "application/font-woff2",
+  '.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
+);
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -54,7 +58,7 @@ if($l > 1){
   if(array_key_exists($route, $routes)){
     $this_page = $routes[$route];
     include 'src/'.$this_page;
-  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.gif)$/", $url, $matches)){
+  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
     }

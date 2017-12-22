@@ -1,6 +1,8 @@
 <?php include 'header.php'; ?>
+<link rel='stylesheet' href='plugins/fullcalendar/fullcalendar.css' />
 <script src="plugins/chartsjs/Chart.min.js"></script>
-<!-- BODY -->
+<script src='plugins/fullcalendar/lib/moment.min.js'></script>
+<script src='plugins/fullcalendar/fullcalendar.js'></script>
 <style>
 #statisticChart, #analysisChart{
   margin:50px 0px 50px 0px;
@@ -23,9 +25,158 @@ setTimeout(function(){
 </script>
 
 <?php
-$curID = $userID;
-include 'tableSummary.php'; //this is how it goes
+require 'Calculators/IntervalCalculator.php';
+$logSums = new Interval_Calculator($userID);
 
+if($logSums->saldo < 0){
+  $color = 'style="color:red"';
+} else {
+  $color = 'style="color:#00ba29"';
+}
+
+$result_Sum = $conn->query("SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $userID AND endDate IS NULL");
+if($result_Sum && $result_Sum->num_rows > 0){
+  $userRow = $result_Sum->fetch_assoc();
+} else {
+  echo $conn->error;
+}
+?>
+<br><br>
+<div class="container-fluid">
+  <div class="col-md-5">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#saldo" data-toggle="tab">Saldo</a></li>
+      <li><a href="#weekHours" data-toggle="tab"><?php echo $lang['TIMETABLE']; ?></a></li>
+      <li><a href="#other" data-toggle="tab"><?php echo $lang['DATA']; ?></a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="saldo">
+        <table class="table table-striped">
+          <thead>
+            <th><?php echo $lang['DESCRIPTION']; ?></th>
+            <th><?php echo $lang['HOURS']; ?></th>
+          </thead>
+          <tbody>
+            <?php
+            echo '<tr><td>'.$lang['EXPECTED_HOURS'].'</td><td>-'. number_format(array_sum($logSums->shouldTime), 2, '.', '') .'</td></tr>';
+            echo '<tr><td>'.$lang['ABSOLVED_HOURS'].'</td><td>+'. number_format(array_sum($logSums->absolvedTime), 2, '.', '') .'</td></tr>';
+            echo '<tr><td>'.$lang['LUNCHBREAK'].'</td><td>-'. number_format(array_sum($logSums->lunchTime), 2, '.', '') . '</td></tr>';
+            $overTimeAdditive = $corrections = 0;
+            foreach($logSums->endOfMonth as $arr){
+              $overTimeAdditive += $arr['overTimeLump'];
+              $corrections += $arr['correction'];
+            }
+            if($overTimeAdditive) echo '<tr><td>'.$lang['OVERTIME_ALLOWANCE'] . '</td> <td> -' . number_format($overTimeAdditive) . ' </td></tr>';
+            if($corrections) echo "<tr><td><a data-toggle='modal' data-target='#correctionModal'>".$lang['CORRECTION'].' '.$lang['HOURS'].'</a></td><td>'.sprintf('%+.2f',$corrections).'</td></tr>';
+            echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td $color>". number_format($logSums->saldo, 2, '.', ''). '</td></tr>';
+            ?>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="weekHours">
+        <table class="table table-striped">
+          <thead>
+            <th><?php echo $lang['TIMETABLE']; ?></th>
+            <th><?php echo $lang['HOURS']; ?></th>
+          </thead>
+          <tbody>
+            <?php
+            $theBigSum = $userRow['mon'] + $userRow['tue'] + $userRow['wed'] + $userRow['thu'] + $userRow['fri'] + $userRow['sat'] + $userRow['sun'];
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['mon'].'</td><td>'. $userRow['mon'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['tue'].'</td><td>'. $userRow['tue'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['wed'].'</td><td>'. $userRow['wed'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['thu'].'</td><td>'. $userRow['thu'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['fri'].'</td><td>'. $userRow['fri'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sat'].'</td><td>'. $userRow['sat'] .'</td></tr>';
+            echo '<tr><td>'.$lang['WEEKDAY_TOSTRING']['sun'].'</td><td>'. $userRow['sun'] .'</td></tr>';
+            echo "<tr><td style='font-weight:bold;'>".$lang['SUM']."</td><td>". $theBigSum .'</td></tr>';
+            ?>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="other">
+        <table class="table table-striped">
+          <thead>
+            <th><?php echo $lang['DESCRIPTION']; ?> </th>
+            <th>Detail</th>
+          </thead>
+          <tbody>
+            <?php
+            echo '<tr><td>'. $lang['ENTRANCE_DATE'] .'</td><td>'. substr($userRow['beginningDate'],0,10) .'</td></tr>';
+            echo '<tr><td><a href="../time/vacations?curID='.$userID.'" >'. $lang['VACATION_DAYS'].' '.$lang['AVAILABLE'].'</a></td><td>'. sprintf('%.2f', $logSums->availableVacation) .'</td></tr>';
+            echo '<tr><td>'. $lang['VACATION_DAYS'].$lang['PER_YEAR'].'</td><td>'. $userRow['vacPerYear'] .'</td></tr>';
+            echo '<tr><td>'. $lang['OVERTIME_ALLOWANCE'].'</td><td>'. $userRow['overTimeLump'] .'</td></tr>';
+            ?>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- End tab content -->
+    <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
+      <br><h4><?php echo $lang['READY_STATUS'];?></h4>
+      <table class="table table-hover">
+      <thead>
+        <th>Name</th>
+        <th>Checkin</th>
+      </thead>
+      <tbody>
+        <?php
+        $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
+        $row = $result->fetch_assoc();
+        $today = substr(getCurrentTimestamp(),0,10);
+        $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
+        $result = $conn->query($sql);
+        if($result && $result->num_rows > 0){
+          while($row = $result->fetch_assoc()){
+            echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
+            echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
+          }
+        } else {
+          echo mysqli_error($conn);
+        }
+        ?>
+      </tbody>
+      </table>
+    <?php endif; ?>
+  </div>
+  <div class="col-md-7">
+    <div id='calendar'></div>
+  </div>
+</div>
+
+<div class="modal fade" id="correctionModal" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel"><?php echo $lang['CORRECTION']; ?></h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+            <th><?php echo $lang['CORRECTION'] .' '. $lang['DATE']; ?></th>
+            <th><?php echo $lang['ADJUSTMENTS'].' '. $lang['HOURS']; ?></th>
+            <th>Info</th>
+          </thead>
+          <tbody>
+            <?php
+            $result = $conn->query("SELECT * FROM $correctionTable WHERE userID = $userID AND cType='log'");
+            while($result && ($row = $result->fetch_assoc())){
+              echo '<tr>';
+              echo '<td>'.substr($row['createdOn'],0,10).'</td>';
+              echo '<td>'.sprintf("%+.2f",$row['hours'] * $row['addOrSub']).'</td>';
+              echo '<td>'.$row['infoText'].'</td>';
+              echo '</tr>';
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<?php  //PROCESSING CHART DATA:
 $mean_mon = $mean_tue = $mean_wed = $mean_thu = $mean_fri = $mean_sat = $mean_sun = 0;
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){$mean_mon = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows); }
@@ -93,9 +244,56 @@ if($result && ($row = $result->fetch_assoc())){
 } else {
   $absolved_today = 0;
 }
+
+
+//CALENDAR STUFF
+$dates = array();
+$start = getCurrentTimestamp(); //normal users can only see future dates
+if($isCoreAdmin == 'TRUE') { $start = date('Y-m-d', strtotime('-1 year')); }
+$result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID
+WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
+if($result && ($row = $result->fetch_assoc())){
+  $start = substr($row['time'], 0, 10);
+  $prev_row = $row;
+  if($result && ($row = $result->fetch_assoc())){
+    $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffb9b9');
+    do {
+      if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
+        $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+        $color = $colors[$prev_row['status']];
+        $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+        $start = substr($row['time'], 0, 10);
+      }
+      $prev_row = $row;
+    } while($row = $result->fetch_assoc());
+    $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+    $color = $colors[$prev_row['status']];
+    $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+    $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+  }
+} else {
+  $conn->error;
+}
 ?>
 
 <script>
+$(document).ready(function(){
+  setTimeout(function () {
+    $("#calendar").fullCalendar({
+      height: 500,
+      firstDay: 1,
+      header: {
+        left: 'prev, next today',
+        center: 'title',
+        right: 'month, agendaWeek, listMonth'
+      },
+      events: [<?php echo implode(', ', $dates); ?>],
+      eventTextColor: '#6D6D6D',
+      eventBorderColor: '#FFFFFF'
+    });
+  });
+});
 $(function(){
   var ctx_analysis = document.getElementById("analysisChart");
   var myAnalysisChart = new Chart(ctx_analysis, {
@@ -117,8 +315,8 @@ $(function(){
           'rgba(251, 231, 54, 0.5)', 'rgba(189, 209, 71, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(90, 163, 231, 0.5)', 'rgba(154, 125, 210, 0.5)'
         ],
         data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
-      }
-    ]}
+      }]
+    }
   });
 
   <?php if($absolved_today): ?>
