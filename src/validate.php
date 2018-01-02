@@ -165,7 +165,7 @@ function isDynamicProjectAdmin($userID){
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo ('Access denied.');
     include 'footer.php';
-    die('<a href="../user/logout"> log out</a> or <a href="../user/logout"> log out</a>');
+    die('<a href="../user/logout"> log out</a>');
   }
 }
 
@@ -177,5 +177,18 @@ function enableToDynamicProjects($userID){
     die('<a href="../system/advanced">Enable</a>');
   }
   enableToBookings($userID);
+  // test whether user has active dynamic projects
+  $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* 
+  FROM dynamicprojects 
+  LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid 
+  LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  
+  WHERE dynamicprojectsoptionalemployees.userid = $userID 
+  OR dynamicprojectsemployees.userid = $userID 
+  OR dynamicprojects.projectowner = $userID");
+  if($result && $result->num_rows == 0){
+    echo "You are not part of any dynamic projects <a href='../user/logout'> logout</a>";
+    include 'footer.php';
+    die();
+  }
 }
 ?>

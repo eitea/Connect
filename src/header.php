@@ -65,9 +65,13 @@
   if($result && ($row = $result->fetch_assoc())){
     $enableSocialMedia = $row['enableSocialMedia'];
     $enableDynamicProjects = $row['enableDynamicProjects'];
+    $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+    echo $conn->error;
+    $hasActiveDynamicProjects = ($result && $result->num_rows > 0)?'TRUE':'FALSE';
   } else {
     $enableSocialMedia = 'FALSE';
     $enableDynamicProjects = 'FALSE';
+    $hasActiveDynamicProjects = 'FALSE';
   }
   if($enableSocialMedia == 'TRUE'){
     $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
@@ -481,7 +485,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
             <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
-            <?php if($enableDynamicProjects == 'TRUE'):?>
+            <?php if($enableDynamicProjects == 'TRUE' && $hasActiveDynamicProjects == 'TRUE'):?>
               <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
             <?php endif; //dynamicProjects ?> 
           <?php endif; ?>
