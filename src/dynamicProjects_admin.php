@@ -207,6 +207,7 @@ require "dynamicProjects_template.php";
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENT"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
@@ -275,6 +276,7 @@ require "dynamicProjects_template.php";
         echo "</td>";
         echo "<td>$start</td>";
         echo "<td>$end</td>"; // no end = ""
+        echo "<td>$series</td>";
         echo "<td>$status</td>";
         echo "<td>$priority</td>";
         // echo "<td>$parent</td>";

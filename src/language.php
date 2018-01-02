@@ -398,6 +398,9 @@ $lang_ger['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'Dieses Projekt gehört
 $lang_eng['DYNAMIC_PROJECTS_BELONG_TO'] = 'This belongs to a dynamic project';
 $lang_ger['DYNAMIC_PROJECTS_BELONG_TO'] = 'Das gehört zu einem dynamischen Projekt';
 
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Series';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Serie';
+
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
 
