@@ -24,7 +24,6 @@ $disabled = $modal_isAdmin ? "": "disabled";
     <!-- new dynamic project modal -->
     <form method="post" autocomplete="off" id="projectForm<?php echo stripSymbols($modal_id) ?>">
         <input type="hidden" name="id" value="<?php echo $modal_id ?>">
-        <input type="hidden" name="projectdataid" value="<?php echo $modal_project_data_id ?>">
         <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
             <div class="modal-dialog" role="form">
                 <div class="modal-content">

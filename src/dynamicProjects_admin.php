@@ -24,7 +24,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
 if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || $forceCreate)) {
     $connectIdentification = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
     $id = $_POST["id"] ?? "";
-    $projectDataId = $_POST["projectdataid"] ?? "";
     $name = $_POST["name"] ?? "missing name";
     $description = $_POST["description"] ?? "missing description";
     $company = $_POST["company"] ?? false;
@@ -95,14 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $status = $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
 
-    if($projectDataId) echo "projectDataId no longer used";
-    // if(empty($projectDataId)){
-    //     $conn->query("INSERT INTO projectData (name,dynamicprojectid) VALUES ('$name', $id)");
-    //     $projectDataId = $conn->query("SELECT id FROM projectData WHERE id = (SELECT MAX(id) FROM projectData)")->fetch_assoc()["id"];
-    // }else{
-    //     $projectDataId = intval($projectDataId);
-    //     $conn->query("UPDATE projectData SET name = '$name' WHERE id = $projectDataId");
-    // }
     foreach ($clients as $client) {
         $client = intval($client);
         $clientResult = $conn->query("SELECT * FROM projectData WHERE dynamicprojectid = '$id' AND clientID = $client");
@@ -114,9 +105,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
             $conn->query("UPDATE projectData SET name = '$name' WHERE dynamicprojectid = '$id' AND clientID = $client");
         }
         echo $conn->error;
-        // $conn->query("INSERT INTO projectData (name,dynamicprojectid,clientID) VALUES ('$name', '$id', $client)
-        // ON DUPLICATE KEY UPDATE dynamicprojectid='$name', projectdescription = '$description',
-        // ");
     }
     $clientsAsSQLList = "(";
     for ($i=0; $i < count($clients); $i++) { 
@@ -127,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $clientsAsSQLList.= ")";
     $clientsResult = $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id' AND clientID NOT IN $clientsAsSQLList"); //remove all other projects
 
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted, projectdataid) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed', '$projectDataId') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed', projectdataid='$projectDataId'");
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed'");
     echo $conn->error;
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
@@ -167,10 +155,9 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST["deleteDynamicProject"])){
         $id = $id = $_POST["id"] ?? "error - no id";
         $id = $conn->real_escape_string($id);
-        $projectDataId = $conn->query("SELECT projectdataid FROM dynamicprojects WHERE projectid = '$id'")->fetch_assoc()["projectdataid"];
         $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'");
-        //also delete the static project
-        $conn->query("DELETE FROM projectData WHERE id = '$projectDataId'");
+        //also delete the static projects
+        $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id'");
     }
 }
 ?>
@@ -237,7 +224,6 @@ require "dynamicProjects_template.php";
     $result = $conn->query("SELECT * FROM dynamicprojects");
     while ($row = $result->fetch_assoc()) {
         $id = $row["projectid"];
-        $projectDataId = $row["projectdataid"];
         $name = $row["projectname"];
         $description = $row["projectdescription"];
         $company = $row["companyid"];
@@ -344,7 +330,6 @@ require "dynamicProjects_template.php";
         $modal_status = $status; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
         $modal_priority = $priority;
         $modal_id = $id;
-        $modal_project_data_id = $projectDataId;
         $modal_pictures = $pictures;
         $modal_parent = $parent; //default: "none" or ""
         $modal_clients = $clients; //array of ids
