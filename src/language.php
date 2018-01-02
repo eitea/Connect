@@ -389,6 +389,9 @@ $lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
 $lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
 $lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
 
+$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'What did you do?';
+$lang_ger['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Welche Aufgaben haben Sie erledigt?';
+
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
 

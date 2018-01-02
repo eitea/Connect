@@ -186,14 +186,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //     bookingtext VARCHAR(1000)
     //   );
     $projectID = $_POST["id"] ?? "";
+    $clientID = $_POST["client"] ?? -1;
     if(isset($_POST["play"])){
         $conn->query("INSERT INTO dynamicprojectsbookings (projectid, userid) VALUES ('$projectID', $userID)");
     }else if(isset($_POST["pause"])){
         $bookingtext = $_POST["description"] ?? "no description";
         $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
         echo $conn->error;
-        //$endDate = date("Y-m-d H:i:s");
-        $projectDataId = $conn->query("SELECT projectdataid FROM dynamicprojects WHERE projectid = '$projectID'")->fetch_assoc()["projectdataid"];
+        $projectDataId = $conn->query("SELECT id FROM projectData WHERE dynamicprojectid = '$projectID' AND clientID = $clientID ")->fetch_assoc()["id"];
         $startEndArray = $conn->query("SELECT bookingstart, bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID ORDER BY bookingend DESC LIMIT 1")->fetch_assoc();
         $bookingStart = $startEndArray["bookingstart"];
         $bookingEnd = $startEndArray["bookingend"];
@@ -247,7 +247,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     ");
     while ($row = $result->fetch_assoc()) {
         $id = $row["projectid"];
-        $projectDataId = $row["projectdataid"];
         $name = $row["projectname"];
         $description = $row["projectdescription"];
         $company = $row["companyid"];
@@ -326,7 +325,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $modal_status = $status; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
         $modal_priority = $priority;
         $modal_id = $id;
-        $modal_project_data_id = $projectDataId;        
         $modal_pictures = $pictures;
         $modal_parent = $parent; //default: "none" or ""
         $modal_clients = $clients; //array of ids
@@ -348,21 +346,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 //echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
             ?>
 
-            <!-- group settings modal -->
+            <!-- booking modal -->
                 <div class="modal fade" id="bookDynamicProject<?php echo stripSymbols($modal_id); ?>" tabindex="-1" role="dialog" aria-labelledby="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
                     <div class="modal-dialog" role="form">
                         <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                     <h4 class="modal-title" id="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
-                                        What did you do?
+                                        <?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?>
                                     </h4>
                                 </div>
                                 <br>
                                 <div class="modal-body">
                                     <!-- modal body -->
                                         <textarea name="description" required class="form-control"></textarea>
-                                    </form>
+                                        <label>Kunde*:</label>
+                                            <select class="form-control js-example-basic-single" name="client" required>
+                                                <?php 
+                                                $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT JOIN $clientTable ON $clientTable.id = dynamicprojectsclients.clientid WHERE projectid = '$modal_id'");
+                                                while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
+                                                    $modal_client_id = $modal_clientRow["id"];
+                                                    $modal_client = $modal_clientRow["name"];
+                                                    echo "<option value='$modal_client_id'>$modal_client</option>";
+                                                }
+                                                ?>
+                                            </select>
                                     <!-- /modal body -->
                                 </div>
                                 <div class="modal-footer">
@@ -371,7 +379,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         </div>
                     </div>
                 </div>
-            <!-- /group settings modal -->
+            <!-- /booking modal -->
 
             <?php
             }
