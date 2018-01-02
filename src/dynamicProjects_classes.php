@@ -124,22 +124,24 @@ class ProjectSeries
             default:
                 return "ERROR";
         }
-        // $this->last_date = $retDate;
-        // if (!$this->end) {
-        //     return $retDate->format("Y-m-d");
-        // } elseif (is_numeric($this->end)) {
-        //     if ($this->end > 0) {
-        //         return $retDate->format("Y-m-d");
-        //     } else {
-        //         return "";
-        //     }
-        //     //series ended
-        // } elseif ($retDate > $this->end) {
-        //     return ""; //series ended
-        // }
-        // return $retDate->format("Y-m-d");
-        // return var_export($retDate,true);
-        return "01-01-1970";
+        if (is_a($retDate, "DateTime")) {
+            $this->last_date = $retDate;
+            if (!$this->end) {
+                return $retDate->format("Y-m-d");
+            } elseif (is_numeric($this->end)) {
+                if ($this->end > 0) {
+                    return $retDate->format("Y-m-d");
+                } else {
+                    return "";
+                }
+                //series ended
+            } elseif ($retDate > $this->end) {
+                return ""; //series ended
+            }
+            return $retDate->format("Y-m-d");
+            return var_export($retDate, true);
+        }
+        return "not DateTime";
     }
 
     public function __toString()
@@ -194,6 +196,7 @@ class ProjectSeries
     public function __sleep()
     {
         $this->start = $this->start->getTimestamp();
+        $this->last_date = $this->last_date->getTimestamp();
         if (!is_numeric($this->end) && $this->end != false) {
             //end is a DateTime which can't be serialized
             $this->end = $this->end->getTimestamp();
@@ -206,6 +209,9 @@ class ProjectSeries
         $startTimestamp = $this->start;
         $this->start = new DateTime();
         $this->start->setTimestamp($startTimestamp);
+        $last_dateTimestamp = $this->last_date;
+        $this->last_date = new DateTime();
+        $this->last_date->setTimestamp($last_dateTimestamp);
         if ($this->end > 100000000) { //probably a timestamp
             $endTimestamp = $this->end;
             $this->end = new DateTime();
