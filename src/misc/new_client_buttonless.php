@@ -66,7 +66,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $clientNums = array(1 => '');
           $numstrings = '';
           $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
-          while($rowNum = $res_num->fetch_assoc()){
+          while($res_num && ($rowNum = $res_num->fetch_assoc())){ //prevented error: call fetch_assoc() on boolean
             $cmpnyID = $rowNum['companyID'];
             $step = $rowNum['clientStep'];
             $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
