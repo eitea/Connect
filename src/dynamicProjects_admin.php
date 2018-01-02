@@ -158,7 +158,7 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
 $modal_name = "";
 $modal_company = ""; //id
-$modal_description = "No description given";
+$modal_description = $lang['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'];
 $modal_color = "#ededed";
 $modal_start = date("Y-m-d");
 $modal_end = ""; // Possibilities: ""(none);number (repeats); Y-m-d (date)
