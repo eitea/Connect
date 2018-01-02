@@ -350,6 +350,45 @@ $lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamische Projekte verwalten';
 $lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
 $lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
 
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Name';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Name';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Description';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Beschreibung';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_COMPANY'] = 'Company';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_COMPANY'] = 'Mandant';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_START'] = 'Start';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_START'] = 'Beginn';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_END'] = 'End';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_END'] = 'Ende';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_STATUS'] = 'Status';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_STATUS'] = 'Status';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priority';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priorität';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Owner';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Employees';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Mitarbeiter';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Clients';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Kunden';
+
+$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Dynamic Project';
+$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Dynamisches Projekt bearbeiten';
+
+$lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
+$lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
+
+$lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
+$lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
+
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
 

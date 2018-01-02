@@ -219,11 +219,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <table class="table">
 <thead>
     <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Owner</th>
-        <th>Employees</th>
-        <th>Optional Employees</th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_DESCRIPTION"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENT"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?></th>
+        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for play or pause -->
+        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for edit and bookings -->
     </tr>
 </thead>
 <tbody>
@@ -285,19 +292,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         echo "<td style='background-color:$color;'>$name</td>";
         echo "<td>$description</td>";
         echo "<td>$companyName</td>";
-        echo "<td>$start</td>";
-        echo "<td>$end</td>";
-        echo "<td>$status</td>";
-        echo "<td>$priority</td>";
-        echo "<td>$parent</td>";
-        echo "<td>$owner</td>";
-        echo "<td>";
-        while ($pictureRow = $pictureResult->fetch_assoc()) {
-            $picture = $pictureRow["picture"];
-            array_push($pictures, $picture);
-            echo "<img  height='50' src='$picture'>";
-        }
-        echo "</td>";
         echo "<td>";
         while ($clientRow = $clientsResult->fetch_assoc()) {
             array_push($clients, $clientRow["id"]);
@@ -305,21 +299,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             echo "$client, ";
         }
         echo "</td>";
+        echo "<td>$start</td>";
+        echo "<td>$end</td>"; // no end = ""
+        echo "<td>$status</td>";
+        echo "<td>$priority</td>";
+        // echo "<td>$parent</td>";
+        echo "<td>$owner</td>";
         echo "<td>";
         while ($employeeRow = $employeesResult->fetch_assoc()) {
             array_push($employees, $employeeRow["id"]);
             $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
             echo "$employee, ";
         }
-        echo "</td>";
-        echo "<td>";
         while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
             array_push($optional_employees, $optional_employeeRow["id"]);
             $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
             echo "$optional_employee, ";
         }
         echo "</td>";
-        $modal_title = "Edit Dynamic Project";
+
+        $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
         $modal_name = $name;
         $modal_company = $company;
         $modal_description = $description;
@@ -381,10 +380,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         echo "</form></td>";
 
-        echo "<td>";
+        echo "<td style='white-space: nowrap;width: 1%;'>";
        
         require "dynamicProjects_template.php";
-        $modal_title = "Notes";
+        $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
         require "dynamicProjects_comments.php";
         echo "</td>";
         echo "</tr>";
