@@ -2506,7 +2506,6 @@ if($row['version'] < 119) {
   
     $conn->multi_query("CREATE TABLE dynamicprojects(
       projectid VARCHAR(100) NOT NULL,
-      projectdataid INT(6) UNSIGNED,
       projectname VARCHAR(60) NOT NULL,
       projectdescription VARCHAR(500) NOT NULL,
       companyid INT(6),
@@ -2576,6 +2575,22 @@ if($row['version'] < 119) {
     );
     ");    
   }
+
+
+	if($row['version'] < 120) {
+		$conn->query("ALTER TABLE projectData ADD COLUMN dynamicprojectid VARCHAR(100)");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>projectData: +dynamicprojectid';
+		}
+		$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectdataid");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojects: -dynamicprojectid';
+		}
+	}
 
 // ------------------------------------------------------------------------------
 

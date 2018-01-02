@@ -95,13 +95,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $status = $conn->real_escape_string($status);
     $parent = $conn->real_escape_string($parent);
 
-    if(empty($projectDataId)){
-        $conn->query("INSERT INTO projectData (name) VALUES ('$name')");
-        $projectDataId = $conn->query("SELECT id FROM projectData WHERE id = (SELECT MAX(id) FROM projectData)")->fetch_assoc()["id"];
-    }else{
-        $projectDataId = intval($projectDataId);
-        $conn->query("UPDATE projectData SET name = '$name' WHERE id = $projectDataId");
+    if($projectDataId) echo "projectDataId no longer used";
+    // if(empty($projectDataId)){
+    //     $conn->query("INSERT INTO projectData (name,dynamicprojectid) VALUES ('$name', $id)");
+    //     $projectDataId = $conn->query("SELECT id FROM projectData WHERE id = (SELECT MAX(id) FROM projectData)")->fetch_assoc()["id"];
+    // }else{
+    //     $projectDataId = intval($projectDataId);
+    //     $conn->query("UPDATE projectData SET name = '$name' WHERE id = $projectDataId");
+    // }
+    foreach ($clients as $client) {
+        $client = intval($client);
+        $clientResult = $conn->query("SELECT * FROM projectData WHERE dynamicprojectid = '$id' AND clientID = $client");
+        echo $conn->error;
+        $clientExists = $clientResult->num_rows != 0;
+        if(!$clientExists){
+            $conn->query("INSERT INTO projectData (clientID,name,dynamicprojectid) VALUES ($client, '$name', '$id')");
+        }else{
+            $conn->query("UPDATE projectData SET name = '$name' WHERE dynamicprojectid = '$id' AND clientID = $client");
+        }
+        echo $conn->error;
+        // $conn->query("INSERT INTO projectData (name,dynamicprojectid,clientID) VALUES ('$name', '$id', $client)
+        // ON DUPLICATE KEY UPDATE dynamicprojectid='$name', projectdescription = '$description',
+        // ");
     }
+    $clientsAsSQLList = "(";
+    for ($i=0; $i < count($clients); $i++) { 
+        $clientsAsSQLList .= $clients[$i];
+        if($i<count($clients)-1)
+            $clientsAsSQLList.=", ";
+    }
+    $clientsAsSQLList.= ")";
+    $clientsResult = $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id' AND clientID NOT IN $clientsAsSQLList"); //remove all other projects
 
     $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted, projectdataid) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed', '$projectDataId') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed', projectdataid='$projectDataId'");
     echo $conn->error;

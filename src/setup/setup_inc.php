@@ -130,6 +130,7 @@ function create_tables($conn) {
     field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    dynamicprojectid VARCHAR(100),
     FOREIGN KEY (clientID) REFERENCES clientData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -1181,7 +1182,6 @@ function create_tables($conn) {
   
   $sql = "CREATE TABLE dynamicprojects(
     projectid VARCHAR(100) NOT NULL,
-    projectdataid INT(6) UNSIGNED,
     projectname VARCHAR(60) NOT NULL,
     projectdescription VARCHAR(500) NOT NULL,
     companyid INT(6),
