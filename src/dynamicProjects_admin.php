@@ -4,6 +4,12 @@ isDynamicProjectAdmin($userID); ?>
 <?php
 require "dynamicProjects_classes.php";
 
+// //testing
+// $retDate/*now*/ = new DateTime();
+// echo $retDate->format("Y-m-d");
+// $retDate->setTimestamp(strtotime("first day of march", $retDate->getTimestamp()));
+// echo "<br>".$retDate->format("Y-m-d");
+
 $forceCreate = false;
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
     $forceCreate = true;
