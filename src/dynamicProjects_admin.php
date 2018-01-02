@@ -309,7 +309,7 @@ require "dynamicProjects_template.php";
         //     echo "$optional_employee, ";
         // }
         // echo "</td>";
-        echo "<td style='white-space: nowrap;width: 1%;'>";
+        echo "<td>";
         $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
         $modal_name = $name;
         $modal_company = $company;

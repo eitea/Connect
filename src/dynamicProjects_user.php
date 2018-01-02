@@ -195,8 +195,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         echo $conn->error;
         //$endDate = date("Y-m-d H:i:s");
         $projectDataId = $conn->query("SELECT projectdataid FROM dynamicprojects WHERE projectid = '$projectID'")->fetch_assoc()["projectdataid"];
-        $startEndArray = $conn->query("SELECT bookingstart, bookingend FROM dynamicprojectsbookings WHERE 
-        bookingend >= ALL (SELECT bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID)")->fetch_assoc();
+        $startEndArray = $conn->query("SELECT bookingstart, bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID ORDER BY bookingend DESC LIMIT 1")->fetch_assoc();
         $bookingStart = $startEndArray["bookingstart"];
         $bookingEnd = $startEndArray["bookingend"];
         echo $conn->error;
@@ -205,7 +204,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $indexIM = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'")->fetch_assoc()["indexIM"];
         echo $conn->error;
         $conn->query("INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType)
-        VALUES('$bookingStart', CURRENT_TIMESTAMP, $projectDataId, $indexIM, '$bookingtext', NULL, 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
+        VALUES('$bookingStart', '$bookingEnd', $projectDataId, $indexIM, '$bookingtext', NULL, 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
         echo $conn->error;
     }else if(isset($_POST["stop"])){
         echo "stop not implemented";
@@ -380,7 +379,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         echo "</form></td>";
 
-        echo "<td style='white-space: nowrap;width: 1%;'>";
+        echo "<td>";
        
         require "dynamicProjects_template.php";
         $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
