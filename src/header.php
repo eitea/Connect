@@ -489,10 +489,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
               <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
             <?php endif; //dynamicProjects ?> 
           <?php endif; ?>
-
-          <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
-              <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;} ?> href="../dynamic-projects/admin"><i class="fa fa-gavel"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
-          <?php endif; ?>
         <?php endif; //endif(canStamp)?>
       </ul>
     </div>
@@ -619,12 +615,15 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if($this_page =='audit_projectBookings.php'){echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
+                <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
+                  <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+                <?php endif; ?>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php"){
+        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php"){
           echo "<script>$('#adminOption_PROJECT').click();</script>";
         }
         ?>
