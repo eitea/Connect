@@ -102,17 +102,28 @@ echo $conn->error;
 $overall_hours = $modal_result->fetch_assoc()["timediff"];
 $overall_hours = round(floatval($overall_hours), 2);
 
-$modal_result = $conn->query("SELECT clientData.name clientname,sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff, projectcompleted completed FROM dynamicprojectsbookings, clientData, dynamicprojectsclients WHERE dynamicprojectsbookings.bookingclient = clientData.id AND dynamicprojectsbookings.bookingclient = dynamicprojectsclients.clientid AND dynamicprojectsbookings.projectid = dynamicprojectsclients.projectid AND userid = $userID AND dynamicprojectsbookings.projectid = '$modal_id' GROUP BY clientname");
+$modal_result = $conn->query("SELECT avg(projectcompleted) completed FROM dynamicprojectsclients WHERE projectid = '$modal_id'");
+echo $conn->error;
+$overall_completed = round(floatval($modal_result->fetch_assoc()["completed"]));
+
+$modal_result = $conn->query(
+    "SELECT clientData.name clientname,sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff, projectcompleted completed
+    FROM dynamicprojectsbookings, clientData, dynamicprojectsclients
+    WHERE dynamicprojectsbookings.bookingclient = clientData.id
+    AND dynamicprojectsbookings.bookingclient = dynamicprojectsclients.clientid
+    AND dynamicprojectsbookings.projectid = dynamicprojectsclients.projectid
+    AND userid = $userID AND dynamicprojectsbookings.projectid = '$modal_id'
+    GROUP BY clientname");
 echo $conn->error;
 echo "<table class='table'>";
-echo "<tr><td>Insgesamt</td><td>$overall_hours Stunden</td><td></td></tr>";
+echo "<tr><td>Insgesamt</td><td>$overall_hours Stunden</td><td>$overall_completed % fertiggestellt</td></tr>";
 while ($modal_row = $modal_result->fetch_assoc()) {
     echo "<tr><td>";
     echo $modal_row["clientname"];
     echo "</td><td>";
     echo round(floatval($modal_row["timediff"]), 2);
     echo " Stunden</td><td>";
-    echo $modal_row["completed"] . " % completed";
+    echo $modal_row["completed"] . " % fertiggestellt";
     echo "</td></tr>";
 }
 echo "</table>";
