@@ -1,5 +1,5 @@
 <?php include 'header.php';
-enableToDynamicProjects($userID); 
+enableToDynamicProjects($userID);
 require "dynamicProjects_classes.php";
 
 if (!function_exists('stripSymbols')) {
@@ -16,42 +16,40 @@ if (!function_exists('stripSymbols')) {
 }
 
 $forceCreate = false;
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
     $id = $_POST["id"] ?? "";
     $id = $conn->real_escape_string($id);
     $conn->query("DELETE FROM dynamicprojectsnotes WHERE projectid = '$id'");
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["note"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["note"])) {
     $id = $_POST["id"] ?? "";
     $id = $conn->real_escape_string($id);
-    $text = $_POST["notetext"]??"error";
+    $text = $_POST["notetext"] ?? "error";
     $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
     echo $conn->error;
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])){
-   $note_id = $_POST["id"] ?? "";
-   $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
+    $note_id = $_POST["id"] ?? "";
+    $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])){
-    require_once __DIR__. "/utilities.php";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
+    require_once __DIR__ . "/utilities.php";
     $project = $_POST["id"];
     $picture = uploadFile("image", 1, 0, 1);
-    $picture = "data:image/jpeg;base64,".base64_encode( $picture );
+    $picture = "data:image/jpeg;base64," . base64_encode($picture);
     $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
     echo $conn->error;
-    $null = NULL;
+    $null = null;
     $stmt->bind_param("b", $null);
     $stmt->send_long_data(0, $picture);
     $stmt->execute();
     echo $stmt->error;
 }
 
-
-
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])) {
     //edit deletes the project and recreates it
     $forceCreate = true;
     $id = $id = $_POST["id"] ?? "error - no id";
@@ -85,30 +83,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $clients = $_POST["clients"] ?? array();
     $employees = $_POST["employees"] ?? array();
     $optional_employees = $_POST["optionalemployees"] ?? array();
-    $completed = (int)$_POST["completed"] ?? 0;
+    $completed = (int) $_POST["completed"] ?? 0;
     //series one of: once daily_every_nth daily_every_weekday weekly monthly_day_of_month monthly_nth_day_of_week yearly_nth_day_of_month yearly_nth_day_of_week
     $series = $_POST["series"] ?? "once";
     if ($end == "no") {
         $end = "";
-    }
-    else if ($end == "number") {
+    } else if ($end == "number") {
         $end = $_POST["endnumber"] ?? "";
-    }
-    else if ($end == "date") {
+    } else if ($end == "date") {
         $end = $_POST["enddate"] ?? "";
     }
     $series = new ProjectSeries($series, $start, $end);
-    $series->daily_days = (int)$_POST["daily_days"] ?? 1;
-    $series->weekly_weeks = (int)$_POST["weekly_weeks"] ?? 1;
+    $series->daily_days = (int) $_POST["daily_days"] ?? 1;
+    $series->weekly_weeks = (int) $_POST["weekly_weeks"] ?? 1;
     $series->weekly_day = $_POST["weekly_day"] ?? "monday";
-    $series->monthly_day_of_month_day = (int)$_POST["monthly_day_of_month_day"] ?? 1;
-    $series->monthly_day_of_month_month = (int)$_POST["monthly_day_of_month_month"] ?? 1;
-    $series->monthly_nth_day_of_week_nth = (int)$_POST["monthly_nth_day_of_week_nth"] ?? 1;
+    $series->monthly_day_of_month_day = (int) $_POST["monthly_day_of_month_day"] ?? 1;
+    $series->monthly_day_of_month_month = (int) $_POST["monthly_day_of_month_month"] ?? 1;
+    $series->monthly_nth_day_of_week_nth = (int) $_POST["monthly_nth_day_of_week_nth"] ?? 1;
     $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] ?? "monday";
-    $series->monthly_nth_day_of_week_month = (int)$_POST["monthly_nth_day_of_week_month"] ?? 1;
-    $series->yearly_nth_day_of_month_nth = (int)$_POST["yearly_nth_day_of_month_nth"] ?? 1;
+    $series->monthly_nth_day_of_week_month = (int) $_POST["monthly_nth_day_of_week_month"] ?? 1;
+    $series->yearly_nth_day_of_month_nth = (int) $_POST["yearly_nth_day_of_month_nth"] ?? 1;
     $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] ?? "JAN";
-    $series->yearly_nth_day_of_week_nth = (int)$_POST["yearly_nth_day_of_week_nth"] ?? 1;
+    $series->yearly_nth_day_of_week_nth = (int) $_POST["yearly_nth_day_of_week_nth"] ?? 1;
     $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] ?? "monday";
     $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
     // var_dump($series);
@@ -131,7 +127,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $series = serialize($series);
     $series = base64_encode($series);
 
-
     $description = $conn->real_escape_string($description);
     $id = $conn->real_escape_string($id);
     $name = $conn->real_escape_string($name);
@@ -145,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
     echo $conn->error;
-    $null = NULL;
+    $null = null;
     $stmt->bind_param("b", $null);
     $stmt->send_long_data(0, $series);
     $stmt->execute();
@@ -156,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
             // $conn->query("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id','$picture')");
             $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
             echo $conn->error;
-            $null = NULL;
+            $null = null;
             $stmt->bind_param("b", $null);
             $stmt->send_long_data(0, $picture);
             $stmt->execute();
@@ -177,7 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // CREATE TABLE dynamicprojectsbookings(
     //     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     //     bookingstart DATETIME,
@@ -187,9 +182,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //   );
     $projectID = $_POST["id"] ?? "";
     $clientID = $_POST["client"] ?? -1;
-    if(isset($_POST["play"])){
+    if (isset($_POST["play"])) {
         $conn->query("INSERT INTO dynamicprojectsbookings (projectid, userid) VALUES ('$projectID', $userID)");
-    }else if(isset($_POST["pause"])){
+    } else if (isset($_POST["pause"])) {
         $bookingtext = $_POST["description"] ?? "no description";
         $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
         echo $conn->error;
@@ -205,12 +200,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $conn->query("INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType)
         VALUES('$bookingStart', '$bookingEnd', $projectDataId, $indexIM, '$bookingtext', NULL, 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
         echo $conn->error;
-    }else if(isset($_POST["stop"])){
+    } else if (isset($_POST["stop"])) {
         echo "stop not implemented";
     }
 }
-
-
 
 ?>
 <!-- BODY -->
@@ -220,7 +213,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_DESCRIPTION"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENT"]; ?></th>
+        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENTS"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
@@ -234,119 +227,118 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 </thead>
 <tbody>
     <?php
-    $dateNow = date('Y-m-d');
-    $result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.* 
-    FROM dynamicprojects,dynamicprojectsemployees, dynamicprojectsoptionalemployees 
-    WHERE dynamicprojects.projectid = dynamicprojectsemployees.projectid 
+$dateNow = date('Y-m-d');
+$result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.*
+    FROM dynamicprojects,dynamicprojectsemployees, dynamicprojectsoptionalemployees
+    WHERE dynamicprojects.projectid = dynamicprojectsemployees.projectid
     AND dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid
     AND ( dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID )
     AND dynamicprojects.projectstatus = 'ACTIVE'
-    AND dynamicprojects.projectstart <= '$dateNow' 
+    AND dynamicprojects.projectstart <= '$dateNow'
     AND (dynamicprojects.projectend = '' OR dynamicprojects.projectend > 0 OR dynamicprojects.projectend <= '$dateNow')
     GROUP BY dynamicprojects.projectid
     ORDER BY dynamicprojects.projectstart
     ");
-    while ($row = $result->fetch_assoc()) {
-        $id = $row["projectid"];
-        $name = $row["projectname"];
-        $description = $row["projectdescription"];
-        $company = $row["companyid"];
-        $companyName = $conn->query("SELECT name FROM companyData where id = $company")->fetch_assoc()["name"];
-        $color = $row["projectcolor"];
-        $start = $row["projectstart"];
-        $end = $row["projectend"];
-        $status = $row["projectstatus"];
-        $priority = $row["projectpriority"];
-        $pictureResult = $conn->query("SELECT picture FROM dynamicprojectspictures WHERE projectid='$id'");
-        $seriesResult = $conn->query("SELECT projectseries FROM dynamicprojectsseries WHERE projectid='$id'");
+while ($row = $result->fetch_assoc()) {
+    $id = $row["projectid"];
+    $name = $row["projectname"];
+    $description = $row["projectdescription"];
+    $company = $row["companyid"];
+    $companyName = $conn->query("SELECT name FROM companyData where id = $company")->fetch_assoc()["name"];
+    $color = $row["projectcolor"];
+    $start = $row["projectstart"];
+    $end = $row["projectend"];
+    $status = $row["projectstatus"];
+    $priority = $row["projectpriority"];
+    $pictureResult = $conn->query("SELECT picture FROM dynamicprojectspictures WHERE projectid='$id'");
+    $seriesResult = $conn->query("SELECT projectseries FROM dynamicprojectsseries WHERE projectid='$id'");
+    echo $conn->error;
+    $parent = $row["projectparent"];
+    $ownerId = $row["projectowner"];
+    $completed = $row["projectcompleted"];
+    $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
+    $owner = "${owner['firstname']} ${owner['lastname']}";
+    $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
+    $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
+    $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
+    $pictures = array();
+    $clients = array();
+    $employees = array();
+    $optional_employees = array();
+    if (!empty($parent)) {
+        $parent = $conn->real_escape_string($parent);
+        $parent = $conn->query("SELECT * FROM dynamicprojects WHERE projectid='$parent'")->fetch_assoc()["projectname"];
+    }
+    $series = null;
+    if ($seriesResult) {
+        $series = $seriesResult->fetch_assoc()["projectseries"];
+        $series = base64_decode($series);
+        $series = unserialize($series, array("allowed_classes" => array("ProjectSeries")));
+    } else {
+        echo "series couldn't be unserialized";
+    }
+
+    echo "<tr>";
+    echo "<td style='background-color:$color;'>$name</td>";
+    echo "<td>$description</td>";
+    echo "<td>$companyName</td>";
+    echo "<td>";
+    while ($clientRow = $clientsResult->fetch_assoc()) {
+        array_push($clients, $clientRow["id"]);
+        $client = $clientRow["name"];
+        echo "$client, ";
+    }
+    echo "</td>";
+    echo "<td>$start</td>";
+    echo "<td>$end</td>"; // no end = ""
+    echo "<td>$series</td>";
+    echo "<td>$status</td>";
+    echo "<td>$priority</td>";
+    // echo "<td>$parent</td>";
+    echo "<td>$owner</td>";
+    echo "<td>";
+    while ($employeeRow = $employeesResult->fetch_assoc()) {
+        array_push($employees, $employeeRow["id"]);
+        $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
+        echo "$employee, ";
+    }
+    while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
+        array_push($optional_employees, $optional_employeeRow["id"]);
+        $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
+        echo "$optional_employee, ";
+    }
+    echo "</td>";
+
+    $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
+    $modal_name = $name;
+    $modal_company = $company;
+    $modal_description = $description;
+    $modal_color = $color;
+    $modal_start = $start;
+    $modal_end = $end; // Possibilities: ""(none);number (repeats); Y-m-d (date)
+    $modal_status = $status; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
+    $modal_priority = $priority;
+    $modal_id = $id;
+    $modal_pictures = $pictures;
+    $modal_parent = $parent; //default: "none" or ""
+    $modal_clients = $clients; //array of ids
+    $modal_owner = $ownerId;
+    $modal_employees = $employees;
+    $modal_optional_employees = $optional_employees;
+    $modal_series = $series;
+    $modal_isAdmin = false;
+    $modal_completed = $completed;
+    echo "<td><form method='post'>";
+    echo "<input type='hidden' name='id' value='$id'/>";
+    $bookingActive = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id' AND bookingend IS NULL")->num_rows > 0;
+    if (!$bookingActive) {
+        echo "<button class='btn btn-default' type='submit' name='play' value='true'><i class='fa fa-play' ></i></button>";
+    } else {
+        $strippedID = stripSymbols($id);
         echo $conn->error;
-        $parent = $row["projectparent"];
-        $ownerId = $row["projectowner"];
-        $completed = $row["projectcompleted"];
-        $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
-        $owner = "${owner['firstname']} ${owner['lastname']}";
-        $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
-        $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
-        $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
-        $pictures = array();
-        $clients = array();
-        $employees = array();
-        $optional_employees = array();
-        if (!empty($parent)) {
-            $parent = $conn->real_escape_string($parent);
-            $parent = $conn->query("SELECT * FROM dynamicprojects WHERE projectid='$parent'")->fetch_assoc()["projectname"];
-        }
-        $series = null;
-        if ($seriesResult) {
-            $series = $seriesResult->fetch_assoc()["projectseries"];
-            $series = base64_decode($series);
-            $series = unserialize($series, array("allowed_classes" => array("ProjectSeries")));
-        }
-        else {
-            echo "series couldn't be unserialized";
-        }
-
-        echo "<tr>";
-        echo "<td style='background-color:$color;'>$name</td>";
-        echo "<td>$description</td>";
-        echo "<td>$companyName</td>";
-        echo "<td>";
-        while ($clientRow = $clientsResult->fetch_assoc()) {
-            array_push($clients, $clientRow["id"]);
-            $client = $clientRow["name"];
-            echo "$client, ";
-        }
-        echo "</td>";
-        echo "<td>$start</td>";
-        echo "<td>$end</td>"; // no end = ""
-        echo "<td>$series</td>";
-        echo "<td>$status</td>";
-        echo "<td>$priority</td>";
-        // echo "<td>$parent</td>";
-        echo "<td>$owner</td>";
-        echo "<td>";
-        while ($employeeRow = $employeesResult->fetch_assoc()) {
-            array_push($employees, $employeeRow["id"]);
-            $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
-            echo "$employee, ";
-        }
-        while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
-            array_push($optional_employees, $optional_employeeRow["id"]);
-            $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-            echo "$optional_employee, ";
-        }
-        echo "</td>";
-
-        $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
-        $modal_name = $name;
-        $modal_company = $company;
-        $modal_description = $description;
-        $modal_color = $color;
-        $modal_start = $start;
-        $modal_end = $end; // Possibilities: ""(none);number (repeats); Y-m-d (date)
-        $modal_status = $status; // Possibiilities: "ACTIVE","DEACTIVATED","DRAFT","COMPLETED"
-        $modal_priority = $priority;
-        $modal_id = $id;
-        $modal_pictures = $pictures;
-        $modal_parent = $parent; //default: "none" or ""
-        $modal_clients = $clients; //array of ids
-        $modal_owner = $ownerId;
-        $modal_employees = $employees;
-        $modal_optional_employees = $optional_employees;
-        $modal_series = $series;
-        $modal_isAdmin = false;        
-        $modal_completed = $completed;
-        echo "<td><form method='post'>";
-            echo "<input type='hidden' name='id' value='$id'/>";        
-            $bookingActive = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id' AND bookingend IS NULL")->num_rows > 0;
-            if(!$bookingActive){
-                echo "<button class='btn btn-default' type='submit' name='play' value='true'><i class='fa fa-play' ></i></button>";                
-            }else{
-                $strippedID = stripSymbols($id);
-                echo $conn->error;
-                echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
-                //echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
-            ?>
+        echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
+        //echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
+        ?>
 
             <!-- booking modal -->
                 <div class="modal fade" id="bookDynamicProject<?php echo stripSymbols($modal_id); ?>" tabindex="-1" role="dialog" aria-labelledby="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
@@ -362,16 +354,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <div class="modal-body">
                                     <!-- modal body -->
                                         <textarea name="description" required class="form-control"></textarea>
-                                        <label>Kunde*:</label>
+                                        <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENT"]; ?>*:</label>
                                             <select class="form-control js-example-basic-single" name="client" required>
-                                                <?php 
-                                                $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT JOIN $clientTable ON $clientTable.id = dynamicprojectsclients.clientid WHERE projectid = '$modal_id'");
-                                                while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
-                                                    $modal_client_id = $modal_clientRow["id"];
-                                                    $modal_client = $modal_clientRow["name"];
-                                                    echo "<option value='$modal_client_id'>$modal_client</option>";
-                                                }
-                                                ?>
+                                                <?php
+$modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT JOIN $clientTable ON $clientTable.id = dynamicprojectsclients.clientid WHERE projectid = '$modal_id'");
+        while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
+            $modal_client_id = $modal_clientRow["id"];
+            $modal_client = $modal_clientRow["name"];
+            echo "<option value='$modal_client_id'>$modal_client</option>";
+        }
+        ?>
                                             </select>
                                     <!-- /modal body -->
                                 </div>
@@ -384,26 +376,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <!-- /booking modal -->
 
             <?php
-            }
+}
 
-        echo "</form></td>";
+    echo "</form></td>";
 
-        echo "<td>";
-       
-        require "dynamicProjects_template.php";
-        $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
-        require "dynamicProjects_comments.php";
-        echo "</td>";
-        echo "</tr>";
+    echo "<td>";
 
-        ?>
+    require "dynamicProjects_template.php";
+    $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
+    require "dynamicProjects_comments.php";
+    echo "</td>";
+    echo "</tr>";
+
+    ?>
         <!--<button data-toggle="modal" data-target='#bookDynamicProject<?php echo stripSymbols($modal_id); ?>' >Toggle_</button>-->
-          
+
 
         <?php
-    }
-    ?>
+}
+?>
 </tbody>
 </table>
 <!-- /BODY -->
-<?php include 'footer.php'; ?>
+<?php include 'footer.php';?>

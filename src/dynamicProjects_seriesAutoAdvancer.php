@@ -4,7 +4,7 @@ require 'connection.php';
 require "dynamicProjects_classes.php";
 
 $result = $conn->query("SELECT * FROM dynamicprojects");
-while($row = $result->fetch_assoc()){
+while ($row = $result->fetch_assoc()) {
     $id = $row["projectid"];
     $name = $row["projectname"];
     $start = $row["projectstart"];
@@ -23,15 +23,14 @@ while($row = $result->fetch_assoc()){
         $series = base64_decode($series);
         $series = unserialize($series, array("allowed_classes" => array("ProjectSeries")));
         $previous_date = $seriesRow["projectnextdate"];
-    }
-    else {
+    } else {
         echo "series couldn't be queried, aborting";
         continue;
     }
-    if(!$series){
+    if (!$series) {
         echo "series couldn't be unserialized, aborting";
         continue;
-    }else{
+    } else {
         $next_date = $series->get_next_date();
     }
     echo "<br> $series";
@@ -42,7 +41,7 @@ while($row = $result->fetch_assoc()){
 
     $stmt = $conn->prepare("UPDATE dynamicprojectsseries SET projectnextdate = '$next_date', projectseries = ? WHERE projectid = '$id'");
     echo $conn->error;
-    $null = NULL;
+    $null = null;
     $stmt->bind_param("b", $null);
     $stmt->send_long_data(0, $series);
     $stmt->execute();
@@ -50,9 +49,9 @@ while($row = $result->fetch_assoc()){
     echo "<br>done<br>";
 }
 
-
-echo "<br><br>done " . random_int(100,999); //to show it's ready when reloading (todo: remove when everything works)
 ?>
+
+<!-- for testing in browser -->
 <script>
     setTimeout(function() {
         document.write("<br>reloading...")
