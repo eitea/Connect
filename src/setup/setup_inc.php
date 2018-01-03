@@ -1274,6 +1274,7 @@ function create_tables($conn) {
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
     bookingend DATETIME,
+    bookingclient INT(6) UNSIGNED,
     userid INT(6) UNSIGNED,
     bookingtext VARCHAR(1000)
   );";

@@ -2608,6 +2608,15 @@ if($row['version'] < 119) {
 		}
 	}
 
+	if($row['version'] < 122) {
+		$conn->query("ALTER TABLE dynamicprojectsbookings ADD COLUMN bookingclient INT(6) UNSIGNED");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojectsbookings: +bookingclient';
+		}
+	}
+	
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';

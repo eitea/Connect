@@ -177,23 +177,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //   );
     $projectID = $_POST["id"] ?? "";
     $clientID = $_POST["client"] ?? -1;
+    $completed = intval($_POST["completed"] ?? 0);
     if (isset($_POST["play"])) {
         $conn->query("INSERT INTO dynamicprojectsbookings (projectid, userid) VALUES ('$projectID', $userID)");
     } else if (isset($_POST["pause"])) {
         $bookingtext = $_POST["description"] ?? "no description";
-        $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
+        $conn->query("UPDATE dynamicprojectsbookings SET bookingend = CURRENT_TIMESTAMP, bookingtext = '$bookingtext',bookingclient = '$clientID' WHERE userid = $userID AND projectid = '$projectID' AND bookingend IS NULL");
         echo $conn->error;
         $projectDataId = $conn->query("SELECT id FROM projectData WHERE dynamicprojectid = '$projectID' AND clientID = $clientID ")->fetch_assoc()["id"];
         $startEndArray = $conn->query("SELECT bookingstart, bookingend FROM dynamicprojectsbookings WHERE projectid = '$projectID' AND userid = $userID ORDER BY bookingend DESC LIMIT 1")->fetch_assoc();
         $bookingStart = $startEndArray["bookingstart"];
         $bookingEnd = $startEndArray["bookingend"];
         echo $conn->error;
+        $internInfo = "Client ID $clientID, completed $completed%";
+        $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$projectID' AND clientid = '$clientID'");
         //$conn->query("INSERT INTO logs (time,timeEnd,userID) VALUES ('$bookingStart','$endDate',$userID)");
         //$indexIM  = $conn->query("SELECT indexIM FROM logs WHERE timeEnd = '$endDate' AND userID = $userID")->fetch_assoc()["indexIM"]; //log id
         $indexIM = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'")->fetch_assoc()["indexIM"];
         echo $conn->error;
         $conn->query("INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType)
-        VALUES('$bookingStart', '$bookingEnd', $projectDataId, $indexIM, '$bookingtext', NULL, 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
+        VALUES('$bookingStart', '$bookingEnd', $projectDataId, $indexIM, '$bookingtext', '$internInfo', 'project' )"); // '$bookingEnd' causes duplicate key restraint to fail
         echo $conn->error;
     } else if (isset($_POST["stop"])) {
         echo "stop not implemented";
@@ -370,8 +373,20 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                         <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>" />
                                         <script>
                                             $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change(function(event){
-                                                alert($(event.target).val())
-                                            })
+                                                    $.ajax({
+                                                        url: 'ajaxQuery/AJAX_getDynamicProjectClientsCompleted.php',
+                                                        dataType: 'json',
+                                                        data: {id:"<?php echo $modal_id; ?>",client:$(event.target).val()},
+                                                        cache: false,
+                                                        type: 'POST',
+                                                        success: function (response) {
+                                                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(response.completed)
+                                                        },
+                                                        error: function(response){
+                                                            console.error(response.error);
+                                                        }
+                                                    })
+                                                }).change()
                                         </script>
                                     <!-- /modal body -->
                                 </div>
