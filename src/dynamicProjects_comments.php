@@ -102,17 +102,18 @@ echo $conn->error;
 $overall_hours = $modal_result->fetch_assoc()["timediff"];
 $overall_hours = round(floatval($overall_hours), 2);
 
-
-$modal_result = $conn->query("SELECT clientData.name clientname,sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff FROM dynamicprojectsbookings, clientData WHERE dynamicprojectsbookings.bookingclient = clientData.id AND userid = $userID AND projectid = '$modal_id' GROUP BY clientname");
+$modal_result = $conn->query("SELECT clientData.name clientname,sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff, projectcompleted completed FROM dynamicprojectsbookings, clientData, dynamicprojectsclients WHERE dynamicprojectsbookings.bookingclient = clientData.id AND dynamicprojectsbookings.bookingclient = dynamicprojectsclients.clientid AND dynamicprojectsbookings.projectid = dynamicprojectsclients.projectid AND userid = $userID AND dynamicprojectsbookings.projectid = '$modal_id' GROUP BY clientname");
 echo $conn->error;
 echo "<table class='table'>";
-echo "<tr><td>Insgesamt</td><td>$overall_hours Stunden</td></tr>";
+echo "<tr><td>Insgesamt</td><td>$overall_hours Stunden</td><td></td></tr>";
 while ($modal_row = $modal_result->fetch_assoc()) {
     echo "<tr><td>";
     echo $modal_row["clientname"];
     echo "</td><td>";
     echo round(floatval($modal_row["timediff"]), 2);
-    echo " Stunden</td></tr>";
+    echo " Stunden</td><td>";
+    echo $modal_row["completed"] . " % completed";
+    echo "</td></tr>";
 }
 echo "</table>";
 $modal_result = $conn->query("SELECT dynamicprojectsbookings.*,clientData.name clientname FROM dynamicprojectsbookings, clientData WHERE dynamicprojectsbookings.bookingclient = clientData.id AND userid = $userID AND projectid = '$modal_id'");
