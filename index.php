@@ -26,7 +26,7 @@ $routes = array(
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
   'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',             'project/log' => 'audit_projectBookings.php',
 
-  'dynamic-projects/user' => 'dynamicProjects_user.php', 'dynamic-projects/admin' => 'dynamicProjects_admin.php',
+  'dynamic-projects/user' => 'dynamicProjects_user.php', 'dynamic-projects/admin' => 'dynamicProjects_admin.php', 'dynamic-projects/test' => 'dynamicProjects_test.php',
 
   'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',       'report/autotask' => 'autotask.php',
 
