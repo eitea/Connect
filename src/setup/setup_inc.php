@@ -1192,7 +1192,6 @@ function create_tables($conn) {
     projectpriority INT(6),
     projectparent VARCHAR(100),
     projectowner INT(6),
-    projectcompleted INT(6),
     PRIMARY KEY (`projectid`)
   );";
   if(!$conn->query($sql)){
@@ -1202,6 +1201,7 @@ function create_tables($conn) {
   $sql = "CREATE TABLE dynamicprojectsclients(
     projectid VARCHAR(100) NOT NULL,
     clientid INT(6),
+    projectcompleted INT(6),
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE

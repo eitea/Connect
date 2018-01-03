@@ -120,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $clientsAsSQLList .= ")";
     $clientsResult = $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id' AND clientID NOT IN $clientsAsSQLList"); //remove all other projects
 
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner, projectcompleted) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner', '$completed') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner', projectcompleted='$completed'");
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner'");
     echo $conn->error;
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
     foreach ($clients as $client) {
         $client = intval($client);
-        $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid) VALUES ('$id',$client)");
+        $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid, projectcompleted) VALUES ('$id', $client, '$completed')");
     }
     foreach ($employees as $employee) {
         $employee = intval($employee);
@@ -242,7 +242,6 @@ while ($row = $result->fetch_assoc()) {
     echo $conn->error;
     $parent = $row["projectparent"];
     $ownerId = $row["projectowner"];
-    $completed = $row["projectcompleted"];
     $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
     $owner = "${owner['firstname']} ${owner['lastname']}";
     $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
@@ -270,11 +269,14 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$description</td>";
     echo "<td>$companyName</td>";
     echo "<td>";
+    $completed = 0; //percentage of overall project completed 0-100
     while ($clientRow = $clientsResult->fetch_assoc()) {
         array_push($clients, $clientRow["id"]);
+        $completed += intval($clientRow["projectcompleted"]);
         $client = $clientRow["name"];
         echo "$client, ";
     }
+    $completed = intval($completed / count($clients)); // average completion
     echo "</td>";
     echo "<td>$start</td>";
     echo "<td>$end</td>"; // no end = ""

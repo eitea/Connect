@@ -2593,6 +2593,21 @@ if($row['version'] < 119) {
 		}
 	}
 
+	if($row['version'] < 121) {
+		$conn->query("ALTER TABLE dynamicprojectsclients ADD COLUMN projectcompleted INT(6)");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojectsclients: +projectcompleted';
+		}
+		$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectcompleted");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojects: -projectcompleted';
+		}
+	}
+
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';

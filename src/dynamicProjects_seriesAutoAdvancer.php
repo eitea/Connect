@@ -13,7 +13,7 @@ while ($row = $result->fetch_assoc()) {
     $seriesResult = $conn->query("SELECT * FROM dynamicprojectsseries WHERE projectid='$id'");
     echo $conn->error;
     $parent = $row["projectparent"];
-    $completed = $row["projectcompleted"];
+    // $completed = $row["projectcompleted"];
     $series = null;
     $previous_date = "no previous date";
     echo "<br>Checking project ${name}: ";
