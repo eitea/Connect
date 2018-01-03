@@ -227,17 +227,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php
 $dateNow = date('Y-m-d');
 $result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.*
-    FROM dynamicprojects,dynamicprojectsemployees, dynamicprojectsoptionalemployees
-    WHERE dynamicprojects.projectid = dynamicprojectsemployees.projectid
-    AND dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid
-    AND ( dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID )
+    FROM dynamicprojects 
+    LEFT JOIN dynamicprojectsemployees ON dynamicprojects.projectid = dynamicprojectsemployees.projectid
+    LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojects.projectid = dynamicprojectsoptionalemployees.projectid
+    WHERE ( dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID )
     AND dynamicprojects.projectstatus = 'ACTIVE'
     AND dynamicprojects.projectstart <= '$dateNow'
     AND (dynamicprojects.projectend = '' OR dynamicprojects.projectend > 0 OR dynamicprojects.projectend <= '$dateNow')
     GROUP BY dynamicprojects.projectid
     ORDER BY dynamicprojects.projectstart
     ");
-while ($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch_assoc()) {
     $id = $row["projectid"];
     $name = $row["projectname"];
     $description = $row["projectdescription"];
