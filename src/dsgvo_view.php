@@ -10,7 +10,6 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
     include 'footer.php';
     die();
 }
-
 $cmpID = intval($_GET['n']);
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['addDocument']) && !empty($_POST['add_docName'])){
@@ -49,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt->close();
 
     //contactPerson
-    $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
+    $result = $conn->query("SELECT email, firstname, lastname FROM contactpersons WHERE id = $contactID");
     $contact_row = $result->fetch_assoc();
     
     //build the content
@@ -64,11 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     //build link
-    $link_id = '';
-    if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
-      $link_id = '/'.substr($servername,0,8);
-    }
-    $link = "https://".$_SERVER['HTTP_HOST'].$link_id .$_SERVER['REQUEST_URI'];
+    $link = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     $link = explode('/', $link);
     array_pop($link);
     $link = implode('/', $link) . "/access?n=$processID";
@@ -99,8 +94,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $mail->Host       = $row['host'];
     $mail->Port       = $row['port'];
-    $mail->setFrom($row['sender']);
-
+    if(!empty($row['sendername'])){
+      $result = $conn->query("SELECT name FROM companydata WHERE id = $cmpID");
+      $mail->setFrom($row['sender'],$row['sendername'].$result->fetch_assoc()['name']);
+    }else{
+      $mail->setFrom($row['sender']);
+    }
+    
     $mail->addAddress($contact_row['email'], $contact_row['firstname'].' '.$contact_row['lastname']);
 
     $mail->isHTML(true);                       // Set email format to HTML
@@ -158,8 +158,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <div class="row form-group">
             <div class="col-sm-4">
               <label><?php echo $lang['CLIENT']; ?></label>
-              <select class="js-example-basic-single" onchange="showContacts(this.value);">
-              <option value="">...</option>
+              <select id="clientHint" class="js-example-basic-single" onchange="showContacts(this.value);">
               <?php             
               $res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
               if($res && $res->num_rows > 1){ echo '<option value="0">...</option>'; }
@@ -200,7 +199,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="sendAccess">Dokument Senden</button>
+        <button type="submit" class="btn btn-warning" name="sendAccess"><?php echo $lang['SEND_ACCESS']; ?></button>
       </div>
     </div>
   </div>

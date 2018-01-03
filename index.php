@@ -1,6 +1,5 @@
 <?php
 $routes = array(
-
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
   'login/access' => 'login_tester.php',
@@ -26,28 +25,31 @@ $routes = array(
   'project/bookings' => 'getProjects.php',         'project/view' => 'editProjects.php',              'project/csvDownload' => 'csvDownload.php',
   'project/pdfDownload' => 'pdfDownload.php',      'project/time' => 'getTimestamps.php',             'project/log' => 'audit_projectBookings.php',
 
-  'dynamic-projects/user' => 'dynamicProjects_user.php', 'dynamic-projects/admin' => 'dynamicProjects_admin.php',
+  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 
-  'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',       'report/autotask' => 'autotask.php',
-
-  'erp/view' => 'erp_view.php',                    'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
+  'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
-  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'erp_process.php',
+  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
   'erp/receipts' => 'receiptBook.php',             'erp/suppliers' => 'editSuppliers.php',
 
   'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php',
   
-  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',              'dsgvo/templates' => 'dsgvo_mail.php',
-  'dsgvo/edit' => 'dsgvo_edit.php',                'dsgvo/vv' => 'dsgvo_vv.php',                      'dsgvo/vtemplates' =>'dsgvo_vv_templates.php',
-  'dsgvo/vDetail' => 'dsgvo_vv_detail.php',        'dsgvo/editTemplate' => 'dsgvo_vv_template_edit.php',
+  'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',            'dsgvo/templates' => 'dsgvo_mail.php',
+  'dsgvo/edit' => 'dsgvo_edit.php',
 
-  's3/buckets' => 's3_buckets.php',                's3/download' => 's3_download.php'
+  'archive/share' => 'shareGroups.php',            'archive/files' => 'sharedFiles.php',              'archive/download' => 'downloadFile.php',
+  'archive/delete' => 'deleteSharedGroup.php',     'archive/upload' => 'uploadFiles.php',
+  
+  'test/encryption' => 'testEncDenc.php',
+
+  's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
 );
 $mime_types = array(
-  '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",                    '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
+  '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
+  '.gif' => "image/gif",                '.woff' => "application/font-woff", '.ttf' => "font/opentype"
 );
+
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');

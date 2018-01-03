@@ -109,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
       $sun = test_input($_POST['sun'.$x]);
     }
+
     //close up the old one
     $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
       vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest', endDate='$intervalEnd'
@@ -143,11 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!empty($_POST['coreTime'.$x])) {
       $coreTime = test_input($_POST['coreTime'.$x]);
       $conn->query("UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$x'");
-    }
-
-    if (!empty($_POST['supervisor'.$x])){
-      $supervisor = intval($_POST['supervisor'.$x]);
-      $conn->query("UPDATE $userTable SET supervisor = $supervisor WHERE id = $x");
     }
 
     if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
@@ -206,12 +202,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
     } else {
       $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isDynamicProjectsAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
-    } else {
-        $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
     }
     $conn->query($sql);
 
@@ -335,7 +325,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['saveProfilePicture'])){
     $x = intval($_POST['saveProfilePicture']);
     require_once __DIR__ . "/utilities.php";
-    $pp = uploadImage('profilePicture', 1, 1);
+    $pp = uploadFile('profilePicture', 1, 1, 1);
     if(!is_array($pp)) {
       $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
       echo $conn->error;
@@ -408,7 +398,6 @@ $(document).ready(function(){
       $rest = $row['hoursOfRest'];
 
       $isCoreAdmin = $row['isCoreAdmin'];
-      $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
       $isTimeAdmin = $row['isTimeAdmin'];
       $isProjectAdmin = $row['isProjectAdmin'];
       $isReportAdmin = $row['isReportAdmin'];
@@ -491,23 +480,6 @@ $(document).ready(function(){
                     <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="* * * *">
                   </div>
                 </div>
-                <div class="form-group">
-                  <div class="col-md-2">
-                    <?php echo $lang['SUPERVISOR']; ?>:
-                  </div>
-                  <div class="col-md-3">
-                    <select name="supervisor<?php echo $x; ?>" class="js-example-basic-single" >
-                    <option value="0"> ... </option>
-                    <?php
-                    $sup_result = $conn->query("SELECT id, firstname, lastname FROM UserData");
-                    while($sup_row = $sup_result->fetch_assoc()){
-                      $selected = ($row['supervisor'] == $sup_row['id']) ? 'selected' : '';
-                      echo '<option '.$selected.' value="'.$sup_row['id'].'" >'.$sup_row['firstname'].' '.$sup_row['lastname'].'</option>';
-                    }
-                    ?>
-                    </select>
-                  </div>
-                </div>
               </div>
               <div class="container-fluid radio">
                 <div class="col-md-2">
@@ -515,12 +487,12 @@ $(document).ready(function(){
                 </div>
                 <div class="col-md-2">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
+                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> >Female <br>
                   </label>
                 </div>
                 <div class="col-md-8">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
+                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> >Male
                   </label>
                 </div>
               </div>
@@ -542,34 +514,27 @@ $(document).ready(function(){
                 <div class="col-md-4">
                   <?php echo $lang['ADMIN_MODULES']; ?>: <br>
                   <div class="checkbox">
-                    <div class="col-md-6">
-                      <label>
-                      <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
-                      </label><br>
-                    </div>
-                    <div class="col-md-6">
-                      <label>
-                        <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_DYNAMIC_PROJECTS_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isDSGVOAdmin<?php echo $x; ?>" <?php if($isDSGVOAdmin == 'TRUE'){echo 'checked';} ?> />DSGVO
-                      </label>
-                    </div>
+                    <label>
+                    <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
+                    </label><br>
+                    <label>
+                      <input type="checkbox" name="isDSGVOAdmin<?php echo $x; ?>" <?php if($isDSGVOAdmin == 'TRUE'){echo 'checked';} ?> />DSGVO
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-4">

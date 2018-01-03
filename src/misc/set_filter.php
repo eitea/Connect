@@ -79,8 +79,12 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   if(isset($_POST['searchProcessStatus'])){
     $filterings['procedures'][1] = intval($_POST['searchProcessStatus']);
   }
-  if(isset($_POST['searchProcessNumber'])){
-      $filterings['procedures'][2] = intval($_POST['searchProcessNumber']);
+  if(isset($filterings['procedures'][2])){
+    if(isset($_POST['searchAllProcesses'])){
+      $filterings['procedures'][2] = 'checked';
+    } else {
+      $filterings['procedures'][2] = '';
+    }
   }
   if(isset($_POST['searchRequestType'])){
     $filterings['requestType'] = test_input($_POST['searchRequestType']);
@@ -315,11 +319,8 @@ if($scale > 2){ //3 columns
                 echo '<option value="'.$i.'" '.$selected.' >'.$lang['OFFERSTATUS_TOSTRING'][$i].'</option>';
               }
               ?>
-            </select><br>
-            <?php if(isset($filterings['procedures'][2])){
-              echo '<br><label>Nummer</label>';
-              echo '<input type="number" name="searchProcessNumber" class="form-control" value="'.$filterings['procedures'][2].'" />';
-            } ?>
+            </select>
+            <div class="checkbox"><label><input type="checkbox" <?php echo $filterings['procedures'][2]; ?> name="searchAllProcesses"/><?php echo $lang['HIDE_PROCESSED_DATA']; ?></label></div>
           </div>
         <?php endif; ?>
         <div class="container-fluid text-right">

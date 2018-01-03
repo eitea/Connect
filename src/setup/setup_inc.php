@@ -1,23 +1,24 @@
 <?php
 /*
- * SETTING UP A NEW TABLE:
- * 1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
- * 2. Append your information to the specs or add them here. TODO: Create specs.
- * 3. Put your CREATE TABLE statement in here, similar to already existing code.
- * 4. increment the version numbers in version_number.php.
- * 5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
- * 6. relog inside program with a core admin account. you should see an update.
- *
- * MAKING CHANGES TO EXISTING TABLE:
- * 1. make your changes in here
- * 2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
- * 3. increment the numbers in version_number.php
- * 4. relog inisde program with an account with core priviliges.
- *
- * Please test the setup after every change.
- */
-function create_tables($conn) {
-	$sql = "CREATE TABLE UserData (
+SETTING UP A NEW TABLE:
+1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
+2. Append your information to the specs or add them here. TODO: Create specs.
+3. Put your CREATE TABLE statement in here, similar to already existing code.
+4. increment the version numbers in version_number.php.
+5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
+6. relog inside program with a core admin account. you should see an update.
+
+MAKING CHANGES TO EXISTING TABLE:
+1. make your changes in here
+2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
+3. increment the numbers in version_number.php
+4. relog inisde program with an account with core priviliges.
+
+Please test the setup after every change.
+*/
+
+function create_tables($conn){
+  $sql = "CREATE TABLE UserData (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     firstname VARCHAR(30),
     lastname VARCHAR(30) NOT NULL,
@@ -39,11 +40,11 @@ function create_tables($conn) {
     strikeCount INT(3) DEFAULT 0,
     keyCode VARCHAR(100)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE logs (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE logs (
     indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     time DATETIME NOT NULL,
@@ -55,11 +56,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE ldapConfigTab (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE ldapConfigTab (
     ldapConnect VARCHAR(30),
     ldapPassword VARCHAR(30),
     ldapUsername VARCHAR(30),
@@ -69,21 +70,21 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE holidays(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE holidays(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     begin DATETIME,
     end DATETIME,
     name VARCHAR(60) NOT NULL
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE companyData (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE companyData (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     cmpDescription VARCHAR(50),
@@ -102,25 +103,25 @@ function create_tables($conn) {
     uid VARCHAR(20),
     istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE clientData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE clientData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     companyID INT(6) UNSIGNED,
-    clientNumber VARCHAR(15),
+    clientNumber VARCHAR(12) UNIQUE,
     isSupplier VARCHAR(10) DEFAULT 'FALSE',
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE projectData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE projectData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     clientID INT(6) UNSIGNED,
     name VARCHAR(60) NOT NULL,
@@ -134,11 +135,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE projectBookingData (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE projectBookingData (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     start DATETIME NOT NULL,
     end DATETIME NOT NULL,
@@ -165,11 +166,11 @@ function create_tables($conn) {
     ON DELETE CASCADE,
     UNIQUE KEY double_submit (timestampID, start, end)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE relationship_company_client (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE relationship_company_client (
     companyID INT(6) UNSIGNED,
     userID INT(6) UNSIGNED,
     FOREIGN KEY (companyID) REFERENCES companyData(id)
@@ -179,11 +180,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE companyDefaultProjects (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE companyDefaultProjects (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     companyID INT(6) UNSIGNED,
@@ -198,11 +199,11 @@ function create_tables($conn) {
     ON DELETE CASCADE,
     UNIQUE KEY name_company (name, companyID)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE configurationData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE configurationData(
     bookingTimeBuffer INT(3) DEFAULT '5',
     cooldownTimer INT(3) DEFAULT '2',
     enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
@@ -211,12 +212,12 @@ function create_tables($conn) {
     enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     checkSum VARCHAR(40)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	// status: 0 = open, 1 = declined, 2 = accepted
-	$sql = "CREATE TABLE userRequestsData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  //status: 0 = open, 1 = declined, 2 = accepted
+  $sql = "CREATE TABLE userRequestsData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     fromDate DATETIME NOT NULL,
@@ -231,18 +232,18 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE gitHubConfigTab(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE gitHubConfigTab(
     sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE roles(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE roles(
     userID INT(6) UNSIGNED,
     isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -255,27 +256,26 @@ function create_tables($conn) {
     canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-    isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     FOREIGN KEY (userID) REFERENCES UserData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE travelCountryData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE travelCountryData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     identifier VARCHAR(10) NOT NULL,
     countryName VARCHAR(50),
     dayPay DECIMAL(6,2) DEFAULT 0,
     nightPay DECIMAL(6,2) DEFAULT 0
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE travelBookings(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE travelBookings(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     countryID INT(6) UNSIGNED,
@@ -295,12 +295,12 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	// deactivated tables
-	$sql = "CREATE TABLE DeactivatedUsers (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  //deactivated tables
+  $sql = "CREATE TABLE DeactivatedUsers (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     firstname VARCHAR(30),
     lastname VARCHAR(30) NOT NULL,
@@ -318,11 +318,11 @@ function create_tables($conn) {
     emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
     real_email VARCHAR(50)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE DeactivatedUserLogData (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE DeactivatedUserLogData (
     indexIM INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     time DATETIME NOT NULL,
     timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -333,11 +333,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE DeactivatedUserData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE DeactivatedUserData(
     userID INT(6) UNSIGNED,
     startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     endDate DATETIME DEFAULT NULL,
@@ -356,11 +356,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE DeactivatedUserProjectData (
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE DeactivatedUserProjectData (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     start DATETIME NOT NULL,
     end DATETIME NOT NULL,
@@ -386,11 +386,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE DeactivatedUserTravelData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE DeactivatedUserTravelData(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     countryID INT(6) UNSIGNED,
@@ -410,11 +410,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE clientInfoData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE clientInfoData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     contactType ENUM('person', 'company'),
     gender ENUM('female', 'male'),
@@ -443,7 +443,6 @@ function create_tables($conn) {
     creditLimit DECIMAL(10,2),
     eBill ENUM('true', 'false') DEFAULT 'false',
     lastFaktura DATETIME,
-	billingMailAddress VARCHAR(100),
     daysNetto INT(4),
     skonto1 DECIMAL(6,2),
     skonto2 DECIMAL(6,2),
@@ -461,11 +460,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE clientInfoNotes(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE clientInfoNotes(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     infoText VARCHAR(800),
     createDate DATETIME,
@@ -474,11 +473,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE clientInfoBank(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE clientInfoBank(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     bic VARCHAR(300),
     iban VARCHAR(400),
@@ -490,45 +489,46 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE modules (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE policyData (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE policyData (
     passwordLength INT(2) DEFAULT 6,
     complexity ENUM('0', '1', '2') DEFAULT '1',
     expiration ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     expirationDuration INT(3) DEFAULT 3,
     expirationType ENUM('ALERT', 'FORCE') DEFAULT 'ALERT'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE mailingOptions(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE mailingOptions(
     host VARCHAR(50),
     username VARCHAR(50),
     password VARCHAR(50),
     port VARCHAR(50),
     smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
     sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
-    enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername',
+    isDefault TINYINT(1) NOT NULL DEFAULT 1
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE templateData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE templateData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     repeatCount VARCHAR(50),
@@ -536,11 +536,11 @@ function create_tables($conn) {
     userIDs VARCHAR(200),
     type VARCHAR(10) NOT NULL DEFAULT 'report'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE mailReports(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE mailReports(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     reportID INT(6) UNSIGNED,
     email VARCHAR(50) NOT NULL,
@@ -548,29 +548,16 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
   }
-  
-  $sql = "CREATE TABLE mailRecipients(
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    reportID INT(6) UNSIGNED,
-    email VARCHAR(50) NOT NULL,
-    name VARCHAR(50),
-    FOREIGN KEY (reportID) REFERENCES templateData(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  	)";
-	if (! $conn->query ( $sql )) {
-    echo mysqli_error ( $conn );
-  }
-	
-	/*
-	 * cOnDate is Date this correction was created On
-	 * createdOn defines Month this corrections accounts for
-	 * (used names were swapped by mistake.)
-	 */
-	$sql = "CREATE TABLE correctionData(
+
+  /*
+  * cOnDate is Date this correction was created On
+  * createdOn defines Month this corrections accounts for
+  * (used names were swapped by mistake.)
+  */
+  $sql = "CREATE TABLE correctionData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     hours DECIMAL(6,2),
@@ -583,11 +570,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE intervalData(
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE intervalData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     startDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     endDate DATETIME DEFAULT NULL,
@@ -607,11 +594,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE teamData (
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE teamData (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60),
     companyID INT(6) UNSIGNED,
@@ -619,11 +606,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE teamRelationshipData (
+  if (!$conn->query($sql)){
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE teamRelationshipData (
     teamID INT(6) UNSIGNED,
     userID INT(6) UNSIGNED,
     FOREIGN KEY (teamID) REFERENCES teamData(id)
@@ -633,11 +620,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE additionalFields (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE additionalFields (
     id INT(6) UNSIGNED PRIMARY KEY,
     companyID INT(6) UNSIGNED,
     name VARCHAR(25) NOT NULL,
@@ -649,11 +636,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE taskData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE taskData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
     runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -661,11 +648,11 @@ function create_tables($conn) {
     lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
     callee VARCHAR(50) NOT NULL
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE proposals(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE proposals(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     clientID INT(6) UNSIGNED,
     status INT(2),
@@ -687,11 +674,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE processHistory(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE processHistory(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_number VARCHAR(12) NOT NULL,
     processID INT(6) UNSIGNED,
@@ -699,11 +686,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE products(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE products(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     taxID INT(4),
     historyID INT(6) UNSIGNED,
@@ -722,16 +709,15 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	/*
-	 * IMPORTANT:
-	 * Tax IDs must always correspond to their current positon in place.
-	 * Taxes may only be altered under supervision of an accountant
-	 */
-	$sql = "CREATE TABLE taxRates (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  
+  /* IMPORTANT:
+  Tax IDs must always correspond to their current positon in place.
+  Taxes may only be altered under supervision of an accountant
+  */
+  $sql = "CREATE TABLE taxRates (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(100),
     percentage INT(3),
@@ -739,11 +725,11 @@ function create_tables($conn) {
     account2 INT(4),
     account3 INT(4)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE mixedInfoData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE mixedInfoData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     timestampID INT(10) UNSIGNED,
     status INT(3),
@@ -754,11 +740,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE articles (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE articles (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     taxID INT(4) UNSIGNED,
     name VARCHAR(255),
@@ -770,20 +756,20 @@ function create_tables($conn) {
     iv VARCHAR(255),
     iv2 VARCHAR(255)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE units (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE units (
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(20) NOT NULL,
     unit VARCHAR(10) NOT NULL
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE paymentMethods (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE paymentMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     daysNetto INT(4),
@@ -792,27 +778,27 @@ function create_tables($conn) {
     skonto1Days INT(4),
     skonto2Days INT(4)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE representatives (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE representatives (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE shippingMethods (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE shippingMethods (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-  
-	$sql = "CREATE TABLE erp_settings(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE erpNumbers(
     companyID INT(6) UNSIGNED,
     erp_ang INT(5) DEFAULT 1,
     erp_aub INT(5) DEFAULT 1,
@@ -828,11 +814,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE socialprofile(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialprofile(
     userID INT(6) UNSIGNED,
     isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     status varchar(150) DEFAULT '-',
@@ -841,11 +827,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE socialmessages(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialmessages(
     userID INT(6) UNSIGNED,
     partner INT(6) UNSIGNED,
     message TEXT,
@@ -853,21 +839,21 @@ function create_tables($conn) {
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE socialgroups(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroups(
     groupID INT(6) UNSIGNED,
     userID INT(6) UNSIGNED,
     name VARCHAR(30),
     admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE socialgroupmessages(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE socialgroupmessages(
     userID INT(6) UNSIGNED,
     groupID INT(6) UNSIGNED,
     message TEXT,
@@ -875,27 +861,27 @@ function create_tables($conn) {
     sent DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen TEXT
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	if (! $conn->query ( "CREATE TABLE resticconfiguration(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  if(!$conn->query("CREATE TABLE resticconfiguration(
     path VARCHAR(255),
     password VARCHAR(255),
     awskey VARCHAR(255),
     awssecret VARCHAR(255),
     location VARCHAR(255)
-  )" )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE identification(
+  )")){
+    echo mysqli_error($conn);
+  }
+  
+  $sql = "CREATE TABLE identification(
     id VARCHAR(60) PRIMARY KEY
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE accounts (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE accounts (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     companyID INT(6) UNSIGNED,
     manualBooking VARCHAR(10) DEFAULT 'FALSE',
@@ -908,11 +894,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE account_journal(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE account_journal(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6),
     taxID INT(4) UNSIGNED,
@@ -932,11 +918,11 @@ function create_tables($conn) {
     ON DELETE CASCADE,
     UNIQUE KEY double_submit (userID, inDate)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE account_balance(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE account_balance(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     journalID INT(10) UNSIGNED,
     accountID INT(4) UNSIGNED,
@@ -949,21 +935,21 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE projectBookingData_audit(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE projectBookingData_audit(
     id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     changedat DATETIME,
     bookingID INT(6) UNSIGNED,
     statement VARCHAR(100)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TRIGGER projectBookingData_update_trigger 
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TRIGGER projectBookingData_update_trigger 
     BEFORE UPDATE ON projectBookingData
     FOR EACH ROW
   BEGIN
@@ -974,11 +960,11 @@ function create_tables($conn) {
     INSERT INTO projectBookingData_audit
     SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = CONCAT('UPDATE ', OLD.id);
   END";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TRIGGER projectBookingData_delete_trigger 
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TRIGGER projectBookingData_delete_trigger 
       BEFORE DELETE ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -989,11 +975,11 @@ function create_tables($conn) {
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = OLD.id, statement = 'DELETE';
     END";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TRIGGER projectBookingData_insert_trigger 
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TRIGGER projectBookingData_insert_trigger 
       AFTER INSERT ON projectBookingData
       FOR EACH ROW
     BEGIN
@@ -1004,11 +990,11 @@ function create_tables($conn) {
       INSERT INTO projectBookingData_audit
       SET changedat = UTC_TIMESTAMP, bookingID = NEW.id, statement = CONCAT('INSERT ', NEW.timestampID);
     END";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE receiptBook(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE receiptBook(
     id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     supplierID INT(6) UNSIGNED,
     taxID INT(4) UNSIGNED,
@@ -1023,11 +1009,11 @@ function create_tables($conn) {
     ON DELETE SET NULL
     ON UPDATE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE closeUpData(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE closeUpData(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userID INT(6) UNSIGNED,
     lastDate DATETIME NOT NULL,
@@ -1036,11 +1022,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE accountingLocks(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE accountingLocks(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     companyID INT(6) UNSIGNED,
     lockDate DATE NOT NULL,
@@ -1048,11 +1034,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE checkinLogs(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE checkinLogs(
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     timestampID INT(10) UNSIGNED,
     remoteAddr VARCHAR(50),
@@ -1061,11 +1047,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE documents(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE documents(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     companyID INT(6) UNSIGNED,
     name VARCHAR(100) NOT NULL,
@@ -1075,11 +1061,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE contactPersons (
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+
+  $sql = "CREATE TABLE contactPersons (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     clientID INT(6) UNSIGNED,
     firstname VARCHAR(150),
@@ -1091,11 +1077,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE documentProcess(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }
+  
+  $sql = "CREATE TABLE documentProcess(
     id VARCHAR(16) NOT NULL PRIMARY KEY,
     docID INT(6) UNSIGNED,
     personID INT(6) UNSIGNED,
@@ -1107,11 +1093,11 @@ function create_tables($conn) {
     ON UPDATE CASCADE
     ON DELETE CASCADE
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-	}
-	
-	$sql = "CREATE TABLE documentProcessHistory(
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }  
+
+  $sql = "CREATE TABLE documentProcessHistory(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     processID VARCHAR(16),
     logDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1119,166 +1105,42 @@ function create_tables($conn) {
     info VARCHAR(450),
     userAgent VARCHAR(150)
   )";
-	if (! $conn->query ( $sql )) {
-		echo mysqli_error ( $conn );
-  }
-  
-  $sql = "CREATE TABLE dsgvo_vv_templates(
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		companyID INT(6) UNSIGNED,
-		name VARCHAR(60) NOT NULL,
-		type ENUM('base', 'app') NOT NULL,
-		FOREIGN KEY (companyID) REFERENCES companyData(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	)";
-	if (! $conn->query ( $sql )) {
-		echo $conn->error;
-	}
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  }  
 
-	$sql = "CREATE TABLE dsgvo_vv_template_settings(
-		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		templateID INT(6) UNSIGNED,
-		opt_name VARCHAR(30) NOT NULL,
-		opt_descr VARCHAR(350) NOT NULL,
-		opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
-		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	)";
-	if (! $conn->query ( $sql )) {
-		echo $conn->error;
-	}
 
-	$sql = "CREATE TABLE dsgvo_vv(
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		templateID INT(6) UNSIGNED,
-		name VARCHAR(60) NOT NULL,
-		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	)";
-	if(!$conn->query($sql)){
-		echo $conn->error;
-	}
+  $sql = "CREATE TABLE sharedfiles (
+    id int(11) NOT NULL AUTO_INCREMENT,
+    name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
+    type varchar(10) NOT NULL COMMENT 'Dateiendung',
+    owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
+    sharegroup int(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
+    hashkey varchar(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
+    filesize bigint(20) NOT NULL,
+    uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY hashkey (hashkey),
+    KEY owner (owner)
+   )"; 
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } 
 
-  $sql = "CREATE TABLE dsgvo_vv_settings(
-		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		vv_id INT(6) UNSIGNED,
-		setting_id INT(10) UNSIGNED,
-		setting VARCHAR(850) NOT NULL,
-		category VARCHAR(50),
-		FOREIGN KEY (vv_id) REFERENCES dsgvo_vv(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-		FOREIGN KEY (setting_id) REFERENCES dsgvo_vv_template_settings(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	)";
-	if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-  
-  $sql = "CREATE TABLE dynamicprojects(
-    projectid VARCHAR(100) NOT NULL,
-    projectdataid INT(6) UNSIGNED,
-    projectname VARCHAR(60) NOT NULL,
-    projectdescription VARCHAR(500) NOT NULL,
-    companyid INT(6),
-    projectcolor VARCHAR(10),
-    projectstart VARCHAR(12),
-    projectend VARCHAR(12),
-    projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
-    projectpriority INT(6),
-    projectparent VARCHAR(100),
-    projectowner INT(6),
-    projectcompleted INT(6),
-    PRIMARY KEY (`projectid`)
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsclients(
-    projectid VARCHAR(100) NOT NULL,
-    clientid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsemployees(
-    projectid VARCHAR(100) NOT NULL,
-    userid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
-    projectid VARCHAR(100) NOT NULL,
-    userid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectspictures(
-    projectid VARCHAR(100) NOT NULL,
-    picture MEDIUMBLOB,
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsseries(
-    projectid VARCHAR(100) NOT NULL,
-    projectnextdate VARCHAR(12),
-    projectseries MEDIUMBLOB,
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsnotes(
-    projectid VARCHAR(100) NOT NULL,
-    noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    notetext VARCHAR(1000),
-    notecreator INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
-  $sql = "CREATE TABLE dynamicprojectsbookings(
-    projectid VARCHAR(100) NOT NULL,
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
-    bookingend DATETIME,
-    userid INT(6) UNSIGNED,
-    bookingtext VARCHAR(1000)
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
+  $sql = "CREATE TABLE sharedgroups (
+    id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
+    dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
+    ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
+    uri varchar(100) NOT NULL COMMENT 'URL zu den Objekten',
+    owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
+    files varchar(200) DEFAULT NULL,
+    company int(11) NOT NULL COMMENT 'Mandant',
+    PRIMARY KEY (id),
+    UNIQUE KEY url (uri),
+    KEY owner (owner)
+    )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } 
 }

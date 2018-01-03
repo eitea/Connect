@@ -12,6 +12,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         echo mysqli_error($conn);
       }
     }
+  } elseif(!empty($_POST['save_edit'])){
+    $x = intval($_POST['save_edit']);
+    $name = test_input($_POST['edit_name']);
+    $companyID = intval($_POST['edit_company']);
+    $number = test_input($_POST['edit_clientNumber']);
+    $conn->query("UPDATE $clientTable SET name = '$name', companyID = $companyID, clientNumber = '$number' WHERE id = $x");
   }
 }
 ?>
@@ -55,7 +61,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo "<td>".$row['companyName']."</td>";
           echo "<td>".$row['name']."</td>";
           echo "<td>".$row['clientNumber']."</td>";
-          echo "<td><a class='btn btn-default' title='Bearbeiten' href='../system/clientDetail?custID=$i'><i class='fa fa-pencil'></i></a></td>";
+          echo '<td>';
+          echo "<a class='btn btn-default' title='Edit' data-toggle='modal' data-target='.edit-client-$i'><i class='fa fa-pencil'></i></a> ";
+          echo "<a class='btn btn-default' title='Details' href='../system/clientDetail?custID=$i'><i class='fa fa-arrow-right'></i></a>";
+          echo '</td>';
           echo '</tr>';
         }
         ?>
@@ -63,6 +72,41 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </table>
   <?php endif; echo $conn->error; ?>
 </form>
+
+<?php $result->data_seek(0); while ($row = $result->fetch_assoc()): ?>
+<form method="POST">
+  <div class="modal fade edit-client-<?php echo $row['id']; ?>">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header"><h4><?php echo $lang['EDIT'].' - '.$row['name']; ?></h4></div>
+      <div class="modal-body">
+        <label>Name</label><input type="text" class="form-control" name="edit_name" value="<?php echo $row['name']; ?>" />
+        <br>
+        <div class="row">
+          <div class="col-md-6">
+            <label><?php echo $lang['COMPANY']; ?></label>
+            <select class="js-example-basic-single" name="edit_company">
+              <?php
+              $res_cmp = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+              while($row_cmp = $res_cmp->fetch_assoc()){
+                $selected = ($row['companyID'] == $row_cmp['id']) ? 'selected' : '';
+                echo '<option '.$selected.' value="'.$row_cmp['id'].'">'.$row_cmp['name'].'</option>';
+              }
+              ?>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label>Kundennummer</label><input type="text" class="form-control" maxlength="12" value="<?php echo $row['clientNumber']; ?>" name="edit_clientNumber" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="save_edit" value="<?php echo $row['id']; ?>"><?php echo $lang['SAVE']; ?></button>
+      </div>
+    </div>
+  </div>
+</form>
+<?php endwhile; ?>
 
 <script>
   $('.table').DataTable({
@@ -76,4 +120,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   });
 </script>
+
+<!-- /BODY -->
 <?php include 'footer.php'; ?>

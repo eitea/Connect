@@ -12,10 +12,6 @@ $processID = clean($_GET['n']);
 $proc_agent = $_SERVER['HTTP_USER_AGENT'];
 $access = true;
 
-//logs
-$stmt = $conn->prepare("INSERT INTO documentProcessHistory (processID, activity, info, userAgent) VALUES('$processID', ?, ?, '$proc_agent')");
-$stmt->bind_param("ss", $proc_activity, $proc_info);
-
 //document
 $result = $conn->query("SELECT password, txt, documentProcess.id, documents.name AS docName, companyData.* FROM documentProcess
 LEFT JOIN documents ON documents.id = docID
@@ -42,6 +38,10 @@ while($row = $result->fetch_assoc()){
         $processHistory[$row['activity']]['count'] = 1;
     }
 }
+
+//logs
+$stmt = $conn->prepare("INSERT INTO documentProcessHistory (processID, activity, info, userAgent) VALUES('$processID', ?, ?, '$proc_agent')");
+$stmt->bind_param("ss", $proc_activity, $proc_info);
 
 if($document_row['password']){
     $access = false;

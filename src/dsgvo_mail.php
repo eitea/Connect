@@ -18,21 +18,20 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
     $templateName = test_input($_POST['report_name']);
     $templateContent = $_POST['report_content'];
     if($action == 'new'){
-        $stmt = $conn->prepare("INSERT INTO templateData (name, htmlCode, type, userIDs) VALUES(?, ?, 'document', $cmpID)");        
+        $stmt = $conn->prepare("INSERT INTO templateData (name, htmlCode, type, userIDs) VALUES(?, ?, 'document', $cmpID)");
     } else {
         $stmt = $conn->prepare("UPDATE templateData SET name = ?, htmlCode = ? WHERE id = $action_id");
     }
     $stmt->bind_param("ss", $templateName, $templateContent);
     $stmt->execute();
-    
-    $action = '';
+
     if($conn->error){
         echo '<div class="alert alter-danger"><a href="" data-dismiss="alert" class="close">&times;</a></div>';
     } else {
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
 } elseif(!empty($_POST['delete_report'])){
-    $val = intval($_POST['delete_report']);
+    $val = intval($_POSt['delete_report']);
     $conn->query("DELETE FROM templateData WHERE id = $val");
     if($conn->error){
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
@@ -68,6 +67,7 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
 <br><hr><br>
 <?php if($action): ?>
 <form method="POST">
+
 <?php
 if($action == 'edit'){
     echo '<input type="hidden" name="edit_report" value="'.$action_id.'" />';
@@ -83,7 +83,6 @@ if($action == 'edit'){
 <div class="row">
     <div class="col-sm-1 text-right"><strong>Name</strong></div>
     <div class="col-xs-6"><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
-    <div class="col-sm-3"><button type="submit" name="save" class="btn btn-warning">Speichern</button></div>
 </div>
 <div class="row">
     <div class="col-sm-1 text-right"><strong>Inhalt</strong></div>
@@ -107,9 +106,9 @@ tinymce.init({
   plugins: [
     'advlist autolink lists link image charmap print preview anchor',
     'searchreplace visualblocks code fullscreen',
-    'insertdatetime media table contextmenu paste code'
+    'insertdatetime media table contextmenu paste code save'
   ],
-  toolbar: 'undo redo | styleselect | outdent indent | bullist table',
+  toolbar: 'undo redo | styleselect | outdent indent | bullist table | save',
   relative_urls: false,
   content_css: '../plugins/homeMenu/template.css'
 });

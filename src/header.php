@@ -28,46 +28,37 @@
     $isERPAdmin = $row['isERPAdmin'];
     $isFinanceAdmin = $row['isFinanceAdmin'];
     $isDSGVOAdmin = $row['isDSGVOAdmin'];
-    $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
-    $canUseSocialMedia = $row['canUseSocialMedia'];    
+    $canUseSocialMedia = $row['canUseSocialMedia'];
   } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
   }
 
   if($userID == 1){ //superuser
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'TRUE';
     $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
   }
 
   $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
-  if($result){
-    $row = $result->fetch_assoc();
-    $lastPswChange = $row['lastPswChange'];
-    $userPasswordHash = $row['psw'];
-    $userKeyCode = $row['keyCode'];
-  }
-
+  $row = $result->fetch_assoc();
+  $lastPswChange = $row['lastPswChange'];
+  $userPasswordHash = $row['psw'];
+  $userKeyCode = $row['keyCode'];
 
   $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
-  if($result){
-    $row = $result->fetch_assoc();
-    $showReadyPlan = $row['enableReadyCheck'];
-    $masterPasswordHash = $row['masterPassword'];
-    $masterPass_checkSum = $row['checkSum']; //ABCabc123!
-  }
+  $row = $result->fetch_assoc();
+  $showReadyPlan = $row['enableReadyCheck'];
+  $masterPasswordHash = $row['masterPassword'];
+  $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 
-
-  $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
+  $result = $conn->query("SELECT enableSocialMedia FROM modules");
   if($result && ($row = $result->fetch_assoc())){
     $enableSocialMedia = $row['enableSocialMedia'];
-    $enableDynamicProjects = $row['enableDynamicProjects'];
   } else {
     $enableSocialMedia = 'FALSE';
-    $enableDynamicProjects = 'FALSE';
   }
   if($enableSocialMedia == 'TRUE'){
     $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
@@ -105,19 +96,8 @@
   $validation_output = $error_output = '';
 
   if($_SERVER["REQUEST_METHOD"] == "POST"){
-    if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-      require __DIR__ ."/ckInOut.php";
-      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      if(isset($_POST['stampIn'])){
-        checkIn($userID);
-        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
-      } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, intval($_POST['stampOut']));
-        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
-      }
-    }
     if(isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2){
-      $_POST = array();
+        $_POST = array();
     }
     $_SESSION['posttimer'] = time();
     if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
@@ -145,6 +125,16 @@
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
+    } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
+      require __DIR__ ."/ckInOut.php";
+      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      if(isset($_POST['stampIn'])){
+        checkIn($userID);
+        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
+      } elseif(isset($_POST['stampOut'])){
+        $error_output = checkOut($userID, intval($_POST['stampOut']));
+        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
+      }
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
@@ -156,7 +146,6 @@
       $_SESSION['language'] = 'ENG';
       $validation_output = mysqli_error($conn);
     }
-
     if(isset($_POST['set_skin'])){
       $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
       $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
@@ -165,7 +154,7 @@
       // picture upload
       if(isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
         require_once __DIR__ . "/utilities.php";
-        $pp = uploadImage("profilePictureUpload", 1, 1);
+        $pp = uploadFile("profilePictureUpload", 1, 1, 1);
         if(!is_array($pp)) {
           $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
           echo $conn->error;
@@ -207,8 +196,6 @@
   } else {
     $css_file = '';
   }
-  
-  //TODO: we should really prepend every name attr with i.e. "header_" or something even more unique, so nothing triggers accidentally
 ?>
 <!DOCTYPE html>
 <html>
@@ -480,14 +467,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
-            <?php if($enableDynamicProjects == 'TRUE'):?>
-              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
-            <?php endif; //dynamicProjects ?> 
-          <?php endif; ?>
-
-          <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
-              <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;} ?> href="../dynamic-projects/admin"><i class="fa fa-gavel"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
       </ul>
@@ -573,7 +553,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
-      <?php endif; ?>
+      <?php endif; ?> 
 
       <!-- Section Two: TIME -->
       <?php if($isTimeAdmin == 'TRUE'): ?>
@@ -708,14 +688,18 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if(isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
+        if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
+          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "editSuppliers.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
+          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
-          echo "<script>$('#adminOption_ERP').click();</script>";
+          echo "<script>$('#adminOption_ERP').click();";
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
         }
         ?>
       <?php endif; ?>
@@ -758,6 +742,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           if(isset($_GET['n'])){
             echo "$('#finance-click-".$_GET['n']."').click();";
           }
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';
         }
         ?>
@@ -779,16 +764,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                   echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
-                  
-                  echo '<li>';
-                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
-                  echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
-                  echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
-                  echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
-                  echo '</ul></div></li>';
-                  
                   echo '</ul></div></li>';
                 }
                 ?>
@@ -797,18 +773,35 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php"  || $this_page == "dsgvo_vv_templates.php" ||$this_page == "dsgvo_vv_template_edit.php"){
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php"){
           echo "<script>$('#adminOption_DSGVO').click();";
           if(isset($_GET['n'])){
             echo "$('#tdsgvo-".$_GET['n']."').toggle();";
           }
-          if($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php"){
-            echo "$('#tdsgvo-sets-".$_GET['n']."').toggle();";
-          }
+          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';
         }
         ?>
       <?php endif; ?>
+      <!-- Section Seven: ARCHIVE -->
+      <?php if($isDSGVOAdmin == 'TRUE'): ?>
+        <div class="panel panel-default panel-borderless">
+          <div class="panel-heading">
+            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><strong style="padding: 0px 6px;"> [Ξ] </strong><?php echo $lang['ARCHIVE'] ?><i class="fa fa-caret-down pull-right"></i></a>
+          </div>
+          <div id="collapse-archives" class="panel-collapse collapse">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+                <li>
+                    <a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+      <!-- Section Ends : ARCHIVE -->
       <br><br>
     </div> <!-- /accordions -->
     <br><br><br>

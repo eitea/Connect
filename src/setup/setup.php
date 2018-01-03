@@ -60,7 +60,7 @@ ignore_user_abort(1);
     }
     return implode($psw); //turn the array into a string
   }
-  function match_passwordpolicy_setup($p, &$out = ''){
+  function match_passwordpolicy($p, &$out = ''){
     if(strlen($p) < 6){
       $out = "Password must be at least 6 Characters long.";
       return false;
@@ -123,7 +123,7 @@ ignore_user_abort(1);
             $domainname = clean($_POST['domainPart']);
             $loginname = clean($_POST['localPart']) .'@'.$domainname;
 
-            if(match_passwordpolicy_setup(test_input($_POST['adminPass']), $out)){
+            if(match_passwordpolicy(test_input($_POST['adminPass']), $out)){
               $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
               //create connection file
               $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
@@ -170,7 +170,6 @@ ignore_user_abort(1);
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
               $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-              echo $conn->error;
               $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
               $stmt->execute();
               $stmt->close();
@@ -202,8 +201,8 @@ ignore_user_abort(1);
               $sql = "INSERT INTO intervalData (userID) VALUES (2);";
               $conn->query($sql);
               //insert roletable
-              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
+              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
               $conn->query($sql);
               //insert company-client relationship
               $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
@@ -333,138 +332,6 @@ ignore_user_abort(1);
                 echo "<br>Error Opening csv File";
               }
               $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
-
-              //INSERT DEFAULT TEMPLATES
-	$base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement','Awarness: Risikoanalyse','Awarness: Datenschutz-Folgeabschätzung',
-	'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage','Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',
-	'Zugangskontrolle: regelmäßige Passwortänderung der Benutzerpasswörter per Policy (mind. Alle 180 Tage)','Zugangskontrolle: regelmäßige Passwortänderung der administrativen Zugänge, 
-	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automaischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
-	'Wechseldatenträger: Sperre oder zumindest Einschränkung von Wechseldatenträger (USB-Stick, SD Karte, USB Geräte mit Speichermöglichkeiten…)',
-	'Infrastruktur: Verschlüsselung der gesamten Festplatte in PC und Notebooks','Infrastruktur: Network Access Control (NAC) im Netzwerk aktiv',
-	'Infrastruktur: Protokollierung der Verbindungen über die Firewall (mind. 180 Tage)','Infrastruktur: Einsatz einer Applikationsbasierter Firewall (next Generation Firewall)', 'Infrastruktur: Backup-Strategie, die mind. Alle 180 Tage getestet wird','Infrastruktur: Virenschutz (advanced Endpoint Protection)',
-	'Infrastruktur: Regelmäßige Failover Tests, falls ein zweites Rechenzentrum vorhanden ist','Infrastruktur: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
-	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
-	'Drucker und MFP Geräte: Verschlüsselung der eingebauten Datenträger.','Drucker und MFP Geräte: Secure Printing bei personenbezogenen Daten. Unter "secure printing" versteht man die zusätzliche Authentifizierung direkt am Drucker, um den Ausdruck zu erhalten.',
-	'Drucker und MFP Geräte: Bei Leasinggeräten, oder pay per Page Verträgen muss der Datenschutz zwischen den Vertragspartner genau geregelt werden (Vertrag).',
-	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
-	$app_opt_1 = array('', 'Name der verantwortlichen Stelle für diese Applikation', 'Beschreibung der betroffenen Personengruppen und der diesbezüglichen Daten oder Datenkategorien',
-	'Zweckbestimmung der Datenerhebung, Datenverarbeitung und Datennutzung', 'Regelfristen für die Löschung der Daten', 'Datenübermittlung in Drittländer', 'Einführungsdatum der Applikation','Liste der zugriffsberechtigten Personen');
-	$app_opt_2 = array('', 'Pseudonymisierung: Falls die jeweilige Datenanwendung eine Pseudonymisierung unterstützt, wird diese aktiviert. Bei einer Pseudonymisierung werden personenbezogene Daten in der Anwendung entfernt und gesondert aufbewahrt.',
-	'Verschlüsselung der Daten: Sofern von der jeweiligen Datenverarbeitung möglich, werden die personenbezogenen Daten verschlüsselt und nicht als Plain-Text Daten gespeichert',
-	'Applikation: Backup-Strategie, die mind. Alle 180 Tage getestet wird', 'Applikation: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
-	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
-	'Vertraglich (bei externer Betreuung): Gib eine schriftliche Übereinkunft der Leistung und Verpflichtung mit dem entsprechenden Dienstleister der Software?',
-	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
-
-            $stmt_vv = $conn->prepare("INSERT INTO dsgvo_vv(templateID, name) VALUES(?, 'Basis')");
-            $stmt_vv->bind_param("i", $templateID);
-            $stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
-            $stmt->bind_param("iss", $templateID, $opt, $descr);
-            $result = $conn->query("SELECT id FROM companyData");
-            while($row = $result->fetch_assoc()){
-              $cmpID = $row['id'];
-              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')"); 
-              $templateID = $conn->insert_id;
-              $stmt_vv->execute();
-              //BASE
-              $descr = '';
-              $opt = 'DESCRIPTION';
-              $stmt->execute();
-              $descr = 'Leiter der Datenverarbeitung (IT Leitung)';
-              $opt = 'GEN_1';
-              $stmt->execute();
-              $descr = 'Inhaber, Vorstände, Geschäftsführer oder sonstige gesetzliche oder nach der Verfassung des Unternehmens berufene Leiter';
-              $opt = 'GEN_2';
-              $stmt->execute();
-              $descr = 'Rechtsgrundlage(n) für die Verwendung von Daten';
-              $opt = 'GEN_3';
-              $stmt->execute();
-              $i = 1;
-              while($i < 24){
-                $opt = 'MULT_OPT_'.$i;
-                $descr = $base_opts[$i];
-                $stmt->execute();
-                $i++;
-              }
-
-              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
-              $templateID = $conn->insert_id;
-              //APPS
-              $descr = '';
-              $opt = 'DESCRIPTION';
-              $stmt->execute();
-              $i = 1;
-              while($i < 8){
-                $opt = 'GEN_'.$i;
-                $descr = $app_opt_1[$i];
-                $stmt->execute();
-                $i++;
-              }
-              $i = 1;
-              while($i < 8){
-                $opt = 'MULT_OPT_'.$i;
-                $descr = $app_opt_2[$i];
-                $stmt->execute();
-                $i++;
-              }
-              $descr = 'Angaben zum Datenverarbeitungsregister (DVR)';
-              $opt = 'EXTRA_DVR';
-              $stmt->execute();
-              $descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
-              $opt = 'EXTRA_FOLGE';
-              $stmt->execute();
-              $descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
-              $opt = 'EXTRA_DOC';
-              $stmt->execute();
-              
-              $opt = 'APP_MATR_DESCR';
-              $stmt->execute();
-              $opt = 'APP_GROUP_1';
-              $descr = 'Kunde';
-              $stmt->execute();
-              $opt = 'APP_GROUP_2';
-              $descr = 'Lieferanten und Partner';
-              $stmt->execute();
-              $opt = 'APP_GROUP_3';
-              $descr = 'Mitarbeiter';
-              $stmt->execute();
-              $i = 1;
-              $cat_descr = array('', 'Firmenname', 'Ansprechpartner, E-Mail, Telefon', 'Straße', 'Ort', 'Bankverbindung', 'Zahlungsdaten', 'UID', 'Firmenbuchnummer');
-              while($i < 9){ //Kunde
-                $opt = 'APP_CAT_1_'.$i;
-                $descr = $cat_descr[$i];
-                $stmt->execute();
-                $i++;
-              }
-              $i = 1;
-              while($i < 9){ //Lieferanten und Partner
-                $opt = 'APP_CAT_2_'.$i;
-                $descr = $cat_descr[$i];
-                $stmt->execute();
-                $i++;
-              }
-              $cat_descr = array('', 'Nachname', 'Vorname', 'PLZ', 'Ort', 'Telefon', 'Geb. Datum', 'Lohn und Gehaltsdaten', 'Religion', 'Gewerkschaftszugehörigkeit', 'Familienstand',
-              'Anwesenheitsdaten', 'Bankverbindung', 'Sozialversicherungsnummer', 'Beschäftigt als', 'Staatsbürgerschaft', 'Geschlecht', 'Name, Geb. Datum und Sozialversicherungsnummer des Ehegatten',
-              'Name, Geb. Datum und Sozialversicherungsnummer der Kinder', 'Personalausweis, Führerschein', 'Abwesenheitsdaten', 'Kennung');
-              $i = 1;
-              while($i < 22){ //Mitarbeiter
-                $opt = 'APP_CAT_3_'.$i;
-                $descr = $cat_descr[$i];
-                $stmt->execute();
-                $i++;
-              }
-              $descr = '';
-              $i = 1;
-              while($i < 21){ //20 App Spaces
-                $opt = 'APP_HEAD_'.$i;
-                $descr = $cat_descr[$i];
-                $stmt->execute();
-                $i++;
-              }
-            }
-            $stmt->close();
-            $stmt_vv->close();
-  
 
               //-------------------------------- GIT -----------------------------------------
 

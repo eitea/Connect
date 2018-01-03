@@ -1,0 +1,6 @@
+{
+    "require": {
+        "aws/aws-sdk-php": "^3.48",
+        "singpolyma/openpgp-php": "^0.3.0"
+    }
+}

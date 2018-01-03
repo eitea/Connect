@@ -35,13 +35,13 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     if($row['keyCode']){
       $_SESSION['masterpassword'] = base64_encode(simple_decryption($row['keyCode'], $_POST['password']));
     }
-    
+
     //check for updates, if core admin
     require __DIR__ ."/language.php";
-    $sql = "SELECT userID FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
+    $sql = "SELECT * FROM $roleTable WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
     $result = $conn->query($sql);
-    if($row['id'] == 1 || ($result && $result->num_rows > 0)){
-      $sql = "SELECT version FROM $adminLDAPTable;";
+    if($result && $result->num_rows > 0){
+      $sql = "SELECT * FROM $adminLDAPTable;";
       $result = mysqli_query($conn, $sql);
       $row = $result->fetch_assoc();
       if($row['version'] < $VERSION_NUMBER){

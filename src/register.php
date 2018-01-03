@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $accept = false;
     }
 
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'FALSE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = 'FALSE';
     $canBook = $canStamp = $canEdit = $canUseSocialMedia = 'FALSE';
     if(isset($_POST['isCoreAdmin'])){
       $isCoreAdmin = 'TRUE';
@@ -102,12 +102,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if(isset($_POST['isERPAdmin'])){
       $isERPAdmin = 'TRUE';
-    }
-    if(isset($_POST['isFinanceAdmin'])){
-      $isFinanceAdmin = 'TRUE';
-    }
-    if(isset($_POST['isDSGVOAdmin'])){
-      $isDSGVOAdmin = 'TRUE';
     }
     if(isset($_POST['canStamp'])){
       $canStamp = 'TRUE';
@@ -174,8 +168,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
           echo mysqli_error($conn);
           //create roletable
-          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
-          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$isFinanceAdmin', '$isDSGVOAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
+          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
+          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create socialprofile
@@ -283,9 +277,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <label><input type="checkbox" name="isTimeAdmin" /><?php echo $lang['ADMIN_TIME_OPTIONS']; ?></label><br>
           <label><input type="checkbox" name="isProjectAdmin" /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></label><br>
           <label><input type="checkbox" name="isReportAdmin" /><?php echo $lang['REPORTS']; ?></label><br>
-          <label><input type="checkbox" name="isERPAdmin" />ERP</label><br>
-          <label><input type="checkbox" name="isFinanceAdmin" /><?php echo $lang['FINANCES']; ?></label><br>
-          <label><input type="checkbox" name="isDSGVOAdmin" checked />DSGVO</label>
+          <label><input type="checkbox" name="isERPAdmin" />ERP</label>
         </div>
       </div>
       <div class="col-md-3">
