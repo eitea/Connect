@@ -40,7 +40,7 @@ if (!function_exists('stripSymbols')) {
                             <a data-toggle="tab" href="#dynamicCommentsPictures<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></a>
                         </li>
                         <li>
-                            <a data-toggle="tab" href="#dynamicCommentsBooking<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_NOTES"]; ?></a>
+                            <a data-toggle="tab" href="#dynamicCommentsBooking<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_BOOKING"]; ?></a>
                         </li>
                     </ul>
                     <!-- /tab buttons -->
@@ -101,8 +101,22 @@ $modal_result = $conn->query("SELECT sum( time_to_sec(timediff(bookingend, booki
 echo $conn->error;
 $overall_hours = $modal_result->fetch_assoc()["timediff"];
 $overall_hours = round(floatval($overall_hours), 2);
-echo "Insgesamt: $overall_hours Stunden";
-$modal_result = $conn->query("SELECT * FROM dynamicprojectsbookings WHERE userid = $userID AND projectid = '$modal_id'");
+
+
+$modal_result = $conn->query("SELECT clientData.name clientname,sum( time_to_sec(timediff(bookingend, bookingstart) ) / 3600) AS timediff FROM dynamicprojectsbookings, clientData WHERE dynamicprojectsbookings.bookingclient = clientData.id AND userid = $userID AND projectid = '$modal_id' GROUP BY clientname");
+echo $conn->error;
+echo "<table class='table'>";
+echo "<tr><td>Insgesamt</td><td>$overall_hours Stunden</td></tr>";
+while ($modal_row = $modal_result->fetch_assoc()) {
+    echo "<tr><td>";
+    echo $modal_row["clientname"];
+    echo "</td><td>";
+    echo round(floatval($modal_row["timediff"]), 2);
+    echo " Stunden</td></tr>";
+}
+echo "</table>";
+$modal_result = $conn->query("SELECT dynamicprojectsbookings.*,clientData.name clientname FROM dynamicprojectsbookings, clientData WHERE dynamicprojectsbookings.bookingclient = clientData.id AND userid = $userID AND projectid = '$modal_id'");
+echo $conn->error;
 echo "<table class='table'>";
 while ($modal_row = $modal_result->fetch_assoc()) {
     echo "<tr>";
@@ -113,6 +127,9 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     } else {
         echo "<td>Jetzt</td><td>{$lang['DYNAMIC_PROJECTS_BOOKING_NO_TEXT']}</td>";
     }
+    echo "<td>";
+    echo $modal_row["clientname"];
+    echo "</td>";
     echo "</tr>";
 }
 echo "</table>";
