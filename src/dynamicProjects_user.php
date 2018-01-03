@@ -288,7 +288,7 @@ $result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dyn
         $client = $clientRow["name"];
         echo "$client, ";
     }
-    $completed = intval($completed / count($clients)); // average completion
+    $completed = intval($completed / ((count($clients)>0)?count($clients):1)); // average completion
     echo "</td>";
     echo "<td>$start</td>";
     echo "<td>$end</td>"; // no end = ""
