@@ -354,8 +354,9 @@ while ($row = $result->fetch_assoc()) {
                                 <br>
                                 <div class="modal-body">
                                     <!-- modal body -->
-                                        <textarea name="description" required class="form-control"></textarea>
+                                        <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%"></textarea>
                                         <!-- client selection -->
+                                        <?php if($conn->query("SELECT count(*) count FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["count"] > 1): ?>
                                         <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENT"]; ?>*:</label>
                                             <select class="form-control js-example-basic-single" name="client"
                                                 id="bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>"  required>
@@ -368,6 +369,11 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
         }
         ?>
                                             </select>
+                                        <?php else: ?> <!-- no selection if only one client -->
+                                        <input id="bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>"  
+                                        type="hidden" name="client" 
+                                        value="<?php echo $conn->query("SELECT * FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["clientid"] ?>" />
+                                        <?php endif; ?>
                                         <!-- /client selection -->
                                         <label><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?>*:</label>
                                         <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>" />
@@ -379,6 +385,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                         </div>
                                         <script>
                                             $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change(function(event){
+                                                // console.log($(event.target).val())
                                                     $.ajax({
                                                         url: 'ajaxQuery/AJAX_getDynamicProjectClientsCompleted.php',
                                                         dataType: 'json',
@@ -399,7 +406,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                                 if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
                                                     $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
                                                 }else{
-                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);                                                   
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);
                                                 }
                                             }).keyup()
                                             $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").change(function(event){
@@ -407,7 +414,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                                 if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
                                                     $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
                                                 }else{
-                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);                                                   
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);
                                                 }
                                             }).change()
                                             $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").change(function(event){
@@ -415,7 +422,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                                 if($("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked')){
                                                     $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(100)
                                                 }else{
-                                                    $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change()                                                  
+                                                    $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change()
                                                 }
                                                 $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup()
                                             }).change()
