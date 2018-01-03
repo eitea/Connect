@@ -17,7 +17,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
 ?>
 
     <button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo stripSymbols($modal_id) ?>" type="button">
-        <i class="fa fa-cog"></i>
+        <i class="<?php echo $modal_symbol; ?>"></i>
     </button>
 
 

@@ -190,6 +190,7 @@ $modal_optional_employees = array();
 $modal_series = new ProjectSeries("", "", "");
 $modal_isAdmin = true;
 $modal_project_data_id = "";
+$modal_symbol = "fa fa-plus";
 require "dynamicProjects_template.php";
 
 ?>
@@ -344,6 +345,7 @@ while ($row = $result->fetch_assoc()) {
     $modal_optional_employees = $optional_employees;
     $modal_series = $series;
     $modal_completed = $completed;
+    $modal_symbol = "fa fa-cog";
     require "dynamicProjects_template.php";
     echo "</td>";
     echo "</tr>";

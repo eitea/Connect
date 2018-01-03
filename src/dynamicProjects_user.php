@@ -371,6 +371,12 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                         <!-- /client selection -->
                                         <label><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?>*:</label>
                                         <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>" />
+                                        <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>">
+                                            Abgeschlossen
+                                        </label>
+                                        </div>
                                         <script>
                                             $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change(function(event){
                                                     $.ajax({
@@ -381,12 +387,38 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                                         type: 'POST',
                                                         success: function (response) {
                                                             $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(response.completed)
+                                                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup()
                                                         },
                                                         error: function(response){
                                                             console.error(response.error);
                                                         }
                                                     })
                                                 }).change()
+                                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup(function(event){
+                                                console.log(event,$("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100)
+                                                if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
+                                                }else{
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);                                                   
+                                                }
+                                            }).keyup()
+                                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").change(function(event){
+                                                console.log(event,$("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100)
+                                                if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
+                                                }else{
+                                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);                                                   
+                                                }
+                                            }).change()
+                                            $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").change(function(event){
+                                                console.log(event)
+                                                if($("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked')){
+                                                    $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(100)
+                                                }else{
+                                                    $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change()                                                  
+                                                }
+                                                $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup()
+                                            }).change()
                                         </script>
                                     <!-- /modal body -->
                                 </div>
@@ -404,7 +436,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
     echo "</form></td>";
 
     echo "<td>";
-
+    $modal_symbol = "fa fa-cog";
     require "dynamicProjects_template.php";
     $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
     require "dynamicProjects_comments.php";
