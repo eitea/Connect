@@ -38,7 +38,9 @@ function create_tables($conn){
     real_email VARCHAR(50),
     erpOption VARCHAR(10) DEFAULT 'TRUE',
     strikeCount INT(3) DEFAULT 0,
-    keyCode VARCHAR(100)
+    keyCode VARCHAR(100),
+    publicPGPKey TEXT NULL,
+    privatePGPKey TEXT NULL
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

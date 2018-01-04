@@ -40,7 +40,7 @@ $routes = array(
   'archive/share' => 'shareGroups.php',            'archive/files' => 'sharedFiles.php',              'archive/download' => 'downloadFile.php',
   'archive/delete' => 'deleteSharedGroup.php',     'archive/upload' => 'uploadFiles.php',
   
-  'test/encryption' => 'testEncDenc.php',
+  'pgp/keygen' => 'pgpKeyGen.php',
 
   's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
 );

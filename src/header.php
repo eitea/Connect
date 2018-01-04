@@ -7,6 +7,7 @@
   $userID = $_SESSION['userid'];
   $timeToUTC = $_SESSION['timeToUTC'];
   $setActiveLink = 'class="active-link"';
+  $unlockedPGP = '';
 
   require __DIR__."/connection.php";
   require __DIR__."/utilities.php";
@@ -100,6 +101,7 @@
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
+    
     if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
@@ -121,7 +123,12 @@
       } else {
         $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
-    } elseif(isset($_POST['savePAS'])){
+    } if(!empty($_POST['publicPGP'])&&isset($_POST['savePAS'])){
+      $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
+     if(!empty($_POST['privatePGP'])&&isset($_POST['savePAS'])&&!empty($_POST['encodePGP'])){
+      $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
+      $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
+    }} elseif(isset($_POST['savePAS'])){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -236,7 +243,31 @@
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
     }
+    <?php 
+  if(isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])){
+    $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
+     if($result){
+       $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'],'AES-128-ECB',$_POST['encryptionPassword']);
+       if($privateDecoded!=false){
+          $unlockedPGP=$privateDecoded; 
+          echo 'document.getElementById("options").click();';
+       } 
+     }
+    
+  }
+  ?>
   });
+  function generateKeys($userID){
+    $.ajax({
+      type: "POST",
+      url: "../pgp/keygen",
+      data: { userID: $userID}
+    }).done(function(keys){
+      keys = JSON.parse(keys);
+      document.getElementsByName('privatePGP')[0].value = keys[0];
+      document.getElementsByName('publicPGP')[0].value = keys[1];
+    })
+  }
   </script>
 </head>
 <body id="body_container" class="is-table-row">
@@ -298,7 +329,7 @@
           </a>
         <?php endif; ?>
         <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-        <a class="btn navbar-btn navbar-link" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+        <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
         <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
       </div>
     </div>
@@ -316,22 +347,49 @@
   <!-- modal -->
   <form method="POST">
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-content modal-sm" >
+      <div class="modal-dialog modal-content modal-md" >
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
         </div>
         <div class="modal-body">
+          <div class="col-md-12">
           <label><?php echo $lang['PASSWORD_CURRENT']?></label>
           <input type="password" class="form-control" name="passwordCurrent" ><br>
+          </div>
+          <div class="col-md-6">
           <label><?php echo $lang['NEW_PASSWORD']?></label>
           <input type="password" class="form-control" name="password" ><br>
+          </div>
+          <div class="col-md-6">
           <label><?php echo $lang['NEW_PASSWORD_CONFIRM']?></label>
-          <input type="password" class="form-control" name="passwordConfirm" ><br><br>
+          <input type="password" class="form-control" name="passwordConfirm" ><br>
           <?php if($masterPasswordHash): ?>
           <label><?php echo $lang['MASTER_PASSWORD']?> (Experimentell)</label>
           <input type="password" class="form-control" name="passwordMaster"><br>
           <?php endif; ?>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Pretty Good Protection</h4>
+          <button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12">
+          <label>Public Key</label>
+          <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php 
+          $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
+          if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
+          ?></textarea><br>
+          </div>
+          <div class="col-md-12">
+          <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP">Ꙭ</button>
+          <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP);?></textarea><br>
+          </div>
+          <div class="col-md-12">
+          <label>Encryption Password</label>
+          <input placeholder="Ihr Private Key wird mit diesem Passwort verschlüsselt! z.B. Ihr Benutzer-Passwort" type="password" class="form-control" name="encodePGP"/><br>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -340,6 +398,24 @@
       </div>
     </div>
   </form>
+  <form method="POST">
+    <div class="modal fade" id="decryptPGP" role="dialog" tab-index="-1">
+      <div class="modal-dialog modal-content modal-sm">
+        <div class="modal-header">
+          <h4 class="modal-title">Unlock Private PGP Key</h4>
+        </div>
+        <div class="modal-body">
+          <label>Encryption Passwort</label>
+          <input type="text" class="form-control" name="encryptionPassword"/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning" name="unlockPrivatePGP">Weiter</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
   <!-- /modal -->
   <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
     <!-- social settings modal -->
