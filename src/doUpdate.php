@@ -2615,6 +2615,18 @@ if($row['version'] < 119) {
 		} else {
 			echo '<br>dynamicprojectsbookings: +bookingclient';
 		}
+		$conn->query("ALTER TABLE modules MODIFY COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>Dynamic Projects by default';
+		}
+		$conn->query("UPDATE modules SET enableDynamicProjects = 'TRUE'");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>Dynamic Projects enabled';
+		}
 	}
 	
 // ------------------------------------------------------------------------------

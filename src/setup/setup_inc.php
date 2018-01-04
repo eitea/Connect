@@ -499,7 +499,7 @@ function create_tables($conn) {
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
   )";
 	if (! $conn->query ( $sql )) {
 		echo mysqli_error ( $conn );
