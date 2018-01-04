@@ -128,6 +128,14 @@ if (isset($_POST['filterClient'])) {
 ?>
 <?php include 'misc/set_filter.php';?>
 <!-- BODY -->
+<style>
+    table .form-control, .form-inline .form-control, .form-inline .input-group {
+        width:100%;
+    }
+    table .form-control, .form-inline .form-control {
+        display: block;        
+    }
+</style>
 <table class="table table-hover">
 <thead>
     <tr>

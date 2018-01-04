@@ -1,6 +1,14 @@
 <?php include 'header.php';
 isDynamicProjectAdmin($userID);?>
 <!-- BODY -->
+<style>
+    table .form-control, .form-inline .form-control, .form-inline .input-group {
+        width:100%;
+    }
+    table .form-control, .form-inline .form-control {
+        display: block;
+    }
+</style>
 <?php
 require "dynamicProjects_classes.php";
 // //testing
@@ -178,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
 }
 // if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/admin");}
 ?>
-<?php
+    <?php
 // variables for easy reuse for editing existing dynamic projects
 $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
 $modal_name = "";
@@ -211,33 +219,56 @@ if (isset($_POST['filterClient'])) {
     $filterings['client'] = intval($_POST['filterClient']);
 }
 ?>
-<?php include 'misc/set_filter.php';?>
+        <?php include 'misc/set_filter.php';?>
 
-<!--
+        <!--
 *************************************************************************************
                               List all dynamic projects
 *************************************************************************************
 -->
 
-<table class="table table-hover">
-<thead>
-    <tr>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_DESCRIPTION"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENTS"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?></th>
-        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for edit button -->
-    </tr>
-</thead>
-<tbody>
-    <?php
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_DESCRIPTION"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENTS"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>
+                    </th>
+                    <th>
+                        <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?>
+                    </th>
+                    <th style="white-space: nowrap;width: 1%;"></th>
+                    <!-- space for edit button -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php
 $companyQuery = $clientQuery = "";
 if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = " . $filterings['company'];}
 if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
@@ -352,25 +383,25 @@ while ($row = $result->fetch_assoc()) {
     echo "</tr>";
 }
 ?>
-</tbody>
-</table>
+            </tbody>
+        </table>
 
-<script>
-$('.table').DataTable({
-  order: [[ 8, "asc" ]],
-  columns: [null, {orderable: false}, null, null, null,null,{orderable: false},null, null,  {orderable: false},{orderable: false},{orderable: false}],
-  deferRender: true,
-  responsive: true,
-  colReorder: true,
-  autoWidth: false,
-  language: {
-    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+        <script>
+            $('.table').DataTable({
+                order: [[8, "asc"]],
+                columns: [null, { orderable: false }, null, null, null, null, { orderable: false }, null, null, { orderable: false }, { orderable: false }, { orderable: false }],
+                deferRender: true,
+                responsive: true,
+                colReorder: true,
+                autoWidth: false,
+                language: {
+    <? php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
   }
 });
-</script>
+        </script>
 
 
 
-<!-- /BODY -->
-<?php
+        <!-- /BODY -->
+        <?php
 include 'footer.php';?>
