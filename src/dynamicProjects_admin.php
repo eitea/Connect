@@ -3,7 +3,6 @@ isDynamicProjectAdmin($userID);?>
 <!-- BODY -->
 <?php
 require "dynamicProjects_classes.php";
-
 // //testing
 // $retDate/*now*/ = new DateTime();
 // echo $retDate->format("Y-m-d");
@@ -25,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"]))
     echo $conn->error;
     $conn->query("DELETE FROM dynamicprojectsseries WHERE projectid = '$id'");
     echo $conn->error;
-    $conn->query("DELETE FROM dynamicprojectsteams WHERE projectid = '$id'");
+    $conn->query("DELETE FROM dynamicprojectsteams WHERE projectid = '$id'"); //employees in teams get deleted before
     echo $conn->error;
 }
 
@@ -160,7 +159,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         }else{
             $team = intval($emp_array[1]);
             $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
-            echo $conn->error;
+            $team_member_result = $conn->query("SELECT * FROM $teamRelationshipTable WHERE teamID = $team");
+            while($team_member_row = $team_member_result->fetch_assoc()){
+                $employee = $team_member_row["userID"];
+                $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
+            }
         }
     }
     foreach ($optional_employees as $optional_employee) {

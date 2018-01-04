@@ -2639,6 +2639,12 @@ if($row['version'] < 119) {
 		} else {
 			echo '<br>dynamicprojectsteams';
 		}
+		$conn->query("ALTER TABLE dynamicprojectsemployees ADD PRIMARY KEY(projectid, userid);");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojectsteams';
+		}
 	}
 	
 // ------------------------------------------------------------------------------

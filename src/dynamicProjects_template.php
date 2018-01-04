@@ -562,6 +562,9 @@ foreach (array_keys($months_of_the_year) as $month) {
                  })
                  if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
             })
+            $("#dynamicProject<?php echo stripSymbols($modal_id) ?>").on('hidden.bs.modal', function () {
+                window.location.reload()
+            });
         })
 
 

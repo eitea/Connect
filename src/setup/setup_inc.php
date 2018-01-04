@@ -1213,6 +1213,7 @@ function create_tables($conn) {
   $sql = "CREATE TABLE dynamicprojectsemployees(
     projectid VARCHAR(100) NOT NULL,
     userid INT(6),
+    PRIMARY KEY(projectid, userid),
     FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
     ON UPDATE CASCADE
     ON DELETE CASCADE
