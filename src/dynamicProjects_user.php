@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
     $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
     echo $conn->error;
-    echo "completed: ",$completed, "completed == 100",$completed == 100 ;
+    echo "completed: ", $completed, "completed == 100", $completed == 100;
     if ($completed == 100) {
         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
     }
@@ -117,8 +117,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "stop not implemented";
     }
 }
-if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
+// if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
+if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
+    $filterings['client'] = test_input($_GET['custID']);
+}
+if (isset($_POST['filterClient'])) {
+    $filterings['client'] = intval($_POST['filterClient']);
+}
 ?>
+<?php include 'misc/set_filter.php';?>
 <!-- BODY -->
 <table class="table">
 <thead>
@@ -140,18 +148,37 @@ if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
 </thead>
 <tbody>
     <?php
+$companyQuery = $clientQuery = "";
+if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = " . $filterings['company'];}
+if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
+
 $dateNow = date('Y-m-d');
-$result = $conn->query("SELECT dynamicprojects.*, dynamicprojectsemployees.*,dynamicprojectsoptionalemployees.*
+$result = $conn->query(
+    "SELECT dynamicprojects.*
     FROM dynamicprojects
-    LEFT JOIN dynamicprojectsemployees ON dynamicprojects.projectid = dynamicprojectsemployees.projectid
-    LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojects.projectid = dynamicprojectsoptionalemployees.projectid
-    WHERE ( dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID )
+    LEFT JOIN dynamicprojectsemployees
+    ON dynamicprojects.projectid = dynamicprojectsemployees.projectid
+    LEFT JOIN dynamicprojectsoptionalemployees
+    ON dynamicprojects.projectid = dynamicprojectsoptionalemployees.projectid
+    LEFT JOIN dynamicprojectsclients
+    ON dynamicprojectsclients.projectid = dynamicprojects.projectid
+    WHERE (
+        dynamicprojectsoptionalemployees.userid = $userID
+        OR dynamicprojectsemployees.userid = $userID
+        OR dynamicprojects.projectowner = $userID
+    )
     AND dynamicprojects.projectstatus = 'ACTIVE'
     AND dynamicprojects.projectstart <= '$dateNow'
-    AND (dynamicprojects.projectend = '' OR dynamicprojects.projectend > 0 OR dynamicprojects.projectend <= '$dateNow')
+    AND (
+        dynamicprojects.projectend = ''
+        OR dynamicprojects.projectend > 0
+        OR dynamicprojects.projectend <= '$dateNow'
+    )
+    $companyQuery $clientQuery
     GROUP BY dynamicprojects.projectid
-    ORDER BY dynamicprojects.projectstart
-    ");
+    ORDER BY dynamicprojects.projectstart"
+);
+echo $conn->error;
 while ($row = $result->fetch_assoc()) {
     $id = $row["projectid"];
     $name = $row["projectname"];
@@ -176,6 +203,7 @@ while ($row = $result->fetch_assoc()) {
         INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid
         WHERE projectid='$id'"
     );
+    echo $conn->error;
     $employeesResult = $conn->query(
         "SELECT * FROM dynamicprojectsemployees
         INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid
@@ -228,12 +256,12 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {
-        array_push($employees, "user;".$employeeRow["id"]);
+        array_push($employees, "user;" . $employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
         echo "$employee, ";
     }
-    while($teamRow = $teamsResult->fetch_assoc()){
-        array_push($employees, "team;".$teamRow["id"]);
+    while ($teamRow = $teamsResult->fetch_assoc()) {
+        array_push($employees, "team;" . $teamRow["id"]);
         $team = $teamRow["name"];
         echo "$team, ";
     }

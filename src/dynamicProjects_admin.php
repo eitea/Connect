@@ -176,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id'");
     }
 }
-if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/admin");}
+// if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/admin");}
 ?>
 <?php
 // variables for easy reuse for editing existing dynamic projects
@@ -203,8 +203,15 @@ $modal_project_data_id = "";
 $modal_symbol = "fa fa-plus";
 require "dynamicProjects_template.php";
 
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, );//"project" => 0); //set_filter requirement
+if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
+    $filterings['client'] = test_input($_GET['custID']);
+}
+if (isset($_POST['filterClient'])) {
+    $filterings['client'] = intval($_POST['filterClient']);
+}
 ?>
-
+<?php include 'misc/set_filter.php';?>
 
 <!--
 *************************************************************************************
@@ -227,16 +234,22 @@ require "dynamicProjects_template.php";
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?></th>
         <th style="white-space: nowrap;width: 1%;"></th> <!-- space for edit button -->
-        <!-- <th>Parent</th> -->
-        <!-- <th>Pictures</th> -->
-        <!-- <th>Clients</th>
-        <th>Employees</th>
-        <th>Optional Employees</th> -->
     </tr>
 </thead>
 <tbody>
     <?php
-$result = $conn->query("SELECT * FROM dynamicprojects");
+$companyQuery = $clientQuery = "";
+if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = " . $filterings['company'];}
+if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
+
+$result = $conn->query(
+    "SELECT * FROM dynamicprojects 
+    LEFT JOIN dynamicprojectsclients 
+    ON dynamicprojectsclients.projectid = dynamicprojects.projectid 
+    WHERE 1 = 1 $companyQuery $clientQuery 
+    GROUP BY dynamicprojects.projectid"
+);
+echo $conn->error;
 while ($row = $result->fetch_assoc()) {
     $id = $row["projectid"];
     $name = $row["projectname"];
