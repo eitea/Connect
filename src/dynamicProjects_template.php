@@ -59,19 +59,34 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                                 <div class="well">
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?>*:</label>
                                     <input class="form-control" type="text" name="name" <?php echo $disabled ?> required value="<?php echo $modal_name; ?>">
-                                    <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single" name="company"  <?php echo $disabled ?> required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')">
-                                        <option value="">...</option>
-                                        <?php
+                                    <?php if ($conn->query("SELECT count(*) count FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ")->fetch_assoc()["count"] != 1) {?>
+                                        <!-- more than one company -->
+                                        <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COMPANY"]; ?>*:</label>
+                                        <select class="form-control js-example-basic-single" name="company"  <?php echo $disabled ?> required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')">
+                                            <option value="">...</option>
+                                            <?php
 $modal_result = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ");
-while ($modal_row = $modal_result->fetch_assoc()) {
-    $companyID = $modal_row["id"];
-    $companyName = $modal_row["name"];
-    $selected = $companyID == $modal_company && $modal_company != "" ? "selected" : "";
-    echo "<option $selected value='$companyID'>$companyName</option>";
-}
-?>
-                                    </select>
+    while ($modal_row = $modal_result->fetch_assoc()) {
+        $companyID = $modal_row["id"];
+        $companyName = $modal_row["name"];
+        $selected = $companyID == $modal_company && $modal_company != "" ? "selected" : "";
+        echo "<option $selected value='$companyID'>$companyName</option>";
+    }
+    ?>
+                                                                                </select>
+                                        <?php } else {
+    $modal_company = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ")->fetch_assoc()["id"];
+    ?>
+
+	                                        <input type="hidden" name="company" value="<?php echo $modal_company; ?>"/>
+	                                        <?php if (empty($modal_clients)): ?>
+	                                        <script>
+	                                        $(document).ready(function(){
+	                                            showClients(<?php echo $modal_company; ?>, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')
+	                                        })
+	                                        </script>
+	                                        <?php endif;?>
+                                        <?php }?>
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENTS"]; ?>*:</label>
                                     <select id="dynamicProjectClients<?php echo stripSymbols($modal_id) ?>"  <?php echo $disabled ?> class="form-control js-example-basic-single" name="clients[]"
                                         multiple="multiple" required>
