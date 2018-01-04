@@ -69,8 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $series->yearly_nth_day_of_week_nth = (int) $_POST["yearly_nth_day_of_week_nth"] ?? 1;
     $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] ?? "monday";
     $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
-    // var_dump($series);
-    echo "<br><br><br>";
     if ($parent == "none") {
         $parent = "";
     }
@@ -85,7 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
     $owner = intval($owner) ?? $userID;
     $nextDate = $series->get_next_date();
-    // var_dump($series);
     $series = serialize($series);
     $series = base64_encode($series);
 
@@ -152,15 +149,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid, projectcompleted) VALUES ('$id', $client, '$completed')");
     }
     foreach ($employees as $employee) {
-        $emp_array = explode(";",$employee);
-        if($emp_array[0] == "user"){
+        $emp_array = explode(";", $employee);
+        if ($emp_array[0] == "user") {
             $employee = intval($emp_array[1]);
             $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
-        }else{
+        } else {
             $team = intval($emp_array[1]);
             $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
             $team_member_result = $conn->query("SELECT * FROM $teamRelationshipTable WHERE teamID = $team");
-            while($team_member_row = $team_member_result->fetch_assoc()){
+            while ($team_member_row = $team_member_result->fetch_assoc()) {
                 $employee = $team_member_row["userID"];
                 $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
             }
@@ -179,10 +176,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id'");
     }
 }
+if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/admin");}
 ?>
-<br>
-
-
 <?php
 // variables for easy reuse for editing existing dynamic projects
 $modal_title = $lang['DYNAMIC_PROJECTS_NEW'];
@@ -304,12 +299,12 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {
-        array_push($employees, "user;".$employeeRow["id"]);
+        array_push($employees, "user;" . $employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
         echo "$employee, ";
     }
-    while($teamRow = $teamsResult->fetch_assoc()){
-        array_push($employees, "team;".$teamRow["id"]);
+    while ($teamRow = $teamsResult->fetch_assoc()) {
+        array_push($employees, "team;" . $teamRow["id"]);
         $team = $teamRow["name"];
         echo "$team, ";
     }

@@ -65,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
     $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
     echo $conn->error;
+    echo "completed: ",$completed, "completed == 100",$completed == 100 ;
     if ($completed == 100) {
         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
     }
@@ -116,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "stop not implemented";
     }
 }
-
+if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
 ?>
 <!-- BODY -->
 <table class="table">
