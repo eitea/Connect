@@ -25,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"]))
     echo $conn->error;
     $conn->query("DELETE FROM dynamicprojectsseries WHERE projectid = '$id'");
     echo $conn->error;
+    $conn->query("DELETE FROM dynamicprojectsteams WHERE projectid = '$id'");
+    echo $conn->error;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || $forceCreate)) {
@@ -42,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $pictures = $_POST["imagesbase64"] ?? false;
     $owner = $_POST["owner"] ?? $userID ?? "";
     $clients = $_POST["clients"] ?? array();
-    $employees = $_POST["employees"] ?? array();
+    $employees = $_POST["employees"] ?? array(); //can be "user;<id>" or "team;<id>"
     $optional_employees = $_POST["optionalemployees"] ?? array();
     $completed = (int) $_POST["completed"] ?? 0;
     //series one of: once daily_every_nth daily_every_weekday weekly monthly_day_of_month monthly_nth_day_of_week yearly_nth_day_of_month yearly_nth_day_of_week
@@ -151,8 +153,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
         $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid, projectcompleted) VALUES ('$id', $client, '$completed')");
     }
     foreach ($employees as $employee) {
-        $employee = intval($employee);
-        $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
+        $emp_array = explode(";",$employee);
+        if($emp_array[0] == "user"){
+            $employee = intval($emp_array[1]);
+            $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
+        }else{
+            $team = intval($emp_array[1]);
+            $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
+            echo $conn->error;
+        }
     }
     foreach ($optional_employees as $optional_employee) {
         $optional_employee = intval($optional_employee);
@@ -250,6 +259,7 @@ while ($row = $result->fetch_assoc()) {
     $owner = "${owner['firstname']} ${owner['lastname']}";
     $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
     $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
+    $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
     $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
     $pictures = array();
     $clients = array();
@@ -291,9 +301,14 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {
-        array_push($employees, $employeeRow["id"]);
+        array_push($employees, "user;".$employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
         echo "$employee, ";
+    }
+    while($teamRow = $teamsResult->fetch_assoc()){
+        array_push($employees, "team;".$teamRow["id"]);
+        $team = $teamRow["name"];
+        echo "$team, ";
     }
     while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
         array_push($optional_employees, $optional_employeeRow["id"]);
@@ -301,34 +316,6 @@ while ($row = $result->fetch_assoc()) {
         echo "$optional_employee, ";
     }
     echo "</td>";
-    // echo "<td>";
-    // while ($pictureRow = $pictureResult->fetch_assoc()) {
-    //     $picture = $pictureRow["picture"];
-    //     array_push($pictures, $picture);
-    //     echo "<img  height='50' src='$picture'>";
-    // }
-    // echo "</td>";
-    // echo "<td>";
-    // while ($clientRow = $clientsResult->fetch_assoc()) {
-    //     array_push($clients, $clientRow["id"]);
-    //     $client = $clientRow["name"];
-    //     echo "$client, ";
-    // }
-    // echo "</td>";
-    // echo "<td>";
-    // while ($employeeRow = $employeesResult->fetch_assoc()) {
-    //     array_push($employees, $employeeRow["id"]);
-    //     $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
-    //     echo "$employee, ";
-    // }
-    // echo "</td>";
-    // echo "<td>";
-    // while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
-    //     array_push($optional_employees, $optional_employeeRow["id"]);
-    //     $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-    //     echo "$optional_employee, ";
-    // }
-    // echo "</td>";
     echo "<td>";
     $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
     $modal_name = $name;

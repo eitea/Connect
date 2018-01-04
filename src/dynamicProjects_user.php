@@ -180,6 +180,8 @@ while ($row = $result->fetch_assoc()) {
         INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid
         WHERE projectid='$id'"
     );
+    $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
+    echo $conn->error;
     $optional_employeesResult = $conn->query(
         "SELECT * FROM dynamicprojectsoptionalemployees
         INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid
@@ -225,9 +227,14 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {
-        array_push($employees, $employeeRow["id"]);
+        array_push($employees, "user;".$employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
         echo "$employee, ";
+    }
+    while($teamRow = $teamsResult->fetch_assoc()){
+        array_push($employees, "team;".$teamRow["id"]);
+        $team = $teamRow["name"];
+        echo "$team, ";
     }
     while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
         array_push($optional_employees, $optional_employeeRow["id"]);

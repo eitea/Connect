@@ -2627,6 +2627,18 @@ if($row['version'] < 119) {
 		} else {
 			echo '<br>Dynamic Projects enabled';
 		}
+		$conn->query("CREATE TABLE dynamicprojectsteams(
+			projectid VARCHAR(100) NOT NULL,
+			teamid INT(6) UNSIGNED,
+			FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+			ON UPDATE CASCADE
+			ON DELETE CASCADE
+		  );");
+		if($conn->error){
+			$conn->error;
+		} else {
+			echo '<br>dynamicprojectsteams';
+		}
 	}
 	
 // ------------------------------------------------------------------------------

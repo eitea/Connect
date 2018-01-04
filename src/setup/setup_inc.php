@@ -1282,4 +1282,12 @@ function create_tables($conn) {
 		echo $conn->error;
   }
 
+  $sql = "CREATE TABLE dynamicprojectsteams(
+    projectid VARCHAR(100) NOT NULL,
+    teamid INT(6) UNSIGNED
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
 }

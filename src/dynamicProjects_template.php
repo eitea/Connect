@@ -123,21 +123,53 @@ while ($modal_row = $modal_result->fetch_assoc()) {
 ?>
                                     </select>
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single" <?php echo $disabled ?>  name="employees[]" multiple="multiple" required>
+                                    <select class="form-control select2-team-icons" <?php echo $disabled ?>  name="employees[]" multiple="multiple" required>
                                         <?php
 $modal_result = $conn->query("SELECT * FROM UserData");
 while ($modal_row = $modal_result->fetch_assoc()) {
     $x = $modal_row['id'];
     $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
     if (!empty($modal_employees)) {
-        $selected = in_array($x, $modal_employees) ? "selected" : "";
+        $selected = in_array("user;".$x, $modal_employees) ? "selected" : "";
     } else {
         $selected = $x == $userID ? "selected" : "";
     }
-    echo "<option value='$x' $selected >$modal_user_name</option>";
+    echo "<option value='user;$x' $selected data-icon='user'>$modal_user_name</option>";
 }
+//teams
+$modal_result = $conn->query("SELECT * FROM $teamTable");
+while ($modal_row = $modal_result->fetch_assoc()) {
+    $x = $modal_row["id"];
+    $selected = in_array("team;".$x, $modal_employees) ? "selected" : "";
+    $modal_team_name = $modal_row["name"];
+    echo "<option value='team;$x' $selected data-icon='group'><i class='fa fa-group'></i>$modal_team_name</option>";
+}
+
 ?>
                                     </select>
+
+
+                                    <script>
+            function formatState (state) {
+                if (!state.id) { return state.text; }
+                var $state = $(
+                    '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+                );
+                return $state;
+            };
+            $(function(){
+                $(".select2-team-icons").select2({
+                templateResult: formatState,
+                templateSelection: formatState
+                });
+            })
+
+            </script>
+
+
+
+
+
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?>:</label>
                                     <select class="form-control js-example-basic-single" <?php echo $disabled ?>  name="optionalemployees[]" multiple="multiple">
                                         <?php
