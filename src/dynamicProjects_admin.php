@@ -203,7 +203,7 @@ $modal_project_data_id = "";
 $modal_symbol = "fa fa-plus";
 require "dynamicProjects_template.php";
 
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, );//"project" => 0); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
     $filterings['client'] = test_input($_GET['custID']);
 }
@@ -219,7 +219,7 @@ if (isset($_POST['filterClient'])) {
 *************************************************************************************
 -->
 
-<table class="table">
+<table class="table table-hover">
 <thead>
     <tr>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
@@ -243,10 +243,10 @@ if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = "
 if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
 
 $result = $conn->query(
-    "SELECT * FROM dynamicprojects 
-    LEFT JOIN dynamicprojectsclients 
-    ON dynamicprojectsclients.projectid = dynamicprojects.projectid 
-    WHERE 1 = 1 $companyQuery $clientQuery 
+    "SELECT * FROM dynamicprojects
+    LEFT JOIN dynamicprojectsclients
+    ON dynamicprojectsclients.projectid = dynamicprojects.projectid
+    WHERE 1 = 1 $companyQuery $clientQuery
     GROUP BY dynamicprojects.projectid"
 );
 echo $conn->error;
@@ -355,7 +355,19 @@ while ($row = $result->fetch_assoc()) {
 </tbody>
 </table>
 
-
+<script>
+$('.table').DataTable({
+  order: [[ 8, "asc" ]],
+  columns: [null, {orderable: false}, null, null, null,null,{orderable: false},null, null,  {orderable: false},{orderable: false},{orderable: false}],
+  deferRender: true,
+  responsive: true,
+  colReorder: true,
+  autoWidth: false,
+  language: {
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+  }
+});
+</script>
 
 
 

@@ -128,7 +128,7 @@ if (isset($_POST['filterClient'])) {
 ?>
 <?php include 'misc/set_filter.php';?>
 <!-- BODY -->
-<table class="table">
+<table class="table table-hover">
 <thead>
     <tr>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
@@ -142,8 +142,7 @@ if (isset($_POST['filterClient'])) {
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?></th>
-        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for play or pause -->
-        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for edit and bookings -->
+        <th style="white-space: nowrap;width: 1%;"></th> <!-- space for edit, bookings and play/pause -->
     </tr>
 </thead>
 <tbody>
@@ -403,9 +402,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
             <?php
 }
 
-    echo "</form></td>";
-
-    echo "<td>";
+    echo "</form>";
     $modal_symbol = "fa fa-cog";
     require "dynamicProjects_template.php";
     $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
@@ -422,5 +419,21 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 ?>
 </tbody>
 </table>
+
+<script>
+$('.table').DataTable({
+  order: [[ 8, "asc" ]],
+  columns: [null, {orderable: false}, null, null, null,null,{orderable: false},null, null,  {orderable: false},{orderable: false},{orderable: false}],
+  deferRender: true,
+  responsive: true,
+  colReorder: true,
+  autoWidth: false,
+  language: {
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+  }
+});
+</script>
+
+
 <!-- /BODY -->
 <?php include 'footer.php';?>
