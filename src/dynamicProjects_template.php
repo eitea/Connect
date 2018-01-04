@@ -88,7 +88,7 @@ $modal_result = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implo
 	                                        <?php endif;?>
                                         <?php }?>
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_CLIENTS"]; ?>*:</label>
-                                    <select id="dynamicProjectClients<?php echo stripSymbols($modal_id) ?>"  <?php echo $disabled ?> class="form-control js-example-basic-single" name="clients[]"
+                                    <select id="dynamicProjectClients<?php echo stripSymbols($modal_id) ?>"  <?php echo $disabled ?> class="form-control select2-team-icons" name="clients[]"
                                         multiple="multiple" required>
                                         <?php
 if (!empty($modal_clients) && !empty($modal_company)) {
@@ -97,7 +97,7 @@ if (!empty($modal_clients) && !empty($modal_company)) {
         $modal_client_id = $modal_clientRow["id"];
         $modal_client = $modal_clientRow["name"];
         $selected = in_array($modal_client_id, $modal_clients) ? "selected" : "";
-        echo "<option $selected value='$modal_client_id'>$modal_client</option>";
+        echo "<option $selected value='$modal_client_id' data-icon='address-card'>$modal_client</option>";
     }
 } else {
     echo "<option>Zuerst Mandant auswählen</option>";
@@ -107,7 +107,7 @@ if (!empty($modal_clients) && !empty($modal_company)) {
                                 </div>
                                 <div class="well">
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single"  <?php echo $disabled ?>  name="owner" required>
+                                    <select class="form-control select2-team-icons"  <?php echo $disabled ?>  name="owner" required>
                                         <?php
 $modal_result = $conn->query("SELECT * FROM UserData");
 while ($modal_row = $modal_result->fetch_assoc()) {
@@ -118,7 +118,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     } else {
         $selected = $x == $userID ? "selected" : "";
     }
-    echo "<option value='$x' $selected >$modal_user_name</option>";
+    echo "<option value='$x' $selected data-icon='user'>$modal_user_name</option>";
 }
 ?>
                                     </select>
@@ -142,7 +142,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     $x = $modal_row["id"];
     $selected = in_array("team;".$x, $modal_employees) ? "selected" : "";
     $modal_team_name = $modal_row["name"];
-    echo "<option value='team;$x' $selected data-icon='group'><i class='fa fa-group'></i>$modal_team_name</option>";
+    echo "<option value='team;$x' $selected data-icon='group'>$modal_team_name</option>";
 }
 
 ?>
@@ -171,7 +171,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
 
 
                                     <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?>:</label>
-                                    <select class="form-control js-example-basic-single" <?php echo $disabled ?>  name="optionalemployees[]" multiple="multiple">
+                                    <select class="form-control select2-team-icons" <?php echo $disabled ?>  name="optionalemployees[]" multiple="multiple">
                                         <?php
 $modal_result = $conn->query("SELECT * FROM UserData");
 while ($modal_row = $modal_result->fetch_assoc()) {
@@ -179,10 +179,8 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
     if (!empty($modal_optional_employees)) {
         $selected = in_array($x, $modal_optional_employees) ? "selected" : "";
-    } else {
-        $selected = $x == $userID ? "selected" : "";
     }
-    echo "<option value='$x' $selected >$modal_user_name</option>";
+    echo "<option value='$x' $selected data-icon='user'>$modal_user_name</option>";
 }
 ?>
                                     </select>

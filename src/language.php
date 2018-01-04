@@ -372,7 +372,7 @@ $lang_eng['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priority';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priorität';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Owner';
-$lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher Mitarbeiter';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Employees';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Mitarbeiter';
