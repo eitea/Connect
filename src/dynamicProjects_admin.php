@@ -122,6 +122,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
 
     $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner'");
     echo $conn->error;
+    if ($completed == 100) {
+        $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
+    }
     // series
     $stmt = $conn->prepare("INSERT INTO dynamicprojectsseries (projectid,projectnextdate,projectseries) VALUES ('$id','$nextDate',?)");
     echo $conn->error;
@@ -277,7 +280,7 @@ while ($row = $result->fetch_assoc()) {
         $client = $clientRow["name"];
         echo "$client, ";
     }
-    $completed = intval($completed / ((count($clients)>0)?count($clients):1)); // average completion
+    $completed = intval($completed / ((count($clients) > 0) ? count($clients) : 1)); // average completion
     echo "</td>";
     echo "<td>$start</td>";
     echo "<td>$end</td>"; // no end = ""
