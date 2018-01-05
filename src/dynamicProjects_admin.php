@@ -1,6 +1,7 @@
 <?php include 'header.php';
 isDynamicProjectAdmin($userID);?>
 <!-- BODY -->
+<script src='../plugins/tinymce/tinymce.min.js'></script>
 <style>
     table .form-control, .form-inline .form-control, .form-inline .input-group {
         width:100%;
@@ -11,11 +12,6 @@ isDynamicProjectAdmin($userID);?>
 </style>
 <?php
 require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
-// //testing
-// $retDate/*now*/ = new DateTime();
-// echo $retDate->format("Y-m-d");
-// $retDate->setTimestamp(strtotime("first day of march", $retDate->getTimestamp()));
-// echo "<br>".$retDate->format("Y-m-d");
 
 $forceCreate = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["editDynamicProject"])) {
@@ -142,7 +138,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     // /series
     if ($pictures) {
         foreach ($pictures as $picture) {
-            // $conn->query("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id','$picture')");
             $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
             echo $conn->error;
             $null = null;
@@ -274,10 +269,11 @@ if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = "
 if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
 
 $result = $conn->query(
-    "SELECT * FROM dynamicprojects
+    "SELECT dynamicprojects.* FROM dynamicprojects
     LEFT JOIN dynamicprojectsclients
     ON dynamicprojectsclients.projectid = dynamicprojects.projectid
-    WHERE 1 = 1 $companyQuery $clientQuery
+    WHERE 1 = 1 AND dynamicprojects.projectid is not null
+    $companyQuery $clientQuery
     GROUP BY dynamicprojects.projectid"
 );
 echo $conn->error;
@@ -339,7 +335,6 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$series</td>";
     echo "<td>$status</td>";
     echo "<td>$priority</td>";
-    // echo "<td>$parent</td>";
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {

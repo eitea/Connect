@@ -128,6 +128,7 @@ if (isset($_POST['filterClient'])) {
 ?>
 <?php include 'misc/set_filter.php';?>
 <!-- BODY -->
+<script src='../plugins/tinymce/tinymce.min.js'></script>
 <style>
     table .form-control, .form-inline .form-control, .form-inline .input-group {
         width:100%;
@@ -146,7 +147,7 @@ if (isset($_POST['filterClient'])) {
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_START"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_END"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
-        <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?></th>
+        <!-- <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_STATUS"]; ?></th> -->
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
         <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_EMPLOYEES"]; ?></th>
@@ -202,7 +203,6 @@ while ($row = $result->fetch_assoc()) {
     echo $conn->error;
     $parent = $row["projectparent"];
     $ownerId = $row["projectowner"];
-    // $completed = $row["projectcompleted"];
     $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
     $owner = "${owner['firstname']} ${owner['lastname']}";
     $clientsResult = $conn->query(
@@ -257,9 +257,8 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$start</td>";
     echo "<td>$end</td>"; // no end = ""
     echo "<td>$series</td>";
-    echo "<td>$status</td>";
+    // echo "<td>$status</td>"; //all projects are active anyway
     echo "<td>$priority</td>";
-    // echo "<td>$parent</td>";
     echo "<td>$owner</td>";
     echo "<td>";
     while ($employeeRow = $employeesResult->fetch_assoc()) {
@@ -307,7 +306,6 @@ while ($row = $result->fetch_assoc()) {
         $strippedID = stripSymbols($id);
         echo $conn->error;
         echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
-        //echo "<button class='btn btn-default' type='submit' name='stop'  value='true'><i class='fa fa-stop' ></i></button>";
         ?>
 
             <!-- booking modal -->
@@ -355,7 +353,6 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
                                         </div>
                                         <script>
                                             $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change(function(event){
-                                                // console.log($(event.target).val())
                                                     $.ajax({
                                                         url: 'ajaxQuery/AJAX_getDynamicProjectClientsCompleted.php',
                                                         dataType: 'json',
@@ -419,9 +416,6 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
     echo "</tr>";
 
     ?>
-        <!--<button data-toggle="modal" data-target='#bookDynamicProject<?php echo stripSymbols($modal_id); ?>' >Toggle_</button>-->
-
-
         <?php
 }
 ?>
@@ -431,7 +425,7 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 <script>
 $('.table').DataTable({
   order: [[ 8, "asc" ]],
-  columns: [null, {orderable: false}, null, null, null,null,{orderable: false},null, null,  {orderable: false},{orderable: false},{orderable: false}],
+  columns: [null, {orderable: false}, null, null, null,null,{orderable: false}, null,  {orderable: false},{orderable: false},{orderable: false}],
   deferRender: true,
   responsive: true,
   colReorder: true,
