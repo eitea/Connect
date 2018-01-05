@@ -571,7 +571,7 @@ foreach (array_keys($months_of_the_year) as $month) {
 
 
 
-<!-- text editor test - ->
+<!-- text editor test -->
 <script>
 tinymce.init({
   selector: '#projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>', //needs to be changed
@@ -579,20 +579,20 @@ tinymce.init({
   relative_urls: false,
   toolbar: 'undo redo | link image file media | code',
   // enable title field in the Image dialog
-  image_title: true, 
+  image_title: true,
   // enable automatic uploads of images represented by blob or data URIs
   automatic_uploads: true,
   // URL of our upload handler (for more details check: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url)
   // images_upload_url: 'postAcceptor.php',
   // here we add custom filepicker only to Image dialog
-  file_picker_types: 'file image media', 
+  file_picker_types: 'file image media',
   // and here's our custom image picker
   file_picker_callback: function(cb, value, meta) {
     var input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', '*');
-    
-    // Note: In modern browsers input[type="file"] is functional without 
+
+    // Note: In modern browsers input[type="file"] is functional without
     // even adding it to the DOM, but that might not be the case in some older
     // or quirky browsers like IE, so you might want to add it to the DOM
     // just in case, and visually hide it. And do not forget do remove it
@@ -600,7 +600,7 @@ tinymce.init({
 
     input.onchange = function() {
       var file = this.files[0];
-      
+
       var reader = new FileReader();
       reader.onload = function () {
         // Note: Now we need to register the blob in TinyMCEs image blob
@@ -608,18 +608,19 @@ tinymce.init({
         // necessary, as we are looking to handle it internally.
         var id = 'blobid' + (new Date()).getTime();
         var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+        console.log(reader.result.split(";")[0].split(":")[1]) //mime type
         var base64 = reader.result.split(',')[1];
+        alert("Base64 size: "+base64.length+" chars")
         var blobInfo = blobCache.create(id, file, base64);
         blobCache.add(blobInfo);
-
         // call the callback and populate the Title field with the file name
-        cb(blobInfo.blobUri(), { title: file.name, text:"aasdkfasdf",alt:"asldkfjaklsd",source2:"source2sdklja",poser:"asldkfjksdf.png" });
+        cb(blobInfo.blobUri(), { title: file.name, text:file.name,alt:file.name,source:"images/Question_Circle.jpg",poster:"images/Question_Circle.jpg" });
       };
       reader.readAsDataURL(file);
     };
-    
+
     input.click();
   }
 });
 
-</script>-->
+</script>

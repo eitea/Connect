@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $series = serialize($series);
     $series = base64_encode($series);
 
-    $description = $conn->real_escape_string($description);
+    // $description = $conn->real_escape_string($description);
     $id = $conn->real_escape_string($id);
     $name = $conn->real_escape_string($name);
     $color = $conn->real_escape_string($color);
@@ -121,9 +121,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     }
     $clientsAsSQLList .= ")";
     $clientsResult = $conn->query("DELETE FROM projectData WHERE dynamicprojectid = '$id' AND clientID NOT IN $clientsAsSQLList"); //remove all other projects
-
-    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','$description', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = '$description', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner'");
+    // ini_set('mysql.connect_timeout', 300);
+    // ini_set('default_socket_timeout', 300); 
+    $conn->query("INSERT INTO dynamicprojects (projectid,projectname,projectdescription, companyid, projectcolor, projectstart,projectend,projectstatus,projectpriority, projectparent, projectowner) VALUES ('$id','$name','no description yet', $company, '$color', '$start', '$end', '$status', '$priority', '$parent', '$owner') ON DUPLICATE KEY UPDATE projectname='$name', projectdescription = ' no description yet', companyid=$company, projectcolor='$color', projectstart='$start', projectend='$end', projectstatus='$status', projectpriority='$priority', projectparent='$parent', projectowner='$owner'");
     echo $conn->error;
+
+    // //descripton too long (images)
+    $stmt = $conn->prepare("UPDATE dynamicprojects SET projectdescription = ? WHERE projectid = '$id'");
+    echo $conn->error;
+    $null = null;
+    $stmt->bind_param("b", $null);
+    $stmt->send_long_data(0, $description);
+    $stmt->execute();
+    echo $stmt->error;
+    // $stmt = $conn->prepare("UPDATE dynamicprojects SET projectdescription = ? WHERE projectid = '$id'");
+    // $stmt->bind_param("s", $description);
+    // $stmt->execute();
+
     if ($completed == 100) {
         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
     }
