@@ -1,6 +1,6 @@
 <?php include 'header.php';
 enableToDynamicProjects($userID);
-require "dynamicProjects_classes.php";
+require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
 if (!function_exists('stripSymbols')) {
     function stripSymbols($s)
     {
@@ -133,7 +133,7 @@ if (isset($_POST['filterClient'])) {
         width:100%;
     }
     table .form-control, .form-inline .form-control {
-        display: block;        
+        display: block;
     }
 </style>
 <table class="table table-hover">
@@ -412,9 +412,9 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 
     echo "</form>";
     $modal_symbol = "fa fa-cog";
-    require "dynamicProjects_template.php";
+    require __DIR__ . "/misc/dynamicProjects_ProjectEditor_modal.php";
     $modal_title = $lang["DYNAMIC_PROJECTS_NOTES"];
-    require "dynamicProjects_comments.php";
+    require __DIR__ . "/misc/dynamicProjects_UserNotes_modal.php";
     echo "</td>";
     echo "</tr>";
 

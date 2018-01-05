@@ -1,7 +1,7 @@
 <?php
 // this script is intended to be called every day (because all rules are day based), but it can also be called every minute
-require 'connection.php';
-require "dynamicProjects_classes.php";
+require dirname(__DIR__) . '/connection.php';
+require "dynamicProjects_ProjectSeries.php";
 
 $result = $conn->query("SELECT * FROM dynamicprojects");
 while ($row = $result->fetch_assoc()) {

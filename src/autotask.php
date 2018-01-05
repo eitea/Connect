@@ -49,4 +49,4 @@ while($result && ($row = $result->fetch_assoc())){
 }
 
 
-require "dynamicProjects_seriesAutoAdvancer.php";
+require __DIR__."/misc/dynamicProjects_Series_autotask.php";

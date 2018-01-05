@@ -15,7 +15,6 @@ if (!function_exists('stripSymbols')) {
 $disabled = $modal_isAdmin ? "" : "disabled";
 
 ?>
-
     <button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo stripSymbols($modal_id) ?>" type="button">
         <i class="<?php echo $modal_symbol; ?>"></i>
     </button>
@@ -130,7 +129,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     $x = $modal_row['id'];
     $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
     if (!empty($modal_employees)) {
-        $selected = in_array("user;".$x, $modal_employees) ? "selected" : "";
+        $selected = in_array("user;" . $x, $modal_employees) ? "selected" : "";
     } else {
         $selected = $x == $userID ? "selected" : "";
     }
@@ -140,7 +139,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
 $modal_result = $conn->query("SELECT * FROM $teamTable");
 while ($modal_row = $modal_result->fetch_assoc()) {
     $x = $modal_row["id"];
-    $selected = in_array("team;".$x, $modal_employees) ? "selected" : "";
+    $selected = in_array("team;" . $x, $modal_employees) ? "selected" : "";
     $modal_team_name = $modal_row["name"];
     echo "<option value='team;$x' $selected data-icon='group'>$modal_team_name</option>";
 }

@@ -10,7 +10,7 @@ isDynamicProjectAdmin($userID);?>
     }
 </style>
 <?php
-require "dynamicProjects_classes.php";
+require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
 // //testing
 // $retDate/*now*/ = new DateTime();
 // echo $retDate->format("Y-m-d");
@@ -209,7 +209,7 @@ $modal_series = new ProjectSeries("", "", "");
 $modal_isAdmin = true;
 $modal_project_data_id = "";
 $modal_symbol = "fa fa-plus";
-require "dynamicProjects_template.php";
+require __DIR__ . "/misc/dynamicProjects_ProjectEditor_modal.php";
 
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
@@ -378,7 +378,7 @@ while ($row = $result->fetch_assoc()) {
     $modal_series = $series;
     $modal_completed = $completed;
     $modal_symbol = "fa fa-cog";
-    require "dynamicProjects_template.php";
+    require __DIR__ . "/misc/dynamicProjects_ProjectEditor_modal.php";
     echo "</td>";
     echo "</tr>";
 }
@@ -395,7 +395,7 @@ while ($row = $result->fetch_assoc()) {
                 colReorder: true,
                 autoWidth: false,
                 language: {
-    <? php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
   }
 });
         </script>
