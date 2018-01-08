@@ -1145,4 +1145,20 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } 
+
+  $sql ="CREATE TABLE uploadedfiles (
+    id INT NOT NULL AUTO_INCREMENT ,
+    uploadername VARCHAR NOT NULL ,
+    filename VARCHAR(20) NOT NULL ,
+    filetype VARCHAR(10) NOT NULL ,
+    hashkey VARCHAR(32) NOT NULL ,
+    filesize BIGINT(20) NOT NULL ,
+    uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    notes TEXT NULL ,
+    PRIMARY KEY (id),
+    UNIQUE hashkey (hashkey)
+    )";
+  if (!$conn->query($sql)) {
+    echo mysqli_error($conn);
+  } 
 }

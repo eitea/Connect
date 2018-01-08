@@ -38,9 +38,9 @@ $routes = array(
   'dsgvo/edit' => 'dsgvo_edit.php',
 
   'archive/share' => 'shareGroups.php',            'archive/files' => 'sharedFiles.php',              'archive/download' => 'downloadFile.php',
-  'archive/delete' => 'deleteSharedGroup.php',     'archive/upload' => 'uploadFiles.php',
+  'archive/delete' => 'deleteSharedGroup.php',     'archive/upload' => 'uploadFiles.php',             'upload/file' => 'uploadToS3.php',
   
-  'pgp/keygen' => 'pgpKeyGen.php',
+  'pgp/keygen' => 'pgpKeyGen.php',                 'misc/sharedfiles' => 'getSharedFiles.php',
 
   's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
 );
