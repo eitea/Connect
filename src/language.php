@@ -329,8 +329,8 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
-$lang_eng['DOCUMENTS'] = 'Documents';
-$lang_ger['DOCUMENTS'] = 'Dokumente';
+$lang_eng['DOCUMENTS'] = 'Agreements';
+$lang_ger['DOCUMENTS'] = 'Vereinbarungen';
 
 $lang_eng['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
 $lang_ger['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
