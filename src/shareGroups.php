@@ -17,44 +17,73 @@ if(isset($_POST['filterClient'])){
 </div></h3></div>
 
 <script>
+  var filesGotDropped = false;
+  var droppedFiles = false;
+  var droppedFiles2 = false;
   document.onreadystatechange = () => {
   if (document.readyState === 'complete') {
-    
-
-
-
-
-    var isAdvancedUpload = function() {
+  
+  var isAdvancedUpload = function() {
   var div = document.createElement('div');
   return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;}();
   if(isAdvancedUpload){
-    var $form = $('.fileBox');
-    $form.addClass('has-advanced-upload');
-    var droppedFiles = false;
+    var $formGroup = $('#fileBox');
+    var fileForm = $('#dropBox');
+    $formGroup.addClass('has-advanced-upload');
+    fileForm.addClass('has-advanced-upload');
+    
 
-  $form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+  fileForm.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
     e.preventDefault();
     e.stopPropagation();
   })
   .on('dragover dragenter', function() {
-    $form.addClass('is-dragover');
+    fileForm.addClass('is-dragover');
   })
   .on('dragleave dragend drop', function() {
-    $form.removeClass('is-dragover');
+    fileForm.removeClass('is-dragover');
   })
   .on('drop', function(e) {
   droppedFiles = e.originalEvent.dataTransfer.files; // the files that were dropped
+  
   showFiles( droppedFiles );
 });
+
+  $formGroup.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  })
+  .on('dragover dragenter', function() {
+    $formGroup.addClass('is-dragover');
+  })
+  .on('dragleave dragend drop', function() {
+    $formGroup.removeClass('is-dragover');
+  })
+  .on('drop', function(e) {
+  droppedFiles2 = e.originalEvent.dataTransfer.files; // the files that were dropped
+  console.log(droppedFiles2);
+  console.log("TEST");
+  filesGotDropped = true;
+  showFiles(droppedFiles2);
+});
   
-  var $input    = $form.find('input[type="file"]'),
-    $label    = $form.find('label'),
+  var $input    = $formGroup.find('input[type="file"]'),
+    $label    = $formGroup.find('label'),
     showFiles = function(files) {
       $label.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', files.length ) : files[ 0 ].name);
     };
     $input.on('change', function(e) {
     showFiles(e.target.files);
   });
+  var $input2    = fileForm.find('#addFile'),
+    $label2    = fileForm.find('label'),
+    showFiles2 = function(files) {
+      $label2.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', files.length ) : files[ 0 ].name);
+    };
+    $input2.on('change', function(e) {
+    showFiles2(e.target.files);
+  });
+
 
 
 
@@ -64,7 +93,7 @@ if(isset($_POST['filterClient'])){
   }
 };
 function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
-    var $form = $('.fileBox');
+    var $form = $('#fileBox');
     var $input    = $form.find('input[type="file"]'),
     $label    = $form.find('label'),
     $name     = $form.find('input[type="text"]'),
@@ -79,67 +108,6 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
 
 
 </script>
-
-<?php
-
- 
-
-   $s3 = new Aws\S3\S3Client($s3config);
-  if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(isset($_POST['addGroup']) && !empty($_POST['add_groupName']) && !empty($_FILES) && !empty($_POST['filterCompany'])){
-      $companyID = intval($_POST['filterCompany']);
-      $name = test_input($_POST['add_groupName']);
-      $radio = test_input($_POST['ttl']);
-      $url = hash('whirlpool',random_bytes(10));
-      try{
-      $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_SESSION['userid'].", NULL, $companyID)");
-      $groupID = $conn->insert_id;
-      foreach($_FILES['files']['error'] as $key => $error){
-        if($error == UPLOAD_ERR_OK){
-          $buckets = $s3->listBuckets();
-          $thereisabucket = false;
-          foreach($buckets['Buckets'] as $bucket){
-            if($bucket['name']=='sharedFiles') $thereisabucket=true;
-          }
-          if(!$thereisabucket)$s3->createBucket( array('Bucket' => 'sharedFiles' ) );
-          $filename = pathinfo($_FILES['files']['name'][$key], PATHINFO_FILENAME);
-          $filetype = pathinfo($_FILES['files']['name'][$key], PATHINFO_EXTENSION);
-          $filesize = $_FILES['files']['size'][$key];
-          $hashkey = hash('md5',random_bytes(10));
-          $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_SESSION['userid'].", $groupID, '$hashkey', $filesize, null)");
-          $s3->putObject(array(
-          'Bucket' => 'sharedFiles',
-          'Key' => $hashkey,
-          'SourceFile' => $_FILES['files']['temp_name'][$key]
-          ));
-          
-        }
-          
-      }
-
-    }catch(Exception $e){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
-    }
-      if($conn->error){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-      } else {
-        ?>
-        <script>
-        location.reload();
-        </script>
-        <?php
-      }
-    }elseif(isset($_POST['editGroup'])&&!empty($_POST['edit_groupName'])&&!empty($_POST['groupID'])){
-      $name = test_input($_POST['edit_groupName']);
-      $conn->query("UPDATE sharedgroups SET name = '$name' WHERE id=".$_POST['groupID']);
-      if(!empty($_POST['ttl'])){
-        $ttl = test_input($_POST['ttl']);
-        $conn->query("UPDATE sharedgroups SET ttl = $ttl WHERE id = ".$_POST['groupID']);
-        $conn->query("UPDATE sharedgroups SET dateOfBirth=CURRENT_TIMESTAMP WHERE id= ".$_POST['groupID']);
-      }
-    }
-  }
-?>
 
 <table class="table">
 <thead><tr>
@@ -184,9 +152,9 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
         <input id="editName" style="margin-bottom: 2%" type="text" class="form-control" name="edit_groupName" autofocus/>
         <input id="groupID" style="visibility: hidden; width:1px; height:1px;" type="number" name="groupID"/>
         <label>Lebenszeit der Gruppe</label>
-        <input class="radioChoose" type="radio" name="ttl" value="1" checked>Ein Tag</input>
-        <input class="radioChoose" type="radio" name="ttl" value="7">Eine Woche</input>
-        <input class="radioChoose" type="radio" name="ttl" value="30">Ein Monat</input>
+        <input class="radioChoose" type="radio" name="ttlE" value="1">Ein Tag</input>
+        <input class="radioChoose" type="radio" name="ttlE" value="7">Eine Woche</input>
+        <input class="radioChoose" type="radio" name="ttlE" value="30">Ein Monat</input>
         <br>
         <table class="table">
           <thead><tr>
@@ -199,12 +167,26 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
         </table>
         <div class="modal-footer">
         <div style="text-align: left; margin-bottom: -35px">
-        <button type="button" class="btn btn-warning" onClick="blabla()"><i class="fa fa-plus"></i></button>
+        <button type="button" class="btn btn-warning" id="openNewFile" data-toggle="modal" data-target="#new-file" ><i class="fa fa-plus"></i></button>
         </div>
         <div>
         <button type="button" class="btn btn-default" onclick="handleCancel()" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="editGroup"><?php echo $lang['EDIT']; ?></button>
+        <button type="submit" class="btn btn-warning" name="editGroup" onclick="finishEditGroup(event)"><?php echo $lang['EDIT']; ?></button>
         </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="new-file">
+      <div class="modal-dialog modal-content modal-sm" >
+        <div class="modal-header h4"><?php echo "Datei". " ".$lang['ADD']; ?></div>
+        <div class="modal-body" >
+          <div class="fileBox" id="dropBox" ondrop="guideFiles(event)" ondragover="dragover(event)" ondragend="dragend(event)">
+            <input class="fileInput" type="file" name="files[]" id="addFile" onChange="uploadFiles(this)" data-multiple-caption="{count} files uploaded" multiple />
+            <label class="lbl" for="addFile" id="lblNewFile"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>          
+          </div>
+          <div class="modal-footer" >
+            <button type="button" onClick="fade(this)" class="btn btn-default">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -215,24 +197,24 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
       <div class="modal-body">
         <?php include 'misc/select_company.php';?>
         <label>Name der Gruppe</label>
-        <input style="margin-bottom: 2%" type="text" class="form-control" name="add_groupName" autofocus/>
+        <input style="margin-bottom: 2%" type="text" class="form-control" name="add_groupName" id="add_groupName" autofocus/>
         <label>Lebenszeit der Gruppe</label>
         <input class="radioChoose" type="radio" name="ttl" value="1" checked>Ein Tag</input>
         <input class="radioChoose" type="radio" name="ttl" value="7">Eine Woche</input>
         <input class="radioChoose" type="radio" name="ttl" value="30">Ein Monat</input>
-        <div class="fileBox">
-          <input class="fileInput" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+        <div id="fileBox" class="fileBox">
+          <input class="fileInput" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple />
           <label class="lbl" for="file"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>          
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-default" onclick="handleCancel()" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="addGroup"><?php echo $lang['ADD']; ?></button>
+        <button type="submit" class="btn btn-warning" onclick="createGroup(event)" name="addGroup"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
   </div>
 </form>
 
-<!--TODO Little Window To Upload Files (Drag n Drop) -->
+
 
 
 
@@ -240,11 +222,22 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
 
 
 <script>
+  function finishEditGroup(evt){
+    editGroup(evt,document.getElementById('groupID').value);
+  }
+
   function editGroup(evt, groupID){
+    var ttl = null;
+    if(document.querySelector('input[name = "ttlE"]:checked')){
+      ttl = document.querySelector('input[name = "ttlE"]:checked').value
+    }
     $.ajax({
       type: "POST",
       url: "../misc/sharedfiles",
-      data: { groupID: groupID}
+      data: { groupID: groupID,
+              'function': 'editGroup',
+              'editName': document.getElementById('editName').value,
+              'ttl': ttl}
     }).done(function(info){
       document.getElementById('editName').value = info;
       info = JSON.parse(info);
@@ -282,11 +275,144 @@ function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
     $.ajax({
       type: "POST",
       url: "../misc/sharedfiles",
-      data: { fileID: fileID}
+      data: { fileID: fileID,
+              'function': 'deleteFile'}
     }).done(function(groupID){
       if(groupID)editGroup(null,groupID);
       
     });
+  }
+
+  function uploadFiles(evt){
+    //evt.preventDefault();
+    var formData = new FormData();
+    var fileIndex = [];
+    for(var i = 0;i<document.getElementById('addFile').files.length;i++){
+      formData.append('file'+i,document.getElementById('addFile').files[i]); 
+    }
+    formData.append('amount',document.getElementById('addFile').files.length);
+    formData.append('userID',<?php echo $userID ?>);
+    formData.append('function','sendFiles');
+    formData.append('fileIndex',fileIndex);
+    formData.append('groupID',document.getElementById('groupID').value);
+    $.ajax({
+      url: '../misc/sharedfiles',
+      type: 'POST',
+      async: true,
+      data: formData,
+      cache: false,
+      contentType: false,
+      encType: 'multipart/form-data',
+      processData: false,
+      success: function(response){
+        //alert(response);
+        editGroup(null,response)
+      }
+    });
+  }
+
+  function sendFile(file){
+    var formData = new FormData();
+    formData.append('function','sendFiles');
+    formData.append('file0',file);    
+    formData.append('amount',1);
+    formData.append('userID',<?php echo $userID ?>)
+    formData.append('groupID',document.getElementById('groupID').value);
+    $.ajax({
+      url: '../misc/sharedfiles',
+      type: 'POST',
+      async: true,
+      data: formData,
+      cache: false,
+      contentType: false,
+      encType: 'multipart/form-data',
+      processData: false,
+      success: function(response){
+        //alert(response);
+        editGroup(null,response)
+      }
+    });
+  }
+
+  function createGroup(evt){
+    var formData = new FormData();
+    var amount = 0;
+    if(filesGotDropped){
+      for(var i = 0;i<droppedFiles2.length;i++){
+        formData.append('file'+i,droppedFiles2[i]);
+      }
+      amount = droppedFiles2.length;
+      console.log(droppedFiles2);
+    }else{
+      for(var i = 0;i<document.getElementById('file').files.length;i++){
+        formData.append('file'+i,document.getElementById('file').files[i]); 
+      }
+      amount = document.getElementById('file').files.length;
+      console.log(document.getElementById('file').files);
+    }   
+    formData.append('amount',amount);
+    formData.append('function','addGroup');
+    formData.append('userid',<?php echo $userID ?>);
+    formData.append('ttl',document.querySelector('input[name = "ttl"]:checked').value);
+    formData.append('add_groupName',document.getElementById('add_groupName').value);
+    formData.append('filterCompany',document.getElementsByName('filterCompany')[0].value);
+    $.ajax({
+      url: '../misc/sharedfiles',
+      type: 'POST',
+      async: true,
+      data: formData,
+      cache: false,
+      contentType: false,
+      encType: 'multipart/form-data',
+      processData: false,
+      success: function(res){
+        //alert(res);
+        location.reload();
+      }
+    });
+  }
+
+  function guideFiles(evt){
+    evt.preventDefault();
+    var dt = evt.dataTransfer;
+    if(dt.items){
+      for(var i=0;i<dt.items.length;i++){
+        if(dt.items[i].kind=="file"){
+          var f = dt.items[i].getAsFile();
+          sendFile(f);
+        }
+      }
+    }else{
+      for(var i=0;i<dt.files.length;i++){
+        sendFile(dt.files[i]);
+      }
+    }
+  }
+
+  function fade(evt){
+    var btn = document.getElementById('openNewFile');
+    btn.click();
+    document.getElementById('lblNewFile').innerHTML = "Datei auswählen oder hier hin ziehen.";
+    //var backdrop = document.getElementsByClassName('modal-backdrop fade in')[0];
+    //var body = document.getElementsByTagName('body')[0];
+    //body.classList.remove("modal-open");
+    //backdrop.parentNode.removeChild(backdrop);
+    //div.setAttribute('style','display: hidden');
+  }
+
+  function dragover(evt){
+    //evt.preventDefault();
+  }
+
+  function dragend(evt){
+    var dt = evt.dataTransfer;
+    if (dt.items) {
+      for (var i = 0; i < dt.items.length; i++) {
+        dt.items.remove(i);
+      }
+    } else {
+      ev.dataTransfer.clearData();
+    }
   }
 </script>
 

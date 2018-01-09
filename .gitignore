@@ -7,4 +7,5 @@ images/ups/*
 cryptlog.txt
 plugins/restic/backup.sql
 plugins/aws/*
+test*
 backup.sql

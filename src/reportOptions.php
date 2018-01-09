@@ -27,7 +27,7 @@ if(isset($_POST['functionname'])&&isset($_POST['arguments'])){
 
 
 if(isset($_POST['saveButton'])){
-  if(!(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER']))){
+  if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
     if(isset($_POST['defaultOptions'])){
         $conn->query("UPDATE $mailOptionsTable SET host = 'adminmail'");
         $conn->query("UPDATE $mailOptionsTable SET port = 25");
