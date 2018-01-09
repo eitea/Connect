@@ -28,6 +28,10 @@ class ComposerStaticInit3a36fa2adee19169cb68a001e809d13b
         array (
             'JmesPath\\' => 9,
         ),
+        'H' => 
+        array (
+            'Hackzilla\\PasswordGenerator\\' => 28,
+        ),
         'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
@@ -52,6 +56,10 @@ class ComposerStaticInit3a36fa2adee19169cb68a001e809d13b
         'JmesPath\\' => 
         array (
             0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
+        ),
+        'Hackzilla\\PasswordGenerator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hackzilla/password-generator',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (

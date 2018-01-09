@@ -22,9 +22,11 @@ require __DIR__."/connection.php";
             var_dump($buckets);
             $thereisabucket = false;
             foreach($buckets['Buckets'] as $bucket){
-              if($bucket['Name']=='sharedFiles') $thereisabucket=true;
+              if($bucket['Name']==$s3SharedFiles) $thereisabucket=true;
             }
-            if(!$thereisabucket)$s3->createBucket( array('Bucket' => 'sharedFiles' ) );
+            if(!$thereisabucket){
+                $s3->createBucket( array('Bucket' => $s3SharedFiles ) ); 
+            }
             for($i = 0;$i<$amount;$i++){
               $filename = pathinfo($_FILES['file'.$i]['name'], PATHINFO_FILENAME);
               $filetype = pathinfo($_FILES['file'.$i]['name'], PATHINFO_EXTENSION);
@@ -32,7 +34,7 @@ require __DIR__."/connection.php";
               $hashkey = hash('md5',random_bytes(10));
               $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_POST['userid'].", $groupID, '$hashkey', $filesize, null)");
               $s3->putObject(array(
-                  'Bucket' => 'sharedFiles',
+                  'Bucket' => $s3SharedFiles,
                   'Key' => $hashkey,
                   'SourceFile' => $_FILES['file'.$i]['tmp_name']
               ));
@@ -101,7 +103,7 @@ require __DIR__."/connection.php";
             }
             $groupID = $groupID->fetch_assoc()['groupID'];
             $s3->deleteObject(array(
-                'Bucket' => 'sharedFiles',
+                'Bucket' => $s3SharedFiles,
                 'Key' => $hash
             ));
             $conn->query("DELETE FROM sharedFiles WHERE id = $fileID");
@@ -121,7 +123,7 @@ require __DIR__."/connection.php";
                 $hashkey = hash('md5',random_bytes(10));
                 $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_POST['userID'].", $groupID, '$hashkey', $filesize, null)");
                 $s3->putObject(array(
-                    'Bucket' => 'sharedFiles',
+                    'Bucket' => $s3SharedFiles,
                     'Key' => $hashkey,
                     'SourceFile' => $_FILES['file'.$i]['tmp_name']
                 ));

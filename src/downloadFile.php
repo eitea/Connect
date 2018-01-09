@@ -19,7 +19,7 @@ require __DIR__."/connection.php";
   if($result){
       $row = $result->fetch_assoc();
       $object= $s3->getObject(array(
-          'Bucket' => 'sharedFiles',
+          'Bucket' => $s3SharedFiles,
           'Key' => $hashkey,
       ));
   }

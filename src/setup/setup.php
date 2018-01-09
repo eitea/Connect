@@ -164,9 +164,18 @@ ignore_user_abort(1);
               create_tables($conn);
 
               require_once dirname(__DIR__) . "/version_number.php";
+              
+              //add lines to connection file
+              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
+              $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
+              $txt = '$identifier = "'.$identifier.'";
+              $s3SharedFiles=$identifier."_sharedFiles";
+              $s3uploadedFiles=$identifier."_uploadedFiles";';
+              fwrite($myfile, $txt);
+              fclose($myfile);
+
               //------------------------------ INSERTS ---------------------------------------
               //insert identification
-              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
               $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
               //insert main company
               $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");

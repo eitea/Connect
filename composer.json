@@ -1,6 +1,7 @@
 {
     "require": {
         "aws/aws-sdk-php": "^3.48",
-        "singpolyma/openpgp-php": "^0.3.0"
+        "singpolyma/openpgp-php": "^0.3.0",
+        "hackzilla/password-generator": "^1.4"
     }
 }
