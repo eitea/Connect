@@ -623,8 +623,16 @@ $resultContacts = $conn->query ( "SELECT * FROM contactPersons WHERE clientID = 
 			<div class="col-xs-2 text-center">
 				UID
 			</div>
-			<div class="col-sm-4">
-				<input type="text" class="form-control" name="vatnumber" value="<?php echo $row ['vatnumber']; ?>" />
+			<div class="col-sm-3">
+				<div class="input-group">					
+					<input type="text" id="uidNumber" class="form-control" name="vatnumber" value="<?php echo $row ['vatnumber']; ?>" />
+					<span class="input-group-btn">
+						<button id="uidCheck" class="btn btn-default" type="button">Überprüfen</button>
+					</span>
+				</div>
+			</div>
+			<div class="col-sm-1">
+				<span id="uidValidate" ></span>
 			</div>
 		</div>
 		<div class="row form-group">
@@ -1109,4 +1117,22 @@ while ( $row = $result_p->fetch_assoc () ) :
     </div>
   </div>
 </form>
+
+<script>
+$('#uidCheck').click(function(e){
+	$.ajax({
+    url: 'ajaxQuery/AJAX_vies.php',
+    data: { vatNumber : $('#uidNumber').val() },
+    type: 'get',
+    success : function(resp){
+		if(resp){
+			$("#uidValidate").html('<img width="25px" height="25px" src="images/okay.png" /> ' + resp);
+		} else {
+			$("#uidValidate").html('<img width="25px" height="25px" src="images/not_okay.png" />');
+		}
+    },
+    error : function(resp){}
+  });
+});
+</script>
 <?php require "footer.php"; ?>

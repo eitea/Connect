@@ -190,9 +190,9 @@ function simple_decryption($message, $key){
 /** Usage
 * Encrypt
 * $c = new MasterCrypt();
-* $encrypted = $c->encrypt("this is a test");
-* $encrypted2 = $c->encrypt("this is a test");
-* INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$iv','$iv2');
+* $encrypted = $c->encrypt("sensible info 1");
+* $encrypted2 = $c->encrypt("sensible info 2");
+* INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$c->iv','$c->iv2');
 *
 * Decrypt
 * SELECT var1,var2,iv,iv2 FROM table1;
@@ -221,7 +221,7 @@ class MasterCrypt{
         $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
         $encrypted = self::mc_encrypt($unencrypted, $iv);
         return $encrypted;
-    } else {      
+    } else {
         return $unencrypted;
     }
   }
@@ -247,7 +247,6 @@ class MasterCrypt{
     return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
   }
 
-  //TODO: mcrypt is deprecated. replace with openssl (try _seal and _open)
   private static function mc_encrypt($encrypt, $key){
     $message = serialize($encrypt);
     $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
@@ -255,7 +254,7 @@ class MasterCrypt{
     $ciphertext = openssl_encrypt($message,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
     return base64_encode($nonce.$ciphertext);
     return $nonce.$ciphertext;
-    /*
+    /* deprecated
     $encrypt = serialize($encrypt);
     $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
     $key = pack('H*', $key);
@@ -275,7 +274,7 @@ class MasterCrypt{
     $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
     $plaintext = openssl_decrypt($ciphertext,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
     return unserialize($plaintext);
-    /*
+    /* deprecated
     $decrypt = explode('|', $decrypt.'|');
     $decoded = base64_decode($decrypt[0]);
     $iv = base64_decode($decrypt[1]);
