@@ -10,7 +10,12 @@
       <label><input type="checkbox" name="setPassword" checked value="1" /> ZIP mit Passwort versehen: </label>
     </div>
     <div class="col-md-6" >
-      <input type="text" name="password" class="form-control" placeholder="<?php echo $lang['PASSWORD']; ?>" />
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button id="ranNumgen" class="btn btn-default" type="button">Zufallszahl generieren</button>
+        </span>
+        <input id="randNum" type="text" name="password" class="form-control" placeholder="<?php echo $lang['PASSWORD']; ?>" />
+      </div>
     </div>
     <div class="col-md-12">
       <br>
@@ -18,4 +23,15 @@
     </div>
   </div>
 </form>
+
+<script>
+$('#ranNumgen').click(function(e){
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (var i = 0; i < 8; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  $('#randNum').val(text);
+});
+</script>
 <?php include 'footer.php'; ?>

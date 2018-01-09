@@ -1,6 +1,7 @@
 <?php require 'header.php'; enableToDSGVO($userID); ?>
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?><div class="page-header-button-group">
-  <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></a>
+  <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
+  <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
 </div></h3></div>
 
 <?php 
@@ -22,6 +23,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       redirect("edit?d=".$conn->insert_id);
     }
   }
+  if(isset($_FILES['uploadZip']) && !empty($_FILES['uploadZip']['name'])) {
+    $file = null;
+    
+  }
   if(isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])){
     $processID = uniqid();
     $docID = intval($_POST['send_document']);
@@ -35,7 +40,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt = $conn->prepare("INSERT INTO documentProcessHistory(processID, activity) VALUES('$processID', ?)");
     $stmt->bind_param("s", $activity);
     if(isset($_POST['send_andRead'])){
-      $activity = 'ENABLE_READ';      
+      $activity = 'ENABLE_READ';
       $stmt->execute();
     }
     if(isset($_POST['send_andSign'])){
@@ -43,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $stmt->execute();
     }
     if(isset($_POST['send_andAccept'])){
-      $activity = 'ENABLE_ACCEPT';      
+      $activity = 'ENABLE_ACCEPT';
       $stmt->execute();
     }
     $stmt->close();
@@ -217,6 +222,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['ADD']; ?></button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="modal fade" id="zip-upload">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header h4">ZIP <?php echo $lang['UPLOAD']; ?></div>
+      <div class="modal-body">
+        <label class="btn btn-default">
+          .zip File <?php echo $lang['UPLOAD']; ?>
+          <input type="file" name="uploadZip" style="display:none">
+        </label>
+        <small>Max. 8MB</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['UPLOAD']; ?></button>
       </div>
     </div>
   </div>
