@@ -499,12 +499,8 @@ function create_tables($conn){
   $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-<<<<<<< HEAD
-    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-=======
     enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
->>>>>>> master
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);

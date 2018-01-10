@@ -2400,6 +2400,74 @@ if($row['version'] < 122) {
     echo '<br>dynamicprojectsteams';
   }
 }
+
+
+if($row['version'] < 123) {
+  $conn->query("CREATE TABLE sharedfiles (
+    id int(11) NOT NULL AUTO_INCREMENT,
+    name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
+    type varchar(10) NOT NULL COMMENT 'Dateiendung',
+    owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
+    sharegroup int(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
+    hashkey varchar(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
+    filesize bigint(20) NOT NULL,
+    uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY hashkey (hashkey),
+    KEY owner (owner)
+   )"); 
+  if ($conn->error) {
+    $conn->error;
+  }else{
+    echo '<br>s3Files';
+  }
+
+  $conn->query("CREATE TABLE sharedgroups (
+    id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
+    dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
+    ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
+    uri varchar(100) NOT NULL COMMENT 'URL zu den Objekten',
+    owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
+    files varchar(200) DEFAULT NULL,
+    company int(11) NOT NULL COMMENT 'Mandant',
+    PRIMARY KEY (id),
+    UNIQUE KEY url (uri),
+    KEY owner (owner)
+    )");
+  if ($conn->error) {
+    $conn->error;
+  }else{
+    echo '<br>s3Groups';
+  }
+
+  $conn->query("CREATE TABLE uploadedfiles (
+    id INT NOT NULL AUTO_INCREMENT ,
+    uploadername VARCHAR NOT NULL ,
+    filename VARCHAR(20) NOT NULL ,
+    filetype VARCHAR(10) NOT NULL ,
+    hashkey VARCHAR(32) NOT NULL ,
+    filesize BIGINT(20) NOT NULL ,
+    uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+    notes TEXT NULL ,
+    PRIMARY KEY (id),
+    UNIQUE hashkey (hashkey)
+    )");
+  if ($conn->error) {
+    $conn->error;
+  }else{
+    echo '<br>s3Upload';
+  } 
+
+  $conn->query("ALTER TABLE mailingoptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername'");
+
+  $conn->query("ALTER TABLE mailingoptions ADD COLUMN isDefault TINYINT(1) NOT NULL DEFAULT 1");
+  if ($conn->error) {
+    $conn->error;
+  }else{
+    echo '<br>mailingoptions';
+  } 
+}
 	
 // ------------------------------------------------------------------------------
 
