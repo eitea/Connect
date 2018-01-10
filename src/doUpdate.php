@@ -2646,6 +2646,29 @@ if($row['version'] < 122) {
 		echo '<br>dynamicprojectsteams';
 	}
 }
+
+if($row['version'] < 123){
+	$conn->query("ALTER TABLE contactPersons ADD COLUMN dial VARCHAR(20)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Kontaktpersonen: Durchwahl';
+	}
+
+	$conn->query("ALTER TABLE contactPersons ADD COLUMN faxDial VARCHAR(20)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Kontaktpersonen: Faxfurchwahl';
+	}
+
+	$conn->query("ALTER TABLE contactPersons ADD COLUMN phone VARCHAR(25)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Kontaktpersonen: Mobiltelefon';
+	}
+}
 	
 // ------------------------------------------------------------------------------
 

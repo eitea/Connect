@@ -24,8 +24,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   if(isset($_FILES['uploadZip']) && !empty($_FILES['uploadZip']['name'])) {
-    $file = null;
-    
+    $filename = $_FILES["uploadZip"]["name"];
+    $source = $_FILES["uploadZip"]["tmp_name"];
+
+    $accepted_types = array('application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed');
+    if($_FILES['uploadZip']["size"] < 8000008 && in_array($_FILES["uploadZip"]["type"], $accepted_types) && substr_compare($filename, 'zip', -3 ) === 0){
+      $zip = new ZipArchive();      
+      if($zip->open($_FILES['uploadZip']["tmp_name"]) === TRUE){
+        $conts = $zip->getFromName('Vereinbarung.txt');
+        echo $conts;
+        $zip->close();
+      } else {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>ZIP File konnte nicht geöffnet werden.</div>';
+      }
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Ungültig: File zu groß oder kein gültiges ZIP.</div>';
+    }
   }
   if(isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])){
     $processID = uniqid();
@@ -44,7 +58,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $stmt->execute();
     }
     if(isset($_POST['send_andSign'])){
-      $activity = 'ENABLE_SIGN';      
+      $activity = 'ENABLE_SIGN';
       $stmt->execute();
     }
     if(isset($_POST['send_andAccept'])){
@@ -240,7 +254,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['UPLOAD']; ?></button>
+        <button type="submit" class="btn btn-warning"><?php echo $lang['UPLOAD']; ?></button>
       </div>
     </div>
   </div>

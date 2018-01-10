@@ -1,6 +1,5 @@
 <?php
 $routes = array(
-
   'php/info' => 'phpinfo.php',                     'php/test' => 'template.php',                      'setup/run' => 'setup/setup.php',
   'login/auth' => 'login.php',                     'login/register' => 'selfregistration.php',        'login/update' => 'doUpdate.php',
   'login/access' => 'login_tester.php',
