@@ -268,6 +268,10 @@
       document.getElementsByName('publicPGP')[0].value = keys[1];
     })
   }
+
+  function clearPGP(){
+    document.getElementsByName('privatePGP')[0].value = '';
+  }
   </script>
 </head>
 <body id="body_container" class="is-table-row">
@@ -392,7 +396,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-default" onClick="clearPGP()" data-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
         </div>
       </div>
@@ -406,7 +410,7 @@
         </div>
         <div class="modal-body">
           <label>Encryption Passwort</label>
-          <input type="text" class="form-control" name="encryptionPassword"/>
+          <input type="password" class="form-control" name="encryptionPassword"/>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

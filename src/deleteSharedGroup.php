@@ -16,7 +16,7 @@ $result = $conn->query("SELECT * FROM sharedfiles WHERE sharegroup=".$groupID.""
 while($row = $result->fetch_assoc()){
     
     $s3->deleteObject(array(
-        'Bucket' => 'sharedFiles',
+        'Bucket' => $s3SharedFiles,
         'Key' => $row['hashkey']
     ));
     $conn->query("DELETE FROM sharedfiles WHERE id=".$row['id']);
