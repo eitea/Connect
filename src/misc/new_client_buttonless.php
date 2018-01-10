@@ -40,22 +40,40 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <h4><?php echo $lang['NEW_CLIENT_CREATE']; ?></h4>
       </div>
       <div class="modal-body">
-        <br>
-        <input type="text" class="form-control required-field" name="create_client_name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;">
-        <br>
-        <div class="row">
-          <div class="col-md-6">
-            <select id="create_client_company" name="create_client_company" class="js-example-basic-single" style="width:200px">
-              <?php
-              $result_cc = $conn->query("SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-              while ($result_cc && ($row_cc = $result_cc->fetch_assoc())) {
-                $cmpnyID = $row_cc['id'];
-                $cmpnyName = $row_cc['name'];
-                if(isset($filterCompanyID) && $filterCompanyID == $cmpnyID){
-                  echo "<option selected name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-                } else {
-                  echo "<option name='cmp' value='$cmpnyID'>$cmpnyName</option>";
-                }
+        <div class="col-md-12">
+          <label>Name</label>
+          <input type="text" class="form-control required-field" name="create_client_name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;">
+          <br>
+        </div>
+        <div class="col-md-6">
+          <label>Mandant</label>
+          <select id="create_client_company" name="create_client_company" class="js-example-basic-single" style="width:200px">
+            <?php
+            $result_cc = $conn->query("SELECT * FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+            while ($result_cc && ($row_cc = $result_cc->fetch_assoc())) {
+              $cmpnyID = $row_cc['id'];
+              $cmpnyName = $row_cc['name'];
+              if(isset($filterCompanyID) && $filterCompanyID == $cmpnyID){
+                echo "<option selected value='$cmpnyID'>$cmpnyName</option>";
+              } else {
+                echo "<option value='$cmpnyID'>$cmpnyName</option>";
+              }
+            }
+            ?>
+          </select>
+        </div>
+        <?php
+          $clientNums = array(1 => '');
+          $numstrings = '';
+          $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
+          while($res_num && ($rowNum = $res_num->fetch_assoc())){ //prevented error: call fetch_assoc() on boolean
+            $cmpnyID = $rowNum['companyID'];
+            $step = $rowNum['clientStep'];
+            $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
+            if($row_c_num = $res_c_num->fetch_assoc()){
+              $num = $row_c_num['clientNumber'];
+              if($row_c_num['clientNumber'] < $rowNum['clientNum']){
+                $num = $rowNum['clientNum'];
               }
               ?>
             </select>

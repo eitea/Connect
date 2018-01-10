@@ -58,8 +58,14 @@
   $result = $conn->query("SELECT enableSocialMedia FROM modules");
   if($result && ($row = $result->fetch_assoc())){
     $enableSocialMedia = $row['enableSocialMedia'];
+    $enableDynamicProjects = $row['enableDynamicProjects'];
+    $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+    echo $conn->error;
+    $hasActiveDynamicProjects = ($result && $result->num_rows > 0)?'TRUE':'FALSE';
   } else {
     $enableSocialMedia = 'FALSE';
+    $enableDynamicProjects = 'FALSE';
+    $hasActiveDynamicProjects = 'FALSE';
   }
   if($enableSocialMedia == 'TRUE'){
     $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
@@ -280,7 +286,7 @@
   <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header hidden-xs">
-        <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT</a>
+        <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT <span style="font-size:9pt">(Beta)</span></a>
       </div>
       <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
         <ul class="nav navbar-nav" style="margin:10px">
@@ -547,7 +553,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
 
           <!-- User-Section: BOOKING -->
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
+<<<<<<< HEAD
             <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+=======
+            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
+            <?php if($enableDynamicProjects == 'TRUE' && $hasActiveDynamicProjects == 'TRUE'):?>
+              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
+            <?php endif; //dynamicProjects ?> 
+>>>>>>> master
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>
       </ul>
@@ -675,12 +688,15 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
               <ul class="nav navbar-nav">
                 <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if($this_page =='audit_projectBookings.php'){echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
+                <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
+                  <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+                <?php endif; ?>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php"){
+        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php"){
           echo "<script>$('#adminOption_PROJECT').click();</script>";
         }
         ?>
@@ -793,23 +809,35 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <?php
-                $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                while($result && ($row = $result->fetch_assoc())){
-                  echo '<li>';                  
-                  echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                  echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';                  
-                  echo '<ul class="nav nav-list">';
-                  echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                  echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                if(count($available_companies) == 2){
+                  echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                  echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
                   while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
                     echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
                     if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
                       echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
                     }
                   }
-                  echo '</ul></div></li>';
-                }
+                } else {
+                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                  while($result && ($row = $result->fetch_assoc())){
+                    echo '<li>';                  
+                    echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';                  
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                    echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                    while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                      echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                      if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                        echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                      }
+                    }
+                    echo '</ul></div></li>';
+                  }
+                }                
                 ?>
                 <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
               </ul>
@@ -837,6 +865,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <?php
+<<<<<<< HEAD
                 $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                 while($result && ($row = $result->fetch_assoc())){
                   echo '<li>';
@@ -845,7 +874,38 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
                   echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+=======
+                if(count($available_companies) == 2){
+                  echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
+                  echo '<li>';
+                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$available_companies[1].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
+                  echo '<div class="collapse" id="tdsgvo-sets-'.$available_companies[1].'" >';
+                  echo '<ul class="nav nav-list">';
+                  echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
+                  echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
+>>>>>>> master
                   echo '</ul></div></li>';
+                } else {
+                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                  while($result && ($row = $result->fetch_assoc())){
+                    echo '<li>';
+                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                    echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
+                    
+                    echo '<li>';
+                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+                    echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
+                    echo '</ul></div></li>';
+                    
+                    echo '</ul></div></li>';
+                  }
                 }
                 ?>
               </ul>

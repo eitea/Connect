@@ -113,7 +113,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
     </div> <!-- End tab content -->
     <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
-      <table class="table table-hover">
+      <table class="table table-striped">
       <thead>
         <th>Name</th>
         <th>Checkin</th>

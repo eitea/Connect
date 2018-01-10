@@ -360,6 +360,7 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
       </table>
     </div>
 
+<<<<<<< HEAD
     <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
       <h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
       <hr>
@@ -555,6 +556,132 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
         </div>
       </div>
     </div>
+=======
+	<div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'in active';}?>">
+	<h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
+	<hr>
+		<div class="row">
+			<div class="col-md-4 col-md-offset-1">
+				<label>Kundenname</label><input type="text" class="form-control" name="edit_name" placeholder="Kundenname" value="<?php echo $rowClient['name']; ?>" />
+			</div>
+			<div class="col-md-3">
+				<label>Kundennummer</label><input type="text" class="form-control" maxlength="12" placeholder="z.B. #KD-123" value="<?php echo $rowClient['clientNumber']; ?>" name="edit_clientNumber" />
+			</div>
+			<div class="col-md-4">
+				<label><?php echo $lang['COMPANY']; ?></label>
+				<select class="js-example-basic-single" name="edit_company">
+					<?php
+					$res_cmp = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+					while($row_cmp = $res_cmp->fetch_assoc()){
+						$selected = ($rowClient['companyID'] == $row_cmp['id']) ? 'selected' : '';
+						echo '<option '.$selected.' value="'.$row_cmp['id'].'">'.$row_cmp['name'].'</option>';
+					}
+					?>
+				</select>
+			</div>
+		</div>
+		<hr>
+    	<div class="row checkbox">
+			<div class="col-xs-2 text-right"><?php echo $lang['ADDRESS_FORM']; ?></div>
+			<div class="col-sm-2">
+				<label><input type="radio" value="male" name="gender" <?php if($row['gender'] == 'male'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['male']; ?></label>
+			</div>
+			<div class="col-sm-2">
+				<label><input type="radio" value="female" name="gender" <?php if($row['gender'] == 'female'){echo 'checked';} ?> /> <?php echo $lang['GENDER_TOSTRING']['female']; ?></label>
+			</div>
+			<div class="col-sm-3">
+				<label><input type="checkbox" value="company" name="contactType" <?php if($row['contactType'] == 'company'){echo 'checked';} ?> /> <?php echo $lang['COMPANY_2']; ?></label>
+			</div>
+		</div>
+		<br>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">Name</div>
+			<div class="col-sm-2">
+				<input type="text" class="form-control" name="title" value="<?php echo $row['title']; ?>" placeholder="Title"/>
+			</div>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>" placeholder="<?php echo $lang['FIRSTNAME']; ?>" />
+			</div>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" name="name" value="<?php echo $row['name']; ?>" placeholder="<?php echo $lang['LASTNAME']; ?>" />
+				</div>
+			<div class="col-sm-2">
+				<input type="text" class="form-control" name="nameAddition" value="<?php echo $row['nameAddition']; ?>" placeholder="Addition <?php if(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') echo "/Zusatz"; ?>"/>
+			</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">Anschrift</div>
+			<div class="col-sm-5">
+			<input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" placeholder="<?php echo $lang['STREET']; ?>"/>
+		</div>
+			<div class="col-sm-5">
+			<input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" placeholder="<?php echo $lang['COUNTRY']; ?>"/>
+			</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" name="address_Country_City" value="<?php echo $row ['address_Country_City']; ?>" placeholder="<?php echo $lang ['CITY']; ?>" />
+			</div>
+			<div class="col-sm-2">
+			<input type="text" class="form-control" name="address_Country_Postal" value="<?php echo $row['address_Country_Postal']; ?>" placeholder="<?php echo $lang['PLZ']; ?>" />
+		</div>
+		<div class="col-sm-5">
+			<input type="text" class="form-control" name="address_Addition" value="<?php echo $row['address_Addition']; ?>" placeholder="<?php echo $lang['ADDITION']; ?>"/>
+		</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">Kontakt</div>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" name="phone" value="<?php echo $row ['phone']; ?>" placeholder="<?php echo $lang ['PHONE_NUMBER']; ?>" />
+			</div>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" name="fax_number" value="<?php echo $row ['fax_number']; ?>"  placeholder="Fax" />
+			</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">Webseite</div>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" name="homepage" value="<?php echo $row ['homepage']; ?>" placeholder="Homepage" />
+			</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">E-Mail</div>
+			<div class="col-sm-5">
+				<input type="email" class="form-control" name="mail" value="<?php echo $row ['mail']; ?>" placeholder="E-Mail" />
+			</div>
+		</div>
+		<br><br>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">Ansprechpartner</div>
+			<div class="col-sm-10">
+				<table class="table">
+					<thead><tr>
+					<th>Name</th>
+					<th>E-Mail</th>
+					<th>Position</th>
+					<th>Verantwortung</th>
+					<th></th>
+					</tr></thead>
+					<tbody>
+					<?php
+					while ( $contactRow = $resultContacts->fetch_assoc () ) {
+						echo '<tr>';
+						echo '<td>' . $contactRow ['firstname'] . ' ' . $contactRow ['lastname'] . '</td>';
+						echo '<td>' . $contactRow ['email'] . '</td>';
+						echo '<td>' . $contactRow ['position'] . '</td>';
+						echo '<td>' . $contactRow ['responsibility'] . '</td>';
+						echo '<td><button type="submit" name="deleteContact" value="' . $contactRow ['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+						echo '</tr>';
+					}
+					?>
+					</tbody>
+				</table>
+				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php echo $lang ['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+			</div>
+		</div>
+	</div>
+>>>>>>> master
 
     <div id="menuBank" class="tab-pane fade <?php if($activeTab == 'banking'){echo 'in active';}?>">
       <div class="row form-group">
@@ -666,6 +793,7 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
       </div>
     </div>
 
+<<<<<<< HEAD
     <div id="menuPayment" class="tab-pane fade <?php if($activeTab == 'payment'){echo 'in active';}?>">
       <h3>Zahlungsdaten</h3>
       <hr>
@@ -746,6 +874,74 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
         </div>
       </div>
     </div>
+=======
+	<div id="menuBilling" class="tab-pane fade <?php if ($activeTab == 'billing') { echo 'in active'; } ?>">
+		<div class="row checkbox">
+			<div class="col-sm-9">
+				<h3>Rechnungsdaten</h3>
+			</div>
+			<br>
+			<div class="col-sm-3">
+				<input type="checkbox" name="eBill" <?php if ($row ['eBill'] == 'true') { echo 'checked'; } ?> />
+				E-Rechnung
+			</div>
+		</div>
+		<hr>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">
+				Kreditlimit
+			</div>
+			<div class="col-sm-3">
+				<input type="number" step="any" class="form-control" name="creditLimit" value="<?php echo $row ['creditLimit']; ?>" />
+			</div>
+			<div class="col-xs-3 text-center">
+				Letzte Faktura Buchung
+			</div>
+			<div class="col-sm-3">
+				<input type="text" class="form-control datetimepicker" name="lastFaktura" value="<?php echo $row ['lastFaktura']; ?>" />
+			</div>
+		</div>
+		<div class="row form-group">        
+			<div class="col-xs-2 text-right">
+				Versandart
+			</div>
+			<div class="col-sm-3">
+				<select class="js-example-basic-single" name="shipmentType">
+					<option value="0">...</option>
+					<?php
+					$result_con = $conn->query ( "SELECT * FROM shippingMethods" );
+					while ( $row_con = $result_con->fetch_assoc () ) {
+						$selected = '';
+						if ($row ['shipmentType'] == $row_con ['name']) {
+							$selected = 'selected';
+						}
+						echo '<option ' . $selected . ' value="' . $row_con ['name'] . '">' . $row_con ['name'] . '</option>';
+					}
+					?>
+				</select>
+			</div>
+		</div>
+	<br><hr><br>
+		<div class="row form-group">
+			<div class="col-xs-2 text-right">
+				Rechnungsadresse (E-Mail)
+			</div>
+			<div class="col-sm-3">
+				<input type="email" name="billingMailAddress" class="form-control" value="<?php echo $row ['billingMailAddress']; ?>" />
+			</div>
+			<div class="col-xs-2 text-center">
+				Rechnungsversand
+			</div>
+			<div class="col-sm-3">
+				<select name="billDelivery" class="js-example-basic-single">
+					<option <?php if($row['billDelivery'] == 'Fax') echo 'selected'; ?> value="Fax">Fax</option>
+					<option <?php if($row['billDelivery'] == 'Post') echo 'selected'; ?> value="Post">Post</option>
+					<option <?php if($row['billDelivery'] == 'E-Mail') echo 'selected'; ?> value="E-Mail">E-Mail</option>
+				</select>
+			</div>
+		</div>
+	</div>
+>>>>>>> master
 
     <div id="menuContact" class="tab-pane fade <?php if($activeTab == 'notes'){echo 'in active';}?>">
       <h3>Bemerkungen</h3>

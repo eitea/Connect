@@ -108,7 +108,7 @@ while($result && ($row = $result->fetch_assoc())){
     $A = strtotime($row['start']) + $row['timeToUTC']*3600;
     $B = strtotime($row['end']) + $row['timeToUTC']*3600;
     $y = array(0);
-    $y[] = $pdf->MultiColCell($w[0],5,$row['clientName']."\n".$row['projectName']);
+    $y[] = $pdf->MultiColCell($w[0],5,iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$row['projectName']));
     $pdf->Cell($w[1],7,date('d.m.Y', $A), '', 0, 'C');
     $pdf->Cell($w[2],7,date('H:i', $A).' - '.date('H:i', $B) , 0, 0, 'L');
     $pdf->Cell($w[3],7,(($B - $A)/60));
@@ -120,7 +120,7 @@ while($result && ($row = $result->fetch_assoc())){
     $pdf->SetY(max($y));
     $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
 
-    if(280 - $pdf->GetY() < 10){ $pdf->AddPage(); } 
+    if(280 - $pdf->GetY() < 10){ $pdf->AddPage(); }
 }
 
 $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);

@@ -2234,7 +2234,175 @@ if($row['version'] < 118){
 	}
 }
 
-//------------------------------------------------------------------------------
+if($row['version'] < 119){
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN homepage VARCHAR(100)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Datenstamm: Homepage';
+	}
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN mail VARCHAR(100)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Datenstamm: Allgemeine E-Mails';
+	}
+
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN billDelivery VARCHAR(60)");
+	if($conn->error){
+		$conn->error;
+	} else {
+		echo '<br>Kundendetails: Rechnungsversand';
+	}
+
+  $conn->query("ALTER TABLE roles ADD COLUMN isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+  $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+
+  $conn->multi_query("CREATE TABLE dynamicprojects(
+    projectid VARCHAR(100) NOT NULL,
+    projectdataid INT(6) UNSIGNED,
+    projectname VARCHAR(60) NOT NULL,
+    projectdescription VARCHAR(500) NOT NULL,
+    companyid INT(6),
+    projectcolor VARCHAR(10),
+    projectstart VARCHAR(12),
+    projectend VARCHAR(12),
+    projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+    projectpriority INT(6),
+    projectparent VARCHAR(100),
+    projectowner INT(6),
+    projectcompleted INT(6),
+    PRIMARY KEY (`projectid`)
+  );
+  CREATE TABLE dynamicprojectsclients(
+    projectid VARCHAR(100) NOT NULL,
+    clientid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsoptionalemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectspictures(
+    projectid VARCHAR(100) NOT NULL,
+    picture MEDIUMBLOB,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsseries(
+    projectid VARCHAR(100) NOT NULL,
+    projectnextdate VARCHAR(12),
+    projectseries MEDIUMBLOB,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsnotes(
+    projectid VARCHAR(100) NOT NULL,
+    noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    notetext VARCHAR(1000),
+    notecreator INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );
+  CREATE TABLE dynamicprojectsbookings(
+    projectid VARCHAR(100) NOT NULL,
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
+    bookingend DATETIME,
+    userid INT(6) UNSIGNED,
+    bookingtext VARCHAR(1000)
+  );
+  ");
+}
+
+
+if($row['version'] < 120) {
+  $conn->query("ALTER TABLE projectData ADD COLUMN dynamicprojectid VARCHAR(100)");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>projectData: +dynamicprojectid';
+  }
+  $conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectdataid");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojects: -dynamicprojectid';
+  }
+}
+
+if($row['version'] < 121) {
+  $conn->query("ALTER TABLE dynamicprojectsclients ADD COLUMN projectcompleted INT(6)");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojectsclients: +projectcompleted';
+  }
+  $conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectcompleted");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojects: -projectcompleted';
+  }
+}
+
+if($row['version'] < 122) {
+  $conn->query("ALTER TABLE dynamicprojectsbookings ADD COLUMN bookingclient INT(6) UNSIGNED");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojectsbookings: +bookingclient';
+  }
+  $conn->query("ALTER TABLE modules MODIFY COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>Dynamic Projects by default';
+  }
+  $conn->query("UPDATE modules SET enableDynamicProjects = 'TRUE'");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>Dynamic Projects enabled';
+  }
+  $conn->query("CREATE TABLE dynamicprojectsteams(
+    projectid VARCHAR(100) NOT NULL,
+    teamid INT(6) UNSIGNED,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojectsteams';
+  }
+  $conn->query("ALTER TABLE dynamicprojectsemployees ADD PRIMARY KEY(projectid, userid);");
+  if($conn->error){
+    $conn->error;
+  } else {
+    echo '<br>dynamicprojectsteams';
+  }
+}
+	
+// ------------------------------------------------------------------------------
+
 require 'version_number.php';
 $conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
 echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht automatisch weitergeleitet werden: <a href="../user/home">Weiter</a>';
