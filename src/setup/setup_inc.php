@@ -133,6 +133,7 @@ function create_tables($conn){
     field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+    dynamicprojectid VARCHAR(100),
     FOREIGN KEY (clientID) REFERENCES clientData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -498,7 +499,12 @@ function create_tables($conn){
   $sql = "CREATE TABLE modules (
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+<<<<<<< HEAD
     enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+=======
+    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+>>>>>>> master
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
@@ -1107,9 +1113,107 @@ function create_tables($conn){
     info VARCHAR(450),
     userAgent VARCHAR(150)
   )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }  
+	if (! $conn->query ( $sql )) {
+		echo mysqli_error ( $conn );
+  }
+  
+  $sql = "CREATE TABLE dsgvo_vv_templates(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		companyID INT(6) UNSIGNED,
+		name VARCHAR(60) NOT NULL,
+		type ENUM('base', 'app') NOT NULL,
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if (! $conn->query ( $sql )) {
+		echo $conn->error;
+	}
+
+	$sql = "CREATE TABLE dsgvo_vv_template_settings(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		templateID INT(6) UNSIGNED,
+		opt_name VARCHAR(30) NOT NULL,
+		opt_descr VARCHAR(350) NOT NULL,
+		opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if (! $conn->query ( $sql )) {
+		echo $conn->error;
+	}
+
+	$sql = "CREATE TABLE dsgvo_vv(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		templateID INT(6) UNSIGNED,
+		name VARCHAR(60) NOT NULL,
+		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	}
+
+  $sql = "CREATE TABLE dsgvo_vv_settings(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		vv_id INT(6) UNSIGNED,
+		setting_id INT(10) UNSIGNED,
+		setting VARCHAR(850) NOT NULL,
+		category VARCHAR(50),
+		FOREIGN KEY (vv_id) REFERENCES dsgvo_vv(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+		FOREIGN KEY (setting_id) REFERENCES dsgvo_vv_template_settings(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+  
+  $sql = "CREATE TABLE dynamicprojects(
+    projectid VARCHAR(100) NOT NULL,
+    projectname VARCHAR(60) NOT NULL,
+    projectdescription VARCHAR(500) NOT NULL,
+    companyid INT(6),
+    projectcolor VARCHAR(10),
+    projectstart VARCHAR(12),
+    projectend VARCHAR(12),
+    projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+    projectpriority INT(6),
+    projectparent VARCHAR(100),
+    projectowner INT(6),
+    PRIMARY KEY (`projectid`)
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsclients(
+    projectid VARCHAR(100) NOT NULL,
+    clientid INT(6),
+    projectcompleted INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    PRIMARY KEY(projectid, userid),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
 
 
   $sql = "CREATE TABLE sharedfiles (
@@ -1161,4 +1265,25 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   } 
+  $sql = "CREATE TABLE dynamicprojectsbookings(
+    projectid VARCHAR(100) NOT NULL,
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
+    bookingend DATETIME,
+    bookingclient INT(6) UNSIGNED,
+    userid INT(6) UNSIGNED,
+    bookingtext VARCHAR(1000)
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsteams(
+    projectid VARCHAR(100) NOT NULL,
+    teamid INT(6) UNSIGNED
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
 }

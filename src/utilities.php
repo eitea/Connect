@@ -249,6 +249,13 @@ class MasterCrypt{
 
   //TODO: mcrypt is deprecated. replace with openssl (try _seal and _open)
   private static function mc_encrypt($encrypt, $key){
+    $message = serialize($encrypt);
+    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+    $nonce = openssl_random_pseudo_bytes($nonceSize);
+    $ciphertext = openssl_encrypt($message,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
+    return base64_encode($nonce.$ciphertext);
+    return $nonce.$ciphertext;
+    /*
     $encrypt = serialize($encrypt);
     $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
     $key = pack('H*', $key);
@@ -256,8 +263,19 @@ class MasterCrypt{
     $passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $encrypt.$mac, MCRYPT_MODE_CBC, $iv);
     $encoded = base64_encode($passcrypt).'|'.base64_encode($iv);
     return $encoded;
+    */
   }
-  private static function mc_decrypt($decrypt, $key){
+  private static function mc_decrypt($message, $key){
+    $message = base64_decode($message, true);
+    if($message === false) {
+      throw new Exception('Encryption failure');
+    }
+    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+    $nonce = mb_substr($message, 0, $nonceSize, '8bit');
+    $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
+    $plaintext = openssl_decrypt($ciphertext,'aes-256-ctr',$key,OPENSSL_RAW_DATA,$nonce);
+    return unserialize($plaintext);
+    /*
     $decrypt = explode('|', $decrypt.'|');
     $decoded = base64_decode($decrypt[0]);
     $iv = base64_decode($decrypt[1]);
@@ -270,6 +288,7 @@ class MasterCrypt{
     if($calcmac!==$mac){ return false; }
     $decrypted = unserialize($decrypted);
     return $decrypted;
+    */
   }
 }
   
@@ -530,7 +549,7 @@ function uploadFile($file_field, $check_image = true,$crop_square = false,$resiz
   $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
 
   //Validation
-  $out = array('error'=>null);
+  $out = array('error' => array());
 
   //Make sure that there is a file
   if((!empty($_FILES[$file_field])) && ($_FILES[$file_field]['error'] == 0)) {

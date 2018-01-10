@@ -47,3 +47,5 @@ while($result && ($row = $result->fetch_assoc())){
     }
   }
 }
+
+require __DIR__."/misc/dynamicProjects_Series_autotask.php";

@@ -329,8 +329,8 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
-$lang_eng['DOCUMENTS'] = 'Documents';
-$lang_ger['DOCUMENTS'] = 'Dokumente';
+$lang_eng['DOCUMENTS'] = 'Agreements';
+$lang_ger['DOCUMENTS'] = 'Vereinbarungen';
 
 $lang_eng['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Do you really wish to Update? Unsaved changes will get lost.';
 $lang_ger['DO_YOU_REALLY_WANT_TO_UPDATE'] = 'Möchten Sie wirklich ein Update durchführen? Nicht gesicherte Inhalte gehen dadurch verloren.';
@@ -340,6 +340,126 @@ $lang_ger['DOUBLE'] = 'Doppelt';
 
 $lang_eng['DRIVES'] = 'Drives';
 $lang_ger['DRIVES'] = 'Fahrten';
+
+$lang_eng['DYNAMIC_PROJECTS_USER'] = 'Dynamic Projects';
+$lang_ger['DYNAMIC_PROJECTS_USER'] = 'Dynamische Projekte';
+
+$lang_eng['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamic Projects';
+$lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamische Projekte';
+
+$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
+$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Project Name';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Projektbezeichnung';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Description';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Beschreibung';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_COMPANY'] = 'Company';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_COMPANY'] = 'Mandant';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_START'] = 'Start';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_START'] = 'Beginn';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_END'] = 'End';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_END'] = 'Ende';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_STATUS'] = 'Status';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_STATUS'] = 'Status';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priority';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priorität';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Owner';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher Mitarbeiter';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Employees';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_EMPLOYEES'] = 'Mitarbeiter';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optional employees';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optionale Mitarbeiter';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_CLIENTS'] = 'Clients';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_CLIENTS'] = 'Kunden';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Client';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Kunde';
+
+$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Dynamic Project';
+$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Dynamisches Projekt bearbeiten';
+
+$lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
+$lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
+
+$lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
+$lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
+
+$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'What did you do?';
+$lang_ger['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Welche Aufgaben haben Sie erledigt?';
+
+$lang_eng['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'This belongs to a dynamic project and can\' be deleted here.';
+$lang_ger['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'Dieses Projekt gehört zu einem dynamischen Projekt und kann hier nicht gelöscht werden.';
+
+$lang_eng['DYNAMIC_PROJECTS_BELONG_TO'] = 'This belongs to a dynamic project';
+$lang_ger['DYNAMIC_PROJECTS_BELONG_TO'] = 'Das gehört zu einem dynamischen Projekt';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Series';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Serie';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_PICTURES'] = 'Pictures';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_PICTURES'] = 'Bilder';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_BOOKING'] = 'Bookings';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_BOOKING'] = 'Buchungen';
+
+$lang_eng['DYNAMIC_PROJECTS_BOOKING_NO_TEXT'] = 'No text yet';
+$lang_ger['DYNAMIC_PROJECTS_BOOKING_NO_TEXT'] = 'Noch kein Text';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_BASICS'] = 'Basics';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_BASICS'] = 'Grundliegendes';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_ADVANCED'] = 'Advanced';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_ADVANCED'] = 'Erweitert';
+
+$lang_eng['DYNAMIC_PROJECTS_CHOOSE_PICTURES'] = 'Choose pictures...';
+$lang_ger['DYNAMIC_PROJECTS_CHOOSE_PICTURES'] = 'Durchsuchen...';
+
+$lang_eng['DYNAMIC_PROJECTS_PERCENTAGE_FINISHED'] = '% finished';
+$lang_ger['DYNAMIC_PROJECTS_PERCENTAGE_FINISHED'] = '% abgeschlossen';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_COLOR'] = 'Color';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_COLOR'] = 'Farbe';
+
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_PARENT'] = 'Project parent';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_PARENT'] = 'Überprojekt';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_START'] = 'Start';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_START'] = 'Start';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_END'] = 'End';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_END'] = 'Ende';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_NO_END'] = 'No end';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_NO_END'] = 'Kein Ende';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_REPETITIONS'] = 'Repetitions';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_REPETITIONS'] = 'Wiederholungen';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_ONCE'] = 'Once';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_ONCE'] = 'Einmalig';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_DAILY'] = 'Daily';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_DAILY'] = 'Täglich';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_WEEKLY'] = 'Weekly';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_WEEKLY'] = 'Wöchentlich';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_MONTHLY'] = 'Monthly';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_MONTHLY'] = 'Monatlich';
+
+$lang_eng['DYNAMIC_PROJECTS_SERIES_YEARLY'] = 'Yearly';
+$lang_ger['DYNAMIC_PROJECTS_SERIES_YEARLY'] = 'Jährlich';
 
 $lang_eng['EDIT'] = 'Edit';
 $lang_ger['EDIT'] = 'Bearbeiten';
