@@ -1068,6 +1068,7 @@ function create_tables($conn) {
 	
 	$sql = "CREATE TABLE documents(
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    docID VARCHAR(40),
     companyID INT(6) UNSIGNED,
     name VARCHAR(100) NOT NULL,
     txt MEDIUMTEXT NOT NULL,
@@ -1088,6 +1089,9 @@ function create_tables($conn) {
     email VARCHAR(150) NOT NULL,
     position VARCHAR(250),
     responsibility VARCHAR(250),
+    dial VARCHAR(20),
+    faxDial VARCHAR(20),
+    phone VARCHAR(25),
     FOREIGN KEY (clientID) REFERENCES clientData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE

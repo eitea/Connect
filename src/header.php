@@ -51,7 +51,6 @@
     $userKeyCode = $row['keyCode'];
   }
 
-
   $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
   if($result){
     $row = $result->fetch_assoc();
@@ -59,7 +58,6 @@
     $masterPasswordHash = $row['masterPassword'];
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
   }
-
 
   $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
   if($result && ($row = $result->fetch_assoc())){

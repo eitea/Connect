@@ -2,15 +2,20 @@
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?><div class="page-header-button-group">
   <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
   <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
-</div></h3></div>
+</div>
+<span style="position:fixed; right:15px;">
+<a href="https://consulio.at/dokumente" class="btn btn-default" target="_blank">Laden Sie sich hier die neuesten Vereinbarungen runter</a>
+</span>
+</h3></div>
 
-<?php 
+<?php
 use PHPMailer\PHPMailer\PHPMailer;
-if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
+if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
     echo "Invalid Access.";
     include 'footer.php';
     die();
 }
+
 
 $cmpID = intval($_GET['n']);
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -28,11 +33,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $source = $_FILES["uploadZip"]["tmp_name"];
 
     $accepted_types = array('application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed');
-    if($_FILES['uploadZip']["size"] < 8000008 && in_array($_FILES["uploadZip"]["type"], $accepted_types) && substr_compare($filename, 'zip', -3 ) === 0){
-      $zip = new ZipArchive();      
+    if($_FILES['uploadZip']["size"] < 8000008 && in_array($_FILES["uploadZip"]["type"], $accepted_types) && substr_compare($filename, '.zip', -4 ) === 0){
+      $zip = new ZipArchive();
       if($zip->open($_FILES['uploadZip']["tmp_name"]) === TRUE){
-        $conts = $zip->getFromName('Vereinbarung.txt');
-        echo $conts;
+        $stmt = $conn->prepare("INSERT INTO documents(name, txt, companyID, version, docID) VALUES(?, ?, $cmpID, ?, ?)");
+        $stmt->bind_param('ssss', $doc_name, $doc_txt, $doc_ver, $doc_id);
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+          $filename = explode('.', $zip->getNameIndex($i));
+          if(count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0].'.xml'))){
+            $meta = simplexml_load_string($meta);
+            $doc_name = $meta->template_name;
+
+            ini_set('mbstring.substitute_character', "none"); 
+            $doc_txt = convToUTF8( nl2br($zip->getFromIndex($i)), 'UTF-8', 'UTF-8');
+            $doc_ver = $meta->template_version;
+            $doc_id = $meta->template_ID;
+            
+            //does the $meta->template_id already exist? if not -> simple. but if it does? what do we do? overwrite if unsent, create new if not?
+            $stmt->execute();
+          }
+        }
+        $stmt->close();
         $zip->close();
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>ZIP File konnte nicht geöffnet werden.</div>';
@@ -79,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurde&nbsp;folgendes Dokument an&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] versendet. Es ist unter folgendem Link einsehbar:</p>".
       "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>".
-      "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsche assw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
+      "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsche passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
     }
 
     //build link

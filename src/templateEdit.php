@@ -60,8 +60,8 @@ if($templateName == 'Main_Report'){
     </div>
     <div class="col-sm-2">
       <br><br>Click to Insert: <br><br>
-      <button type="button" class="btn btn-warning btn-block" value='[BOOKINGS]' onclick="addText(this);"><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
-      <button type="button" class="btn btn-warning btn-block" value='[TIMESTAMPS]' onclick="addText(this);"><?php echo $lang['TIMESTAMPS']; ?></button>
+      <button type="button" class="btn btn-warning btn-block btn-insert" value='[BOOKINGS]'><?php echo $lang['PROJECT_BOOKINGS']; ?></button>
+      <button type="button" class="btn btn-warning btn-block btn-insert" value='[TIMESTAMPS]'><?php echo $lang['TIMESTAMPS']; ?></button>
     </div>
   </form>
 </div>
@@ -82,10 +82,10 @@ tinymce.init({
   content_css: '../plugins/homeMenu/template.css'
 });
 
-function addText(o) {
-    var inText = o.value;
+$('.btn-insert').click(function() {
+    var inText = this.value;
     tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
-}
+});
 </script>
 
 <?php include 'footer.php'; ?>

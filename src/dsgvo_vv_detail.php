@@ -6,7 +6,7 @@ if(empty($_GET['v'])){
 }
 $vvID = intval($_GET['v']);
 
-$result = $conn->query("SELECT dsgvo_vv.name, companyID, dsgvo_vv_templates.type, dsgvo_vv_templates.id AS templateID 
+$result = $conn->query("SELECT dsgvo_vv.name, companyID, dsgvo_vv_templates.type, dsgvo_vv_templates.id AS templateID
 FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv.id = $vvID AND dsgvo_vv_templates.id = templateID");
 if(!$result || $result->num_rows < 1 || !($vv_row = $result->fetch_assoc()) || !in_array($vv_row['companyID'], $available_companies)){
     echo $conn->error;
@@ -102,7 +102,7 @@ if(isset($settings['DESCRIPTION'])):
 <div class="col-md-12">
     <div class="panel panel-default">
         <div class="panel-body">
-        <?php 
+        <?php
         $settings = getSettings('GEN_%');
         foreach($settings as $key => $val){
             if(isset($_POST[$key])){
@@ -160,7 +160,7 @@ $settings = getSettings('EXTRA_%');
 if(isset($settings['EXTRA_DVR'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_DVR']['descr'].'</div>';    
+    echo '<div class="panel-heading">'.$settings['EXTRA_DVR']['descr'].'</div>';
     echo '<div class="row"><div class="col-sm-6 bold">DVR-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">DAN-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
     echo '</div></div>';
@@ -168,7 +168,7 @@ if(isset($settings['EXTRA_DVR'])){
 if(isset($settings['EXTRA_FOLGE'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].'</div>';    
+    echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].'</div>';
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Ja, wann?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_DATE" class="form-control datepicker"></div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Nein, warum?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_REASON" class="form-control"></div></div>';
@@ -177,7 +177,7 @@ if(isset($settings['EXTRA_FOLGE'])){
 if(isset($settings['EXTRA_DOC'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].'</div>';  
+    echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].'</div>';
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control"></div></div>';
     echo '</div></div>';
@@ -238,7 +238,7 @@ if(isset($settings['EXTRA_DOC'])){
                         if(!empty($_POST[$catKey])){
                             $catVal['setting'] = $setting = '1';
                             if($valID){ //update to true if checked and exists
-                                $stmt_update_setting->execute();                                
+                                $stmt_update_setting->execute();
                             } else { //insert with true if checked and not exists
                                 $cat = '';
                                 $setID = $catVal['id'];
@@ -254,7 +254,7 @@ if(isset($settings['EXTRA_DOC'])){
                     echo '<td>'.$catVal['descr'].'</td>';
                     $checked = $catVal['setting'] ? 'checked' : '';
                     echo '<td><input type="checkbox" '.$checked.' name="'.$catKey.'" value="1" /> Trifft Zu</td>';
-                    
+
                     foreach($heading as $headKey => $headVal){
                         $j = array_search($catKey, $headVal['category']); //$j = numeric index
                         $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';

@@ -47,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 <br>
 <form method="POST">
-<div class="page-header"><h3><?php echo $lang['TEMPLATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
+    <div class="page-header"><h3><?php echo $lang['TEMPLATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
     <div class="row">
         <div class="col-xs-8"><input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $name; ?>" /></div>
         <div class="col-sm-2"><input type="text" class="form-control" name="templateVersion" value="<?php echo $version; ?>" placeholder="Version" /></div>
@@ -55,7 +55,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
     <br><br>
     <div class="row">
-        <div class="col-sm-10 col-sm-offset-2" style="max-width:780px;"><textarea name="documentContent"><?php echo $documentContent; ?></textarea></div>
+        <div class="col-sm-10" style="max-width:780px;"><textarea name="documentContent"><?php echo $documentContent; ?></textarea></div>
+        <div class="col-sm-2">
+            <br><br>Click to Insert: <br><br>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[LINK]'>Url des Dokumentes</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[ANREDE]'>Herr/ Frau</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[FIRSTNAME]'>Vorname</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[LASTNAME]'>Nachname</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'>Firmenname</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companystreet]'>Straße</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyplace]'>Ort</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[CUSTOMTEXT]'>Freitext</button>            
+        </div>
     </div>
 </form>
 
@@ -72,13 +84,24 @@ tinymce.init({
   ],
   toolbar: 'undo redo | styleselect | outdent indent | bullist table',
   relative_urls: false,
-  content_css: '../plugins/homeMenu/template.css'
+  content_css: '../plugins/homeMenu/template.css',
+  init_instance_callback: function (editor) {
+    editor.on('keyup', function (e) {
+        var blink = $('.blinking');
+        blink.attr('class', 'btn btn-warning blinking');
+        setInterval(function() {
+        blink.fadeOut(500, function() {
+            blink.fadeIn(500);
+        });
+        }, 1000);
+    });
+  }
 });
 
-function addText(o) {
-    var inText = o.value;
+$('.btn-insert').click(function() {
+    var inText = this.value;
     tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
-}
+});
 </script>
 
 <?php include 'footer.php'; ?>
