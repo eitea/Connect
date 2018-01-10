@@ -556,7 +556,10 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
             <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
             <?php if($enableDynamicProjects == 'TRUE' && $hasActiveDynamicProjects == 'TRUE'):?>
-              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?></span></a></li>
+              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?> <?php 
+            $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
+            if($result->num_rows>0) echo '<label style="font-size: 16px; color: white;">'.$result->num_rows.'</label>';            
+            ?></span></a></li>
             <?php endif; //dynamicProjects ?> 
           <?php endif; ?>
         <?php endif; //endif(canStamp)?>

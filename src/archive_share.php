@@ -62,7 +62,6 @@ if(isset($_POST['filterClient'])){
   .on('drop', function(e) {
   droppedFiles2 = e.originalEvent.dataTransfer.files; // the files that were dropped
   console.log(droppedFiles2);
-  console.log("TEST");
   filesGotDropped = true;
   showFiles(droppedFiles2);
 });
@@ -393,11 +392,6 @@ function handleCancel(){ //not found
     var btn = document.getElementById('openNewFile');
     btn.click();
     document.getElementById('lblNewFile').innerHTML = "Datei auswählen oder hier hin ziehen.";
-    //var backdrop = document.getElementsByClassName('modal-backdrop fade in')[0];
-    //var body = document.getElementsByTagName('body')[0];
-    //body.classList.remove("modal-open");
-    //backdrop.parentNode.removeChild(backdrop);
-    //div.setAttribute('style','display: hidden');
   }
 
   function dragover(evt){
