@@ -14,17 +14,12 @@
   require __DIR__."/validate.php";
   require __DIR__."/language.php";
 
+
   if($this_page != "editCustomer_detail.php"){
     unset($_SESSION['unlock']);
   }
 
   $sql = "SELECT * FROM roles WHERE userID = $userID";
-  $conn->query("CREATE OR ALTER TABLE modules (
-    enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-  );");
   $result = $conn->query($sql);
   if($result && $result->num_rows > 0){
     $row = $result->fetch_assoc();
@@ -35,17 +30,17 @@
     $isERPAdmin = $row['isERPAdmin'];
     $isFinanceAdmin = $row['isFinanceAdmin'];
     $isDSGVOAdmin = $row['isDSGVOAdmin'];
+    $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
-    $canUseSocialMedia = $row['canUseSocialMedia'];
+    $canUseSocialMedia = $row['canUseSocialMedia'];    
   } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
   }
-
   if($userID == 1){ //superuser
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'TRUE';
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
     $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
   }
 
@@ -359,7 +354,7 @@
       the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
     </div>
   </div>
-
+  <?php require dirname(__DIR__)."\plugins\pgp\autoload.php"; ?>
   <!-- modal -->
   <form method="POST">
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">

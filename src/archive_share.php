@@ -1,5 +1,5 @@
 <?php require 'header.php'; enableToDSGVO($userID); 
-require 'vendor/autoload.php';
+require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
 
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement

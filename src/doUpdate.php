@@ -2467,6 +2467,16 @@ if($row['version'] < 123) {
   }else{
     echo '<br>mailingoptions';
   } 
+
+  $conn->query("ALTER TABLE userdata ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
+
+  $conn->query("ALTER TABLE userdata ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
+  if ($conn->error) {
+    $conn->error;
+  }else{
+    echo '<br>PGPKeys';
+  } 
+
 }
 	
 // ------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 <?php
-    require "vendor/autoload.php";
+    require __DIR__."/plugins/aws/autoload.php";
     require __DIR__."/connection.php";
 
     $s3 = new Aws\S3\S3Client($s3config);

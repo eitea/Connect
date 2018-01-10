@@ -1,6 +1,6 @@
 <?php
 
-require "vendor/autoload.php";
+require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){

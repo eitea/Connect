@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
 if(empty($_GET['n'])){
     echo "Invalid Access.";
