@@ -55,7 +55,7 @@
   $masterPasswordHash = $row['masterPassword'];
   $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 
-  $result = $conn->query("SELECT enableSocialMedia FROM modules");
+  $result = $conn->query("SELECT enableSocialMedia,enableDynamicProjects FROM modules");
   if($result && ($row = $result->fetch_assoc())){
     $enableSocialMedia = $row['enableSocialMedia'];
     $enableDynamicProjects = $row['enableDynamicProjects'];
@@ -861,16 +861,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <?php
-<<<<<<< HEAD
-                $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                while($result && ($row = $result->fetch_assoc())){
-                  echo '<li>';
-                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                  echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
-                  echo '<ul class="nav nav-list">';
-                  echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
-=======
                 if(count($available_companies) == 2){
                   echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
                   echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
@@ -880,7 +870,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
->>>>>>> master
                   echo '</ul></div></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");

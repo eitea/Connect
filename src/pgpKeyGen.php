@@ -39,7 +39,7 @@ require __DIR__."/connection.php";
                 $keys[0] = OpenPGP::enarmor($private_bytes, "PGP PRIVATE KEY BLOCK");
                 $keys[1] = OpenPGP::enarmor($public_bytes, "PGP PUBLIC KEY BLOCK");
                 echo json_encode($keys);
-            }else{
+            } else {
                 return $lol = "LOL FUNTZT NED";
             }
             
