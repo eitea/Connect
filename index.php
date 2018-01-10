@@ -37,12 +37,12 @@ $routes = array(
   'dsgvo/documents' => 'dsgvo_view.php',           'dsgvo/access' => 'dsgvo_access.php',            'dsgvo/templates' => 'dsgvo_mail.php',
   'dsgvo/edit' => 'dsgvo_edit.php',
 
-  'archive/share' => 'shareGroups.php',            'archive/files' => 'sharedFiles.php',              'archive/download' => 'downloadFile.php',
-  'archive/delete' => 'deleteSharedGroup.php',     'archive/upload' => 'uploadFiles.php',             'upload/file' => 'uploadToS3.php',
+  'archive/share' => 'archive_share.php',          'archive/files' => 'archive_filesFiles.php',       'archive/download' => 'archive_download.php',
+  'archive/delete' => 'archive_delete.php',        'archive/upload' => 'archive_upload.php',          
   
-  'pgp/keygen' => 'pgpKeyGen.php',                 'misc/sharedfiles' => 'getSharedFiles.php',
-
-  's3/buckets' => 's3_buckets.php',                 's3/download' => 's3_download.php'
+  'upload/file' => 'uploadToS3.php',
+  
+  'pgp/keygen' => 'pgpKeyGen.php',                 'misc/sharedfiles' => 'getSharedFiles.php'
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",

@@ -92,7 +92,7 @@ if(isset($_POST['filterClient'])){
 }
   }
 };
-function handleCancel(){ // NICHT GEFUNDEN?!?!?!!
+function handleCancel(){ //not found
     var $form = $('#fileBox');
     var $input    = $form.find('input[type="file"]'),
     $label    = $form.find('label'),
