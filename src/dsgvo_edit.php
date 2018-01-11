@@ -65,8 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'>Firmenname</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companystreet]'>Straße</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyplace]'>Ort</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[CUSTOMTEXT]'>Freitext</button>            
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>        
         </div>
     </div>
 </form>

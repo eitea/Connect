@@ -1999,6 +1999,9 @@ if($row['version'] < 123){
 	} else {
 		echo '<br>Vereinbarungen: Template ID';
 	}
+
+
+	$conn->query("ALTER TABLE documents ADD COLUMN isBase ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE' ");
 }
 
 
