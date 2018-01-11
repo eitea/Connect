@@ -48,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt->close();
 
     //contactPerson
-    $result = $conn->query("SELECT email, firstname, lastname FROM contactpersons WHERE id = $contactID");
+    $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
     $contact_row = $result->fetch_assoc();
     
     //build the content
@@ -63,7 +63,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     //build link
-    $link = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    $link_id = '';
+    if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+      $link_id = '/'.substr($servername,0,8);
+    }
+    $link = "https://".$_SERVER['HTTP_HOST'].$link_id .$_SERVER['REQUEST_URI'];
     $link = explode('/', $link);
     array_pop($link);
     $link = implode('/', $link) . "/access?n=$processID";
@@ -158,7 +162,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <div class="row form-group">
             <div class="col-sm-4">
               <label><?php echo $lang['CLIENT']; ?></label>
-              <select id="clientHint" class="js-example-basic-single" onchange="showContacts(this.value);">
+              <select class="js-example-basic-single" onchange="showContacts(this.value);">
+              <option value="">...</option>
               <?php             
               $res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
               if($res && $res->num_rows > 1){ echo '<option value="0">...</option>'; }
@@ -199,7 +204,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="sendAccess"><?php echo $lang['SEND_ACCESS']; ?></button>
+        <button type="submit" class="btn btn-warning" name="sendAccess">Dokument Senden</button>
       </div>
     </div>
   </div>

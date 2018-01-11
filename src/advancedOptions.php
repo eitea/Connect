@@ -37,6 +37,9 @@ if(isset($_POST['saveButton'])){
   $status = isset($_POST['enableSocialMedia']) ? 'TRUE' : 'FALSE';
   $conn->query("UPDATE $moduleTable SET enableSocialMedia = '$status'");
 
+  $status = isset($_POST['enableDynamicProjects']) ? 'TRUE' : 'FALSE';
+  $conn->query("UPDATE $moduleTable SET enableDynamicProjects = '$status'");
+
   redirect("../system/advanced");
 }
 
@@ -101,6 +104,12 @@ $rowModuleTable = $result->fetch_assoc();
       <label>
         <input <?php if($rowModuleTable['enableSocialMedia'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableSocialMedia' value='TRUE'>
         Social Media
+      </label>
+    </div>
+    <div class="checkbox col-md-12">
+      <label>
+        <input <?php if($rowModuleTable['enableDynamicProjects'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableDynamicProjects' value='TRUE'>
+        Dynamic Projects
       </label>
     </div>
     <br>

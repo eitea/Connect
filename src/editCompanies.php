@@ -21,9 +21,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';}
   } elseif(isset($_POST['save_logo'])){
     require_once __DIR__ . "/utilities.php";
-    $logo = uploadFile("fileToUpload", 1); //returns array on false
+    $logo = uploadImage("fileToUpload", 0, 1); //returns array on false
     if(!is_array($logo)){
-      $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID"); 
+      $stmt = $conn->prepare("UPDATE companyData SET logo = ? WHERE id = $cmpID");
       $null = NULL;
       $stmt->bind_param("b", $null);
       $stmt->send_long_data(0, $logo);
@@ -118,7 +118,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    $erp_lfs = abs(intval($_POST['erp_lfs']));
    $erp_gut = abs(intval($_POST['erp_gut']));
    $erp_stn = abs(intval($_POST['erp_stn']));
-   $conn->query("UPDATE erpNumbers SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn WHERE companyID = $cmpID");
+   $clientNum = test_input($_POST['erp_clientNum']);
+   $clientStep = abs(intval($_POST['erp_clientStep']));
+   $supplierNum = test_input($_POST['erp_supplierNum']);
+   $supplierStep = abs(intval($_POST['erp_supplierStep']));
+
+   $conn->query("UPDATE erp_settings SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn,
+    clientNum = '$clientNum', clientStep = $clientStep, supplierNum = '$supplierNum', supplierStep = $supplierStep WHERE companyID = $cmpID");
    if($conn->error){ echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; } else {
      echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
    }
@@ -127,7 +133,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $ourMessage = test_input($_POST['erp_ourMessage']);
     $yourSign = test_input($_POST['erp_yourSign']);
     $yourOrder = test_input($_POST['erp_yourOrder']);
-    $stmt = $conn->prepare("UPDATE erpNumbers SET ourSign = ?, ourMessage = ?, yourSign = ?, yourOrder = ? WHERE companyID = $cmpID");
+    $stmt = $conn->prepare("UPDATE erp_settings SET ourSign = ?, ourMessage = ?, yourSign = ?, yourOrder = ? WHERE companyID = $cmpID");
     echo $conn->error;
     $stmt->bind_param("ssss", $ourSign, $ourMessage, $yourSign, $yourOrder);
     $stmt->execute();
@@ -194,7 +200,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
       $name = test_input($_POST['addFinance_name']);
       $num = intval($_POST['addFinance_num']);
-      $ggk = 'FALSE';      
+      $ggk = 'FALSE';
       if(isset($_POST['addFinance_booking'])) $ggk = 'TRUE';
       $opt = 'STAT';
       if(isset($_POST['addOption'])) $opt = 'CONT';
@@ -237,7 +243,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
     //validate uploaded file
     function convSet($s){
-      $s = test_input($s);
+      $s = preg_replace("~[^A-Za-z0-9\-!:.,$()+öäüÖÄÜß ]~", "", $s);
       return trim(iconv(mb_detect_encoding($s), "UTF-8", $s));
     }
     $error = '';
@@ -249,12 +255,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if(!$file) {$error = 'Could not open file'; }
     }
     if(!$error){
+      $i = 0;
       if(isset($_POST['uploadClients']) || isset($_POST['uploadSuppliers'])){
         $isSupplier = 'TRUE';
         if(isset($_POST['uploadClients'])) $isSupplier = 'FALSE';
         $stmt_client = $conn->prepare("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES (?, $cmpID, ?, '$isSupplier')");
         $stmt_client_detail = $conn->prepare("INSERT INTO clientInfoData (clientID, name, firstname, title, nameAddition, gender, address_Street, address_Country, address_Country_Postal,
-        address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxNumber,    taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
+        address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxnumber, taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
         warning1, warning2, warning3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ");
         if(!$conn->error && !$stmt_client->error && !$stmt_client_detail->error){
           $stmt_client->bind_param("ss", $name, $num);
@@ -265,17 +272,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           echo $stmt_client_detail->error .' err3<br>';
         }
         fgetcsv($file); //skip 1st line
-        while(($line = fgetcsv($file, 0, ';')) !== false){
+        while(($line = fgetcsv($file, 0, ";")) !== false){
           if(empty($line)) continue;
           if(empty($line[0])) continue;
           $name = convSet($line[0]);
           $num = $line[1];
-          $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' ");
+          $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' "); echo $conn->error;
           if($res && $res->num_rows > 0){
             $row = $res->fetch_assoc();
             $clientID = $row['id'];
-            $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID");
-            echo $conn->error;
+            $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID"); echo $conn->error;
             $conn->query("DELETE FROM clientInfoData WHERE clientID = $clientID"); echo $conn->error;
           } else {
             $stmt_client->execute();
@@ -301,12 +307,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $uid = $line[19];
           $customerGroup = $line[20];
           $creditLimit = floatval($line[21]);
-          $faktura = $line[22] ? '0000-00-00 00:00:00' : $line[22];
+          $faktura = empty(trim($line[22])) ? '0000-00-00 00:00:00' : $line[22];
           $karenztage = intval($line[23]);
           $warn1 = floatval($line[24]);
           $warn2 = floatval($line[25]);
           $warn3 = floatval($line[26]);
           $stmt_client_detail->execute();
+          $i++;
         }
         $stmt_client->close();
         $stmt_client_detail->close();
@@ -324,6 +331,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $purchase = floatval($line[5]);
           $taxID = intval($line[6]);
           if($name && $price){
+            $i++;
             $stmt->execute();
           }
         }
@@ -331,7 +339,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       } else {
         echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
       }
-      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      if($conn->error){
+        echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      } else {
+        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$i.' '.$lang['OK_SAVE'].'</div>';
+      }
     } else {
       echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
     }
@@ -389,6 +401,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
     <div class="col-sm-8">
       <input type="file" name="fileToUpload"/>
+      <small>Empfohlen 350x200px; Max. 5MB</small>
     </div>
   </div>
 </form>
@@ -431,7 +444,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
       <div class="col-sm-9">
         <input type="text" class="form-control" name="general_uid" value="<?php echo $companyRow['uid'];?>" />
       </div>
-    </div>  
+    </div>
     <div class="row">
       <div class="col-sm-3"><label><?php echo $lang['PHONE_NUMBER']; ?></label></div>
       <div class="col-sm-9">
@@ -714,7 +727,6 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 </form>
 <br>
 
-
 <!-- ADDITIONAL BOOKING FIELDS -->
 <?php $fieldResult = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = $cmpID"); $i = 1; ?>
 <form method="POST" class="page-seperated-section">
@@ -838,7 +850,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 
 <!-- ERP NUMBERS -->
 <?php
-$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID");
 $row = $result->fetch_assoc();
 ?>
 <form method="POST" class="page-seperated-section">
@@ -858,37 +870,47 @@ $row = $result->fetch_assoc();
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></label>
-        <input type="number" class="form-control" name="erp_ang" value="<?php echo $row['erp_ang']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_ang" value="<?php echo $row['erp_ang']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></label>
-        <input type="number" class="form-control" name="erp_aub" value="<?php echo $row['erp_aub']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_aub" value="<?php echo $row['erp_aub']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></label>
-        <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
     </div>
   </div>
   <br>
   <div class="container-fluid">
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></label>
-        <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['GUT']; ?></label>
-        <input type="number" class="form-control" name="erp_gut" value="<?php echo $row['erp_gut']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_gut" value="<?php echo $row['erp_gut']; ?>" min="1"/>
     </div>
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['STN']; ?></label>
-        <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
+      <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
     </div>
   </div><br>
+  <br>
+  <div class="container-fluid">
+    <div class="col-md-4"><label>Kundennummernkreis</label><input type="text" name="erp_clientNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['clientNum']; ?>"/></div>
+    <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_clientStep" class="form-control" value="<?php echo $row['clientStep']; ?>"/></div>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <div class="col-md-4"><label>Lieferantennummernkreis</label><input type="text" name="erp_supplierNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['supplierNum']; ?>"/></div>
+    <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_supplierStep" class="form-control" value="<?php echo $row['supplierStep']; ?>"/></div>
+  </div>
 </form><br>
 
-<!-- ERP REFERENCE NUMERAL ROW -->
+<!-- ERP REFERENCE ROW -->
 <?php
-$result = $conn->query("SELECT * FROM erpNumbers WHERE companyID = $cmpID");
+$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID");
 $row = $result->fetch_assoc();
 ?>
 
@@ -1001,9 +1023,9 @@ $row = $result->fetch_assoc();
 <!-- IMPORT -->
 <div class="page-seperated-section">
   <?php
-  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
-  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300");
-  $csv_articles = iconv('UTF-8','windows-1252', "NAME;beschreibung;PREIS;einheit;barauslage;einkaufspreis;steuerID\nApfel;Eine Beschreibung von Apfel;100;Pkg;FALSE;80;3");
+  $csv_clients = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;debitNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3");
+  $csv_suppliers = iconv('UTF-8','windows-1252',"NAME;nr;vorname;nachname;titel;zusatz;gender;straße;plz;stadt;land;adressZusatz;tel;fax;creditNr;datev;kontobez;steuernr;steuergeb;uid;kundenGrp;kreditLimit;letzteFaktura;karenztage;mahnung1;mahnung2;mahnung3");
+  $csv_articles = iconv('UTF-8','windows-1252', "NAME;beschreibung;PREIS;einheit;barauslage;einkaufspreis;steuerID");
   ?>
   <h4>Import</h4>
   <div class="container-fluid">
@@ -1016,9 +1038,10 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadClients" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Kunden_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_clients); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_clients."\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <div class="col-sm-4">
       <h5><?php echo $lang['SUPPLIERS']; ?></h5>
@@ -1029,9 +1052,10 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadSuppliers" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Lieferanten_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_suppliers); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_suppliers."\nMusterfirma;#123;Max;Mustermann;Dr.;123;male;Musterstraße 44;4020;Musterort;Musterland;Beispieldaten;123 456;123 456;1234;258;Beispiel Kontobezeichnung;Steuernummer 123;Österreich;AT123456;Gruppe123;100;2017-23-11 05:00:00;5;100;150;300"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <div class="col-sm-4">
       <h5><?php echo $lang['ARTICLE']; ?></h5>
@@ -1042,15 +1066,130 @@ $row = $result->fetch_assoc();
         <button type="submit" name="uploadArticles" class="btn btn-warning" value="<?php echo $cmpID;?>"><?php echo $lang['SAVE']; ?></button>
       </form>
       <form method="POST" target="_blank" action="../project/csvDownload?name=Artikel_Muster">
-        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_articles); ?>" />
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv_articles."\nApfel;Eine Beschreibung von Apfel;100;Pkg;FALSE;80;3"); ?>" />
         <button type="submit" title="Musterdownload" class="btn btn-link">Musterdownload</button>
-      </form><br>
+      </form>
+      <br>
     </div>
     <br>
     <small>*Die 1. Zeile wird ignoriert. Beim befüllen bitte auf die Reihenfolge achten. Pflichtfelder sind in Großbuchstaben angeführt.</small>
   </div>
 </div>
+<br>
+<div class="page-seperated-section">
+  <h4>Export</h4>
+  <div class="container-fluid">
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Kunden_Export">
+        <?php
+        $csv = $csv_clients . "\n";
+        $result = $conn->query("SELECT *, clientData.name AS clientName FROM clientData LEFT JOIN clientInfoData ON clientID = clientData.id WHERE companyID = $cmpID AND isSupplier = 'FALSE'"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['clientName'] .';';
+          $line.= $row['clientNumber'] .';';
+          $line.= $row['firstname'] .';';
+          $line.= $row['name'] .';';
+          $line.= $row['title'] .';';
+          $line.= $row['nameAddition'] .';';
+          $line.= $row['gender'] .';';
+          $line.= $row['address_Street'] .';';
+          $line.= $row['address_Country_Postal'] .';';
+          $line.= $row['address_Country_City'] .';';
+          $line.= $row['address_Country'] .';';
+          $line.= $row['address_Addition'] .';';
+          $line.= $row['phone'] .';';
+          $line.= $row['fax_number'] .';';
+          $line.= $row['debitNumber'] .';';
+          $line.= $row['datev'] .';';
+          $line.= $row['accountName'] .';';
+          $line.= $row['taxnumber'] .';';
+          $line.= $row['taxArea'] .';';
+          $line.= $row['vatnumber'] .';';
+          $line.= $row['customerGroup'] .';';
+          $line.= $row['creditLimit'] .';';
+          $line.= $row['lastFaktura'] .';';
+          $line.= $row['karenztage'] .';';
+          $line.= $row['warning1'] .';';
+          $line.= $row['warning2'] .';';
+          $line.= $row['warning3'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Kunden Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Lieferanten_Export">
+        <?php
+        $csv = $csv_suppliers . "\n";
+        $result = $conn->query("SELECT *, clientData.name AS clientName FROM clientData LEFT JOIN clientInfoData ON clientID = clientData.id WHERE companyID = $cmpID AND isSupplier = 'TRUE'"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['clientName'] .';';
+          $line.= $row['clientNumber'] .';';
+          $line.= $row['firstname'] .';';
+          $line.= $row['name'] .';';
+          $line.= $row['title'] .';';
+          $line.= $row['nameAddition'] .';';
+          $line.= $row['gender'] .';';
+          $line.= $row['address_Street'] .';';
+          $line.= $row['address_Country_Postal'] .';';
+          $line.= $row['address_Country_City'] .';';
+          $line.= $row['address_Country'] .';';
+          $line.= $row['address_Addition'] .';';
+          $line.= $row['phone'] .';';
+          $line.= $row['fax_number'] .';';
+          $line.= $row['debitNumber'] .';';
+          $line.= $row['datev'] .';';
+          $line.= $row['accountName'] .';';
+          $line.= $row['taxnumber'] .';';
+          $line.= $row['taxArea'] .';';
+          $line.= $row['vatnumber'] .';';
+          $line.= $row['customerGroup'] .';';
+          $line.= $row['creditLimit'] .';';
+          $line.= $row['lastFaktura'] .';';
+          $line.= $row['karenztage'] .';';
+          $line.= $row['warning1'] .';';
+          $line.= $row['warning2'] .';';
+          $line.= $row['warning3'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Lieferanten Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+    <div class="col-sm-4">
+      <form method="POST" target="_blank" action="../project/csvDownload?name=Artikel_Export">
+        <?php
+        $csv = $csv_articles . "\n";
+        $result = $conn->query("SELECT * FROM articles"); echo $conn->error;
+        while($row = $result->fetch_assoc()){
+          $line = '';
+          $line.= $row['name'] .';';
+          $line.= $row['description'] .';';
+          $line.= $row['price'] .';';
+          $line.= $row['unit'] .';';
+          $line.= $row['cash'] .';';
+          $line.= $row['purchase'] .';';
+          $line.= $row['taxID'] .';';
+          $line.= "\n";
+          $csv .= iconv(mb_detect_encoding($line), 'UTF-16LE', $line);
+        }
+        ?>
+        <button type="submit" class="btn btn-default" title="CSV Download">Artikel Export</button>
+        <input type="hidden" name='csv' value="<?php echo rawurlencode($csv); ?>" />
+      </form>
+    </div>
+  </div>
+  <br>
+</div>
 
+<br><br>
 <script>
 $('#account2').mask("0000");
 function startBlinker(){

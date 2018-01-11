@@ -7,11 +7,10 @@
 <form method="POST" target="_blank" action="downloadSql">
   <div class="container-fluid">
     <div class="col-md-4">
-      <label><input type="checkbox" name="setPassword" value="1" /> ZIP mit Passwort versehen: </label>
-      <br><small>*Funktioniert auf Windows nur mit zip Installation.</small>
+      <label><input type="checkbox" name="setPassword" checked value="1" /> ZIP mit Passwort versehen: </label>
     </div>
     <div class="col-md-6" >
-      <input type="password" disabled name="password" class="form-control" placeholder="<?php echo $lang['PASSWORD']; ?>" />
+      <input type="text" name="password" class="form-control" placeholder="<?php echo $lang['PASSWORD']; ?>" />
     </div>
     <div class="col-md-12">
       <br>

@@ -25,13 +25,15 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
     $stmt->bind_param("ss", $templateName, $templateContent);
     $stmt->execute();
 
+    $action = '';
+
     if($conn->error){
         echo '<div class="alert alter-danger"><a href="" data-dismiss="alert" class="close">&times;</a></div>';
     } else {
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
 } elseif(!empty($_POST['delete_report'])){
-    $val = intval($_POSt['delete_report']);
+    $val = intval($_POST['delete_report']);
     $conn->query("DELETE FROM templateData WHERE id = $val");
     if($conn->error){
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
@@ -67,7 +69,6 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
 <br><hr><br>
 <?php if($action): ?>
 <form method="POST">
-
 <?php
 if($action == 'edit'){
     echo '<input type="hidden" name="edit_report" value="'.$action_id.'" />';
@@ -106,9 +107,9 @@ tinymce.init({
   plugins: [
     'advlist autolink lists link image charmap print preview anchor',
     'searchreplace visualblocks code fullscreen',
-    'insertdatetime media table contextmenu paste code save'
+    'insertdatetime media table contextmenu paste code'
   ],
-  toolbar: 'undo redo | styleselect | outdent indent | bullist table | save',
+  toolbar: 'undo redo | styleselect | outdent indent | bullist table',
   relative_urls: false,
   content_css: '../plugins/homeMenu/template.css'
 });

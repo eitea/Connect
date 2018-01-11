@@ -62,6 +62,9 @@ $lang_ger['ADMIN_DELETE'] = 'Bitte nicht den Admin oder den eigenen Account lös
 $lang_eng['ADMIN_CORE_OPTIONS'] = 'General';
 $lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 
+$lang_eng['ADMIN_DYNAMIC_PROJECTS_OPTIONS'] = 'Dynamic Projects';
+$lang_ger['ADMIN_DYNAMIC_PROJECTS_OPTIONS'] = 'Dynamische Projekte';
+
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';
 
@@ -94,9 +97,6 @@ $lang_ger['ARTICLE'] = 'Artikel';
 
 $lang_eng['ASK_DELETE'] = 'Do you really wish to delete %s?';
 $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
-
-$lang_eng['ARCHIVE'] = 'Archive';
-$lang_ger['ARCHIVE'] = 'Archiv';
 
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
@@ -938,6 +938,9 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
+$lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
+
 $lang_eng['PROCESS'] = 'Process';
 $lang_ger['PROCESS'] = 'Vorgang';
 
@@ -1082,9 +1085,6 @@ $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 $lang_eng['SETTINGS'] = 'Settings';
 $lang_ger['SETTINGS'] = 'Einstellungen';
 
-$lang_eng['SHARE'] = 'Share';
-$lang_ger['SHARE'] = 'Freigabe';
-
 $lang_eng['SHIPPING_METHODS'] = 'Shipping Methods';
 $lang_ger['SHIPPING_METHODS'] = 'Versandarten';
 
@@ -1168,6 +1168,9 @@ $lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
 $lang_ger['SUM'] ='Summe';
+
+$lang_eng['SUPERVISOR'] = 'Supervisor';
+$lang_ger['SUPERVISOR'] = 'Vorgesetzter';
 
 $lang_eng['SUPPLIER'] = 'Supplier';
 $lang_ger['SUPPLIER'] = 'Lieferant';

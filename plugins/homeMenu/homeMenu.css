@@ -125,12 +125,10 @@ ul.nav.navbar-nav .nav.nav-list {
 
 /* LOADER */
 #loader {
-  position: absolute;
+  position: fixed;
   left: 55%;
   top: 50%;
   z-index: 1;
-  width: 150px;
-  height: 150px;
   margin: -75px 0 0 -75px;
   border: 16px solid #f3f3f3;
   border-radius: 50%;
@@ -221,9 +219,8 @@ input[type="radio"]{
   margin-bottom:-3px;
 }
 input[type="radio"]:checked {
-  border: 1px solid #f0ad4e;
+  border: 4px solid #f0ad4e;
   background-color: white;
-  box-shadow: inset 0px 0px 0 3px #f0ad4e;
 }
 
 /* seperations */
@@ -238,9 +235,7 @@ input[type="radio"]:checked {
 }
 
 /* alerts */
-.alert{
-  margin: 0 -20px;
-}
+
 .alert-over{
   position:fixed;
   z-index: 50;
@@ -251,7 +246,7 @@ input[type="radio"]:checked {
 
 /* little helperlings */
 .row{
-  padding-bottom:5px;
+  padding: 7px 15px;
 }
 .table{
   word-wrap: break-word;
@@ -260,6 +255,15 @@ i{
   margin-right:5px;
   margin-left:5px;
 }
+
+.bold{
+  font-weight: bold;
+}
+
+.grey{
+  color:grey;
+}
+
 .modal-body{
   max-height:80vh;
   overflow-y:auto;

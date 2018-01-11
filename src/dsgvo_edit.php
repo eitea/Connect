@@ -1,5 +1,5 @@
 <?php include 'header.php'; enableToDSGVO($userID); ?>
-<div class="page-header"><h3><?php echo $lang['TEMPLATES']; ?></h3></div>
+
 <?php
 $docID = 0;
 if(!empty($_GET['d'])){
@@ -47,6 +47,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 <br>
 <form method="POST">
+<div class="page-header"><h3><?php echo $lang['TEMPLATES']; ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
     <div class="row">
         <div class="col-xs-8"><input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $name; ?>" /></div>
         <div class="col-sm-2"><input type="text" class="form-control" name="templateVersion" value="<?php echo $version; ?>" placeholder="Version" /></div>
@@ -67,9 +68,9 @@ tinymce.init({
   plugins: [
     'advlist autolink lists link image charmap print preview anchor',
     'searchreplace visualblocks code fullscreen',
-    'insertdatetime media table contextmenu paste code save'
+    'insertdatetime media table contextmenu paste code'
   ],
-  toolbar: 'undo redo | styleselect | outdent indent | bullist table | save',
+  toolbar: 'undo redo | styleselect | outdent indent | bullist table',
   relative_urls: false,
   content_css: '../plugins/homeMenu/template.css'
 });

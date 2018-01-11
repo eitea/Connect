@@ -30,9 +30,9 @@ $routes = array(
 
   'report/send' => 'sendMailReport.php',           'report/productivity'=>'report_productivity.php',  'report/autotask' => 'autotask.php',
 
-  'erp/view' => 'offer_proposals.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
+  'erp/view' => 'erp_view.php',             'erp/articles' => 'product_articles.php',          'erp/taxes' => 'editTaxes.php',
   'erp/units' => 'editUnits.php',                  'erp/payment' => 'editPaymentMethods.php',         'erp/shipping' => 'editShippingMethods.php',
-  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'offer_proposal_edit.php',
+  'erp/representatives' => 'editRepres.php',       'erp/download' => 'download_proposal.php',         'erp/edit' => 'erp_process.php',
   'erp/receipts' => 'receiptBook.php',             'erp/suppliers' => 'editSuppliers.php',
 
   'finance/account' => 'accounting.php',           'finance/plan' => 'accountPlan.php',               'finance/journal' => 'accountJournal.php',
@@ -48,9 +48,9 @@ $routes = array(
   'pgp/keygen' => 'pgpKeyGen.php',                 'misc/sharedfiles' => 'getSharedFiles.php'
 );
 $mime_types = array(
-  '.css' => "text/css",                 '.js' => "text/javascript",         '.png' => "image/png",
-  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",              '.woff2' => "application/font-woff2",
-  '.gif' => "image/gif",                '.woff' => "application/font-woff", '.ttf' => "font/opentype"
+  '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
+  '.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",                    '.woff2' => "application/font-woff2",
+  '.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
 );
 
 

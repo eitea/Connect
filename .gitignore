@@ -4,5 +4,4 @@ images/ups/*
 !images/ups/.gitkeep
 cryptlog.txt
 plugins/restic/backup.sql
-test*
 backup.sql

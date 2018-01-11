@@ -140,8 +140,9 @@ function denyToContainer(){
 function enableToSocialMedia($userID){
   require 'connection.php';
   if ($conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'] === 'FALSE'){
+    echo 'Module not enabled.';
     include 'footer.php';
-    die('Module not enabled. <a href="../system/advanced">Enable</a>');
+    die('<a href="../system/advanced">Enable</a>');
   }
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
   $result = $conn->query($sql);
