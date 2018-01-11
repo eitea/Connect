@@ -18,13 +18,6 @@
 <!-- BODY -->
 <?php
 
-if(isset($_POST['functionname'])&&isset($_POST['arguments'])){
-  if($_POST['functionname']=='changeDefault'){
-    $defaultOpt = (int) $conn->query("SELECT isDefault FROM $mailOptionsTable");
-    $conn->query("UPDATE $mailOptionsTable SET isDefault =" . ($defaultOpt-1)*(-1));
-  }
-}
-
 
 if(isset($_POST['saveButton'])){
   if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
@@ -33,6 +26,7 @@ if(isset($_POST['saveButton'])){
         $conn->query("UPDATE $mailOptionsTable SET port = 25");
         $conn->query("UPDATE $mailOptionsTable SET username = 'admin'");
         $conn->query("UPDATE $mailOptionsTable SET password = 'admin'");
+        $conn->query("UPDATE $mailOptionsTable SET smtpSecure = 'SSL'");
         $conn->query("UPDATE $mailOptionsTable SET sender = 'noreply@eitea.at'");
         $conn->query("UPDATE $mailOptionsTable SET sendername = 'Connect im Auftrag von '");
         $conn->query("UPDATE $mailOptionsTable SET isDefault = 1");
@@ -134,7 +128,7 @@ $row = $result->fetch_assoc();
   </div> 
   <div class="col-md-8" >
     <?php
-      if(!(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER']))){
+      if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
       $string = '<input style="float: right" id="defaultCheck" type="checkbox" name="defaultOptions" ';
 
       if($row['isDefault']){
@@ -163,7 +157,7 @@ $row = $result->fetch_assoc();
     <div class="col-md-8"><input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" /></div>
     <br><br>
     <div class="col-md-4"> Absender-Name </div>
-    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender_name"  value="<?php echo $row['sendername'] . "<Kunde>"; ?>" /></div>
+    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender_name"  value="<?php echo $row['sendername']; if(isset($_POST['defaultOptions'])) echo "<Kunde>";?>" /></div>
     <br><br><br>
     <div class="col-md-4">Host</div>
     <div class="col-md-8"><input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" /></div>

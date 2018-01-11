@@ -1,7 +1,7 @@
 <?php require 'header.php'; enableToDSGVO($userID); 
 require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
-
+use PHPMailer\PHPMailer\PHPMailer;
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
@@ -117,8 +117,95 @@ function handleCancel(){ //not found
 <th></th>
 </tr></thead>
 <?php
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+  
+  if(isset($_POST['sendAccess']) && !empty($_POST['send_contact'])&& !empty($_POST['link'])){
+    
+    $processID = uniqid();
+    $contactID = intval($_POST['send_contact']);
+    $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
+    $contact_row = $result->fetch_assoc();
+    
+    //build the content
+    if($_POST['send_template']){
+      $val = intval($_POST['send_template']);
+      $res = $conn->query("SELECT htmlCode FROM templateData WHERE id = $val AND type='document' AND userIDs = $cmpID ");
+      $content = $res->fetch_assoc()['htmlCode'];
+    } else {
+      $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurden folgende Dateien für&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] freigegeben. Sie sind unter folgendem Link einsehbar:</p>".
+      "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten ist:</p><ul><li>Der Link läuft nach einigen Tagen ab, sichern Sie sich also so schnell wie möglich die Dateien auf ihr System!</li>".
+      "<li>Diese E-Mail wurde automatisch Generiert, bitte Antworten sie nicht auf diese E-Mail!</li></ul><p>&nbsp;</p><p>Danke.</p>";
+    }
+    
+    $link = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    $link = explode('/', $link);
+    array_pop($link);
+    $link = implode('/', $link) . "/files?n=".$_POST['link'];
+    
+    $content = str_replace("[LINK]", $link, $content);
+    $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
+    $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
+
+    
+  require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
+  
+  $mail = new PHPMailer();
+  
+  $mail->CharSet = 'UTF-8';
+  $mail->Encoding = "base64";
+  $mail->IsSMTP();
+  
+  $result = $conn->query("SELECT * FROM $mailOptionsTable");
+  $row = $result->fetch_assoc();
+  if(!empty($row['username']) && !empty($row['password'])){
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $row['username'];
+    $mail->Password   = $row['password'];
+  } else {
+    $mail->SMTPAuth   = false;
+  }
+  if(empty($row['smptSecure'])){
+    $mail->SMTPSecure = false;
+  }
+  
+  $mail->Host       = $row['host'];
+  $mail->Port       = $row['port'];
+  
+  if(!empty($row['sendername'])&&$row['isDefault']==1){
+    $cmpID = $conn->query("SELECT company FROM sharedgroups WHERE uri = '".$_POST['link']."'");
+    $cmpID = $cmpID->fetch_assoc();
+    $result = $conn->query("SELECT name FROM companydata WHERE id = ".$cmpID['company']);
+    $sendTo = $result->fetch_assoc();
+    $mail->setFrom($row['sender'],$row['sendername'].$sendTo['name']);
+  }elseif(!empty($row['sendername'])){
+    $mail->setFrom($row['sender'],$row['sendername']);
+  }else{
+    $mail->setFrom($row['sender']);
+  }
+
+  $mail->addAddress($contact_row['email'], $contact_row['firstname'].' '.$contact_row['lastname']);
+  
+  $mail->isHTML(true);                       // Set email format to HTML
+  $mail->Subject = 'Connect - File-Download';
+  $mail->Body    = $content;
+  $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
+  if(!$mail->send()){
+    $errorInfo = $mail->ErrorInfo;
+    $mail->SMTPDebug = 2;
+    //$conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+    echo $errorInfo;
+  }
+
+  if($conn->error){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+  } else {
+    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+  }
+ }
+}
+
   $doc_selects = '';
-  $result = $conn->query("SELECT s.name AS name, s.uri AS uri, s.ttl AS ttl, s.id AS id, s.dateOfBirth AS dateOfBirth, c.name AS company FROM sharedGroups s JOIN companyData c ON s.company = c.id WHERE s.owner = $userID");
+  $result = $conn->query("SELECT s.name AS name, s.uri AS uri, s.ttl AS ttl, s.id AS id, s.dateOfBirth AS dateOfBirth, c.name AS company, s.company AS companyID FROM sharedGroups s JOIN companyData c ON s.company = c.id WHERE s.owner = $userID");
   while($row = $result->fetch_assoc()){
     echo '<tr>';
     echo '<td>'.$row['name'].'</td>';
@@ -134,7 +221,7 @@ function handleCancel(){ //not found
     echo '<td>'.$daysLeft. $days .' </td>';
     echo '<td>';
     echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
-    echo '<button type="button" name="setSelect" value="'.$row['id'].'" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+    echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')"  data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
     echo '<button onclick="location.href=\'../archive/delete?n=' . $row['id'] . '\'" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
     echo '</td>';
     echo '</tr>';
@@ -142,7 +229,46 @@ function handleCancel(){ //not found
 ?>
 </table>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" id="form">
+  <div id="send-as-mail" class="modal fade">
+    <div class="modal-dialog modal-content modal-md"><div class="modal-header h4">Link Senden</div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row form-group">
+            <div class="col-sm-6">
+              <label><?php echo $lang['CLIENT']; ?></label>
+              <select id="clientHint" class="js-example-basic-single" onchange="showContacts(this.value);">
+              <option value="">...</option>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <label><?php echo $lang['CONTACT_PERSON']; ?></label>
+              <select id="contactHint" class="js-example-basic-single" name="send_contact"></select>
+            </div>
+          </div>
+            <br>
+            <div class="row">
+              <label>E-Mail Vorlage</label>
+              <select class="js-example-basic-single" name="send_template">
+                <option value="0"><?php echo  $lang['DEFAULT']; ?></option>
+                <?php
+                $res = $conn->query("SELECT * FROM templateData WHERE type='document' AND userIDs = $cmpID");
+                while($res && ($row_fc = $res->fetch_assoc())){
+                  echo "<option value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                }
+                ?>
+              </select>
+              <input name="link" id="linkID" style="heigth: 1px; width: 1px; visibility: hidden;" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning" name="sendAccess">Link Senden</button>
+      </div>
+      </div>
+    </div>
+  </div>
   <div class="modal" id="edit-group">
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header h4"><?php echo "Gruppe". " " . $lang['EDIT'];  ?></div>
@@ -194,28 +320,53 @@ function handleCancel(){ //not found
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header h4"><?php echo "Gruppe". " " . $lang['ADD'];  ?></div>
       <div class="modal-body">
-        <?php include 'misc/select_company.php';?>
+      
+        <?php
+        $filterCompany = empty($filterings['company']) ? 0 : $filterings['company'];
+        $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+        if($result_fc && $result_fc->num_rows > 1){
+          echo '<div class="col-sm-12"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" ;" >';
+          echo '<option value="0">...</option>';
+          while($result && ($row_fc = $result_fc->fetch_assoc())){
+            $checked = '';
+            if($filterCompany == $row_fc['id']) {
+              $checked = 'selected';
+            }
+            echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+          }
+          echo '</select></div>';
+        } else {
+          $filterCompany = $available_companies[1];
+        }
+        ?>
+  
+        <div class="col-sm-12">
         <label>Name der Gruppe</label>
         <input style="margin-bottom: 2%" type="text" class="form-control" name="add_groupName" id="add_groupName" autofocus/>
+        </div>
+        <div class="col-sm-12">
         <label>Lebenszeit der Gruppe</label>
         <input class="radioChoose" type="radio" name="ttl" value="1" checked>Ein Tag</input>
         <input class="radioChoose" type="radio" name="ttl" value="7">Eine Woche</input>
         <input class="radioChoose" type="radio" name="ttl" value="30">Ein Monat</input>
+        </div>
+        <div class="col-sm-12">
         <div id="fileBox" class="fileBox">
           <input class="fileInput" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple />
           <label class="lbl" for="file"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>          
         </div>
+      </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-default" onclick="handleCancel()" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" onclick="createGroup(event)" name="addGroup"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
   </div>
+  
 </form>
 
 
-
-
+  
 
 
 
@@ -366,7 +517,7 @@ function handleCancel(){ //not found
       processData: false,
       success: function(res){
         //alert(res);
-        location.reload();
+       document.getElementById('form').submit();
       }
     });
   }
@@ -409,7 +560,46 @@ function handleCancel(){ //not found
     }
   }
 </script>
+<script>
+$('button[name=setSelect]').click(function(){
+  $("[name='send_document']").val($(this).val()).trigger('change');
+});
 
+function showContacts(client){
+  
+  $.ajax({
+    url:'ajaxQuery/AJAX_getContacts.php',
+    data:{clientID:client},
+    type: 'get',
+    success : function(resp){
+     
+      $('#contactHint').html(resp);
+    },
+    error : function(resp){}
+  });
+}
+
+function showClients(companyID,linkID){
+  document.getElementById('linkID').value = linkID;
+  $.ajax({
+    url:'ajaxQuery/AJAX_getClients.php',
+    data:{companyID:companyID},
+    type: 'get',
+    success : function(resp){
+      $('#clientHint').html(resp);
+    },
+    error : function(resp){}
+  });
+}
+</script>
+
+<?php
+if(isset($filterClient)){
+  echo '<script>';
+  echo "showContacts($filterClient)";
+  echo '</script>';
+}
+?>
 
 
 <?php require 'footer.php'; ?>

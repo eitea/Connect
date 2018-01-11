@@ -98,9 +98,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $mail->Host       = $row['host'];
     $mail->Port       = $row['port'];
-    if(!empty($row['sendername'])){
+    if(!empty($row['sendername'])&&$row['isDefault']==1){
       $result = $conn->query("SELECT name FROM companydata WHERE id = $cmpID");
-      $mail->setFrom($row['sender'],$row['sendername'].$result->fetch_assoc()['name']);
+      $sendTo = $result->fetch_assoc();
+      $mail->setFrom($row['sender'],$row['sendername'].$sendTo['name']);
+    }elseif(!empty($row['sendername'])){
+      $mail->setFrom($row['sender'],$row['sendername']);
     }else{
       $mail->setFrom($row['sender']);
     }

@@ -148,7 +148,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           $mail->Host       = $row['host'];
           $mail->Port       = $row['port'];
+          
           $mail->setFrom($row['sender']);
+          
           $mail->addAddress($recipients);
           $mail->isHTML(true);                       // Set email format to HTML
           $mail->Subject = "Your access to T-Time";
