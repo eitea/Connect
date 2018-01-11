@@ -98,6 +98,10 @@ $lang_ger['ARTICLE'] = 'Artikel';
 $lang_eng['ASK_DELETE'] = 'Do you really wish to delete %s?';
 $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
+$lang_eng['ARCHIVE'] = 'Archive';
+$lang_ger['ARCHIVE'] = 'Archiv';
+
+
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
 
@@ -1084,6 +1088,9 @@ $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
 $lang_eng['SETTINGS'] = 'Settings';
 $lang_ger['SETTINGS'] = 'Einstellungen';
+
+$lang_eng['SHARE'] = 'Share';
+$lang_ger['SHARE'] = 'Freigabe';
 
 $lang_eng['SHIPPING_METHODS'] = 'Shipping Methods';
 $lang_ger['SHIPPING_METHODS'] = 'Versandarten';
