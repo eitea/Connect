@@ -45,16 +45,20 @@
   }
 
   $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
+  if($result){
   $row = $result->fetch_assoc();
   $lastPswChange = $row['lastPswChange'];
   $userPasswordHash = $row['psw'];
   $userKeyCode = $row['keyCode'];
+  }
 
   $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
+  if($result){
   $row = $result->fetch_assoc();
   $showReadyPlan = $row['enableReadyCheck'];
   $masterPasswordHash = $row['masterPassword'];
   $masterPass_checkSum = $row['checkSum']; //ABCabc123!
+  }
 
   $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
   if($result && ($row = $result->fetch_assoc())){
@@ -104,6 +108,17 @@
   $validation_output = $error_output = '';
 
   if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
+      require __DIR__ ."/ckInOut.php";
+      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+      if(isset($_POST['stampIn'])){
+        checkIn($userID);
+        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
+      } elseif(isset($_POST['stampOut'])){
+        $error_output = checkOut($userID, intval($_POST['stampOut']));
+        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
+      }
+    }
     if(isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2){
         $_POST = array();
     }
@@ -168,7 +183,7 @@
       // picture upload
       if(isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
         require_once __DIR__ . "/utilities.php";
-        $pp = uploadFile("profilePictureUpload", 1, 1, 1);
+        $pp = uploadImage("profilePictureUpload", 1, 1);
         if(!is_array($pp)) {
           $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
           echo $conn->error;
@@ -784,18 +799,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if(isset($_GET['t']) || $this_page == "offer_proposals.php" || $this_page == "offer_proposal_edit.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+        if(isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php" ){
+          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
         } elseif($this_page == "editSuppliers.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
         } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
-          echo "<script>$('#adminOption_ERP').click();";
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });</script>';
+          echo "<script>$('#adminOption_ERP').click();</script>";
         }
         ?>
       <?php endif; ?>
@@ -850,7 +861,6 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           if(isset($_GET['n'])){
             echo "$('#finance-click-".$_GET['n']."').click();";
           }
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
           echo '</script>';
         }
         ?>
@@ -902,12 +912,14 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php"){
+        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php"  || $this_page == "dsgvo_vv_templates.php" ||$this_page == "dsgvo_vv_template_edit.php""){
           echo "<script>$('#adminOption_DSGVO').click();";
           if(isset($_GET['n'])){
             echo "$('#tdsgvo-".$_GET['n']."').toggle();";
           }
-          echo '$(document).ready(function() { $("#sidemenu").animate({ scrollTop: $("#sidemenu").prop("scrollHeight")}, 1500); });';
+          if($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php"){
+            echo "$('#tdsgvo-sets-".$_GET['n']."').toggle();";
+          }
           echo '</script>';
         }
         ?>

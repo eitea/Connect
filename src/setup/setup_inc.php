@@ -16,7 +16,6 @@ MAKING CHANGES TO EXISTING TABLE:
 
 Please test the setup after every change.
 */
-
 function create_tables($conn){
   $sql = "CREATE TABLE UserData (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -113,7 +112,7 @@ function create_tables($conn){
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     companyID INT(6) UNSIGNED,
-    clientNumber VARCHAR(12) UNIQUE,
+    clientNumber VARCHAR(15),
     isSupplier VARCHAR(10) DEFAULT 'FALSE',
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
@@ -556,6 +555,19 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
+  $sql = "CREATE TABLE mailRecipients(
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reportID INT(6) UNSIGNED,
+    email VARCHAR(50) NOT NULL,
+    name VARCHAR(50),
+    FOREIGN KEY (reportID) REFERENCES templateData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  	)";
+	if (! $conn->query ( $sql )) {
+    echo mysqli_error ( $conn );
+  }
+
   /*
   * cOnDate is Date this correction was created On
   * createdOn defines Month this corrections accounts for
@@ -802,7 +814,7 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE erpNumbers(
+  $sql = "CREATE TABLE erp_settings(
     companyID INT(6) UNSIGNED,
     erp_ang INT(5) DEFAULT 1,
     erp_aub INT(5) DEFAULT 1,
@@ -1211,6 +1223,53 @@ function create_tables($conn){
 		echo $conn->error;
   }
 
+  $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
+    projectid VARCHAR(100) NOT NULL,
+    userid INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectspictures(
+    projectid VARCHAR(100) NOT NULL,
+    picture MEDIUMBLOB,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsseries(
+    projectid VARCHAR(100) NOT NULL,
+    projectnextdate VARCHAR(12),
+    projectseries MEDIUMBLOB,
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsnotes(
+    projectid VARCHAR(100) NOT NULL,
+    noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    notetext VARCHAR(1000),
+    notecreator INT(6),
+    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
 
   $sql = "CREATE TABLE sharedfiles (
     id int(11) NOT NULL AUTO_INCREMENT,
