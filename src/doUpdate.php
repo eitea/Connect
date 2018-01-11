@@ -1993,15 +1993,38 @@ if($row['version'] < 123){
 		echo '<br>Kontaktpersonen: Mobiltelefon';
 	}
 
-	$conn->query("ALTER TABLE documents ADD COLUMN docID VARCHAR(40) UNIQUE DEFAULT NULL");
+	//ALTER TABLE `documents` DROP INDEX `docID`;
+	$conn->query("ALTER TABLE documents ADD COLUMN docID VARCHAR(40) DEFAULT NULL");
 	if($conn->error){
 		echo $conn->error;
 	} else {
 		echo '<br>Vereinbarungen: Template ID';
 	}
 
-
 	$conn->query("ALTER TABLE documents ADD COLUMN isBase ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE' ");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Vereinbarungen: Basis Templates';
+	}
+
+	$conn->query("CREATE TABLE document_customs(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		companyID INT(6) UNSIGNED,
+		doc_id VARCHAR(40) NOT NULL,
+		identifier VARCHAR(30),
+		content VARCHAR(450),
+		status VARCHAR(10),
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Vereinbarungen: Freitext';
+	}
+
 }
 
 

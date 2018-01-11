@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   } elseif (!empty($_POST['clone'])){
     $val = intval($_POST['clone']);
-    $conn->query("INSERT INTO documents (companyID, name, txt, version) SELECT companyID, name, txt, version FROM documents WHERE id = $val AND companyID = $cmpID");
+    $conn->query("INSERT INTO documents (companyID, docID, name, txt, version) SELECT companyID, docID, name, txt, version FROM documents WHERE id = $val AND companyID = $cmpID");
+    //TODO: cloning a BASE has to result in merging the freetext INTO the document
     if($conn->error){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
@@ -53,21 +54,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($zip->open($_FILES['uploadZip']["tmp_name"]) === true) {
                 $stmt = $conn->prepare("INSERT INTO documents(name, txt, companyID, version, docID, isBase) VALUES(?, ?, $cmpID, ?, ?, 'TRUE')");
                 $stmt->bind_param('ssss', $doc_name, $doc_txt, $doc_ver, $doc_id);
+                $stmt_up = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?");
+                $stmt_up->bind_param('ssi', $doc_name, $doc_txt, $id);
                 for ($i = 0; $i < $zip->numFiles; $i++) {
                     $filename = explode('.', $zip->getNameIndex($i));
                     if (count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0] . '.xml'))) {
                         $meta = simplexml_load_string($meta);
-                        $doc_name = $meta->template_name;
-
-                        ini_set('mbstring.substitute_character', "none");
-                        $doc_txt = convToUTF8(nl2br($zip->getFromIndex($i)), 'UTF-8', 'UTF-8');
-                        $doc_ver = $meta->template_version;
-                        $doc_id = $meta->template_ID;
-                        //does the $meta->template_id already exist
-                        $stmt->execute();
+                        if($meta->template_name && $meta->template_version && $meta->template_ID){
+                          $doc_name = $meta->template_name;
+                          $doc_ver = $meta->template_version;
+                          $doc_id = $meta->template_ID;
+                          $doc_txt = convToUTF8(nl2br($zip->getFromIndex($i)));
+                          //upload exists and has same version: update
+                          $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id' AND version = '$doc_ver'");
+                          if($result && $result->num_rows > 0){
+                            $row = $result->fetch_assoc();
+                            $result->free();
+                            $id = $row['id'];
+                            $stmt_up->execute();
+                          } else {  //insert as new document
+                            $stmt->execute();
+                          }
+                        } else {
+                          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fehler in '.$filename[0].'.xml: Fehlerhafte Tags.</div>';
+                          continue;
+                        }
                     }
                 }
                 $stmt->close();
+                $stmt_up->close();
                 $zip->close();
             } else {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>ZIP File konnte nicht geöffnet werden.</div>';
@@ -189,14 +204,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $doc_selects = '';
 $result = $conn->query("SELECT * FROM documents WHERE companyID = $cmpID");
 while ($row = $result->fetch_assoc()) {
-    $style = $row['isBase'] == 'FALSE' ? 'style="background-color:#efefef"' : '';
+    $style = '';
+    if($row['isBase'] == 'TRUE'){
+      $style = 'style="background-color:#efefef"';
+      $row['version'] .= ' <small>(Basis)</small>';
+    }
     echo "<tr $style>";
     echo '<td>' . $row['name'] . '</td>';
     echo '<td>' . $row['version'] . '</td>';
     echo '<td><form method="POST">';
     echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-    echo '<button type="submit" name="clone" value="' . $row['id'] . '" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
-    echo '<button type="submit" name="delete" value="' . $row['id'] . '" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
+    echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
+    echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
     echo '<button type="button" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
     echo '</form></td>';
     echo '</tr>';
