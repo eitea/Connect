@@ -28,11 +28,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $documentContent = $_POST['documentContent'];
     $name = test_input($_POST['templateName']);
     $newVersion = test_input($_POST['templateVersion']);
-    if($newVersion == $version){
-        $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ?, version = ? WHERE id = $docID");
-    } else {
-        $stmt = $conn->prepare("INSERT INTO documents (txt, name, version, companyID) VALUES(?, ?, ?, $cmpID)");
-    }
+    $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ?, version = ? WHERE id = $docID");
     $stmt->bind_param("sss", $documentContent, $name, $version);
     $stmt->execute();
     $stmt->close();
@@ -61,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="col-md-2">
             <br><br>Click to Insert: <br><br>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[LINK]'>URL</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[ANREDE]'>Herr/ Frau</button>
+            <!--button type="button" class="btn btn-warning btn-block btn-insert" value='[ANREDE]'>Herr/ Frau</button-->
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[FIRSTNAME]'>Vorname</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[LASTNAME]'>Nachname</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'>Firmenname</button>
@@ -80,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             for($i = 0; $i < count($matches[0]); $i++){
                 $match = $matches[0][$i];
-                //split off the document parts                
+                //split off the document parts
                 $split = explode($match, $documentContent, 2);
                 echo $split[0];
                 $documentContent = $split[1];

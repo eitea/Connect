@@ -17,12 +17,13 @@ $stmt = $conn->prepare("INSERT INTO documentProcessHistory (processID, activity,
 $stmt->bind_param("ss", $proc_activity, $proc_info);
 
 //document
-$result = $conn->query("SELECT password, txt, documentProcess.id, documents.name AS docName, companyData.* FROM documentProcess
-LEFT JOIN documents ON documents.id = docID
+$result = $conn->query("SELECT password, document_text AS txt, document_headline AS docName, documentProcess.id, companyData.* FROM documentProcess
+LEFT JOIN documents ON documents.id = documentProcess.docID
 LEFT JOIN companyData ON companyID = companyData.id
 WHERE documentProcess.id = '$processID'");
 
 if(!$result || $result->num_rows < 1){
+    echo $conn->error;
     $proc_activity = 'invalid access';
     $proc_info = 'ID in Link is invalid';
     $stmt->execute();

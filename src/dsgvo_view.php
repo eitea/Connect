@@ -54,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($zip->open($_FILES['uploadZip']["tmp_name"]) === true) {
                 $stmt = $conn->prepare("INSERT INTO documents(name, txt, companyID, version, docID, isBase) VALUES(?, ?, $cmpID, ?, ?, 'TRUE')");
                 $stmt->bind_param('ssss', $doc_name, $doc_txt, $doc_ver, $doc_id);
-                $stmt_up = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?");
-                $stmt_up->bind_param('ssi', $doc_name, $doc_txt, $id);
+                $stmt_up = $conn->prepare("UPDATE documents SET txt = ?, name = ?, version = ? WHERE id = ?");
+                $stmt_up->bind_param('sssi', $doc_name, $doc_txt, $doc_ver, $id);
                 for ($i = 0; $i < $zip->numFiles; $i++) {
                     $filename = explode('.', $zip->getNameIndex($i));
                     if (count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0] . '.xml'))) {
@@ -65,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           $doc_ver = $meta->template_version;
                           $doc_id = $meta->template_ID;
                           $doc_txt = convToUTF8(nl2br($zip->getFromIndex($i)));
-                          //upload exists and has same version: update
-                          $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id' AND version = '$doc_ver'");
+                          //upload exists: update
+                          $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id'");
                           if($result && $result->num_rows > 0){
                             $row = $result->fetch_assoc();
                             $result->free();
@@ -92,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     if (isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])) {
+        $accept = true;
         $processID = uniqid();
         $docID = intval($_POST['send_document']);
         $contactID = intval($_POST['send_contact']);
@@ -99,40 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($_POST['send_andPassword'])) {
             $pass = password_hash($_POST['send_andPassword'], PASSWORD_BCRYPT);
         }
-        //create process and history
-        $conn->query("INSERT INTO documentProcess(id, docID, personID, password) VALUES('$processID', $docID, $contactID, '$pass')");
-        echo $conn->error;
-        $stmt = $conn->prepare("INSERT INTO documentProcessHistory(processID, activity) VALUES('$processID', ?)");
-        $stmt->bind_param("s", $activity);
-        if (isset($_POST['send_andRead'])) {
-            $activity = 'ENABLE_READ';
-            $stmt->execute();
-        }
-        if (isset($_POST['send_andSign'])) {
-            $activity = 'ENABLE_SIGN';
-            $stmt->execute();
-        }
-        if (isset($_POST['send_andAccept'])) {
-            $activity = 'ENABLE_ACCEPT';
-            $stmt->execute();
-        }
-        $stmt->close();
-
         //contactPerson
         $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
-        $contact_row = $result->fetch_assoc();
-
-        //build the content
-        if ($_POST['send_template']) {
-            $val = intval($_POST['send_template']);
-            $res = $conn->query("SELECT htmlCode FROM templateData WHERE id = $val AND type='document' AND userIDs = $cmpID ");
-            $content = $res->fetch_assoc()['htmlCode'];
-        } else {
-            $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurde&nbsp;folgendes Dokument an&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] versendet. Es ist unter folgendem Link einsehbar:</p>" .
-                "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>" .
-                "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsche passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
-        }
-
+        if(!$contact_row = $result->fetch_assoc()) $accept = false;
+        
         //build link
         $link_id = '';
         if (getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) {
@@ -143,51 +114,119 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         array_pop($link);
         $link = implode('/', $link) . "/access?n=$processID";
 
-        $content = str_replace("[LINK]", $link, $content);
-        $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
-        $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
-
-        //send mail
-        require dirname(__DIR__) . '/plugins/phpMailer/autoload.php';
-        $mail = new PHPMailer();
-        $mail->CharSet = 'UTF-8';
-        $mail->Encoding = "base64";
-        $mail->IsSMTP();
-
-        $result = $conn->query("SELECT * FROM $mailOptionsTable");
-        $row = $result->fetch_assoc();
-        if (!empty($row['username']) && !empty($row['password'])) {
-            $mail->SMTPAuth = true;
-            $mail->Username = $row['username'];
-            $mail->Password = $row['password'];
+        //prepare document
+        $result = $conn->query("SELECT docID, name, txt, version FROM documents WHERE id = $docID AND companyID = $cmpID");
+        if($row = $result->fetch_assoc()){
+          $doc_cont = $row['txt'];
+          $doc_head = $row['name'];
+          $doc_ver = $row['version'];
+          $doc_ident = $row['docID'];
+          $result->free();
         } else {
-            $mail->SMTPAuth = false;
+          echo $conn->error;
+          $accept = false;
         }
-        if (empty($row['smptSecure'])) {
-            $mail->SMTPSecure = $row['smtpSecure'];
+        $result = $conn->query("SELECT p.firstname, p.lastname, c.name, c.address_Street, c.address_Country_Postal, c.address_Country_City  FROM contactPersons p
+        INNER JOIN clientData ON p.clientID = clientData.id INNER JOIN clientInfoData c ON clientData.id = c.clientID WHERE p.id = $contactID");
+        if($accept && ($row = $result->fetch_assoc())){
+          $doc_cont = str_replace('[LINK]', $link, $doc_cont);
+          $doc_cont = str_replace('[FIRSTNAME]', $contact_row['firstname'], $doc_cont);
+          $doc_cont = str_replace('[LASTNAME]', $contact_row['lastname'], $doc_cont);
+          $doc_cont = str_replace('[Companyname]', $row['name'], $doc_cont);
+          $doc_cont = str_replace('[Companystreet]', $row['address_Street'], $doc_cont);
+          $doc_cont = str_replace('[Companyplace]', $row['address_Country_City'], $doc_cont);
+          $doc_cont = str_replace('[Companypostcode]', $row['address_Country_Postal'], $doc_cont);
+          $result->free();
+          if(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $doc_cont, $matches) && $matches){
+            $result = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
+            $result = $result->fetch_all(MYSQLI_ASSOC);
+            $result = array_combine(array_column($result, 'identifier'), array_column($result, 'content'));
+            foreach($matches[0] as $match){
+              $doc_cont = str_replace($match, $result[substr($match,1,-1)], $doc_cont);
+            }
+          }
         }
 
-        $mail->Host = $row['host'];
-        $mail->Port = $row['port'];
-        $mail->setFrom($row['sender']);
+        if($accept){
+          //create process and history
+          $stmt = $conn->prepare("INSERT INTO documentProcess(id, docID, personID, password, document_text, document_headline, document_version) VALUES(?, ?, ?, ?, ?, ?, ?)");
+          $stmt->bind_param('siissss', $processID, $docID, $contactID, $pass, $doc_cont, $doc_head, $doc_ver);
+          $stmt->execute();
+          $stmt->close();
+          $stmt = $conn->prepare("INSERT INTO documentProcessHistory(processID, activity) VALUES('$processID', ?)");
+          $stmt->bind_param("s", $activity);
+          if (isset($_POST['send_andRead'])) {
+              $activity = 'ENABLE_READ';
+              $stmt->execute();
+          }
+          if (isset($_POST['send_andSign'])) {
+              $activity = 'ENABLE_SIGN';
+              $stmt->execute();
+          }
+          if (isset($_POST['send_andAccept'])) {
+              $activity = 'ENABLE_ACCEPT';
+              $stmt->execute();
+          }
+          $stmt->close();
 
-        $mail->addAddress($contact_row['email'], $contact_row['firstname'] . ' ' . $contact_row['lastname']);
+          //build email content
+          if ($_POST['send_template']) {
+            $val = intval($_POST['send_template']);
+            $res = $conn->query("SELECT htmlCode FROM templateData WHERE id = $val AND type='document' AND userIDs = $cmpID ");
+            $content = $res->fetch_assoc()['htmlCode'];
+          } else {
+            $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurde&nbsp;folgendes Dokument an&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] versendet. Es ist unter folgendem Link einsehbar:</p>" .
+                "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>" .
+                "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsch eingegebene Passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
+          }
 
-        $mail->isHTML(true); // Set email format to HTML
-        $mail->Subject = 'Connect - Dokumentenversand';
-        $mail->Body = $content;
-        $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
-        if (!$mail->send()) {
-            $errorInfo = $mail->ErrorInfo;
-            $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
-            echo $errorInfo;
-        }
+          $content = str_replace("[LINK]", $link, $content);
+          $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
+          $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
 
-        if ($conn->error) {
+          //send mail
+          require dirname(__DIR__) . '/plugins/phpMailer/autoload.php';
+          $mail = new PHPMailer();
+          $mail->CharSet = 'UTF-8';
+          $mail->Encoding = "base64";
+          $mail->IsSMTP();
+
+          $result = $conn->query("SELECT * FROM $mailOptionsTable");
+          $row = $result->fetch_assoc();
+          if (!empty($row['username']) && !empty($row['password'])) {
+              $mail->SMTPAuth = true;
+              $mail->Username = $row['username'];
+              $mail->Password = $row['password'];
+          } else {
+              $mail->SMTPAuth = false;
+          }
+          if (empty($row['smptSecure'])) {
+              $mail->SMTPSecure = $row['smtpSecure'];
+          }
+
+          $mail->Host = $row['host'];
+          $mail->Port = $row['port'];
+          $mail->setFrom($row['sender']);
+
+          $mail->addAddress($contact_row['email'], $contact_row['firstname'] . ' ' . $contact_row['lastname']);
+
+          $mail->isHTML(true); // Set email format to HTML
+          $mail->Subject = 'Connect - Dokumentenversand';
+          $mail->Body = $content;
+          $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
+          if (!$mail->send()) {
+              $errorInfo = $mail->ErrorInfo;
+              $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+              echo $errorInfo;
+          }
+          if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+          } else {
+              echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_CREATE'] . '</div>';
+          }
         } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
-        }
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Dokument oder Kontakperson unzulässig.</div>';
+        }        
     }
 }
 ?>
@@ -216,10 +255,10 @@ while ($row = $result->fetch_assoc()) {
     echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
     echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
     echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
-    echo '<button type="button" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+    echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
     echo '</form></td>';
     echo '</tr>';
-    $doc_selects .= '<option value="' . $row['id'] . '" >' . $row['name'] . '</option>';
+    $doc_selects .= '<option value="' . $row['id'] . '" >' . $row['name'] .' - '. $row['version']. '</option>';
 }
 ?>
   </tbody>
@@ -321,7 +360,7 @@ while ($res && ($row_fc = $res->fetch_assoc())) {
 
 <script>
 $('button[name=setSelect]').click(function(){
-  $("[name='send_document']").val($(this).val()).trigger('change');
+  $("#send-select-doc").val($(this).val()).trigger('change');
 });
 function showContacts(client){
   $.ajax({

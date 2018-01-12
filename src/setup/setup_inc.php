@@ -1073,6 +1073,7 @@ function create_tables($conn) {
     name VARCHAR(100) NOT NULL,
     txt MEDIUMTEXT NOT NULL,
     version VARCHAR(15) NOT NULL DEFAULT 'latest',
+    isBase ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -1105,6 +1106,9 @@ function create_tables($conn) {
     docID INT(6) UNSIGNED,
     personID INT(6) UNSIGNED,
     password VARCHAR(60) NOT NULL,
+    document_text MEDIUMTEXT NOT NULL,
+    document_headline VARCHAR(120) NOT NULL,
+    document_version VARCHAR(15) NOT NULL DEFAULT '1.0',
     FOREIGN KEY (docID) REFERENCES documents(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
@@ -1291,6 +1295,22 @@ function create_tables($conn) {
     projectid VARCHAR(100) NOT NULL,
     teamid INT(6) UNSIGNED
   );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  
+  $sql = "CREATE TABLE document_customs(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		companyID INT(6) UNSIGNED,
+		doc_id VARCHAR(40) NOT NULL,
+		identifier VARCHAR(30),
+		content VARCHAR(450),
+		status VARCHAR(10),
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	);";
   if(!$conn->query($sql)){
 		echo $conn->error;
   }

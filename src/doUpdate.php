@@ -1994,7 +1994,7 @@ if($row['version'] < 123){
 	}
 
 	//ALTER TABLE `documents` DROP INDEX `docID`;
-	$conn->query("ALTER TABLE documents ADD COLUMN docID VARCHAR(40) DEFAULT NULL");
+	$conn->query("ALTER TABLE documents ADD COLUMN docID VARCHAR(40)");
 	if($conn->error){
 		echo $conn->error;
 	} else {
@@ -2025,6 +2025,11 @@ if($row['version'] < 123){
 		echo '<br>Vereinbarungen: Freitext';
 	}
 
+	$conn->query("ALTER TABLE documentProcess ADD COLUMN document_text MEDIUMTEXT NOT NULL");
+
+	$conn->query("ALTER TABLE documentProcess ADD COLUMN document_headline VARCHAR(120) NOT NULL");
+
+	$conn->query("ALTER TABLE documentProcess ADD COLUMN document_version VARCHAR(15) NOT NULL DEFAULT '1.0' ");
 }
 
 
