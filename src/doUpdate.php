@@ -1579,6 +1579,74 @@ if ($row['version'] < 118) {
         echo '<br>Verfahrensverzeichnis: Einstellungen';
     }
 
+    $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
+	$conn->query("ALTER TABLE documents MODIFY COLUMN name VARCHAR(100) NOT NULL");
+	
+	$conn->query ( "ALTER TABLE clientInfoData ADD COLUMN billingMailAddress VARCHAR(100)" );
+	if (! $conn->error) {
+		echo '<br>Kundenstamm: Rechnungs Email Adresse';
+	}
+	$sql = "CREATE TABLE dsgvo_vv_templates(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		companyID INT(6) UNSIGNED,
+		name VARCHAR(60) NOT NULL,
+		type ENUM('base', 'app') NOT NULL,
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if (! $conn->query ( $sql )) {
+		echo '<br>' . $conn->error;
+	} else {
+		echo '<br>Verfahrensverzeichnis: Templates';
+	}
+	$sql = "CREATE TABLE dsgvo_vv_template_settings(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		templateID INT(6) UNSIGNED,
+		opt_name VARCHAR(30) NOT NULL,
+		opt_descr VARCHAR(350) NOT NULL,
+		opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if (! $conn->query ( $sql )) {
+		echo '<br>' . $conn->error;
+	} else {
+		echo '<br>Verfahrensverzeichnis: Template Einstellungen';
+	}
+	$sql = "CREATE TABLE dsgvo_vv(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		templateID INT(6) UNSIGNED,
+		name VARCHAR(60) NOT NULL,
+		FOREIGN KEY (templateID) REFERENCES dsgvo_vv_templates(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo '<br>'.$conn->error;
+	} else {
+		echo '<br>Verfahrensverzeichnisse erstellt.';
+	}
+	$sql = "CREATE TABLE dsgvo_vv_settings(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		vv_id INT(6) UNSIGNED,
+		setting_id INT(10) UNSIGNED,
+		setting VARCHAR(850) NOT NULL,
+		category VARCHAR(50),
+		FOREIGN KEY (vv_id) REFERENCES dsgvo_vv(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+		FOREIGN KEY (setting_id) REFERENCES dsgvo_vv_template_settings(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo '<br>'.$conn->error;
+	} else {
+		echo '<br>Verfahrensverzeichnis: Einstellungen';
+	}
+
     //INSERT DEFAULT TEMPLATES
     $base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement', 'Awarness: Risikoanalyse', 'Awarness: Datenschutz-Folgeabschätzung',
         'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage', 'Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',

@@ -30,7 +30,7 @@ if(isset($_POST['accept'])){
     $conn = new mysqli($servername,$username,$password,$dbName);
     $import = new MySQLImport($conn);
     $import->load($file);
-    //redirect("../user/logout");
+    redirect("../user/logout");
 
   } else {
     $error_output = $lang['ERROR_INVALID_UPLOAD'];
