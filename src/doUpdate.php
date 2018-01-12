@@ -1580,13 +1580,13 @@ if ($row['version'] < 118) {
     }
 
     $conn->query("ALTER TABLE clientInfoData ADD COLUMN address_Addition VARCHAR(150)");
-	$conn->query("ALTER TABLE documents MODIFY COLUMN name VARCHAR(100) NOT NULL");
-	
-	$conn->query ( "ALTER TABLE clientInfoData ADD COLUMN billingMailAddress VARCHAR(100)" );
-	if (! $conn->error) {
-		echo '<br>Kundenstamm: Rechnungs Email Adresse';
-	}
-	$sql = "CREATE TABLE dsgvo_vv_templates(
+    $conn->query("ALTER TABLE documents MODIFY COLUMN name VARCHAR(100) NOT NULL");
+
+    $conn->query("ALTER TABLE clientInfoData ADD COLUMN billingMailAddress VARCHAR(100)");
+    if (!$conn->error) {
+        echo '<br>Kundenstamm: Rechnungs Email Adresse';
+    }
+    $sql = "CREATE TABLE dsgvo_vv_templates(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		companyID INT(6) UNSIGNED,
 		name VARCHAR(60) NOT NULL,
@@ -1595,12 +1595,12 @@ if ($row['version'] < 118) {
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 	)";
-	if (! $conn->query ( $sql )) {
-		echo '<br>' . $conn->error;
-	} else {
-		echo '<br>Verfahrensverzeichnis: Templates';
-	}
-	$sql = "CREATE TABLE dsgvo_vv_template_settings(
+    if (!$conn->query($sql)) {
+        echo '<br>' . $conn->error;
+    } else {
+        echo '<br>Verfahrensverzeichnis: Templates';
+    }
+    $sql = "CREATE TABLE dsgvo_vv_template_settings(
 		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		templateID INT(6) UNSIGNED,
 		opt_name VARCHAR(30) NOT NULL,
@@ -1610,12 +1610,12 @@ if ($row['version'] < 118) {
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 	)";
-	if (! $conn->query ( $sql )) {
-		echo '<br>' . $conn->error;
-	} else {
-		echo '<br>Verfahrensverzeichnis: Template Einstellungen';
-	}
-	$sql = "CREATE TABLE dsgvo_vv(
+    if (!$conn->query($sql)) {
+        echo '<br>' . $conn->error;
+    } else {
+        echo '<br>Verfahrensverzeichnis: Template Einstellungen';
+    }
+    $sql = "CREATE TABLE dsgvo_vv(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		templateID INT(6) UNSIGNED,
 		name VARCHAR(60) NOT NULL,
@@ -1623,12 +1623,12 @@ if ($row['version'] < 118) {
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 	)";
-	if(!$conn->query($sql)){
-		echo '<br>'.$conn->error;
-	} else {
-		echo '<br>Verfahrensverzeichnisse erstellt.';
-	}
-	$sql = "CREATE TABLE dsgvo_vv_settings(
+    if (!$conn->query($sql)) {
+        echo '<br>' . $conn->error;
+    } else {
+        echo '<br>Verfahrensverzeichnisse erstellt.';
+    }
+    $sql = "CREATE TABLE dsgvo_vv_settings(
 		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		vv_id INT(6) UNSIGNED,
 		setting_id INT(10) UNSIGNED,
@@ -1641,11 +1641,11 @@ if ($row['version'] < 118) {
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 	)";
-	if(!$conn->query($sql)){
-		echo '<br>'.$conn->error;
-	} else {
-		echo '<br>Verfahrensverzeichnis: Einstellungen';
-	}
+    if (!$conn->query($sql)) {
+        echo '<br>' . $conn->error;
+    } else {
+        echo '<br>Verfahrensverzeichnis: Einstellungen';
+    }
 
     //INSERT DEFAULT TEMPLATES
     $base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement', 'Awarness: Risikoanalyse', 'Awarness: Datenschutz-Folgeabschätzung',
@@ -1841,77 +1841,122 @@ if ($row['version'] < 119) {
     $conn->query("ALTER TABLE roles ADD COLUMN isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     $conn->query("ALTER TABLE modules ADD COLUMN enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
 
-    $conn->multi_query("CREATE TABLE dynamicprojects(
-    projectid VARCHAR(100) NOT NULL,
-    projectdataid INT(6) UNSIGNED,
-    projectname VARCHAR(60) NOT NULL,
-    projectdescription VARCHAR(500) NOT NULL,
-    companyid INT(6),
-    projectcolor VARCHAR(10),
-    projectstart VARCHAR(12),
-    projectend VARCHAR(12),
-    projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
-    projectpriority INT(6),
-    projectparent VARCHAR(100),
-    projectowner INT(6),
-    projectcompleted INT(6),
-    PRIMARY KEY (`projectid`)
-  );
-  CREATE TABLE dynamicprojectsclients(
-    projectid VARCHAR(100) NOT NULL,
-    clientid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsemployees(
-    projectid VARCHAR(100) NOT NULL,
-    userid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsoptionalemployees(
-    projectid VARCHAR(100) NOT NULL,
-    userid INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectspictures(
-    projectid VARCHAR(100) NOT NULL,
-    picture MEDIUMBLOB,
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsseries(
-    projectid VARCHAR(100) NOT NULL,
-    projectnextdate VARCHAR(12),
-    projectseries MEDIUMBLOB,
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsnotes(
-    projectid VARCHAR(100) NOT NULL,
-    noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    notetext VARCHAR(1000),
-    notecreator INT(6),
-    FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
-  );
-  CREATE TABLE dynamicprojectsbookings(
-    projectid VARCHAR(100) NOT NULL,
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
-    bookingend DATETIME,
-    userid INT(6) UNSIGNED,
-    bookingtext VARCHAR(1000)
-  );
-  ");
+    $sql = "CREATE TABLE dynamicprojects(
+        projectid VARCHAR(100) NOT NULL,
+        projectname VARCHAR(60) NOT NULL,
+        projectdescription VARCHAR(500) NOT NULL,
+        companyid INT(6),
+        projectcolor VARCHAR(10),
+        projectstart VARCHAR(12),
+        projectend VARCHAR(12),
+        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+        projectpriority INT(6),
+        projectparent VARCHAR(100),
+        projectowner INT(6),
+        PRIMARY KEY (`projectid`)
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsclients(
+        projectid VARCHAR(100) NOT NULL,
+        clientid INT(6),
+        projectcompleted INT(6),
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Kunden';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsemployees(
+        projectid VARCHAR(100) NOT NULL,
+        userid INT(6),
+        PRIMARY KEY(projectid, userid),
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Employees';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
+        projectid VARCHAR(100) NOT NULL,
+        userid INT(6),
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Optional Employees';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectspictures(
+        projectid VARCHAR(100) NOT NULL,
+        picture MEDIUMBLOB,
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Pictures';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsseries(
+        projectid VARCHAR(100) NOT NULL,
+        projectnextdate VARCHAR(12),
+        projectseries MEDIUMBLOB,
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Series';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsnotes(
+        projectid VARCHAR(100) NOT NULL,
+        noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        notetext VARCHAR(1000),
+        notecreator INT(6),
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Notizen';
+    }
+
+    $sql = "CREATE TABLE dynamicprojectsbookings(
+        projectid VARCHAR(100) NOT NULL,
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
+        bookingend DATETIME,
+        bookingclient INT(6) UNSIGNED,
+        userid INT(6) UNSIGNED,
+        bookingtext VARCHAR(1000)
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 }
 
 if ($row['version'] < 120) {

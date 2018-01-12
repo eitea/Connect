@@ -1279,6 +1279,28 @@ function create_tables($conn){
 		echo $conn->error;
   }
 
+  $sql = "CREATE TABLE dynamicprojectsbookings(
+    projectid VARCHAR(100) NOT NULL,
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
+    bookingend DATETIME,
+    bookingclient INT(6) UNSIGNED,
+    userid INT(6) UNSIGNED,
+    bookingtext VARCHAR(1000)
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+  $sql = "CREATE TABLE dynamicprojectsteams(
+    projectid VARCHAR(100) NOT NULL,
+    teamid INT(6) UNSIGNED
+  );";
+  if(!$conn->query($sql)){
+		echo $conn->error;
+  }
+
+
   $sql = "CREATE TABLE sharedfiles (
     id int(11) NOT NULL AUTO_INCREMENT,
     name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
@@ -1327,28 +1349,7 @@ function create_tables($conn){
     )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
-  } 
-  $sql = "CREATE TABLE dynamicprojectsbookings(
-    projectid VARCHAR(100) NOT NULL,
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
-    bookingend DATETIME,
-    bookingclient INT(6) UNSIGNED,
-    userid INT(6) UNSIGNED,
-    bookingtext VARCHAR(1000)
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
   }
-
-  $sql = "CREATE TABLE dynamicprojectsteams(
-    projectid VARCHAR(100) NOT NULL,
-    teamid INT(6) UNSIGNED
-  );";
-  if(!$conn->query($sql)){
-		echo $conn->error;
-  }
-
   
   $sql = "CREATE TABLE document_customs(
 		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
