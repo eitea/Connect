@@ -369,7 +369,7 @@
       the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
     </div>
   </div>
-  <?php require dirname(__DIR__)."\plugins\pgp\autoload.php"; ?>
+  <?php require dirname(__DIR__)."/plugins/pgp/autoload.php"; ?>
   <!-- modal -->
   <form method="POST">
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
