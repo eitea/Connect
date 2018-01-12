@@ -34,7 +34,6 @@ while($result && ($row = $result->fetch_assoc())){
 </tbody>
 </table>
 
-
 <div class="page-header"><h3>Projektbuchungen - Log</h3></div>
 <table class="table table-hover">
 <thead><tr>

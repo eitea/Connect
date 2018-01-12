@@ -10,7 +10,7 @@ enableToCore($userID);
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['start_Download'])){
     require 'connection_config.php';
-    if(isset($_POST['setPassword']) && !empty($_POST['password'])){
+    if(!empty($_POST['password'])){
       Export_Database($servername,$username,$password,$dbName,$_POST['password']);
     } else {
       Export_Database($servername,$username,$password,$dbName);
