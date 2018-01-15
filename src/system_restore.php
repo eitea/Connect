@@ -20,7 +20,7 @@ if(isset($_POST['accept'])){
   }
 
   if($accept){
-    //changes here have to be copied to resticBackup.php 
+    //changes here have to be copied to resticBackup.php
     require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
     $conn->close();
     $conn = new mysqli($servername,$username,$password);

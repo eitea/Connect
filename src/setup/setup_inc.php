@@ -1351,16 +1351,16 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE document_customs(
-		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		companyID INT(6) UNSIGNED,
-		doc_id VARCHAR(40) NOT NULL,
-		identifier VARCHAR(30),
-		content VARCHAR(450),
-		status VARCHAR(10),
-		FOREIGN KEY (companyID) REFERENCES companyData(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	);";
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    companyID INT(6) UNSIGNED,
+    doc_id VARCHAR(40) NOT NULL,
+    identifier VARCHAR(30),
+    content VARCHAR(450),
+    status VARCHAR(10),
+    FOREIGN KEY (companyID) REFERENCES companyData(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);";
     if (!$conn->query($sql)) {
         echo $conn->error;
     }

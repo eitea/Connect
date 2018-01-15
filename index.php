@@ -6,7 +6,7 @@ $routes = array(
 
   'user/home' => 'home.php',                              'user/time' => 'timeCalcTable.php',                    'user/book' => 'userProjecting.php',
   'user/logout' => 'logout.php',                          'user/request' => 'makeRequest.php',                   'user/ready' => 'readyPlan.php',
-  
+
   'social/home' => 'socialMedia.php',
 
   'system/users' => 'editUsers.php',                       'system/saldo' => 'admin_saldoview.php',              'system/register' => 'register.php',
@@ -16,7 +16,7 @@ $routes = array(
   'system/update' => 'pullGitRepo.php',                    'system/backup' => 'system_backup.php',               'system/restore' => 'system_restore.php',
   'system/designer' => 'templateSelect.php',               'system/clients' => 'editCustomers.php',              'system/clientDetail' => 'editCustomer_detail.php',
   'system/previewTem' => 'templatePreview.php',            'system/downloadTem' => 'templateDownload.php',       'system/editTemp' => 'templateEdit.php',
-  'system/downloadSql' => 'sqlDownload.php',               'system/cryptlog'=> 'viewCryptLog.php',               'system/restic' => 'resticBackup.php',
+  'system/downloadSql' => 'system_backup_download.php',               'system/cryptlog'=> 'viewCryptLog.php',               'system/restic' => 'resticBackup.php',
   'system/checkinLogs' => 'checkinLogs.php',
 
   'time/view' => 'time_projects.php',                      'time/corrections' => 'time_adjusts.php',             'time/travels' => 'time_travel.php',
@@ -35,16 +35,16 @@ $routes = array(
   'erp/receipts' => 'receiptBook.php',                     'erp/suppliers' => 'editSuppliers.php',
 
   'finance/account' => 'accounting.php',                   'finance/plan' => 'accountPlan.php',                  'finance/journal' => 'accountJournal.php',
-  
+
   'dsgvo/documents' => 'dsgvo_view.php',                   'dsgvo/access' => 'dsgvo_access.php',                 'dsgvo/templates' => 'dsgvo_mail.php',
   'dsgvo/edit' => 'dsgvo_edit.php',                        'dsgvo/vv' => 'dsgvo_vv.php',                         'dsgvo/vtemplates' =>'dsgvo_vv_templates.php',
   'dsgvo/vDetail' => 'dsgvo_vv_detail.php',                'dsgvo/editTemplate' => 'dsgvo_vv_template_edit.php',
 
   'archive/share' => 'archive_share.php',                   'archive/files' => 'archive_files.php',              'archive/download' => 'archive_download.php',
-  'archive/delete' => 'archive_delete.php',                 'archive/upload' => 'archive_upload.php',          
-  
+  'archive/delete' => 'archive_delete.php',                 'archive/upload' => 'archive_upload.php',
+
   'upload/file' => 'uploadToS3.php',
-  
+
   'pgp/keygen' => 'pgpKeyGen.php',                 'misc/sharedfiles' => 'getSharedFiles.php'
 );
 $mime_types = array(
