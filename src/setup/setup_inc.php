@@ -1366,4 +1366,5 @@ function create_tables($conn){
 		echo $conn->error;
   }
 
+  
 }
