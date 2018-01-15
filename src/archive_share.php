@@ -1,4 +1,13 @@
-<?php require 'header.php'; enableToDSGVO($userID); 
+<?php require 'header.php';
+$result = $conn->query("SELECT enableS3Archive FROM modules");
+if($result){
+  $enabled = $result->fetch_assoc();
+  if($enabled['enableS3Archive']=="FALSE"){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
+    require 'footer.php'; 
+    return;
+  } 
+}
 require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
 use PHPMailer\PHPMailer\PHPMailer;

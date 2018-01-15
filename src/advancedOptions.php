@@ -40,6 +40,9 @@ if(isset($_POST['saveButton'])){
   $status = isset($_POST['enableDynamicProjects']) ? 'TRUE' : 'FALSE';
   $conn->query("UPDATE $moduleTable SET enableDynamicProjects = '$status'");
 
+  $status = isset($_POST['enableS3Archive']) ? 'TRUE' : 'FALSE';
+  $conn->query("UPDATE $moduleTable SET enableS3Archive = '$status'");
+
   redirect("../system/advanced");
 }
 
@@ -110,6 +113,12 @@ $rowModuleTable = $result->fetch_assoc();
       <label>
         <input <?php if($rowModuleTable['enableDynamicProjects'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableDynamicProjects' value='TRUE'>
         Dynamic Projects
+      </label>
+    </div>
+    <div class="checkbox col-md-12">
+      <label>
+        <input <?php if($rowModuleTable['enableS3Archive'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableS3Archive' value='TRUE'>
+        S3 Archive
       </label>
     </div>
     <br>

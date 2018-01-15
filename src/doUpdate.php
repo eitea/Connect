@@ -2050,6 +2050,15 @@ if ($row['version'] < 123) {
     $conn->query("ALTER TABLE documentProcess ADD COLUMN document_version VARCHAR(15) NOT NULL DEFAULT '1.0' ");
 }
 
+    if ($row['version'] < 124) {
+        $conn->query("ALTER TABLE modules ADD COLUMN enableS3Archive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+        if ($conn->error) {
+            echo $conn->error;
+        } else {
+            echo '<br>S3 Modul';
+        }
+    }
+
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';
