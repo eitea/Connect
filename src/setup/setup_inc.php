@@ -1336,7 +1336,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE uploadedfiles (
     id INT(10) NOT NULL AUTO_INCREMENT ,
-    uploadername VARCHAR NOT NULL ,
+    uploadername VARCHAR(50) NOT NULL ,
     filename VARCHAR(20) NOT NULL ,
     filetype VARCHAR(10) NOT NULL ,
     hashkey VARCHAR(32) NOT NULL ,
