@@ -125,13 +125,18 @@ ignore_user_abort(1);
 
             if(match_passwordpolicy_setup(test_input($_POST['adminPass']), $out)){
               $psw = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
+              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
               //create connection file
               $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
               $txt = '<?php
               $servername = "'.test_input($_POST['serverName']).'";
               $username = "'.test_input($_POST['mysqlUsername']).'";
               $password = "'.test_input($_POST['pass']).'";
-              $dbName = "'.test_input($_POST['dbName']).'";';
+              $dbName = "'.test_input($_POST['dbName']).'";
+              $identifier = "'.$identifier.'";
+              $s3SharedFiles=$identifier."_sharedFiles";
+              $s3uploadedFiles=$identifier."_uploadedFiles";
+              ';
               fwrite($myfile, $txt);
               fclose($myfile);
               if(!file_exists(dirname(__DIR__) .'/connection_config.php')){
@@ -164,15 +169,6 @@ ignore_user_abort(1);
               create_tables($conn);
 
               require_once dirname(__DIR__) . "/version_number.php";
-              
-              //add lines to connection file
-              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
-              $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'a');
-              $txt = '$identifier = "'.$identifier.'";
-              $s3SharedFiles=$identifier."_sharedFiles";
-              $s3uploadedFiles=$identifier."_uploadedFiles";';
-              fwrite($myfile, $txt);
-              fclose($myfile);
 
               //------------------------------ INSERTS ---------------------------------------
               //insert identification
