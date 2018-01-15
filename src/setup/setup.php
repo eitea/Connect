@@ -167,7 +167,7 @@ ignore_user_abort(1);
               
               //add lines to connection file
               $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
-              $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'w');
+              $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'a');
               $txt = '$identifier = "'.$identifier.'";
               $s3SharedFiles=$identifier."_sharedFiles";
               $s3uploadedFiles=$identifier."_uploadedFiles";';
