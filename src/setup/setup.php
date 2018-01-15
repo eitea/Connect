@@ -208,7 +208,7 @@ ignore_user_abort(1);
               $conn->query($sql);
               //insert roletable
               $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE','TRUE');";
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
               $conn->query($sql);
               //insert company-client relationship
               $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
