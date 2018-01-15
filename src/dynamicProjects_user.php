@@ -214,7 +214,7 @@ while ($row = $result->fetch_assoc()) {
     $employeesResult = $conn->query(
         "SELECT * FROM dynamicprojectsemployees
         INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid
-        WHERE projectid='$id'"
+        WHERE projectid='$id' AND UserData.id NOT IN (SELECT t.userID FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON d.teamid = t.teamid WHERE d.projectid = '$id')"
     );
     $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
     echo $conn->error;
