@@ -21,7 +21,7 @@ $correctionTable = "correctionData";
 
 //deactivated users disappear from the program like deleted ones, but these keep their data.
 $deactivatedUserTable = "DeactivatedUsers";
-$deactivatedUserDataTable = "DeactivatedUserData"; //intervals 
+$deactivatedUserDataTable = "DeactivatedUserData"; //intervals
 $deactivatedUserLogs = "DeactivatedUserLogData";
 $deactivatedUserProjects = "DeactivatedUserProjectData";
 $deactivatedUserTravels = "DeactivatedUserTravelData";
@@ -34,7 +34,6 @@ $mailLogsTable = "mailLogs";
 $mailOptionsTable = "mailingOptions";
 $mailReportsTable = 'mailReports';
 $mailReportsRecipientsTable = 'mailRecipients';
-$moduleTable = "modules"; //module enable/disable options set by systematic admin
 
 $negative_logTable = "unlogs"; //deleted
 

@@ -5,3 +5,5 @@ images/ups/*
 cryptlog.txt
 plugins/restic/backup.sql
 backup.sql
+dynamicProjects.php
+*.db

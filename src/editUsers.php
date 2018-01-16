@@ -121,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if (isset($_POST['submitUser'])) {
-    $activeTab = $x = $_POST['submitUser'];    
+    $activeTab = $x = $_POST['submitUser'];
 
     if (!empty($_POST['firstname'.$x])) {
       $firstname = test_input($_POST['firstname'.$x]);
@@ -362,17 +362,6 @@ $(document).ready(function(){
 <br>
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
-  //enable/disable modules
-  $result = $conn->query("SELECT * FROM $moduleTable");
-  $moduleEnableRow = $result->fetch_assoc();
-  $moduleTime =  $moduleProject = $moduleSocialMedia = '';
-  //timemodule will momentarily always be active, since projectM requires timeM
-  if($moduleEnableRow['enableProject'] == 'FALSE'){
-    $moduleProject = 'disabled';
-  }
-  if($moduleEnableRow['enableSocialMedia'] == 'FALSE'){
-    $moduleSocialMedia = 'disabled';
-  }
   $query = "SELECT *, $userTable.id AS user_id FROM $userTable
   INNER JOIN $roleTable ON $roleTable.userID = $userTable.id
   INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id
@@ -457,7 +446,7 @@ $(document).ready(function(){
                 </div>
               </div>
             </form>
-            
+
             <form method="POST">
               <div class="container-fluid">
                 <div class="form-group">
@@ -561,7 +550,7 @@ $(document).ready(function(){
                         <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_DYNAMIC_PROJECTS_OPTIONS']; ?>
+                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                       </label><br>
                       <label>
                         <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
@@ -580,7 +569,7 @@ $(document).ready(function(){
                     </label>
                     <br>
                     <label>
-                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE' && $moduleEnableRow['enableProject'] == 'TRUE'){echo 'checked';} echo $moduleProject; ?> /><?php echo $lang['CAN_BOOK']; ?>
+                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
                     </label>
                     <br>
                     <label>
@@ -588,7 +577,7 @@ $(document).ready(function(){
                     </label>
                     <br>
                     <label>
-                      <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE' && $moduleEnableRow['enableSocialMedia'] == 'TRUE'){echo 'checked';} echo $moduleSocialMedia; ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
+                      <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
                     </label>
                   </div>
                 </div>

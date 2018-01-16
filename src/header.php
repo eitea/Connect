@@ -336,7 +336,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
         <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
         <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
           <i class="fa fa-commenting"></i>
-          <span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
+          <span class="badge pull-right alert-badge" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
         </a>
         <script>
           var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
@@ -354,12 +354,12 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
         			  var alertDifference = parseInt(response) - alertsBeforeUpdate
         			  alertsBeforeUpdate = parseInt(response)
         			  if(alertDifference > 0){
-        				generateNotification(parseInt(response),alertDifference)
+        				      generateNotification(parseInt(response),alertDifference)
         			  }
         			}
         		},
         	});
-          },10000) // 10 seconds
+          },10000) //10 seconds
 
           function generateNotification(messages, newMessages){
         	var image = 'images/messageIcon.png';
@@ -607,7 +607,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
 	            <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 	            <?php if ($hasActiveDynamicProjects == 'TRUE'): ?>
-	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?> <?php
+	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS']; ?> <?php
     $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
     if ($result->num_rows > 0) {
         echo '<label style="font-size: 16px; color: white;">' . $result->num_rows . '</label>';
@@ -743,7 +743,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                 <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
               </ul>
             </div>

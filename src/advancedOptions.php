@@ -34,12 +34,6 @@ if(isset($_POST['saveButton'])){
   $sql = "UPDATE $configTable SET enableReadyCheck = '$status', enableReg = '$regStatus'";
   $conn->query($sql);
 
-  $status = isset($_POST['enableSocialMedia']) ? 'TRUE' : 'FALSE';
-  $conn->query("UPDATE $moduleTable SET enableSocialMedia = '$status'");
-
-  $status = isset($_POST['enableDynamicProjects']) ? 'TRUE' : 'FALSE';
-  $conn->query("UPDATE $moduleTable SET enableDynamicProjects = '$status'");
-
   redirect("../system/advanced");
 }
 
