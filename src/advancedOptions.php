@@ -105,18 +105,6 @@ $rowModuleTable = $result->fetch_assoc();
     <br>
     <div class="checkbox col-md-12">
       <label>
-        <input <?php if($rowModuleTable['enableSocialMedia'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableSocialMedia' value='TRUE'>
-        Social Media
-      </label>
-    </div>
-    <div class="checkbox col-md-12">
-      <label>
-        <input <?php if($rowModuleTable['enableDynamicProjects'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableDynamicProjects' value='TRUE'>
-        Dynamic Projects
-      </label>
-    </div>
-    <div class="checkbox col-md-12">
-      <label>
         <input <?php if($rowModuleTable['enableS3Archive'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableS3Archive' value='TRUE'>
         S3 Archive
       </label>

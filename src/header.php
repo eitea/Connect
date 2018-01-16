@@ -62,16 +62,14 @@
 
   $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
   if($result && ($row = $result->fetch_assoc())){
-    $enableSocialMedia = $row['enableSocialMedia'];
-    $enableDynamicProjects = $row['enableDynamicProjects'];
-    $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
-    echo $conn->error;
     $hasActiveDynamicProjects = ($result && $result->num_rows > 0)?'TRUE':'FALSE';
-  } else {
-    $enableSocialMedia = 'FALSE';
-    $enableDynamicProjects = 'FALSE';
+  }else{
     $hasActiveDynamicProjects = 'FALSE';
   }
+  $enableSocialMedia = 'TRUE';
+  $enableDynamicProjects = 'TRUE';
+    
+  
   if($enableSocialMedia == 'TRUE'){
     $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
     $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
