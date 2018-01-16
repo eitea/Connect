@@ -1,27 +1,26 @@
 <?php
-  session_start();
-  if(empty($_SESSION['userid'])){
+session_start();
+if (empty($_SESSION['userid'])) {
     die('Please <a href="../login/auth">login</a> first.');
-  }
+}
 
-  $userID = $_SESSION['userid'];
-  $timeToUTC = $_SESSION['timeToUTC'];
-  $setActiveLink = 'class="active-link"';
-  $unlockedPGP = '';
+$userID = $_SESSION['userid'];
+$timeToUTC = $_SESSION['timeToUTC'];
+$setActiveLink = 'class="active-link"';
+$unlockedPGP = '';
 
-  require __DIR__."/connection.php";
-  require __DIR__."/utilities.php";
-  require __DIR__."/validate.php";
-  require __DIR__."/language.php";
+require __DIR__ . "/connection.php";
+require __DIR__ . "/utilities.php";
+require __DIR__ . "/validate.php";
+require __DIR__ . "/language.php";
 
-
-  if($this_page != "editCustomer_detail.php"){
+if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
-  }
+}
 
-  $sql = "SELECT * FROM roles WHERE userID = $userID";
-  $result = $conn->query($sql);
-  if($result && $result->num_rows > 0){
+$sql = "SELECT * FROM roles WHERE userID = $userID";
+$result = $conn->query($sql);
+if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $isCoreAdmin = $row['isCoreAdmin'];
     $isTimeAdmin = $row['isTimeAdmin'];
@@ -35,30 +34,30 @@
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
-  } else {
+} else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
-  }
-  if($userID == 1){ //superuser
+}
+if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
     $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
-  }
+}
 
-  $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
-  if($result){
-  $row = $result->fetch_assoc();
-  $lastPswChange = $row['lastPswChange'];
-  $userPasswordHash = $row['psw'];
-  $userKeyCode = $row['keyCode'];
-  }
+$result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
+if ($result) {
+    $row = $result->fetch_assoc();
+    $lastPswChange = $row['lastPswChange'];
+    $userPasswordHash = $row['psw'];
+    $userKeyCode = $row['keyCode'];
+}
 
-  $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
-  if($result){
-  $row = $result->fetch_assoc();
-  $showReadyPlan = $row['enableReadyCheck'];
-  $masterPasswordHash = $row['masterPassword'];
-  $masterPass_checkSum = $row['checkSum']; //ABCabc123!
-  }
+$result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
+if ($result) {
+    $row = $result->fetch_assoc();
+    $showReadyPlan = $row['enableReadyCheck'];
+    $masterPasswordHash = $row['masterPassword'];
+    $masterPass_checkSum = $row['checkSum']; //ABCabc123!
+}
 
 $result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
 $hasActiveDynamicProjects = ($result && $result->num_rows > 0) ? 'TRUE' : 'FALSE';
@@ -70,45 +69,45 @@ if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
-    if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
+    if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //forgotten checkouts
     $result = $conn->query("SELECT indexIM FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
-    if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
+    if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //gemini date in logs
     $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
-    if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
+    if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //lunchbreaks
     $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
     INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
     WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
-    if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
-  }
-  $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
-  $available_companies = array('-1'); //care
-  while($result && ($row = $result->fetch_assoc())){
+    if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
+}
+$result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
+$available_companies = array('-1'); //care
+while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
-  }
-  $result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(".implode(', ', $available_companies).") OR $userID = 1");
-  $available_users = array('-1');
-  while($result && ($row = $result->fetch_assoc())){
+}
+$result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
+$available_users = array('-1');
+while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
-  }
-  $validation_output = $error_output = '';
+}
+$validation_output = $error_output = '';
 
-  if($_SERVER["REQUEST_METHOD"] == "POST"){
-    if(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-      require __DIR__ ."/ckInOut.php";
-      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      if(isset($_POST['stampIn'])){
-        checkIn($userID);
-        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
-      } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, intval($_POST['stampOut']));
-        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
-      }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
+        require __DIR__ . "/ckInOut.php";
+        $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        if (isset($_POST['stampIn'])) {
+            checkIn($userID);
+            $validation_output .= $lang['INFO_CHECKIN'] . '</div>';
+        } elseif (isset($_POST['stampOut'])) {
+            $error_output = checkOut($userID, intval($_POST['stampOut']));
+            $validation_output .= $lang['INFO_CHECKOUT'] . '</div>';
+        }
     }
-    if(isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2){
+    if (isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2) {
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
@@ -164,56 +163,55 @@ if ($isTimeAdmin) {
       $_SESSION['language'] = 'ENG';
       $validation_output = mysqli_error($conn);
     }
-    if(isset($_POST['set_skin'])){
-      $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
-      $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
+    if (isset($_POST['set_skin'])) {
+        $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
+        $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
     }
-    if(isset($_POST['saveSocial'])) {
-      // picture upload
-      if(isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-        require_once __DIR__ . "/utilities.php";
-        $pp = uploadImage("profilePictureUpload", 1, 1);
-        if(!is_array($pp)) {
-          $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
-          echo $conn->error;
-          $null = NULL;
-          $stmt->bind_param("b", $null);
-          $stmt->send_long_data(0, $pp);
-          $stmt->execute();
-          if ($stmt->errno) {
-              echo $stmt->error;//displayError($stmt->error);
-          } else {
-              //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
-          }
-          $stmt->close();
-        } else {
-            echo print_r($filename);
+    if (isset($_POST['saveSocial'])) {
+        // picture upload
+        if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
+            require_once __DIR__ . "/utilities.php";
+            $pp = uploadImage("profilePictureUpload", 1, 1);
+            if (!is_array($pp)) {
+                $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
+                echo $conn->error;
+                $null = NULL;
+                $stmt->bind_param("b", $null);
+                $stmt->send_long_data(0, $pp);
+                $stmt->execute();
+                if ($stmt->errno) {
+                    echo $stmt->error; //displayError($stmt->error);
+                } else {
+                    //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
+                }
+                $stmt->close();
+            } else {
+                echo print_r($filename);
+            }
         }
-      }
-      // other settings
-      if (isset($_POST['social_status'])) {
-          $status = test_input($_POST['social_status']);
-          $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
-      }
-      if (isset($_POST['social_isAvailable'])) {
-          $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
-      }
-      else {
-          $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
-      }
-      $conn->query($sql);
+        // other settings
+        if (isset($_POST['social_status'])) {
+            $status = test_input($_POST['social_status']);
+            $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
+        }
+        if (isset($_POST['social_isAvailable'])) {
+            $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
+        } else {
+            $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
+        }
+        $conn->query($sql);
     }
-  }
+}
 
-  if($_SESSION['color'] == 'light'){
+if ($_SESSION['color'] == 'light') {
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
-  } elseif($_SESSION['color'] == 'dark'){
+} elseif ($_SESSION['color'] == 'dark') {
     $css_file = 'plugins/homeMenu/homeMenu_metro.css';
-  } elseif($_SESSION['color'] == 'stellar') {
+} elseif ($_SESSION['color'] == 'stellar') {
     $css_file = 'plugins/homeMenu/homeMenu_dark.css';
-  } else {
+} else {
     $css_file = '';
-  }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -384,12 +382,12 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
         </script>
         <?php else: ?>
         <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-        <?php endif; ?>
-        <?php if($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
+        <?php endif;?>
+        <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
           <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
             <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
           </a>
-        <?php endif; ?>
+        <?php endif;?>
         <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
         <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
         <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -399,13 +397,14 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
   <!-- /navbar -->
   <div class="collapse" id="infoDiv_collapse">
     <div class="well" style="margin:0">
-      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT; ?>
+      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php';
+echo $VERSION_TEXT;?>
       <br>
       The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
       the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
     </div>
   </div>
-  <?php require dirname(__DIR__)."/plugins/pgp/autoload.php"; ?>
+  <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
   <!-- modal -->
   <form method="POST">
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
@@ -416,20 +415,20 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
         </div>
         <div class="modal-body">
           <div class="col-md-12">
-          <label><?php echo $lang['PASSWORD_CURRENT']?></label>
+          <label><?php echo $lang['PASSWORD_CURRENT'] ?></label>
           <input type="password" class="form-control" name="passwordCurrent" ><br>
           </div>
           <div class="col-md-6">
-          <label><?php echo $lang['NEW_PASSWORD']?></label>
+          <label><?php echo $lang['NEW_PASSWORD'] ?></label>
           <input type="password" class="form-control" name="password" ><br>
           </div>
           <div class="col-md-6">
-          <label><?php echo $lang['NEW_PASSWORD_CONFIRM']?></label>
+          <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label>
           <input type="password" class="form-control" name="passwordConfirm" ><br>
-          <?php if($masterPasswordHash): ?>
-          <label><?php echo $lang['MASTER_PASSWORD']?> (Experimentell)</label>
+          <?php if ($masterPasswordHash): ?>
+          <label><?php echo $lang['MASTER_PASSWORD'] ?> (Experimentell)</label>
           <input type="password" class="form-control" name="passwordMaster"><br>
-          <?php endif; ?>
+          <?php endif;?>
           </div>
         </div>
         <div class="modal-header">
@@ -446,7 +445,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
           </div>
           <div class="col-md-12">
           <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP">Ꙭ</button>
-          <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP);?></textarea><br>
+          <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP); ?></textarea><br>
           </div>
           <div class="col-md-12">
           <label>Encryption Password</label>
@@ -500,7 +499,7 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
                       </label>
                       <div class="checkbox">
                           <label>
-                              <input type="checkbox" name="social_isAvailable" <?php if ($social_isAvailable == 'TRUE') { echo 'checked';} ?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                              <input type="checkbox" name="social_isAvailable" <?php if ($social_isAvailable == 'TRUE') {echo 'checked';}?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
                           </label>
                           <br>
                       </div>
@@ -517,17 +516,17 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
       </div>
   </form>
   <!-- /social settings modal -->
-  <?php endif; ?>
+  <?php endif;?>
 <?php
 $showProjectBookingLink = $cd = $diff = 0;
 $disabled = '';
 
 $result = mysqli_query($conn, "SELECT * FROM $configTable");
 if ($result && ($row = $result->fetch_assoc())) {
-  $cd = $row['cooldownTimer'];
-  $bookingTimeBuffer = $row['bookingTimeBuffer'];
+    $cd = $row['cooldownTimer'];
+    $bookingTimeBuffer = $row['bookingTimeBuffer'];
 } else {
-  $bookingTimeBuffer = 5;
+    $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
 $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
@@ -546,15 +545,15 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
   <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
   <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 } else {
-  $buttonVal = $lang['CHECK_IN'];
-  $buttonNam = 'stampIn';
-  $buttonEmoji = '';
-  $today = getCurrentTimestamp();
-  $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr($today, 0, 10)." %' AND status = '0'");
-  if($result && ($row = $result->fetch_assoc())){
-    $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
-    if($diff < $cd/60){ $disabled = 'disabled'; }
-  }
+    $buttonVal = $lang['CHECK_IN'];
+    $buttonNam = 'stampIn';
+    $buttonEmoji = '';
+    $today = getCurrentTimestamp();
+    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
+    if ($result && ($row = $result->fetch_assoc())) {
+        $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
+        if ($diff < $cd / 60) {$disabled = 'disabled';}
+    }
 }
 $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-ckin' name='$buttonNam'>$buttonVal</button>";
 ?>
@@ -582,26 +581,26 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
   <div class="inner">
     <div class="navbar navbar-default" role="navigation">
       <ul class="nav navbar-nav" id="sidenav01">
-        <?php if($canStamp == 'TRUE'): ?>
+        <?php if ($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
               <form method='post' action="../user/home"><br>
                 <?php
-                echo $checkInButton;
-                if($diff > 0){
-                  echo '<div class="clock-counter" style="display:inline">';
-                  echo "&nbsp;<span id='hours'>".sprintf("%02d",$diff)."</span>:<span id='minutes'>".sprintf("%02d",($diff * 60) % 60)."</span>:<span id='seconds'>".sprintf("%02d",($diff * 3600) % 60)."</span>";
-                  echo '</div>';
-                }
-                echo '<br>'.$buttonEmoji;
-                ?>
+echo $checkInButton;
+if ($diff > 0) {
+    echo '<div class="clock-counter" style="display:inline">';
+    echo "&nbsp;<span id='hours'>" . sprintf("%02d", $diff) . "</span>:<span id='minutes'>" . sprintf("%02d", ($diff * 60) % 60) . "</span>:<span id='seconds'>" . sprintf("%02d", ($diff * 3600) % 60) . "</span>";
+    echo '</div>';
+}
+echo '<br>' . $buttonEmoji;
+?>
               </form><br>
             </div>
           </li>
           <!-- User-Section: BASIC -->
-          <li><a <?php if($this_page =='home.php'){echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
-          <li><a <?php if($this_page =='timeCalcTable.php'){echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
-          <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
+          <li><a <?php if ($this_page == 'home.php') {echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
+          <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
+          <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
 
           <!-- User-Section: BOOKING -->
           <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
@@ -621,7 +620,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
     </div>
     <div class="panel-group" id="sidebar-accordion">
       <!-- Section One: CORE -->
-      <?php if($isCoreAdmin == 'TRUE'): ?>
+      <?php if ($isCoreAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingCore">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE">
@@ -637,51 +636,51 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   </a>
                   <div class="collapse" id="toggleUsers" style="height: 0px;">
                     <ul class="nav nav-list">
-                      <li><a <?php if($this_page =='editUsers.php'){echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
-                      <li><a <?php if($this_page =='admin_saldoview.php'){echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                      <li><a <?php if($this_page =='register.php'){echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
-                      <li><a <?php if($this_page =='deactivatedUsers.php'){echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
-                      <li><a <?php if($this_page =='checkinLogs.php'){echo $setActiveLink;} ?> href="../system/checkinLogs">Checkin Logs</a></li>
+                      <li><a <?php if ($this_page == 'editUsers.php') {echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
+                      <li><a <?php if ($this_page == 'admin_saldoview.php') {echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
+                      <li><a <?php if ($this_page == 'register.php') {echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
+                      <li><a <?php if ($this_page == 'deactivatedUsers.php') {echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
+                      <li><a <?php if ($this_page == 'checkinLogs.php') {echo $setActiveLink;}?> href="../system/checkinLogs">Checkin Logs</a></li>
                     </ul>
                   </div>
                 </li>
                 <li>
-                  <a id="coreCompanyToggle" <?php if($this_page =='editCompanies.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
+                  <a id="coreCompanyToggle" <?php if ($this_page == 'editCompanies.php') {echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
                     <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleCompany" style="height: 0px;">
                     <ul class="nav nav-list">
                       <?php
-                      $result = $conn->query("SELECT * FROM $companyTable");
-                      while($result && ($row = $result->fetch_assoc())){
-                        if(in_array($row['id'], $available_companies)){
-                          echo "<li><a href='../system/company?cmp=".$row['id']."'>".$row['name']."</a></li>";
-                        }
-                      }
-                      ?>
-                      <li><a <?php if($this_page =='new_Companies.php'){echo $setActiveLink;}?> href="../system/new"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
+$result = $conn->query("SELECT * FROM $companyTable");
+while ($result && ($row = $result->fetch_assoc())) {
+    if (in_array($row['id'], $available_companies)) {
+        echo "<li><a href='../system/company?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
+    }
+}
+?>
+                      <li><a <?php if ($this_page == 'new_Companies.php') {echo $setActiveLink;}?> href="../system/new"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
                     </ul>
                   </div>
                 </li>
-                <li><a <?php if($this_page =='editCustomers.php'){echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
-                <li><a <?php if($this_page =='teamConfig.php'){echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
+                <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
                   <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleSettings" style="height: 0px;">
                     <ul class="nav nav-list">
-                      <li><a <?php if($this_page =='editHolidays.php'){echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                      <li><a <?php if($this_page =='advancedOptions.php'){echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                      <li><a <?php if($this_page =='passwordOptions.php'){echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?></span></a></li>
-                      <li><a <?php if($this_page =='reportOptions.php'){echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                      <li><a <?php if($this_page =='taskScheduler.php'){echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
-                      <li><a <?php if($this_page =='download_sql.php'){echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
-                      <?php if(!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
-                        <li><a <?php if($this_page =='upload_database.php'){echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
-                        <li><a <?php if($this_page =='pullGitRepo.php'){echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
-                      <?php endif; ?>
-                      <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
+                      <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                      <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
+                      <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
+                      <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
+                        <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
+                        <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
+                      <?php endif;?>
+                      <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -703,7 +702,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
       <?php endif; ?>
 
       <!-- Section Two: TIME -->
-      <?php if($isTimeAdmin == 'TRUE'): ?>
+      <?php if ($isTimeAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingTime">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME">
@@ -713,24 +712,24 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='getTimeprojects.php'){echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'].' '.$lang['VIEW']; ?></span></a></li>
-                <li><a <?php if($this_page =='bookAdjustments.php'){echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
-                <li><a <?php if($this_page =='getTravellingExpenses.php'){echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
-                <li><a <?php if($this_page =='display_vacation.php'){echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
-                <li><a <?php if($this_page =='adminTodos.php'){echo $setActiveLink;}?> href="../time/check"><?php echo $lang['CHECKLIST']; ?></a></li>
+                <li><a <?php if ($this_page == 'getTimeprojects.php') {echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'] . ' ' . $lang['VIEW']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'bookAdjustments.php') {echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
+                <li><a <?php if ($this_page == 'getTravellingExpenses.php') {echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
+                <li><a <?php if ($this_page == 'display_vacation.php') {echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
+                <li><a <?php if ($this_page == 'adminTodos.php') {echo $setActiveLink;}?> href="../time/check"><?php echo $lang['CHECKLIST']; ?></a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php'){
-          echo "<script>document.getElementById('adminOption_TIME').click();</script>";
-        }
-        ?>
-      <?php endif; ?>
+if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php') {
+    echo "<script>document.getElementById('adminOption_TIME').click();</script>";
+}
+?>
+      <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
-      <?php if($isProjectAdmin == 'TRUE'): ?>
+      <?php if ($isProjectAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingProject">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT">
@@ -750,13 +749,13 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php"){
-          echo "<script>$('#adminOption_PROJECT').click();</script>";
-        }
-        ?>
-      <?php endif; ?>
+if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php") {
+    echo "<script>$('#adminOption_PROJECT').click();</script>";
+}
+?>
+      <?php endif;?>
       <!-- Section Four: REPORTS -->
-      <?php if($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
+      <?php if ($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingReport">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT">
@@ -766,23 +765,23 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-              <?php if($isReportAdmin == 'TRUE'): ?>
+              <?php if ($isReportAdmin == 'TRUE'): ?>
                 <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
-                <li><a <?php if($this_page =='report_productivity.php'){echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
-              <?php endif; ?>
-                <li><a <?php if($this_page =='templateSelect.php'){echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li>
+                <li><a <?php if ($this_page == 'report_productivity.php') {echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
+              <?php endif;?>
+                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "report_productivity.php" || $this_page =='templateSelect.php'){
-          echo "<script>$('#adminOption_REPORT').click();</script>";
-        }
-        ?>
-      <?php endif; ?>
+if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
+    echo "<script>$('#adminOption_REPORT').click();</script>";
+}
+?>
+      <?php endif;?>
       <!-- Section Five: ERP -->
-      <?php if($isERPAdmin == 'TRUE'): ?>
+      <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingERP">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-file-text-o"></i> ERP<i class="fa fa-caret-down pull-right"></i></a>
@@ -790,17 +789,20 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='offer_proposal_edit.php'){echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESS']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'offer_proposal_edit.php') {echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESS']; ?></span></a></li>
                 <li><a id="erpClients" href="#" data-toggle="collapse" data-target="#toggleERPClients" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['CLIENTS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleERPClients">
                     <ul class="nav nav-list">
-                      <li><a <?php if(isset($_GET['t']) && $_GET['t'] == 'ang') echo $setActiveLink; ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
+                      <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') {
+    echo $setActiveLink;
+}
+?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
                       <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                       <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                       <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                      <li><a <?php if($this_page == 'editCustomers.php'){echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -811,7 +813,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                     <ul class="nav nav-list">
                       <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
                       <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a <?php if($this_page =='editSuppliers.php'){echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -825,11 +827,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   </a>
                   <div class="collapse" id="toggleERPSettings">
                     <ul class="nav nav-list">
-                      <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-                      <li><a <?php if($this_page == 'editUnits.php'){echo $setActiveLink;}?> href="../erp/units"><span><?php echo $lang['UNITS']; ?></span></a></li>
-                      <li><a <?php if($this_page == 'editPaymentMethods.php'){echo $setActiveLink;}?> href="../erp/payment"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
-                      <li><a <?php if($this_page == 'editShippingMethods.php'){echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
-                      <li><a <?php if($this_page == 'editRepres.php'){echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editTaxes.php') {echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editUnits.php') {echo $setActiveLink;}?> href="../erp/units"><span><?php echo $lang['UNITS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editPaymentMethods.php') {echo $setActiveLink;}?> href="../erp/payment"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editShippingMethods.php') {echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
+                      <li><a <?php if ($this_page == 'editRepres.php') {echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -838,19 +840,19 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if(isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
-        } elseif($this_page == "editSuppliers.php" ){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
-        } elseif($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php"){
-          echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
-        } elseif($this_page == "product_articles.php" || $this_page == "receiptBook.php" ){
-          echo "<script>$('#adminOption_ERP').click();</script>";
-        }
-        ?>
-      <?php endif; ?>
+if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php") {
+    echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
+} elseif ($this_page == "editSuppliers.php") {
+    echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
+} elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
+    echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+} elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
+    echo "<script>$('#adminOption_ERP').click();</script>";
+}
+?>
+      <?php endif;?>
       <!-- Section Six: FINANCES -->
-      <?php if($isFinanceAdmin == 'TRUE'): ?>
+      <?php if ($isFinanceAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-finance"  id="adminOption_FINANCE"><i class="fa fa-book"></i><?php echo $lang['FINANCES']; ?><i class="fa fa-caret-down pull-right"></i></a>
@@ -895,17 +897,17 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php'){
-          echo "<script>$('#adminOption_FINANCE').click();";
-          if(isset($_GET['n'])){
-            echo "$('#finance-click-".$_GET['n']."').click();";
-          }
-          echo '</script>';
-        }
-        ?>
-      <?php endif; ?>
+if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php') {
+    echo "<script>$('#adminOption_FINANCE').click();";
+    if (isset($_GET['n'])) {
+        echo "$('#finance-click-" . $_GET['n'] . "').click();";
+    }
+    echo '</script>';
+}
+?>
+      <?php endif;?>
       <!-- Section Six: DSGVO -->
-      <?php if($isDSGVOAdmin == 'TRUE'): ?>
+      <?php if ($isDSGVOAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><strong style="padding: 0px 6px;"> § </strong>DSGVO<i class="fa fa-caret-down pull-right"></i></a>
@@ -951,20 +953,20 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           </div>
         </div>
         <?php
-        if($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php"  || $this_page == "dsgvo_vv_templates.php" ||$this_page == "dsgvo_vv_template_edit.php"){
-          echo "<script>$('#adminOption_DSGVO').click();";
-          if(isset($_GET['n'])){
-            echo "$('#tdsgvo-".$_GET['n']."').toggle();";
-          }
-          if($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php"){
-            echo "$('#tdsgvo-sets-".$_GET['n']."').toggle();";
-          }
-          echo '</script>';
-        }
-        ?>
-      <?php endif; ?>
+if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
+    echo "<script>$('#adminOption_DSGVO').click();";
+    if (isset($_GET['n'])) {
+        echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
+    }
+    if ($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php") {
+        echo "$('#tdsgvo-sets-" . $_GET['n'] . "').toggle();";
+    }
+    echo '</script>';
+}
+?>
+      <?php endif;?>
       <!-- Section Seven: ARCHIVE -->
-      <?php if($isDSGVOAdmin == 'TRUE'): ?>
+      <?php if ($isDSGVOAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><strong style="padding: 0px 6px;"> [Ξ] </strong><?php echo $lang['ARCHIVE'] ?><i class="fa fa-caret-down pull-right"></i></a>
@@ -980,7 +982,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
             </div>
           </div>
         </div>
-      <?php endif; ?>
+      <?php endif;?>
       <!-- Section Ends : ARCHIVE -->
       <br><br>
     </div> <!-- /accordions -->
@@ -1007,12 +1009,15 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
         die();
       }
     }
-  }
-  if($masterPasswordHash && !empty($_SESSION['masterpassword'])){
-    if(simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
-  }
-  $user_agent = $_SERVER["HTTP_USER_AGENT"];
-  if(strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge') ) {
+}
+if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {
+    if (simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') {
+        echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
+    }
+
+}
+$user_agent = $_SERVER["HTTP_USER_AGENT"];
+if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
 }
 ?>
