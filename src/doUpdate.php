@@ -2163,6 +2163,15 @@ if ($row['version'] < 123) {
     $conn->query("ALTER TABLE documentProcess ADD COLUMN document_version VARCHAR(15) NOT NULL DEFAULT '1.0' ");
 }
 
+if($row['version'] < 124){
+  $conn->query("DROP TABLE modules");
+  if ($conn->error) {
+      echo $conn->error;
+  } else {
+      echo '<br>Module: Auflösen';
+  }
+}
+
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';

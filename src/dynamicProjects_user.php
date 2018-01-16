@@ -2,8 +2,7 @@
 enableToDynamicProjects($userID);
 require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
 if (!function_exists('stripSymbols')) {
-    function stripSymbols($s)
-    {
+    function stripSymbols($s) {
         $result = "";
         foreach (str_split($s) as $char) {
             if (ctype_alnum($char)) {
@@ -14,64 +13,61 @@ if (!function_exists('stripSymbols')) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
-    $id = $_POST["id"] ?? "";
-    $id = $conn->real_escape_string($id);
-    $conn->query("DELETE FROM dynamicprojectsnotes WHERE projectid = '$id'");
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["note"])) {
-    $id = $_POST["id"] ?? "";
-    $id = $conn->real_escape_string($id);
-    $text = $_POST["notetext"] ?? "error";
-    $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
-    echo $conn->error;
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
-    $note_id = $_POST["id"] ?? "";
-    $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
-    require_once __DIR__ . "/utilities.php";
-    $project = $_POST["id"];
-    $picture = uploadFile("image", 1, 0, 1);
-    $picture = "data:image/jpeg;base64," . base64_encode($picture);
-    $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
-    echo $conn->error;
-    $null = null;
-    $stmt->bind_param("b", $null);
-    $stmt->send_long_data(0, $picture);
-    $stmt->execute();
-    echo $stmt->error;
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || isset($_POST["editDynamicProject"]))) {
-    $id = $_POST["id"] ?? "";
-    $pictures = $_POST["imagesbase64"] ?? false;
-    $completed = (int) $_POST["completed"] ?? 0;
-    $id = $conn->real_escape_string($id);
-    if ($pictures) {
-        foreach ($pictures as $picture) {
-            $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
-            echo $conn->error;
-            $null = null;
-            $stmt->bind_param("b", $null);
-            $stmt->send_long_data(0, $picture);
-            $stmt->execute();
-            echo $stmt->error;
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    if (isset($_POST["deletenote"])) {
+        $id = $_POST["id"] ?? "";
+        $id = $conn->real_escape_string($id);
+        $conn->query("DELETE FROM dynamicprojectsnotes WHERE projectid = '$id'");
+    }
+    if (isset($_POST["note"])) {
+        $id = $_POST["id"] ?? "";
+        $id = $conn->real_escape_string($id);
+        $text = $_POST["notetext"] ?? "error";
+        $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
+        echo $conn->error;
+    }
+    if (isset($_POST["deletenote"])) {
+        $note_id = $_POST["id"] ?? "";
+        $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
+    }
+    if (isset($_FILES["image"])) {
+        require_once __DIR__ . "/utilities.php";
+        $project = $_POST["id"];
+        $picture = uploadFile("image", 1, 0, 1);
+        $picture = "data:image/jpeg;base64," . base64_encode($picture);
+        $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
+        echo $conn->error;
+        $null = null;
+        $stmt->bind_param("b", $null);
+        $stmt->send_long_data(0, $picture);
+        $stmt->execute();
+        echo $stmt->error;
+    }
+    if ((isset($_POST["dynamicProject"]) || isset($_POST["editDynamicProject"]))) {
+        $id = $_POST["id"] ?? "";
+        $pictures = $_POST["imagesbase64"] ?? false;
+        $completed = (int) $_POST["completed"] ?? 0;
+        $id = $conn->real_escape_string($id);
+        if ($pictures) {
+            foreach ($pictures as $picture) {
+                $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
+                echo $conn->error;
+                $null = null;
+                $stmt->bind_param("b", $null);
+                $stmt->send_long_data(0, $picture);
+                $stmt->execute();
+                echo $stmt->error;
+            }
+        }
+        $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
+        echo $conn->error;
+        echo "completed: ", $completed, "completed == 100", $completed == 100;
+        if ($completed == 100) {
+            $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
         }
     }
-    $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
-    echo $conn->error;
-    echo "completed: ", $completed, "completed == 100", $completed == 100;
-    if ($completed == 100) {
-        $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
-    }
-}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     $projectID = $_POST["id"] ?? "";
     $clientID = $_POST["client"] ?? -1;
     $completed = intval($_POST["completed"] ?? 0);
@@ -117,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "stop not implemented";
     }
 }
+
 // if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {

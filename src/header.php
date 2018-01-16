@@ -34,7 +34,7 @@
     $canBook = $row['canBook'];
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
-    $canUseSocialMedia = $row['canUseSocialMedia'];    
+    $canUseSocialMedia = $row['canUseSocialMedia'];
   } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
@@ -60,24 +60,13 @@
   $masterPass_checkSum = $row['checkSum']; //ABCabc123!
   }
 
-  $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
-  if($result && ($row = $result->fetch_assoc())){
-    $enableSocialMedia = $row['enableSocialMedia'];
-    $enableDynamicProjects = $row['enableDynamicProjects'];
-    $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
-    echo $conn->error;
-    $hasActiveDynamicProjects = ($result && $result->num_rows > 0)?'TRUE':'FALSE';
-  } else {
-    $enableSocialMedia = 'FALSE';
-    $enableDynamicProjects = 'FALSE';
-    $hasActiveDynamicProjects = 'FALSE';
-  }
-  if($enableSocialMedia == 'TRUE'){
-    $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
-    $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
-    $numberOfSocialAlerts = $private+$group;
-  }
-  if($isTimeAdmin){
+$result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+$hasActiveDynamicProjects = ($result && $result->num_rows > 0) ? 'TRUE' : 'FALSE';
+
+$numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
+$numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
+
+if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
@@ -91,7 +80,7 @@
     //lunchbreaks
     $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
     INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
-    WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+    WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
     if($result && $result->num_rows > 0){ $numberOfAlerts += $result->num_rows; }
   }
@@ -123,7 +112,7 @@
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
-    
+
     if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
       $password = $_POST['password'];
       $passwordConfirm = $_POST['passwordConfirm'];
@@ -265,17 +254,17 @@
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
     }
-    <?php 
+    <?php
   if(isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])){
     $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
      if($result){
        $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'],'AES-128-ECB',$_POST['encryptionPassword']);
        if($privateDecoded!=false){
-          $unlockedPGP=$privateDecoded; 
+          $unlockedPGP=$privateDecoded;
           echo 'document.getElementById("options").click();';
-       } 
+       }
      }
-    
+
   }
   ?>
   });
@@ -332,20 +321,67 @@
         </ul>
       </div>
       <div class="navbar-right" style="margin-right:10px;">
-        <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>          
+        <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
         <?php
-          $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
-          $row = $result->fetch_assoc();
-          $social_status = $row["status"];
-          $social_isAvailable = $row["isAvailable"];
-          $defaultGroupPicture = "images/group.png";
-          $defaultPicture = "images/defaultProfilePicture.png";
-          $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : $defaultPicture;
-        ?>
-        <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
+$result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
+$row = $result->fetch_assoc();
+$social_status = $row["status"];
+$social_isAvailable = $row["isAvailable"];
+$defaultGroupPicture = "images/group.png";
+$defaultPicture = "images/defaultProfilePicture.png";
+$profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+?>
+        <?php if ($canUseSocialMedia == 'TRUE'): ?>
         <a class="hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
         <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
-        <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>"><i class="fa fa-commenting"></i></a>
+        <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
+          <i class="fa fa-commenting"></i>
+          <span class="badge pull-right" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
+        </a>
+        <script>
+          var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
+          setInterval(function(){
+          	$.ajax({
+        		url: 'ajaxQuery/AJAX_socialGetAlerts.php',
+        		type: 'GET',
+        		success: function (response) {
+        			$("#numberOfSocialAlerts").html(response)
+        			if(response == "0"){
+        			  $("#numberOfSocialAlerts").hide()
+        			  alertsBeforeUpdate = parseInt(response)
+        			}else{
+        			  $("#numberOfSocialAlerts").show()
+        			  var alertDifference = parseInt(response) - alertsBeforeUpdate
+        			  alertsBeforeUpdate = parseInt(response)
+        			  if(alertDifference > 0){
+        				generateNotification(parseInt(response),alertDifference)
+        			  }
+        			}
+        		},
+        	});
+          },10000) // 10 seconds
+
+          function generateNotification(messages, newMessages){
+        	var image = 'images/messageIcon.png';
+        	var options = {
+        		body: newMessages + " new\n"+messages+" unread",
+        		icon: image,
+        		tag: "tagToUpdateNotification",
+        		badge: image
+        	}
+        	var n = new Notification('Connect Social',options);
+        	setTimeout(n.close.bind(n), 5000);
+        	n.onclick = function(){
+        	  console.info("Click");
+        	}
+        	n.onerror = function(){
+        	  console.warn("Error while displaying notification");
+        	}
+        	n.onshow = function(){
+        	  console.info("Show");
+        	}
+        }
+        </script>
         <?php else: ?>
         <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
         <?php endif; ?>
@@ -403,7 +439,7 @@
         <div class="modal-body">
           <div class="col-md-12">
           <label>Public Key</label>
-          <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php 
+          <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php
           $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
           if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
           ?></textarea><br>
@@ -443,7 +479,7 @@
   </form>
 
   <!-- /modal -->
-  <?php if($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
+  <?php if ($canUseSocialMedia == 'TRUE'): ?>
     <!-- social settings modal -->
     <form method="post" enctype="multipart/form-data">
       <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog" aria-labelledby="socialSettingsLabel">
@@ -498,7 +534,7 @@ $result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00
 if($result && ($row = $result->fetch_assoc())) { //checkout
   $buttonVal = $lang['CHECK_OUT'];
   $buttonNam = 'stampOut';
-  //<img width="15px" height="15px" src="images/emji1.png"> 
+  //<img width="15px" height="15px" src="images/emji1.png">
   $showProjectBookingLink = TRUE;
   $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
   if($diff < $cd / 60) { $disabled = 'disabled'; }
@@ -568,15 +604,18 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <li><a <?php if($this_page =='makeRequest.php'){echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
 
           <!-- User-Section: BOOKING -->
-          <?php if($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-            <li><a <?php if($this_page =='userProjecting.php'){echo $setActiveLink;} ?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>         
-            <?php if($enableDynamicProjects == 'TRUE' && $hasActiveDynamicProjects == 'TRUE'):?>
-              <li><a <?php if($this_page =='dynamicProjects_user.php'){echo $setActiveLink;} ?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?> <?php 
-            $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
-            if($result->num_rows>0) echo '<label style="font-size: 16px; color: white;">'.$result->num_rows.'</label>';            
-            ?></span></a></li>
-            <?php endif; //dynamicProjects ?> 
-          <?php endif; ?>
+          <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
+	            <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
+	            <?php if ($hasActiveDynamicProjects == 'TRUE'): ?>
+	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?> <?php
+    $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
+    if ($result->num_rows > 0) {
+        echo '<label style="font-size: 16px; color: white;">' . $result->num_rows . '</label>';
+    }
+
+    ?></span></a></li>
+	            <?php endif; //dynamicProjects ?>
+          <?php endif;?>
         <?php endif; //endif(canStamp)?>
       </ul>
     </div>
@@ -645,7 +684,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                       <li><a <?php if($this_page =='resticBackup.php'){echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
                     </ul>
                   </div>
-                </li>               
+                </li>
               </ul>
             </div>
           </div>
@@ -661,7 +700,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
-      <?php endif; ?> 
+      <?php endif; ?>
 
       <!-- Section Two: TIME -->
       <?php if($isTimeAdmin == 'TRUE'): ?>
@@ -701,11 +740,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
           <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if($this_page =='editProjects.php'){echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
-                <li><a <?php if($this_page =='audit_projectBookings.php'){echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                <?php if($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'):?>
-                  <li><a <?php if($this_page =='dynamicProjects_admin.php'){echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
-                <?php endif; ?>
+                <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
+                <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
+                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+                <?php endif;?>
               </ul>
             </div>
           </div>
@@ -776,11 +815,11 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                     </ul>
                   </div>
                 </li>
-                
+
                 <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
                 <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
                 <li><a disabled href=""><span><?php echo $lang['VACANT_POSITIONS']; ?></span></a></li>
-                
+
                 <li><a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
                     <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
@@ -833,9 +872,9 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
-                    echo '<li>';                  
+                    echo '<li>';
                     echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';                  
+                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
                     echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
                     echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
@@ -848,7 +887,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                     }
                     echo '</ul></div></li>';
                   }
-                }                
+                }
                 ?>
                 <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
               </ul>
@@ -877,7 +916,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 <?php
                 if(count($available_companies) == 2){
                   echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
+                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   echo '<li>';
                   echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$available_companies[1].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
                   echo '<div class="collapse" id="tdsgvo-sets-'.$available_companies[1].'" >';
@@ -893,8 +932,8 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                     echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
                     echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                    echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';      
-                    
+                    echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+
                     echo '<li>';
                     echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
                     echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
@@ -902,7 +941,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                     echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
                     echo '</ul></div></li>';
-                    
+
                     echo '</ul></div></li>';
                   }
                 }
@@ -936,7 +975,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 <li>
                     <a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a>
                 </li>
-                
+
               </ul>
             </div>
           </div>
@@ -958,7 +997,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
 
 <?php
   $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
-  $row = $result->fetch_assoc();  
+  $row = $result->fetch_assoc();
   if($row['expiration'] == 'TRUE'){ //can a password expire?
     $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
     if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
@@ -975,5 +1014,5 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
   $user_agent = $_SERVER["HTTP_USER_AGENT"];
   if(strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge') ) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
-  }
+}
 ?>

@@ -139,11 +139,6 @@ function denyToContainer(){
 
 function enableToSocialMedia($userID){
   require 'connection.php';
-  if ($conn->query("SELECT enableSocialMedia FROM modules")->fetch_assoc()['enableSocialMedia'] === 'FALSE'){
-    echo 'Module not enabled.';
-    include 'footer.php';
-    die('<a href="../system/advanced">Enable</a>');
-  }
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -155,11 +150,6 @@ function enableToSocialMedia($userID){
 
 function isDynamicProjectAdmin($userID){
   require 'connection.php';
-  if ($conn->query("SELECT enableDynamicProjects FROM modules")->fetch_assoc()['enableDynamicProjects'] === 'FALSE'){
-    echo 'Module not enabled.';
-    include 'footer.php';
-    die('<a href="../system/advanced">Enable</a>');
-  }
   $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND isDynamicProjectsAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -171,19 +161,14 @@ function isDynamicProjectAdmin($userID){
 
 function enableToDynamicProjects($userID){
   require 'connection.php';
-  if ($conn->query("SELECT enableDynamicProjects FROM modules")->fetch_assoc()['enableDynamicProjects'] === 'FALSE'){
-    echo 'Module not enabled.';
-    include 'footer.php';
-    die('<a href="../system/advanced">Enable</a>');
-  }
   enableToBookings($userID);
   // test whether user has active dynamic projects
-  $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.* 
-  FROM dynamicprojects 
-  LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid 
-  LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid  
-  WHERE dynamicprojectsoptionalemployees.userid = $userID 
-  OR dynamicprojectsemployees.userid = $userID 
+  $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.*
+  FROM dynamicprojects
+  LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid
+  LEFT JOIN dynamicprojectsemployees on dynamicprojectsemployees.projectid = dynamicprojects.projectid
+  WHERE dynamicprojectsoptionalemployees.userid = $userID
+  OR dynamicprojectsemployees.userid = $userID
   OR dynamicprojects.projectowner = $userID");
   if($result && $result->num_rows == 0){
     echo "You are not part of any dynamic projects <a href='../user/logout'> logout</a>";

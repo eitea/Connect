@@ -495,17 +495,7 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TABLE modules (
-    enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
-  )";
-  if (!$conn->query($sql)) {
-    echo mysqli_error($conn);
-  }
-
-  $sql = "CREATE TABLE policyData (
+    $sql = "CREATE TABLE policyData (
     passwordLength INT(2) DEFAULT 6,
     complexity ENUM('0', '1', '2') DEFAULT '1',
     expiration ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
@@ -716,7 +706,7 @@ function create_tables($conn){
     price DECIMAL(10,2),
     unit VARCHAR(20),
     quantity DECIMAL(8,2),
-    purchase DECIMAL(10,2),    
+    purchase DECIMAL(10,2),
     cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
     iv VARCHAR(255),
     iv2 VARCHAR(255),
@@ -728,7 +718,7 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-  
+
   /* IMPORTANT:
   Tax IDs must always correspond to their current positon in place.
   Taxes may only be altered under supervision of an accountant
@@ -889,7 +879,7 @@ function create_tables($conn){
   )")){
     echo mysqli_error($conn);
   }
-  
+
   $sql = "CREATE TABLE identification(
     id VARCHAR(60) PRIMARY KEY
   )";
@@ -943,10 +933,10 @@ function create_tables($conn){
     journalID INT(10) UNSIGNED,
     accountID INT(4) UNSIGNED,
     should DECIMAL(18,2),
-    have DECIMAL(18,2),  
+    have DECIMAL(18,2),
     FOREIGN KEY (accountID) REFERENCES accounts(id)
     ON UPDATE CASCADE
-    ON DELETE CASCADE,  
+    ON DELETE CASCADE,
     FOREIGN KEY (journalID) REFERENCES account_journal(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
@@ -965,12 +955,12 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TRIGGER projectBookingData_update_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_update_trigger
     BEFORE UPDATE ON projectBookingData
     FOR EACH ROW
   BEGIN
     SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
-    IF @cnt >= 150 THEN 
+    IF @cnt >= 150 THEN
       DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
     END IF;
     INSERT INTO projectBookingData_audit
@@ -980,12 +970,12 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TRIGGER projectBookingData_delete_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_delete_trigger
       BEFORE DELETE ON projectBookingData
       FOR EACH ROW
     BEGIN
       SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
-      IF @cnt >= 150 THEN 
+      IF @cnt >= 150 THEN
         DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
       END IF;
       INSERT INTO projectBookingData_audit
@@ -995,12 +985,12 @@ function create_tables($conn){
     echo mysqli_error($conn);
   }
 
-  $sql = "CREATE TRIGGER projectBookingData_insert_trigger 
+  $sql = "CREATE TRIGGER projectBookingData_insert_trigger
       AFTER INSERT ON projectBookingData
       FOR EACH ROW
     BEGIN
       SELECT COUNT(*) INTO @cnt FROM projectBookingData_audit;
-      IF @cnt >= 150 THEN 
+      IF @cnt >= 150 THEN
         DELETE FROM projectBookingData_audit ORDER BY id LIMIT 1;
       END IF;
       INSERT INTO projectBookingData_audit
@@ -1019,7 +1009,7 @@ function create_tables($conn){
     info VARCHAR(64),
     amount DECIMAL(10,2),
     FOREIGN KEY (supplierID) REFERENCES clientData(id)
-    ON UPDATE CASCADE 
+    ON UPDATE CASCADE
     ON DELETE CASCADE,
     FOREIGN KEY (journalID) REFERENCES account_journal(id)
     ON DELETE SET NULL
@@ -1101,7 +1091,7 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-  
+
   $sql = "CREATE TABLE documentProcess(
     id VARCHAR(16) NOT NULL PRIMARY KEY,
     docID INT(6) UNSIGNED,
@@ -1119,7 +1109,7 @@ function create_tables($conn){
   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
-  }  
+  }
 
   $sql = "CREATE TABLE documentProcessHistory(
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1132,7 +1122,7 @@ function create_tables($conn){
 	if (! $conn->query ( $sql )) {
 		echo mysqli_error ( $conn );
   }
-  
+
   $sql = "CREATE TABLE dsgvo_vv_templates(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		companyID INT(6) UNSIGNED,
@@ -1188,7 +1178,7 @@ function create_tables($conn){
 	if(!$conn->query($sql)){
 		echo $conn->error;
   }
-  
+
   $sql = "CREATE TABLE dynamicprojects(
     projectid VARCHAR(100) NOT NULL,
     projectname VARCHAR(60) NOT NULL,
@@ -1313,10 +1303,10 @@ function create_tables($conn){
     PRIMARY KEY (id),
     UNIQUE KEY hashkey (hashkey),
     KEY owner (owner)
-   )"; 
+   )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
-  } 
+  }
 
   $sql = "CREATE TABLE sharedgroups (
     id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
@@ -1333,7 +1323,7 @@ function create_tables($conn){
     )";
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
-  } 
+  }
 
   $sql ="CREATE TABLE uploadedfiles (
     id INT NOT NULL AUTO_INCREMENT ,
@@ -1350,7 +1340,7 @@ function create_tables($conn){
   if (!$conn->query($sql)) {
     echo mysqli_error($conn);
   }
-  
+
   $sql = "CREATE TABLE document_customs(
 		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		companyID INT(6) UNSIGNED,
@@ -1366,5 +1356,5 @@ function create_tables($conn){
 		echo $conn->error;
   }
 
-  
+
 }
