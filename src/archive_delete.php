@@ -1,13 +1,13 @@
 <?php
 require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."/connection.php";
-if(empty($_GET['n'])){
+if(empty($_POST['groupID'])){
   echo "Invalid Access.";
   die();
 }
 
 $s3 = new Aws\S3\S3Client($s3config);
-$groupID = $_GET['n'];
+$groupID = $_POST['groupID'];
 
 try {
   $result = $conn->query("SELECT * FROM sharedfiles WHERE sharegroup=".$groupID."");
@@ -24,8 +24,6 @@ try {
 } catch(Exception $e) {
   echo $e;
   die();
-  header('Location: ../archive/share');
 }
-header('Location: ../archive/share');
-
+return;
 ?>

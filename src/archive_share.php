@@ -231,7 +231,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<td>';
     echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
     echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')"  data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
-    echo '<button onclick="location.href=\'../archive/delete?n=' . $row['id'] . '\'" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
+    echo '<button onclick="deleteGroup('.$row['id'].')" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
     echo '</td>';
     echo '</tr>';
   }
@@ -381,6 +381,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 <script>
+  function deleteGroup(groupID){
+    $.ajax({
+      type: "POST",
+      url: "../archive/delete",
+      data: { groupID: groupID}
+    }).done(function(e){
+      if(e!='') alert(e);
+      location.href='../archive/share';
+    });
+  }
+  
   function finishEditGroup(evt){
     editGroup(evt,document.getElementById('groupID').value);
   }
