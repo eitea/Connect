@@ -40,7 +40,7 @@ if (!function_exists('stripSymbols')) {
                             <a data-toggle="tab" href="#dynamicCommentsPictures<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></a>
                         </li>
                         <li>
-                            <a data-toggle="tab" href="#dynamicCommentsBooking<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_BOOKING"]; ?></a>
+                            <a data-toggle="tab" href="#dynamicCommentsBooking<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["BOOKINGS"]; ?></a>
                         </li>
                     </ul>
                     <!-- /tab buttons -->
