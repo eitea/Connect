@@ -242,7 +242,7 @@ while ($row = $result->fetch_assoc()) {
 
     echo "<tr>";
     echo "<td style='background-color:$color;'>$name</td>";
-    echo "<td>$description</td>";
+    echo "<td><button type='button' onClick='showDescription(\"$id\")' data-toggle='modal' data-target='#projectDescription'><i class='fa fa-file-text-o'></i></button></td>";
     echo "<td>$companyName</td>";
     echo "<td>";
     $completed = 0; //percentage of overall project completed 0-100
@@ -421,8 +421,36 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 ?>
 </tbody>
 </table>
-
+<div class="modal fade" id="projectDescription" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="projectDescriptionId"></h4>
+            </div>
+            <br>
+            <div id="projectDescriptionBody" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+function showDescription(pId){
+    var header = document.getElementById('projectDescriptionId');
+    var body = document.getElementById('projectDescriptionBody');
+    $.ajax({
+      url: 'ajaxQuery/AJAX_getDescription.php',
+      type: 'POST',
+      data: {pId:pId},
+      success: function(res){
+        res = JSON.parse(res);
+        header.innerHTML = res['projectname'];
+        body.innerHTML = res['projectdescription'];
+      }
+    });
+}
+
+
 $('.table').DataTable({
   order: [[ 8, "asc" ]],
   columns: [null, {orderable: false}, null, null, null,null,{orderable: false}, null,  {orderable: false},{orderable: false},{orderable: false}],
