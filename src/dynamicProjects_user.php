@@ -242,7 +242,7 @@ while ($row = $result->fetch_assoc()) {
 
     echo "<tr>";
     echo "<td style='background-color:$color;'>$name</td>";
-    echo "<td><button type='button' onClick='showDescription(\"$id\")' data-toggle='modal' data-target='#projectDescription'><i class='fa fa-file-text-o'></i></button></td>";
+    echo "<td><button class='btn btn-default' type='button' onClick='showDescription(\"$id\")' data-toggle='modal' data-target='#projectDescription'><i class='fa fa-file-text-o'></i></button></td>";
     echo "<td>$companyName</td>";
     echo "<td>";
     $completed = 0; //percentage of overall project completed 0-100
