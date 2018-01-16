@@ -2164,12 +2164,12 @@ if ($row['version'] < 123) {
 }
 
 if($row['version'] < 124){
-  $conn->query("DROP TABLE modules");
-  if ($conn->error) {
-      echo $conn->error;
-  } else {
-      echo '<br>Module: Auflösen';
-  }
+    $conn->query("DROP TABLE modules");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Module: Auflösen';
+    }
 }
 
 // ------------------------------------------------------------------------------

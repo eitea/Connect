@@ -211,7 +211,7 @@ while ($row = $result->fetch_assoc()) {
     $employeesResult = $conn->query(
         "SELECT * FROM dynamicprojectsemployees
         INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid
-        WHERE projectid='$id'"
+        WHERE projectid='$id' AND UserData.id NOT IN (SELECT t.userID FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON d.teamid = t.teamid WHERE d.projectid = '$id')"
     );
     $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
     echo $conn->error;
@@ -239,16 +239,18 @@ while ($row = $result->fetch_assoc()) {
 
     echo "<tr>";
     echo "<td style='background-color:$color;'>$name</td>";
-    echo "<td>$description</td>";
+    echo "<td><button class='btn btn-default' type='button' onClick='showDescription(\"$id\")' data-toggle='modal' data-target='#projectDescription'><i class='fa fa-file-text-o'></i></button></td>";
     echo "<td>$companyName</td>";
     echo "<td>";
     $completed = 0; //percentage of overall project completed 0-100
+    $string = '';
     while ($clientRow = $clientsResult->fetch_assoc()) {
         array_push($clients, $clientRow["id"]);
         $completed += intval($clientRow["projectcompleted"]);
         $client = $clientRow["name"];
-        echo "$client, ";
+        $string .= "$client, ";
     }
+    echo rtrim($string,", ");
     $completed = intval($completed / ((count($clients) > 0) ? count($clients) : 1)); // average completion
     echo "</td>";
     echo "<td>$start</td>";
@@ -258,21 +260,23 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$priority</td>";
     echo "<td>$owner</td>";
     echo "<td>";
+    $string = '';
     while ($employeeRow = $employeesResult->fetch_assoc()) {
         array_push($employees, "user;" . $employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
-        echo "$employee, ";
+        $string .= "$employee, ";
     }
     while ($teamRow = $teamsResult->fetch_assoc()) {
         array_push($employees, "team;" . $teamRow["id"]);
         $team = $teamRow["name"];
-        echo "$team, ";
+        $string .= "$team, ";
     }
     while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
         array_push($optional_employees, $optional_employeeRow["id"]);
         $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-        echo "$optional_employee, ";
+        $string .= "$optional_employee, ";
     }
+    echo rtrim($string,", ");
     echo "</td>";
 
     $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
@@ -418,8 +422,36 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 ?>
 </tbody>
 </table>
-
+<div class="modal fade" id="projectDescription" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="projectDescriptionId"></h4>
+            </div>
+            <br>
+            <div id="projectDescriptionBody" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+function showDescription(pId){
+    var header = document.getElementById('projectDescriptionId');
+    var body = document.getElementById('projectDescriptionBody');
+    $.ajax({
+      url: 'ajaxQuery/AJAX_getDescription.php',
+      type: 'POST',
+      data: {pId:pId},
+      success: function(res){
+        res = JSON.parse(res);
+        header.innerHTML = res['projectname'];
+        body.innerHTML = res['projectdescription'];
+      }
+    });
+}
+
+
 $('.table').DataTable({
   order: [[ 8, "asc" ]],
   columns: [null, {orderable: false}, null, null, null,null,{orderable: false}, null,  {orderable: false},{orderable: false},{orderable: false}],

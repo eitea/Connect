@@ -253,18 +253,18 @@ if ($_SESSION['color'] == 'light') {
       }, 1000);
     }
     <?php
-  if(isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])){
+if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
     $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-     if($result){
-       $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'],'AES-128-ECB',$_POST['encryptionPassword']);
-       if($privateDecoded!=false){
-          $unlockedPGP=$privateDecoded;
-          echo 'document.getElementById("options").click();';
-       }
-     }
+    if ($result) {
+        $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
+        if ($privateDecoded != false) {
+            $unlockedPGP = $privateDecoded;
+            echo 'document.getElementById("options").click();';
+        }
+    }
 
-  }
-  ?>
+}
+?>
   });
   function generateKeys($userID){
     $.ajax({
@@ -529,7 +529,7 @@ if ($result && ($row = $result->fetch_assoc())) {
     $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
-$result = mysqli_query($conn,  "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+$result = mysqli_query($conn,  "SELECT `time` FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
   $buttonVal = $lang['CHECK_OUT'];
   $buttonNam = 'stampOut';
@@ -549,7 +549,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonNam = 'stampIn';
     $buttonEmoji = '';
     $today = getCurrentTimestamp();
-    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
+    $result = mysqli_query($conn, "SELECT timeEnd FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
     if ($result && ($row = $result->fetch_assoc())) {
         $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
         if ($diff < $cd / 60) {$disabled = 'disabled';}

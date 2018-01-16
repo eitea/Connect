@@ -7,3 +7,4 @@ plugins/restic/backup.sql
 backup.sql
 dynamicProjects.php
 *.db
+src/connection_s3admin.php

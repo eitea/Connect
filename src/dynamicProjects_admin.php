@@ -310,7 +310,7 @@ while ($row = $result->fetch_assoc()) {
     $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
     $owner = "${owner['firstname']} ${owner['lastname']}";
     $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
-    $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id'");
+    $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id' AND UserData.id NOT IN (SELECT t.userID FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON d.teamid = t.teamid WHERE d.projectid = '$id')");
     $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
     $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
     $pictures = array();
