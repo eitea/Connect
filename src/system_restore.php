@@ -20,7 +20,7 @@ if(isset($_POST['accept'])){
   }
 
   if($accept){
-    //changes here have to be copied to resticBackup.php 
+    //changes here have to be copied to resticBackup.php
     require dirname(__DIR__).'/plugins/mysqldump/MySQLImport.php';
     $conn->close();
     $conn = new mysqli($servername,$username,$password);
@@ -30,7 +30,7 @@ if(isset($_POST['accept'])){
     $conn = new mysqli($servername,$username,$password,$dbName);
     $import = new MySQLImport($conn);
     $import->load($file);
-    //redirect("../user/logout");
+    redirect("../user/logout");
 
   } else {
     $error_output = $lang['ERROR_INVALID_UPLOAD'];
