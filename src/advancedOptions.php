@@ -46,6 +46,45 @@ if(isset($_POST['saveButton'])){
   redirect("../system/advanced");
 }
 
+if(isset($_POST['saveS3'])){
+  if(isset($_POST['server'])){
+    require dirname(__DIR__)."\plugins\aws\autoload.php";
+    try{
+      $credentials = array('key' => $_POST['aKey'], 'secret' => $_POST['sKey']);
+      $testconfig = array(
+        'version' => 'latest',
+        'region' => '',
+        'endpoint' => $_POST['server'],
+        'use_path_style_endpoint' => true,
+        'credentials' => $credentials
+      );
+      $test = new Aws\S3\S3Client($testconfig);
+      $test->listBuckets();
+      $conn->query("UPDATE $moduleTable SET enableS3Archive = 'TRUE'");
+      $conf = fopen(dirname(__DIR__) .'/src/connection_config.php', 'a');
+      $txt = "\$credentials = array('key' => '".$_POST['aKey']."', 'secret' => '".$_POST['sKey']."');\$s3config = array('version' => 'latest','region' => '','endpoint' => '".$_POST['server']."','use_path_style_endpoint' => true,'credentials' => '\$credentials');";
+      fwrite($conf, $txt);
+      fclose($conf);
+    }catch(Exception $e){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+    }
+  }else{
+    try{
+      $lines = file(dirname(__DIR__) .'/src/connection_config.php');
+      $last = sizeof($lines)-1;
+      unset($lines[$last]);
+
+      $conf = fopen(dirname(__DIR__) .'/src/connection_config.php', 'w');
+      fwrite($conf,implode('',$lines));
+      fclose($conf);
+
+      $conn->query("UPDATE $moduleTable SET enableS3Archive = 'FALSE'");
+    }catch(Exception $e){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+    }
+  }
+}
+
 
 $result = $conn->query("SELECT sslVerify FROM $adminGitHubTable");
 $rowGitHubTable = $result->fetch_assoc();
@@ -105,7 +144,7 @@ $rowModuleTable = $result->fetch_assoc();
     <br>
     <div class="checkbox col-md-12">
       <label>
-        <input <?php if($rowModuleTable['enableS3Archive'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableS3Archive' value='TRUE'>
+        <input <?php if($rowModuleTable['enableS3Archive'] == 'TRUE'){echo "checked ";} ?> data-toggle='modal' data-target='#s3Input'  onChange="showS3Input(event)" type='checkbox' name='enableS3Archive' value='TRUE'>
         S3 Archive
       </label>
     </div>
@@ -122,7 +161,43 @@ $rowModuleTable = $result->fetch_assoc();
     </div>
     <br>
   </div>
+
+
+  <div class="modal fade" id="s3Input" role="dialog">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title">Archiv Zugangsdaten</h4>
+              </div>
+              <br>
+              <div class="modal-body">
+              <?php if($rowModuleTable['enableS3Archive'] == 'FALSE'){
+                  echo '<div class="col-md-12"><label>Server</label><input class="form-control" name="server"><br></div>';
+                  echo '<div class="col-md-12"><label>Access Key</label><input class="form-control" name="aKey"><br></div>';
+                  echo '<div class="col-md-12"><label>Secret Key</label><input class="form-control" name="sKey"><br></div>';
+                }else{
+                  echo '<div class="col-md-12"><label>Are your sure you want to delete your S3 Configuration?</label><br></div>';
+                } ?>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning" name="saveS3"><?php echo $lang['SAVE']; ?></button>
+              </div>
+          </div>
+      </div>
+  </div>
 </form>
+<script>
+  function showS3Input(event){
+    if(event.target.checked){
+      event.target.checked = false;
+    }else{
+      event.target.checked = true;
+    }
+    console.log(event);
+  }
+</script>
 
 <!-- /BODY -->
 <?php include 'footer.php'; ?>
