@@ -142,16 +142,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
-    } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-      require __DIR__ ."/ckInOut.php";
-      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      if(isset($_POST['stampIn'])){
-        checkIn($userID);
-        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
-      } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, intval($_POST['stampOut']));
-        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
-      }
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
