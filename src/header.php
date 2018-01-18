@@ -130,9 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
         $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
-    } if(!empty($_POST['publicPGP'])&&isset($_POST['savePAS'])){
+    } if(!empty($_POST['publicPGP']) && isset($_POST['savePAS'])){
       $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
-     if(!empty($_POST['privatePGP'])&&isset($_POST['savePAS'])&&!empty($_POST['encodePGP'])){
+     if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
       $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
       $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
     }} elseif(isset($_POST['savePAS'])){
@@ -1004,7 +1004,6 @@ if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {
     if (simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') {
         echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
     }
-
 }
 $user_agent = $_SERVER["HTTP_USER_AGENT"];
 if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {

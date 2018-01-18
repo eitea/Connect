@@ -1,5 +1,4 @@
 <?php
-
 class ProjectSeries
 {
     public $once = true;
@@ -27,8 +26,7 @@ class ProjectSeries
     public $end;
     public $last_date;
 
-    public function __construct($series/*eg once, daily_every_nth, ...*/, $start, $end)
-    {
+    public function __construct($series/*eg once, daily_every_nth, ...*/, $start, $end){
         // $start and $end are both strings like "2018-01-01" end can also be "" or "no" for no end or "3" for 3 repetions
         $this->once = $series == "once" || $series == "";
         $this->daily_every_nth = $series == "daily_every_nth";
@@ -49,8 +47,7 @@ class ProjectSeries
         $this->last_date = $this->start;
     }
 
-    public function get_next_date()
-    {
+    public function get_next_date() {
         $now = new DateTime();
         $retDate = $this->last_date;
         // "" should indicate the end of series

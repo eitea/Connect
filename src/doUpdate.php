@@ -2170,7 +2170,8 @@ if($row['version'] < 124){
     } else {
         echo '<br>Module: Auflösen';
     }
-
+}
+if($row['version'] < 125){
     $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription TEXT NOT NULL");
     if ($conn->error) {
         echo $conn->error;
@@ -2216,6 +2217,8 @@ if($row['version'] < 124){
     $conn->query("DROP TABLE dynamicprojectsclients)");
     $conn->query("DROP TABLE dynamicprojectsseries");
     $conn->query("DROP TABLE dynamicprojectsoptionalemployees");
+
+    $conn->query("ALTER TABLE projectBookingData ADD COLUMN dynamicID VARCHAR(100)");
 }
 
 // ------------------------------------------------------------------------------

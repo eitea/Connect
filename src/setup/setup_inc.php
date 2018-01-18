@@ -160,6 +160,7 @@ function create_tables($conn) {
         exp_info TEXT,
         exp_price DECIMAL(10,2),
         exp_unit DECIMAL(10,2),
+        dynamicID VARCHAR(100),
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1210,21 +1211,10 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE dynamicprojectsclients(
-        projectid VARCHAR(100) NOT NULL,
-        clientid INT(6),
-        projectcompleted INT(6),
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
     $sql = "CREATE TABLE dynamicprojectsemployees(
         projectid VARCHAR(100) NOT NULL,
         userid INT(6),
+        position VARCHAR(10) DEFAULT 'normal' NOT NULL,
         PRIMARY KEY(projectid, userid),
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE

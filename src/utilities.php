@@ -56,8 +56,12 @@ return($result && $result->num_rows>0);
 }
  */
 
-function test_input($data) {
-    $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+function test_input($data, $strong = false) {
+    if($strong){
+        $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
+    } else {
+        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+    }
     $data = trim($data);
     return $data;
 }
