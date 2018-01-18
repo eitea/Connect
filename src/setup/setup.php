@@ -216,7 +216,7 @@ ignore_user_abort(1);
             $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
             $conn->query($sql);
             //insert ERP numbers
-            $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+            $conn->query("INSERT INTO erp_settings (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
             //insert mail options
             $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
             //insert restic backup configuration
