@@ -1,14 +1,14 @@
 <?php
 
-require dirname(__DIR__)."\plugins\aws\autoload.php";
+require dirname(__DIR__) . "\src\misc\useS3Config.php";
 require __DIR__."/connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
-        $s3 = new Aws\S3\S3Client($s3config);
+        $s3 = new Aws\S3\S3Client(getS3Config());
        
         //   var_dump($_POST);
         //   var_dump($_FILES);
-          if($_POST['function']=="addGroup"){
+          if($_POST['function']==="addGroup"){
             
             $companyID = $_POST['filterCompany'];
             $name = $_POST['add_groupName'];
@@ -19,7 +19,6 @@ require __DIR__."/connection.php";
             $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)");
             $groupID = $conn->insert_id;
             $buckets = $s3->listBuckets();
-            var_dump($buckets);
             $thereisabucket = false;
             foreach($buckets['Buckets'] as $bucket){
               if($bucket['Name']==$s3SharedFiles) $thereisabucket=true;
@@ -46,7 +45,7 @@ require __DIR__."/connection.php";
             if($conn->error){
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             }
-          }elseif($_POST['function']=='editGroup'&&!empty($_POST['editName'])){
+          }elseif($_POST['function']==='editGroup'&&!empty($_POST['editName'])){
             $name = $_POST['editName'];
             $conn->query("UPDATE sharedgroups SET name = '$name' WHERE id=".$_POST['groupID']);
             if(!empty($_POST['ttl'])){
@@ -54,7 +53,7 @@ require __DIR__."/connection.php";
               $conn->query("UPDATE sharedgroups SET ttl = $ttl WHERE id = ".$_POST['groupID']);
               $conn->query("UPDATE sharedgroups SET dateOfBirth=CURRENT_TIMESTAMP WHERE id= ".$_POST['groupID']);
             }
-          }if($_POST['function']=='editGroup'){
+          }if($_POST['function']==='editGroup'){
             $groupID = $_POST['groupID'];
             $groupName = $conn->query("SELECT name FROM sharedgroups WHERE id = $groupID");
             if(!$groupName){
@@ -82,8 +81,8 @@ require __DIR__."/connection.php";
                 echo json_encode($info);
             }
             
-        }elseif($_POST['function']=='deleteFile'){
-            $s3 = new Aws\S3\S3Client($s3config);
+        }elseif($_POST['function']==='deleteFile'){
+            $s3 = new Aws\S3\S3Client(getS3Config());
             try{
             $fileID = $_POST['fileID'];
             $hash = $conn->query("SELECT hashkey FROM sharedFiles WHERE id = $fileID");
@@ -111,8 +110,8 @@ require __DIR__."/connection.php";
             }catch(Exception $e){
                 echo $e;
             }
-        }elseif($_POST['function']=='sendFiles'){
-            $s3 = new Aws\S3\S3Client($s3config);
+        }elseif($_POST['function']==='sendFiles'){
+            $s3 = new Aws\S3\S3Client(getS3Config());
             try{
             $groupID = $_POST['groupID'];
             $amount = $_POST['amount'];
@@ -137,8 +136,7 @@ require __DIR__."/connection.php";
                   echo $groupID;
                 }
         }else{
-            var_dump($_FILES);
-            var_dump($_POST);
+            return;
         }
         
     }

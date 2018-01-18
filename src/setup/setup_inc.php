@@ -499,8 +499,7 @@ function create_tables($conn) {
     enableTime ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableProject ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
     enableSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-    enableS3Archive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    enableDynamicProjects ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
   )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1323,7 +1322,7 @@ function create_tables($conn) {
     name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
     dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
     ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
-    uri varchar(100) NOT NULL COMMENT 'URL zu den Objekten',
+    uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten',
     owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
     files varchar(200) DEFAULT NULL,
     company int(11) NOT NULL COMMENT 'Mandant',
@@ -1361,9 +1360,22 @@ function create_tables($conn) {
     FOREIGN KEY (companyID) REFERENCES companyData(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
-);";
+    );";
     if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE archiveconfig(
+    endpoint VARCHAR(50),
+    awskey VARCHAR(50),
+    secret VARCHAR(50)
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+    
+    $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 }

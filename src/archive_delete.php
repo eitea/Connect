@@ -1,12 +1,12 @@
 <?php
-require dirname(__DIR__)."\plugins\aws\autoload.php";
+require dirname(__DIR__) . "\src\misc\useS3Config.php";
 require __DIR__."/connection.php";
 if(empty($_POST['groupID'])){
   echo "Invalid Access.";
   die();
 }
 
-$s3 = new Aws\S3\S3Client($s3config);
+$s3 = new Aws\S3\S3Client(getS3Config());
 $groupID = $_POST['groupID'];
 
 try {

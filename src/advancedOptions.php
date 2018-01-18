@@ -34,21 +34,12 @@ if(isset($_POST['saveButton'])){
   $sql = "UPDATE $configTable SET enableReadyCheck = '$status', enableReg = '$regStatus'";
   $conn->query($sql);
 
-  $status = isset($_POST['enableSocialMedia']) ? 'TRUE' : 'FALSE';
-  $conn->query("UPDATE $moduleTable SET enableSocialMedia = '$status'");
-
-  $status = isset($_POST['enableDynamicProjects']) ? 'TRUE' : 'FALSE';
-  $conn->query("UPDATE $moduleTable SET enableDynamicProjects = '$status'");
-
-  $status = isset($_POST['enableS3Archive']) ? 'TRUE' : 'FALSE';
-  $conn->query("UPDATE $moduleTable SET enableS3Archive = '$status'");
-
   redirect("../system/advanced");
 }
 
 if(isset($_POST['saveS3'])){
+  require dirname(__DIR__) . "\src\misc\useS3Config.php";
   if(isset($_POST['server'])){
-    require dirname(__DIR__)."\plugins\aws\autoload.php";
     try{
       $credentials = array('key' => $_POST['aKey'], 'secret' => $_POST['sKey']);
       $testconfig = array(
@@ -60,27 +51,15 @@ if(isset($_POST['saveS3'])){
       );
       $test = new Aws\S3\S3Client($testconfig);
       $test->listBuckets();
-      $conn->query("UPDATE $moduleTable SET enableS3Archive = 'TRUE'");
-      $conf = fopen(dirname(__DIR__) .'/src/connection_config.php', 'a');
-      $txt = "\$credentials = array('key' => '".$_POST['aKey']."', 'secret' => '".$_POST['sKey']."');\$s3config = array('version' => 'latest','region' => '','endpoint' => '".$_POST['server']."','use_path_style_endpoint' => true,'credentials' => '\$credentials');";
-      fwrite($conf, $txt);
-      fclose($conf);
+      if(!setS3Config($_POST['server'],$_POST['aKey'],$_POST['sKey'])){
+        throw new S3Exception("Ups! Something went wrong");
+      }
     }catch(Exception $e){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
     }
   }else{
-    try{
-      $lines = file(dirname(__DIR__) .'/src/connection_config.php');
-      $last = sizeof($lines)-1;
-      unset($lines[$last]);
-
-      $conf = fopen(dirname(__DIR__) .'/src/connection_config.php', 'w');
-      fwrite($conf,implode('',$lines));
-      fclose($conf);
-
-      $conn->query("UPDATE $moduleTable SET enableS3Archive = 'FALSE'");
-    }catch(Exception $e){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+    if(!clearS3Config()){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.test.'</div>';
     }
   }
 }
@@ -92,7 +71,7 @@ $rowGitHubTable = $result->fetch_assoc();
 $result = $conn->query("SELECT * FROM $configTable");
 $rowConfigTable = $result->fetch_assoc();
 
-$result = $conn->query("SELECT * FROM modules");
+$result = $conn->query("SELECT * FROM archiveconfig");
 $rowModuleTable = $result->fetch_assoc();
 ?>
 
@@ -144,7 +123,7 @@ $rowModuleTable = $result->fetch_assoc();
     <br>
     <div class="checkbox col-md-12">
       <label>
-        <input <?php if($rowModuleTable['enableS3Archive'] == 'TRUE'){echo "checked ";} ?> data-toggle='modal' data-target='#s3Input'  onChange="showS3Input(event)" type='checkbox' name='enableS3Archive' value='TRUE'>
+        <input <?php if(isset($rowModuleTable['endpoint'])){echo "checked ";} ?> data-toggle='modal' data-target='#s3Input'  onChange="showS3Input(event)" type='checkbox' name='enableS3Archive' value='TRUE'>
         S3 Archive
       </label>
     </div>
@@ -172,7 +151,7 @@ $rowModuleTable = $result->fetch_assoc();
               </div>
               <br>
               <div class="modal-body">
-              <?php if($rowModuleTable['enableS3Archive'] == 'FALSE'){
+              <?php if(!isset($rowModuleTable['endpoint'])){
                   echo '<div class="col-md-12"><label>Server</label><input class="form-control" name="server"><br></div>';
                   echo '<div class="col-md-12"><label>Access Key</label><input class="form-control" name="aKey"><br></div>';
                   echo '<div class="col-md-12"><label>Secret Key</label><input class="form-control" name="sKey"><br></div>';

@@ -1,8 +1,8 @@
 <?php
-    require __DIR__."/plugins/aws/autoload.php";
+    require __DIR__."/misc/useS3Config.php";
     require __DIR__."/connection.php";
 
-    $s3 = new Aws\S3\S3Client($s3config);
+    $s3 = new Aws\S3\S3Client(getS3Config());
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(!empty($_POST['name']) && !empty($_FILES['file']) && !empty($_POST['note'])){
           $name = $_POST['name'];

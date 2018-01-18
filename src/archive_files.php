@@ -1,8 +1,17 @@
 <?php
 
-require dirname(__DIR__) . "\plugins\aws\autoload.php";
+require dirname(__DIR__) . "\src\misc\useS3Config.php";
+require __DIR__ . "/utilities.php";
 require __DIR__ . "/connection.php";
-$s3 = new Aws\S3\S3Client($s3config);
+$result = $conn->query("SELECT * FROM archiveconfig");
+if($result){
+  $enabled = $result->fetch_assoc();
+  if(!isset($enabled['endpoint'])){
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv</div>';
+    return;
+  } 
+}
+$s3 = new Aws\S3\S3Client(getS3Config());
 if (empty($_GET['n'])) {
     echo "Invalid Access.";
     die();
@@ -24,13 +33,28 @@ function round_up($number, $precision = 2) {
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <script src="plugins/jQuery/jquery.min.js"></script>
-  <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
-  <link href="plugins/homeMenu/template.css" rel="stylesheet" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
+
+<script src="plugins/jQuery/jquery.min.js"></script>
+<script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
+<script src='plugins/select2/js/select2.min.js'></script>
+
+<link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
+<script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
+
+<link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
+<script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
+<script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
+
+<link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+<link href="plugins/homeMenu/homeMenu_light.css" rel="stylesheet" />
   <title>Files</title>
 </head>
 <body>

@@ -1,8 +1,8 @@
 <?php require 'header.php';
-$result = $conn->query("SELECT enableS3Archive FROM modules");
+$result = $conn->query("SELECT endpoint FROM archiveconfig");
 if($result){
   $enabled = $result->fetch_assoc();
-  if($enabled['enableS3Archive']=="FALSE"){
+  if(!isset($enabled['endpoint'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
     require 'footer.php'; 
     return;
@@ -536,8 +536,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       encType: 'multipart/form-data',
       processData: false,
       success: function(res){
-        //alert(res);
-       document.getElementById('form').submit();
+        alert(res);
       }
     });
   }

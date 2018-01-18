@@ -2053,7 +2053,7 @@ if ($row['version'] < 123) {
 	  name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
 	  dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
 	  ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
-	  uri varchar(100) NOT NULL COMMENT 'URL zu den Objekten',
+	  uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten',
 	  owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
 	  files varchar(200) DEFAULT NULL,
 	  company int(11) NOT NULL COMMENT 'Mandant',
@@ -2165,11 +2165,14 @@ if ($row['version'] < 123) {
 
     if ($row['version'] < 124) {
         $conn->query("ALTER TABLE modules ADD COLUMN enableS3Archive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+        $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50))");
+        $conn->query("INSERT INTO archiveconfig VALUE (null,null,null)");
         if ($conn->error) {
             echo $conn->error;
         } else {
             echo '<br>S3 Modul';
         }
+
     }
 
 // ------------------------------------------------------------------------------
