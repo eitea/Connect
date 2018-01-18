@@ -3,7 +3,6 @@
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
-
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['delete']) && isset($_POST['index'])){
     foreach($_POST["index"] as $x) {

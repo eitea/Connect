@@ -59,21 +59,12 @@ if ($result) {
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
 
-  $result = $conn->query("SELECT enableSocialMedia, enableDynamicProjects FROM modules");
-  if($result && ($row = $result->fetch_assoc())){
-    $hasActiveDynamicProjects = ($result && $result->num_rows > 0)?'TRUE':'FALSE';
-  }else{
-    $hasActiveDynamicProjects = 'FALSE';
-  }
-  $enableSocialMedia = 'TRUE';
-  $enableDynamicProjects = 'TRUE';
+$result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+$hasActiveDynamicProjects = ($result && $result->num_rows > 0) ? 'TRUE' : 'FALSE';
 
+$numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
+$numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
 
-  if($enableSocialMedia == 'TRUE'){
-    $private = $conn->query("SELECT * FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
-    $group = $conn->query("SELECT * FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
-    $numberOfSocialAlerts = $private + $group;
-}
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -121,49 +112,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION['posttimer'] = time();
 
-    if (!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash) {
-        $password = $_POST['password'];
-        $passwordConfirm = $_POST['passwordConfirm'];
-        $newMasterPass = '';
-        if ($userKeyCode) {
-            $newMasterPass = simple_decryption($userKeyCode, $_POST['passwordCurrent']);
-            $newMasterPass = simple_encryption($newMasterPass, $password);
-        } elseif ($masterPasswordHash && !empty($_POST['passwordMaster'])) {
-            $newMasterPass = simple_encryption($_POST['passwordMaster'], $password);
-        }
-        $output = '';
-        if ($newMasterPass && (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[~\!@#\$%&\*_\-\+\.\?]/', $password))) {
-            $validation_output = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert">&times;</a>Passwörter mit Masterpasswortverschlüsselung müssen mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.</div>';
-        } elseif (strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)) {
-            $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
-            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
-            if ($newMasterPass) {
-                $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
-            }
-
-            $validation_output = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
-        } else {
-            $validation_output = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>' . $output . '</div>';
-        }
-    }if (!empty($_POST['publicPGP']) && isset($_POST['savePAS'])) {
-        $conn->query("UPDATE userdata SET publicPGPKey = '" . $_POST['publicPGP'] . "' WHERE id=" . $userID);
-        if (!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])) {
-            $privateEncoded = openssl_encrypt($_POST['privatePGP'], 'AES-128-ECB', $_POST['encodePGP']);
-            $conn->query("UPDATE userdata SET privatePGPKey = '" . $privateEncoded . "' WHERE id=" . $userID);
-        }} elseif (isset($_POST['savePAS'])) {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['ERROR_INVALID_DATA'] . '</div>';
-    } elseif (isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") {
-        $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
-    } elseif (isset($_POST["GERMAN"])) {
-        $sql = "UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
-        $conn->query($sql);
-        $_SESSION['language'] = 'GER';
-        $validation_output = mysqli_error($conn);
-    } elseif (isset($_POST['ENGLISH'])) {
-        $sql = "UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
-        $conn->query($sql);
-        $_SESSION['language'] = 'ENG';
-        $validation_output = mysqli_error($conn);
+    if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
+      $password = $_POST['password'];
+      $passwordConfirm = $_POST['passwordConfirm'];
+      $newMasterPass = '';
+      if($userKeyCode){
+        $newMasterPass = simple_decryption($userKeyCode, $_POST['passwordCurrent']);
+        $newMasterPass = simple_encryption($newMasterPass, $password);
+      } elseif($masterPasswordHash && !empty($_POST['passwordMaster'])){
+        $newMasterPass = simple_encryption($_POST['passwordMaster'], $password);
+      }
+      $output = '';
+      if($newMasterPass && (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[~\!@#\$%&\*_\-\+\.\?]/', $password))){
+        $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert">&times;</a>Passwörter mit Masterpasswortverschlüsselung müssen mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.</div>';
+      } elseif(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
+        $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
+        $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
+        if($newMasterPass) $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
+        $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
+      } else {
+        $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
+      }
+    } if(!empty($_POST['publicPGP'])&&isset($_POST['savePAS'])){
+      $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
+     if(!empty($_POST['privatePGP'])&&isset($_POST['savePAS'])&&!empty($_POST['encodePGP'])){
+      $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
+      $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
+    }} elseif(isset($_POST['savePAS'])){
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+      $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
+    } elseif(isset($_POST["GERMAN"])){
+      $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
+      $conn->query($sql);
+      $_SESSION['language'] = 'GER';
+      $validation_output = mysqli_error($conn);
+    } elseif(isset($_POST['ENGLISH'])){
+      $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
+      $conn->query($sql);
+      $_SESSION['language'] = 'ENG';
+      $validation_output = mysqli_error($conn);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
@@ -331,10 +319,57 @@ $defaultGroupPicture = "images/group.png";
 $defaultPicture = "images/defaultProfilePicture.png";
 $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
 ?>
-        <?php if ($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
+        <?php if ($canUseSocialMedia == 'TRUE'): ?>
         <a class="hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
         <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
-        <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>"><i class="fa fa-commenting"></i></a>
+        <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
+          <i class="fa fa-commenting"></i>
+          <span class="badge pull-right alert-badge" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
+        </a>
+        <script>
+          var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
+          setInterval(function(){
+          	$.ajax({
+        		url: 'ajaxQuery/AJAX_socialGetAlerts.php',
+        		type: 'GET',
+        		success: function (response) {
+        			$("#numberOfSocialAlerts").html(response)
+        			if(response == "0"){
+        			  $("#numberOfSocialAlerts").hide()
+        			  alertsBeforeUpdate = parseInt(response)
+        			}else{
+        			  $("#numberOfSocialAlerts").show()
+        			  var alertDifference = parseInt(response) - alertsBeforeUpdate
+        			  alertsBeforeUpdate = parseInt(response)
+        			  if(alertDifference > 0){
+        				      generateNotification(parseInt(response),alertDifference)
+        			  }
+        			}
+        		},
+        	});
+          },10000) //10 seconds
+
+          function generateNotification(messages, newMessages){
+        	var image = 'images/messageIcon.png';
+        	var options = {
+        		body: newMessages + " new\n"+messages+" unread",
+        		icon: image,
+        		tag: "tagToUpdateNotification",
+        		badge: image
+        	}
+        	var n = new Notification('Connect Social',options);
+        	setTimeout(n.close.bind(n), 5000);
+        	n.onclick = function(){
+        	  console.info("Click");
+        	}
+        	n.onerror = function(){
+        	  console.warn("Error while displaying notification");
+        	}
+        	n.onshow = function(){
+        	  console.info("Show");
+        	}
+        }
+        </script>
         <?php else: ?>
         <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
         <?php endif;?>
@@ -394,12 +429,9 @@ echo $VERSION_TEXT;?>
           <div class="col-md-12">
           <label>Public Key</label>
           <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php
-$result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
-if (($result)) {
-    echo ($result->fetch_assoc()["publicPGPKey"]);
-}
-
-?></textarea><br>
+          $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
+          if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
+          ?></textarea><br>
           </div>
           <div class="col-md-12">
           <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP">Ꙭ</button>
@@ -436,7 +468,7 @@ if (($result)) {
   </form>
 
   <!-- /modal -->
-  <?php if ($enableSocialMedia == 'TRUE' && $canUseSocialMedia == 'TRUE'): ?>
+  <?php if ($canUseSocialMedia == 'TRUE'): ?>
     <!-- social settings modal -->
     <form method="post" enctype="multipart/form-data">
       <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog" aria-labelledby="socialSettingsLabel">
@@ -487,27 +519,27 @@ if ($result && ($row = $result->fetch_assoc())) {
     $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
-$result = mysqli_query($conn, "SELECT * FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
-if ($result && ($row = $result->fetch_assoc())) { //checkout
-    $buttonVal = $lang['CHECK_OUT'];
-    $buttonNam = 'stampOut';
-    //<img width="15px" height="15px" src="images/emji1.png">
-    $showProjectBookingLink = TRUE;
-    $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
-    if ($diff < $cd / 60) {$disabled = 'disabled';}
-    $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
-  <button type="submit" ' . $disabled . ' class="btn btn-emji emji1" name="stampOut" value="1" title="' . $lang['EMOJI_TOSTRING'][1] . '"></button>
-  <button type="submit" ' . $disabled . ' class="btn btn-emji emji2" name="stampOut" value="2" title="' . $lang['EMOJI_TOSTRING'][2] . '"></button>
-  <button type="submit" ' . $disabled . ' class="btn btn-emji emji3" name="stampOut" value="3" title="' . $lang['EMOJI_TOSTRING'][3] . '"></button>
-  <button type="submit" ' . $disabled . ' class="btn btn-emji emji4" name="stampOut" value="4" title="' . $lang['EMOJI_TOSTRING'][4] . '"></button>
-  <button type="submit" ' . $disabled . ' class="btn btn-emji emji5" name="stampOut" value="5" title="' . $lang['EMOJI_TOSTRING'][5] . '"></button></div>
+$result = mysqli_query($conn,  "SELECT `time` FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+if($result && ($row = $result->fetch_assoc())) { //checkout
+  $buttonVal = $lang['CHECK_OUT'];
+  $buttonNam = 'stampOut';
+  //<img width="15px" height="15px" src="images/emji1.png">
+  $showProjectBookingLink = TRUE;
+  $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
+  if($diff < $cd / 60) { $disabled = 'disabled'; }
+  $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
+  <button type="submit" '.$disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
+  <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
   <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 } else {
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
     $buttonEmoji = '';
     $today = getCurrentTimestamp();
-    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
+    $result = mysqli_query($conn, "SELECT timeEnd FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
     if ($result && ($row = $result->fetch_assoc())) {
         $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
         if ($diff < $cd / 60) {$disabled = 'disabled';}
@@ -563,8 +595,8 @@ echo '<br>' . $buttonEmoji;
           <!-- User-Section: BOOKING -->
           <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
 	            <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-	            <?php if ($enableDynamicProjects == 'TRUE' && $hasActiveDynamicProjects == 'TRUE'): ?>
-	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS_USER']; ?> <?php
+	            <?php if ($hasActiveDynamicProjects == 'TRUE'): ?>
+	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS']; ?> <?php
     $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
     if ($result->num_rows > 0) {
         echo '<label style="font-size: 16px; color: white;">' . $result->num_rows . '</label>';
@@ -647,17 +679,17 @@ while ($result && ($row = $result->fetch_assoc())) {
           </div>
         </div>
         <?php
-if ($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php") {
-    echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-} elseif ($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php") {
-    echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-} elseif ($this_page == "editCompanies.php" || $this_page == "new_Companies.php") {
-    echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-} elseif ($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
-    echo "<script>document.getElementById('adminOption_CORE').click();</script>";
-}
-?>
-      <?php endif;?>
+        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" ){
+          echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+          echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+        } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
+          echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
+          echo "<script>document.getElementById('adminOption_CORE').click();</script>";
+        }
+        ?>
+      <?php endif; ?>
 
       <!-- Section Two: TIME -->
       <?php if ($isTimeAdmin == 'TRUE'): ?>
@@ -699,8 +731,8 @@ if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || 
               <ul class="nav navbar-nav">
                 <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                <?php if ($isDynamicProjectsAdmin == 'TRUE' && $enableDynamicProjects == 'TRUE'): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS_ADMIN']; ?></span></a></li>
+                <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
+                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
               </ul>
             </div>
@@ -776,8 +808,8 @@ if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php
                   </div>
                 </li>
 
-                <li><a <?php if ($this_page == 'product_articles.php') {echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
-                <li><a <?php if ($this_page == 'receiptBook.php') {echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
+                <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
                 <li><a disabled href=""><span><?php echo $lang['VACANT_POSITIONS']; ?></span></a></li>
 
                 <li><a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
@@ -819,37 +851,37 @@ if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_proc
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <?php
-if (count($available_companies) == 2) {
-    echo '<li><a href="../finance/plan?n=' . $available_companies[1] . '">' . $lang['ACCOUNT_PLAN'] . '</a></li>';
-    echo '<li><a href="../finance/journal?n=' . $available_companies[1] . '">' . $lang['ACCOUNT_JOURNAL'] . '</a></li>';
-    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = " . $available_companies[1]);
-    while ($acc_res && ($acc_row = $acc_res->fetch_assoc())) {
-        echo '<li><a href="../finance/account?v=' . $acc_row['id'] . '">' . $acc_row['name'] . '</a></li>';
-        if ($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']) {
-            echo "<script>$('#finance-click-" . $acc_row['companyID'] . "').click();</script>";
-        }
-    }
-} else {
-    $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ")");
-    while ($result && ($row = $result->fetch_assoc())) {
-        echo '<li>';
-        echo '<a id="finance-click-' . $row['id'] . '" href="#" data-toggle="collapse" data-target="#tfinances-' . $row['id'] . '" data-parent="#sidenav01" class="collapsed">' . $row['name'] . ' <i class="fa fa-caret-down"></i></a>';
-        echo '<div class="collapse" id="tfinances-' . $row['id'] . '" >';
-        echo '<ul class="nav nav-list">';
-        echo '<li><a href="../finance/plan?n=' . $row['id'] . '">' . $lang['ACCOUNT_PLAN'] . '</a></li>';
-        echo '<li><a href="../finance/journal?n=' . $row['id'] . '">' . $lang['ACCOUNT_JOURNAL'] . '</a></li>';
-        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = " . $row['id']);
-        while ($acc_res && ($acc_row = $acc_res->fetch_assoc())) {
-            echo '<li><a href="../finance/account?v=' . $acc_row['id'] . '">' . $acc_row['name'] . '</a></li>';
-            if ($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']) {
-                echo "<script>$('#finance-click-" . $acc_row['companyID'] . "').click();</script>";
-            }
-        }
-        echo '</ul></div></li>';
-    }
-}
-?>
-                <li><a <?php if ($this_page == 'editTaxes.php') {echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
+                if(count($available_companies) == 2){
+                  echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                  echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
+                  while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                    echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                    if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                      echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                    }
+                  }
+                } else {
+                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                  while($result && ($row = $result->fetch_assoc())){
+                    echo '<li>';
+                    echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                    echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                    while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                      echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                      if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                        echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                      }
+                    }
+                    echo '</ul></div></li>';
+                  }
+                }
+                ?>
+                <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
               </ul>
             </div>
           </div>
@@ -874,38 +906,38 @@ if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_p
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <?php
-if (count($available_companies) == 2) {
-    echo '<li><a href="../dsgvo/documents?n=' . $available_companies[1] . '">' . $lang['DOCUMENTS'] . '</a></li>';
-    echo '<li><a href="../dsgvo/vv?n=' . $available_companies[1] . '" >' . $lang['PROCEDURE_DIRECTORY'] . '</a></li>';
-    echo '<li>';
-    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-' . $available_companies[1] . '" data-parent="#sidenav01" class="collapsed">' . $lang['SETTINGS'] . ' <i class="fa fa-caret-down"></i></a>';
-    echo '<div class="collapse" id="tdsgvo-sets-' . $available_companies[1] . '" >';
-    echo '<ul class="nav nav-list">';
-    echo '<li><a href="../dsgvo/templates?n=' . $available_companies[1] . '">E-Mail Templates</a></li>';
-    echo '<li><a href="../dsgvo/vtemplates?n=' . $available_companies[1] . '" >Ver.V. Templates</a></li>';
-    echo '</ul></div></li>';
-} else {
-    $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ")");
-    while ($result && ($row = $result->fetch_assoc())) {
-        echo '<li>';
-        echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-' . $row['id'] . '" data-parent="#sidenav01" class="collapsed">' . $row['name'] . ' <i class="fa fa-caret-down"></i></a>';
-        echo '<div class="collapse" id="tdsgvo-' . $row['id'] . '" >';
-        echo '<ul class="nav nav-list">';
-        echo '<li><a href="../dsgvo/documents?n=' . $row['id'] . '">' . $lang['DOCUMENTS'] . '</a></li>';
-        echo '<li><a href="../dsgvo/vv?n=' . $row['id'] . '" >' . $lang['PROCEDURE_DIRECTORY'] . '</a></li>';
+                if(count($available_companies) == 2){
+                  echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                  echo '<li>';
+                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$available_companies[1].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
+                  echo '<div class="collapse" id="tdsgvo-sets-'.$available_companies[1].'" >';
+                  echo '<ul class="nav nav-list">';
+                  echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
+                  echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
+                  echo '</ul></div></li>';
+                } else {
+                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                  while($result && ($row = $result->fetch_assoc())){
+                    echo '<li>';
+                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                    echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
 
-        echo '<li>';
-        echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-' . $row['id'] . '" data-parent="#sidenav01" class="collapsed">' . $lang['SETTINGS'] . ' <i class="fa fa-caret-down"></i></a>';
-        echo '<div class="collapse" id="tdsgvo-sets-' . $row['id'] . '" >';
-        echo '<ul class="nav nav-list">';
-        echo '<li><a href="../dsgvo/templates?n=' . $row['id'] . '">E-Mail Templates</a></li>';
-        echo '<li><a href="../dsgvo/vtemplates?n=' . $row['id'] . '" >Ver.V. Templates</a></li>';
-        echo '</ul></div></li>';
+                    echo '<li>';
+                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
+                    echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
+                    echo '<ul class="nav nav-list">';
+                    echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+                    echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
+                    echo '</ul></div></li>';
 
-        echo '</ul></div></li>';
-    }
-}
-?>
+                    echo '</ul></div></li>';
+                  }
+                }
+                ?>
               </ul>
             </div>
           </div>
@@ -956,17 +988,16 @@ if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_pa
       <span><?php echo $error_output; ?></span>
 
 <?php
-$result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable");
-echo $conn->error;
-$row = $result->fetch_assoc();
-if ($row['expiration'] == 'TRUE') { //can a password expire?
-    $pswDate = date('Y-m-d', strtotime("+" . $row['expirationDuration'] . " months", strtotime($lastPswChange)));
-    if (timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0) { //has my password actually expired?
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
-        if ($row['expirationType'] == 'FORCE') { //force the change
-            include 'footer.php';
-            die();
-        }
+  $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
+  $row = $result->fetch_assoc();
+  if($row['expiration'] == 'TRUE'){ //can a password expire?
+    $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
+    if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
+      if($row['expirationType'] == 'FORCE'){ //force the change
+        include 'footer.php';
+        die();
+      }
     }
 }
 if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {

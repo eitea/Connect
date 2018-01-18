@@ -48,13 +48,13 @@ require "utilities.php";
 $result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, clientData.*, proposals.id AS proposalID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
-  erpNumbers.yourSign, erpNumbers.yourOrder, erpNumbers.ourSign, erpNumbers.ourMessage
+  erp_settings.yourSign, erp_settings.yourOrder, erp_settings.ourSign, erp_settings.ourMessage
   FROM processHistory
   INNER JOIN proposals ON processHistory.processID = proposals.id
   INNER JOIN clientData ON proposals.clientID = clientData.id
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
-  INNER JOIN erpNumbers ON erpNumbers.companyID = companyData.id
+  INNER JOIN erp_settings ON erp_settings.companyID = companyData.id
   WHERE processHistory.id = $processID");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);

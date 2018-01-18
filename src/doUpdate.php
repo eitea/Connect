@@ -2172,8 +2172,14 @@ if ($row['version'] < 123) {
         } else {
             echo '<br>S3 Modul';
         }
+        $conn->query("DROP TABLE modules");
+        if ($conn->error) {
+            echo $conn->error;
+        } else {
+            echo '<br>Module: Auflösen';
 
     }
+}
 
 // ------------------------------------------------------------------------------
 
