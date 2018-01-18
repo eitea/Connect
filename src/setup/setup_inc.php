@@ -1181,10 +1181,12 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE dynamicprojects(
-        projectid VARCHAR(100) NOT NULL,
+        projectid VARCHAR(100) NOT NULL PRIMARY KEY,
         projectname VARCHAR(60) NOT NULL,
-        projectdescription VARCHAR(500) NOT NULL,
-        companyid INT(6),
+        projectdescription TEXT NOT NULL,
+        companyid INT(6) UNSIGNED NOT NULL,
+        clientid INT(6) UNSIGNED,
+        clientprojectid INT(6) UNSIGNED,
         projectcolor VARCHAR(10),
         projectstart VARCHAR(12),
         projectend VARCHAR(12),
@@ -1192,7 +1194,17 @@ function create_tables($conn) {
         projectpriority INT(6),
         projectparent VARCHAR(100),
         projectowner INT(6),
-        PRIMARY KEY (`projectid`)
+        projectnextdate VARCHAR(12),
+        projectseries MEDIUMBLOB,
+        FOREIGN KEY (companyid) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (clientid) REFERENCES clientData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+        FOREIGN KEY (clientprojectid) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1222,32 +1234,9 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
-        projectid VARCHAR(100) NOT NULL,
-        userid INT(6),
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
     $sql = "CREATE TABLE dynamicprojectspictures(
         projectid VARCHAR(100) NOT NULL,
         picture MEDIUMBLOB,
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsseries(
-        projectid VARCHAR(100) NOT NULL,
-        projectnextdate VARCHAR(12),
-        projectseries MEDIUMBLOB,
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
         ON DELETE CASCADE

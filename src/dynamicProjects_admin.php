@@ -147,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
     $stmt->send_long_data(0, $series);
     $stmt->execute();
     echo $stmt->error;
-    // /series
+    // pictures
     if ($pictures) {
         foreach ($pictures as $picture) {
             $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
@@ -159,10 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
             echo $stmt->error;
         }
     }
-    foreach ($clients as $client) {
-        $client = intval($client);
-        $conn->query("INSERT INTO dynamicprojectsclients (projectid, clientid, projectcompleted) VALUES ('$id', $client, '$completed')");
-    }
+
     foreach ($employees as $employee) {
         $emp_array = explode(";", $employee);
         if ($emp_array[0] == "user") {
@@ -177,10 +174,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || 
                 $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid) VALUES ('$id',$employee)");
             }
         }
-    }
-    foreach ($optional_employees as $optional_employee) {
-        $optional_employee = intval($optional_employee);
-        $conn->query("INSERT INTO dynamicprojectsoptionalemployees (projectid, userid) VALUES ('$id',$optional_employee)");
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["deleteDynamicProject"])) {
@@ -237,39 +230,18 @@ List all dynamic projects
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>
-                <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["DESCRIPTION"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["COMPANY"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["CLIENTS"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["BEGIN"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["END"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?>
-            </th>
-            <th>
-                Status
-            </th>
-            <th>
-                <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>
-            </th>
-            <th>
-                <?php echo $lang["EMPLOYEE"]; ?>
-            </th>
+            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
+            <th><?php echo $lang["DESCRIPTION"]; ?></th>
+            <th><?php echo $lang["COMPANY"]; ?></th>
+            <th><?php echo $lang["CLIENTS"]; ?></th>
+            <th><?php echo $lang["BEGIN"]; ?></th>
+            <th><?php echo $lang["END"]; ?></th>
+            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
+            <th>Status</th>
+            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
+            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
+            <th><?php echo $lang["EMPLOYEE"]; ?></th>
+            <th></th> <!-- space for edit, bookings and play/pause -->
             <th style="white-space: nowrap;width: 1%;"></th>
             <!-- space for edit button -->
         </tr>
@@ -278,12 +250,9 @@ List all dynamic projects
         <?php
         $companyQuery = $clientQuery = "";
         if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = " . $filterings['company'];}
-        if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
 
         $result = $conn->query(
             "SELECT dynamicprojects.* FROM dynamicprojects
-            LEFT JOIN dynamicprojectsclients
-            ON dynamicprojectsclients.projectid = dynamicprojects.projectid
             WHERE 1 = 1 AND dynamicprojects.projectid is not null
             $companyQuery $clientQuery
             GROUP BY dynamicprojects.projectid"
@@ -307,14 +276,10 @@ List all dynamic projects
             $ownerId = $row["projectowner"];
             $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
             $owner = "${owner['firstname']} ${owner['lastname']}";
-            $clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid  WHERE projectid='$id'");
             $employeesResult = $conn->query("SELECT * FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid WHERE projectid='$id' AND UserData.id NOT IN (SELECT t.userID FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON d.teamid = t.teamid WHERE d.projectid = '$id')");
             $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
-            $optional_employeesResult = $conn->query("SELECT * FROM dynamicprojectsoptionalemployees INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid WHERE projectid='$id'");
             $pictures = array();
-            $clients = array();
             $employees = array();
-            $optional_employees = array();
             if (!empty($parent)) {
                 $parent = $conn->real_escape_string($parent);
                 $parent = $conn->query("SELECT * FROM dynamicprojects WHERE projectid='$parent'")->fetch_assoc()["projectname"];
@@ -334,12 +299,6 @@ List all dynamic projects
             echo "<td>$companyName</td>";
             echo "<td>";
             $completed = 0; //percentage of overall project completed 0-100
-            while ($clientRow = $clientsResult->fetch_assoc()) {
-                array_push($clients, $clientRow["id"]);
-                $completed += intval($clientRow["projectcompleted"]);
-                $client = $clientRow["name"];
-                echo "$client, ";
-            }
             $completed = intval($completed / ((count($clients) > 0) ? count($clients) : 1)); // average completion
             echo "</td>";
             echo "<td>$start</td>";
@@ -359,11 +318,6 @@ List all dynamic projects
                 $team = $teamRow["name"];
                 echo "$team, ";
             }
-            while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
-                array_push($optional_employees, $optional_employeeRow["id"]);
-                $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-                echo "$optional_employee, ";
-            }
             echo "</td>";
             echo "<td>";
             $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
@@ -378,7 +332,7 @@ List all dynamic projects
             $modal_id = $id;
             $modal_pictures = $pictures;
             $modal_parent = $parent; //default: "none" or ""
-            $modal_clients = $clients; //array of ids
+            $modal_clients = array(); //array of ids
             $modal_owner = $ownerId;
             $modal_employees = $employees;
             $modal_optional_employees = $optional_employees;

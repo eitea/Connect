@@ -2170,6 +2170,52 @@ if($row['version'] < 124){
     } else {
         echo '<br>Module: Auflösen';
     }
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription TEXT NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectseries MEDIUMBLOB");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectnextdate VARCHAR(12)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN clientid INT(6) UNSIGNED");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN clientprojectid INT(6) UNSIGNED");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojectsemployees ADD COLUMN position VARCHAR(10) DEFAULT 'normal' NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("DROP TABLE dynamicprojectsclients)");
+    $conn->query("DROP TABLE dynamicprojectsseries");
+    $conn->query("DROP TABLE dynamicprojectsoptionalemployees");
 }
 
 // ------------------------------------------------------------------------------

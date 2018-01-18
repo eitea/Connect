@@ -1,17 +1,6 @@
 <?php include 'header.php';
 enableToDynamicProjects($userID);
 require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
-if (!function_exists('stripSymbols')) {
-    function stripSymbols($s) {
-        $result = "";
-        foreach (str_split($s) as $char) {
-            if (ctype_alnum($char)) {
-                $result = $result . $char;
-            }
-        }
-        return $result;
-    }
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (isset($_POST["deletenote"])) {
@@ -304,19 +293,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             if (!$bookingActive) {
                 echo "<button class='btn btn-default' type='submit' name='play' value='true'><i class='fa fa-play' ></i></button>";
             } else {
-                $strippedID = stripSymbols($id);
+                $modal_id = preg_replace('/[^A-Za-z0-9]/', '', $modal_id);
                 echo $conn->error;
-                echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$strippedID'><i class='fa fa-pause'></i></button>";
+                echo "<button class='btn btn-default' type='button' data-toggle='modal' data-target='#bookDynamicProject$modal_id'><i class='fa fa-pause'></i></button>";
                 ?>
 
                 <!-- booking modal -->
-                <div class="modal fade" id="bookDynamicProject<?php echo stripSymbols($modal_id); ?>" tabindex="-1"
-                    role="dialog" aria-labelledby="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
+                <div class="modal fade" id="bookDynamicProject<?php echo $modal_id; ?>" tabindex="-1"
+                    role="dialog" aria-labelledby="bookDynamicProjectLabel<?php echo $modal_id; ?>">
                     <div class="modal-dialog" role="form">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="bookDynamicProjectLabel<?php echo stripSymbols($modal_id); ?>">
+                                <h4 class="modal-title" id="bookDynamicProjectLabel<?php echo $modal_id; ?>">
                                     <?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?>
                                 </h4>
                             </div>
@@ -328,7 +317,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <?php if ($conn->query("SELECT count(*) count FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["count"] > 1): ?>
                                     <label><?php echo $lang["CLIENT"]; ?>*:</label>
                                     <select class="form-control js-example-basic-single" name="client"
-                                    id="bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>"  required>
+                                    id="bookDynamicProjectClient<?php echo $modal_id; ?>"  required>
                                     <?php
                                     $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT JOIN $clientTable ON $clientTable.id = dynamicprojectsclients.clientid WHERE projectid = '$modal_id'");
                                     while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
@@ -339,21 +328,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                                     ?>
                                 </select>
                             <?php else: ?> <!-- no selection if only one client -->
-                                <input id="bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>"
+                                <input id="bookDynamicProjectClient<?php echo $modal_id; ?>"
                                 type="hidden" name="client"
                                 value="<?php echo $conn->query("SELECT * FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["clientid"] ?>" />
                             <?php endif;?>
                             <!-- /client selection -->
                             <label><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?>*:</label>
-                            <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>" />
+                            <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo $modal_id; ?>" />
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" id="bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>">
+                                    <input type="checkbox" id="bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>">
                                     Abgeschlossen
                                 </label>
                             </div>
                             <script>
-                            $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change(function(event){
+                            $("#bookDynamicProjectClient<?php echo $modal_id; ?>").change(function(event){
                                 $.ajax({
                                     url: 'ajaxQuery/AJAX_getDynamicProjectClientsCompleted.php',
                                     dataType: 'json',
@@ -361,38 +350,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                                     cache: false,
                                     type: 'POST',
                                     success: function (response) {
-                                        $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(response.completed)
-                                        $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup()
+                                        $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val(response.completed)
+                                        $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").keyup()
                                     },
                                     error: function(response){
                                         console.error(response.error);
                                     }
                                 })
                             }).change()
-                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup(function(event){
-                                console.log(event,$("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100)
-                                if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
-                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
+                            $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").keyup(function(event){
+                                console.log(event,$("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val() == 100)
+                                if($("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val() == 100){
+                                    $("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").prop('checked', true);
                                 }else{
-                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);
+                                    $("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").prop('checked', false);
                                 }
                             }).keyup()
-                            $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").change(function(event){
-                                console.log(event,$("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100)
-                                if($("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val() == 100){
-                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', true);
+                            $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").change(function(event){
+                                console.log(event,$("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val() == 100)
+                                if($("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val() == 100){
+                                    $("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").prop('checked', true);
                                 }else{
-                                    $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked', false);
+                                    $("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").prop('checked', false);
                                 }
                             }).change()
-                            $("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").change(function(event){
+                            $("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").change(function(event){
                                 console.log(event)
-                                if($("#bookDynamicProjectCompletedCheckbox<?php echo stripSymbols($modal_id); ?>").prop('checked')){
-                                    $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").val(100)
+                                if($("#bookDynamicProjectCompletedCheckbox<?php echo $modal_id; ?>").prop('checked')){
+                                    $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").val(100)
                                 }else{
-                                    $("#bookDynamicProjectClient<?php echo stripSymbols($modal_id); ?>").change()
+                                    $("#bookDynamicProjectClient<?php echo $modal_id; ?>").change()
                                 }
-                                $("#bookDynamicProjectCompleted<?php echo stripSymbols($modal_id); ?>").keyup()
+                                $("#bookDynamicProjectCompleted<?php echo $modal_id; ?>").keyup()
                             }).change()
                             </script>
                             <!-- /modal body -->

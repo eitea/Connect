@@ -59,9 +59,6 @@ if ($result) {
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
 
-$result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
-$hasActiveDynamicProjects = ($result && $result->num_rows > 0) ? 'TRUE' : 'FALSE';
-
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
 
@@ -142,16 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
-    } elseif(isset($_POST['stampIn']) || isset($_POST['stampOut'])){
-      require __DIR__ ."/ckInOut.php";
-      $validation_output  = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-      if(isset($_POST['stampIn'])){
-        checkIn($userID);
-        $validation_output .= $lang['INFO_CHECKIN'].'</div>';
-      } elseif(isset($_POST['stampOut'])){
-        $error_output = checkOut($userID, intval($_POST['stampOut']));
-        $validation_output .= $lang['INFO_CHECKOUT'].'</div>';
-      }
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
@@ -604,15 +591,18 @@ echo '<br>' . $buttonEmoji;
 
           <!-- User-Section: BOOKING -->
           <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-	            <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-	            <?php if ($hasActiveDynamicProjects == 'TRUE'): ?>
-	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS']; ?> <?php
-    $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
-    if ($result->num_rows > 0) {
-        echo '<label style="font-size: 16px; color: white;">' . $result->num_rows . '</label>';
-    }
+              <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 
-    ?></span></a></li>
+              <?php $result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+              if ($result && $result->num_rows > 0): ?>
+                  <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span>
+                      <?php echo $lang['DYNAMIC_PROJECTS'];
+                      $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
+                      if ($result->num_rows > 0) {
+                          echo ' <span class="badge alert-badge">' . $result->num_rows . '</span>';
+                      }
+                      ?>
+                  </span></a></li>
 	            <?php endif; //dynamicProjects ?>
           <?php endif;?>
         <?php endif; //endif(canStamp)?>

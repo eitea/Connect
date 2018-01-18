@@ -1,36 +1,26 @@
 <?php
 //This template is a modal for editing new and existing dynamic projects
-if (!function_exists('stripSymbols')) {
-    function stripSymbols($s)
-    {
-        $result = "";
-        foreach (str_split($s) as $char) {
-            if (ctype_alnum($char)) {
-                $result = $result . $char;
-            }
-        }
-        return $result;
-    }
-}
+
 $disabled = $modal_isAdmin ? "" : "disabled";
 
+$modal_id = preg_replace('/[^A-Za-z0-9]/', '', $modal_id);
 ?>
-<button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo stripSymbols($modal_id) ?>" type="button">
+<button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo $modal_id ?>" type="button">
     <i class="<?php echo $modal_symbol; ?>"></i>
 </button>
 
 
 <!-- new dynamic project modal -->
-<form method="post" autocomplete="off" id="projectForm<?php echo stripSymbols($modal_id) ?>">
+<form method="post" autocomplete="off" id="projectForm<?php echo $modal_id ?>">
     <input type="hidden" name="id" value="<?php echo $modal_id ?>">
-    <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
+    <div class="modal fade" id="dynamicProject<?php echo $modal_id ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo $modal_id ?>">
         <div class="modal-dialog modal-lg" role="form">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
+                    <h4 class="modal-title" id="dynamicProjectLabel<?php echo $modal_id ?>">
                         <?php echo $modal_title; ?>
                     </h4>
                 </div>
@@ -38,21 +28,21 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                 <!-- tab buttons -->
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a data-toggle="tab" href="#projectBasics<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_BASICS"]; ?>*</a>
+                        <a data-toggle="tab" href="#projectBasics<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_BASICS"]; ?>*</a>
                     </li>
                     <li>
-                        <a data-toggle="tab" href="#projectDescription<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a>
+                        <a data-toggle="tab" href="#projectDescription<?php echo $modal_id ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a>
                     </li>
                     <li>
-                        <a data-toggle="tab" href="#projectAdvanced<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_ADVANCED"]; ?></a>
+                        <a data-toggle="tab" href="#projectAdvanced<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_ADVANCED"]; ?></a>
                     </li>
                     <li>
-                        <a data-toggle="tab" href="#projectSeries<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></a>
+                        <a data-toggle="tab" href="#projectSeries<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></a>
                     </li>
                 </ul>
                 <!-- /tab buttons -->
                 <div class="tab-content">
-                    <div id="projectBasics<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade in active">
+                    <div id="projectBasics<?php echo $modal_id ?>" class="tab-pane fade in active">
                         <div class="modal-body">
                             <!-- basics -->
                             <div class="well">
@@ -61,7 +51,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                                 <?php if ($conn->query("SELECT count(*) count FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ")->fetch_assoc()["count"] != 1) {?>
                                     <!-- more than one company -->
                                     <label><?php echo $lang["COMPANY"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single" name="company"  <?php echo $disabled ?> required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')">
+                                    <select class="form-control js-example-basic-single" name="company"  <?php echo $disabled ?> required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo $modal_id ?>')">
                                         <option value="">...</option>
                                         <?php
                                         $modal_result = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ");
@@ -81,13 +71,13 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                                     <?php if (empty($modal_clients)): ?>
                                         <script>
                                         $(document).ready(function(){
-                                            showClients(<?php echo $modal_company; ?>, 0,'#dynamicProjectClients<?php echo stripSymbols($modal_id) ?>')
+                                            showClients(<?php echo $modal_company; ?>, 0,'#dynamicProjectClients<?php echo $modal_id ?>')
                                         })
                                         </script>
                                     <?php endif;?>
                                 <?php }?>
                                 <label><?php echo $lang["CLIENTS"]; ?>*:</label>
-                                <select id="dynamicProjectClients<?php echo stripSymbols($modal_id) ?>"  <?php echo $disabled ?> class="form-control select2-team-icons" name="clients[]"
+                                <select id="dynamicProjectClients<?php echo $modal_id ?>"  <?php echo $disabled ?> class="form-control select2-team-icons" name="clients[]"
                                     multiple="multiple" required>
                                     <?php
                                     if (!empty($modal_clients) && !empty($modal_company)) {
@@ -162,7 +152,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                                         templateSelection: formatState
                                     });
                                 })
-                                
+
                                 </script>
 
 
@@ -187,19 +177,19 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                             <!-- /basics -->
                         </div>
                     </div>
-                    <div id="projectDescription<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
+                    <div id="projectDescription<?php echo $modal_id ?>" class="tab-pane fade">
                         <div class="modal-body">
                             <!-- description -->
                             <div class="well">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*:</label>
-                                <textarea id="projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>" class="form-control" style="max-width: 100%" rows="10"  <?php echo $disabled ?>  name="description" required><?php echo $modal_description; ?></textarea>
+                                <textarea id="projectDescriptionEditor<?php echo $modal_id ?>" class="form-control" style="max-width: 100%" rows="10"  <?php echo $disabled ?>  name="description" required><?php echo $modal_description; ?></textarea>
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?>:</label>
                                 <br>
                                 <label class="btn btn-default" role="button"><?php echo $lang["DYNAMIC_PROJECTS_CHOOSE_PICTURES"]; ?>
-                                    <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo stripSymbols($modal_id) ?>"
+                                    <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo $modal_id ?>"
                                     accept=".jpg,.jpeg,.png">
                                 </label>
-                                <div id="projectPreview<?php echo stripSymbols($modal_id) ?>">
+                                <div id="projectPreview<?php echo $modal_id ?>">
                                     <?php
                                     foreach ($modal_pictures as $modal_picture) {
                                         echo "<span><img src='$modal_picture' alt='Previously uploaded' class='img-thumbnail' style='width:48%;margin:0.45%'></span>";
@@ -210,7 +200,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                             <!-- /description -->
                         </div>
                     </div>
-                    <div id="projectAdvanced<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
+                    <div id="projectAdvanced<?php echo $modal_id ?>" class="tab-pane fade">
                         <div class="modal-body">
                             <!-- advanced -->
                             <div class="well">
@@ -257,10 +247,9 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                             <!-- /advanced -->
                         </div>
                     </div>
-                    <div id="projectSeries<?php echo stripSymbols($modal_id) ?>" class="tab-pane fade">
+                    <div id="projectSeries<?php echo $modal_id ?>" class="tab-pane fade">
                         <div class="modal-body">
                             <!-- series -->
-
                             <div class="well">
                                 <label><?php echo $lang["BEGIN"]; ?>:</label>
                                 <input type='text' class="form-control datepicker" name='localPart' placeholder='Startdatum' <?php echo $disabled ?>  value="<?php echo $modal_start; ?>"
@@ -439,14 +428,14 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                         <!-- /modal body -->
                         <div class="modal-footer">
                             <?php if ($modal_id && $modal_isAdmin): ?>
-                                <button type="submit" class="btn btn-danger ask-before-submit<?php echo stripSymbols($modal_id) ?> disable-required-fields<?php echo stripSymbols($modal_id) ?>" name="deleteDynamicProject">
+                                <button type="submit" class="btn btn-danger ask-before-submit<?php echo $modal_id ?> disable-required-fields<?php echo $modal_id ?>" name="deleteDynamicProject">
                                     <?php echo $lang["DELETE"]; ?>
                                 </button>
                             <?php endif;?>
                             <button type="button" class="btn btn-default" data-dismiss="modal">
                                 <?php echo $lang['CANCEL']; ?>
                             </button>
-                            <button type="submit" class="btn btn-warning show-required-fields<?php echo stripSymbols($modal_id) ?>" <?php if ($modal_id): ?> name="editDynamicProject" <?php else: ?> name="dynamicProject" <?php endif;?>  >
+                            <button type="submit" class="btn btn-warning show-required-fields<?php echo $modal_id ?>" <?php if ($modal_id): ?> name="editDynamicProject" <?php else: ?> name="dynamicProject" <?php endif;?>  >
                                 <?php echo $lang['SAVE']; ?>
                             </button>
                         </div>
@@ -468,7 +457,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
             });
         }
 
-        $("#projectImageUpload<?php echo stripSymbols($modal_id) ?>").change(function (event) {
+        $("#projectImageUpload<?php echo $modal_id ?>").change(function (event) {
             var files = event.target.files;
             //$("#newProjectPreview").html(""); //delete old pictures
             // Loop through the FileList and render image files as thumbnails.
@@ -490,8 +479,8 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                             '" title="', escape(theFile.name),
                             '"/>'
                         ].join('');
-                        $("#projectPreview<?php echo stripSymbols($modal_id) ?>").append(span);
-                        $("#projectPreview<?php echo stripSymbols($modal_id) ?> img").unbind("click").click(removeImg)
+                        $("#projectPreview<?php echo $modal_id ?>").append(span);
+                        $("#projectPreview<?php echo $modal_id ?> img").unbind("click").click(removeImg);
                     };
                 })(f);
                 // Read in the image file as a data URL.
@@ -501,20 +490,20 @@ $disabled = $modal_isAdmin ? "" : "disabled";
         });
 
         $(function () {
-            $("#projectPreview<?php echo stripSymbols($modal_id) ?> img").click(removeImg)
+            $("#projectPreview<?php echo $modal_id ?> img").click(removeImg);
         })
 
         function removeImg(event) {
-            $(event.target).remove()
+            $(event.target).remove();
         }
 
-        $("#projectForm<?php echo stripSymbols($modal_id) ?>").submit(function (event) {
-            $("#projectPreview<?php echo stripSymbols($modal_id) ?>").find("input").remove()
-            $("#projectPreview<?php echo stripSymbols($modal_id) ?>").find("img").each(function (index, elem) {
-                console.log(getImageSrc(elem).length)
-                $("#projectPreview<?php echo stripSymbols($modal_id) ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>")
-            })
-        })
+        $("#projectForm<?php echo $modal_id ?>").submit(function (event) {
+            $("#projectPreview<?php echo $modal_id ?>").find("input").remove()
+            $("#projectPreview<?php echo $modal_id ?>").find("img").each(function (index, elem) {
+                console.log(getImageSrc(elem).length);
+                $("#projectPreview<?php echo $modal_id ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
+            });
+        });
 
         function getImageSrc(img) {
             var c = document.createElement("canvas");
@@ -525,7 +514,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
             return c.toDataURL();
         }
         $(function () {
-            $(".ask-before-submit<?php echo stripSymbols($modal_id) ?>").click(function askUser(event) {
+            $(".ask-before-submit<?php echo $modal_id ?>").click(function askUser(event) {
                 if(confirm("Are you sure?") && confirm("This can not be reverted")){
                     return true;
                 }
@@ -533,48 +522,42 @@ $disabled = $modal_isAdmin ? "" : "disabled";
                 return false;
             });
 
-            $(".disable-required-fields<?php echo stripSymbols($modal_id) ?>").click(function (event){
-                $("#projectForm<?php echo stripSymbols($modal_id) ?> input, #projectForm<?php echo stripSymbols($modal_id) ?> textarea, #projectForm<?php echo stripSymbols($modal_id) ?> select").filter("[required]").each(function(index,elem){
+            $(".disable-required-fields<?php echo $modal_id ?>").click(function (event){
+                $("#projectForm<?php echo $modal_id ?> input, #projectForm<?php echo $modal_id ?> textarea, #projectForm<?php echo $modal_id ?> select").filter("[required]").each(function(index,elem){
                     $(elem).attr("required",false);
-                })
-                $("#projectForm<?php echo stripSymbols($modal_id) ?> select").each(function(index,elem){
+                });
+                $("#projectForm<?php echo $modal_id ?> select").each(function(index,elem){
                     $(elem).attr("required",false);
-                })
-                $("#projectForm<?php echo stripSymbols($modal_id) ?> input").each(function(index,elem){
+                });
+                $("#projectForm<?php echo $modal_id ?> input").each(function(index,elem){
                     if($(elem).attr("min") || $(elem).attr("max"))
                     $(elem).attr("min", false);
                     $(elem).attr("max", false);
-                })
-            })
+                });
+            });
 
-            $(".show-required-fields<?php echo stripSymbols($modal_id) ?>").click(function (event){
+            $(".show-required-fields<?php echo $modal_id ?>").click(function (event){
                 var fields = [];
-                $("#projectForm<?php echo stripSymbols($modal_id) ?> input, #projectForm<?php echo stripSymbols($modal_id) ?> textarea, #projectForm<?php echo stripSymbols($modal_id) ?> select").filter("[required]").each(function(index,elem){
+                $("#projectForm<?php echo $modal_id ?> input, #projectForm<?php echo $modal_id ?> textarea, #projectForm<?php echo $modal_id ?> select").filter("[required]").each(function(index,elem){
                     if($(elem).val() == ""){
                         var name = $(elem).attr("name");
                         name = name.charAt(0).toUpperCase() + name.slice(1);
                         name = name.replace("[]","");
                         fields.push(name);
                     }
-                })
+                });
                 if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
-            })
-            $("#dynamicProject<?php echo stripSymbols($modal_id) ?>").on('hidden.bs.modal', function () {
-                window.location.reload()
             });
-        })
-
-
+            $("#dynamicProject<?php echo $modal_id ?>").on('hidden.bs.modal', function () {
+                window.location.reload();
+            });
+        });
         </script>
-
-
-
-
 
         <!-- text editor test -->
         <script>
         tinymce.init({
-            selector: '#projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>', //needs to be changed
+            selector: '#projectDescriptionEditor<?php echo $modal_id ?>', //needs to be changed
             plugins: 'image code',
             plugins: 'paste',
             relative_urls: false,
