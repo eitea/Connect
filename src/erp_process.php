@@ -84,7 +84,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $historyID = $conn->insert_id;
       $stmt = $conn->prepare("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
-      $stmt->bind_param("isisddsidsdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
+      $stmt->bind_param("isisddsissdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
       foreach($prod_list as $p){
         if($p['quantity'] > 0 || !$p['origin']){
           $origin = $p['origin'];
