@@ -2164,7 +2164,6 @@ if ($row['version'] < 123) {
 }
 
     if ($row['version'] < 124) {
-        $conn->query("ALTER TABLE modules ADD COLUMN enableS3Archive ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
         $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50))");
         $conn->query("INSERT INTO archiveconfig VALUE (null,null,null)");
         if ($conn->error) {
