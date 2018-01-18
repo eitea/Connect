@@ -60,37 +60,35 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             }
                         }
                         ?>
-                    </select>
+                    </select><br>
                 </div>
-                <?php
-                $clientNums = array(1 => '');
-                $numstrings = '';
-                $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
-                while($res_num && ($rowNum = $res_num->fetch_assoc())){ //prevented error: call fetch_assoc() on boolean
-                    $cmpnyID = $rowNum['companyID'];
-                    $step = $rowNum['clientStep'];
-                    $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
-                    if($row_c_num = $res_c_num->fetch_assoc()){
-                        $num = $row_c_num['clientNumber'];
-                        if($row_c_num['clientNumber'] < $rowNum['clientNum']){
-                            $num = $rowNum['clientNum'];
+                <div class="col-md-6">
+                    <?php
+                    $clientNums = array(1 => '');
+                    $numstrings = '';
+                    $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
+                    while($res_num && ($rowNum = $res_num->fetch_assoc())){ //prevented error: call fetch_assoc() on boolean
+                        $cmpnyID = $rowNum['companyID'];
+                        $step = $rowNum['clientStep'];
+                        $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
+                        if($row_c_num = $res_c_num->fetch_assoc()){
+                            $num = $row_c_num['clientNumber'];
+                            if($row_c_num['clientNumber'] < $rowNum['clientNum']){
+                                $num = $rowNum['clientNum'];
+                            }
                         }
                     }
-                }
-                ?>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <input type="text" class="form-control" name="clientNumber" placeholder="#" >
-            <small> &nbsp Kundennummer - Optional</small>
-        </div>
+                    ?>
+                    <label>Kundennummer</label>
+                    <input type="text" class="form-control" name="clientNumber" placeholder="#" >
+                    <small> &nbsp Optional</small>
+                </div>
+                <input type="hidden" name="filterCompanyID" value="<?php echo $filterCompanyID; ?>" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-warning " name="create_client"> <?php echo $lang['ADD']; ?></button>
+            </div>
+        </form>
     </div>
-    <input type="hidden" name="filterCompanyID" value="<?php echo $filterCompanyID; ?>" />
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-    <button type="submit" class="btn btn-warning " name="create_client"> <?php echo $lang['ADD']; ?></button>
-</div>
-</form>
-</div>
 </div>
