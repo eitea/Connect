@@ -5,11 +5,11 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //
 ?>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include 'misc/set_filter.php';?>
-    <?php if($isDynamicProjectsAdmin): ?> <button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
+    <?php if($isDynamicProjectsAdmin == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
 </div></h3></div>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if($isDynamicProjectsAdmin){
+    if($isDynamicProjectsAdmin == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
             $conn->query("DELETE FROM dynamicProjects WHERE projectid = '$val'");
@@ -18,6 +18,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             } else {
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
             }
+        }
+        if(isset($_POST['editDynamicProject'])){
+
         }
          if(isset($_POST['newDynamicProject'])){ //only an admin can trigger this
             if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
@@ -35,6 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $priority = intval($_POST["priority"]); //1-5
                 $parent = test_input($_POST["parent"]); //dynamproject id
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
+                $percentage = intval($_POST['completed']);
 
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
@@ -62,8 +66,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectnextdate, projectseries) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisisb", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null);
+                    projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssbiiissssisisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null, $percentage);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -137,14 +141,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $modals = '';
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
-        $stmt_employee = $conn->prepare("SELECT firstname, lastname, dynamicprojectsemployees.status FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
+        $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
         $result = $conn->query("SELECT projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, firstname, lastname,
             dynamicprojects.companyid, companyData.name AS companyName, clientData.name AS clientName
             FROM dynamicprojects LEFT JOIN companyData ON companyData.id = dynamicprojects.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
             WHERE dynamicprojects.companyid IN (".implode(', ', $available_companies).")"); echo $conn->error;
         while($row = $result->fetch_assoc()){
-            $x = test_input($row['projectid'], true);
+            $x = $row['projectid'];
             $completed = 0;
             echo '<tr>';
             echo '<td style="background-color:'.$row['projectcolor'].'">'.$row['projectname'].'</td>';
@@ -154,25 +158,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
 
-            //$completed = intval($completed / ((count($clients) > 0) ? count($clients) : 1)); // average completio
-            echo '<td>';
-            if($row['projectseries']) echo unserialize(base64_decode($series), array("allowed_classes" => array("ProjectSeries")));
-            echo '</td>';
-
+            if($row['projectseries']){
+                echo '<td><i class="fa fa-clock-o"></i></td>';
+            } else {
+                echo '<td><i class="fa fa-times" style="color:red"></i></td>';
+            }
             echo '<td>'.$row['projectstatus'].'</td>';
             echo '<td>'.$row['projectpriority'].'</td>';
             echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
 
+            echo '<td>';
             $stmt_team->execute();
-            $red = $stmt_team->get_result();
-            while($employee = $red->fetch_assoc()){
-
-            }
-            echo '<td></td>';
+            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
+            $stmt_employee->execute();
+            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
+            echo implode(',<br>', $employees);
+            echo '</td>';
             //modal creation happens on demand
             echo '<td><form method="POST">';
-            echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default"><i class="fa fa-pencil"></i></button>';
-            if($isDynamicProjectsAdmin) echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+            echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default"><i class="fa fa-pencil"></i></button> ';
+            if($isDynamicProjectsAdmin == 'TRUE') echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
             echo '</form></td>';
             echo '</tr>';
 
@@ -184,7 +189,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </tbody>
 </table>
 
-<div id="myModalDiv">
+<div id="editingModalDiv">
     <?php echo $modals; ?>
 </div>
 
@@ -238,7 +243,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </div>
                     <div id="projectDescription" class="tab-pane fade"><br>
                         <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
-                        <textarea id="projectDescriptionEditor" class="form-control" rows="10" name="description" required> </textarea>
+                        <textarea class="form-control projectDescriptionEditor" rows="10" name="description" required> </textarea>
                         <br>
                         <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></label>
                         <br>
@@ -402,63 +407,56 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-function dynamicOnLoad(){
-    function formatState (state) {
-        if (!state.id) { return state.text; }
-        var $state = $(
-            '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
-        );
-        return $state;
-    };
-    $(".select2-team-icons").select2({
-        templateResult: formatState,
-        templateSelection: formatState
-    });
-    $("#projectPreview img").click(removeImg);
-    function removeImg(event) {
-        $(event.target).remove();
-    }
-    $("#projectForm").submit(function (event) {
-        $("#projectPreview").find("input").remove()
-        $("#projectPreview").find("img").each(function (index, elem) {
+function formatState (state) {
+    if (!state.id) { return state.text; }
+    var $state = $(
+        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+    );
+    return $state;
+};
+function removeImg(event) {
+    $(event.target).remove();
+}
+function getImageSrc(img) {
+    var c = document.createElement("canvas");
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
+    var ctx = c.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    return c.toDataURL();
+}
+
+function dynamicOnLoad(modID){
+    if(typeof modID === 'undefined') modID = '';
+    $("#projectPreview"+modID+" img").click(removeImg);
+    $("#projectForm"+modID).submit(function (event) {
+        $("#projectPreview"+modID).find("input").remove()
+        $("#projectPreview"+modID).find("img").each(function (index, elem) {
             console.log(getImageSrc(elem).length);
-            $("#projectPreview").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
+            $("#projectPreview"+modID).append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
         });
     });
-    function getImageSrc(img) {
-        var c = document.createElement("canvas");
-        c.width = img.naturalWidth;
-        c.height = img.naturalHeight;
-        var ctx = c.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        return c.toDataURL();
-    }
-
-    $(".ask-before-submit").click(function askUser(event) {
-        if(confirm("Are you sure?") && confirm("This can not be reverted")){
-            return true;
+    $("#projectImageUpload"+modID).change(function (event) {
+        var files = event.target.files;
+        //$("#newProjectPreview").html(""); //delete old pictures
+        for (var i = 0, f; f = files[i]; i++) { // Loop through the FileList and render image files as thumbnails.
+            if (!f.type.match('image.*')) continue;
+            var reader = new FileReader();
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) {
+                return function (e) { // Render thumbnail.
+                    var span = document.createElement('span');
+                    span.innerHTML = '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="' + e.target.result + '" title="' + escape(theFile.name) + '"/>';
+                    $("#projectPreview"+modID).append(span);
+                    $("#projectPreview"+modID+" img").unbind("click").click(removeImg);
+                };
+            })(f);
+            reader.readAsDataURL(f); // Read in the image file as a data URL.
         }
-        event.preventDefault();
-        return false;
     });
-
-    $(".disable-required-fields").click(function (event){
-        $("#projectForm input, #projectForm textarea, #projectForm select").filter("[required]").each(function(index,elem){
-            $(elem).attr("required",false);
-        });
-        $("#projectForm select").each(function(index,elem){
-            $(elem).attr("required",false);
-        });
-        $("#projectForm input").each(function(index,elem){
-            if($(elem).attr("min") || $(elem).attr("max"))
-            $(elem).attr("min", false);
-            $(elem).attr("max", false);
-        });
-    });
-
     $(".show-required-fields").click(function (event){
         var fields = [];
-        $("#projectForm input, #projectForm textarea, #projectForm select").filter("[required]").each(function(index,elem){
+        $("#projectForm"+modID+" input, #projectForm"+modID+" textarea, #projectForm"+modID+" select").filter("[required]").each(function(index,elem){
             if($(elem).val() == ""){
                 var name = $(elem).attr("name");
                 name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -469,8 +467,19 @@ function dynamicOnLoad(){
         if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
     });
 
+    $(".select2-team-icons").select2({
+        templateResult: formatState,
+        templateSelection: formatState
+    });
+    $(".ask-before-submit").click(function askUser(event) {
+        if(confirm("Are you sure?") && confirm("This can not be reverted")){
+            return true;
+        }
+        event.preventDefault();
+        return false;
+    });
     tinymce.init({
-        selector: '#projectDescriptionEditor', //needs to be changed
+        selector: '.projectDescriptionEditor',
         plugins: 'image code',
         plugins: 'paste',
         relative_urls: false,
@@ -511,30 +520,51 @@ function dynamicOnLoad(){
             input.click();
         }
     });
+} //end dnymaicOnLoad()
 
-    $("#projectImageUpload").change(function (event) {
-        var files = event.target.files;
-        //$("#newProjectPreview").html(""); //delete old pictures
-        for (var i = 0, f; f = files[i]; i++) { // Loop through the FileList and render image files as thumbnails.
-            if (!f.type.match('image.*')) continue;
-            var reader = new FileReader();
-            // Closure to capture the file information.
-            reader.onload = (function (theFile) {
-                return function (e) { // Render thumbnail.
-                    var span = document.createElement('span');
-                    span.innerHTML = '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="' + e.target.result + '" title="' + escape(theFile.name) + '"/>';
-                    $("#projectPreview").append(span);
-                    $("#projectPreview img").unbind("click").click(removeImg);
-                };
-            })(f);
-            reader.readAsDataURL(f); // Read in the image file as a data URL.
-        }
-    });
-}
+var existingModals = new Array();
+$('button[name=editModal]').click(function(){
+    var index = $(this).val();
+  if(existingModals.indexOf(index) == -1){
+    $.ajax({
+    url:'ajaxQuery/AJAX_dynamicEditModal.php',
+    data:{projectid: index, userid: <?php echo $userID; ?> },
+    type: 'get',
+    success : function(resp){
+      $("#editingModalDiv").append(resp);
+      existingModals.push(index);
+      onPageLoad();
+      dynamicOnLoad(index);
+      $('#editingModal-'+index).modal('show');
+    },
+    error : function(resp){}
+   });
+  } else {
+    $('#editingModal-'+index).modal('show');
+  }
+  event.stopPropagation(); //event stop for tr clicker
+});
 
 
 $(document).ready(function() {
     dynamicOnLoad();
+    $('.table').DataTable({
+      order: [],
+      ordering: false,
+      language: {
+        <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+      },
+      responsive: true,
+      dom: 'tf',
+      autoWidth: false,
+      fixedHeader: {
+        header: true,
+        headerOffset: 50,
+        zTop: 1
+      },
+      paging: false
+    });
+    setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('#projectTable').trigger('column-reorder.dt'); }, 500);
 });
 </script>
 

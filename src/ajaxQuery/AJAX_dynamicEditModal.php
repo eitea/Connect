@@ -1,611 +1,257 @@
 <?php
-//This template is a modal for editing new and existing dynamic projects
+require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . "/language.php";
 
-$disabled = $modal_isAdmin ? "" : "disabled";
+$x = $_GET['projectid'];
 
-$modal_id = preg_replace('/[^A-Za-z0-9]/', '', $modal_id);
+$userID = $_GET['userid'];
+$result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
+$available_companies = array('-1'); //care
+while ($result && ($row = $result->fetch_assoc())) {
+    $available_companies[] = $row['companyID'];
+}
+
+$result = $conn->query("SELECT * from dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
+$dynrow = $result->fetch_assoc();
+
+$result = $conn->query("SELECT teamid FROM dynamicprojectsteams WHERE projectid = '$x'");
+$dynrow_teams = $result->fetch_all(MYSQLI_ASSOC);
+
+$result = $conn->query("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = '$x'");
+$dynrow_emps = $result->fetch_all(MYSQLI_ASSOC);
 ?>
-<button class="btn btn-default" data-toggle="modal" data-target="#dynamicProject<?php echo $modal_id ?>" type="button">
-    <i class="<?php echo $modal_symbol; ?>"></i>
-</button>
 
-
-<!-- new dynamic project modal -->
-<form method="post" autocomplete="off" id="projectForm<?php echo $modal_id ?>">
-    <input type="hidden" name="id" value="<?php echo $modal_id ?>">
-    <div class="modal fade" id="dynamicProject<?php echo $modal_id ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo $modal_id ?>">
-        <div class="modal-dialog modal-lg" role="form">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="dynamicProjectLabel<?php echo $modal_id ?>">
-                        <?php echo $modal_title; ?>
-                    </h4>
-                </div>
-                <!-- modal body -->
-                <!-- tab buttons -->
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a data-toggle="tab" href="#projectBasics<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_BASICS"]; ?>*</a>
-                    </li>
-                    <li>
-                        <a data-toggle="tab" href="#projectDescription<?php echo $modal_id ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a>
-                    </li>
-                    <li>
-                        <a data-toggle="tab" href="#projectAdvanced<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_ADVANCED"]; ?></a>
-                    </li>
-                    <li>
-                        <a data-toggle="tab" href="#projectSeries<?php echo $modal_id ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></a>
-                    </li>
-                </ul>
-                <!-- /tab buttons -->
-                <div class="tab-content">
-                    <div id="projectBasics<?php echo $modal_id ?>" class="tab-pane fade in active">
-                        <div class="modal-body">
-                            <!-- basics -->
-                            <div class="well">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?>*:</label>
-                                <input class="form-control" type="text" name="name" <?php echo $disabled ?> required value="<?php echo $modal_name; ?>">
-                                <?php if ($conn->query("SELECT count(*) count FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ")->fetch_assoc()["count"] != 1) {?>
-                                    <!-- more than one company -->
-                                    <label><?php echo $lang["COMPANY"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single" name="company"  <?php echo $disabled ?> required onchange="showClients(this.value, 0,'#dynamicProjectClients<?php echo $modal_id ?>')">
-                                        <option value="">...</option>
-                                        <?php
-                                        $modal_result = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ");
-                                        while ($modal_row = $modal_result->fetch_assoc()) {
-                                            $companyID = $modal_row["id"];
-                                            $companyName = $modal_row["name"];
-                                            $selected = $companyID == $modal_company && $modal_company != "" ? "selected" : "";
-                                            echo "<option $selected value='$companyID'>$companyName</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                <?php } else {
-                                    $modal_company = $conn->query("SELECT * FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ") ")->fetch_assoc()["id"];
-                                    ?>
-
-                                    <input type="hidden" name="company" value="<?php echo $modal_company; ?>"/>
-                                    <?php if (empty($modal_clients)): ?>
-                                        <script>
-                                        $(document).ready(function(){
-                                            showClients(<?php echo $modal_company; ?>, 0,'#dynamicProjectClients<?php echo $modal_id ?>')
-                                        })
-                                        </script>
-                                    <?php endif;?>
-                                <?php }?>
-                                <label><?php echo $lang["CLIENTS"]; ?>*:</label>
-                                <select id="dynamicProjectClients<?php echo $modal_id ?>"  <?php echo $disabled ?> class="form-control select2-team-icons" name="clients[]"
-                                    multiple="multiple" required>
-                                    <?php
-                                    if (!empty($modal_clients) && !empty($modal_company)) {
-                                        $modal_clientsResult = $conn->query("SELECT * FROM $clientTable WHERE companyID = $modal_company");
-                                        while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
-                                            $modal_client_id = $modal_clientRow["id"];
-                                            $modal_client = $modal_clientRow["name"];
-                                            $selected = in_array($modal_client_id, $modal_clients) ? "selected" : "";
-                                            echo "<option $selected value='$modal_client_id' data-icon='address-card'>$modal_client</option>";
-                                        }
-                                    } else {
-                                        echo "<option>Zuerst Mandant auswählen</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="well">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>*:</label>
-                                <select class="form-control select2-team-icons"  <?php echo $disabled ?>  name="owner" required>
-                                    <?php
-                                    $modal_result = $conn->query("SELECT * FROM UserData");
-                                    while ($modal_row = $modal_result->fetch_assoc()) {
-                                        $x = $modal_row['id'];
-                                        $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
-                                        if (!empty($modal_owner)) {
-                                            $selected = $modal_owner == $x ? "selected" : "";
-                                        } else {
-                                            $selected = $x == $userID ? "selected" : "";
-                                        }
-                                        echo "<option value='$x' $selected data-icon='user'>$modal_user_name</option>";
-                                    }
-                                    ?>
-                                </select>
-                                <label><?php echo $lang["EMPLOYEE"]; ?>*:</label>
-                                <select class="form-control select2-team-icons" <?php echo $disabled ?>  name="employees[]" multiple="multiple" required>
-                                    <?php
-                                    $modal_result = $conn->query("SELECT * FROM UserData");
-                                    while ($modal_row = $modal_result->fetch_assoc()) {
-                                        $x = $modal_row['id'];
-                                        $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
-                                        if (!empty($modal_employees)) {
-                                            $selected = in_array("user;" . $x, $modal_employees) ? "selected" : "";
-                                        } else {
-                                            $selected = $x == $userID ? "selected" : "";
-                                        }
-                                        echo "<option value='user;$x' $selected data-icon='user'>$modal_user_name</option>";
-                                    }
-                                    //teams
-                                    $modal_result = $conn->query("SELECT * FROM $teamTable");
-                                    while ($modal_row = $modal_result->fetch_assoc()) {
-                                        $x = $modal_row["id"];
-                                        $selected = in_array("team;" . $x, $modal_employees) ? "selected" : "";
-                                        $modal_team_name = $modal_row["name"];
-                                        echo "<option value='team;$x' $selected data-icon='group'>$modal_team_name</option>";
-                                    }
-
-                                    ?>
-                                </select>
-
-
-                                <script>
-                                function formatState (state) {
-                                    if (!state.id) { return state.text; }
-                                    var $state = $(
-                                        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
-                                    );
-                                    return $state;
-                                };
-                                $(function(){
-                                    $(".select2-team-icons").select2({
-                                        templateResult: formatState,
-                                        templateSelection: formatState
-                                    });
-                                })
-
-                                </script>
-
-
-
-
-
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?>:</label>
-                                <select class="form-control select2-team-icons" <?php echo $disabled ?>  name="optionalemployees[]" multiple="multiple">
-                                    <?php
-                                    $modal_result = $conn->query("SELECT * FROM UserData");
-                                    while ($modal_row = $modal_result->fetch_assoc()) {
-                                        $x = $modal_row['id'];
-                                        $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
-                                        if (!empty($modal_optional_employees)) {
-                                            $selected = in_array($x, $modal_optional_employees) ? "selected" : "";
-                                        }
-                                        echo "<option value='$x' $selected data-icon='user'>$modal_user_name</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <!-- /basics -->
-                        </div>
-                    </div>
-                    <div id="projectDescription<?php echo $modal_id ?>" class="tab-pane fade">
-                        <div class="modal-body">
-                            <!-- description -->
-                            <div class="well">
-                                <label><?php echo $lang["DESCRIPTION"]; ?>*:</label>
-                                <textarea id="projectDescriptionEditor<?php echo $modal_id ?>" class="form-control" style="max-width: 100%" rows="10"  <?php echo $disabled ?>  name="description" required><?php echo $modal_description; ?></textarea>
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?>:</label>
-                                <br>
-                                <label class="btn btn-default" role="button"><?php echo $lang["DYNAMIC_PROJECTS_CHOOSE_PICTURES"]; ?>
-                                    <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload<?php echo $modal_id ?>"
-                                    accept=".jpg,.jpeg,.png">
-                                </label>
-                                <div id="projectPreview<?php echo $modal_id ?>">
-                                    <?php
-                                    foreach ($modal_pictures as $modal_picture) {
-                                        echo "<span><img src='$modal_picture' alt='Previously uploaded' class='img-thumbnail' style='width:48%;margin:0.45%'></span>";
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                            <!-- /description -->
-                        </div>
-                    </div>
-                    <div id="projectAdvanced<?php echo $modal_id ?>" class="tab-pane fade">
-                        <div class="modal-body">
-                            <!-- advanced -->
-                            <div class="well">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*:</label>
-                                <select class="form-control js-example-basic-single" <?php echo $disabled ?>  name="priority" required>
-                                    <?php
-                                    $modal_priorities = array(1 => "Sehr niedrig", 2 => "Niedrig", 3 => "Normal", 4 => "Hoch", 5 => "Sehr hoch");
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        $selected = $modal_priority == $i ? "selected" : "";
-                                        echo "<option $selected value='$i'>${modal_priorities[$i]}</option>";
-                                    }
-                                    ?>
-                                </select>
-                                <label>Status*:</label>
-                                <div class="input-group">
-                                    <select class="form-control" name="status" required <?php echo $disabled ?> >
-                                        <option value="DEACTIVATED" <?php echo $modal_status == 'DEACTIVATED' ? "selected" : "" ?> >Deaktiviert</option>
-                                        <option value="DRAFT" <?php echo $modal_status == 'DRAFT' ? "selected" : "" ?> >Entwurf</option>
-                                        <option value="ACTIVE" <?php echo $modal_status == 'ACTIVE' ? "selected" : "" ?> >Aktiv</option>
-                                        <option value="COMPLETED" <?php echo $modal_status == 'COMPLETED' ? "selected" : "" ?> >Abgeschlossen</option>
-                                    </select>
-                                    <span class="input-group-addon text-warning"><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?></span>
-                                    <input type='number' class="form-control" name='completed' value="<?php echo $modal_completed; ?>" min="0" max="100" step="1"
-                                    required/>
-                                </div>
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?>:</label>
-                                <input <?php echo $disabled ?>  type="color" class="form-control" value="<?php echo $modal_color; ?>" name="color">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
-                                <select class="form-control js-example-basic-single" name="parent" <?php echo $disabled ?>  required>
-                                    <?php
-                                    $parentResult = $conn->query("SELECT * FROM dynamicprojects");
-                                    if ($modal_parent == "" || $modal_parent == "none") {
-                                        echo "<option value='none' selected>Keines</option>";
-                                    }
-                                    while ($parentRow = $parentResult->fetch_assoc()) {
-                                        $parentID = $parentRow["projectid"];
-                                        $parentSelected = ($parentID == $modal_parent) ? "selected" : "";
-                                        $parentName = $parentRow["projectname"];
-                                        echo "<option $parentSelected value='$parentID' >$parentName</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <!-- /advanced -->
-                        </div>
-                    </div>
-                    <div id="projectSeries<?php echo $modal_id ?>" class="tab-pane fade">
-                        <div class="modal-body">
-                            <!-- series -->
-                            <div class="well">
-                                <label><?php echo $lang["BEGIN"]; ?>:</label>
-                                <input type='text' class="form-control datepicker" name='localPart' placeholder='Startdatum' <?php echo $disabled ?>  value="<?php echo $modal_start; ?>"
-                                />
-                                <label><?php echo $lang["END"]; ?>:</label>
-                                <br>
-                                <?php if ($modal_end == ""): ?>
-                                    <label>
-                                        <input type="radio" name="endradio" value="no" <?php echo $disabled ?>  checked><?php echo $lang["DYNAMIC_PROJECTS_SERIES_NO_END"]; ?></label>
-                                        <br>
-                                    <?php else: ?>
-                                        <label>
-                                            <input type="radio" name="endradio" value="no" <?php echo $disabled ?> ><?php echo $lang["DYNAMIC_PROJECTS_SERIES_NO_END"]; ?></label>
-                                            <br>
-                                        <?php endif;?>
-                                        <?php if (preg_match("/\d{4}-\d{2}-\d{2}/", $modal_end)): ?>
-                                            <input type="radio" name="endradio" value="date" checked <?php echo $disabled ?> >
-                                            <label>
-                                                <input type='text' class="form-control datepicker" <?php echo $disabled ?>  name='enddate' placeholder="Enddatum" value="<?php echo $modal_end; ?>"
-                                                />
-                                            </label>
-                                            <br>
-                                        <?php else: ?>
-                                            <input type="radio" name="endradio" <?php echo $disabled ?>  value="date">
-                                            <label>
-                                                <input type='text' class="form-control datepicker" <?php echo $disabled ?>  name='enddate' placeholder="Enddatum" value="<?php echo date('Y-m-d'); ?>"
-                                                />
-                                            </label>
-                                            <br>
-                                        <?php endif;?>
-                                        <?php if (preg_match("/^\d+$/", $modal_end)): ?>
-                                            <input type="radio" name="endradio" value="number" checked <?php echo $disabled ?> >
-                                            <label>
-                                                <input type='number' class="form-control" name='endnumber' placeholder="<?php echo $lang["DYNAMIC_PROJECTS_SERIES_REPETITIONS"]; ?>" value="<?php echo $modal_end ?>" <?php echo $disabled ?> >
-                                            </label>
-                                        <?php else: ?>
-                                            <input type="radio" name="endradio" value="number" <?php echo $disabled ?> >
-                                            <label>
-                                                <input type='number' class="form-control" name='endnumber' placeholder="<?php echo $lang["DYNAMIC_PROJECTS_SERIES_REPETITIONS"]; ?>" <?php echo $disabled ?> >
-                                            </label>
-                                        <?php endif;?>
-                                    </div>
-
-                                    <div class="well">
-                                        <?php
-                                        $modal_series = empty($modal_series) ? new ProjectSeries("", "", "") : $modal_series;
-                                        ?>
-                                        <label><?php echo $lang["SCHEDULE_TOSTRING"][0]; ?></label>
-                                        <br>
-                                        <input type="radio" <?php echo $modal_series->once ? "checked" : ""; ?> name="series" value="once" <?php echo $disabled ?> >Keine Wiederholungen
-                                        <br>
-
-                                        <label><?php echo $lang["SCHEDULE_TOSTRING"][1]; ?></label>
-                                        <br>
-                                        <input type="radio" <?php echo $modal_series->daily_every_nth ? "checked" : ""; ?> name="series" value="daily_every_nth" <?php echo $disabled ?> >Alle
-                                        <label>
-                                            <input class="form-control" type="number" min="1" max="365" value="<?php echo $modal_series->daily_days; ?>" name="daily_days" <?php echo $disabled ?> >
-                                        </label> Tage
-                                        <br>
-                                        <input type="radio" <?php echo $modal_series->daily_every_weekday ? "checked" : ""; ?> name="series" value="daily_every_weekday" <?php echo $disabled ?> >Montag
-                                        bis Freitag
-                                        <br>
-
-
-                                        <label><?php echo $lang["SCHEDULE_TOSTRING"][2]; ?></label>
-                                        <br>
-                                        <input type="radio" <?php echo $modal_series->weekly ? "checked" : ""; ?> name="series" value="weekly" <?php echo $disabled ?> >Alle
-                                        <label>
-                                            <input class="form-control" type="number" max="52" value="<?php echo $modal_series->weekly_weeks; ?>" name="weekly_weeks" <?php echo $disabled ?> >
-                                        </label> Wochen am
-                                        <label>
-                                            <select class="form-control" name="weekly_day" required <?php echo $disabled ?> >
-                                                <?php
-                                                $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
-                                                foreach (array_keys($days_of_the_week) as $day) {
-                                                    $selected = $modal_series->weekly_day == $day ? "selected" : "";
-                                                    echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </label>
-                                        <br>
-
-
-                                        <label><?php echo $lang["SCHEDULE_TOSTRING"][3]; ?></label>
-                                        <br>
-                                        <input type="radio" <?php echo $modal_series->monthly_day_of_month ? "checked" : ""; ?> name="series" value="monthly_day_of_month" <?php echo $disabled ?> >am
-                                        <label>
-                                            <input name="monthly_day_of_month_day" class="form-control" value="<?php echo $modal_series->monthly_day_of_month_day; ?>"
-                                            type="number" min="1" max="31" <?php echo $disabled ?> >
-                                        </label> Tag jedes
-                                        <label>
-                                            <input <?php echo $disabled ?>  name="monthly_day_of_month_month" value="<?php echo $modal_series->monthly_day_of_month_month; ?>" class="form-control"
-                                            type="number" min="1" max="12">
-                                        </label>. Monats
-                                        <br>
-                                        <input <?php echo $disabled ?>  type="radio" <?php echo $modal_series->monthly_nth_day_of_week ? "checked" : ""; ?> name="series" value="monthly_nth_day_of_week">am
-                                        <label>
-                                            <input <?php echo $disabled ?>  name="monthly_nth_day_of_week_nth" value="<?php echo $modal_series->monthly_nth_day_of_week_nth; ?>" class="form-control"
-                                            type="number" min="1" max="5">
-                                        </label>
-                                        <label>
-                                            <select class="form-control" name="monthly_nth_day_of_week_day" required <?php echo $disabled ?> >
-                                                <?php
-                                                $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
-                                                foreach (array_keys($days_of_the_week) as $day) {
-                                                    $selected = $modal_series->monthly_nth_day_of_week_day == $day ? "selected" : "";
-                                                    echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </label> jedes
-                                        <label>
-                                            <input <?php echo $disabled ?>  name="monthly_nth_day_of_week_month" value="<?php echo $modal_series->monthly_nth_day_of_week_month; ?>" class="form-control"
-                                            type="number" min="1" max="12">
-                                        </label> monats
-                                        <br>
-
-
-                                        <label><?php echo $lang["SCHEDULE_TOSTRING"][4]; ?></label>
-                                        <br>
-                                        <input  <?php echo $disabled ?> type="radio" <?php echo $modal_series->yearly_nth_day_of_month ? "checked" : ""; ?> name="series" value="yearly_nth_day_of_month">jeden
-                                        <label>
-                                            <input  <?php echo $disabled ?> name="yearly_nth_day_of_month_nth" value="<?php echo $modal_series->yearly_nth_day_of_month_nth; ?>" class="form-control"
-                                            min="1" max="31" type="number">
-                                        </label>.
-                                        <label>
-                                            <select class="form-control" name="yearly_nth_day_of_month_month" required <?php echo $disabled ?> >
-                                                <?php
-                                                $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
-                                                foreach (array_keys($months_of_the_year) as $month) {
-                                                    $selected = $modal_series->yearly_nth_day_of_month_month == $month ? "selected" : "";
-                                                    echo "<option $selected value='$month'>${months_of_the_year[$month]}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </label>
-                                        <br>
-                                        <input <?php echo $disabled ?>  type="radio" <?php echo $modal_series->yearly_nth_day_of_week ? "checked" : ""; ?> name="series" value="yearly_nth_day_of_week">am
-                                        <label>
-                                            <input <?php echo $disabled ?>  name="yearly_nth_day_of_week_nth" value="<?php echo $modal_series->yearly_nth_day_of_week_nth; ?>" class="form-control"
-                                            min="1" max="5" type="number">
-                                        </label>.
-                                        <label>
-                                            <select class="form-control" name="yearly_nth_day_of_week_day" required <?php echo $disabled ?> >
-                                                <?php
-                                                $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
-                                                foreach (array_keys($days_of_the_week) as $day) {
-                                                    $selected = $modal_series->yearly_nth_day_of_week_day == $day ? "selected" : "";
-                                                    echo "<option $selected value='$day'>${days_of_the_week[$day]}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </label> im
-                                        <label>
-                                            <select name="yearly_nth_day_of_week_month" class="form-control" name="month" required <?php echo $disabled ?> >
-                                                <?php
-                                                $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
-                                                foreach (array_keys($months_of_the_year) as $month) {
-                                                    $selected = $modal_series->yearly_nth_day_of_week_month == $month ? "selected" : "";
-                                                    echo "<option $selected value='$month'>${months_of_the_year[$month]}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </label>
-                                        <br>
-
-
-                                    </div>
-
-
-                                    <!-- /series -->
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /modal body -->
-                        <div class="modal-footer">
-                            <?php if ($modal_id && $modal_isAdmin): ?>
-                                <button type="submit" class="btn btn-danger ask-before-submit<?php echo $modal_id ?> disable-required-fields<?php echo $modal_id ?>" name="deleteDynamicProject">
-                                    <?php echo $lang["DELETE"]; ?>
-                                </button>
-                            <?php endif;?>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">
-                                <?php echo $lang['CANCEL']; ?>
-                            </button>
-                            <button type="submit" class="btn btn-warning show-required-fields<?php echo $modal_id ?>" <?php if ($modal_id): ?> name="editDynamicProject" <?php else: ?> name="dynamicProject" <?php endif;?>  >
-                                <?php echo $lang['SAVE']; ?>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+<div class="modal fade" id="editingModal-<?php echo $x; ?>">
+    <div class="modal-dialog modal-lg" role="form">
+        <div class="modal-content">
+            <form method="POST" id="projectForm<?php echo $x; ?>">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Task editieren</h4>
             </div>
-        </form>
-        <!-- /new dynamic project modal -->
-        <script>
-        function showClients(company, client, targetSelector) {
-            $.ajax({
-                url: 'ajaxQuery/AJAX_getClient.php',
-                data: { companyID: company, clientID: client },
-                type: 'get',
-                success: function (resp) {
-                    $(targetSelector).html(resp);
-                },
-                error: function (resp) { },
-            });
-        }
-
-        $("#projectImageUpload<?php echo $modal_id ?>").change(function (event) {
-            var files = event.target.files;
-            //$("#newProjectPreview").html(""); //delete old pictures
-            // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, f; f = files[i]; i++) {
-                // Only process image files.
-                if (!f.type.match('image.*')) {
-                    continue;
-                }
-                var reader = new FileReader();
-                // Closure to capture the file information.
-                reader.onload = (function (theFile) {
-                    return function (e) {
-                        // Render thumbnail.
-                        var span = document.createElement('span');
-                        span.innerHTML =
-                        [
-                            '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="',
-                            e.target.result,
-                            '" title="', escape(theFile.name),
-                            '"/>'
-                        ].join('');
-                        $("#projectPreview<?php echo $modal_id ?>").append(span);
-                        $("#projectPreview<?php echo $modal_id ?> img").unbind("click").click(removeImg);
-                    };
-                })(f);
-                // Read in the image file as a data URL.
-                reader.readAsDataURL(f);
-            }
-
-        });
-
-        $(function () {
-            $("#projectPreview<?php echo $modal_id ?> img").click(removeImg);
-        })
-
-        function removeImg(event) {
-            $(event.target).remove();
-        }
-
-        $("#projectForm<?php echo $modal_id ?>").submit(function (event) {
-            $("#projectPreview<?php echo $modal_id ?>").find("input").remove()
-            $("#projectPreview<?php echo $modal_id ?>").find("img").each(function (index, elem) {
-                console.log(getImageSrc(elem).length);
-                $("#projectPreview<?php echo $modal_id ?>").append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
-            });
-        });
-
-        function getImageSrc(img) {
-            var c = document.createElement("canvas");
-            c.width = img.naturalWidth;
-            c.height = img.naturalHeight;
-            var ctx = c.getContext("2d");
-            ctx.drawImage(img, 0, 0);
-            return c.toDataURL();
-        }
-        $(function () {
-            $(".ask-before-submit<?php echo $modal_id ?>").click(function askUser(event) {
-                if(confirm("Are you sure?") && confirm("This can not be reverted")){
-                    return true;
-                }
-                event.preventDefault();
-                return false;
-            });
-
-            $(".disable-required-fields<?php echo $modal_id ?>").click(function (event){
-                $("#projectForm<?php echo $modal_id ?> input, #projectForm<?php echo $modal_id ?> textarea, #projectForm<?php echo $modal_id ?> select").filter("[required]").each(function(index,elem){
-                    $(elem).attr("required",false);
-                });
-                $("#projectForm<?php echo $modal_id ?> select").each(function(index,elem){
-                    $(elem).attr("required",false);
-                });
-                $("#projectForm<?php echo $modal_id ?> input").each(function(index,elem){
-                    if($(elem).attr("min") || $(elem).attr("max"))
-                    $(elem).attr("min", false);
-                    $(elem).attr("max", false);
-                });
-            });
-
-            $(".show-required-fields<?php echo $modal_id ?>").click(function (event){
-                var fields = [];
-                $("#projectForm<?php echo $modal_id ?> input, #projectForm<?php echo $modal_id ?> textarea, #projectForm<?php echo $modal_id ?> select").filter("[required]").each(function(index,elem){
-                    if($(elem).val() == ""){
-                        var name = $(elem).attr("name");
-                        name = name.charAt(0).toUpperCase() + name.slice(1);
-                        name = name.replace("[]","");
-                        fields.push(name);
-                    }
-                });
-                if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
-            });
-            $("#dynamicProject<?php echo $modal_id ?>").on('hidden.bs.modal', function () {
-                window.location.reload();
-            });
-        });
-        </script>
-
-        <!-- text editor test -->
-        <script>
-        tinymce.init({
-            selector: '#projectDescriptionEditor<?php echo $modal_id ?>', //needs to be changed
-            plugins: 'image code',
-            plugins: 'paste',
-            relative_urls: false,
-            paste_data_images: true,
-            toolbar: 'undo redo | link image file media | code',
-            // enable title field in the Image dialog
-            image_title: true,
-            // enable automatic uploads of images represented by blob or data URIs
-            automatic_uploads: true,
-            // URL of our upload handler (for more details check: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url)
-            // images_upload_url: 'postAcceptor.php',
-            // here we add custom filepicker only to Image dialog
-            file_picker_types: 'file image media',
-            // and here's our custom image picker
-            file_picker_callback: function(cb, value, meta) {
-                var input = document.createElement('input');
-                input.setAttribute('type', 'file');
-                input.setAttribute('accept', '*');
-
-                // Note: In modern browsers input[type="file"] is functional without
-                // even adding it to the DOM, but that might not be the case in some older
-                // or quirky browsers like IE, so you might want to add it to the DOM
-                // just in case, and visually hide it. And do not forget do remove it
-                // once you do not need it anymore.
-
-                input.onchange = function() {
-                    var file = this.files[0];
-
-                    var reader = new FileReader();
-                    reader.onload = function () {
-                        // Note: Now we need to register the blob in TinyMCEs image blob
-                        // registry. In the next release this part hopefully won't be
-                        // necessary, as we are looking to handle it internally.
-                        var id = 'blobid' + (new Date()).getTime();
-                        var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                        console.log(reader.result.split(";")[0].split(":")[1]) //mime type
-                        var base64 = reader.result.split(',')[1];
-                        alert("Base64 size: "+base64.length+" chars")
-                        var blobInfo = blobCache.create(id, file, base64);
-                        blobCache.add(blobInfo);
-                        // call the callback and populate the Title field with the file name
-                        cb(blobInfo.blobUri(), { title: file.name, text:file.name,alt:file.name,source:"images/Question_Circle.jpg",poster:"images/Question_Circle.jpg" });
-                    };
-                    reader.readAsDataURL(file);
-                };
-
-                input.click();
-            }
-        });
-
-    </script>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Grundliegendes*</a></li>
+                    <li><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a></li>
+                    <li><a data-toggle="tab" href="#projectAdvanced<?php echo $x; ?>">Erweiterte Optionen</a></li>
+                    <li><a data-toggle="tab" href="#projectSeries<?php echo $x; ?>">Routine Aufgabe</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="projectBasics<?php echo $x; ?>" class="tab-pane fade in active"><br>
+                        <?php
+                        $filterCompany = $dynrow['companyid'];
+                        $filterClient = $dynrow['clientid'];
+                        $filterProject = $dynrow['clientprojectid'];
+                        include dirname(__DIR__ ).'/misc/select_project.php';
+                        ?>
+                        <div class="col-md-12"><small>*Auswahl ist Optional. Falls kein Projekt angegeben, entscheidet der Benutzer.</small><br><br></div>
+                        <div class="col-md-12"><label>Task Name*</label><input class="form-control" type="text" name="name" placeholder="Bezeichnung" required value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                        <?php
+                        $modal_options = '';
+                        $result = $conn->query("SELECT id, firstname, lastname FROM UserData");
+                        while ($row = $result->fetch_assoc()) $modal_options .= '<option value="user;'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>';
+                        ?>
+                        <div class="col-md-4">
+                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>*</label>
+                            <select class="select2-team-icons" name="owner" required>
+                                <?php echo str_replace('<option value="user;'.$dynrow['projectowner'].'" ', '<option value="'.$dynrow['projectowner'].'" selected ', $modal_options); ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label><?php echo $lang["EMPLOYEE"]; ?>*</label>
+                            <select class="select2-team-icons" name="employees[]" multiple="multiple" required>
+                                <?php
+                                $result = $modal_options;
+                                for($i = 0; $i < count($dynrow_emps['userid']); $i++){
+                                    if($dynrow_emps['position'][$i] == 'normal')
+                                        $result = str_replace('<option value="user;"'.$dynrow_emps['userid'][$i].'" ', '<option selected value="user;"'.$dynrow_emps['userid'][$i].'" ', $result);
+                                }
+                                echo $result;
+                                $result = $conn->query("SELECT id, name FROM $teamTable");
+                                while ($row = $result->fetch_assoc()) {
+                                    $selected = '';
+                                    if(in_array($row['id'], $dynrow_teams['teamid'])){
+                                        $selected = 'selected';
+                                    }
+                                    echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
+                            <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
+                                <?php
+                                $result = $modal_options;
+                                for($i = 0; $i < count($dynrow_emps['userid']); $i++){
+                                    if($dynrow_emps['position'][$i] == 'optional')
+                                        $result = str_replace('<option value="user;"'.$dynrow_emps['userid'][$i].'" ', '<option selected value="user;"'.$dynrow_emps['userid'][$i].'" ', $result);
+                                }
+                                echo $result;
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade"><br>
+                        <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
+                        <textarea class="form-control projectDescriptionEditor" rows="10" name="description" required><?php echo $dynrow['projectdescription']; ?></textarea>
+                        <br>
+                        <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></label>
+                        <br>
+                        <label class="btn btn-default" role="button"><?php echo $lang["DYNAMIC_PROJECTS_CHOOSE_PICTURES"]; ?>
+                            <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload" accept=".jpg,.jpeg,.png">
+                        </label>
+                        <div id="projectPreview<?php echo $x; ?>">
+                            <?php
+                            if(isset($_POST['imagesbase64'])){
+                                foreach ($_POST['imagesbase64'] as $modal_picture) {
+                                    echo "<span><img src='$modal_picture' alt='Previously uploaded' class='img-thumbnail' style='width:48%;margin:0.45%'></span>";
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>
+                        <div class="col-md-6">
+                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
+                            <select class="form-control js-example-basic-single" name="priority">
+                                <option value='1' <?php if($dynrow['projectpriority'] == 1) echo 'selected'; ?> >Sehr niedrig</option>
+                                <option value='2' <?php if($dynrow['projectpriority'] == 2) echo 'selected'; ?> >Niedrig</option>
+                                <option value='3' <?php if($dynrow['projectpriority'] == 3) echo 'selected'; ?> >Normal</option>
+                                <option value='4' <?php if($dynrow['projectpriority'] == 4) echo 'selected'; ?> >Hoch</option>
+                                <option value='5' <?php if($dynrow['projectpriority'] == 5) echo 'selected'; ?> >Sehr hoch</option>
+                            </select><br>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status*</label>
+                            <div class="input-group">
+                                <select class="form-control" name="status" >
+                                    <option value="DEACTIVATED" <?php if($dynrow['projectpriority'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
+                                    <option value="DRAFT" <?php if($dynrow['projectpriority'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
+                                    <option value="ACTIVE" <?php if($dynrow['projectpriority'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
+                                    <option value="COMPLETED" <?php if($dynrow['projectpriority'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
+                                </select>
+                                <span class="input-group-addon text-warning"><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?></span>
+                                <input type='number' class="form-control" name='completed' value="<?php echo $dynrow['projectpercentage']; ?>" min="0" max="100" step="1"/>
+                            </div><br>
+                        </div>
+                        <div class="col-md-6">
+                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
+                            <input type="color" class="form-control" value="<?php echo $dynrow['projectcolor']; ?>" name="color"><br>
+                        </div>
+                        <div class="col-md-6">
+                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
+                            <select class="form-control js-example-basic-single" name="parent">
+                                <option value=''>Keines</option>
+                                <?php
+                                $result = $conn->query("SELECT projectid, projectname FROM dynamicprojects");
+                                while ($row = $result->fetch_assoc()) {
+                                    $selected = ($row['projectid'] == $dynrow['projectowner']) ? 'selected' : '';
+                                    echo '<option '.$selected.' value="'.$row["projectid"].'" >'.$row["projectname"].'</option>';
+                                }
+                                ?>
+                            </select><br>
+                        </div>
+                    </div>
+                    <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>
+                        <div class="well">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label><?php echo $lang["BEGIN"]; ?></label>
+                                    <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
+                                </div>
+                                <div class="col-md-6">
+                                    <label><?php echo $lang["END"]; ?></label><br>
+                                    <label><input type="radio" name="endradio" value="" checked ><?php echo $lang["DYNAMIC_PROJECTS_SERIES_NO_END"]; ?></label><br>
+                                    <input type="radio" name="endradio" value="date">
+                                    <label><input type='text' class="form-control datepicker" name='enddate' placeholder="Enddatum" value="<?php echo $dynrow['projectend']; ?>"/></label><br>
+                                    <input type="radio" name="endradio" value="number" >
+                                    <label><input type='number' class="form-control" name='endnumber' placeholder="<?php echo $lang["DYNAMIC_PROJECTS_SERIES_REPETITIONS"]; ?>" ></label><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12"><br> <!-- Once -->
+                            <label><?php echo $lang["SCHEDULE_TOSTRING"][0]; ?></label><br>
+                            <label><input type="radio"checked name="series" value="once" >Keine Wiederholungen</label><br>
+                        </div>
+                        <div class="col-md-12"><br> <!-- Daily -->
+                            <label><?php echo $lang["SCHEDULE_TOSTRING"][1]; ?></label><br>
+                            <input type="radio" name="series" value="daily_every_nth" >Jeden
+                            <label><input class="form-control" type="number" min="1" max="365" value="1" name="daily_days"></label> -ten Tag
+                            <br>
+                            <input type="radio" name="series" value="daily_every_weekday" >Montag bis Freitag <br>
+                        </div>
+                        <div class="col-md-12"><br> <!-- Weekly -->
+                            <label><?php echo $lang["SCHEDULE_TOSTRING"][2]; ?></label><br>
+                            <input type="radio" name="series" value="weekly" >Alle
+                            <label><input name="weekly_weeks" type="number" class="form-control" min="1" max="52" value="1" ></label> Wochen am
+                            <label>
+                                <select class="form-control" name="weekly_day">
+                                    <?php
+                                    $modal_weeks = '';
+                                    $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
+                                    foreach ($days_of_the_week as $key => $val) {
+                                        $modal_weeks .= "<option value='$key'>$val</option>";
+                                    }
+                                    echo $modal_weeks;
+                                    ?>
+                                </select>
+                            </label>
+                            <br>
+                        </div>
+                        <div class="col-md-12"><br> <!-- Monthly -->
+                            <label><?php echo $lang["SCHEDULE_TOSTRING"][3]; ?></label><br>
+                            <input type="radio" name="series" value="monthly_day_of_month">Am
+                            <label><input name="monthly_day_of_month_day" class="form-control" value="1" type="number" min="1" max="31"></label> -ten Tag jedes
+                            <label><input name="monthly_day_of_month_month" value="1" class="form-control" type="number" min="1" max="12"></label> -ten Monats
+                            <br>
+                            <input type="radio"  name="series" value="monthly_nth_day_of_week">Am
+                            <label><input name="monthly_nth_day_of_week_nth" value="1" class="form-control" type="number" min="1" max="5"></label> -ten
+                            <label>
+                                <select class="form-control" name="monthly_nth_day_of_week_day">
+                                    <?php echo $modal_weeks; ?>
+                                </select>
+                            </label> jeden
+                            <label><input name="monthly_nth_day_of_week_month" value="1" class="form-control" type="number" min="1" max="12"></label> -ten Monat
+                            <br>
+                        </div>
+                        <div class="col-md-12"><br> <!-- Yearly -->
+                            <label><?php echo $lang["SCHEDULE_TOSTRING"][4]; ?></label><br>
+                            <input type="radio" name="series" value="yearly_nth_day_of_month">Jeden
+                            <label><input name="yearly_nth_day_of_month_nth" class="form-control" min="1" max="31" type="number" value="1"></label> -ten
+                            <label>
+                                <select class="form-control" name="yearly_nth_day_of_month_month">
+                                    <?php
+                                    $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
+                                    $modal_months = '';
+                                    foreach ($months_of_the_year as $key => $val) $modal_months .= "<option value='$key'>$val</option>";
+                                    echo $modal_months;
+                                    ?>
+                                </select>
+                            </label>
+                            <br>
+                            <input type="radio" name="series" value="yearly_nth_day_of_week">Am
+                            <label><input name="yearly_nth_day_of_week_nth" value="1" class="form-control" min="1" max="5" type="number"></label> -ten
+                            <label>
+                                <select class="form-control" name="yearly_nth_day_of_week_day">
+                                    <?php echo $modal_weeks; ?>
+                                </select>
+                            </label> im
+                            <label>
+                                <select name="yearly_nth_day_of_week_month" class="form-control" name="month">
+                                    <?php echo $modal_months; ?>
+                                </select>
+                            </label>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /modal-body -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                <button type="submit" class="btn btn-warning show-required-fields" name="editDynamicProject" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

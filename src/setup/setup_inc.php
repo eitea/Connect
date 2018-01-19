@@ -1197,6 +1197,7 @@ function create_tables($conn) {
         projectowner INT(6),
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
+        projectpercentage INT(3) DEFAULT 0,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1244,19 +1245,6 @@ function create_tables($conn) {
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
         ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsbookings(
-        projectid VARCHAR(100) NOT NULL,
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
-        bookingend DATETIME,
-        bookingclient INT(6) UNSIGNED,
-        userid INT(6) UNSIGNED,
-        bookingtext VARCHAR(1000)
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;

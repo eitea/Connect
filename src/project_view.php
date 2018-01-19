@@ -92,14 +92,9 @@ if(!$result || $result->num_rows <= 0){
 
       while($row = $result->fetch_assoc()){
         $productive = $row['status'] ? '<i class="fa fa-tags"></i>' : '';
-        $dynamic_badge = $row["dynamicprojectid"] && strlen($row["dynamicprojectid"])>0 ? "<i class='fa fa-tasks' title='{$lang['DYNAMIC_PROJECTS_BELONG_TO']}'></i>" : '';
         echo '<tr>';
-        if($row["dynamicprojectid"] && strlen($row["dynamicprojectid"])>0){
-          echo "<td><input title='{$lang['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT']}' type='checkbox' disabled/></td>"; //Dynamic projects use static projects for booking. They shouldn't be without deleting the dynamic project. 
-        }else{
-          echo '<td><input type="checkbox" name="index[]" value='. $row['id'].' /></td>';
-        }
-        echo '<td>'.$productive.$dynamic_badge.'</td>';
+        echo '<td><input type="checkbox" name="index[]" value='. $row['id'].' /></td>';
+        echo '<td>'.$productive.'</td>';
         echo '<td>'.$row['companyName'] .'</td>';
         echo '<td>'. $row['clientName'] .'</td>';
         echo '<td>'. $row['name'] .'</td>';

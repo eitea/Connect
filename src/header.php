@@ -35,8 +35,8 @@ if ($result && $result->num_rows > 0) {
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
 } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
@@ -590,12 +590,15 @@ echo '<br>' . $buttonEmoji;
           <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
 
           <!-- User-Section: BOOKING -->
-          <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
+          <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
               <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 
-              <?php $result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
+              <?php $result = $conn->query("SELECT projectid FROM dynamicprojects LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid
+                  LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = dynamicprojects.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                  WHERE dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID OR teamRelationshipData.userID = $userID");
+
               if ($result && $result->num_rows > 0): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span>
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span>
                       <?php echo $lang['DYNAMIC_PROJECTS'];
                       $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
                       if ($result->num_rows > 0) {
@@ -732,14 +735,14 @@ if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || 
                 <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                 <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
               </ul>
             </div>
           </div>
         </div>
         <?php
-if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php") {
+if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
     echo "<script>$('#adminOption_PROJECT').click();</script>";
 }
 ?>

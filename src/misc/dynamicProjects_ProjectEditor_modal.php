@@ -21,7 +21,7 @@ $modal_id = preg_replace('/[^A-Za-z0-9]/', '', $modal_id);
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title" id="dynamicProjectLabel<?php echo $modal_id ?>">
-                        <?php echo $modal_title; ?>
+                        <?php echo $modal_t; itle; ?>
                     </h4>
                 </div>
                 <!-- modal body -->
@@ -42,7 +42,7 @@ $modal_id = preg_replace('/[^A-Za-z0-9]/', '', $modal_id);
                 </ul>
                 <!-- /tab buttons -->
                 <div class="tab-content">
-                    <div id="projectBasics<?php echo $modal_id ?>" class="tab-pane fade in active">
+                    <div id="projectBasics<?php echo $modal_id; ?>" class="tab-pane fade in active">
                         <div class="modal-body">
                             <!-- basics -->
                             <div class="well">
