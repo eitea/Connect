@@ -5,20 +5,30 @@ require dirname(__DIR__) . "/language.php";
 $x = $_GET['projectid'];
 
 $userID = $_GET['userid'];
+
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
 }
 
-$result = $conn->query("SELECT * from dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
-$dynrow = $result->fetch_assoc();
+if($x){
+    $result = $conn->query("SELECT * from dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
+    $dynrow = $result->fetch_assoc();
 
-$result = $conn->query("SELECT teamid FROM dynamicprojectsteams WHERE projectid = '$x'");
-$dynrow_teams = $result->fetch_all(MYSQLI_ASSOC);
+    $result = $conn->query("SELECT teamid FROM dynamicprojectsteams WHERE projectid = '$x'");
+    $dynrow_teams = $result->fetch_all(MYSQLI_ASSOC);
 
-$result = $conn->query("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = '$x'");
-$dynrow_emps = $result->fetch_all(MYSQLI_ASSOC);
+    $result = $conn->query("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = '$x'");
+    $dynrow_emps = $result->fetch_all(MYSQLI_ASSOC);
+} else {
+    $result = $conn->query("SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='$dbName' AND `TABLE_NAME`='dynamicprojects'");
+    $dynrow = array_fill_keys(array_column($result->fetch_all(MYSQLI_ASSOC), 'COLUMN_NAME'), '');
+    $dynrow['projectcolor'] = '#efefef';
+    $dynrow_teams = array('teamid' => '');
+    $dynrow_emps = array('userid' => '', 'position' => '');
+}
+
 ?>
 
 <div class="modal fade" id="editingModal-<?php echo $x; ?>">

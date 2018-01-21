@@ -165,6 +165,8 @@ ignore_user_abort(1);
 
             require_once dirname(__DIR__) . "/version_number.php";
 
+            $identifier = uniqid('', true);
+
             //------------------------------ INSERTS ---------------------------------------
             //insert identification
             $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
@@ -199,8 +201,8 @@ ignore_user_abort(1);
             $sql = "INSERT INTO intervalData (userID) VALUES (2);";
             $conn->query($sql);
             //insert roletable
-            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
+            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
             $conn->query($sql);
             //insert company-client relationship
             $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
