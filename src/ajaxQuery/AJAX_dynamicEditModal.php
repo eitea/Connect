@@ -28,6 +28,7 @@ if($x){
     $dynrow['projectstart'] = date('Y-m-d');
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
+    $dynrow['projectowner'] = $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
 }
