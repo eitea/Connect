@@ -235,6 +235,7 @@ input[type="radio"]:checked {
 }
 
 /* alerts */
+
 .alert-over{
   position:fixed;
   z-index: 50;
@@ -245,7 +246,7 @@ input[type="radio"]:checked {
 
 /* little helperlings */
 .row{
-  padding:7px 15px;
+  padding: 7px 15px;
 }
 .table{
   word-wrap: break-word;
@@ -254,12 +255,15 @@ i{
   margin-right:5px;
   margin-left:5px;
 }
+
 .bold{
   font-weight: bold;
 }
+
 .grey{
   color:grey;
 }
+
 .modal-body{
   max-height:80vh;
   overflow-y:auto;

@@ -18,14 +18,15 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
     $templateName = test_input($_POST['report_name']);
     $templateContent = $_POST['report_content'];
     if($action == 'new'){
-        $stmt = $conn->prepare("INSERT INTO templateData (name, htmlCode, type, userIDs) VALUES(?, ?, 'document', $cmpID)");        
+        $stmt = $conn->prepare("INSERT INTO templateData (name, htmlCode, type, userIDs) VALUES(?, ?, 'document', $cmpID)");
     } else {
         $stmt = $conn->prepare("UPDATE templateData SET name = ?, htmlCode = ? WHERE id = $action_id");
     }
     $stmt->bind_param("ss", $templateName, $templateContent);
     $stmt->execute();
-    
+
     $action = '';
+
     if($conn->error){
         echo '<div class="alert alter-danger"><a href="" data-dismiss="alert" class="close">&times;</a></div>';
     } else {
@@ -83,7 +84,6 @@ if($action == 'edit'){
 <div class="row">
     <div class="col-sm-1 text-right"><strong>Name</strong></div>
     <div class="col-xs-6"><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
-    <div class="col-sm-3"><button type="submit" name="save" class="btn btn-warning">Speichern</button></div>
 </div>
 <div class="row">
     <div class="col-sm-1 text-right"><strong>Inhalt</strong></div>

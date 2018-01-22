@@ -11,7 +11,7 @@ if(!empty($_GET['val'])){
   redirect('view?err=1');
 }
 
-$result = $conn->query("SELECT proposals.*, companyID, id_number FROM proposals, processHistory, clientData 
+$result = $conn->query("SELECT proposals.*, companyID, id_number FROM proposals, processHistory, clientData
 WHERE proposals.clientID = clientData.id AND proposals.id = processHistory.processID AND processHistory.id = $historyID");
 if($result && $result->num_rows > 0){
   $proposal_row = $result->fetch_assoc();
@@ -70,20 +70,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
       }
       //step2 - reduce by all products which are same as transit
-      $res = $conn->query("SELECT quantity, origin FROM products INNER JOIN processHistory ON products.historyID = processHistory.id 
+      $res = $conn->query("SELECT quantity, origin FROM products INNER JOIN processHistory ON products.historyID = processHistory.id
       WHERE processHistory.processID = ".$proposal_row['id']." AND id_number LIKE '$transit%'"); echo $conn->error;
       while($row = $res->fetch_assoc()){
         if(isset($prod_list[$row['origin']])){
           $prod_list[$row['origin']]['quantity'] -= $row['quantity'];
         }
       }
+      $res->free();
       //step3 - create new history and enter products with quantities
       $num = getNextERP($transit, $proposal_row['companyID']);
       $conn->query("INSERT INTO processHistory (id_number, processID) VALUES('$num', ".$proposal_row['id'].")"); echo $conn->error;
       $historyID = $conn->insert_id;
       $stmt = $conn->prepare("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase, iv, iv2)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-      $stmt->bind_param("isisddsidsdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
+      $stmt->bind_param("isisddsissdss", $historyID, $origin, $pos, $name, $price, $quantity, $desc, $taxID, $cash, $unit, $purchase, $iv, $iv2);
       foreach($prod_list as $p){
         if($p['quantity'] > 0 || !$p['origin']){
           $origin = $p['origin'];
@@ -102,6 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if($stmt->error) echo $stmt->error;
       }
+      echo $stmt->error;
       $stmt->close();
       redirect("edit?val=$historyID");
     } else {
@@ -211,7 +213,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
   if(isset($_POST['meta_save'])){
-    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType', 
+    $conn->query("UPDATE proposals SET curDate = '$meta_curDate', deliveryDate = '$meta_deliveryDate', paymentMethod = '$meta_paymentMethod', shipmentType = '$meta_shipmentType',
     representative = '$meta_representative', porto = '$meta_porto', portoRate = '$meta_porto_percentage', header = '$meta_header' WHERE id = ".$proposal_row['id']);
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
   }
@@ -382,7 +384,7 @@ $x = $prod_row['id'];
     <div class="modal-dialog modal-md modal-content" role="document">
       <div class="modal-header"><h4 class="modal-title"><?php echo $prod_row['name']; ?></h4></div>
       <div class="modal-body">
-        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>        
+        <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>
           <label>Text<?php echo mc_status(); ?></label>
           <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
         <?php else: ?>
@@ -404,7 +406,7 @@ $x = $prod_row['id'];
             </div>
           </div>
           <br>
-          <div class="row">          
+          <div class="row">
             <div class="col-md-6">
               <label><?php echo $lang['QUANTITY']; ?></label>
               <input type="text" class="form-control" name="update_quantity_<?php echo $x ?>" value="<?php echo $prod_row['quantity']; ?>"/>
@@ -500,7 +502,7 @@ $x = $prod_row['id'];
             $tax_result = $conn->query("SELECT * FROM taxRates");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
               $selected = '';
-              if($tax_row['id'] == 3) $selected = 'selected'; 
+              if($tax_row['id'] == 3) $selected = 'selected';
               echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
             }
             ?>

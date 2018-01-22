@@ -102,7 +102,7 @@ ignore_user_abort(1);
         }
         $firstname = $lastname = $companyName = $companyType = $localPart = $domainname = $out = "";
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){          
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $cmpDescription = $uid = $postal = $city = $address = $phone = $homepage = $email = '';
           if(isset($_POST['cmpDescription'])){
             $cmpDescription = $_POST['cmpDescription'];
@@ -149,93 +149,90 @@ ignore_user_abort(1);
                 echo mysqli_error($conn);
                 unlink(dirname(__DIR__) .'/connection_config.php');
                 die("<br>Invalid DB Connection: Could not instantiate a database.<a href='run'>Return</a><br>");
-              }
+            }
 
-              //reconnect to database
-              $conn->close();
-              $conn = new mysqli($servername, $username, $password, $dbName);
+            //reconnect to database
+            $conn->close();
+            $conn = new mysqli($servername, $username, $password, $dbName);
 
-              $conn->query("SET NAMES 'utf8';");
-              $conn->query("SET CHARACTER SET 'utf8';");
+            $conn->query("SET NAMES 'utf8';");
+            $conn->query("SET CHARACTER SET 'utf8';");
 
-              set_time_limit(0); //setup takes longer with a laptop in energy saving mode
-              //create all tables
-              require __DIR__ . "/setup_inc.php";
-              create_tables($conn);
+            set_time_limit(0); //setup takes longer with a laptop in energy saving mode
+            //create all tables
+            require __DIR__ . "/setup_inc.php";
+            create_tables($conn);
 
-              require_once dirname(__DIR__) . "/version_number.php";
-              //------------------------------ INSERTS ---------------------------------------
-              //insert identification
-              $identifier = str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword()); //60 characters;
-              $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
-              //insert main company
-              $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-              echo $conn->error;
-              $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
-              $stmt->execute();
-              $stmt->close();
-              //insert password policy
-              $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
-              //insert module en/disable
-              $conn->query("INSERT INTO modules (enableTime, enableProject, enableSocialMedia) VALUES('TRUE', 'TRUE', 'TRUE')");
+            require_once dirname(__DIR__) . "/version_number.php";
 
-              //insert ADMIN bogus
-              $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
-              $conn->query($sql);
-              //interval
-              $sql = "INSERT INTO intervalData (userID) VALUES (1);";
-              $conn->query($sql);
-              //role
-              $sql = "INSERT INTO roles (userID) VALUES(1);";
-              $conn->query($sql);
-              //insert company-client relationship
-              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1, 1)";
-              $conn->query($sql);
-              //socialprofile
-              $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
-              $conn->query($sql);
+            //------------------------------ INSERTS ---------------------------------------
+            //insert identification
+            $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
+            //insert main company
+            $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            echo $conn->error;
+            $stmt->bind_param("ssssssssss", $companyName, $companyType, $cmpDescription, $postal, $city, $uid, $address, $phone, $email, $homepage);
+            $stmt->execute();
+            $stmt->close();
+            //insert password policy
+            $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
+            //insert ADMIN bogus
+            $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
+            $conn->query($sql);
+            //interval
+            $sql = "INSERT INTO intervalData (userID) VALUES (1);";
+            $conn->query($sql);
+            //role
+            $sql = "INSERT INTO roles (userID) VALUES(1);";
+            $conn->query($sql);
+            //insert company-client relationship
+            $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1, 1)";
+            $conn->query($sql);
+            //socialprofile
+            $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
+            $conn->query($sql);
 
-              //insert core user
-              $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
-              $conn->query($sql);
-              //insert intervaltable
-              $sql = "INSERT INTO intervalData (userID) VALUES (2);";
-              $conn->query($sql);
-              //insert roletable
-              $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
-              $conn->query($sql);
-              //insert company-client relationship
-              $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
-              $conn->query($sql);
-              //socialprofile
-              $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
-              $conn->query($sql);
+            //insert core user
+            $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
+            $conn->query($sql);
+            //insert intervaltable
+            $sql = "INSERT INTO intervalData (userID) VALUES (2);";
+            $conn->query($sql);
+            //insert roletable
+            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
+            $conn->query($sql);
+            //insert company-client relationship
+            $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
+            $conn->query($sql);
+            //socialprofile
+            $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
+            $conn->query($sql);
 
-              //insert configs
-              $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
-              $conn->query($sql);
-              //insert ldap config
-              $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
-              $conn->query($sql);
-              //insert ERP numbers
-              $conn->query("INSERT INTO erpNumbers (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
-              //insert mail options
-              $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
-              //insert restic backup configuration
-              $conn->query("INSERT INTO resticconfiguration () VALUES ()");
+            //insert configs
+            $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
+            $conn->query($sql);
+            //insert ldap config
+            $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
+            $conn->query($sql);
+            //insert ERP numbers
+            $conn->query("INSERT INTO erp_settings (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+            //insert mail options
+            $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
+            //insert restic backup configuration
+            $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 
-              //insert holidays
-              $holidayFile = icsToArray(__DIR__ . '/Feiertage.txt');
-              $stmt = $conn->prepare("INSERT INTO holidays(begin, end, name) VALUES(?, ?, ?)");
-              echo mysqli_error($conn);
-              $stmt->bind_param("sss", $start, $end, $n);
-              for($i = 1; $i < count($holidayFile); $i++){
-                if(trim($holidayFile[$i]['BEGIN']) == 'VEVENT'){
-                  $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
-                  $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) ."-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
-                  $n = $holidayFile[$i]['SUMMARY'];
-                  $stmt->execute();              
+            //insert holidays
+            $holidayFile = icsToArray(__DIR__ . '/Feiertage.txt');
+            $stmt = $conn->prepare("INSERT INTO holidays(begin, end, name) VALUES(?, ?, ?)");
+            echo mysqli_error($conn);
+            $stmt->bind_param("sss", $start, $end, $n);
+            for ($i = 1; $i < count($holidayFile); $i++) {
+                if (trim($holidayFile[$i]['BEGIN']) == 'VEVENT') {
+                    $start = substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 0, 4) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTSTART;VALUE=DATE'], 6, 2) . " 00:00:00";
+                    $end = substr($holidayFile[$i]['DTEND;VALUE=DATE'], 0, 4) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 4, 2) . "-" . substr($holidayFile[$i]['DTEND;VALUE=DATE'], 6, 2) . " 20:00:00";
+                    $n = $holidayFile[$i]['SUMMARY'];
+                    $stmt->execute();
                 }
               }
               //insert github options
@@ -296,7 +293,7 @@ ignore_user_abort(1);
                 fclose($travellingFile);
               } else {
                 echo "Error Laender File <br>";
-              }            
+              }
 
               //insert sum units
               $conn->query("INSERT INTO units (name, unit) VALUES('Stück', 'Stk')");
@@ -334,10 +331,10 @@ ignore_user_abort(1);
               }
               $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE name = 'Bank' OR name = 'Kassa' ");
 
-              //INSERT DEFAULT TEMPLATES
+                            //INSERT DEFAULT TEMPLATES
 	$base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement','Awarness: Risikoanalyse','Awarness: Datenschutz-Folgeabschätzung',
 	'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage','Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',
-	'Zugangskontrolle: regelmäßige Passwortänderung der Benutzerpasswörter per Policy (mind. Alle 180 Tage)','Zugangskontrolle: regelmäßige Passwortänderung der administrativen Zugänge, 
+	'Zugangskontrolle: regelmäßige Passwortänderung der Benutzerpasswörter per Policy (mind. Alle 180 Tage)','Zugangskontrolle: regelmäßige Passwortänderung der administrativen Zugänge,
 	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automaischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
 	'Wechseldatenträger: Sperre oder zumindest Einschränkung von Wechseldatenträger (USB-Stick, SD Karte, USB Geräte mit Speichermöglichkeiten…)',
 	'Infrastruktur: Verschlüsselung der gesamten Festplatte in PC und Notebooks','Infrastruktur: Network Access Control (NAC) im Netzwerk aktiv',
@@ -363,7 +360,7 @@ ignore_user_abort(1);
             $result = $conn->query("SELECT id FROM companyData");
             while($row = $result->fetch_assoc()){
               $cmpID = $row['id'];
-              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')"); 
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'base')");
               $templateID = $conn->insert_id;
               $stmt_vv->execute();
               //BASE
@@ -387,7 +384,7 @@ ignore_user_abort(1);
                 $i++;
               }
 
-              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')"); 
+              $conn->query("INSERT INTO dsgvo_vv_templates(companyID, name, type) VALUES ($cmpID, 'Default', 'app')");
               $templateID = $conn->insert_id;
               //APPS
               $descr = '';
@@ -416,7 +413,7 @@ ignore_user_abort(1);
               $descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
               $opt = 'EXTRA_DOC';
               $stmt->execute();
-              
+
               $opt = 'APP_MATR_DESCR';
               $stmt->execute();
               $opt = 'APP_GROUP_1';
@@ -464,7 +461,6 @@ ignore_user_abort(1);
             }
             $stmt->close();
             $stmt_vv->close();
-  
 
               //-------------------------------- GIT -----------------------------------------
 
@@ -490,7 +486,7 @@ ignore_user_abort(1);
 
               //------------------------------------------------------------------------------
               die('<br><br> Setup Finished. Click Next: <a href="../login/auth">Next</a>');
-              
+
             } else {
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$out.'</div>';
             }

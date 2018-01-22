@@ -60,7 +60,15 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
 
   $mail->Host       = $row['host'];
   $mail->Port       = $row['port'];
-  $mail->setFrom($row['sender']);
+  if(!empty($row['sendername'])&&$row['isDefault']==1){
+    $result = $conn->query("SELECT name FROM companydata WHERE id = $cmpID");
+    $sendTo = $result->fetch_assoc();
+    $mail->setFrom($row['sender'],$row['sendername'].$sendTo['name']);
+  }elseif(!empty($row['sendername'])){
+    $mail->setFrom($row['sender'],$row['sendername']);
+  }else{
+    $mail->setFrom($row['sender']);
+  }
 
   //check if mail has recipients
   $result = $conn->query("SELECT * FROM $mailReportsRecipientsTable WHERE reportID = $reportID");

@@ -1,30 +1,96 @@
 <?php include 'header.php'; enableToCore($userID);?>
+<script>
+  document.onreadystatechange = () => {
+    if (document.readyState === "complete"){
+      if(document.getElementById("defaultCheck").hasAttribute("checked")){
+        var container = document.getElementById("emailContainer");
+        var inputs = container.getElementsByClassName("form-control");
+        for(i = 0;i<inputs.length;i++){
+          inputs[i].setAttribute("disabled","disabled");
+        }
+        document.getElementById("smtpDropDown").setAttribute("disabled","disabled");
+      }
+   }
+
+  }
+</script>
+
 <!-- BODY -->
 <?php
+
+
 if(isset($_POST['saveButton'])){
-  if(!empty($_POST['smtp_host'])){
-    $val = test_input($_POST['smtp_host']);
-    $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
-  }
-  if(!empty($_POST['smtp_port'])){
-    $val = intval($_POST['smtp_port']);
-    $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
-  }
-  if(isset($_POST['mail_username'])){
-    $val = test_input($_POST['mail_username']);
-    $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
-  }
-  if(isset($_POST['mail_password'])){
-    $val = test_input($_POST['mail_password']);
-    $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
-  }
-  if(isset($_POST['smtp_secure'])){
-    $val = test_input($_POST['smtp_secure']);
-    $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
-  }
-  if(!empty($_POST['mail_sender'])){
-    $val = test_input($_POST['mail_sender']);
-    $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
+  if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+    if(isset($_POST['defaultOptions'])){
+        $conn->query("UPDATE $mailOptionsTable SET host = 'adminmail'");
+        $conn->query("UPDATE $mailOptionsTable SET port = 25");
+        $conn->query("UPDATE $mailOptionsTable SET username = 'admin'");
+        $conn->query("UPDATE $mailOptionsTable SET password = 'admin'");
+        $conn->query("UPDATE $mailOptionsTable SET smtpSecure = 'SSL'");
+        $conn->query("UPDATE $mailOptionsTable SET sender = 'noreply@eitea.at'");
+        $conn->query("UPDATE $mailOptionsTable SET sendername = 'Connect im Auftrag von '");
+        $conn->query("UPDATE $mailOptionsTable SET isDefault = 1");
+    }else{
+      if(!empty($_POST['smtp_host'])){
+        $val = test_input($_POST['smtp_host']);
+        $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
+      }
+      if(!empty($_POST['smtp_port'])){
+        $val = intval($_POST['smtp_port']);
+        $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
+      }
+      if(isset($_POST['mail_username'])){
+        $val = test_input($_POST['mail_username']);
+        $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
+      }
+      if(isset($_POST['mail_password'])){
+        $val = test_input($_POST['mail_password']);
+        $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
+      }
+      if(isset($_POST['smtp_secure'])){
+        $val = test_input($_POST['smtp_secure']);
+        $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
+      }
+      if(!empty($_POST['mail_sender'])){
+        $val = test_input($_POST['mail_sender']);
+        $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
+      }
+      if(!empty($_POST['mail_sender_name'])){
+        $val = test_input($_POST['mail_sender_name']);
+        $conn->query("UPDATE $mailOptionsTable SET sendername = '$val'");
+      }
+      $conn->query("UPDATE $mailOptionsTable SET isDefault = null");
+    }
+  }else{
+    if(!empty($_POST['smtp_host'])){
+      $val = test_input($_POST['smtp_host']);
+      $conn->query("UPDATE $mailOptionsTable SET host = '$val'");
+    }
+    if(!empty($_POST['smtp_port'])){
+      $val = intval($_POST['smtp_port']);
+      $conn->query("UPDATE $mailOptionsTable SET port = '$val'");
+    }
+    if(isset($_POST['mail_username'])){
+      $val = test_input($_POST['mail_username']);
+      $conn->query("UPDATE $mailOptionsTable SET username = '$val'");
+    }
+    if(isset($_POST['mail_password'])){
+      $val = test_input($_POST['mail_password']);
+      $conn->query("UPDATE $mailOptionsTable SET password = '$val'");
+    }
+    if(isset($_POST['smtp_secure'])){
+      $val = test_input($_POST['smtp_secure']);
+      $conn->query("UPDATE $mailOptionsTable SET smtpSecure = '$val'");
+    }
+    if(!empty($_POST['mail_sender'])){
+      $val = test_input($_POST['mail_sender']);
+      $conn->query("UPDATE $mailOptionsTable SET sender = '$val'");
+    }
+    if(!empty($_POST['mail_sender_name'])){
+      $val = test_input($_POST['mail_sender_name']);
+      $conn->query("UPDATE $mailOptionsTable SET sendername = '$val'");
+    }
+    $conn->query("UPDATE $mailOptionsTable SET isDefault = null");
   }
   echo mysqli_error($conn);
 }
@@ -57,12 +123,30 @@ $row = $result->fetch_assoc();
   <input style="display:none" type="text" name="fakeusernameremembered"/>
   <input style="display:none" type="password" name="fakepasswordremembered"/>
 
-  <h4>SMTP Einstellungen</h4>
-  <div class="container-fluid">
+  <div class="col-md-4">
+  <h4>SMTP Einstellungen</h4> 
+  </div> 
+  <div class="col-md-8" >
+    <?php
+      if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+      $string = '<input style="float: right" id="defaultCheck" type="checkbox" name="defaultOptions" ';
+
+      if($row['isDefault']){
+        $string = $string . 'checked ';
+      }
+      $string = $string . '><label style="float: right;position: relative;min-height: 1px;padding-right: 10px;padding-left: 15px;padding-top: 5px;">Default</label></input>';
+      echo $string;
+      }
+      ?>
+      </div>
+  <br><br>
+  <div id="emailContainer" class="container-fluid">
+  
     <br>
     <div class="col-md-4">SMTP Security</div>
+   
     <div class="col-md-8">
-      <select class="js-example-basic-single" name="smtp_secure" style="width:200px">
+      <select id = "smtpDropDown" class="js-example-basic-single" name="smtp_secure" style="width:200px">
         <option value="" <?php if($row['smtpSecure'] == ''){echo "selected";} ?>> - </option>
         <option value="tls" <?php if($row['smtpSecure'] == 'tls'){echo "selected";} ?>> TLS </option>
         <option value="ssl" <?php if($row['smtpSecure'] == 'ssl'){echo "selected";} ?>> SSL </option>
@@ -71,6 +155,9 @@ $row = $result->fetch_assoc();
     <br><br>
     <div class="col-md-4"> Absender-Adresse </div>
     <div class="col-md-8"><input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" /></div>
+    <br><br>
+    <div class="col-md-4"> Absender-Name </div>
+    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender_name"  value="<?php echo $row['sendername']; if(isset($_POST['defaultOptions'])) echo "<Kunde>";?>" /></div>
     <br><br><br>
     <div class="col-md-4">Host</div>
     <div class="col-md-8"><input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" /></div>

@@ -24,7 +24,7 @@ $disabled = $modal_isAdmin ? "" : "disabled";
     <form method="post" autocomplete="off" id="projectForm<?php echo stripSymbols($modal_id) ?>">
         <input type="hidden" name="id" value="<?php echo $modal_id ?>">
         <div class="modal fade" id="dynamicProject<?php echo stripSymbols($modal_id) ?>" tabindex="-1" role="dialog" aria-labelledby="dynamicProjectLabel<?php echo stripSymbols($modal_id) ?>">
-            <div class="modal-dialog" role="form">
+            <div class="modal-dialog modal-lg" role="form">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -576,7 +576,9 @@ foreach (array_keys($months_of_the_year) as $month) {
 tinymce.init({
   selector: '#projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>', //needs to be changed
   plugins: 'image code',
+  plugins: 'paste',
   relative_urls: false,
+  paste_data_images: true,
   toolbar: 'undo redo | link image file media | code',
   // enable title field in the Image dialog
   image_title: true,

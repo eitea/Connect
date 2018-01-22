@@ -114,27 +114,27 @@ if($result_Sum && $result_Sum->num_rows > 0){
     <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
       <table class="table table-striped">
-      <thead>
-        <th>Name</th>
-        <th>Checkin</th>
-      </thead>
-      <tbody>
-        <?php
-        $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
-        $row = $result->fetch_assoc();
-        $today = substr(getCurrentTimestamp(),0,10);
-        $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
-        $result = $conn->query($sql);
-        if($result && $result->num_rows > 0){
-          while($row = $result->fetch_assoc()){
-            echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
-            echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
+        <thead>
+          <th>Name</th>
+          <th>Checkin</th>
+        </thead>
+        <tbody>
+          <?php
+          $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
+          $row = $result->fetch_assoc();
+          $today = substr(getCurrentTimestamp(),0,10);
+          $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
+          $result = $conn->query($sql);
+          if($result && $result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+              echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
+              echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
+            }
+          } else {
+            echo mysqli_error($conn);
           }
-        } else {
-          echo mysqli_error($conn);
-        }
-        ?>
-      </tbody>
+          ?>
+        </tbody>
       </table>
     <?php endif; ?>
   </div>
@@ -251,113 +251,113 @@ $dates = array();
 $start = getCurrentTimestamp(); //normal users can only see future dates
 if($isCoreAdmin == 'TRUE') { $start = date('Y-m-d', strtotime('-1 year')); }
 $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID
-WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
-if($result && ($row = $result->fetch_assoc())){
-  $start = substr($row['time'], 0, 10);
-  $prev_row = $row;
+  WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
   if($result && ($row = $result->fetch_assoc())){
-    $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffb9b9');
-    do {
-      if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
-        $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-        $color = $colors[$prev_row['status']];
-        $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
-        $start = substr($row['time'], 0, 10);
-      }
-      $prev_row = $row;
-    } while($row = $result->fetch_assoc());
-    $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-    $color = $colors[$prev_row['status']];
-    $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-    $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+    $start = substr($row['time'], 0, 10);
+    $prev_row = $row;
+    if($result && ($row = $result->fetch_assoc())){
+      $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffb9b9');
+      do {
+        if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
+          $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+          $color = $colors[$prev_row['status']];
+          $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+          $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+          $start = substr($row['time'], 0, 10);
+        }
+        $prev_row = $row;
+      } while($row = $result->fetch_assoc());
+      $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
+      $color = $colors[$prev_row['status']];
+      $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+      $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+    }
+  } else {
+    $conn->error;
   }
-} else {
-  $conn->error;
-}
-?>
+  ?>
 
-<script>
-$(document).ready(function(){
-  setTimeout(function () {
-    $("#calendar").fullCalendar({
-      height: 500,
-      firstDay: 1,
-      header: {
-        left: 'prev, next today',
-        center: 'title',
-        right: 'month, agendaWeek, listMonth'
-      },
-      events: [<?php echo implode(', ', $dates); ?>],
-      eventTextColor: '#6D6D6D',
-      eventBorderColor: '#FFFFFF'
+  <script>
+  $(document).ready(function(){
+    setTimeout(function () {
+      $("#calendar").fullCalendar({
+        height: 500,
+        firstDay: 1,
+        header: {
+          left: 'prev, next today',
+          center: 'title',
+          right: 'month, agendaWeek, listMonth'
+        },
+        events: [<?php echo implode(', ', $dates); ?>],
+        eventTextColor: '#6D6D6D',
+        eventBorderColor: '#FFFFFF'
+      });
     });
   });
-});
-$(function(){
-  var ctx_analysis = document.getElementById("analysisChart");
-  var myAnalysisChart = new Chart(ctx_analysis, {
-    type: 'horizontalBar',
-    options: {
-      legend:{
-        display: false
-      },
-      title:{
-        display:true,
-        text: '<?php echo $lang['AVERAGE'].' '. $lang['WORKING_HOURS']; ?>'
-      }
-    },
-    data: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [{
-        label: "Mittel",
-        backgroundColor: [
-          'rgba(251, 231, 54, 0.5)', 'rgba(189, 209, 71, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(90, 163, 231, 0.5)', 'rgba(154, 125, 210, 0.5)'
-        ],
-        data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
-      }]
-    }
-  });
-
-  <?php if($absolved_today): ?>
-  var ctx_statistic = document.getElementById("statisticChart");
-  var myStatisticChart = new Chart(ctx_statistic, {
-    type: 'doughnut',
-    data: {
-      labels: [
-        "<?php echo $lang['ABSOLVED']; ?>",
-        "<?php echo $lang['BREAK']; ?>",
-        "<?php echo $lang['EXPECTED']; ?>",
-        "<?php echo $lang['OVERTIME']; ?>"
-      ],
-      datasets: [{
-        data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],
-        backgroundColor: [
-          '#fba636', '#75bdee', '#828282', '#7fcb51'
-        ]
-      }]
-    },
-    options: {
-      legend:{
-        display: true,
-        position: 'right'
-      },
-      tooltips: {
-        callbacks: {
-          label: function(tooltipItems, data) {
-            return ' ' + data.labels[tooltipItems.index] +': ' + Math.round(data.datasets[0].data[tooltipItems.index]*100)/100 + 'h';
-          }
+  $(function(){
+    var ctx_analysis = document.getElementById("analysisChart");
+    var myAnalysisChart = new Chart(ctx_analysis, {
+      type: 'horizontalBar',
+      options: {
+        legend:{
+          display: false
+        },
+        title:{
+          display:true,
+          text: '<?php echo $lang['AVERAGE'].' '. $lang['WORKING_HOURS']; ?>'
         }
       },
-      title: {
-        display: true,
-        text: '<?php echo $lang['TODAY'] .' '. date('d.M', strtotime($today)); ?>'
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "Mittel",
+          backgroundColor: [
+            'rgba(251, 231, 54, 0.5)', 'rgba(189, 209, 71, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(90, 163, 231, 0.5)', 'rgba(154, 125, 210, 0.5)'
+          ],
+          data: [<?php echo $mean_mon.', '.$mean_tue.', '.$mean_wed.', '.$mean_thu.', '.$mean_fri.', '.$mean_sat.', '.$mean_sun; ?>]
+        }]
       }
-    }
+    });
+
+    <?php if($absolved_today): ?>
+    var ctx_statistic = document.getElementById("statisticChart");
+    var myStatisticChart = new Chart(ctx_statistic, {
+      type: 'doughnut',
+      data: {
+        labels: [
+          "<?php echo $lang['ABSOLVED']; ?>",
+          "<?php echo $lang['BREAK']; ?>",
+          "<?php echo $lang['EXPECTED']; ?>",
+          "<?php echo $lang['OVERTIME']; ?>"
+        ],
+        datasets: [{
+          data: [<?php echo $absolved_today.', '.$break_today.', '.$expected_today.', '.$surplus_today; ?>],
+          backgroundColor: [
+            '#fba636', '#75bdee', '#828282', '#7fcb51'
+          ]
+        }]
+      },
+      options: {
+        legend:{
+          display: true,
+          position: 'right'
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItems, data) {
+              return ' ' + data.labels[tooltipItems.index] +': ' + Math.round(data.datasets[0].data[tooltipItems.index]*100)/100 + 'h';
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: '<?php echo $lang['TODAY'] .' '. date('d.M', strtotime($today)); ?>'
+        }
+      }
+    });
+    <?php endif; ?>
   });
-  <?php endif; ?>
-});
 </script>
 
-  <!-- /BODY -->
-  <?php include 'footer.php'; ?>
+<!-- /BODY -->
+<?php include 'footer.php'; ?>

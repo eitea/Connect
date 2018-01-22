@@ -1,0 +1,57 @@
+.dragndrop,
+ {
+  display: none;
+}
+.fileBox.has-advanced-upload {
+    background-color: white;
+    outline: 2px dashed black;
+    outline-offset: -10px;
+  }
+  .fileBox.has-advanced-upload .dragndrop {
+    display: inline;
+  }
+  .fileBox.is-dragover {
+    background-color: rgb(197, 197, 197);
+  }
+  
+.radioChoose{
+    margin: 4px;
+}
+
+.fileBox{
+    align-content: center;
+}
+.fileInput {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+    position: absolute;
+    
+    
+    z-index: -1;
+    -webkit-border-radius: 0!important;
+    -moz-border-radius: 0!important;
+    border-radius: 0!important;
+}
+.fileInput + label {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: rgb(0, 0, 0);
+    margin: 15%;
+    align-self: center;
+    display: inline-block;
+    
+}
+
+
+
+.fileInput:focus + label,
+.fileInput + label:hover {
+    background-color: rgb(197, 197, 197);
+}
+
+.fileInput:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}

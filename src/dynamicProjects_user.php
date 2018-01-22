@@ -2,8 +2,7 @@
 enableToDynamicProjects($userID);
 require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
 if (!function_exists('stripSymbols')) {
-    function stripSymbols($s)
-    {
+    function stripSymbols($s) {
         $result = "";
         foreach (str_split($s) as $char) {
             if (ctype_alnum($char)) {
@@ -14,64 +13,61 @@ if (!function_exists('stripSymbols')) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
-    $id = $_POST["id"] ?? "";
-    $id = $conn->real_escape_string($id);
-    $conn->query("DELETE FROM dynamicprojectsnotes WHERE projectid = '$id'");
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["note"])) {
-    $id = $_POST["id"] ?? "";
-    $id = $conn->real_escape_string($id);
-    $text = $_POST["notetext"] ?? "error";
-    $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
-    echo $conn->error;
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["deletenote"])) {
-    $note_id = $_POST["id"] ?? "";
-    $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
-    require_once __DIR__ . "/utilities.php";
-    $project = $_POST["id"];
-    $picture = uploadFile("image", 1, 0, 1);
-    $picture = "data:image/jpeg;base64," . base64_encode($picture);
-    $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
-    echo $conn->error;
-    $null = null;
-    $stmt->bind_param("b", $null);
-    $stmt->send_long_data(0, $picture);
-    $stmt->execute();
-    echo $stmt->error;
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["dynamicProject"]) || isset($_POST["editDynamicProject"]))) {
-    $id = $_POST["id"] ?? "";
-    $pictures = $_POST["imagesbase64"] ?? false;
-    $completed = (int) $_POST["completed"] ?? 0;
-    $id = $conn->real_escape_string($id);
-    if ($pictures) {
-        foreach ($pictures as $picture) {
-            $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
-            echo $conn->error;
-            $null = null;
-            $stmt->bind_param("b", $null);
-            $stmt->send_long_data(0, $picture);
-            $stmt->execute();
-            echo $stmt->error;
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    if (isset($_POST["deletenote"])) {
+        $id = $_POST["id"] ?? "";
+        $id = $conn->real_escape_string($id);
+        $conn->query("DELETE FROM dynamicprojectsnotes WHERE projectid = '$id'");
+    }
+    if (isset($_POST["note"])) {
+        $id = $_POST["id"] ?? "";
+        $id = $conn->real_escape_string($id);
+        $text = $_POST["notetext"] ?? "error";
+        $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
+        echo $conn->error;
+    }
+    if (isset($_POST["deletenote"])) {
+        $note_id = $_POST["id"] ?? "";
+        $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
+    }
+    if (isset($_FILES["image"])) {
+        require_once __DIR__ . "/utilities.php";
+        $project = $_POST["id"];
+        $picture = uploadFile("image", 1, 0, 1);
+        $picture = "data:image/jpeg;base64," . base64_encode($picture);
+        $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$project', ?)");
+        echo $conn->error;
+        $null = null;
+        $stmt->bind_param("b", $null);
+        $stmt->send_long_data(0, $picture);
+        $stmt->execute();
+        echo $stmt->error;
+    }
+    if ((isset($_POST["dynamicProject"]) || isset($_POST["editDynamicProject"]))) {
+        $id = $_POST["id"] ?? "";
+        $pictures = $_POST["imagesbase64"] ?? false;
+        $completed = (int) $_POST["completed"] ?? 0;
+        $id = $conn->real_escape_string($id);
+        if ($pictures) {
+            foreach ($pictures as $picture) {
+                $stmt = $conn->prepare("INSERT INTO dynamicprojectspictures (projectid,picture) VALUES ('$id',?)");
+                echo $conn->error;
+                $null = null;
+                $stmt->bind_param("b", $null);
+                $stmt->send_long_data(0, $picture);
+                $stmt->execute();
+                echo $stmt->error;
+            }
+        }
+        $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
+        echo $conn->error;
+        echo "completed: ", $completed, "completed == 100", $completed == 100;
+        if ($completed == 100) {
+            $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
         }
     }
-    $conn->query("UPDATE dynamicprojectsclients SET projectcompleted = '$completed' WHERE projectid = '$id'");
-    echo $conn->error;
-    echo "completed: ", $completed, "completed == 100", $completed == 100;
-    if ($completed == 100) {
-        $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$id'");
-    }
-}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     $projectID = $_POST["id"] ?? "";
     $clientID = $_POST["client"] ?? -1;
     $completed = intval($_POST["completed"] ?? 0);
@@ -117,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "stop not implemented";
     }
 }
+
 // if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
@@ -214,7 +211,7 @@ while ($row = $result->fetch_assoc()) {
     $employeesResult = $conn->query(
         "SELECT * FROM dynamicprojectsemployees
         INNER JOIN UserData ON UserData.id = dynamicprojectsemployees.userid
-        WHERE projectid='$id'"
+        WHERE projectid='$id' AND UserData.id NOT IN (SELECT t.userID FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON d.teamid = t.teamid WHERE d.projectid = '$id')"
     );
     $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
     echo $conn->error;
@@ -242,16 +239,18 @@ while ($row = $result->fetch_assoc()) {
 
     echo "<tr>";
     echo "<td style='background-color:$color;'>$name</td>";
-    echo "<td>$description</td>";
+    echo "<td><button class='btn btn-default' type='button' onClick='showDescription(\"$id\")' data-toggle='modal' data-target='#projectDescription'><i class='fa fa-file-text-o'></i></button></td>";
     echo "<td>$companyName</td>";
     echo "<td>";
     $completed = 0; //percentage of overall project completed 0-100
+    $string = '';
     while ($clientRow = $clientsResult->fetch_assoc()) {
         array_push($clients, $clientRow["id"]);
         $completed += intval($clientRow["projectcompleted"]);
         $client = $clientRow["name"];
-        echo "$client, ";
+        $string .= "$client, ";
     }
+    echo rtrim($string,", ");
     $completed = intval($completed / ((count($clients) > 0) ? count($clients) : 1)); // average completion
     echo "</td>";
     echo "<td>$start</td>";
@@ -261,21 +260,23 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>$priority</td>";
     echo "<td>$owner</td>";
     echo "<td>";
+    $string = '';
     while ($employeeRow = $employeesResult->fetch_assoc()) {
         array_push($employees, "user;" . $employeeRow["id"]);
         $employee = "${employeeRow['firstname']} ${employeeRow['lastname']}";
-        echo "$employee, ";
+        $string .= "$employee, ";
     }
     while ($teamRow = $teamsResult->fetch_assoc()) {
         array_push($employees, "team;" . $teamRow["id"]);
         $team = $teamRow["name"];
-        echo "$team, ";
+        $string .= "$team, ";
     }
     while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
         array_push($optional_employees, $optional_employeeRow["id"]);
         $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-        echo "$optional_employee, ";
+        $string .= "$optional_employee, ";
     }
+    echo rtrim($string,", ");
     echo "</td>";
 
     $modal_title = $lang["DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT"];
@@ -421,8 +422,36 @@ $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT J
 ?>
 </tbody>
 </table>
-
+<div class="modal fade" id="projectDescription" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="projectDescriptionId"></h4>
+            </div>
+            <br>
+            <div id="projectDescriptionBody" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+function showDescription(pId){
+    var header = document.getElementById('projectDescriptionId');
+    var body = document.getElementById('projectDescriptionBody');
+    $.ajax({
+      url: 'ajaxQuery/AJAX_getDescription.php',
+      type: 'POST',
+      data: {pId:pId},
+      success: function(res){
+        res = JSON.parse(res);
+        header.innerHTML = res['projectname'];
+        body.innerHTML = res['projectdescription'];
+      }
+    });
+}
+
+
 $('.table').DataTable({
   order: [[ 8, "asc" ]],
   columns: [null, {orderable: false}, null, null, null,null,{orderable: false}, null,  {orderable: false},{orderable: false},{orderable: false}],
