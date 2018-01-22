@@ -9,7 +9,7 @@ if($result){
   } 
 }
 require dirname(__DIR__)."\plugins\aws\autoload.php";
-require __DIR__."/connection.php";
+require __DIR__."\connection.php";
 use PHPMailer\PHPMailer\PHPMailer;
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 
@@ -91,12 +91,6 @@ if(isset($_POST['filterClient'])){
     $input2.on('change', function(e) {
     showFiles2(e.target.files);
   });
-
-
-
-
-
-  
 }
   }
 };
@@ -156,7 +150,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
 
     
-  require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
+  require dirname(__DIR__).'\plugins\phpMailer\autoload.php';
   
   $mail = new PHPMailer();
   
@@ -331,9 +325,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="modal-body">
       
         <?php
-        $filterCompany = empty($filterings['company']) ? 0 : $filterings['company'];
-        $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
-        if($result_fc && $result_fc->num_rows > 1){
+        $result_fc = $conn->query("SELECT * FROM companyData WHERE id IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID)");
+        if($result_fc && $result_fc->num_rows > 0){
           echo '<div class="col-sm-12"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" ;" >';
           echo '<option value="0">...</option>';
           while($result && ($row_fc = $result_fc->fetch_assoc())){
@@ -367,7 +360,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-default" onclick="handleCancel()" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" onclick="createGroup(event)" name="addGroup"><?php echo $lang['ADD']; ?></button>
+        <button type="button" class="btn btn-warning" onclick="createGroup(event)" name="addGroup"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
   </div>
@@ -504,7 +497,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     });
   }
 
-  function createGroup(evt){
+  async function createGroup(evt){
     var formData = new FormData();
     var amount = 0;
     if(filesGotDropped){
@@ -521,26 +514,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       console.log(document.getElementById('file').files);
     }   
     formData.append('amount',amount);
-    formData.append('function','addGroup');
+    formData.append('functions','addGroup');
     formData.append('userid',<?php echo $userID ?>);
     formData.append('ttl',document.querySelector('input[name = "ttl"]:checked').value);
     formData.append('add_groupName',document.getElementById('add_groupName').value);
     formData.append('filterCompany',document.getElementsByName('filterCompany')[0].value);
+    
     $.ajax({
       url: '../misc/sharedfiles',
       type: 'POST',
       async: true,
+      dataType: "text",
       data: formData,
       cache: false,
-      contentType: false,
-      encType: 'multipart/form-data',
+      contentType: 'multipart/form-data',
       processData: false,
-      success: function(res){
-        alert(res);
+      complete: function(res){
+        console.log("____________________________________");
+        console.log(res);
       }
     });
+    console.log(formData.get("function"));
   }
 
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   function guideFiles(evt){
     evt.preventDefault();
     var dt = evt.dataTransfer;

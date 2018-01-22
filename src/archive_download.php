@@ -1,7 +1,7 @@
 <?php
 
 require dirname(__DIR__) . "\src\misc\useS3Config.php";
-require __DIR__."/connection.php";
+require __DIR__."\connection.php";
   $s3 = new Aws\S3\S3Client(getS3Config());
     if(empty($_GET['n'])){
       echo "Invalid Access.";

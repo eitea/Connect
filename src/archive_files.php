@@ -1,8 +1,8 @@
 <?php
 
 require dirname(__DIR__) . "\src\misc\useS3Config.php";
-require __DIR__ . "/utilities.php";
-require __DIR__ . "/connection.php";
+require __DIR__ . "\utilities.php";
+require __DIR__ . "\connection.php";
 $result = $conn->query("SELECT * FROM archiveconfig");
 if($result){
   $enabled = $result->fetch_assoc();

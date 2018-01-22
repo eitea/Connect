@@ -2163,20 +2163,34 @@ if ($row['version'] < 123) {
     $conn->query("ALTER TABLE documentProcess ADD COLUMN document_version VARCHAR(15) NOT NULL DEFAULT '1.0' ");
 }
 
-    if ($row['version'] < 124) {
-        $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50))");
-        $conn->query("INSERT INTO archiveconfig VALUE (null,null,null)");
-        if ($conn->error) {
-            echo $conn->error;
-        } else {
-            echo '<br>S3 Modul';
-        }
-        $conn->query("DROP TABLE modules");
-        if ($conn->error) {
-            echo $conn->error;
-        } else {
-            echo '<br>Module: Auflösen';
+if ($row['version'] < 124) {
+    $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50))");
+    $conn->query("INSERT INTO archiveconfig VALUE (null,null,null)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>S3 Modul';
+    }
+    $conn->query("DROP TABLE modules");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Module: Auflösen';
+    }
+    $id = $conn->query("SELECT * FROM identification");
+    $identifier = $id->fetch_assoc()['id'];
+    $myfile = fopen(__DIR__ .'/connection_config.php', 'a');
+    $txt = '$identifier = "'.$identifier.'";
+    $s3SharedFiles=$identifier."_sharedFiles";
+    $s3uploadedFiles=$identifier."_uploadedFiles";';
+    fwrite($myfile, $txt);
+    fclose($myfile);
 
+    echo '<br>S3 Configuration';
+    
+    $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div','doc') DEFAULT 'vac'";
+    if ($conn->query($sql)) {
+        echo '<br> Extended requests by splitted lunchbreaks';
     }
 }
 

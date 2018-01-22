@@ -33,15 +33,17 @@
 <?php endif; ?>
 
 <script>
-function onPageLoad(){
+function onPageLoad(reload = true){
   if($(".js-example-basic-single")[0]){
     var open = false;
     var elem = $(".js-example-basic-single");
     elem.select2();
+    if(reload){
     elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
     elem.on("select2:focus", function (e) {
       if(!open && $(this).is(':enabled') && !$(this).attr('multiple')){ $(this).select2("open") };
     });
+    }
   }
 
   $('input:checkbox').keypress(function(e) {

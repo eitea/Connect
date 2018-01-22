@@ -75,6 +75,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($result && ($row = $result->fetch_assoc())){
       $i = $row['fromDate'];
       $days = (timeDiff_Hours($i, $row['toDate'])/24) + 1; //days
+      if($row['requestType'] == 'doc')$days = (timeDiff_Hours($i, $row['toDate'])/24); //days
       for($j = 0; $j < $days; $j++){
         $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
         if($expected != 0){ //only insert if expectedHours != 0
@@ -82,6 +83,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $expectedMinutes = ($expected * 60) % 60;
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
+          if($row['requestType'] == 'doc'){
+            $coreTime = $conn->query("SELECT coreTime FROM userdata WHERE id =". $row['userID']);
+            $coreTime = $coreTime->fetch_assoc()['coreTime'];
+            $coretime = new DateTime(date('Y-m-d',strtotime($row['fromDate']))." ".$coreTime);
+            $fromTime =	new DateTime($row['fromDate']);
+            $i = ($fromTime->diff($coreTime)->h>0||$fromTime->diff($coreTime)->i>0)&&$fromTime->diff($coreTime)->invert==0 ? date('Y-m-d H:i:s',$coreTime->getTimestamp()) : $row['fromDate'];
+            $i2 = timeDiff_Hours($coreTime, $row['toDate'])<$expected ? $row['toDate'] : carryOverAdder_Minutes(carryOverAdder_Hours($coreTime, $expectedHours),$expectedMinutes);
+          }
           if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
           } elseif($row['requestType'] == 'scl'){
@@ -90,6 +99,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '2')";
           } elseif($row['requestType'] == 'cto'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '6')";
+          } elseif($row['requestType'] == 'doc'){
+            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '3')";
           }
           $conn->query($sql);
           echo mysqli_error($conn);
@@ -272,6 +283,15 @@ if($result && $result->num_rows > 0):
               echo '<span class="input-group-btn">';
               echo '<button type="submit" class="btn btn-default" name="okay_div" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_div" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
+              echo '</span></div></td>';
+            }elseif($row['requestType'] == 'doc'){
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).' (utc)</td>';
+              echo '<td></td>';
+              echo '<td><div class="input-group">';
+              echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
+              echo '<span class="input-group-btn">';
+              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             }
             echo '</tr>';

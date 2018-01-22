@@ -1,6 +1,6 @@
 <?php
 require dirname(__DIR__) . "\src\misc\useS3Config.php";
-require __DIR__."/connection.php";
+require __DIR__."\connection.php";
 if(empty($_POST['groupID'])){
   echo "Invalid Access.";
   die();

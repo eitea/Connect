@@ -1,27 +1,26 @@
 <?php
 
 require dirname(__DIR__) . "\src\misc\useS3Config.php";
-require __DIR__."/connection.php";
+require __DIR__."\connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $s3 = new Aws\S3\S3Client(getS3Config());
-       
-        //   var_dump($_POST);
-        //   var_dump($_FILES);
-          if($_POST['function']==="addGroup"){
-            
+           //var_dump($_POST);
+           //var_dump($_FILES);
+           print_r($_POST);
+          if($_POST['functions']==="addGroup"){
             $companyID = $_POST['filterCompany'];
             $name = $_POST['add_groupName'];
             $amount = $_POST['amount'];
             $radio = $_POST['ttl'];
-            $url = hash('whirlpool',random_bytes(10));
+            $url = hash('whirlpool',random_bytes(100));
             try{
             $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)");
             $groupID = $conn->insert_id;
             $buckets = $s3->listBuckets();
             $thereisabucket = false;
             foreach($buckets['Buckets'] as $bucket){
-              if($bucket['Name']==$s3SharedFiles) $thereisabucket=true;
+              if($bucket['Name']===$s3SharedFiles) $thereisabucket=true;
             }
             if(!$thereisabucket){
                 $s3->createBucket( array('Bucket' => $s3SharedFiles ) ); 
@@ -30,7 +29,7 @@ require __DIR__."/connection.php";
               $filename = pathinfo($_FILES['file'.$i]['name'], PATHINFO_FILENAME);
               $filetype = pathinfo($_FILES['file'.$i]['name'], PATHINFO_EXTENSION);
               $filesize = $_FILES['file'.$i]['size'];
-              $hashkey = hash('md5',random_bytes(10));
+              $hashkey = hash('md5',random_bytes(100));
               $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_POST['userid'].", $groupID, '$hashkey', $filesize, null)");
               $s3->putObject(array(
                   'Bucket' => $s3SharedFiles,

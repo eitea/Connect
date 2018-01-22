@@ -19,7 +19,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all running Operations.");
   }  
-  if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
+  if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['day'])){
+    if(test_Date($_POST['day'].' '.$_POST['start'].':00') && test_Date($_POST['day'].' '.$_POST['end'].':00')){
+      $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
+      $row = $result->fetch_assoc();
+      $begin = test_input($_POST['day'].' '.$_POST['start'].':00');
+      $end = test_input($_POST['day'].' '.$_POST['end'].':00');
+      $infoText = test_input($_POST['requestText']);
+      $type = test_input($_POST['requestType']);
+      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin', '$end', '$infoText', '$type')";
+      $conn->query($sql);
+      echo mysqli_error($conn);
+    } else {
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    }
+    
+  }elseif(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
       $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
       $row = $result->fetch_assoc();
@@ -33,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
-  } elseif(isset($_POST['makeRequest'])){
+  }elseif(isset($_POST['makeRequest'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   } elseif(isset($_POST['request_lunchbreak']) && !empty($_POST['lunch_FROM']) && !empty($_POST['lunch_TO'])){
     $timestampID = $_POST['request_lunchbreak'];
@@ -122,7 +137,7 @@ if($result && $result->num_rows > 0): ?>
         }
         echo "<tr>";
         echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
-        if($row['requestType'] == 'log'){
+        if($row['requestType'] == 'log'||$row['requestType'] == 'doc'){
           echo '<td>'.substr($row['fromDate'],0,16).'</td>';
           echo '<td>'.substr($row['toDate'],0,16).'</td>';
         } else {
@@ -154,15 +169,16 @@ if($result && $result->num_rows > 0): ?>
 <br><hr><br>
 <h4><?php echo $lang['MAKE_REQUEST']; ?></h4><br>
 
-<form method="POST">
+<form method="POST" onsubmit="giveData(event)">
 <div class="row"><div class="col-sm-3 col-sm-offset-1"><label><?php echo $lang['TIMES']; ?>: </label></div></div>
   <div class="row">
     <div class="col-sm-3 col-sm-offset-1">
-      <select name="requestType" class="js-example-basic-single">
+      <select onchange="checkIfDoc(event)" name="requestType" class="js-example-basic-single">
         <option value="vac"><?php echo $lang['VACATION']; ?></option>
         <option value="scl"><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
         <option value="spl"><?php echo $lang['SPECIAL_LEAVE']; ?></option>
-        <option value="cto"><?php echo $lang['COMPENSATORY_TIME']; ?></option>        
+        <option value="cto"><?php echo $lang['COMPENSATORY_TIME']; ?></option>
+        <option value="doc"><?php echo $lang['DOCTOR']; ?></option>      
       </select>
     </div>
     <div class="col-sm-3"><input type="text" class="form-control" placeholder="Info... (Optional)" name="requestText"></div>
@@ -170,11 +186,11 @@ if($result && $result->num_rows > 0): ?>
     <div class="row">
     <div class="col-sm-3 col-sm-offset-1">
       <div class="input-group input-daterange">
-        <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span><input type="text" class="form-control datepicker" name="start"></div>
+        <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span><input type="text" class="form-control datepicker" id="from" name="start"></div>
     </div>
     <div class="col-sm-3">
       <div class="input-group input-daterange">
-        <span class="input-group-addon"> <?php echo $lang['TO'];?> </span><input type="text" class="form-control datepicker" name="end"></div>
+        <span class="input-group-addon"> <?php echo $lang['TO'];?> </span><input type="text" class="form-control datepicker" id="to" name="end"></div>
     </div>
     <div class="col-sm-3"><button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['MAKE_REQUEST']; ?></button><br></div>
   </div>
@@ -349,4 +365,61 @@ if($result && ($row = $result->fetch_assoc())): ?>
   </div>
   <input id="myCaptcha" class="robot-control" type="text" name="captcha" value="" />
 </form>
+
+
+<script>
+  var wasDoc = false;
+  function checkIfDoc(evt){
+    if(evt.currentTarget.selectedOptions[0].value === "doc"){
+      wasDoc = true;
+      var form = evt.currentTarget.form;
+      var divOut = document.createElement("DIV");
+      var divIn = document.createElement("DIV");
+      var span = document.createElement("SPAN");
+      var inputDay = document.createElement("INPUT");
+      var inputFrom = document.createElement("INPUT");
+      var inputTo = document.createElement("INPUT");
+      divOut.className = "col-sm-3 col-sm-offset-1";
+      divOut.id = "deleteMe";
+      divIn.className = "input-group input-daterange";
+      span.className = "input-group-addon";
+      span.innerHTML = "<?php echo $lang['DAY']; ?>";
+      inputDay.type = "TEXT";
+      inputDay.name = "day";
+      inputDay.className = "form-control datepicker";
+      inputFrom.className = "form-control timepicker";
+      inputFrom.name = "start";
+      inputFrom.id = "from";
+      inputTo.className = "form-control timepicker";
+      inputTo.name = "end";
+      inputTo.id = "to";
+      divIn.append(span);
+      divIn.append(inputDay);
+      divOut.append(divIn);
+      divOut.append(document.createElement("BR"));
+      form.append(divOut);
+      var parent = document.getElementById('from').parentNode;
+      parent.removeChild(parent.lastElementChild);
+      parent.appendChild(inputFrom);
+      parent = document.getElementById('to').parentNode;
+      parent.removeChild(parent.lastElementChild);
+      parent.appendChild(inputTo);
+      onPageLoad(false);
+    }else{
+      if(wasDoc){
+        wasDoc = false;
+        var form = evt.currentTarget.form;
+        var inputFrom = document.getElementById("from");
+        var inputTo = document.getElementById("to");
+        inputFrom.className = "form-control datepicker";
+        inputFrom.name = "from";
+        inputTo.className = "form-control datepicker";
+        inputTo.name = "to";
+        form.removeChild(document.getElementById("deleteMe"));
+        onPageLoad(false);
+      }
+    }
+  }
+</script>
+
 <?php include 'footer.php'; ?>

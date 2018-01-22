@@ -333,6 +333,9 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
+$lang_eng['DOCTOR'] = 'Doctor';
+$lang_ger['DOCTOR'] = 'Arzt';
+
 $lang_eng['DOCUMENTS'] = 'Agreements';
 $lang_ger['DOCUMENTS'] = 'Vereinbarungen';
 
@@ -1396,9 +1399,9 @@ $lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirm
 $lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');
 
 $lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education","spl" => "Special Leave",
-  "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak");
+  "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak", "doc" => "Doctor Appointment");
 $lang_ger['REQUEST_TOSTRING'] = array("vac" => "Urlaub", "acc" => "Neuer Account", "log" => "Zeitänderung", "scl" => "Weiterbildung", "spl" => "Sonderurlaub",
-  "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen");
+  "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen", "doc" => "Arzt Termin");
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
 $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");

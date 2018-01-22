@@ -550,7 +550,7 @@ $(document).ready(function(){
                         <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
+                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS_USER']; ?>
                       </label><br>
                       <label>
                         <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
