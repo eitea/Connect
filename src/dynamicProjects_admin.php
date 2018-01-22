@@ -1,5 +1,7 @@
 <?php include 'header.php';
-isDynamicProjectAdmin($userID);?>
+isDynamicProjectAdmin($userID);
+ini_set('max_execution_time', 300); // default was 30
+?>
 <!-- BODY -->
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <style>

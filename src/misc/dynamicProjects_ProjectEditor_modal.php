@@ -608,9 +608,8 @@ tinymce.init({
         // necessary, as we are looking to handle it internally.
         var id = 'blobid' + (new Date()).getTime();
         var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-        console.log(reader.result.split(";")[0].split(":")[1]) //mime type
+        mimeType = (reader.result.split(";")[0].split(":")[1]) //mime type
         var base64 = reader.result.split(',')[1];
-        alert("Base64 size: "+base64.length+" chars")
         var blobInfo = blobCache.create(id, file, base64);
         blobCache.add(blobInfo);
         // call the callback and populate the Title field with the file name
@@ -620,7 +619,36 @@ tinymce.init({
     };
 
     input.click();
+  },
+  relative_urls: true,
+  images_upload_handler: function (blobInfo, success, failure) {
+      var info = (blobInfo.blob())
+      var mimeType = info.type
+      success("=data:"+mimeType+";base64,"+blobInfo.base64()) // '=' is not valid bases64 (prevents not displaying non image files)
+    
+      failure()
+  },
+  relative_urls: true,
+  init_instance_callback: function (editor) {
+    editor.on('click', function (event) {
+        if(event.target.nodeName.toLowerCase() != "img")
+            return
+      console.log('Element clicked:', event.target.nodeName);
+      src = event.target.src.split("=")[1]
+      downloadBase64File(src, event.target.alt) // src contains data:mime;base64...
+    });
   }
+
+
 });
 
+function downloadBase64File(src, filename){
+    var element = document.createElement('a');
+  element.setAttribute('href', src);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+} 
 </script>
