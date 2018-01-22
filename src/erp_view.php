@@ -59,7 +59,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     $date = getCurrentTimestamp();
     if(isset($_POST['filterCompany'])){
-      $num = getNextERP(test_input($_POST['nERP']), $_POST['filterCompany']); 
+      $num = getNextERP(test_input($_POST['nERP']), $_POST['filterCompany']);
     } else {
       $num = getNextERP(test_input($_POST['nERP']), $available_companies[1]);
     }
@@ -88,7 +88,7 @@ if(isset($_GET['err'])){
   }
   echo '</div>';
 }
-$result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
+$result = $conn->query("SELECT * FROM clientData WHERE companyID IN (".implode(', ', $available_companies).")");
 if(!$result || $result->num_rows <= 0){
   echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
   echo '<a class="btn btn-warning" data-toggle="modal" data-target="#create_client">'.$lang['NEW_CLIENT_CREATE'].'</a>';
@@ -180,14 +180,14 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
           echo '<td>'.$row_history['id_number'].'</td>';
 
           echo "<td></td>";
-          
+
           $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
           if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
           echo '<td>';
           echo "<a href='download?proc=$i' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
           echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="copy_process" title="'.$lang['COPY'].'" value="'.$i.'"><i class="fa fa-files-o"></i></button></form> ';
           echo '<a href="edit?val='.$i.'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-          
+
           if($transitable){ //if open positions
             if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$i.'"><i class="fa fa-trash-o"></i></button> '; }
             echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
@@ -219,13 +219,13 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
             </div>
           </form>';
           } //endif transitable
-          
+
           echo '</td>';
           echo '</tr>';
         } //endwhile each history
-        //TODO: i can only evaluate in here whether a transition still has open positions or not 
+        //TODO: i can only evaluate in here whether a transition still has open positions or not
         //solve this either by a second iteration over questionable entries or... magic
-        
+
       } //endwhile each process
       echo $conn->error;
     ?>
