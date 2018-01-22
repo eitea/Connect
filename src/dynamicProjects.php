@@ -177,8 +177,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($isDynamicProjectsAdmin == 'TRUE'){
             //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
-                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
+                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
+                LEFT JOIN UserData ON UserData.id = projectowner
                 WHERE d.companyid IN (".implode(', ', $available_companies).")");
         } else {
             //see open tasks user is part of

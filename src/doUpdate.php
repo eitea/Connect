@@ -2171,18 +2171,14 @@ if($row['version'] < 124){
         echo '<br>Module: Auflösen';
     }
 }
+
+
 if($row['version'] < 125){
     $conn->query("ALTER TABLE projectBookingData ADD COLUMN dynamicID VARCHAR(100)");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Projektbuchungen: Task Referenz';
-    }
-
-    $result = $conn->query("SELECT projectid FROM dynamicprojects");
-    while($row = $result->fetch_assoc()){
-        $id = uniqid();
-        $conn->query("UPDATE dynamicprojects SET projectid = '$id' WHERE projectid = ".$row['projectid']);
     }
 
     $result = $conn->query("SELECT id, dynamicprojectid FROM projectData WHERE dynamicprojectid IS NOT NULL");
@@ -2230,14 +2226,14 @@ if($row['version'] < 125){
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Dynamische Projekte: Projekt';
+        echo '<br>Dynamische Projekte: Projekt ID';
     }
 
     $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectpercentage INT(3) DEFAULT 0");
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Dynamische Projekte: Projekt';
+        echo '<br>Dynamische Projekte: Projekt Prozentsatz';
     }
 
     $conn->query("ALTER TABLE dynamicprojectsemployees ADD COLUMN position VARCHAR(10) DEFAULT 'normal' NOT NULL");
@@ -2256,6 +2252,13 @@ if($row['version'] < 125){
     $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");
 }
 
+
+    $result = $conn->query("SELECT projectid FROM dynamicprojects");
+    while($row = $result->fetch_assoc()){
+        $id = uniqid();
+        $conn->query("UPDATE dynamicprojects SET projectid = '$id' WHERE projectid = '".$row['projectid']."'");
+    }
+    
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';
