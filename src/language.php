@@ -363,13 +363,10 @@ $lang_ger['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optionale Mitarbeite
 $lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Dynamic Project';
 $lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Dynamisches Projekt bearbeiten';
 
-$lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
-$lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
-
 $lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
 $lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
 
-$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'What did you do?';
+$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Which tasks have you completed?';
 $lang_ger['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Welche Aufgaben haben Sie erledigt?';
 
 $lang_eng['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'This belongs to a dynamic project and can\' be deleted here.';

@@ -1,5 +1,12 @@
 <?php require_once 'header.php'; enableToBookings($userID); ?>
 <?php
+$result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL LIMIT 1");
+if($result->num_rows > 0){
+    echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Solange ein laufender Task registriert wurde, kann keine manuelle Buchung durchgeführt werden. Bitte den laufenden Task vorher beenden. </div>';
+    include 'footer.php';
+    die();
+}
+
 //first of the day
 $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
 if($result && $result->num_rows > 0){
@@ -17,7 +24,7 @@ if($result && $result->num_rows > 0){
 $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
 LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
 LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end DESC;");
+WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end DESC LIMIT 1;");
 if($result && $result->num_rows > 0){
   $row = $result->fetch_assoc();
   $date = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 0, 10);
@@ -226,7 +233,7 @@ echo mysqli_error($conn);
           $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
           LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
           LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-          WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end ASC;";
+          WHERE $projectBookingTable.timestampID = $indexIM ORDER BY start ASC;";
           $result = mysqli_query($conn, $sql);
           if($result && $result->num_rows > 0){
             $numRows = $result->num_rows;
@@ -351,7 +358,7 @@ endif;
     </div>
   </div>
 
-  <!-- EXPENSES --> 
+  <!-- EXPENSES -->
   <div id="hide_expenses" class="row" style="display:none">
     <br>
     <div class="col-md-2">

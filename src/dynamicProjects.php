@@ -1,6 +1,6 @@
 <?php
 require 'header.php';
-require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
+require __DIR__ . "/Calculators/dynamicProjects_ProjectSeries.php";
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
 ?>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
@@ -9,6 +9,26 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //
 </div></h3></div>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(!empty($_POST['play'])){
+        $x = test_input($_POST['play']);
+        $result = mysqli_query($conn, "SELECT indexIM FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
+        if($result && ($row = $result->fetch_assoc())){
+            $indexIM = $row['indexIM'];
+            $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Dummy Text' , 'project', '$x')");
+            if($conn->error){
+            	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            } else {
+            	echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            }
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
+        }
+    }
+    if(!empty($_POST['createBooking']) && !empty($_POST['dynamicbooking-project'])){
+        $x = test_input($_POST['createBooking']);
+
+        $conn->query("UPDATE projectBookingData WHERE id = $x");
+    }
     if($isDynamicProjectsAdmin == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
@@ -24,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
                     $id =  test_input($_POST['editDynamicProject']);
-                    $conn->query("DELETE FROM dynamicProjects WHERE id = '$id'");
+                    $conn->query("DELETE FROM dynamicProjects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
                 }
                 $null = null;
                 $name = test_input($_POST["name"]);
@@ -89,8 +109,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     //EMPLOYEES
                     $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
                     $stmt->bind_param("is", $employee, $position);
+                    $position = 'normal';
                     foreach ($_POST["employees"] as $employee) {
-                        $position = 'normal';
                         $emp_array = explode(";", $employee);
                         if ($emp_array[0] == "user") {
                             $employee = intval($emp_array[1]);
@@ -100,19 +120,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
                         }
                     }
+                    $position = 'optional';
                     foreach ($_POST['optionalemployees'] as $optional_employee) {
-                        $position = 'optional';
                         $employee = intval($optional_employee);
                         $stmt->execute();
                     }
-                    $stmt->close();
-
                     echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
                 } else {
                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$stmt->error.'</div>';
-                    $stmt->close();
                 }
+                $stmt->close();
             } else {
+                echo $_POST['description'] .' -descr<br>';
+                echo $_POST['name'] .' -name<br>';
+                echo !empty($_POST['employees']) .' -emps<br>';
+                echo $available_companies[1] .' -compa<br>';
+                echo test_Date($_POST['start'], 'Y-m-d') .' -date<br>';
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             }
         }
@@ -130,30 +153,46 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th><?php echo $lang["CLIENTS"]; ?></th>
             <th><?php echo $lang["BEGIN"]; ?></th>
             <th><?php echo $lang["END"]; ?></th>
-            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_SERIES"]; ?></th>
+            <th>Routine</th>
             <th>Status</th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
-            <th></th> <!-- space for edit, bookings and play/pause -->
+            <th></th>
         </tr>
     </thead>
     <tbody>
         <?php
-        $modals = '';
+        $modals = $occupation = '';
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
-        $result = $conn->query("SELECT projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, firstname, lastname,
-            dynamicprojects.companyid, companyData.name AS companyName, clientData.name AS clientName
-            FROM dynamicprojects LEFT JOIN companyData ON companyData.id = dynamicprojects.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
-            WHERE dynamicprojects.companyid IN (".implode(', ', $available_companies).")"); echo $conn->error;
+        $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
+        $stmt_booking->bind_param('s', $x); //shall always return max 1 row
+        $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
+        $hasActiveBooking = $result->num_rows;
+        if($isDynamicProjectsAdmin == 'TRUE'){
+            //see all access-legal tasks
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
+                WHERE d.companyid IN (".implode(', ', $available_companies).")");
+        } else {
+            //see open tasks user is part of
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
+                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID)");
+        }
+        echo $conn->error;
         while($row = $result->fetch_assoc()){
             $x = $row['projectid'];
             $completed = 0;
             echo '<tr>';
-            echo '<td style="background-color:'.$row['projectcolor'].'">'.$row['projectname'].'</td>';
+            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
             echo '<td><a type="button" class="btn btn-default" data-toggle="modal" data-target="#view-'.$x.'" >View</a></td>';
             echo '<td>'.$row['companyName'].'</td>';
             echo '<td>'.$row['clientName'].'</td>';
@@ -163,7 +202,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if($row['projectseries']){
                 echo '<td><i class="fa fa-clock-o"></i></td>';
             } else {
-                echo '<td><i class="fa fa-times" style="color:red"></i></td>';
+                echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
             }
             echo '<td>'.$row['projectstatus'].'</td>';
             echo '<td>'.$row['projectpriority'].'</td>';
@@ -178,8 +217,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
             //modal creation happens on demand
             echo '<td><form method="POST">';
-            echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default"><i class="fa fa-pencil"></i></button> ';
-            if($isDynamicProjectsAdmin == 'TRUE') echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+            $stmt_booking->execute();
+            $isInUse = $stmt_booking->get_result(); //max 1 row
+            if(($useRow = $isInUse->fetch_assoc()) && $useRow['userID'] == $userID) {
+                //if this task IsInUse and this user is the one using it
+                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#bookDynamicProject"><i class="fa fa-pause"></i></button>';
+                $occupation = array('bookingID' => $useRow['id'], 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['projectid']);
+            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
+                //only if project ist active, this task is NOT in use and user has no active bookings
+                echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play' ></i></button>";
+            }
+            if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) {
+                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
+                echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button>';
+            }
             echo '</form></td>';
             echo '</tr>';
 
@@ -193,10 +244,48 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <div id="editingModalDiv">
     <?php echo $modals; ?>
+    <!-- booking modal -->
+    <?php if($occupation): ?>
+    <div class="modal fade" id="bookDynamicProject" tabindex="-1">
+        <div class="modal-dialog modal-content modal-md">
+            <form method="POST">
+                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
+                <div class="modal-body">
+                    <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%"></textarea>
+                    <br>
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted" />
+                        <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" id="bookDynamicProjectCompletedCheckbox"> Abgeschlossen</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" name="createBooking" value="<?php echo $occupation['bookingID']; ?>"><?php echo $lang['SAVE']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
+$("#bookDynamicProjectCompletedCheckbox").change(function(event){
+    $("#bookDynamicProjectCompleted").attr('disabled', this.checked);
+    if(this.checked){
+        $("#bookDynamicProjectCompleted").val(100);
+    }
+});
+$("#bookDynamicProjectCompleted").keyup(function(event){
+    if($("#bookDynamicProjectCompleted").val() == 100){
+        $("#bookDynamicProjectCompletedCheckbox").prop('checked', true);
+    } else {
+        $("#bookDynamicProjectCompletedCheckbox").prop('checked', false);
+    }
+});
 function formatState (state) {
     if (!state.id) { return state.text; }
     var $state = $(
@@ -215,7 +304,6 @@ function getImageSrc(img) {
     ctx.drawImage(img, 0, 0);
     return c.toDataURL();
 }
-
 function dynamicOnLoad(modID){
     if(typeof modID === 'undefined') modID = '';
     $("#projectPreview"+modID+" img").click(removeImg);
@@ -244,29 +332,9 @@ function dynamicOnLoad(modID){
             reader.readAsDataURL(f); // Read in the image file as a data URL.
         }
     });
-    $(".show-required-fields").click(function (event){
-        var fields = [];
-        $("#projectForm"+modID+" input, #projectForm"+modID+" textarea, #projectForm"+modID+" select").filter("[required]").each(function(index,elem){
-            if($(elem).val() == ""){
-                var name = $(elem).attr("name");
-                name = name.charAt(0).toUpperCase() + name.slice(1);
-                name = name.replace("[]","");
-                fields.push(name);
-            }
-        });
-        if(fields.length) alert("Seems like you forgot following fields: "+fields.join(", "));
-    });
-
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
-    });
-    $(".ask-before-submit").click(function askUser(event) {
-        if(confirm("Are you sure?") && confirm("This can not be reverted")){
-            return true;
-        }
-        event.preventDefault();
-        return false;
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',

@@ -1,6 +1,6 @@
 <?php include 'header.php';
 enableToDynamicProjects($userID);
-require __DIR__ . "/misc/dynamicProjects_ProjectSeries.php";
+require __DIR__. "/Calculators/dynamicProjects_ProjectSeries.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (isset($_POST["deletenote"])) {
@@ -14,10 +14,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $text = $_POST["notetext"] ?? "error";
         $conn->query("INSERT INTO dynamicprojectsnotes (projectid,notetext,notecreator) VALUES ('$id','$text',$userID)");
         echo $conn->error;
-    }
-    if (isset($_POST["deletenote"])) {
-        $note_id = $_POST["id"] ?? "";
-        $conn->query("DELETE FROM dynamicprojectsnotes WHERE noteid = $note_id");
     }
     if (isset($_FILES["image"])) {
         require_once __DIR__ . "/utilities.php";
@@ -104,13 +100,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 
     // if (!isset($_POST) || count($_POST)) {redirect("../dynamic-projects/user");}
-
-    if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
-        $filterings['client'] = test_input($_GET['custID']);
-    }
-    if (isset($_POST['filterClient'])) {
-        $filterings['client'] = intval($_POST['filterClient']);
-    }
     ?>
 
     <!-- BODY -->
@@ -143,8 +132,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <tbody>
         <?php
         $companyQuery = $clientQuery = "";
-        if ($filterings['company']) {$companyQuery = " AND dynamicprojects.companyid = " . $filterings['company'];}
-        if ($filterings['client']) {$clientQuery = " AND dynamicprojectsclients.clientid = " . $filterings['client'];}
 
         $dateNow = date('Y-m-d');
         $result = $conn->query(
@@ -152,13 +139,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             FROM dynamicprojects
             LEFT JOIN dynamicprojectsemployees
             ON dynamicprojects.projectid = dynamicprojectsemployees.projectid
-            LEFT JOIN dynamicprojectsoptionalemployees
-            ON dynamicprojects.projectid = dynamicprojectsoptionalemployees.projectid
-            LEFT JOIN dynamicprojectsclients
-            ON dynamicprojectsclients.projectid = dynamicprojects.projectid
             WHERE (
-                dynamicprojectsoptionalemployees.userid = $userID
-                OR dynamicprojectsemployees.userid = $userID
+                dynamicprojectsemployees.userid = $userID
                 OR dynamicprojects.projectowner = $userID
             )
             AND dynamicprojects.projectstatus = 'ACTIVE'
@@ -191,11 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $ownerId = $row["projectowner"];
             $owner = $conn->query("SELECT * FROM UserData WHERE id='$ownerId'")->fetch_assoc();
             $owner = "${owner['firstname']} ${owner['lastname']}";
-            $clientsResult = $conn->query(
-                "SELECT * FROM dynamicprojectsclients
-                INNER JOIN  $clientTable ON  $clientTable.id = dynamicprojectsclients.clientid
-                WHERE projectid='$id'"
-            );
             echo $conn->error;
             $employeesResult = $conn->query(
                 "SELECT * FROM dynamicprojectsemployees
@@ -204,11 +181,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             );
             $teamsResult = $conn->query("SELECT * FROM dynamicprojectsteams INNER JOIN $teamTable ON $teamTable.id = dynamicprojectsteams.teamid WHERE projectid='$id'");
             echo $conn->error;
-            $optional_employeesResult = $conn->query(
-                "SELECT * FROM dynamicprojectsoptionalemployees
-                INNER JOIN UserData ON UserData.id = dynamicprojectsoptionalemployees.userid
-                WHERE projectid='$id'"
-            );
             $pictures = array();
             $clients = array();
             $employees = array();
@@ -260,11 +232,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 $team = $teamRow["name"];
                 $string .= "$team, ";
             }
-            while ($optional_employeeRow = $optional_employeesResult->fetch_assoc()) {
-                array_push($optional_employees, $optional_employeeRow["id"]);
-                $optional_employee = "${optional_employeeRow['firstname']} ${optional_employeeRow['lastname']}";
-                $string .= "$optional_employee, ";
-            }
             echo rtrim($string,", ");
             echo "</td>";
 
@@ -314,24 +281,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <!-- modal body -->
                                 <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%"></textarea>
                                 <!-- client selection -->
-                                <?php if ($conn->query("SELECT count(*) count FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["count"] > 1): ?>
-                                    <label><?php echo $lang["CLIENT"]; ?>*:</label>
-                                    <select class="form-control js-example-basic-single" name="client"
-                                    id="bookDynamicProjectClient<?php echo $modal_id; ?>"  required>
-                                    <?php
-                                    $modal_clientsResult = $conn->query("SELECT * FROM dynamicprojectsclients LEFT JOIN $clientTable ON $clientTable.id = dynamicprojectsclients.clientid WHERE projectid = '$modal_id'");
-                                    while ($modal_clientRow = $modal_clientsResult->fetch_assoc()) {
-                                        $modal_client_id = $modal_clientRow["id"];
-                                        $modal_client = $modal_clientRow["name"];
-                                        echo "<option value='$modal_client_id'>$modal_client</option>";
-                                    }
-                                    ?>
-                                </select>
-                            <?php else: ?> <!-- no selection if only one client -->
-                                <input id="bookDynamicProjectClient<?php echo $modal_id; ?>"
-                                type="hidden" name="client"
-                                value="<?php echo $conn->query("SELECT * FROM dynamicprojectsclients WHERE projectid = '$modal_id'")->fetch_assoc()["clientid"] ?>" />
-                            <?php endif;?>
                             <!-- /client selection -->
                             <label><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?>*:</label>
                             <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted<?php echo $modal_id; ?>" />

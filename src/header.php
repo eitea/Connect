@@ -593,17 +593,16 @@ echo '<br>' . $buttonEmoji;
           <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
               <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 
-              <?php $result = $conn->query("SELECT projectid FROM dynamicprojects LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid
-                  LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = dynamicprojects.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                  WHERE dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID OR teamRelationshipData.userID = $userID");
-
+              <?php
+              $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                  LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                  WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID)");
+                  echo $conn->error;
               if ($result && $result->num_rows > 0): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span>
-                      <?php echo $lang['DYNAMIC_PROJECTS'];
-                      $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
-                      if ($result->num_rows > 0) {
-                          echo ' <span class="badge alert-badge">' . $result->num_rows . '</span>';
-                      }
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><i class="fa fa-tasks"></i><span>
+                      <?php
+                      echo $lang['DYNAMIC_PROJECTS'];
+                      if ($result->num_rows > 0) echo '<span class="badge pull-right">' . $result->num_rows . '</span>';
                       ?>
                   </span></a></li>
 	            <?php endif; //dynamicProjects ?>
