@@ -24,10 +24,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
         }
     }
-    if(!empty($_POST['createBooking']) && !empty($_POST['dynamicbooking-project'])){
-        $x = test_input($_POST['createBooking']);
+    if(!empty($_POST['createBooking']) && !empty($_POST['bookDynamicProject'])){
+        $bookingID = test_input($_POST['createBooking']);
+        $projectID = intval($_POST['bookDynamicProject']);
+        //TODO: get dynamicID from booking, update completion status, backwards-check projectID
 
-        $conn->query("UPDATE projectBookingData WHERE id = $x");
+        $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP WHERE id = $bookingID");
+        echo $conn->error;
     }
     if($isDynamicProjectsAdmin == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
@@ -149,8 +152,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <tr>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
             <th><?php echo $lang["DESCRIPTION"]; ?></th>
-            <th><?php echo $lang["COMPANY"]; ?></th>
-            <th><?php echo $lang["CLIENTS"]; ?></th>
+            <th><?php echo $lang["COMPANY"].' '.$lang["CLIENTS"].' '.$lang["PROJECT"]; ?></th>
             <th><?php echo $lang["BEGIN"]; ?></th>
             <th><?php echo $lang["END"]; ?></th>
             <th>Routine</th>
@@ -181,9 +183,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
-                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN UserData ON UserData.id = projectowner
-                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+                LEFT JOIN UserData ON UserData.id = projectowner LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID)");
         }
@@ -194,8 +196,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<tr>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
             echo '<td><a type="button" class="btn btn-default" data-toggle="modal" data-target="#view-'.$x.'" >View</a></td>';
-            echo '<td>'.$row['companyName'].'</td>';
-            echo '<td>'.$row['clientName'].'</td>';
+            echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
 
@@ -257,13 +258,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted" />
                         <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
                     </div>
-                    <div class="checkbox">
-                        <label><input type="checkbox" id="bookDynamicProjectCompletedCheckbox"> Abgeschlossen</label>
+                    <div class="checkbox"><label><input type="checkbox" id="bookDynamicProjectCompletedCheckbox"> Abgeschlossen</label></div>
+                    <br>
+                    <div class="row" <?php if($occupation['projectid']) echo 'disabled'; ?> >
+                        <div class="col-md-4">
+                            <select class="js-example-basic-single">
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="js-example-basic-single">
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="js-example-basic-single" name="bookDynamicProject">
+                            </select>
+                        </div>
                     </div>
+                    WARUNG: FUNKTION EINGESCHRÄNKT. Funktioniert nicht. Update kommt noch.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" name="createBooking" value="<?php echo $occupation['bookingID']; ?>"><?php echo $lang['SAVE']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="createBooking" value="<?php echo $occupation['bookingID']; ?>"><?php echo $lang['SAVE']; ?></button>
                 </div>
             </form>
         </div>
