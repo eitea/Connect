@@ -107,7 +107,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                     $stmt->close();
 
-                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; 
+                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
                 } else {
                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$stmt->error.'</div>';
                     $stmt->close();
@@ -323,7 +323,12 @@ function appendModal(index){
       onPageLoad();
       dynamicOnLoad(index);
     },
-    error : function(resp){}
+    error : function(resp){},
+    complete: function(resp){
+        if(index){
+            $('#editingModal-'+index).modal('show');
+        }
+    }
    });
 }
 var existingModals = new Array();
@@ -331,7 +336,6 @@ $('button[name=editModal]').click(function(){
     var index = $(this).val();
   if(existingModals.indexOf(index) == -1){
       appendModal(index);
-      $('#editingModal-'+index).modal('show');
   } else {
     $('#editingModal-'+index).modal('show');
   }
@@ -358,6 +362,33 @@ $(document).ready(function() {
       paging: false
     });
 });
-</script>
 
+
+  function showClients(company, client, place){
+    if(company != ""){
+      $.ajax({
+        url:'ajaxQuery/AJAX_getClient.php',
+        data:{companyID:company, clientID:client},
+        type: 'get',
+        success : function(resp){
+          $("#"+place).html(resp);
+        },
+        error : function(resp){}
+      });
+    }
+  }
+  function showProjects(client, project, place){
+    if(client != ""){
+      $.ajax({
+        url:'ajaxQuery/AJAX_getProjects.php',
+        data:{clientID:client, projectID:project},
+        type: 'get',
+        success : function(resp){
+          $("#"+place).html(resp);
+        },
+        error : function(resp){}
+      });
+    }
+  }
+</script>
 <?php require 'footer.php'; ?>
