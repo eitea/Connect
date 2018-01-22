@@ -4,9 +4,9 @@ if($result){
   $enabled = $result->fetch_assoc();
   if(!isset($enabled['endpoint'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
-    require 'footer.php'; 
+    require 'footer.php';
     return;
-  } 
+  }
 }
 require dirname(__DIR__)."\plugins\aws\autoload.php";
 require __DIR__."\connection.php";
@@ -31,7 +31,7 @@ if(isset($_POST['filterClient'])){
   var droppedFiles2 = false;
   document.onreadystatechange = () => {
   if (document.readyState === 'complete') {
-  
+
   var isAdvancedUpload = function() {
   var div = document.createElement('div');
   return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;}();
@@ -40,7 +40,7 @@ if(isset($_POST['filterClient'])){
     var fileForm = $('#dropBox');
     $formGroup.addClass('has-advanced-upload');
     fileForm.addClass('has-advanced-upload');
-    
+
 
   fileForm.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
     e.preventDefault();
@@ -54,7 +54,7 @@ if(isset($_POST['filterClient'])){
   })
   .on('drop', function(e) {
   droppedFiles = e.originalEvent.dataTransfer.files; // the files that were dropped
-  
+
   showFiles( droppedFiles );
 });
 
@@ -74,7 +74,7 @@ if(isset($_POST['filterClient'])){
   filesGotDropped = true;
   showFiles(droppedFiles2);
 });
-  
+
   var $input    = $formGroup.find('input[type="file"]'),
     $label    = $formGroup.find('label'),
     showFiles = function(files) {
@@ -91,6 +91,12 @@ if(isset($_POST['filterClient'])){
     $input2.on('change', function(e) {
     showFiles2(e.target.files);
   });
+
+
+
+
+
+
 }
   }
 };
@@ -106,7 +112,7 @@ function handleCancel(){ //not found
     $radio.filter('[value=1]').prop('checked',true);
   }
 
-  
+
 
 
 </script>
@@ -121,14 +127,14 @@ function handleCancel(){ //not found
 </tr></thead>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  
+
   if(isset($_POST['sendAccess']) && !empty($_POST['send_contact'])&& !empty($_POST['link'])){
-    
+
     $processID = uniqid();
     $contactID = intval($_POST['send_contact']);
     $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
     $contact_row = $result->fetch_assoc();
-    
+
     //build the content
     if($_POST['send_template']){
       $val = intval($_POST['send_template']);
@@ -139,25 +145,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten ist:</p><ul><li>Der Link läuft nach einigen Tagen ab, sichern Sie sich also so schnell wie möglich die Dateien auf ihr System!</li>".
       "<li>Diese E-Mail wurde automatisch Generiert, bitte Antworten sie nicht auf diese E-Mail!</li></ul><p>&nbsp;</p><p>Danke.</p>";
     }
-    
+
     $link = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     $link = explode('/', $link);
     array_pop($link);
     $link = implode('/', $link) . "/files?n=".$_POST['link'];
-    
+
     $content = str_replace("[LINK]", $link, $content);
     $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
     $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
 
-    
-  require dirname(__DIR__).'\plugins\phpMailer\autoload.php';
-  
+
+  require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
+
   $mail = new PHPMailer();
-  
+
   $mail->CharSet = 'UTF-8';
   $mail->Encoding = "base64";
   $mail->IsSMTP();
-  
+
   $result = $conn->query("SELECT * FROM $mailOptionsTable");
   $row = $result->fetch_assoc();
   if(!empty($row['username']) && !empty($row['password'])){
@@ -170,10 +176,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(empty($row['smptSecure'])){
     $mail->SMTPSecure = false;
   }
-  
+
   $mail->Host       = $row['host'];
   $mail->Port       = $row['port'];
-  
+
   if(!empty($row['sendername'])&&$row['isDefault']==1){
     $cmpID = $conn->query("SELECT company FROM sharedgroups WHERE uri = '".$_POST['link']."'");
     $cmpID = $cmpID->fetch_assoc();
@@ -187,7 +193,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 
   $mail->addAddress($contact_row['email'], $contact_row['firstname'].' '.$contact_row['lastname']);
-  
+
   $mail->isHTML(true);                       // Set email format to HTML
   $mail->Subject = 'Connect - File-Download';
   $mail->Body    = $content;
@@ -310,7 +316,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="modal-body" >
           <div class="fileBox" id="dropBox" ondrop="guideFiles(event)" ondragover="dragover(event)" ondragend="dragend(event)">
             <input class="fileInput" type="file" name="files[]" id="addFile" onChange="uploadFiles(this)" data-multiple-caption="{count} files uploaded" multiple />
-            <label class="lbl" for="addFile" id="lblNewFile"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>          
+            <label class="lbl" for="addFile" id="lblNewFile"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>
           </div>
           <div class="modal-footer" >
             <button type="button" onClick="fade(this)" class="btn btn-default">Cancel</button>
@@ -323,7 +329,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header h4"><?php echo "Gruppe". " " . $lang['ADD'];  ?></div>
       <div class="modal-body">
-      
+
         <?php
         $result_fc = $conn->query("SELECT * FROM companyData WHERE id IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID)");
         if($result_fc && $result_fc->num_rows > 0){
@@ -341,7 +347,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $filterCompany = $available_companies[1];
         }
         ?>
-  
+
         <div class="col-sm-12">
         <label>Name der Gruppe</label>
         <input style="margin-bottom: 2%" type="text" class="form-control" name="add_groupName" id="add_groupName" autofocus/>
@@ -355,7 +361,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="col-sm-12">
         <div id="fileBox" class="fileBox">
           <input class="fileInput" type="file" name="files" id="file" data-multiple-caption="{count} files selected" multiple />
-          <label class="lbl" for="file"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>          
+          <label class="lbl" for="file"><strong id="clickHere">Datei(en) auswählen</strong><span class="dragndrop"> oder hier hin ziehen</span>.</label>
         </div>
       </div>
         <div class="modal-footer">
@@ -364,11 +370,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </div>
   </div>
-  
+
 </form>
 
 
-  
+
 
 
 
@@ -406,7 +412,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       info = JSON.parse(info);
       document.getElementById('editName').value = info[0]['name'];
       document.getElementById('groupID').value = groupID;
-      var br = document.createElement("br"); 
+      var br = document.createElement("br");
       var tbody = document.getElementById("fileTable");
       while(tbody.firstChild) tbody.removeChild(tbody.firstChild);
       for(var i=1;i<info.length;i++){
@@ -432,7 +438,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         document.getElementById("fileTable").appendChild(br);
       }
     });
-  }           
+  }
 
   function deleteFile(evt,fileID){
     $.ajax({
@@ -442,7 +448,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               'function': 'deleteFile'}
     }).done(function(groupID){
       if(groupID)editGroup(null,groupID);
-      
+
     });
   }
 
@@ -451,7 +457,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     var formData = new FormData();
     var fileIndex = [];
     for(var i = 0;i<document.getElementById('addFile').files.length;i++){
-      formData.append('file'+i,document.getElementById('addFile').files[i]); 
+      formData.append('file'+i,document.getElementById('addFile').files[i]);
     }
     formData.append('amount',document.getElementById('addFile').files.length);
     formData.append('userID',<?php echo $userID ?>);
@@ -477,7 +483,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   function sendFile(file){
     var formData = new FormData();
     formData.append('function','sendFiles');
-    formData.append('file0',file);    
+    formData.append('file0',file);
     formData.append('amount',1);
     formData.append('userID',<?php echo $userID ?>)
     formData.append('groupID',document.getElementById('groupID').value);
@@ -508,11 +514,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       console.log(droppedFiles2);
     }else{
       for(var i = 0;i<document.getElementById('file').files.length;i++){
-        formData.append('file'+i,document.getElementById('file').files[i]); 
+        formData.append('file'+i,document.getElementById('file').files[i]);
       }
       amount = document.getElementById('file').files.length;
       console.log(document.getElementById('file').files);
-    }   
+    }
     formData.append('amount',amount);
     formData.append('functions','addGroup');
     formData.append('userid',<?php echo $userID ?>);
@@ -584,13 +590,13 @@ $('button[name=setSelect]').click(function(){
 });
 
 function showContacts(client){
-  
+
   $.ajax({
     url:'ajaxQuery/AJAX_getContacts.php',
     data:{clientID:client},
     type: 'get',
     success : function(resp){
-     
+
       $('#contactHint').html(resp);
     },
     error : function(resp){}

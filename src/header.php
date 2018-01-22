@@ -35,8 +35,8 @@ if ($result && $result->num_rows > 0) {
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
 } else {
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = FALSE;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = FALSE;
+    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
@@ -58,9 +58,6 @@ if ($result) {
     $masterPasswordHash = $row['masterPassword'];
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
-
-$result = $conn->query("SELECT id FROM dynamicprojects LEFT JOIN dynamicprojectsoptionalemployees ON dynamicprojectsoptionalemployees.projectid = dynamicprojects.projectid LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = dynamicprojects.projectid  WHERE dynamicprojectsoptionalemployees.userid = $userID OR dynamicprojectsemployees.userid = $userID OR dynamicprojects.projectowner = $userID");
-$hasActiveDynamicProjects = ($result && $result->num_rows > 0) ? 'TRUE' : 'FALSE';
 
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
@@ -133,9 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
         $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
-    } if(!empty($_POST['publicPGP'])&&isset($_POST['savePAS'])){
+    } if(!empty($_POST['publicPGP']) && isset($_POST['savePAS'])){
       $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
-     if(!empty($_POST['privatePGP'])&&isset($_POST['savePAS'])&&!empty($_POST['encodePGP'])){
+     if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
       $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
       $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
     }} elseif(isset($_POST['savePAS'])){
@@ -593,16 +590,21 @@ echo '<br>' . $buttonEmoji;
           <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
 
           <!-- User-Section: BOOKING -->
-          <?php if ($canBook == 'TRUE' && $showProjectBookingLink): //a user cannot do projects if he cannot checkin m8 ?>
-	            <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-	            <?php if ($hasActiveDynamicProjects == 'TRUE'): ?>
-	              <li><a <?php if ($this_page == 'dynamicProjects_user.php') {echo $setActiveLink;}?> href="../dynamic-projects/user"><i class="fa fa-tasks"></i><span> <?php echo $lang['DYNAMIC_PROJECTS']; ?> <?php
-    $result = $conn->query("SELECT d.projectid FROM dynamicprojectsemployees d JOIN dynamicprojects p ON d.projectid=p.projectid WHERE d.userid=$userID AND p.projectstatus='ACTIVE'");
-    if ($result->num_rows > 0) {
-        echo '<label style="font-size: 16px; color: white;">' . $result->num_rows . '</label>';
-    }
+          <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
+              <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
 
-    ?></span></a></li>
+              <?php
+              $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                  LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                  WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID)");
+                  echo $conn->error;
+              if ($result && $result->num_rows > 0): ?>
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><i class="fa fa-tasks"></i><span>
+                      <?php
+                      echo $lang['DYNAMIC_PROJECTS'];
+                      if ($result->num_rows > 0) echo '<span class="badge pull-right">' . $result->num_rows . '</span>';
+                      ?>
+                  </span></a></li>
 	            <?php endif; //dynamicProjects ?>
           <?php endif;?>
         <?php endif; //endif(canStamp)?>
@@ -732,14 +734,14 @@ if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || 
                 <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                 <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects_admin.php') {echo $setActiveLink;}?> href="../dynamic-projects/admin"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
               </ul>
             </div>
           </div>
         </div>
         <?php
-if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects_admin.php") {
+if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
     echo "<script>$('#adminOption_PROJECT').click();</script>";
 }
 ?>
@@ -1004,7 +1006,6 @@ if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {
     if (simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') {
         echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
     }
-
 }
 $user_agent = $_SERVER["HTTP_USER_AGENT"];
 if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {

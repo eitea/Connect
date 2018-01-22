@@ -2194,6 +2194,93 @@ if ($row['version'] < 124) {
     }
 }
 
+
+if($row['version'] < 125){
+    $conn->query("ALTER TABLE projectBookingData ADD COLUMN dynamicID VARCHAR(100)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Projektbuchungen: Task Referenz';
+    }
+
+    $result = $conn->query("SELECT id, dynamicprojectid FROM projectData WHERE dynamicprojectid IS NOT NULL");
+    while($row = $result->fetch_assoc()){
+        $conn->query("UPDATE projectBookingData SET dynamicID = '".$row['dynamicprojectid']."' WHERE projectID = ".$row['id']);
+        echo $conn->error;
+
+        $conn->query("UPDATE projectBookingData SET projectID = 350 WHERE projectID = ".$row['id']);
+        echo $conn->error;
+    }
+
+    $conn->query("DELETE FROM projectData WHERE dynamicprojectid IS NOT NULL");
+    $conn->query("ALTER TABLE projectData DROP COLUMN dynamicprojectid");
+
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription TEXT NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Beschreibung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectseries MEDIUMBLOB");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Routine Tasks';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectnextdate VARCHAR(12)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Umbelegung';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN clientid INT(6) UNSIGNED");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Kunde';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN clientprojectid INT(6) UNSIGNED");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Projekt ID';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectpercentage INT(3) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Projekt Prozentsatz';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojectsemployees ADD COLUMN position VARCHAR(10) DEFAULT 'normal' NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Dynamische Projekte: Position';
+    }
+    $conn->query("DROP TABLE dynamicprojectsclients");
+    $conn->query("DROP TABLE dynamicprojectsseries");
+    $conn->query("DROP TABLE dynamicprojectsbookings");
+
+    $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT (projectid, userid, 'optional') FROM dynamicprojectsoptionalemployees");
+    $conn->query("DROP TABLE dynamicprojectsoptionalemployees");
+
+    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");
+}
+
+
+    $result = $conn->query("SELECT projectid FROM dynamicprojects");
+    while($row = $result->fetch_assoc()){
+        $id = uniqid();
+        $conn->query("UPDATE dynamicprojects SET projectid = '$id' WHERE projectid = '".$row['projectid']."'");
+    }
+    
 // ------------------------------------------------------------------------------
 
 require 'version_number.php';

@@ -53,10 +53,10 @@ while ($row = $result->fetch_assoc()) {
 
 <!-- for testing in browser -->
 <script>
-    setTimeout(function() {
-        document.write("<br>reloading...")
-    }, 9000);
-    setTimeout(function() {
-        window.location.reload();
-    }, 10000);
+setTimeout(function() {
+    document.write("<br>reloading...")
+}, 9000);
+setTimeout(function() {
+    window.location.reload();
+}, 10000);
 </script>

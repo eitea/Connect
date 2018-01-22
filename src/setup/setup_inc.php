@@ -160,6 +160,7 @@ function create_tables($conn) {
         exp_info TEXT,
         exp_price DECIMAL(10,2),
         exp_unit DECIMAL(10,2),
+        dynamicID VARCHAR(100),
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -254,6 +255,7 @@ function create_tables($conn) {
         isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -1181,10 +1183,12 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE dynamicprojects(
-        projectid VARCHAR(100) NOT NULL,
+        projectid VARCHAR(100) NOT NULL PRIMARY KEY,
         projectname VARCHAR(60) NOT NULL,
-        projectdescription VARCHAR(500) NOT NULL,
-        companyid INT(6),
+        projectdescription TEXT NOT NULL,
+        companyid INT(6) UNSIGNED NOT NULL,
+        clientid INT(6) UNSIGNED,
+        clientprojectid INT(6) UNSIGNED,
         projectcolor VARCHAR(10),
         projectstart VARCHAR(12),
         projectend VARCHAR(12),
@@ -1192,19 +1196,18 @@ function create_tables($conn) {
         projectpriority INT(6),
         projectparent VARCHAR(100),
         projectowner INT(6),
-        PRIMARY KEY (`projectid`)
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsclients(
-        projectid VARCHAR(100) NOT NULL,
-        clientid INT(6),
-        projectcompleted INT(6),
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        projectnextdate VARCHAR(12),
+        projectseries MEDIUMBLOB,
+        projectpercentage INT(3) DEFAULT 0,
+        FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (clientid) REFERENCES clientData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+        FOREIGN KEY (clientprojectid) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1213,18 +1216,8 @@ function create_tables($conn) {
     $sql = "CREATE TABLE dynamicprojectsemployees(
         projectid VARCHAR(100) NOT NULL,
         userid INT(6),
+        position VARCHAR(10) DEFAULT 'normal' NOT NULL,
         PRIMARY KEY(projectid, userid),
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsoptionalemployees(
-        projectid VARCHAR(100) NOT NULL,
-        userid INT(6),
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1244,18 +1237,6 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE dynamicprojectsseries(
-        projectid VARCHAR(100) NOT NULL,
-        projectnextdate VARCHAR(12),
-        projectseries MEDIUMBLOB,
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
     $sql = "CREATE TABLE dynamicprojectsnotes(
         projectid VARCHAR(100) NOT NULL,
         noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1265,19 +1246,6 @@ function create_tables($conn) {
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
         ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsbookings(
-        projectid VARCHAR(100) NOT NULL,
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        bookingstart DATETIME DEFAULT CURRENT_TIMESTAMP,
-        bookingend DATETIME,
-        bookingclient INT(6) UNSIGNED,
-        userid INT(6) UNSIGNED,
-        bookingtext VARCHAR(1000)
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;

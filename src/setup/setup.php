@@ -165,13 +165,14 @@ ignore_user_abort(1);
 
             require_once dirname(__DIR__) . "/version_number.php";
             //add lines to connection file
-            $identifier = preg_replace('/[^A-Za-z0-9\_]/', 'x', str_replace('.', '0', randomPassword().uniqid('', true).randomPassword().uniqid('').randomPassword())); //60 characters;
+            $identifier = uniqid('', true);
             $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'a');
             $txt = '$identifier = "'.$identifier.'";
             $s3SharedFiles=$identifier."_sharedFiles";
             $s3uploadedFiles=$identifier."_uploadedFiles";';
             fwrite($myfile, $txt);
             fclose($myfile);
+
 
             //------------------------------ INSERTS ---------------------------------------
             //insert identification
@@ -207,8 +208,8 @@ ignore_user_abort(1);
             $sql = "INSERT INTO intervalData (userID) VALUES (2);";
             $conn->query($sql);
             //insert roletable
-            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE');";
+            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
+              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
             $conn->query($sql);
             //insert company-client relationship
             $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
