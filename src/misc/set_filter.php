@@ -1,16 +1,18 @@
 <?php
-/** 
- * company => id
- * client  => id
- * project  => id
- * user => id
- * users => [id1, id2, ...]
- * bookings => [charged, break, drive]
- * logs => [activity, hideAll]
- * date => [fromDate, toDate] || [month]
- * procedures => [transitions[id], status, hideAll]
- * acceptance => status
- * requestType => type
+/**
+* company => id
+* client  => id
+* project  => id
+* user => id
+* users => [id1, id2, ...]
+* bookings => [charged, break, drive]
+* logs => [activity, hideAll]
+* date => [fromDate, toDate] || [month]
+* procedures => [transitions[id], status, hideAll]
+* acceptance => status
+* requestType => type
+* regexField
+*
 **/
 
 if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){

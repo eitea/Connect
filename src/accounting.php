@@ -2,7 +2,7 @@
 require "header.php";
 enableToFinance($userID);
 
-$filterings = array('date' => array(date('Y-m')));
+$filterings = array("savePage" => $this_page, 'date' => array(date('Y-m')));
 $show_undo = false;
 
 if (!empty($_GET['v'])) {
@@ -112,7 +112,6 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
                 if ($res && $res->num_rows > 0) {
                     $account2 = $res->fetch_assoc()['id'];
                 }
-
             }
             if ($taxRow['account3']) {
                 $res = $conn->query("SELECT id FROM accounts WHERE num = " . $taxRow['account3'] . " AND companyID IN (SELECT companyID FROM accounts WHERE id = $id) ");
@@ -120,7 +119,6 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
                 if ($res && $res->num_rows > 0) {
                     $account3 = $res->fetch_assoc()['id'];
                 }
-
             }
         }
         if ($accept) {
@@ -271,46 +269,46 @@ while ($result && ($row = $result->fetch_assoc())) {
         $modals = '';
         $docNum = $saldo = 0;
         $result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should, r1.id AS receiptID
-            FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
-            INNER JOIN accounts ON account_journal.account = accounts.id
-            LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
-            WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, inDate ");
-            echo $conn->error;
-            $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
-            $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
-            while ($result && ($row = $result->fetch_assoc())) {
-                $docNum = $row['docNum'];
-                $docDate = $row['payDate'];
-                $saldo += $row['netto_should'];
-                $saldo -= $row['netto_have'];
-                echo '<tr>';
-                echo '<td>' . $row['docNum'] . '</td>';
-                echo '<td>' . substr($row['payDate'], 0, 10) . '</td>';
-                echo '<td><a href="account?v=' . $row['account'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
-                echo '<td>' . $row['info'] . '</td>';
-                echo '<td>' . sprintf('%02d', $row['taxID']) . '</td>';
-                echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
-                echo '<td style="text-align:right">' . number_format($row['netto_have'], 2, ',', '.') . '</td>';
-                echo '<td style="text-align:right">' . number_format($saldo, 2, ',', '.') . '</td>';
-                if ($row['receiptID']) {echo '<td>' . $lang['YES'] . '</td>';} else {echo '<td>' . $lang['NO'] . '</td>';}
+        FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
+        INNER JOIN accounts ON account_journal.account = accounts.id
+        LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
+        WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, payDate, inDate ");
+        echo $conn->error;
+        $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
+        $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
+        while ($result && ($row = $result->fetch_assoc())) {
+            $docNum = $row['docNum'];
+            $docDate = $row['payDate'];
+            $saldo += $row['netto_should'];
+            $saldo -= $row['netto_have'];
+            echo '<tr>';
+            echo '<td>' . $row['docNum'] . '</td>';
+            echo '<td>' . substr($row['payDate'], 0, 10) . '</td>';
+            echo '<td><a href="account?v=' . $row['account'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
+            echo '<td>' . $row['info'] . '</td>';
+            echo '<td>' . sprintf('%02d', $row['taxID']) . '</td>';
+            echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
+            echo '<td style="text-align:right">' . number_format($row['netto_have'], 2, ',', '.') . '</td>';
+            echo '<td style="text-align:right">' . number_format($saldo, 2, ',', '.') . '</td>';
+            if ($row['receiptID']) {echo '<td>' . $lang['YES'] . '</td>';} else {echo '<td>' . $lang['NO'] . '</td>';}
 
-                if ($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8) . '01', $lockedMonths)) {
-                    echo '<td><button type="button" class="btn btn-default editing-modal-butt" title="Editieren" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
-                } else {
-                    echo '<td></td>';
-                }
-                echo '</tr>';
+            if ($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8) . '01', $lockedMonths)) {
+                echo '<td><button type="button" class="btn btn-default editing-modal-butt" title="Editieren" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
+            } else {
+                echo '<td></td>';
             }
-            if ($account_row['options'] == 'CONT') {
-                $docNum++;
-            }
+            echo '</tr>';
+        }
+        if ($account_row['options'] == 'CONT') {
+            $docNum++;
+        }
 
-            if (!$docNum) {
-                $docNum = 1;
-            }
-            ?>
-        </tbody>
-    </table>
+        if (!$docNum) {
+            $docNum = 1;
+        }
+        ?>
+    </tbody>
+</table>
 <hr><br><br>
 <?php if($account_row['manualBooking'] == 'TRUE'): ?>
     <form method="POST" class="well">

@@ -905,6 +905,7 @@ $row = $result->fetch_assoc();
   <div class="container-fluid">
     <div class="col-md-4"><label>Lieferantennummernkreis</label><input type="text" name="erp_supplierNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['supplierNum']; ?>"/></div>
     <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_supplierStep" class="form-control" value="<?php echo $row['supplierStep']; ?>"/></div>
+    <small><i class="fa fa-arrow-right"></i> Buchstaben werden immmer an den Anfang gestellt</small>
   </div>
 </form><br>
 
