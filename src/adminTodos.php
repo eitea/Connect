@@ -86,10 +86,52 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           if($row['requestType'] == 'doc'){
             $coreTime = $conn->query("SELECT coreTime FROM userdata WHERE id =". $row['userID']);
             $coreTime = $coreTime->fetch_assoc()['coreTime'];
-            $coretime = new DateTime(date('Y-m-d',strtotime($row['fromDate']))." ".$coreTime);
+            $coreTime = new DateTime(date('Y-m-d',strtotime($row['fromDate']))." ".$coreTime);
             $fromTime =	new DateTime($row['fromDate']);
-            $i = ($fromTime->diff($coreTime)->h>0||$fromTime->diff($coreTime)->i>0)&&$fromTime->diff($coreTime)->invert==0 ? date('Y-m-d H:i:s',$coreTime->getTimestamp()) : $row['fromDate'];
-            $i2 = timeDiff_Hours($coreTime, $row['toDate'])<$expected ? $row['toDate'] : carryOverAdder_Minutes(carryOverAdder_Hours($coreTime, $expectedHours),$expectedMinutes);
+            $rndBoolForScience = false;
+            if(($fromTime->diff($coreTime)->h>0||$fromTime->diff($coreTime)->i>0)&&$fromTime->diff($coreTime)->invert==0){
+              $i = date('Y-m-d H:i:s',$coreTime->getTimestamp());
+              if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
+                $i2 = $row['toDate'];
+                
+              }else{
+                echo "<script>console.log('".date('Y-m-d H:i',$coreTime->getTimestamp())."')</script>";
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>6 ? $expectedHours + 0.5 : $expectedHours),$expectedMinutes);
+                $rndBoolForScience = true;
+              }
+            }else{
+              $i = $row['fromDate'];
+              if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
+                $i2 = $row['toDate'];
+                
+              }else{
+                echo "<script>console.log('".$expectedHours."')</script>";
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>6 ? $expectedHours + 0.5 : $expectedHours),$expectedMinutes);
+                $rndBoolForScience = true;
+              }
+            }
+            
+            $alreadyWorked = $conn->query("SELECT indexIM, time, timeEnd  FROM $logTable WHERE userID = ".$row['userID']." AND DATE(time) = '".date('Y-m-d',$fromTime->getTimestamp())."'");
+            if($alreadyWorked){
+              $alreadyWorked = $alreadyWorked->fetch_assoc();
+              $previousStart = new DateTime($alreadyWorked['time']);
+              $previousEnd = new DateTime($alreadyWorked['timeEnd']);
+              $newStart = new DateTime($i);
+              $newEnd = new DateTime($i2);
+              $i = $previousStart<$newStart ? date('Y-m-d H:i:s',$previousStart->getTimestamp()) : $i;
+              if($previousEnd<$newEnd){
+                if($rndBoolForScience){
+                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ ($expectedHours*3600) + ($expectedMinutes*60));
+                  echo "<script>console.log('".$i2."')</script>";
+                }
+              }else{
+                $i2 = date('Y-m-d H:i:s',$previousEnd->getTimestamp());
+              }
+              $sql = "UPDATE $logTable SET time = '$i', timeEnd = '$i2', status = '5' WHERE indexIM = ".$alreadyWorked['indexIM'];
+            }else{
+              $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '5')";
+            }
+            
           }
           if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
@@ -99,8 +141,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '2')";
           } elseif($row['requestType'] == 'cto'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '6')";
-          } elseif($row['requestType'] == 'doc'){
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '3')";
           }
           $conn->query($sql);
           echo mysqli_error($conn);
