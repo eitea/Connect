@@ -289,7 +289,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <div class="row">
                         <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
                             <div class="col-md-4">
-                                <select class="js-example-basic-single" onchange="showClients(this.value, <?php echo $occupation['clientid']; ?>, 'book-dynamic-clientHint')">
+                                <select class="js-example-basic-single" onchange="showClients(this.value, <?php echo intval($occupation['clientid']); ?>, 'book-dynamic-clientHint')">
                                     <?php
                                     $result = $conn->query("SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).") ");
                                     echo '<option value="0"> ... </option>';
@@ -301,7 +301,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             </div>
                         <?php endif; if(!$occupation['clientid']): ?>
                             <div class="col-md-4">
-                                <select id="book-dynamic-clientHint" class="js-example-basic-single" onchange="showProjects(this.value, <?php echo $occupation['projectid']; ?>, 'book-dynamic-projectHint')" >
+                                <select id="book-dynamic-clientHint" class="js-example-basic-single" onchange="showProjects(this.value, '<?php echo intval($occupation['projectid']); ?>', 'book-dynamic-projectHint')" >
                                     <option value="0"> ... </option>
                                 <?php
                                 $result = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).")");
