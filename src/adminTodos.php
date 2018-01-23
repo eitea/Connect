@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 
               }else{
                 echo "<script>console.log('".date('Y-m-d H:i',$coreTime->getTimestamp())."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours),$expectedMinutes);
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
             }else{
@@ -106,7 +106,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 
               }else{
                 echo "<script>console.log('".$expectedHours."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours),$expectedMinutes);
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
             }
@@ -121,7 +121,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               $i = $previousStart<$newStart ? date('Y-m-d H:i:s',$previousStart->getTimestamp()) : $i;
               if($previousEnd<$newEnd){
                 if($rndBoolForScience){
-                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ (($expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours) *3600) + ($expectedMinutes*60));
+                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ (($expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours) *3600) + ($expectedMinutes*60));
                   echo "<script>console.log('".$i2."')</script>";
                 }
               }else{
