@@ -88,7 +88,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $coreTime = $coreTime->fetch_assoc()['coreTime'];
             $coreTime = new DateTime(date('Y-m-d',strtotime($row['fromDate']))." ".$coreTime);
             $fromTime =	new DateTime($row['fromDate']);
-            $rndBoolForScience = false;
+            $rndBoolForScience = false; // maybe he comes back after the appointment and continues to work
             if(($fromTime->diff($coreTime)->h>0||$fromTime->diff($coreTime)->i>0)&&$fromTime->diff($coreTime)->invert==0){
               $i = date('Y-m-d H:i:s',$coreTime->getTimestamp());
               if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 
               }else{
                 echo "<script>console.log('".date('Y-m-d H:i',$coreTime->getTimestamp())."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>6 ? $expectedHours + 0.5 : $expectedHours),$expectedMinutes);
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
             }else{
@@ -106,7 +106,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 
               }else{
                 echo "<script>console.log('".$expectedHours."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>6 ? $expectedHours + 0.5 : $expectedHours),$expectedMinutes);
+                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
             }
@@ -121,7 +121,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               $i = $previousStart<$newStart ? date('Y-m-d H:i:s',$previousStart->getTimestamp()) : $i;
               if($previousEnd<$newEnd){
                 if($rndBoolForScience){
-                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ ($expectedHours*3600) + ($expectedMinutes*60));
+                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ (($expectedHours>$result['pauseAfterHours'] ? $expectedHours + $result['hoursOfRest'] : $expectedHours) *3600) + ($expectedMinutes*60));
                   echo "<script>console.log('".$i2."')</script>";
                 }
               }else{
