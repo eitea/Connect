@@ -4,12 +4,18 @@ require dirname(__DIR__) . "/language.php";
 
 $x = $_GET['projectid'];
 
-$userID = $_GET['userid'];
+$userID = intval($_GET['userid']);
 
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
+}
+
+$result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
+$available_users = array('-1');
+while ($result && ($row = $result->fetch_assoc())) {
+    $available_users[] = $row['userID'];
 }
 
 if($x){
