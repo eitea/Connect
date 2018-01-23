@@ -2,7 +2,7 @@
 require "header.php";
 enableToFinance($userID);
 
-$filterings = array('date' => array(date('Y-m')));
+$filterings = array("savePage" => $this_page, 'date' => array(date('Y-m')));
 $show_undo = false;
 
 if (!empty($_GET['v'])) {
