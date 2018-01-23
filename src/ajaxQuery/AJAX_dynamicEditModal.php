@@ -101,7 +101,7 @@ if($x){
                             <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
-                            $result = $conn->query("SELECT id, firstname, lastname FROM UserData");
+                            $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
                             ?>
                             <div class="col-md-4">

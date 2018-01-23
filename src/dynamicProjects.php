@@ -11,6 +11,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){
         $x = test_input($_POST['play']);
+        //TODO: make sure play does not overlap an existing booking.
         $result = mysqli_query($conn, "SELECT indexIM FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
             $indexIM = $row['indexIM'];
@@ -40,7 +41,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
 
                 $description = test_input($_POST['description']);
-                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo  WHERE id = $bookingID");
+                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% Abgeschlossen'  WHERE id = $bookingID");
                 echo $conn->error;
             } else {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].' (Projekt)</div>';
@@ -265,21 +266,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <div id="editingModalDiv">
     <?php echo $modals; ?>
-    <!-- booking modal -->
     <?php if($occupation): ?>
-    <div class="modal fade" id="dynamic-booking-modal" tabindex="-1">
+    <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">
             <form method="POST">
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
                 <div class="modal-body">
-                    <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea>
-                    <br>
-                    <div class="input-group">
-                        <input type="number" class="form-control" name="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
-                        <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
+                        </div>
+                        <div class="col-md-4">
+                            <label><input type="checkbox" name="bookCompletedCheckbox" id="bookCompletedCheckbox"> Abgeschlossen</label><br>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bookCompleted" id="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
+                                <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
+                            </div><br>
+                        </div>
                     </div>
-                    <div class="checkbox"><label><input type="checkbox" name="bookCompletedCheckbox"> Abgeschlossen</label></div>
-                    <br>
                     <div class="row">
                         <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
                             <div class="col-md-4">
@@ -330,22 +336,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </form>
         </div>
     </div>
-    <?php endif; ?>
+    <?php endif; //endif occupation ?>
 </div>
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-$("#bookDynamicProjectCompletedCheckbox").change(function(event){
-    $("#bookDynamicProjectCompleted").attr('disabled', this.checked);
+$("#bookCompletedCheckbox").change(function(event){
+    $("#bookCompleted").attr('disabled', this.checked);
     if(this.checked){
-        $("#bookDynamicProjectCompleted").val(100);
+        $("#bookCompleted").val(100);
     }
 });
-$("#bookDynamicProjectCompleted").keyup(function(event){
-    if($("#bookDynamicProjectCompleted").val() == 100){
-        $("#bookDynamicProjectCompletedCheckbox").prop('checked', true);
+$("#bookCompleted").keyup(function(event){
+    if($("#bookCompleted").val() == 100){
+        $("#bookCompletedCheckbox").prop('checked', true);
     } else {
-        $("#bookDynamicProjectCompletedCheckbox").prop('checked', false);
+        $("#bookCompletedCheckbox").prop('checked', false);
     }
 });
 function formatState (state) {
