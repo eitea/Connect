@@ -131,7 +131,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
     if (!empty($modal_employees)) {
         $selected = in_array("user;" . $x, $modal_employees) ? "selected" : "";
     } else {
-        $selected = $x == $userID ? "selected" : "";
+        $selected = "";
     }
     echo "<option value='user;$x' $selected data-icon='user'>$modal_user_name</option>";
 }
@@ -175,6 +175,7 @@ while ($modal_row = $modal_result->fetch_assoc()) {
 $modal_result = $conn->query("SELECT * FROM UserData");
 while ($modal_row = $modal_result->fetch_assoc()) {
     $x = $modal_row['id'];
+    $selected = "";
     $modal_user_name = "${modal_row['firstname']} ${modal_row['lastname']}";
     if (!empty($modal_optional_employees)) {
         $selected = in_array($x, $modal_optional_employees) ? "selected" : "";
