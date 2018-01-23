@@ -4,12 +4,18 @@ require dirname(__DIR__) . "/language.php";
 
 $x = $_GET['projectid'];
 
-$userID = $_GET['userid'];
+$userID = intval($_GET['userid']);
 
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
+}
+
+$result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
+$available_users = array('-1');
+while ($result && ($row = $result->fetch_assoc())) {
+    $available_users[] = $row['userID'];
 }
 
 if($x){
@@ -28,6 +34,7 @@ if($x){
     $dynrow['projectstart'] = date('Y-m-d');
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
+    $dynrow['projectowner'] = $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
 }
@@ -100,7 +107,7 @@ if($x){
                             <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
-                            $result = $conn->query("SELECT id, firstname, lastname FROM UserData");
+                            $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
                             ?>
                             <div class="col-md-4">

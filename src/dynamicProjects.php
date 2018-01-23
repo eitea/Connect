@@ -11,6 +11,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){
         $x = test_input($_POST['play']);
+        //TODO: make sure play does not overlap an existing booking.
         $result = mysqli_query($conn, "SELECT indexIM FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
             $indexIM = $row['indexIM'];
@@ -24,18 +25,35 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
         }
     }
-    if(!empty($_POST['createBooking']) && !empty($_POST['bookDynamicProject'])){
+    if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
         $bookingID = test_input($_POST['createBooking']);
-        $projectID = intval($_POST['bookDynamicProject']);
-        //TODO: get dynamicID from booking, update completion status, backwards-check projectID
+        $result = $conn->query("SELECT dynamicID, clientprojectid FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
+        if($row = $result->fetch_assoc()){
+            $dynamicID = $row['dynamicID'];
+            $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
+            if($projectID){
+                $result->free();
+                $percentage = intval($_POST['bookCompleted']);
+                if($percentage == 100 || isset($_POST['bookCompletedCheckbox'])){
+                    $percentage = 100; //safety
+                    $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
+                }
+                $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
 
-        $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP WHERE id = $bookingID");
-        echo $conn->error;
+                $description = test_input($_POST['description']);
+                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% Abgeschlossen'  WHERE id = $bookingID");
+                echo $conn->error;
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].' (Projekt)</div>';
+            }
+        } else { //STRIKE
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
+        }
     }
     if($isDynamicProjectsAdmin == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
-            $conn->query("DELETE FROM dynamicProjects WHERE projectid = '$val'");
+            $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$val'");
             if($conn->error){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             } else {
@@ -47,14 +65,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
                     $id =  test_input($_POST['editDynamicProject']);
-                    $conn->query("DELETE FROM dynamicProjects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
+                    $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
                 }
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
-                $client = intval($_POST['filterClient']);
-                $project = intval($_POST['filterProject']);
+                $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
+                $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
                 $color = $_POST["color"] ? test_input($_POST['color']) : '#FFFFFF';
                 $start = $_POST["start"];
                 $end = $_POST["endradio"];
@@ -123,10 +141,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
                         }
                     }
-                    $position = 'optional';
-                    foreach ($_POST['optionalemployees'] as $optional_employee) {
-                        $employee = intval($optional_employee);
-                        $stmt->execute();
+                    if(!empty($_POST['optionalemployees'])){
+                        $position = 'optional';
+                        foreach ($_POST['optionalemployees'] as $optional_employee) {
+                            $employee = intval($optional_employee);
+                            $stmt->execute();
+                        }
                     }
                     echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
                 } else {
@@ -177,14 +197,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($isDynamicProjectsAdmin == 'TRUE'){
             //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
-                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN UserData ON UserData.id = projectowner
-                WHERE d.companyid IN (".implode(', ', $available_companies).")");
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).")");
         } else {
             //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
-                d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN UserData ON UserData.id = projectowner LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
@@ -223,8 +243,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $isInUse = $stmt_booking->get_result(); //max 1 row
             if(($useRow = $isInUse->fetch_assoc()) && $useRow['userID'] == $userID) {
                 //if this task IsInUse and this user is the one using it
-                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#bookDynamicProject"><i class="fa fa-pause"></i></button>';
-                $occupation = array('bookingID' => $useRow['id'], 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['projectid']);
+                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button>';
+                $occupation = array('bookingID' => $useRow['id'], 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
                 //only if project ist active, this task is NOT in use and user has no active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play' ></i></button>";
@@ -246,36 +266,68 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <div id="editingModalDiv">
     <?php echo $modals; ?>
-    <!-- booking modal -->
     <?php if($occupation): ?>
-    <div class="modal fade" id="bookDynamicProject" tabindex="-1">
+    <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">
             <form method="POST">
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
                 <div class="modal-body">
-                    <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%"></textarea>
-                    <br>
-                    <div class="input-group">
-                        <input type="number" class="form-control" name="completed" min="0" max="100" id="bookDynamicProjectCompleted" />
-                        <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
-                    </div>
-                    <div class="checkbox"><label><input type="checkbox" id="bookDynamicProjectCompletedCheckbox"> Abgeschlossen</label></div>
-                    <br>
-                    <div class="row" <?php if($occupation['projectid']) echo 'disabled'; ?> >
-                        <div class="col-md-4">
-                            <select class="js-example-basic-single">
-                            </select>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <textarea name="description" required class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
                         </div>
                         <div class="col-md-4">
-                            <select class="js-example-basic-single">
-                            </select>
+                            <label><input type="checkbox" name="bookCompletedCheckbox" id="bookCompletedCheckbox"> Abgeschlossen</label><br>
                         </div>
-                        <div class="col-md-4">
-                            <select class="js-example-basic-single" name="bookDynamicProject">
-                            </select>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bookCompleted" id="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
+                                <span class="input-group-addon" id="basic-addon2">% Abgeschlossen</span>
+                            </div><br>
                         </div>
                     </div>
-                    WARUNG: FUNKTION EINGESCHRÄNKT. Funktioniert nicht. Update kommt noch.
+                    <div class="row">
+                        <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
+                            <div class="col-md-4">
+                                <select class="js-example-basic-single" onchange="showClients(this.value, <?php echo intval($occupation['clientid']); ?>, 'book-dynamic-clientHint')">
+                                    <?php
+                                    $result = $conn->query("SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).") ");
+                                    echo '<option value="0"> ... </option>';
+                                    while($row = $result->fetch_assoc()){
+                                        echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php endif; if(!$occupation['clientid']): ?>
+                            <div class="col-md-4">
+                                <select id="book-dynamic-clientHint" class="js-example-basic-single" onchange="showProjects(this.value, '<?php echo intval($occupation['projectid']); ?>', 'book-dynamic-projectHint')" >
+                                    <option value="0"> ... </option>
+                                <?php
+                                $result = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).")");
+                                if($occupation['companyid']){
+                                    $result = $conn->query("SELECT id, name FROM clientData WHERE companyID = ".$occupation['companyid']);
+                                }
+                                while($row = $result->fetch_assoc()){
+                                    echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                }
+                                ?>
+                                </select>
+                            </div>
+                        <?php endif; if(!$occupation['projectid']): ?>
+                            <div class="col-md-4">
+                                <select id="book-dynamic-projectHint" class="js-example-basic-single" name="bookDynamicProjectID">
+                                    <?php if($occupation['clientid']){
+                                        $result = $conn->query("SELECT id, name FROM projectData WHERE clientID = ".$occupation['clientID']);
+                                        echo '<option value="0"> ... </option>';
+                                        while($row = $result->fetch_assoc()){
+                                            echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                        }
+                                    } ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -284,22 +336,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </form>
         </div>
     </div>
-    <?php endif; ?>
+    <?php endif; //endif occupation ?>
 </div>
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-$("#bookDynamicProjectCompletedCheckbox").change(function(event){
-    $("#bookDynamicProjectCompleted").attr('disabled', this.checked);
+$("#bookCompletedCheckbox").change(function(event){
+    $("#bookCompleted").attr('disabled', this.checked);
     if(this.checked){
-        $("#bookDynamicProjectCompleted").val(100);
+        $("#bookCompleted").val(100);
     }
 });
-$("#bookDynamicProjectCompleted").keyup(function(event){
-    if($("#bookDynamicProjectCompleted").val() == 100){
-        $("#bookDynamicProjectCompletedCheckbox").prop('checked', true);
+$("#bookCompleted").keyup(function(event){
+    if($("#bookCompleted").val() == 100){
+        $("#bookCompletedCheckbox").prop('checked', true);
     } else {
-        $("#bookDynamicProjectCompletedCheckbox").prop('checked', false);
+        $("#bookCompletedCheckbox").prop('checked', false);
     }
 });
 function formatState (state) {

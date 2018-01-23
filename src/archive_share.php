@@ -606,7 +606,7 @@ function showContacts(client){
 function showClients(companyID,linkID){
   document.getElementById('linkID').value = linkID;
   $.ajax({
-    url:'ajaxQuery/AJAX_getClients.php',
+    url:'ajaxQuery/AJAX_getClient.php',
     data:{companyID:companyID},
     type: 'get',
     success : function(resp){

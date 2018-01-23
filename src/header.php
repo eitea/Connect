@@ -130,12 +130,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
         $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
-    } if(!empty($_POST['publicPGP']) && isset($_POST['savePAS'])){
-      $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
-     if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
-      $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
-      $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
-    }} elseif(isset($_POST['savePAS'])){
+  }
+  if(!empty(trim($_POST['publicPGP'])) && isset($_POST['savePAS'])){
+        $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
+        if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
+            $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
+            $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
+        }
+    } elseif(isset($_POST['savePAS'])){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -571,17 +573,17 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
         <?php if ($canStamp == 'TRUE'): ?>
           <li>
             <div class='container-fluid'>
-              <form method='post' action="../user/home"><br>
-                <?php
-echo $checkInButton;
-if ($diff > 0) {
-    echo '<div class="clock-counter" style="display:inline">';
-    echo "&nbsp;<span id='hours'>" . sprintf("%02d", $diff) . "</span>:<span id='minutes'>" . sprintf("%02d", ($diff * 60) % 60) . "</span>:<span id='seconds'>" . sprintf("%02d", ($diff * 3600) % 60) . "</span>";
-    echo '</div>';
-}
-echo '<br>' . $buttonEmoji;
-?>
-              </form><br>
+                <form method='post' action="../user/home"><br>
+                    <?php
+                    echo $checkInButton;
+                    if ($diff > 0) {
+                        echo '<div class="clock-counter" style="display:inline">';
+                        echo "&nbsp;<span id='hours'>" . sprintf("%02d", $diff) . "</span>:<span id='minutes'>" . sprintf("%02d", ($diff * 60) % 60) . "</span>:<span id='seconds'>" . sprintf("%02d", ($diff * 3600) % 60) . "</span>";
+                        echo '</div>';
+                    }
+                    echo '<br>' . $buttonEmoji;
+                    ?>
+                </form><br>
             </div>
           </li>
           <!-- User-Section: BASIC -->
@@ -637,22 +639,22 @@ echo '<br>' . $buttonEmoji;
                   </div>
                 </li>
                 <li>
-                  <a id="coreCompanyToggle" <?php if ($this_page == 'editCompanies.php') {echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
-                    <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleCompany" style="height: 0px;">
-                    <ul class="nav nav-list">
-                      <?php
-$result = $conn->query("SELECT * FROM $companyTable");
-while ($result && ($row = $result->fetch_assoc())) {
-    if (in_array($row['id'], $available_companies)) {
-        echo "<li><a href='../system/company?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
-    }
-}
-?>
-                      <li><a <?php if ($this_page == 'new_Companies.php') {echo $setActiveLink;}?> href="../system/new"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
-                    </ul>
-                  </div>
+                    <a id="coreCompanyToggle" <?php if ($this_page == 'editCompanies.php') {echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
+                        <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleCompany" style="height: 0px;">
+                        <ul class="nav nav-list">
+                            <?php
+                            $result = $conn->query("SELECT * FROM $companyTable");
+                            while ($result && ($row = $result->fetch_assoc())) {
+                                if (in_array($row['id'], $available_companies)) {
+                                    echo "<li><a href='../system/company?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
+                                }
+                            }
+                            ?>
+                            <li><a <?php if ($this_page == 'new_Companies.php') {echo $setActiveLink;}?> href="../system/new"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
+                        </ul>
+                    </div>
                 </li>
                 <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
@@ -713,11 +715,9 @@ while ($result && ($row = $result->fetch_assoc())) {
             </div>
           </div>
         </div>
-        <?php
-if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php') {
-    echo "<script>document.getElementById('adminOption_TIME').click();</script>";
-}
-?>
+        <?php if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php') {
+            echo "<script>document.getElementById('adminOption_TIME').click();</script>";
+        } ?>
       <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
@@ -731,7 +731,7 @@ if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || 
           <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if ($this_page == 'editProjects.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                 <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
                   <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
@@ -740,12 +740,11 @@ if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || 
             </div>
           </div>
         </div>
-        <?php
-if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
-    echo "<script>$('#adminOption_PROJECT').click();</script>";
-}
-?>
+        <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
+            echo "<script>$('#adminOption_PROJECT').click();</script>";
+        } ?>
       <?php endif;?>
+
       <!-- Section Four: REPORTS -->
       <?php if ($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
@@ -766,11 +765,9 @@ if ($this_page == "editProjects.php" || $this_page == "audit_projectBookings.php
             </div>
           </div>
         </div>
-        <?php
-if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
-    echo "<script>$('#adminOption_REPORT').click();</script>";
-}
-?>
+        <?php if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
+            echo "<script>$('#adminOption_REPORT').click();</script>";
+        } ?>
       <?php endif;?>
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
@@ -786,16 +783,13 @@ if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php
                     <span><?php echo $lang['CLIENTS']; ?></span> <i class="fa fa-caret-down"></i>
                   </a>
                   <div class="collapse" id="toggleERPClients">
-                    <ul class="nav nav-list">
-                      <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') {
-    echo $setActiveLink;
-}
-?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
-                      <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
-                      <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
-                      <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
-                    </ul>
+                      <ul class="nav nav-list">
+                          <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
+                          <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
+                          <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
+                          <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
+                          <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                      </ul>
                   </div>
                 </li>
                 <li><a id="erpSuppliers" href="#" data-toggle="collapse" data-target="#toggleERPSuppliers" data-parent="#sidenav01" class="collapsed">
@@ -832,16 +826,16 @@ if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php
           </div>
         </div>
         <?php
-if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php") {
-    echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
-} elseif ($this_page == "editSuppliers.php") {
-    echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
-} elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
-    echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
-} elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
-    echo "<script>$('#adminOption_ERP').click();</script>";
-}
-?>
+        if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php") {
+            echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
+        } elseif ($this_page == "editSuppliers.php") {
+            echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
+        } elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
+            echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
+        } elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
+            echo "<script>$('#adminOption_ERP').click();</script>";
+        }
+        ?>
       <?php endif;?>
       <!-- Section Six: FINANCES -->
       <?php if ($isFinanceAdmin == 'TRUE'): ?>
@@ -889,14 +883,14 @@ if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_proc
           </div>
         </div>
         <?php
-if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php') {
-    echo "<script>$('#adminOption_FINANCE').click();";
-    if (isset($_GET['n'])) {
-        echo "$('#finance-click-" . $_GET['n'] . "').click();";
-    }
-    echo '</script>';
-}
-?>
+        if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php') {
+            echo "<script>$('#adminOption_FINANCE').click();";
+            if (isset($_GET['n'])) {
+                echo "$('#finance-click-" . $_GET['n'] . "').click();";
+            }
+            echo '</script>';
+        }
+        ?>
       <?php endif;?>
       <!-- Section Six: DSGVO -->
       <?php if ($isDSGVOAdmin == 'TRUE'): ?>
@@ -945,17 +939,17 @@ if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_p
           </div>
         </div>
         <?php
-if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
-    echo "<script>$('#adminOption_DSGVO').click();";
-    if (isset($_GET['n'])) {
-        echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
-    }
-    if ($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php") {
-        echo "$('#tdsgvo-sets-" . $_GET['n'] . "').toggle();";
-    }
-    echo '</script>';
-}
-?>
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
+            echo "<script>$('#adminOption_DSGVO').click();";
+            if (isset($_GET['n'])) {
+                echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
+            }
+            if ($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php") {
+                echo "$('#tdsgvo-sets-" . $_GET['n'] . "').toggle();";
+            }
+            echo '</script>';
+        }
+        ?>
       <?php endif;?>
       <!-- Section Seven: ARCHIVE -->
       <?php if ($isDSGVOAdmin == 'TRUE'): ?>
