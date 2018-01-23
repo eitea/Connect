@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
       }
   }
-  if(!empty(trim($_POST['publicPGP'])) && isset($_POST['savePAS'])){
+  if(isset($_POST['savePAS']) && !empty(trim($_POST['publicPGP']))){
         $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
         if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
             $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);

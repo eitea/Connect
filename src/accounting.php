@@ -241,127 +241,112 @@ while ($result && ($row = $result->fetch_assoc())) {
 ?>
 
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'] . ' <small>' . $account_row['num'] . ' - ' . $account_row['name'] . '</small>'; ?>
-<div class="page-header-button-group"><?php include __DIR__ . '/misc/set_filter.php';
-$cmpID = $account_row['companyID'];include __DIR__ . '/misc/lockAccounting.php';?>
+<div class="page-header-button-group"><?php include __DIR__ . '/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__ . '/misc/lockAccounting.php';?>
 <?php if ($show_undo): ?>
     <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
 <?php endif;?>
 </div></h3></div>
 <br>
 <table class="table table-hover">
-<thead><tr>
-    <th>Nr.</th>
-    <th><?php echo $lang['DATE']; ?></th>
-    <th><?php echo $lang['ACCOUNT']; ?></th>
-    <th>Text</th>
-    <th>Steuer Nr.</th>
-    <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
-    <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT']; ?></th>
-    <th style="text-align:right">Saldo</th>
-    <th>WEB</th>
-    <th></th>
-</tr></thead>
-<tbody>
-<?php
-$dateQuery = '';
-if ($filterings['date'][0]) {
-    $dateQuery = "AND payDate LIKE '" . $filterings['date'][0] . "-%'";
-}
+    <thead><tr>
+        <th>Nr.</th>
+        <th><?php echo $lang['DATE']; ?></th>
+        <th><?php echo $lang['ACCOUNT']; ?></th>
+        <th>Text</th>
+        <th>Steuer Nr.</th>
+        <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
+        <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT']; ?></th>
+        <th style="text-align:right">Saldo</th>
+        <th>WEB</th>
+        <th></th>
+    </tr></thead>
+    <tbody>
+        <?php
+        $dateQuery = '';
+        if ($filterings['date'][0]) {
+            $dateQuery = "AND payDate LIKE '" . $filterings['date'][0] . "-%'";
+        }
 
-$docDate = getCurrentTimestamp();
-$modals = '';
-$docNum = $saldo = 0;
-$result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should, r1.id AS receiptID
-FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
-INNER JOIN accounts ON account_journal.account = accounts.id
-LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
-WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, inDate ");
-echo $conn->error;
-$lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
-$lockedMonths = array_column($lockedMonths->fetch_all(), 0);
-while ($result && ($row = $result->fetch_assoc())) {
-    $docNum = $row['docNum'];
-    $docDate = $row['payDate'];
-    $saldo += $row['netto_should'];
-    $saldo -= $row['netto_have'];
-    echo '<tr>';
-    echo '<td>' . $row['docNum'] . '</td>';
-    echo '<td>' . substr($row['payDate'], 0, 10) . '</td>';
-    echo '<td><a href="account?v=' . $row['account'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
-    echo '<td>' . $row['info'] . '</td>';
-    echo '<td>' . sprintf('%02d', $row['taxID']) . '</td>';
-    echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
-    echo '<td style="text-align:right">' . number_format($row['netto_have'], 2, ',', '.') . '</td>';
-    echo '<td style="text-align:right">' . number_format($saldo, 2, ',', '.') . '</td>';
-    if ($row['receiptID']) {echo '<td>' . $lang['YES'] . '</td>';} else {echo '<td>' . $lang['NO'] . '</td>';}
-    if ($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8) . '01', $lockedMonths)) {
-        echo '<td><button type="button" class="btn btn-default" title="Editieren" data-toggle="modal" data-target=".edit-journal-' . $row['id'] . '" ><i class="fa fa-pencil"></i></button></td>';
-        $modals .= '<div class="modal fade edit-journal-' . $row['id'] . '"><div class="modal-dialog modal-content modal-md"><form method="POST">
-<div class="modal-header"><h4>' . $lang['EDIT'] . '</h4></div><div class="modal-body"><div class="row">
-<div class="col-md-4"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="' . $row['docNum'] . '"/><br></div>
-<div class="col-md-8"><label>' . $lang['DATE'] . '</label><input type="text" class="form-control datepicker" name="add_date" value="' . substr($row['payDate'], 0, 10) . '" /><br></div>
-<div class="col-md-6"><label>' . $lang['ACCOUNT'] . '</label><select class="js-example-basic-single" name="add_account" ><option>...</otpion>' . str_replace('<option value="' . $row['account'] . '">', '<option selected value="' . $row['account'] . '">', $account_select) . '</select><br></div>
-<div class="col-md-6"><label>' . $lang['VAT'] . '</label><select class="js-example-basic-single" name="add_tax">' . str_replace('<option value="' . $row['taxID'] . '">', '<option selected value="' . $row['taxID'] . '">', $tax_select) . '</select><br><br></div>
-<div class="col-md-6"><label>Text</label><input type="text" class="form-control" name="add_text" maxlength="64" value="' . $row['info'] . '" /></div>
-<div class="col-md-3"><label>' . $lang['FINANCE_DEBIT'] . '<small> (Brutto)</small></label><input type="number" step="0.01" class="form-control" name="add_should" value="' . $row['should'] . '"/></div>
-<div class="col-md-3"><label>' . $lang['FINANCE_CREDIT'] . '<small> (Brutto)</small></label><input type="number" step="0.01" class="form-control" name="add_have" value="' . $row['have'] . '"/><br></div>
-<div class="col-md-9" id="mod-sel-' . $row['id'] . '" ><label>' . $lang['FROM'] . ' WEB</label><select class="js-example-basic-single" name="webID" >' . $web_select . '</select><br><br></div>
-<div class="col-md-3"><label style="padding-top:28px;"><input type="checkbox" name="transferToWEB" onchange="if(this.checked) showHide(\'mod-in-' . $row['id'] . '\' ,\'mod-sel-' . $row['id'] . '\'); else showHide(\'mod-sel-' . $row['id'] . '\', \'mod-in-' . $row['id'] . '\');" />In WEB</label></div>
-<span id="mod-in-' . $row['id'] . '" style="display:none"><div class="col-md-5"><label>' . $lang['SUPPLIER'] . '</label><select class="js-example-basic-single" name="add_supplier" >' . $supplier_select . '</select></div>
-<div class="col-md-4"><label>' . $lang['RECEIPT_DATE'] . '</label><input type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div></span>
-</div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-<button type="submit" class="btn btn-warning" value="' . $row['id'] . '" name="editJournalEntry">' . $lang['SAVE'] . '</button></div></form></div></div>';
-    } else {
-        echo '<td></td>';
-    }
-    echo '</tr>';
-}
-if ($account_row['options'] == 'CONT') {
-    $docNum++;
-}
+        $docDate = getCurrentTimestamp();
+        $modals = '';
+        $docNum = $saldo = 0;
+        $result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have as netto_have, account_balance.should as netto_should, r1.id AS receiptID
+            FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
+            INNER JOIN accounts ON account_journal.account = accounts.id
+            LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
+            WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, inDate ");
+            echo $conn->error;
+            $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
+            $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
+            while ($result && ($row = $result->fetch_assoc())) {
+                $docNum = $row['docNum'];
+                $docDate = $row['payDate'];
+                $saldo += $row['netto_should'];
+                $saldo -= $row['netto_have'];
+                echo '<tr>';
+                echo '<td>' . $row['docNum'] . '</td>';
+                echo '<td>' . substr($row['payDate'], 0, 10) . '</td>';
+                echo '<td><a href="account?v=' . $row['account'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
+                echo '<td>' . $row['info'] . '</td>';
+                echo '<td>' . sprintf('%02d', $row['taxID']) . '</td>';
+                echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
+                echo '<td style="text-align:right">' . number_format($row['netto_have'], 2, ',', '.') . '</td>';
+                echo '<td style="text-align:right">' . number_format($saldo, 2, ',', '.') . '</td>';
+                if ($row['receiptID']) {echo '<td>' . $lang['YES'] . '</td>';} else {echo '<td>' . $lang['NO'] . '</td>';}
 
-if (!$docNum) {
-    $docNum = 1;
-}
+                if ($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8) . '01', $lockedMonths)) {
+                    echo '<td><button type="button" class="btn btn-default editing-modal-butt" title="Editieren" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
+                } else {
+                    echo '<td></td>';
+                }
+                echo '</tr>';
+            }
+            if ($account_row['options'] == 'CONT') {
+                $docNum++;
+            }
 
-?>
-</tbody>
-</table>
+            if (!$docNum) {
+                $docNum = 1;
+            }
+            ?>
+        </tbody>
+    </table>
 <hr><br><br>
-<?php if ($account_row['manualBooking'] == 'TRUE'): echo $modals;?>
-		    <form method="POST" class="well">
-		        <div class="row form-group">
-		            <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'] . ' WEB'; ?></button></div>
-		        </div>
-		        <div class="row">
-		            <div class="col-md-2"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
-		            <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" /></div>
-		            <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
-		                <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
-		                <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
-		            </div>
-		            <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
-		        </div>
-		        <div class="row form-group">
-		            <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
-		            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
-		            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
-		            <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
-		            <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
-		        </div>
-		        <div class="row">
-		            <span id="transferToWebInputs" style="display:none">
-		                <div class="col-md-3"><label><?php echo $lang['SUPPLIER']; ?></label><select name="add_supplier" class="js-example-basic-single"><?php echo $supplier_select; ?></select></div>
-		                <div class="col-md-2"><label><?php echo $lang['RECEIPT_DATE']; ?></label><input id="receiptDate" type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div>
-		            </span>
-		        </div>
-		        <input type="hidden" id="webID" name="webID" value=""/>
-		    </form>
-		    <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
-		<?php else: ?>
-    <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als Gegenkonto markiert werden und ein Konto der Klasse 2 sein. </div>
-<?php endif;?>
+<?php if($account_row['manualBooking'] == 'TRUE'): ?>
+    <form method="POST" class="well">
+        <div class="row form-group">
+            <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'] . ' WEB'; ?></button></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
+            <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" /></div>
+            <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
+                <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
+                    <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
+                </div>
+                <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
+                <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
+                <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
+            </div>
+            <div class="row">
+                <span id="transferToWebInputs" style="display:none">
+                    <div class="col-md-3"><label><?php echo $lang['SUPPLIER']; ?></label><select name="add_supplier" class="js-example-basic-single"><?php echo $supplier_select; ?></select></div>
+                    <div class="col-md-2"><label><?php echo $lang['RECEIPT_DATE']; ?></label><input id="receiptDate" type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div>
+                </span>
+            </div>
+            <input type="hidden" id="webID" name="webID" value=""/>
+        </form>
+        <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
+    <?php else: ?>
+        <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als Gegenkonto markiert werden und ein Konto der Klasse 2 sein. </div>
+    <?php endif;?>
 
+<div id="editingModalDiv"></div>
 <div id="openWEB" class="modal fade">
   <div class="modal-dialog modal-content modal-md">
 	<div class="modal-header"><h4><?php echo $lang['RECEIPT_BOOK']; ?> - <small>Zeile auswählen</small></h4></div>
@@ -391,6 +376,7 @@ while ($row = $res->fetch_assoc()) {
     echo '<td>' . number_format(($row['amount']), 2, ',', '.') . '</td>';
     echo '<td>' . $row['percentage'] . '% </td>';
     echo '<td>' . number_format($row['amount'] - ($row['amount'] * 100) / (100 + $row['percentage']), 2, ',', '.') . '</td>';
+    echo '<td>' . '</td>';
     echo '</tr>';
 }
 ?>
@@ -407,6 +393,33 @@ $("select[name=add_supplier]").change(function(){
     $('#create_client').modal().toggle();
   }
 });
+
+var existingModals = new Array();
+$('.editing-modal-butt').click(function(){
+    var index = $(this).val();
+    if(existingModals.indexOf(index) == -1){
+      $.ajax({
+      url:'ajaxQuery/AJAX_accountingModalEdit.php',
+      data:{
+          id: index, acc: '<?php echo urlencode($account_select); ?>',
+          tax: '<?php echo urlencode($tax_select); ?>',
+          web: '<?php echo urlencode($web_select); ?>',
+          sups: '<?php echo urlencode($supplier_select); ?>'
+      },
+      type: 'post',
+      success : function(resp){
+        $("#editingModalDiv").append(resp);
+        existingModals.push(index);
+        onPageLoad();
+        $('.edit-journal-'+index).modal('show');
+      },
+      error : function(resp){}
+     });
+    } else {
+      $('.edit-journal-'+index).modal('show');
+    }
+});
+
 var active_should = true;
 var active_have = true;
 function disenable(xor1, xor2, active){
@@ -497,7 +510,7 @@ $('#receiptDate').change(function(e) {
 });
 
 $(document).ready(function(){
-  $('.table').DataTable({
+  var tab = $('.table').DataTable({
     order: [],
     ordering: false,
     language: {
@@ -506,6 +519,7 @@ $(document).ready(function(){
     responsive: true,
     autoWidth: false
   });
+  tab.page('last').draw( 'page' );
 setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
 });
 </script>
