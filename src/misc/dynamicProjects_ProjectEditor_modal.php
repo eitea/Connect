@@ -575,9 +575,8 @@ foreach (array_keys($months_of_the_year) as $month) {
 <!-- text editor test -->
 <script>
 tinymce.init({
-  selector: '#projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>', //needs to be changed
-  plugins: 'image code',
-  plugins: 'paste',
+  selector: '#projectDescriptionEditor<?php echo stripSymbols($modal_id) ?>', 
+  plugins: 'image code paste',
   relative_urls: false,
   paste_data_images: true,
   toolbar: 'undo redo | link image file media | code',
