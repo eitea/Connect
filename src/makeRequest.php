@@ -404,7 +404,7 @@ if($result && ($row = $result->fetch_assoc())): ?>
       parent = document.getElementById('to').parentNode;
       parent.removeChild(parent.lastElementChild);
       parent.appendChild(inputTo);
-      onPageLoad(false);
+      onPageLoad();
     }else{
       if(wasDoc){
         wasDoc = false;
@@ -416,7 +416,7 @@ if($result && ($row = $result->fetch_assoc())): ?>
         inputTo.className = "form-control datepicker";
         inputTo.name = "to";
         form.removeChild(document.getElementById("deleteMe"));
-        onPageLoad(false);
+        onPageLoad();
       }
     }
   }

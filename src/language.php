@@ -537,6 +537,9 @@ $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie
 $lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
 $lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
 
+$lang_eng['ERROR_STRIKE'] = 'code-manipulation found, you have been striked!';
+$lang_ger['ERROR_STRIKE'] = 'Code-Manipulation entdeckt, Sie wurden gestriked!';
+
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
 $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 

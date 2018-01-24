@@ -7,6 +7,8 @@ if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
 } elseif (isset($_GET['supID']) && is_numeric($_GET['supID'])) {
     $filterClient = intval($_GET['supID']);
 } else { // STRIKE
+    $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     redirect("../user/logout");
 }
 

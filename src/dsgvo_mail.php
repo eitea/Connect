@@ -4,7 +4,8 @@
 </h4></div>
 <?php
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
-    echo "Invalid Access.";
+    $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include 'footer.php';
     die();
 }

@@ -33,18 +33,23 @@
 <?php endif; ?>
 
 <script>
-function onPageLoad(reload = true){
+var reload = 0;
+function onPageLoad(){
   if($(".js-example-basic-single")[0]){
-    var open = false;
-    var elem = $(".js-example-basic-single");
-    elem.select2();
-    if(reload){
-    elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
-    elem.on("select2:focus", function (e) {
-      if(!open && $(this).is(':enabled') && !$(this).attr('multiple')){ $(this).select2("open") };
+    $(".js-example-basic-single").each(function(i, obj){
+        var elem = $(obj);
+        if(!elem.data('select2')) {
+            var open = false;
+            elem.select2();
+            elem.on('select2:select', (function(){ open = true; $(this).focus(); open = false; }));
+            elem.on("select2:focus", function (e) {
+                if(!open && $(this).is(':enabled') && !$(this).attr('multiple')){ $(this).select2("open") };
+            });
+        }
     });
-    }
-  }
+  } 
+ 
+
 
   $('input:checkbox').keypress(function(e) {
       if((e.keyCode ? e.keyCode : e.which) == 13){

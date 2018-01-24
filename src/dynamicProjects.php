@@ -47,7 +47,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].' (Projekt)</div>';
             }
         } else { //STRIKE
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
+            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Project not Available.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
     }
     if($isDynamicProjectsAdmin == 'TRUE'){
@@ -456,7 +457,7 @@ function appendModal(index){
     success : function(resp){
       $("#editingModalDiv").append(resp);
       existingModals.push(index);
-      onPageLoad(false);
+      onPageLoad();
       dynamicOnLoad(index);
     },
     error : function(resp){},

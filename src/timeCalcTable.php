@@ -55,7 +55,9 @@ if(isset($_POST['request_submit'])){
         echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
       }
     } else {
-      die("Please do not try this again. It will not work."); //TODO for later: we should create a strike system.
+      $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Please do not try this again. It will not work.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+      die(); //TODO for later: we should create a strike system.
     }
   } else {
     echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';

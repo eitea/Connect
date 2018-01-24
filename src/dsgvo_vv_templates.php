@@ -46,7 +46,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
             }
         } else {
-            $conn->query("UPDATE UserData SET strikeCount = strikeCount +1 WHERE id = $userID");
+            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
     } elseif(isset($_POST['add_template'])) {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'. Default nicht erlaubt.</div>';

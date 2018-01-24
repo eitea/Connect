@@ -39,6 +39,10 @@ if (!empty($_POST['webID']) && !isset($_POST['transferToWEB'])) {
     //TODO: if these dont match: STRIKE
     $_POST['add_should'] = $row['amount'];
     $_POST['add_tax'] = $row['taxID'];
+    if($_POST['add_should']!=$_POST['add_tax']){
+        $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+    }
 }
 $journalID = false;
 if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
@@ -66,7 +70,11 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
         if ($res && ($rowP = $res->fetch_assoc())) {
             $accNum = $rowP['num'];
         }
-        //else STRIKE
+        else{//else STRIKE
+            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Monat.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+        }
+        
 
         if ($accNum >= 5000 && $accNum < 8000 && $have) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 5, 6 und 7 dürfen nicht im Haben stehen.</div>';
@@ -78,7 +86,8 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
             $tax = 1; //id1 = no tax;
         }
         if (!empty($_POST['webID'] || isset($_POST['transferToWEB'])) && ($accNum < 5000 || $accNum >= 6000)) { //STRIKE
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültige Konto Klasse.</strong> Es dürfen nur Buchungen auf Konten der Klasse 5 ins WEB übertragen werden. </div>';
+            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültige Konto Klasse.</strong> Es dürfen nur Buchungen auf Konten der Klasse 5 ins WEB übertragen werden. '.$lang['ERROR_STRIKE'].'</div>';
             $accept = false;
         }
         if ($accept) {
@@ -96,6 +105,8 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
             $res = $conn->query("SELECT percentage, account2, account3, code FROM taxRates WHERE id = $tax");
             if (!$res || $res->num_rows < 1) {
                 $accept = false;
+                $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> '.$lang['ERROR_STRIKE'].'</div>';
             }
             //STRIKE
             $taxRow = $res->fetch_assoc();

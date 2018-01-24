@@ -16,9 +16,11 @@ WHERE proposals.clientID = clientData.id AND proposals.id = processHistory.proce
 if($result && $result->num_rows > 0){
   $proposal_row = $result->fetch_assoc();
 } else {
+  $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
   redirect('view?err=2'); //STRIKE
 }
 if(!in_array($proposal_row['companyID'], $available_companies)){
+  $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
   redirect('view?err=2'); //STRIKE
 }
 
