@@ -299,7 +299,7 @@ echo mysqli_error($conn);
   </div>
 <?php
 else:
-  include dirname(__DIR__) . "/userProjecting_addendum.php";
+  include __DIR__ . "/userProjecting_addendum.php";
 endif;
 ?>
   <br><br><br>
