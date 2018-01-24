@@ -345,20 +345,20 @@ $lang_ger['DOUBLE'] = 'Doppelt';
 $lang_eng['DRIVES'] = 'Drives';
 $lang_ger['DRIVES'] = 'Fahrten';
 
-$lang_eng['DYNAMIC_PROJECTS'] = 'Dynamic Projects';
-$lang_ger['DYNAMIC_PROJECTS'] = 'Dynamische Projekte';
+$lang_eng['DYNAMIC_PROJECTS'] = 'Tasks';
+$lang_ger['DYNAMIC_PROJECTS'] = 'Tasks';
 
-$lang_eng['DYNAMIC_PROJECTS_USER'] = 'Dynamic Projects';
-$lang_ger['DYNAMIC_PROJECTS_USER'] = 'Dynamische Projekte';
+$lang_eng['DYNAMIC_PROJECTS_USER'] = 'Tasks';
+$lang_ger['DYNAMIC_PROJECTS_USER'] = 'Tasks';
 
-$lang_eng['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamic Projects';
-$lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Dynamische Projekte';
+$lang_eng['DYNAMIC_PROJECTS_ADMIN'] = 'Tasks';
+$lang_ger['DYNAMIC_PROJECTS_ADMIN'] = 'Tasks';
 
-$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
-$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
+$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new task';
+$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neuen Task erstellen';
 
-$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Project Name';
-$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Projektbezeichnung';
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Task Name';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Taskbezeichnung';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Description';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_DESCRIPTION'] = 'Beschreibung';
@@ -393,8 +393,8 @@ $lang_ger['DYNAMIC_PROJECTS_PROJECT_CLIENTS'] = 'Kunden';
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Client';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_CLIENT'] = 'Kunde';
 
-$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Dynamic Project';
-$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Dynamisches Projekt bearbeiten';
+$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Task';
+$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Task bearbeiten';
 
 $lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
 $lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
@@ -405,11 +405,11 @@ $lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben'
 $lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'What did you do?';
 $lang_ger['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Welche Aufgaben haben Sie erledigt?';
 
-$lang_eng['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'This belongs to a dynamic project and can\' be deleted here.';
-$lang_ger['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'Dieses Projekt gehört zu einem dynamischen Projekt und kann hier nicht gelöscht werden.';
+$lang_eng['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'This belongs to a task and can\' be deleted here.';
+$lang_ger['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'Dieses Projekt gehört zu einem Task und kann hier nicht gelöscht werden.';
 
-$lang_eng['DYNAMIC_PROJECTS_BELONG_TO'] = 'This belongs to a dynamic project';
-$lang_ger['DYNAMIC_PROJECTS_BELONG_TO'] = 'Das gehört zu einem dynamischen Projekt';
+$lang_eng['DYNAMIC_PROJECTS_BELONG_TO'] = 'This belongs to a task';
+$lang_ger['DYNAMIC_PROJECTS_BELONG_TO'] = 'Das gehört zu einem Task';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Series';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Serie';
