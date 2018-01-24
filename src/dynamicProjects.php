@@ -87,7 +87,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $parent = test_input($_POST["parent"]); //dynamproject id
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $percentage = intval($_POST['completed']);
-
+                
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {

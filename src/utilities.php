@@ -180,7 +180,6 @@ function simple_encryption($message, $key) {
     $nonce = openssl_random_pseudo_bytes($nonceSize);
     $ciphertext = openssl_encrypt($message, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
     return base64_encode($nonce . $ciphertext);
-    return $nonce . $ciphertext;
 }
 
 function simple_decryption($message, $key) {
@@ -223,11 +222,10 @@ class MasterCrypt {
             $this->iv = openssl_encrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
         }
     }
-
     function encrypt($unencrypted) {
         if ($this->password && $this->iv && $this->iv2) {
             $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
-            $encrypted = self::mc_encrypt($unencrypted, $iv);
+            $encrypted = simple_encryption($unencrypted, $iv);
             return $encrypted;
         } else {
             return $unencrypted;
@@ -236,72 +234,25 @@ class MasterCrypt {
     function decrypt($encrypted) {
         if ($this->password) {
             $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
-            return self::mc_decrypt($encrypted, $iv);
+            return simple_decryption($encrypted, $iv);
         } else {
-            //if values are encrypted, then **** it
-            if ($this->iv && $this->iv2) {
+            if ($this->iv && $this->iv2) { //if values are encrypted, then **** it
                 return '****';
             }
             return $encrypted;
         }
     }
-
     function getStatus($encrypt = false) {
         if ($encrypt) {
             if ($this->password) {
                 return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
             }
-
             return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
         }
         if ($this->iv && $this->iv2) {
             return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
         }
-
         return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
-    }
-
-    private static function mc_encrypt($encrypt, $key) {
-        $message = serialize($encrypt);
-        $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
-        $nonce = openssl_random_pseudo_bytes($nonceSize);
-        $ciphertext = openssl_encrypt($message, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
-        return base64_encode($nonce . $ciphertext);
-        return $nonce . $ciphertext;
-        /* deprecated
-    $encrypt = serialize($encrypt);
-    $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
-    $key = pack('H*', $key);
-    $mac = hash_hmac('sha256', $encrypt, substr(bin2hex($key), -32));
-    $passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $encrypt.$mac, MCRYPT_MODE_CBC, $iv);
-    $encoded = base64_encode($passcrypt).'|'.base64_encode($iv);
-    return $encoded;
-     */
-    }
-    private static function mc_decrypt($message, $key) {
-        $message = base64_decode($message, true);
-        if ($message === false) {
-            throw new Exception('Encryption failure');
-        }
-        $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
-        $nonce = mb_substr($message, 0, $nonceSize, '8bit');
-        $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
-        $plaintext = openssl_decrypt($ciphertext, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
-        return unserialize($plaintext);
-        /* deprecated
-    $decrypt = explode('|', $decrypt.'|');
-    $decoded = base64_decode($decrypt[0]);
-    $iv = base64_decode($decrypt[1]);
-    if(strlen($iv)!==mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC)){ return false; }
-    $key = pack('H*', $key);
-    $decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_CBC, $iv));
-    $mac = substr($decrypted, -64);
-    $decrypted = substr($decrypted, 0, -64);
-    $calcmac = hash_hmac('sha256', $decrypted, substr(bin2hex($key), -32));
-    if($calcmac!==$mac){ return false; }
-    $decrypted = unserialize($decrypted);
-    return $decrypted;
-     */
     }
 }
 
@@ -339,85 +290,6 @@ function mc_total_row_count() {
     $total_count += $conn->query("SELECT * FROM products")->num_rows ?? 0;
     $total_count += $conn->query("SELECT * FROM $clientDetailBankTable")->num_rows ?? 0;
     return $total_count;
-}
-
-//just encrypt the values from current to new
-//MasterCrypt will handle the masterPass settings
-function mc_update_values($current, $new, $statement = '') {
-    require __DIR__ . "/connection.php";
-    $logFile = fopen("./cryptlog.txt", "a");
-    if ($statement) {
-        fwrite($logFile, "\r\n" . getCurrentTimestamp() . " (UTC): Master password $statement\r\n");
-    }
-
-    $i = 0;
-    //articles
-    $result = $conn->query("SELECT id, name, description, iv, iv2 FROM articles");
-    $stmt = $conn->prepare("UPDATE articles SET name = ?, description = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $description, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering articles\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-        $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-
-    }
-    $stmt->close();
-    //products
-    $result = $conn->query("SELECT id, name, description, iv, iv2 FROM products");
-    $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $description, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering products\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-        $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-
-    }
-    $stmt->close();
-    //bank data
-    $result = $conn->query("SELECT * FROM clientInfoBank");
-    $stmt = $conn->prepare("UPDATE clientInfoBank SET bic = ?, iban = ?, bankName = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("sssssi", $bic, $iban, $name, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering bank\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $bic = $mc_new->encrypt($mc_old->decrypt($row['bic']));
-        $iban = $mc_new->encrypt($mc_old->decrypt($row["iban"]));
-        $name = $mc_new->encrypt($mc_old->decrypt($row["bankName"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-
-    }
-    fwrite($logFile, date("y-m-d h:i:s") . ": Finished\r\n");
-    fwrite($logFile, date("y-m-d h:i:s") . ":  rows affected\r\n");
-    $stmt->close();
-    fclose($logFile);
 }
 
 /*
