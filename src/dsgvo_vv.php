@@ -1,14 +1,14 @@
-<?php require 'header.php'; enableToDSGVO($userID); ?>
-<div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
-<div class="page-header-button-group"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+</button></div>
-</h3></div>
-<?php
+<?php require 'header.php'; enableToDSGVO($userID);
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include 'footer.php';
     die();
-}
+}?>
+<div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
+<div class="page-header-button-group"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+</button></div>
+</h3></div>
+<?php
 $cmpID = intval($_GET['n']);
 
 if(isset($_POST['add_app']) && !empty($_POST['add_app_name']) && !empty($_POST['add_app_template'])){

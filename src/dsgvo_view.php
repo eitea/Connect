@@ -1,4 +1,10 @@
-<?php require 'header.php'; enableToDSGVO($userID); ?>
+<?php require 'header.php'; enableToDSGVO($userID); 
+if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
+  $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+  include 'footer.php';
+  die();
+}?>
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
   <div class="page-header-button-group">
     <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
@@ -9,12 +15,7 @@
 
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
-if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
-    $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
-    include 'footer.php';
-    die();
-}
+
 $cmpID = intval($_GET['n']);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   if (!empty($_POST['delete'])){

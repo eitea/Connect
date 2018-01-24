@@ -1,14 +1,15 @@
-<?php require 'header.php'; ?>
-<div class="page-header"><h4>E-Mail Vorlagen
- <div class="page-header-button-group"><form method="POST" style="display:inline"><button type="submit" name="create_report" class="btn btn-default"><i class="fa fa-plus"></i></button></form>
-</h4></div>
-<?php
+<?php require 'header.php'; 
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include 'footer.php';
     die();
-}
+}?>
+<div class="page-header"><h4>E-Mail Vorlagen
+ <div class="page-header-button-group"><form method="POST" style="display:inline"><button type="submit" name="create_report" class="btn btn-default"><i class="fa fa-plus"></i></button></form>
+</h4></div>
+<?php
+
 $cmpID = intval($_GET['n']);
 
 $action = $action_id = '';

@@ -57,6 +57,7 @@ if(isset($_POST['request_submit'])){
     } else {
       $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Please do not try this again. It will not work.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+      include 'footer.php';
       die(); //TODO for later: we should create a strike system.
     }
   } else {
