@@ -1,6 +1,6 @@
 <?php
 function checkIn($userID) {
-  require 'connection.php';
+  require dirname(__DIR__ ). '/connection.php';
   $timeToUTC =  $_SESSION['timeToUTC'];
 
   $sql = "SELECT * FROM $logTable WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). " %'";
@@ -33,7 +33,7 @@ function checkIn($userID) {
 
 //will return empty if all was okay
 function checkOut($userID, $emoji = 0) {
-  require 'connection.php';
+  require dirname(__DIR__ ). '/connection.php';
   $query = "SELECT time, indexIM, emoji FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
   $result= mysqli_query($conn, $query);
   $row = $result->fetch_assoc();

@@ -1,7 +1,7 @@
 <?php
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE'); //set_filter requirement
 ?>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>

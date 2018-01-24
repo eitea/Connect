@@ -1,4 +1,4 @@
-<?php include 'header.php';
+<?php include dirname(__DIR__) .'/header.php';
 enableToSocialMedia($userID); ?>
 <!-- BODY -->
 <?php
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newGroup'])) {
         foreach ($_POST["members"] as $member) {
             $conn->query("INSERT INTO socialgroups (groupID, userID, admin,name) VALUES ($groupID, $member, 'FALSE','$name')");
         }
-        
+
         redirect("../social/home");
     }else{
         if(!isset($_POST["members"])){
@@ -269,8 +269,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                     echo '</tr>';
                     ?>
                      <script>setInterval(function(){updateGroupSocialBadge("#groupbadge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
-                      <!-- group chat modal -->  
-                                <div class="modal fade" id="groupchat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="groupchatLabel<?php echo $x; ?>">  
+                      <!-- group chat modal -->
+                                <div class="modal fade" id="groupchat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="groupchatLabel<?php echo $x; ?>">
                     <div class="modal-dialog" role="form">
                         <div class="modal-content">
                             <div class="modal-header" style="padding-bottom:5px;">
@@ -360,7 +360,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                             </div>
                         </div>
                     </div>
-                    <!-- /group chat modal --> 
+                    <!-- /group chat modal -->
                     <!-- group settings modal -->
                     <?php if($userIsGroupAdmin){ ?>
                         <form method="post" enctype="multipart/form-data">
@@ -382,9 +382,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                                         <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>" value="<?php echo $name; ?>"><br>
                                         <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
                                         <div class="checkbox">
-                                            <?php 
+                                            <?php
                                             $user_result = $conn->query("SELECT id,firstname,lastname FROM UserData INNER JOIN roles ON roles.userID = UserData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
-                                            
+
                                             while($row = $user_result->fetch_assoc()){
                                                 $name = "${row['firstname']} ${row['lastname']}";
                                                 $_x = $row["id"];
@@ -420,7 +420,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
         </tbody>
     </table>
     <!-- /groups -->
-    
+
     <!-- new group modal -->
     <form method="post" enctype="multipart/form-data">
     <div class="modal fade" id="newGroup" tabindex="-1" role="dialog" aria-labelledby="newGroupLabel">
@@ -441,7 +441,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                     <input type="text" class="form-control" name="name" placeholder="<?php echo $lang['SOCIAL_NAME'] ?>"><br>
                     <label><?php echo $lang['SOCIAL_GROUP_MEMBERS'] ?></label>
                     <div class="checkbox">
-                        <?php 
+                        <?php
                         $result = $conn->query("SELECT id,firstname,lastname FROM UserData INNER JOIN roles ON roles.userID = UserData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
                         while($row = $result->fetch_assoc()){
                             $name = "${row['firstname']} ${row['lastname']}";
@@ -574,4 +574,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
 
 
     <!-- /BODY -->
-    <?php include 'footer.php'; ?>
+    <?php include dirname(__DIR__).'/footer.php'; ?>

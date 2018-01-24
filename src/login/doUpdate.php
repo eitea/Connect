@@ -2085,7 +2085,7 @@ if ($row['version'] < 123) {
         echo '<br>s3Upload';
     }
 
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername'");
+    $conn->query("ALTER TABLE mailingoptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
 
     $conn->query("ALTER TABLE mailingoptions ADD COLUMN isDefault TINYINT(1) NOT NULL DEFAULT 1");
     if ($conn->error) {
@@ -2187,7 +2187,7 @@ if ($row['version'] < 124) {
     fclose($myfile);
 
     echo '<br>S3 Configuration';
-    
+
     $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div','doc') DEFAULT 'vac'";
     if ($conn->query($sql)) {
         echo '<br> Extended requests by splitted lunchbreaks';
@@ -2208,7 +2208,7 @@ if($row['version'] < 125){
         $id = uniqid();
         $conn->query("UPDATE dynamicprojects SET projectid = '$id' WHERE projectid = '".$row['projectid']."'");
     }
-    
+
     $result = $conn->query("SELECT id, dynamicprojectid FROM projectData WHERE dynamicprojectid IS NOT NULL");
     while($row = $result->fetch_assoc()){
         $conn->query("UPDATE projectBookingData SET dynamicID = '".$row['dynamicprojectid']."' WHERE projectID = ".$row['id']);

@@ -31,7 +31,7 @@ require dirname(__DIR__) . "/language.php";
 //projectbookings
 $sql="SELECT $projectTable.id AS projectID,
 $companyTable.id AS companyID, $companyTable.name AS companyName,
-$companyTable.logo, $companyTable.cmpDescription, $companyTable.uid, $companyTable.phone, $companyTable.mail, 
+$companyTable.logo, $companyTable.cmpDescription, $companyTable.uid, $companyTable.phone, $companyTable.mail,
 $companyTable.homepage, $companyTable.address, $companyTable.companyPostal, $companyTable.companyCity,
 $clientTable.id AS clientID,
 $clientTable.name AS clientName,
@@ -66,7 +66,7 @@ while($result && ($row = $result->fetch_assoc())){
         if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription'])){
             die($lang['ERROR_MISSING_DATA']. "(Name, Logo, Adr.)");
         }
-        $logo_path = dirname(__DIR__)."/images/ups/".str_replace(' ', '-',$row['companyName']).'.jpg';
+        $logo_path = dirname(dirname(__DIR__))."/images/ups/".str_replace(' ', '-',$row['companyName']).'.jpg';
         file_put_contents($logo_path, $row['logo']) or die("Unable to create file");
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         if(finfo_file($finfo, $logo_path) == 'image/png'){
@@ -76,14 +76,14 @@ while($result && ($row = $result->fetch_assoc())){
         $created_logos[] = $logo_path;
         $pdf->glob['logo'] = $logo_path;
         $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
-        
+
         $w = array(40, 20, 25, 10, 65, 30); //190
 
         if($companyID){ //copy below
             $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
             $pdf->SetFont('Helvetica','B',10);
             $pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-            $pdf->Cell(30,10, $sum .' '.$lang['MINUTES'] );
+            $pdf->Cell(30,10, round($sum, 2) .' '.$lang['MINUTES'] );
             $pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
         }
 
@@ -111,7 +111,7 @@ while($result && ($row = $result->fetch_assoc())){
     $y[] = $pdf->MultiColCell($w[0],5,iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$row['projectName']));
     $pdf->Cell($w[1],7,date('d.m.Y', $A), '', 0, 'C');
     $pdf->Cell($w[2],7,date('H:i', $A).' - '.date('H:i', $B) , 0, 0, 'L');
-    $pdf->Cell($w[3],7,(($B - $A)/60));
+    $pdf->Cell($w[3],7, sprintf('%.2f', ($B - $A)/60));
 
     $sum += ($B - $A) / 60;
     $y[] = $pdf->MultiColCell($w[4],5,iconv('UTF-8', 'windows-1252', $row['infoText']));
@@ -126,7 +126,7 @@ while($result && ($row = $result->fetch_assoc())){
 $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
 $pdf->SetFont('Helvetica','B',10);
 $pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-$pdf->Cell(30,10, $sum .' '.$lang['MINUTES'] );
+$pdf->Cell(30,10, round($sum, 2) .' '.$lang['MINUTES'] );
 $pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
 
 /*

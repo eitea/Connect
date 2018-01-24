@@ -94,7 +94,7 @@ $validation_output = $error_output = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
-        require __DIR__ . "/ckInOut.php";
+        require __DIR__ . "/misc//ckInOut.php";
         $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
