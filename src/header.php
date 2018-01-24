@@ -736,6 +736,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                 <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
                   <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
+                <li><a <?php if ($this_page == 'project_options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
               </ul>
             </div>
           </div>

@@ -984,6 +984,9 @@ $lang_ger['PROJECT_INFORMATION'] = 'Reports';
 $lang_eng['PROJECT_LOGS'] = 'Project Logs';
 $lang_ger['PROJECT_LOGS'] = 'Buchungsprotokoll ';
 
+$lang_eng['PROJECT_OPTIONS'] = 'Options';
+$lang_ger['PROJECT_OPTIONS'] = 'Optionen';
+
 $lang_eng['PROP_OUR_SIGN'] = 'Our Sign';
 $lang_ger['PROP_OUR_SIGN'] = 'Unser Zeichen';
 

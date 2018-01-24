@@ -2277,8 +2277,16 @@ if($row['version'] < 125){
     $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT (projectid, userid, 'optional') FROM dynamicprojectsoptionalemployees");
     $conn->query("DROP TABLE dynamicprojectsoptionalemployees");
 
-    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");
+    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");   
 }
+if($row['version'] < 126){
+    $conn->query("CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,server VARCHAR(50) NOT NULL,port VARCHAR(50) NOT NULL,smtpSecure ENUM('','tls','ssl') NOT NULL,username VARCHAR(50) NOT NULL,password VARCHAR(50) NOT NULL,logEnabled ENUM('TRUE','FALSE') NOT NULL,PRIMARY KEY (id))");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Email Projekte';
+    }
+}    
 
 // ------------------------------------------------------------------------------
 

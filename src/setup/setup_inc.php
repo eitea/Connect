@@ -1332,7 +1332,19 @@ function create_tables($conn) {
             echo $conn->error;
         }
         
-        $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
+    $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }
+
+    $sql = "CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,
+        server VARCHAR(50) NOT NULL,
+        port VARCHAR(50) NOT NULL,
+        smtpSecure ENUM('','tls','ssl') NOT NULL,
+        username VARCHAR(50) NOT NULL,
+        password VARCHAR(50) NOT NULL,
+        logEnabled ENUM('TRUE','FALSE') NOT NULL,
+        PRIMARY KEY (id))";
         if(!$conn->query($sql)){
             echo $conn->error;
         }
