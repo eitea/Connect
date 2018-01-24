@@ -27,7 +27,7 @@ $routes = array(
 
   'dynamic-projects/view' => 'project/dynamicProjects.php',
 
-  'report/send' => 'report/sendMailReport.php',                   'report/productivity'=>'report/report_productivity.php',     'report/autotask' => 'report/autotask.php',
+  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'schedule/report_productivity.php',     'report/autotask' => 'schedule/autotask.php',
 
   'erp/view' => 'erp/erp_view.php',                            'erp/articles' => 'erp/product_articles.php',             'erp/taxes' => 'erp/editTaxes.php',
   'erp/units' => 'erp/editUnits.php',                          'erp/payment' => 'erp/editPaymentMethods.php',            'erp/shipping' => 'erp/editShippingMethods.php',
@@ -43,7 +43,7 @@ $routes = array(
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',
 
-  'upload/file' => 'upload/uploadToS3.php',
+  'upload/file' => 'archive/uploadToS3.php',
 
   'pgp/keygen' => 'pgp/pgpKeyGen.php',                 'misc/sharedfiles' => 'misc/getSharedFiles.php'
 );

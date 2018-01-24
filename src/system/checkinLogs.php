@@ -1,4 +1,4 @@
-<?php require __DIR__.'/header.php'; ?>
+<?php require dirname(__DIR__).'/header.php'; ?>
 <div class="page-header"><h3>Checkin - Logs</h3></div>
 <table class="table table-hover">
 <thead><tr>
@@ -21,4 +21,4 @@
     ?>
     </tbody>
 </table>
-<?php require __DIR__.'/footer.php'; ?>
+<?php require dirname(__DIR__).'/footer.php'; ?>

@@ -4,12 +4,12 @@ if(empty($_SESSION['userid'])){
   die('Please <a href="login.php">login</a> first.');
 }
 $userID = $_SESSION['userid'];
-require_once 'validate.php';
+require_once dirname(__DIR__).'/validate.php';
 enableToCore($userID);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['start_Download'])){
-    require 'connection_config.php';
+    require dirname(__DIR__).'/connection_config.php';
     if(!empty($_POST['password'])){
       Export_Database($servername,$username,$password,$dbName,$_POST['password']);
     } else {
@@ -26,7 +26,7 @@ function Export_Database($host, $user, $pass, $dbName, $password=false){
   $backup_name = $backup_name.".sql";
 
   //exec("mysqldump --user=$user --password=$pass --host=$host $dbName", $content); will not work without mysql installation
-  require dirname(__DIR__).'/plugins/mysqldump/Mysqldump.php';
+  require dirname(dirname(__DIR__)).'/plugins/mysqldump/Mysqldump.php';
   $dump = new MySQLDump(new mysqli($host, $user, $pass, $dbName));
   $dump->save($backup_name);
   $content = file_get_contents($backup_name);

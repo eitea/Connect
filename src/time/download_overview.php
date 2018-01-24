@@ -1,5 +1,5 @@
 <?php
-require dirname(__DIR__)."/plugins/fpdf/fpdf.php";
+require dirname(dirname(__DIR__))."/plugins/fpdf/fpdf.php";
 
 class PDF extends FPDF {
   public $glob = array();
@@ -25,8 +25,8 @@ class PDF extends FPDF {
   }
 }
 
-require "connection.php";
-require "language.php";
+require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . "/language.php";
 
 //projectbookings
 $sql="SELECT $projectTable.id AS projectID,

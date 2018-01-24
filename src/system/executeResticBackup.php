@@ -1,10 +1,10 @@
-<?php require_once __DIR__ . "/connection.php"; require_once __DIR__ ."/createTimestamps.php"; ?>
-<?php require_once __DIR__ .'/utilities.php'; ?>
+<?php require_once dirname(__DIR__)."/connection.php"; require_once dirname(__DIR__)."/createTimestamps.php"; ?>
+<?php require_once dirname(__DIR__).'/utilities.php'; ?>
 <?php
 
 function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
-    require 'connection_config.php';
+    require dirname(__DIR__).'/connection_config.php';
     $mysqli = new mysqli($servername,$username,$password,$dbName);
     $mysqli->select_db($dbName);
     $mysqli->query("SET NAMES 'utf8'");
@@ -55,7 +55,7 @@ function get_database($tables = false){
     return $content;
 }
 
-$resticDir =dirname(__DIR__)."/plugins/restic/";
+$resticDir = driname(dirname(__DIR__))."/plugins/restic/";
 $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
 
 $location = "s3:".$row["location"];
