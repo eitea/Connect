@@ -33,6 +33,7 @@
 <?php endif; ?>
 
 <script>
+var reload = 0;
 function onPageLoad(){
   if($(".js-example-basic-single")[0]){
     $(".js-example-basic-single").each(function(i, obj){
@@ -46,7 +47,9 @@ function onPageLoad(){
             });
         }
     });
-  }
+  } 
+ 
+
 
   $('input:checkbox').keypress(function(e) {
       if((e.keyCode ? e.keyCode : e.which) == 13){

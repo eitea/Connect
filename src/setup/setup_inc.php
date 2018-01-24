@@ -226,7 +226,7 @@ function create_tables($conn) {
         fromDate DATETIME NOT NULL,
         toDate DATETIME,
         status ENUM('0', '1', '2') DEFAULT '0',
-        requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div') DEFAULT 'vac',
+        requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div', 'doc') DEFAULT 'vac',
         requestText VARCHAR(150),
         answerText VARCHAR(150),
         requestID INT(10) DEFAULT 0,
@@ -1323,4 +1323,17 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+    $sql = "CREATE TABLE archiveconfig(
+        endpoint VARCHAR(50),
+        awskey VARCHAR(50),
+        secret VARCHAR(50)
+        )";
+        if (!$conn->query($sql)) {
+            echo $conn->error;
+        }
+        
+        $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }
 }

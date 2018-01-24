@@ -164,8 +164,15 @@ ignore_user_abort(1);
             create_tables($conn);
 
             require_once dirname(__DIR__) . "/version_number.php";
-
+            //add lines to connection file
             $identifier = uniqid('', true);
+            $myfile = fopen(dirname(__DIR__) .'/connection_config.php', 'a');
+            $txt = '$identifier = "'.$identifier.'";
+            $s3SharedFiles=$identifier."_sharedFiles";
+            $s3uploadedFiles=$identifier."_uploadedFiles";';
+            fwrite($myfile, $txt);
+            fclose($myfile);
+
 
             //------------------------------ INSERTS ---------------------------------------
             //insert identification

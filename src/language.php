@@ -330,6 +330,9 @@ $lang_ger['DISPLAY_ALL'] = 'Alle Anzeigen';
 $lang_eng['DISPLAY_INFORMATION'] = 'Display Infos';
 $lang_ger['DISPLAY_INFORMATION'] = 'Infos Anzeigen';
 
+$lang_eng['DOCTOR'] = 'Doctor';
+$lang_ger['DOCTOR'] = 'Arzt';
+
 $lang_eng['DOCUMENTS'] = 'Agreements';
 $lang_ger['DOCUMENTS'] = 'Vereinbarungen';
 
@@ -345,11 +348,11 @@ $lang_ger['DRIVES'] = 'Fahrten';
 $lang_eng['DYNAMIC_PROJECTS'] = 'Tasks';
 $lang_ger['DYNAMIC_PROJECTS'] = 'Tasks';
 
-$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
-$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
+$lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new task';
+$lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neuen Task erstellen';
 
-$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Project Name';
-$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Projektbezeichnung';
+$lang_eng['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Task Name';
+$lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Taskbezeichnung';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priority';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priorität';
@@ -360,23 +363,17 @@ $lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher Mitarbeiter';
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optional employees';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optionale Mitarbeiter';
 
-$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Dynamic Project';
-$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Dynamisches Projekt bearbeiten';
+$lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Task';
+$lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Task bearbeiten';
+
+$lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
+$lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
 
 $lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
 $lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
 
-$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Which tasks have you completed?';
+$lang_eng['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'What did you do?';
 $lang_ger['DYNAMIC_PROJECTS_BOOKING_PROMPT'] = 'Welche Aufgaben haben Sie erledigt?';
-
-$lang_eng['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'This belongs to a dynamic project and can\' be deleted here.';
-$lang_ger['DYNAMIC_PROJECTS_NO_DELETE_STATIC_PROJECT'] = 'Dieses Projekt gehört zu einem dynamischen Projekt und kann hier nicht gelöscht werden.';
-
-$lang_eng['DYNAMIC_PROJECTS_BELONG_TO'] = 'This belongs to a dynamic project';
-$lang_ger['DYNAMIC_PROJECTS_BELONG_TO'] = 'Das gehört zu einem dynamischen Projekt';
-
-$lang_eng['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Series';
-$lang_ger['DYNAMIC_PROJECTS_PROJECT_SERIES'] = 'Serie';
 
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_PICTURES'] = 'Pictures';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_PICTURES'] = 'Bilder';
@@ -476,6 +473,9 @@ $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie
 
 $lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
 $lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
+
+$lang_eng['ERROR_STRIKE'] = 'code-manipulation found, you have been striked!';
+$lang_ger['ERROR_STRIKE'] = 'Code-Manipulation entdeckt, Sie wurden gestriked!';
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
 $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
@@ -1342,9 +1342,9 @@ $lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirm
 $lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');
 
 $lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education","spl" => "Special Leave",
-  "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak");
+  "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak", "doc" => "Doctor Appointment");
 $lang_ger['REQUEST_TOSTRING'] = array("vac" => "Urlaub", "acc" => "Neuer Account", "log" => "Zeitänderung", "scl" => "Weiterbildung", "spl" => "Sonderurlaub",
-  "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen");
+  "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen", "doc" => "Arzt Termin");
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
 $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
