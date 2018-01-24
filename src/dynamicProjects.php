@@ -456,7 +456,7 @@ function appendModal(index){
     success : function(resp){
       $("#editingModalDiv").append(resp);
       existingModals.push(index);
-      onPageLoad();
+      onPageLoad(false);
       dynamicOnLoad(index);
     },
     error : function(resp){},
