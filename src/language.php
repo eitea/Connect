@@ -342,8 +342,8 @@ $lang_ger['DOUBLE'] = 'Doppelt';
 $lang_eng['DRIVES'] = 'Drives';
 $lang_ger['DRIVES'] = 'Fahrten';
 
-$lang_eng['DYNAMIC_PROJECTS'] = 'Dynamic Projects';
-$lang_ger['DYNAMIC_PROJECTS'] = 'Dynamische Projekte';
+$lang_eng['DYNAMIC_PROJECTS'] = 'Tasks';
+$lang_ger['DYNAMIC_PROJECTS'] = 'Tasks';
 
 $lang_eng['DYNAMIC_PROJECTS_NEW'] = 'Create a new dynamic project';
 $lang_ger['DYNAMIC_PROJECTS_NEW'] = 'Neues dynamisches Projekt erstellen';
@@ -1334,6 +1334,9 @@ $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau');
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
+
+$lang_eng['PRIORITY_TOSTRING'] = array("-", "Very low", "Low", "Normal", "High", "Very high");
+$lang_ger['PRIORITY_TOSTRING'] = array("-", "Sehr niedrig", "Niedrig", "Normal", "Hoch", "Sehr Hoch");
 
 $lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cancellation');
 $lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');

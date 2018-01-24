@@ -54,6 +54,7 @@ if($x){
                         <li><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a></li>
                         <li><a data-toggle="tab" href="#projectAdvanced<?php echo $x; ?>">Erweiterte Optionen</a></li>
                         <li><a data-toggle="tab" href="#projectSeries<?php echo $x; ?>">Routine Aufgabe</a></li>
+                        <?php if($x): ?><li><a data-toggle="tab" href="#projectBookings<?php echo $x; ?>">Routine Aufgabe</a></li><?php endif; ?>
                     </ul>
                     <div class="tab-content">
                         <div id="projectBasics<?php echo $x; ?>" class="tab-pane fade in active"><br>
@@ -175,11 +176,12 @@ if($x){
                             <div class="col-md-6">
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
                                 <select class="form-control js-example-basic-single" name="priority">
-                                    <option value='1' <?php if($dynrow['projectpriority'] == 1) echo 'selected'; ?> >Sehr niedrig</option>
-                                    <option value='2' <?php if($dynrow['projectpriority'] == 2) echo 'selected'; ?> >Niedrig</option>
-                                    <option value='3' <?php if($dynrow['projectpriority'] == 3) echo 'selected'; ?> >Normal</option>
-                                    <option value='4' <?php if($dynrow['projectpriority'] == 4) echo 'selected'; ?> >Hoch</option>
-                                    <option value='5' <?php if($dynrow['projectpriority'] == 5) echo 'selected'; ?> >Sehr hoch</option>
+                                    <?php
+                                    for($i = 1; $i < 6; $i++){
+                                        $selected = $dynrow['projectpriority'] == $i ? 'selected' : '';
+                                        echo '<option value="'.$i.'" '.$selected.'>'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
+                                    }
+                                    ?>
                                 </select><br>
                             </div>
                             <div class="col-md-6">
@@ -304,6 +306,53 @@ if($x){
                                 </label>
                                 <br>
                             </div>
+                        </div>
+                        <div id="projectBookings<?php echo $x; ?>" class="tab-pane fade"><br>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Benutzer</th>
+                                        <th>Von</th>
+                                        <th>Bis</th>
+                                        <th>Infotext</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    function carryOverAdder_Hours($a, $b) {
+                                        $b = round($b);
+                                        if ($a == '0000-00-00 00:00:00') {
+                                            return $a;
+                                        }
+                                        $date = new DateTime($a);
+                                        if ($b < 0) {
+                                            $b *= -1;
+                                            $date->sub(new DateInterval("PT" . $b . "H"));
+                                        } else {
+                                            $date->add(new DateInterval("PT" . $b . "H"));
+                                        }
+                                        return $date->format('Y-m-d H:i:s');
+                                    }
+                                    $result = $conn->query("SELECT p.start, p.end, infoText, internInfo, firstname, lastname, timeToUTC
+                                        FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID LEFT JOIN UserData ON logs.userID = UserData.id WHERE p.dynamicID = '$x' ORDER BY p.start");
+                                    echo $conn->error;
+                                    while($result && ($row = $result->fetch_assoc())){
+                                        $A = substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),0, -3);
+                                        $B = 'Gerade in Arbeit';
+                                        if($row['end'] != '0000-00-00 00:00:00') $B = substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']), 11, 5);
+
+                                        echo '<tr>';
+                                        echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+                                        echo '<td>'.$A.'</td>';
+                                        echo '<td>'.$B.'</td>';
+                                        echo '<td>'.$row['infoText'].'</td>';
+                                        echo '<td>'.$row['internInfo'].'</td>';
+                                        echo '</tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div><!-- /tab-content -->
                 </div><!-- /modal-body -->
