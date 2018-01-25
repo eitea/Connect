@@ -50,7 +50,6 @@ $mime_types = array(
   '.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
 );
 
-
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
 $params = explode('/', $url);

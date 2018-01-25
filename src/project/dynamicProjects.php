@@ -86,6 +86,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $priority = intval($_POST["priority"]); //1-5
                 $parent = test_input($_POST["parent"]); //dynamproject id
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
+                $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
 
                 if ($end == "number") {
@@ -114,8 +115,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null, $percentage);
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+                $stmt->bind_param("ssbiiissssisiisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -160,11 +162,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
                 $stmt->close();
             } else {
-                echo $_POST['description'] .' -descr<br>';
-                echo $_POST['name'] .' -name<br>';
-                echo !empty($_POST['employees']) .' -emps<br>';
-                echo $available_companies[1] .' -compa<br>';
-                echo test_Date($_POST['start'], 'Y-m-d') .' -date<br>';
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             }
         }
