@@ -58,8 +58,8 @@ $l = count($params) -1 ;
 if($l > 1){
   $route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
   if(array_key_exists($route, $routes)){
-    include 'src/'.$routes[$route];
     $this_page = basename($routes[$route]);
+    include 'src/'.$routes[$route];
   } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);
