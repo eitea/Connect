@@ -1,7 +1,7 @@
 <?php
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //"project" => 0); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE'); //set_filter requirement
 ?>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
@@ -10,19 +10,24 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){
-        $x = test_input($_POST['play']);
-        //TODO: make sure play does not overlap an existing booking.
-        $result = mysqli_query($conn, "SELECT indexIM FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
-        if($result && ($row = $result->fetch_assoc())){
-            $indexIM = $row['indexIM'];
-            $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Dummy Text' , 'project', '$x')");
-            if($conn->error){
-            	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        $x = test_input($_POST['play'], true);
+        $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
+        if($result->num_rows < 1){
+            $result = mysqli_query($conn, "SELECT indexIM FROM logs WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
+            if($result && ($row = $result->fetch_assoc())){
+                //TODO: make sure play does not overlap an existing booking.
+                $indexIM = $row['indexIM'];
+                $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Begin of Task $x' , 'project', '$x')");
+                if($conn->error){
+                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                } else {
+                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+                }
             } else {
-            	echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln.</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
             }
         } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.</div>';
         }
     }
     if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
@@ -81,6 +86,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $priority = intval($_POST["priority"]); //1-5
                 $parent = test_input($_POST["parent"]); //dynamproject id
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
+                $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
 
                 if ($end == "number") {
@@ -109,8 +115,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null, $percentage);
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+                $stmt->bind_param("ssbiiissssisiisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -155,16 +162,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
                 $stmt->close();
             } else {
-                echo $_POST['description'] .' -descr<br>';
-                echo $_POST['name'] .' -name<br>';
-                echo !empty($_POST['employees']) .' -emps<br>';
-                echo $available_companies[1] .' -compa<br>';
-                echo test_Date($_POST['start'], 'Y-m-d') .' -date<br>';
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
             }
         }
     } // end if dynamic Admin
-
 } //end if POST
 ?>
 
@@ -179,14 +180,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th>Routine</th>
             <th>Status</th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
-            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
+            <th><?php echo $lang["OWNER"]; ?></th>
+            <th><?php echo $lang["LEADER"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         <?php
-        $modals = $occupation = '';
+        $modals = $occupation = $query_status = '';
+        $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
+        if($filterings['tasks']){ $query_status = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
@@ -197,19 +201,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){
             //see all access-legal tasks
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN UserData ON UserData.id = projectowner
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).")");
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ");
         } else {
             //see open tasks user is part of
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN UserData ON UserData.id = projectowner LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID)");
+                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID) $query_status ");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){
@@ -227,9 +230,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             } else {
                 echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
             }
-            echo '<td>'.$row['projectstatus'].'</td>';
-            echo '<td>'.$row['projectpriority'].'</td>';
-            echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+
+            $stmt_booking->execute();
+            $isInUse = $stmt_booking->get_result(); //max 1 row
+
+            echo '<td>';
+            if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
+            if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
+            echo '</td>';
+
+            echo '<td><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
+            echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
+            echo '<td>'.$userID_toName[$row['projectleader']].'</td>';
 
             echo '<td>';
             $stmt_team->execute();
@@ -240,18 +252,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
             //modal creation happens on demand
             echo '<td><form method="POST">';
-            $stmt_booking->execute();
-            $isInUse = $stmt_booking->get_result(); //max 1 row
-            if(($useRow = $isInUse->fetch_assoc()) && $useRow['userID'] == $userID) {
+
+            if($useRow && $useRow['userID'] == $userID) {
                 //if this task IsInUse and this user is the one using it
-                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button>';
+                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
-                //only if project ist active, this task is NOT in use and user has no active bookings
-                echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play' ></i></button>";
+                //only if project is active, this task is NOT in use and user has no active bookings
+                echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play' ></i></button> ";
             }
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) {
-                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
+                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-cog"></i></button> ';
+                echo '<button type="button" name="infoModal" value="'.$x.'" class="btn btn-default" title="Verlauf Anzeigen"><i class="fa fa-info"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button>';
             }
             echo '</form></td>';
@@ -319,7 +331,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <div class="col-md-4">
                                 <select id="book-dynamic-projectHint" class="js-example-basic-single" name="bookDynamicProjectID">
                                     <?php if($occupation['clientid']){
-                                        $result = $conn->query("SELECT id, name FROM projectData WHERE clientID = ".$occupation['clientID']);
+                                        $result = $conn->query("SELECT id, name FROM projectData WHERE clientID = ".$occupation['clientid']);
                                         echo '<option value="0"> ... </option>';
                                         while($row = $result->fetch_assoc()){
                                             echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
@@ -343,7 +355,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
 $("#bookCompletedCheckbox").change(function(event){
-    $("#bookCompleted").attr('disabled', this.checked);
+    $("#bookCompleted").attr('readonly', this.checked);
     if(this.checked){
         $("#bookCompleted").val(100);
     }
@@ -362,45 +374,8 @@ function formatState (state) {
     );
     return $state;
 };
-function removeImg(event) {
-    $(event.target).remove();
-}
-function getImageSrc(img) {
-    var c = document.createElement("canvas");
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    var ctx = c.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    return c.toDataURL();
-}
 function dynamicOnLoad(modID){
     if(typeof modID === 'undefined') modID = '';
-    $("#projectPreview"+modID+" img").click(removeImg);
-    $("#projectForm"+modID).submit(function (event) {
-        $("#projectPreview"+modID).find("input").remove()
-        $("#projectPreview"+modID).find("img").each(function (index, elem) {
-            console.log(getImageSrc(elem).length);
-            $("#projectPreview"+modID).append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
-        });
-    });
-    $("#projectImageUpload"+modID).change(function (event) {
-        var files = event.target.files;
-        //$("#newProjectPreview").html(""); //delete old pictures
-        for (var i = 0, f; f = files[i]; i++) { // Loop through the FileList and render image files as thumbnails.
-            if (!f.type.match('image.*')) continue;
-            var reader = new FileReader();
-            // Closure to capture the file information.
-            reader.onload = (function (theFile) {
-                return function (e) { // Render thumbnail.
-                    var span = document.createElement('span');
-                    span.innerHTML = '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="' + e.target.result + '" title="' + escape(theFile.name) + '"/>';
-                    $("#projectPreview"+modID).append(span);
-                    $("#projectPreview"+modID+" img").unbind("click").click(removeImg);
-                };
-            })(f);
-            reader.readAsDataURL(f); // Read in the image file as a data URL.
-        }
-    });
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
@@ -411,7 +386,10 @@ function dynamicOnLoad(modID){
         plugins: 'paste',
         relative_urls: false,
         paste_data_images: true,
-        toolbar: 'undo redo | link image file media | code',
+        menubar: false,
+        statusbar: false,
+        height: 300,
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code',
         // enable title field in the Image dialog
         image_title: true,
         // enable automatic uploads of images represented by blob or data URIs
@@ -477,8 +455,31 @@ $('button[name=editModal]').click(function(){
     $('#editingModal-'+index).modal('show');
   }
 });
-
 appendModal('');
+
+var existingModals_info = new Array();
+$('button[name=infoModal]').click(function(){
+    var index = $(this).val();
+  if(existingModals_info.indexOf(index) == -1){
+      $.ajax({
+      url:'ajaxQuery/AJAX_dynamicInfo.php',
+      data:{projectid: index},
+      type: 'get',
+      success : function(resp){
+        $("#editingModalDiv").append(resp);
+        existingModals_info.push(index);
+      },
+      error : function(resp){},
+      complete: function(resp){
+          if(index){
+              $('#infoModal-'+index).modal('show');
+          }
+      }
+     });
+  } else {
+    $('#infoModal-'+index).modal('show');
+  }
+});
 
 $(document).ready(function() {
     dynamicOnLoad();

@@ -1,5 +1,4 @@
 src/connection_config.php
-template.php
 images/ups/*
 !images/ups/.gitkeep
 cryptlog.txt
@@ -7,3 +6,4 @@ plugins/restic/backup.sql
 backup.sql
 *.db
 src/connection_s3admin.php
+plugins/dompdf/dompdf/dompdf/lib/fonts/*

@@ -46,7 +46,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $creatUser = intval($_POST['addTimestamp']);
     $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
     $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
-    $status = intval($_POST['newActivity']);  
+    $status = intval($_POST['newActivity']);
     $timeToUTC = intval($_POST['creatTimeZone']);
     $newBreakVal = floatval($_POST['newBreakValues']);
     if($_POST['is_open']){
@@ -94,6 +94,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   if(!empty($_POST['editing_save'])){
+      //TODO: maybe if the user edits the date and there is another, more fitting timestamp (talking about date) we should change timestampIDs. maybe with a checkbox 'move if available' ?
+
     $accept = true;
     $x = $_POST['editing_save'];
     $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
@@ -174,13 +176,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($accept){
       $startDate = $_POST['add_date']." ".$_POST['start'];
       $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-  
+
       $endDate = $_POST['add_date']." ".$_POST['end'];
       $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-  
+
       $insertInfoText = test_input($_POST['infoText']);
       $insertInternInfoText = test_input($_POST['internInfoText']);
-  
+
       if(timeDiff_Hours($startDate, $endDate) < 0){
         $endDate = carryOverAdder_Hours($endDate, 24);
       }
@@ -495,7 +497,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <!-- ############################### UserData ################################### -->
 
-<?php foreach($filterings['users'] as $x): 
+<?php foreach($filterings['users'] as $x):
 if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; } else { echo "<div id='$x' class='tab-pane fade'>"; }
 ?>
 <div class="page-header"><h3><?php echo $lang['TIMESTAMPS']; ?>
@@ -553,13 +555,13 @@ if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; 
 
             $booking_content =  $rowClass = '';
             if($calcIndexIM){
-              $booking_content = '<tr><td colspan="13" style="padding:0; border:0;">';              
+              $booking_content = '<tr><td colspan="13" style="padding:0; border:0;">';
               $bookingStmt->execute();
               $result = $bookingStmt->get_result();
               if($result->num_rows > 0){$rowClass = 'class="clicker"';}
               while($row = $result->fetch_assoc()){
                 $Ap = substr(carryOverAdder_Hours($row['start'], $calculator->timeToUTC[$i]), 11, 5);
-                $Bp = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);              
+                $Bp = substr(carryOverAdder_Hours($row['end'], $calculator->timeToUTC[$i]), 11, 5);
                 $booking_content .= '<div class="row" style="display:none;color:#797979;">';
                 $booking_content .= '<div class="col-xs-1"></div>';
                 $booking_content .= '<div class="col-sm-1">'.$row['name'].'</div>';
@@ -571,7 +573,7 @@ if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; 
                 if($row['booked'] == 'FALSE'){
                   $booking_content .= '<button type="button" onclick="appendModal_proj('.$row['bookingTableID'].', '.$x.');" class="btn btn-default" ><i class="fa fa-pencil"></i></button>';
                 }
-                $booking_content .= '</div></div>'; 
+                $booking_content .= '</div></div>';
               }
               $booking_content .= '</td></tr>';
             }
@@ -701,7 +703,7 @@ if($activeTab == $x) {echo "<div id=\"$x\" class=\"tab-pane fade active in\">"; 
                 if($filterings['users'][0] == $row['id']) {
                   $selected = 'selected';
                 }
-                
+
                 echo '<option '.$selected.' value="'.$row['id'].'">'.$row['firstname'].' '.$row['lastname'].'</option>';
               }
               ?>
@@ -813,7 +815,7 @@ function appendModal_time(id, index, date, userID){
       $("#editingModalDiv").append(resp);
       existingModals.push(index);
       onPageLoad();
-      $('.editingModal-'+index).modal('show');      
+      $('.editingModal-'+index).modal('show');
     },
     error : function(resp){}
    });

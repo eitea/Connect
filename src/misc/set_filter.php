@@ -1,16 +1,18 @@
 <?php
-/** 
- * company => id
- * client  => id
- * project  => id
- * user => id
- * users => [id1, id2, ...]
- * bookings => [charged, break, drive]
- * logs => [activity, hideAll]
- * date => [fromDate, toDate] || [month]
- * procedures => [transitions[id], status, hideAll]
- * acceptance => status
- * requestType => type
+/**
+* company => id
+* client  => id
+* project  => id
+* user => id
+* users => [id1, id2, ...]
+* bookings => [charged, break, drive]
+* logs => [activity, hideAll]
+* date => [fromDate, toDate] || [month]
+* procedures => [transitions[id], status, hideAll]
+* acceptance => status
+* requestType => type
+* regexField
+* tasks => status
 **/
 
 if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){
@@ -92,6 +94,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   if(isset($_POST['searchAcceptance'])){
     $filterings['acceptance'] = intval($_POST['searchAcceptance']);
   }
+  if(isset($_POST['searchTask'])){
+    $filterings['tasks'] = test_input($_POST['searchTask']);
+  }
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
   } else {
@@ -109,6 +114,7 @@ if(isset($filterings['date']) || isset($filterings['logs'])){$scale++;}
 if(isset($filterings['user']) || isset($filterings['users'])){$scale++;}
 if(isset($filterings['company'])){$scale++;}
 if(isset($filterings['procedures'])){$scale++;}
+if(isset($filterings['tasks'])){$scale++;}
 $styles = array(20, 90);
 if($scale > 1){ //2 columns
   $styles = array(40, 45);
@@ -253,6 +259,16 @@ if($scale > 2){ //3 columns
               <option value="2" <?php if($filterings['acceptance'] == '2'){echo 'selected';} ?>><?php echo $lang['REQUESTSTATUS_TOSTRING'][2]; ?></option>
             </select>
           <?php endif; ?>
+          <?php if(isset($filterings['tasks'])): ?>
+              <label><?php echo $lang['DYNAMIC_PROJECTS']; ?></label>
+              <select name="searchTask" class="js-example-basic-single">
+                  <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
+                  <option value="DEACTIVATED" <?php if($filterings['tasks'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
+                  <option value="ACTIVE" <?php if($filterings['tasks'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
+                  <option value="DRAFT" <?php if($filterings['tasks'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
+                  <option value="COMPLETED" <?php if($filterings['tasks'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
+              </select>
+          <?php endif; ?>
         </div>
 
         <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
@@ -290,7 +306,6 @@ if($scale > 2){ //3 columns
             <?php endif; ?>
           </div>
         <?php endif; ?>
-
 
         <?php if(isset($filterings['procedures'])): ?>
           <div class="filter_column">

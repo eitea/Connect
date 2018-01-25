@@ -52,4 +52,4 @@ while($result && ($row = $result->fetch_assoc())){
 }
 
 
-require dirname(__DIR__)."/misc/dynamicProjects_Series_autotask.php";
+//require "dynamicProjects_Series_autotask.php";

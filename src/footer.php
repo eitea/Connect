@@ -154,7 +154,7 @@ $(document).ready(function() {
     document.getElementById("loader").style.display = "block";
   };
   document.getElementById("loader").style.display = "none";
-  document.getElementById("bodyContent").style.display = "block";  
+  document.getElementById("bodyContent").style.display = "block";
 });
 
 $(window).scroll(function() {

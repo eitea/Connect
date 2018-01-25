@@ -9,7 +9,7 @@ require dirname(__DIR__) . "/Calculators/IntervalCalculator.php";
 $filterQuery = $_POST['filterQuery'];
 $templateID = $_POST['templateID'];
 
-if($templateID < 0) include dirname(__DIR__) . "/download_overview.php";
+if($templateID < 0) include __DIR__ . "/download_overview.php";
 
 $html = getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause
 
