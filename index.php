@@ -24,7 +24,7 @@ $routes = array(
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
   'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',
 
-  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'schedule/report_productivity.php',   'report/autotask' => 'schedule/autotask.php',
+  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',   'report/autotask' => 'schedule/autotask.php',
 
   'erp/view' => 'erp/erp_view.php',                                 'erp/articles' => 'erp/product_articles.php',                'erp/taxes' => 'erp/editTaxes.php',
   'erp/units' => 'erp/editUnits.php',                               'erp/payment' => 'erp/editPaymentMethods.php',               'erp/shipping' => 'erp/editShippingMethods.php',
@@ -58,8 +58,8 @@ $l = count($params) -1 ;
 if($l > 1){
   $route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
   if(array_key_exists($route, $routes)){
-    $this_page = $routes[$route];
-    include 'src/'.$this_page;
+    include 'src/'.$routes[$route];
+    $this_page = basename($routes[$route]);
   } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
     if(array_key_exists($matches[4], $mime_types)){
       header('Content-Type: '. $mime_types[$matches[4]]);

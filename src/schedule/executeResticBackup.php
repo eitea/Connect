@@ -1,10 +1,10 @@
-<?php require_once dirname(dirname(__DIR__))."/connection.php"; require_once dirname(dirname(__DIR__))."/createTimestamps.php"; ?>
-<?php require_once dirname(dirname(__DIR__)).'/utilities.php'; ?>
+<?php require_once dirname(__DIR__)."/connection.php"; require_once dirname(__DIR__)."/createTimestamps.php"; ?>
+<?php require_once dirname(__DIR__).'/utilities.php'; ?>
 <?php
 
 function get_database($tables = false){
     // changes here have to be copied to sqlDownload.php
-    require dirname(dirname(__DIR__)).'/connection_config.php';
+    require dirname(__DIR__).'/connection_config.php';
     $mysqli = new mysqli($servername,$username,$password,$dbName);
     $mysqli->select_db($dbName);
     $mysqli->query("SET NAMES 'utf8'");
@@ -23,39 +23,39 @@ function get_database($tables = false){
         $TableMLine     =   $res->fetch_row();
         $content        = (!isset($content) ?  '' : $content) . "\n".$TableMLine[1].";\n";
         for ($i = 0, $st_counter = 0; $i < $fields_amount;   $i++, $st_counter=0){
-        while($row = $result->fetch_row()){
-            //when started (and every after 100 command cycle):
-            if ($st_counter%100 == 0 || $st_counter == 0 ){
-            $content .= "\nINSERT INTO ".$table." VALUES";
+            while($row = $result->fetch_row()){
+                //when started (and every after 100 command cycle):
+                if ($st_counter%100 == 0 || $st_counter == 0 ){
+                    $content .= "\nINSERT INTO ".$table." VALUES";
+                }
+                $content .= "\n(";
+                for($j=0; $j<$fields_amount; $j++){
+                    $row[$j] = str_replace("\n","\\n", addslashes($row[$j]) );
+                    if ($row[$j] || $row[$j] === "0"){
+                        $content .= '"'.$row[$j].'"' ;
+                    } else {
+                        $content .= 'NULL';
+                    }
+                    if ($j<($fields_amount-1)){
+                        $content.= ',';
+                    }
+                }
+                $content .=")";
+                //every after 100 command cycle [or at last line] ....p.s. but should be inserted 1 cycle eariler
+                if ( (($st_counter+1)%100==0 && $st_counter!=0) || $st_counter+1==$rows_num){
+                    $content .= ";";
+                } else {
+                    $content .= ",";
+                }
+                $st_counter=$st_counter+1;
             }
-            $content .= "\n(";
-            for($j=0; $j<$fields_amount; $j++){
-            $row[$j] = str_replace("\n","\\n", addslashes($row[$j]) );
-            if ($row[$j] || $row[$j] === "0"){
-                $content .= '"'.$row[$j].'"' ;
-            } else {
-                $content .= 'NULL';
-            }
-            if ($j<($fields_amount-1)){
-                $content.= ',';
-            }
-            }
-            $content .=")";
-            //every after 100 command cycle [or at last line] ....p.s. but should be inserted 1 cycle eariler
-            if ( (($st_counter+1)%100==0 && $st_counter!=0) || $st_counter+1==$rows_num){
-            $content .= ";";
-            } else {
-            $content .= ",";
-            }
-            $st_counter=$st_counter+1;
-        }
         }
         $content .="\n\n";
     }
     return $content;
 }
 
-$resticDir = driname(dirname(dirname(__DIR__)))."/plugins/restic/";
+$resticDir = driname(dirname(__DIR__))."/plugins/restic/";
 $row = $conn->query("SELECT * FROM resticconfiguration")->fetch_assoc();
 
 $location = "s3:".$row["location"];
@@ -91,4 +91,4 @@ if (is_resource($process)) {
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
 }
-chdir(dirname(__DIR__));
+chdir(__DIR__);

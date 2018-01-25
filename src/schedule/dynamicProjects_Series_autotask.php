@@ -48,7 +48,6 @@ while ($row = $result->fetch_assoc()) {
     echo $stmt->error;
     echo "<br>done<br>";
 }
-
 ?>
 
 <!-- for testing in browser -->
