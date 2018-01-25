@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION['posttimer'] = time();
 
-    if(!empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
+    if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
         $passwordConfirm = $_POST['passwordConfirm'];
         $newMasterPass = '';
@@ -135,8 +135,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     if(isset($_POST['savePAS']) && !empty(trim($_POST['publicPGP']))){
-        $conn->query("UPDATE userdata SET publicPGPKey = '".$_POST['publicPGP']."' WHERE id=".$userID);
-        if(!empty($_POST['privatePGP']) && isset($_POST['savePAS']) && !empty($_POST['encodePGP'])){
+        $conn->query("UPDATE userdata SET publicPGPKey = '".test_input($_POST['publicPGP'])."' WHERE id=".$userID);
+        if(!empty($_POST['privatePGP']) && !empty($_POST['encodePGP'])){
             $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
             $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
         }
@@ -403,18 +403,44 @@ echo $VERSION_TEXT;?>
                   <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
               </div>
               <div class="modal-body">
-                  <div class="col-md-12">
-                      <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
-                  </div>
-                  <div class="col-md-6">
-                      <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
-                  </div>
-                  <div class="col-md-6">
-                      <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" ><br>
-                      <?php if ($masterPasswordHash): ?>
-                          <label><?php echo $lang['MASTER_PASSWORD'] ?> (Experimentell)</label>
-                          <input type="password" class="form-control" name="passwordMaster"><br>
-                      <?php endif;?>
+                  <ul class="nav nav-tabs">
+                      <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
+                      <li><a data-toggle="tab" href="#myModalPGP">PGP</a></li>
+                  </ul>
+                  <div class="tab-content">
+                      <div id="myModalPassword" class="tab-pane fade in active"><br>
+                          <div class="col-md-12">
+                              <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
+                          </div>
+                          <div class="col-md-6">
+                              <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
+                          </div>
+                          <div class="col-md-6">
+                              <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" ><br>
+                              <?php if ($masterPasswordHash): ?>
+                                  <label><?php echo $lang['MASTER_PASSWORD'] ?> (Experimentell)</label>
+                                  <input type="password" class="form-control" name="passwordMaster"><br>
+                              <?php endif;?>
+                          </div>
+                      </div>
+                      <div id="myModalPGP" class="tab-pane fade"><br>
+                          <h4 class="modal-title">Pretty Good Protection</h4><button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
+                          <br>
+                          <div class="col-md-12">
+                              <label>Public Key</label>
+                              <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php
+                              $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
+                              if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
+                              ?></textarea><br>
+                          </div>
+                          <div class="col-md-12">
+                              <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP"><i class="fa fa-eye"></i></button>
+                              <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP); ?></textarea><br>
+                          </div>
+                          <div class="col-md-12"><label>Encryption Password</label>
+                              <input placeholder="Ihr Private Key wird mit diesem Passwort verschlüsselt! z.B. Ihr Benutzer-Passwort" type="password" class="form-control" name="encodePGP"/><br>
+                          </div>
+                      </div>
                   </div>
               </div>
               <div class="modal-footer">
