@@ -17,7 +17,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if($result && ($row = $result->fetch_assoc())){
                 //TODO: make sure play does not overlap an existing booking.
                 $indexIM = $row['indexIM'];
-                $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Dummy Text' , 'project', '$x')");
+                $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Begin of Task $x' , 'project', '$x')");
                 if($conn->error){
                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
                 } else {
@@ -183,7 +183,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th>Routine</th>
             <th>Status</th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
-            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?></th>
+            <th><?php echo $lang["OWNER"]; ?></th>
+            <th><?php echo $lang["LEADER"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
             <th></th>
         </tr>
@@ -203,17 +204,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){
             //see all access-legal tasks
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN UserData ON UserData.id = projectowner
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ");
         } else {
             //see open tasks user is part of
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, firstname, lastname,
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN UserData ON UserData.id = projectowner LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID) $query_status ");
         }
@@ -234,12 +234,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
             }
 
-            echo '<td>'.$row['projectstatus'];
+            $stmt_booking->execute();
+            $isInUse = $stmt_booking->get_result(); //max 1 row
+
+            echo '<td>';
+            if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
             echo '</td>';
 
             echo '<td><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
-            echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+            echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
+            echo '<td>'.$userID_toName[$row['projectleader']].'</td>';
 
             echo '<td>';
             $stmt_team->execute();
@@ -250,9 +255,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
             //modal creation happens on demand
             echo '<td><form method="POST">';
-            $stmt_booking->execute();
-            $isInUse = $stmt_booking->get_result(); //max 1 row
-            if(($useRow = $isInUse->fetch_assoc()) && $useRow['userID'] == $userID) {
+
+            if($useRow && $useRow['userID'] == $userID) {
                 //if this task IsInUse and this user is the one using it
                 echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
@@ -262,6 +266,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) {
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-cog"></i></button> ';
+                echo '<button type="button" name="infoModal" value="'.$x.'" class="btn btn-default" title="Verlauf Anzeigen"><i class="fa fa-info"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button>';
             }
             echo '</form></td>';
@@ -372,45 +377,8 @@ function formatState (state) {
     );
     return $state;
 };
-function removeImg(event) {
-    $(event.target).remove();
-}
-function getImageSrc(img) {
-    var c = document.createElement("canvas");
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    var ctx = c.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    return c.toDataURL();
-}
 function dynamicOnLoad(modID){
     if(typeof modID === 'undefined') modID = '';
-    $("#projectPreview"+modID+" img").click(removeImg);
-    $("#projectForm"+modID).submit(function (event) {
-        $("#projectPreview"+modID).find("input").remove()
-        $("#projectPreview"+modID).find("img").each(function (index, elem) {
-            console.log(getImageSrc(elem).length);
-            $("#projectPreview"+modID).append("<input type='hidden' value='" + getImageSrc(elem) + "' name='imagesbase64[]'>");
-        });
-    });
-    $("#projectImageUpload"+modID).change(function (event) {
-        var files = event.target.files;
-        //$("#newProjectPreview").html(""); //delete old pictures
-        for (var i = 0, f; f = files[i]; i++) { // Loop through the FileList and render image files as thumbnails.
-            if (!f.type.match('image.*')) continue;
-            var reader = new FileReader();
-            // Closure to capture the file information.
-            reader.onload = (function (theFile) {
-                return function (e) { // Render thumbnail.
-                    var span = document.createElement('span');
-                    span.innerHTML = '<img class="img-thumbnail" style="width:49%;margin:0.5%" src="' + e.target.result + '" title="' + escape(theFile.name) + '"/>';
-                    $("#projectPreview"+modID).append(span);
-                    $("#projectPreview"+modID+" img").unbind("click").click(removeImg);
-                };
-            })(f);
-            reader.readAsDataURL(f); // Read in the image file as a data URL.
-        }
-    });
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
@@ -421,7 +389,10 @@ function dynamicOnLoad(modID){
         plugins: 'paste',
         relative_urls: false,
         paste_data_images: true,
-        toolbar: 'undo redo | link image file media | code',
+        menubar: false,
+        statusbar: false,
+        height: 300,
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code',
         // enable title field in the Image dialog
         image_title: true,
         // enable automatic uploads of images represented by blob or data URIs
@@ -487,8 +458,31 @@ $('button[name=editModal]').click(function(){
     $('#editingModal-'+index).modal('show');
   }
 });
-
 appendModal('');
+
+var existingModals_info = new Array();
+$('button[name=infoModal]').click(function(){
+    var index = $(this).val();
+  if(existingModals_info.indexOf(index) == -1){
+      $.ajax({
+      url:'ajaxQuery/AJAX_dynamicInfo.php',
+      data:{projectid: index},
+      type: 'get',
+      success : function(resp){
+        $("#editingModalDiv").append(resp);
+        existingModals_info.push(index);
+      },
+      error : function(resp){},
+      complete: function(resp){
+          if(index){
+              $('#infoModal-'+index).modal('show');
+          }
+      }
+     });
+  } else {
+    $('#infoModal-'+index).modal('show');
+  }
+});
 
 $(document).ready(function() {
     dynamicOnLoad();

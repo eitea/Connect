@@ -2,7 +2,7 @@
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 
-$x = $_GET['projectid'];
+$x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
 
 $userID = intval($_GET['userid']);
 
@@ -34,7 +34,7 @@ if($x){
     $dynrow['projectstart'] = date('Y-m-d');
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
-    $dynrow['projectowner'] = $userID;
+    $dynrow['projectowner'] = $dynrow['projectleader'] = $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
 }
@@ -50,11 +50,9 @@ if($x){
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Grundliegendes*</a></li>
-                        <li><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>"><?php echo $lang["DESCRIPTION"]; ?>*</a></li>
+                        <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Basic*</a></li>
                         <li><a data-toggle="tab" href="#projectAdvanced<?php echo $x; ?>">Erweiterte Optionen</a></li>
                         <li><a data-toggle="tab" href="#projectSeries<?php echo $x; ?>">Routine Aufgabe</a></li>
-                        <?php if($x): ?><li><a data-toggle="tab" href="#projectBookings<?php echo $x; ?>">Routine Aufgabe</a></li><?php endif; ?>
                     </ul>
                     <div class="tab-content">
                         <div id="projectBasics<?php echo $x; ?>" class="tab-pane fade in active"><br>
@@ -112,9 +110,15 @@ if($x){
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
                             ?>
                             <div class="col-md-4">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OWNER"]; ?>*</label>
+                                <label><?php echo $lang["OWNER"]; ?>*</label>
                                 <select class="select2-team-icons required-field" name="owner">
                                 <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["LEADER"]; ?>*</label>
+                                <select class="select2-team-icons required-field" name="leader">
+                                <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -139,37 +143,11 @@ if($x){
                                     ?>
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
-                                <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
-                                    <?php
-                                    $result = $modal_options;
-                                    for($i = 0; $i < count($dynrow_emps); $i++){
-                                        if($dynrow_emps[$i]['position'] == 'optional')
-                                        $result = str_replace('<option value="'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="'.$dynrow_emps[$i]['userid'].'" ', $result);
-                                    }
-                                    echo $result;
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade"><br>
-                            <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
-                            <textarea class="form-control projectDescriptionEditor" rows="10" name="description" ><?php echo $dynrow['projectdescription']; ?></textarea>
-                            <br>
-                            <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></label>
-                            <br>
-                            <label class="btn btn-default" role="button"><?php echo $lang["DYNAMIC_PROJECTS_CHOOSE_PICTURES"]; ?>
-                                <input type="file" name="images" multiple class="form-control" style="display:none;" id="projectImageUpload" accept=".jpg,.jpeg,.png">
-                            </label>
-                            <div id="projectPreview<?php echo $x; ?>">
-                                <?php
-                                if(isset($_POST['imagesbase64'])){
-                                    foreach ($_POST['imagesbase64'] as $modal_picture) {
-                                        echo "<span><img src='$modal_picture' alt='Previously uploaded' class='img-thumbnail' style='width:48%;margin:0.45%'></span>";
-                                    }
-                                }
-                                ?>
+
+                            <div class="col-md-12"><br>
+                                <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
+                                <textarea class="form-control projectDescriptionEditor" name="description" ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <br>
                             </div>
                         </div>
                         <div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>
@@ -197,22 +175,35 @@ if($x){
                                     <input type='number' class="form-control" name='completed' value="<?php echo $dynrow['projectpercentage']; ?>" min="0" max="100" step="1"/>
                                 </div><br>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
                                 <input type="color" class="form-control" value="<?php echo $dynrow['projectcolor']; ?>" name="color"><br>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
                                 <select class="form-control js-example-basic-single" name="parent">
                                     <option value=''>Keines</option>
                                     <?php
                                     $result = $conn->query("SELECT projectid, projectname FROM dynamicprojects");
                                     while ($row = $result->fetch_assoc()) {
-                                        $selected = ($row['projectid'] == $dynrow['projectowner']) ? 'selected' : '';
+                                        $selected = ($row['projectid'] == $dynrow['projectparent']) ? 'selected' : '';
                                         echo '<option '.$selected.' value="'.$row["projectid"].'" >'.$row["projectname"].'</option>';
                                     }
                                     ?>
                                 </select><br>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
+                                <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
+                                    <?php
+                                    $result = $modal_options;
+                                    for($i = 0; $i < count($dynrow_emps); $i++){
+                                        if($dynrow_emps[$i]['position'] == 'optional')
+                                        $result = str_replace('<option value="'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="'.$dynrow_emps[$i]['userid'].'" ', $result);
+                                    }
+                                    echo $result;
+                                    ?>
+                                </select>
                             </div>
                         </div>
                         <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>
@@ -306,53 +297,6 @@ if($x){
                                 </label>
                                 <br>
                             </div>
-                        </div>
-                        <div id="projectBookings<?php echo $x; ?>" class="tab-pane fade"><br>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Benutzer</th>
-                                        <th>Von</th>
-                                        <th>Bis</th>
-                                        <th>Infotext</th>
-                                        <th>%</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    function carryOverAdder_Hours($a, $b) {
-                                        $b = round($b);
-                                        if ($a == '0000-00-00 00:00:00') {
-                                            return $a;
-                                        }
-                                        $date = new DateTime($a);
-                                        if ($b < 0) {
-                                            $b *= -1;
-                                            $date->sub(new DateInterval("PT" . $b . "H"));
-                                        } else {
-                                            $date->add(new DateInterval("PT" . $b . "H"));
-                                        }
-                                        return $date->format('Y-m-d H:i:s');
-                                    }
-                                    $result = $conn->query("SELECT p.start, p.end, infoText, internInfo, firstname, lastname, timeToUTC
-                                        FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID LEFT JOIN UserData ON logs.userID = UserData.id WHERE p.dynamicID = '$x' ORDER BY p.start");
-                                    echo $conn->error;
-                                    while($result && ($row = $result->fetch_assoc())){
-                                        $A = substr(carryOverAdder_Hours($row['start'],$row['timeToUTC']),0, -3);
-                                        $B = 'Gerade in Arbeit';
-                                        if($row['end'] != '0000-00-00 00:00:00') $B = substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']), 11, 5);
-
-                                        echo '<tr>';
-                                        echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
-                                        echo '<td>'.$A.'</td>';
-                                        echo '<td>'.$B.'</td>';
-                                        echo '<td>'.$row['infoText'].'</td>';
-                                        echo '<td>'.$row['internInfo'].'</td>';
-                                        echo '</tr>';
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
                         </div>
                     </div><!-- /tab-content -->
                 </div><!-- /modal-body -->

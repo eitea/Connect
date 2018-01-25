@@ -1,23 +1,22 @@
 <?php
 $routes = array(
-  'php/info' => 'system/phpinfo.php',                               'php/test' => 'template.php',                               'setup/run' => 'setup/setup.php',
-  'login/auth' => 'login/login.php',                                'login/register' => 'login/selfregistration.php',           'login/update' => 'login/doUpdate.php',
-  'login/access' => 'login/login_tester.php',
+  'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
+  'login/access' => 'core/login/login_tester.php',                  'setup/run' => 'core/setup/setup.php',
 
-  'user/home' => 'user/home.php',                                   'user/time' => 'user/timeCalcTable.php',                    'user/book' => 'user/userProjecting.php',
-  'user/logout' => 'user/logout.php',                               'user/request' => 'user/makeRequest.php',                   'user/ready' => 'user/readyPlan.php',
+  'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
+  'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
 
-  'social/home' => 'system/socialMedia.php',
+  'social/home' => 'core/system/socialMedia.php',                   'php/info' => 'core/system/phpinfo.php',
 
-  'system/users' => 'system/editUsers.php',                         'system/saldo' => 'system/admin_saldoview.php',              'system/register' => 'system/register.php',
-  'system/deactivated' => 'system/deactivatedUsers.php',            'system/company' => 'system/editCompanies.php',              'system/new' => 'system/new_Companies.php',
-  'system/teams' => 'system/teamConfig.php',                        'system/holidays' => 'system/editHolidays.php',              'system/advanced' => 'system/advancedOptions.php',
-  'system/password' => 'system/passwordOptions.php',                'system/email' => 'system/reportOptions.php',                'system/tasks' => 'system/taskScheduler.php',
-  'system/update' => 'system/pullGitRepo.php',                      'system/backup' => 'system/system_backup.php',               'system/restore' => 'system/system_restore.php',
-  'system/designer' => 'system/templateSelect.php',                 'system/clients' => 'system/editCustomers.php',              'system/clientDetail' => 'system/editCustomer_detail.php',
-  'system/previewTem' => 'system/templatePreview.php',              'system/downloadTem' => 'system/templateDownload.php',       'system/editTemp' => 'system/templateEdit.php',
-  'system/downloadSql' => 'system/system_backup_download.php',      'system/cryptlog'=> 'system/viewCryptLog.php',               'system/restic' => 'system/resticBackup.php',
-  'system/checkinLogs' => 'system/checkinLogs.php',
+  'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
+  'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
+  'system/teams' => 'core/system/teamConfig.php',                        'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
+  'system/password' => 'core/system/passwordOptions.php',                'system/email' => 'core/system/reportOptions.php',                'system/tasks' => 'core/system/taskScheduler.php',
+  'system/update' => 'core/system/pullGitRepo.php',                      'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',
+  'system/designer' => 'core/system/templateSelect.php',                 'system/clients' => 'core/system/editCustomers.php',              'system/clientDetail' => 'core/system/editCustomer_detail.php',
+  'system/previewTem' => 'core/system/templatePreview.php',              'system/downloadTem' => 'core/system/templateDownload.php',       'system/editTemp' => 'core/system/templateEdit.php',
+  'system/downloadSql' => 'core/system/system_backup_download.php',      'system/cryptlog'=> 'core/system/viewCryptLog.php',               'system/restic' => 'core/system/resticBackup.php',
+  'system/checkinLogs' => 'core/system/checkinLogs.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',

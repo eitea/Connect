@@ -357,9 +357,6 @@ $lang_ger['DYNAMIC_PROJECTS_PROJECT_NAME'] = 'Taskbezeichnung';
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priority';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_PRIORITY'] = 'Priorität';
 
-$lang_eng['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Owner';
-$lang_ger['DYNAMIC_PROJECTS_PROJECT_OWNER'] = 'Verantwortlicher Mitarbeiter';
-
 $lang_eng['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optional employees';
 $lang_ger['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optionale Mitarbeiter';
 
@@ -693,6 +690,9 @@ $lang_ger['LAST_BOOKING'] = 'Letzte Buchung';
 $lang_eng['LASTNAME'] = 'Lastname';
 $lang_ger['LASTNAME'] = 'Nachname';
 
+$lang_eng['LEADER'] = 'Leader';
+$lang_ger['LEADER'] = 'Verantwortlicher Mitarbeiter';
+
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
 
@@ -836,6 +836,9 @@ $lang_ger['OVERTIME_ALLOWANCE'] = 'Überstundenpauschale';
 
 $lang_eng['OVERVIEW'] = 'Overview';
 $lang_ger['OVERVIEW'] = 'Übersicht';
+
+$lang_eng['OWNER'] = 'Owner';
+$lang_ger['OWNER'] = 'Besitzer';
 
 $lang_eng['PARTIAL_SUM'] = 'Partial Sum';
 $lang_ger['PARTIAL_SUM'] = 'Zwischensumme';
