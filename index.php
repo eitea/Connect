@@ -70,7 +70,7 @@ if($l > 1){
   } else {
     header('HTTP/1.0 404 Not Found');
     include '404.html';
-  }
+}
 } else {
   header('Location: login/auth');
 }

@@ -160,7 +160,7 @@ ignore_user_abort(1);
 
             set_time_limit(0); //setup takes longer with a laptop in energy saving mode
             //create all tables
-            require dirname(__DIR__) . "/setup_inc.php";
+            require "setup_inc.php";
             create_tables($conn);
 
             require_once dirname(dirname(__DIR__)) . "/version_number.php";
