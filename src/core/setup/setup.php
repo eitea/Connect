@@ -71,26 +71,6 @@ ignore_user_abort(1);
     }
     return true;
   }
-  function icsToArray($paramUrl) {
-    $icsFile = file_get_contents($paramUrl);
-    $icsData = explode("BEGIN:", $icsFile);
-    foreach ($icsData as $key => $value) {
-      $icsDatesMeta[$key] = explode("\n", $value);
-    }
-    foreach ($icsDatesMeta as $key => $value) {
-      foreach ($value as $subKey => $subValue) {
-        if ($subValue != "") {
-          if ($key != 0 && $subKey == 0) {
-            $icsDates[$key]["BEGIN"] = $subValue;
-          } else {
-            $subValueArr = explode(":", $subValue, 2);
-            $icsDates[$key][$subValueArr[0]] = $subValueArr[1];
-          }
-        }
-      }
-    }
-    return $icsDates;
-  }
   ?>
   <div id="bodyContent">
     <div class="affix-content">
@@ -232,7 +212,22 @@ ignore_user_abort(1);
             $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 
             //insert holidays
-            $holidayFile = icsToArray(dirname(__DIR__) . '/Feiertage.txt');
+            $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');
+            foreach (explode("BEGIN:", $icsFile) as $key => $value) {
+              $icsDatesMeta[$key] = explode("\n", $value);
+            }
+            foreach ($icsDatesMeta as $key => $value) {
+              foreach ($value as $subKey => $subValue) {
+                if ($subValue != "") {
+                  if ($key != 0 && $subKey == 0) {
+                    $holidayFile[$key]["BEGIN"] = $subValue;
+                  } else {
+                    $subValueArr = explode(":", $subValue, 2);
+                    $holidayFile[$key][$subValueArr[0]] = $subValueArr[1];
+                  }
+                }
+              }
+            }
             $stmt = $conn->prepare("INSERT INTO holidays(begin, end, name) VALUES(?, ?, ?)");
             echo mysqli_error($conn);
             $stmt->bind_param("sss", $start, $end, $n);
@@ -253,7 +248,7 @@ ignore_user_abort(1);
 
               //insert taxRates
               $i = 1;
-              $file = fopen(dirname(__DIR__).'/Steuerraten.csv', 'r');
+              $file = fopen(__DIR__.'/Steuerraten.csv', 'r');
               if($file){
                 $stmt = $conn->prepare("INSERT INTO taxRates(id, description, percentage, account2, account3, code) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("isiiii", $i, $name, $percentage, $account2, $account3, $code);
@@ -273,7 +268,7 @@ ignore_user_abort(1);
               }
 
               //insert travelling expenses
-              $travellingFile = fopen(dirname(__DIR__) . "/Laender.txt", "r");
+              $travellingFile = fopen(__DIR__ . "/Laender.txt", "r");
               if ($travellingFile) {
                 $stmt = $conn->prepare("INSERT INTO travelCountryData(identifier, countryName, dayPay, nightPay) VALUES(?, ?, ?, ?)");
                 echo mysqli_error($conn);
@@ -322,7 +317,7 @@ ignore_user_abort(1);
               $sql = "INSERT INTO shippingMethods (name) VALUES ('Abholer')";
               $conn->query($sql);
               //insert accounts
-              $file = fopen(dirname(__DIR__).'/Kontoplan.csv', 'r');
+              $file = fopen(__DIR__.'/Kontoplan.csv', 'r');
               if($file){
                 $stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) SELECT id, ?, ?, ? FROM companyData");
                 $stmt->bind_param("iss", $num, $name, $type);
