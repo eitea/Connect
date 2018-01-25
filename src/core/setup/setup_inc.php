@@ -1200,6 +1200,7 @@ function create_tables($conn) {
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
+        estimatedHours INT(4) DEFAULT 0 NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1259,6 +1260,15 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo $conn->error;
     }
+
+    $conn->query("CREATE TABLE dynamicprojectslogs(
+        projectid VARCHAR(100) NOT NULL,
+        activity VARCHAR(20) NOT NULL,
+        logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        userID INT(6),
+        extra1 VARCHAR(250),
+        extra2 VARCHAR(450)
+    )");
 
     $sql = "CREATE TABLE sharedfiles (
         id int(11) NOT NULL AUTO_INCREMENT,

@@ -1566,6 +1566,27 @@ if ($row['version'] < 126) { //25.01.2018
     } else {
         echo '<br>Tasks: Projektleiter';
     }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD estimatedHours INT(4) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Geschätzte Zeit';
+    }
+
+    $conn->query("CREATE TABLE dynamicprojectslogs(
+        projectid VARCHAR(100) NOT NULL,
+        activity VARCHAR(20) NOT NULL,
+        logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        userID INT(6),
+        extra1 VARCHAR(250),
+        extra2 VARCHAR(450)
+    )");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Aktivitäten Log';
+    }
 }
 
 // ------------------------------------------------------------------------------
