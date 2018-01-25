@@ -498,6 +498,9 @@ $lang_ger['END'] = 'Ende';
 $lang_eng['ENTRANCE_DATE'] = 'Date of Entry';
 $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 
+$lang_eng['EMAIL_TASK'] = 'Automatic Task Builder';
+$lang_ger['EMAIL_TASK'] = 'Automatischer Task Builder';
+
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
@@ -1412,8 +1415,8 @@ $lang_ger['REQUEST_TOSTRING'] = array("vac" => "Urlaub", "acc" => "Neuer Account
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
 $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
 
-$lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly');
-$lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich');
+$lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly', '5' => 'Once every Five Minutes');
+$lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich', '5' => 'Einmal alle Fünf Minuten');
 
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");

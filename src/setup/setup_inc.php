@@ -651,7 +651,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE taskData(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
+        repeatPattern ENUM('-1', '0', '1', '2', '3', '4','5') DEFAULT '-1',
         runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
         description VARCHAR(200),
         lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -1340,6 +1340,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,
         server VARCHAR(50) NOT NULL,
         port VARCHAR(50) NOT NULL,
+        service ENUM('imap','pop3') NOT NULL,
         smtpSecure ENUM('','tls','ssl') NOT NULL,
         username VARCHAR(50) NOT NULL,
         password VARCHAR(50) NOT NULL,

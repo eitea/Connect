@@ -2280,7 +2280,8 @@ if($row['version'] < 125){
     $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");   
 }
 if($row['version'] < 126){
-    $conn->query("CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,server VARCHAR(50) NOT NULL,port VARCHAR(50) NOT NULL,smtpSecure ENUM('','tls','ssl') NOT NULL,username VARCHAR(50) NOT NULL,password VARCHAR(50) NOT NULL,logEnabled ENUM('TRUE','FALSE') NOT NULL,PRIMARY KEY (id))");
+    $conn->query("CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,server VARCHAR(50) NOT NULL,port VARCHAR(50) NOT NULL,service ENUM('imap','pop3') NOT NULL,smtpSecure ENUM('','tls','ssl') NOT NULL,username VARCHAR(50) NOT NULL,password VARCHAR(50) NOT NULL,logEnabled ENUM('TRUE','FALSE') NOT NULL,PRIMARY KEY (id))");
+    $conn->query("ALTER TABLE taskdata CHANGE repeatPattern repeatPattern ENUM('-1','0','1','2','3','4','5') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT '-1'");
     if ($conn->error) {
         echo $conn->error;
     } else {

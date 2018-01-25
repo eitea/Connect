@@ -9,7 +9,8 @@ require dirname(__DIR__) . '/utilities.php';
 '1' => 'Daily',
 '2' => 'Weekly',
 '3' => 'Monthly',
-'4' => 'Yearly'
+'4' => 'Yearly',
+'5' => 'every Five Minutes'
 */
 
 $result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
@@ -34,6 +35,8 @@ while($result && ($row = $result->fetch_assoc())){
       $expiryDate->add(new DateInterval('P1M'));
     } elseif($pattern === '4') {
       $expiryDate->add(new DateInterval('P12M'));
+    } elseif($pattern === '5') {
+      $expiryDate->add(new DateInterval('PT5M'));
     }
 
     $expiryDate = $expiryDate->format('Y-m-d H:i:s');
@@ -41,7 +44,7 @@ while($result && ($row = $result->fetch_assoc())){
       //4. execute task
       require $row['callee'];
       //5. update last runtime
-      if($task_id != 3){
+      if($task_id < 3){
         $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
       }
     }
