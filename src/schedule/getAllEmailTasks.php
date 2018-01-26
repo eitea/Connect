@@ -39,13 +39,14 @@ if($result){
                 )
             ));
             $imap->selectFolder("INBOX");
-            //TODO Get Them juicy Tasks out of those e-mails
-            //Derweilen Hard Coded
             $messages = $imap->getMessages();
+            $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
             for($i = 0;$i<count($messages);$i++){
-                if(strstr($messages[$i]->header->subject,"#Task#")){
-                    if(insertTask($messages[$i],$conn)) $imap->deleteMessage($messages[$i]->header->uid);
-                }
+                while($rule = $rulesets->fetch_assoc()){
+                    if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
+                        insertTask($imap,$messages[$i],$conn,$rule);
+                    }
+                } 
             }
             
         }catch(Exception $e){
@@ -60,50 +61,73 @@ return;
 
 
 
-function insertTask($message,$conn){
+function insertTask($imap,$messages,$conn,$ruleset){
+    $message = $messages->message;
     $allowedTags = "<div><p><b><img><a><br><em><hr><i><li><ol><s><span><table><tr><td><u><ul>";
-
+try{
     $id = uniqid();
     $null = null;
-    $name = str_replace("#Task#","",$message->header->subject);
-    $description = strip_tags($message->message->html,$allowedTags);
-    for($i=0;$i<count($message->attachments);$i++){
-        if($message->attachments[$i]->info->structure->disposition == "inline"){
-            $description = str_replace("cid:".trim($message->attachments[$i]->info->structure->id,'<>'),"data:image/".$message->attachments[$i]->info->structure->subtype.";base64,".base64_encode($message->attachments[$i]->body),$description);
+    $name = str_replace($ruleset['identifier'],"",$messages->header->subject);
+    $description = strip_tags($messages->message->html,$allowedTags);
+    for($i=0;$i<count($messages->attachments);$i++){
+        if($messages->attachments[$i]->info->structure->disposition == "inline"){
+            $description = str_replace("cid:".trim($messages->attachments[$i]->info->structure->id,'<>'),"data:image/".$messages->attachments[$i]->info->structure->subtype.";base64,".base64_encode($messages->attachments[$i]->body),$description);
         }
     }
-    $company = 1;
-    $client = '';
+    $company = $ruleset['company'];
+    $client = $ruleset['client'];
     $project = '';
-    $color = '#FFFFFF';
+    $color = $ruleset['color'];
     $start = date('Y-m-d');
     $end = '';
-    $status = 'ACTIVE';
-    $priority = 3; //1-5
-    $parent = ''; //dynamproject id
-    $owner = 1;
+    $status = $ruleset['status'];
+    $priority = $ruleset['priority']; //1-5
+    $parent = $ruleset['parent']; //dynamproject id
+    $owner = $ruleset['owner'];
     $percentage = 0;
     $series = null;
+    $projectleader = $ruleset['leader'];
 
-                // PROJECT
-                $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null, $percentage);
-                $stmt->send_long_data(2, $description);
-                $stmt->send_long_data(12, $series);
+    // PROJECT
+    $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+        projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage, projectleader) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssbiiissssisisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $null, $percentage, $projectleader);
+    $stmt->send_long_data(2, $description);
+    $stmt->send_long_data(12, $series);
+    $stmt->execute();
+
+    if(!$stmt->error){
+        $stmt->close();
+        //EMPLOYEES
+        $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
+        $stmt->bind_param("is", $employee, $position);
+        $position = 'normal';
+        
+        $employees = explode(",",$ruleset['employees']);
+        foreach($employees as $employee){
+            $emp_array = explode(";", $employee);
+            if ($emp_array[0] == "user") {
+                $employee = intval($emp_array[1]);
                 $stmt->execute();
+            } else {
+                $team = intval($emp_array[1]);
+                $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
+            }
+            $stmt->execute();
+        }
+        if(!empty($ruleset['optionalemployees'])){
+            $position = 'optional';
+            $employees = explode(",",$ruleset['optionalemployees']);
+            foreach ($employees as $optional_employee) {
+                $employee = intval($optional_employee);
+                $stmt->execute();
+            }
+        }
+    }
+    $stmt->close();
+    $imap->deleteMessage($messages->header->uid);
+}catch(Exception $e){
 
-                if(!$stmt->error){
-                    $stmt->close();
-                    //EMPLOYEES
-                    $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
-                    $stmt->bind_param("is", $employee, $position);
-                    $position = 'normal';
-     
-                    $employee = 2;
-                    $stmt->execute();
-                }
-                $stmt->close();
-                return true;
+}
 }
 ?>
