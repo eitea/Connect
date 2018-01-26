@@ -105,15 +105,7 @@ try{
         
         $employees = explode(",",$ruleset['employees']);
         foreach($employees as $employee){
-            $emp_array = explode(";", $employee);
-            if ($emp_array[0] == "user") {
-                $employee = intval($emp_array[1]);
                 $stmt->execute();
-            } else {
-                $team = intval($emp_array[1]);
-                $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
-            }
-            $stmt->execute();
         }
         if(!empty($ruleset['optionalemployees'])){
             $position = 'optional';
@@ -124,6 +116,7 @@ try{
             }
         }
     }
+
     $stmt->close();
     $imap->deleteMessage($messages->header->uid);
 }catch(Exception $e){

@@ -50,11 +50,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <table class="table">
   <thead><tr>
     <th>Server</th>
-    <th>Port</th>
     <th>Service</th>
     <th>Security</th>
     <th>Username</th>
-    <th>Log</th>
+    <th><?php echo $lang['RULES'] ?></th>
     <th><button type="button" title="Test" onClick="test()" class="btn btn-default" ><i class="fa fa-plus"></i></button></th>
   </tr></thead>
   <tbody>
@@ -63,11 +62,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     while ($row = $result->fetch_assoc()) {
         echo "<tr>";
         echo '<td>' . $row['server'] . '</td>';
-        echo '<td>' . $row['port'] . '</td>';
         echo '<td>' . strtoupper($row['service']) . '</td>';
         echo '<td>' . ($row['smtpSecure']=='null' ? 'none' : $row['smtpSecure']). '</td>';
         echo '<td>' . $row['username'] . '</td>';
-        echo '<td>' . $row['logEnabled'] . '</td>';
+        echo '<td><button type="button" data-toggle="modal" data-target="#edit-rules" onClick="editRules(event,'.$row['id'].')" class="btn btn-default" title="'.$lang['RULES'].'"><i class="fa fa-cog"></i></button></td>';
         echo '<td><form method="POST">';
         echo '<button type="button" data-toggle="modal" data-target="#edit-account" onClick="editAccount(event,'.$row['id'].')" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
         echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
@@ -151,6 +149,76 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </div>
 </form>
+
+<div class="modal fade" id="edit-rules">
+    <div class="modal-dialog modal-content modal-lg">
+      <div class="modal-header h4"><?php echo $lang['ADD']; ?>
+        <button id="addRule" style="float: right" type="button" class="btn btn-warning" data-toggle="modal" data-target="#add-rule"><i class="fa fa-plus"></i></button>
+      </div>
+      <div class="modal-body">
+      <table class="table">
+        <thead><tr>
+            <th>Identification</th>
+            <th>Company</th>
+            <th>Client</th>
+            <th>Color</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Parent</th>
+            <th>Owner</th>
+            <th>Employees</th>
+            <th>Opt. Employees</th>
+            <th>Task-Leader</th>
+        </tr></thead>
+        <tbody id="rulesBody">
+
+        </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+    
+</div>
+
+    <div class="modal fade" id="add-rule">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
+      <div class="modal-body">
+        <label>Identifier</label>
+        <input id="Identifier" class="form-control" type="text" />
+        <label>Company</label>
+        <input id="Company" class="form-control" type="text" />
+        <label>Client</label>
+        <input id="Client" class="form-control" type="text" />
+        <label>Color</label>
+        <input id="Color" class="form-control" type="text" />
+        <label>Status</label>
+        <input id="Status" class="form-control" type="text" />
+        <label>Priority</label>
+        <input id="Priority" class="form-control" type="text" />
+        <label>Parent</label>
+        <input id="Parent" class="form-control" type="text" />
+        <label>Owner</label>
+        <input id="Owner" class="form-control" type="text" />
+        <label>Employees</label>
+        <input id="Employees" class="form-control" type="text" />
+        <label>Opt. Employees</label>
+        <input id="Opt. Employees" class="form-control" type="text" />
+        <label>Task-Leader</label>
+        <input id="Task-Leader" class="form-control" type="text" />
+        <input id="emailId" class="form-control" type="number" style="visibility: hidden"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
+      </div>
+    </div>
+  </div>
+
+
+
 <script>
     function editAccount(event,e_id){
         var id = document.getElementById("edit_id");
@@ -171,7 +239,79 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         id.setAttribute("value",e_id);
         //TODO: Hier forstsetzten mit setzen der Werte
     }
-
+    function changeIdForRule(id){
+        document.getElementById("emailId").setAttribute("value", id);
+    }
+    function addRule(){
+        $.post("../misc/newrule",{
+            Identifier: document.getElementById("Identifier").value,
+            Company: document.getElementById("Company").value,
+            Client: document.getElementById("Client").value,
+            Color: document.getElementById("Color").value,
+            Status: document.getElementById("Status").value,
+            Priority: document.getElementById("Priority").value,
+            Parent: document.getElementById("Parent").value,
+            Owner: document.getElementById("Owner").value,
+            Employees: document.getElementById("Employees").value,
+            OEmployees: document.getElementById("Opt. Employees").value,
+            Leader: document.getElementById("Task-Leader").value,
+            id: document.getElementById("emailId").value,
+        }, function(data){
+            console.log(data);
+            editRules(null,data);
+        });
+    }
+    function editRules(event,id){
+        var body = document.getElementById("rulesBody");
+        document.getElementById("addRule").setAttribute("onClick","changeIdForRule("+id+")");
+        while(body.firstChild){
+            body.removeChild(body.firstChild);
+        }
+        $.post("../misc/getrules",{
+            id: id
+        } , function(data){
+            //console.log(data);
+            var rulesets = JSON.parse(data);
+            for(i = 0;i<rulesets.length;i++){
+                var client = document.createElement("td");
+                var color = document.createElement("td");
+                var company = document.createElement("td");
+                var employees = document.createElement("td");
+                var identifier = document.createElement("td");
+                var leader = document.createElement("td");
+                var optionalemployees = document.createElement("td");
+                var owner = document.createElement("td");
+                var parenttask = document.createElement("td");
+                var priority = document.createElement("td");
+                var status = document.createElement("td");
+                var parent = document.createElement("tr");
+                client.innerHTML = rulesets[i]['client'];
+                color.innerHTML = rulesets[i]['color'];
+                company.innerHTML = rulesets[i]['company'];
+                employees.innerHTML = rulesets[i]['employees'];
+                identifier.innerHTML = rulesets[i]['identifier'];
+                optionalemployees.innerHTML = rulesets[i]['optionalemployees'];
+                leader.innerHTML = rulesets[i]['leader'];
+                owner.innerHTML = rulesets[i]['owner'];
+                parenttask.innerHTML = rulesets[i]['parent'];
+                priority.innerHTML = rulesets[i]['priority'];
+                status.innerHTML = rulesets[i]['status'];
+                parent.appendChild(identifier);
+                parent.appendChild(company);
+                parent.appendChild(client);
+                parent.appendChild(color);
+                parent.appendChild(status);
+                parent.appendChild(priority);
+                parent.appendChild(parenttask);
+                parent.appendChild(owner);
+                parent.appendChild(employees);
+                parent.appendChild(optionalemployees);
+                parent.appendChild(leader);
+                body.appendChild(parent);
+            }
+            //console.log(rulesets);
+        })
+    }
     function test(){
       $.get("../misc/taskemails", function(data){
           console.log(data);

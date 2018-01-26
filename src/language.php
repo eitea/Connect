@@ -1014,6 +1014,9 @@ $lang_ger['REQUEST_TYPE'] = "Art des Antrags";
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 
+$lang_eng['RULES'] = 'Rules';
+$lang_ger['RULES'] = 'Regeln';
+
 $lang_eng['RUNTIME'] = 'Runtime';
 $lang_ger['RUNTIME'] = 'Laufzeit';
 

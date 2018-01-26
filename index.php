@@ -42,8 +42,8 @@ $routes = array(
 
   'upload/file' => 'archive/uploadToS3.php',
 
-  'pgp/keygen' => 'pgp/pgpKeyGen.php',                 'misc/sharedfiles' => 'misc/getSharedFiles.php',                          'misc/taskemails' => 'schedule/getAllEmailTasks.php',
-  'misc/checkemail' => 'misc/checkEmailAvailability.php'
+  'pgp/keygen' => 'pgp/pgpKeyGen.php',                              'misc/sharedfiles' => 'misc/getSharedFiles.php',              'misc/taskemails' => 'schedule/getAllEmailTasks.php',
+  'misc/checkemail' => 'misc/checkEmailAvailability.php',            'misc/getrules'    => 'misc/getRules.php',                   'misc/newrule'    => 'misc/newRule.php',
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
