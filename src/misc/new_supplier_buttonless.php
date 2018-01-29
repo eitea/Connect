@@ -44,8 +44,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </select><br>
                 </div>
                 <div class="col-md-6">
+                    <?php
+                    $clientNums = array(1 => '');
+                    $numstrings = '';
+                    $res_num = $conn->query("SELECT companyID, supplierStep, supplierNum FROM erp_settings");
+                    while($res_num && ($rowNum = $res_num->fetch_assoc())){
+                        $cmpnyID = $rowNum['companyID'];
+                        $step = $rowNum['supplierStep'];
+                        $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'TRUE' AND clientNumber IS NOT NULL AND clientNumber != '' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
+                        if($row_c_num = $res_c_num->fetch_assoc()){
+                            $num = $row_c_num['clientNumber'];
+                            if($row_c_num['clientNumber'] < $rowNum['supplierNum']){
+                                $num = $rowNum['supplierNum'];
+                            }
+                        } else {
+                            $num = $rowNum['supplierNum'];
+                            $step = 0;
+                        }
+                        $clientNums[$cmpnyID] = preg_replace('/[0-9]+/', '', $num) . (preg_replace('/[^0-9]+/', '', $num) + $step);
+                        $numstrings .= $cmpnyID .':"'. $clientNums[$cmpnyID] .'",';
+                    }
+                    ?>
                     <label>Lieferantennummer</label>
-                    <input type="text" class="form-control" name="clientNumber" placeholder="#" >
+                    <input id="clientNumber" type="text" class="form-control" name="clientNumber" value="<?php echo $clientNums[1]; ?>" >
                     <small> &nbsp Optional</small>
                 </div>
             </div>
@@ -56,3 +77,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </form>
     </div>
 </div>
+
+<script>
+$('#create_client_company').on('change', function(){
+    var clientNums = <?php echo "{ $numstrings }"; ?> ;
+    $('#clientNumber').val(clientNums[$(this).val()]);
+});
+</script>

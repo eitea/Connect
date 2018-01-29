@@ -226,7 +226,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$proposal_row['id_number'].'</small>'; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
-      <a href="../system/clientDetail?custID=<?php echo $filterings['client']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+      <a href="../system/clientDetail?custID=<?php echo $proposal_row['clientID']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
       <div class="btn-group">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Daten erneuern"><i class="fa fa-refresh"></i></a>
         <ul class="dropdown-menu">

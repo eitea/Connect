@@ -28,7 +28,6 @@ function create_tables($conn) {
         beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
         email VARCHAR(50) UNIQUE NOT NULL,
-        sid VARCHAR(50),
         gender ENUM('female', 'male'),
         preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
         kmMoney DECIMAL(4,2) DEFAULT 0.42,

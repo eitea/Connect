@@ -74,9 +74,9 @@ if($x){
                                     <select id="clientHint<?php echo $x; ?>" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, '<?php echo $dynrow['clientprojectid']; ?>', 'projectHint<?php echo $x; ?>');">
                                         <?php
                                         if(count($available_companies) <= 2 ){
-                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
+                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).");");
                                         } elseif($dynrow['companyid']){
-                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID = '".$dynrow['companyid']."';");
+                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = '".$dynrow['companyid']."';");
                                         }
                                         echo '<option value="0">...</option>';
                                         while($result && ($row_fc = $result_fc->fetch_assoc())){
@@ -103,7 +103,7 @@ if($x){
                             </div>
 
                             <div class="col-md-12"><small>*Auswahl ist Optional. Falls kein Projekt angegeben, entscheidet der Benutzer.</small><br><br></div>
-                            <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                            <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
                             $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
@@ -301,6 +301,7 @@ if($x){
                     </div><!-- /tab-content -->
                 </div><!-- /modal-body -->
                 <div class="modal-footer">
+                    <div class="pull-left"><?php echo $x; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                     <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
                 </div>
