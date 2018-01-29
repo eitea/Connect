@@ -1,11 +1,14 @@
 <?php
 /* for the good of all of us, write down all callers
-* getTimestamps.php
+* time_project.php
 * timeCalcTable.php
-* 
+*
 * sendMailReport - utilities.php
 * admin_saldoview
 * tableSummary
+
+This Class takes a userID, start and end date, and performs a full calculation
+
 */
 require_once dirname(__DIR__). "/utilities.php";
 
@@ -34,10 +37,10 @@ class Interval_Calculator{
   public $absolvedTime = array();
   public $endOfMonth = array(); //[date => [overtime, correction]]
   public $saldo = 0;
-  
+
   public $prev_saldo = 0;
-  
-  //PHP funfact: 32Bit servers running php cannot calculate dates past 2038 (not enough bits).
+
+  //PHP funfact: 32Bit servers running php cannot calculate dates past 2038.
   public function __construct($userid, $start = 0, $end = 0){
     $this->id = $userid;
     include dirname(__DIR__). "/connection.php";
@@ -71,7 +74,7 @@ class Interval_Calculator{
       $this->dayOfWeek[$this->days] = strtolower(date('D', strtotime($i)));
       $this->date[$this->days] = substr($i, 0, 10);
 
-      //get interval 
+      //get interval
       $sql = "SELECT * FROM $intervalTable WHERE userID = $id AND (endDate IS NULL AND (DATE(startDate) <= DATE('$i')) OR (endDate IS NOT NULL AND DATE(startDate) <= DATE('$i') AND DATE('$i') < DATE(endDate)))";
       $result = $conn->query($sql);
       if($result && $result->num_rows > 0){
@@ -174,7 +177,7 @@ class Interval_Calculator{
         $this->endOfMonth[$this->date[$this->days]]['correction'] = $current_corrections;
         $this->saldo += $current_corrections;
       }
-      
+
       if(timeDiff_Hours($i, $this->startCalculation) > 0){
         $this->prev_saldo = $this->saldo;
       } else {

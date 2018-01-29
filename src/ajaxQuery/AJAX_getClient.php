@@ -4,23 +4,21 @@ require dirname(__DIR__)."/connection.php";
 $cmpID = intval($_GET['companyID']);
 
 if(isset($_GET['clientID'])){
-  $p = intval($_GET['clientID']);
+  $clientID = intval($_GET['clientID']);
 } else {
-  $p = 0;
+  $clientID = 0;
 }
 $result = mysqli_query($conn, "SELECT * FROM $clientTable WHERE companyID = $cmpID AND isSupplier = 'FALSE' ORDER BY name ASC ");
-if($result && $result->num_rows > 1){
-  echo "<option name='clnt' value=0 >...</option>";
-}
+echo "<option name='clnt' value=0 >...</option>";
+
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
-    $clientID = $row['id'];
     $clientName = $row['name'];
     $selected = "";
-    if($p != 0 && $p == $clientID){
+    if($clientID != 0 && $clientID == row['id']){
       $selected = "selected";
     }
-    echo "<option $selected name='clnt' value=$clientID>$clientName</option>";
+    echo '<option '.$selected.' value="'.$row['id'].'">'.$row['name'].'</option>';
   }
 }
 ?>
