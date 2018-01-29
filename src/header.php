@@ -805,7 +805,23 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
                   </div>
                 </li>
 
-                <li><a <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="../erp/articles"><span><?php echo $lang['ARTICLE']; ?></span></a></li>
+                <li>
+                    <a id="articleToggle" <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleArticle" data-parent="#sidenav01" class="collapse in">
+                        <span><?php echo $lang['ARTICLE']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleArticle" style="height: 0px;">
+                        <ul class="nav nav-list">
+                            <?php
+                            $result = $conn->query("SELECT * FROM $companyTable");
+                            while ($result && ($row = $result->fetch_assoc())) {
+                                if (in_array($row['id'], $available_companies)) {
+                                    echo "<li><a href='../erp/articles?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li>
                 <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
                 <li><a disabled href=""><span><?php echo $lang['VACANT_POSITIONS']; ?></span></a></li>
 
@@ -834,7 +850,7 @@ $checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-cki
         } elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
             echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
-            echo "<script>$('#adminOption_ERP').click();</script>";
+            echo "<script>document.getElementById('articleToggle').click();$('#adminOption_ERP').click();</script>";
         }
         ?>
       <?php endif;?>
