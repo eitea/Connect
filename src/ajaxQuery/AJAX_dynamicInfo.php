@@ -45,7 +45,6 @@ $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
                                 $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
                                 $B = 'Gerade in Arbeit';
                                 if ($row['end'] != '0000-00-00 00:00:00') $B = substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']), 11, 5);
-
                                 echo '<tr>';
                                 echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
                                 echo '<td>'.substr($A,0,10).'</td>';
@@ -71,9 +70,11 @@ $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
                             $result = $conn->query("SELECT firstname, lastname, p.activity, logTime FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
                             echo $conn->error;
                             while($result && ($row = $result->fetch_assoc())){
+                                echo '<tr>';
                                 echo '<td>'.$row['logTime'].'</td>';
                                 echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
                                 echo '<td>'.$row['activity'].'</td>';
+                                echo '</tr>';
                             }
                             ?>
                         </tbody>

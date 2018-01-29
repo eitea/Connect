@@ -196,6 +196,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($filterings['tasks']){ $query_status = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
+        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? ORDER BY logTime DESC LIMIT 1"); //get the latest activity
+        $stmt_viewed->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
@@ -220,9 +222,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo $conn->error;
         while($row = $result->fetch_assoc()){
             $x = $row['projectid'];
-            echo '<tr>';
+            $rowStyle = '';
+            $stmt_viewed->execute();
+            $viewed = $stmt_viewed->get_result();
+            if(($viewed = $viewed->fetch_assoc()) && ($viewed['activity'] == 'CREATED' || $viewed['activity'] == 'EDITED') ){ $rowStyle = 'style="color:blue; font-weight:bold;"'; }
+            echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
-            echo '<td><a type="button" class="btn btn-default" data-toggle="modal" data-target="#view-'.$x.'" >View</a></td>';
+            echo '<td><button type="button" class="btn btn-default view-modal-open" data-toggle="modal" data-target="#view-'.$x.'" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
@@ -466,7 +472,7 @@ function dynamicOnLoad(modID){
 function appendModal(index){
     $.ajax({
     url:'ajaxQuery/AJAX_dynamicEditModal.php',
-    data:{projectid: index, userid: <?php echo $userID; ?> },
+    data:{projectid: index},
     type: 'get',
     success : function(resp){
       $("#editingModalDiv").append(resp);
@@ -517,6 +523,18 @@ $('button[name=infoModal]').click(function(){
   }
 });
 
+$('.view-modal-open').click(function(){
+    var o = $(this);
+    $.ajax({
+    url:'ajaxQuery/AJAX_dynamicView.php',
+    data:{projectid: o.val()},
+    type: 'get',
+    success : function(resp){
+        o.parent().parent().removeAttr('style');
+    },
+    error : function(resp){ alert(resp); }
+   });
+});
 $(document).ready(function() {
     dynamicOnLoad();
     $('.table').DataTable({

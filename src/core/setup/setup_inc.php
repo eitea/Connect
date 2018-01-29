@@ -225,7 +225,7 @@ function create_tables($conn) {
         fromDate DATETIME NOT NULL,
         toDate DATETIME,
         status ENUM('0', '1', '2') DEFAULT '0',
-        requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div', 'doc') DEFAULT 'vac',
+        requestType VARCHAR(3) DEFAULT 'vac' NOT NULL,
         requestText VARCHAR(150),
         answerText VARCHAR(150),
         requestID INT(10) DEFAULT 0,
