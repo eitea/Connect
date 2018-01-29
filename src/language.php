@@ -696,6 +696,9 @@ $lang_ger['LASTNAME'] = 'Nachname';
 $lang_eng['LEADER'] = 'Leader';
 $lang_ger['LEADER'] = 'Verantwortlicher Mitarbeiter';
 
+$lang_eng['LEADER_REPLACEMENT'] = 'Leader Replacement';
+$lang_ger['LEADER_REPLACEMENT'] = 'Stellvertretender Mitarbeiter';
+
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
 

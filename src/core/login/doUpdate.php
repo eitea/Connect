@@ -1602,6 +1602,13 @@ if($row['version'] < 127){ //29.01.2018
     } else {
         echo '<br>Artikel: Mandanten-Bezogen';
     }
+
+    $conn->query("ALTER TABLE teamdata ADD leader INT(6), ADD leaderreplacement INT(6)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Teams: Leader-Update';
+    }
 }
 
 // ------------------------------------------------------------------------------

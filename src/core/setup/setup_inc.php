@@ -611,7 +611,9 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(60),
         companyID INT(6) UNSIGNED,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        FOREIGN KEY (companyID) REFERENCES companyData(id),
+        leader INT(6),
+        leaderreplacement INT(6)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";

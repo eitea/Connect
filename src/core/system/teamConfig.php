@@ -3,7 +3,9 @@
 $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
   $name = test_input($_POST['createTeam_name']);
-  $conn->query("INSERT INTO $teamTable (name) VALUES('$name')");
+  $leader = test_input($_POST['leader']);
+  $replacement = test_input($_POST['replacement']);
+  $conn->query("INSERT INTO $teamTable (name,leader,leaderreplacement) VALUES('$name', '$leader', '$replacement')");
   $teamID = mysqli_insert_id($conn);
   foreach($_POST['createTeam_members'] AS $user){
     $conn->query("INSERT INTO $teamRelationshipTable(teamID, userID) VALUES($teamID, $user)");
@@ -101,6 +103,26 @@ echo mysqli_error($conn);
         <div class="modal-body">
           <label>Name</label>
           <input type="text" class="form-control" name="createTeam_name" placeholder="Name" /><br>
+          <div class="row form-group">
+            <label><?php echo $lang['LEADER'] ?></label>
+            <select name="leader" class="form-control">
+              <?php
+              $result = $conn->query("SELECT id, firstname, lastname FROM $userTable");
+              while($result && ($row = $result->fetch_assoc())){
+                echo '<option value="'.$row['id'].'">'.$row['firstname'].' '.$row['lastname'].'</option>';
+              }
+              ?>
+            </select>
+            <label><?php echo $lang['LEADER_REPLACEMENT'] ?></label>
+            <select name="replacement" class="form-control">
+              <?php
+              $result = $conn->query("SELECT id, firstname, lastname FROM $userTable");
+              while($result && ($row = $result->fetch_assoc())){
+                echo '<option value="'.$row['id'].'">'.$row['firstname'].' '.$row['lastname'].'</option>';
+              }
+              ?>
+            </select>
+          </div>
           <label>Benutzer</label>
           <div class="container-fluid checkbox">
             <?php
