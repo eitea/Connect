@@ -15,9 +15,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $Status = $_POST['Status'];
                 $Priority = $_POST['Priority'];
                 $Parent = $_POST['Parent'];
+                if($Parent === "0") $Parent = null;
                 $Owner = $_POST['Owner'];
-                $Employees = $_POST['Employees'];
-                $OEmployees = $_POST['OEmployees'];
+                $EmployeesCollection = $_POST['Employees'];
+                $Employees = '';
+                foreach($EmployeesCollection as $Employee){
+                    $Employees = $Employees.$Employee.',';
+                }
+                $OEmployees = '';
+                $OEmployeesCollection = $_POST['OEmployees'];
+                foreach($OEmployeesCollection as $Employee){
+                    $OEmployees = $OEmployees.$Employee.',';
+                }
                 $Leader = $_POST['Leader'];
                 $conn->query("INSERT INTO taskemailrules VALUES(null,'$Identifier','$Company','$Client','$Color','$Status','$Priority','$Parent','$Owner','$Employees','$OEmployees','$id','$Leader')");
                 if($conn->error){

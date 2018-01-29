@@ -41,6 +41,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 }
+
+
 ?>
 <div class="page-header"><h3><?php echo $lang['PROJECT_OPTIONS']; ?>
   <div class="page-header-button-group">
@@ -169,6 +171,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th>Employees</th>
             <th>Opt. Employees</th>
             <th>Task-Leader</th>
+            <th></th>
         </tr></thead>
         <tbody id="rulesBody">
 
@@ -181,10 +184,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
     
 </div>
-
     <div class="modal fade" id="add-rule">
-    <div class="modal-dialog modal-content modal-md">
+    <div class="modal-dialog modal-content modal-lg">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
+      <!--TODO: Get the Form-Layout from AJAX_dynamicEditModal.php but keep the id's for the inputs -->
+      <!-- OLD BODY 
       <div class="modal-body">
         <label>Identifier</label>
         <input id="Identifier" class="form-control" type="text" />
@@ -210,6 +214,130 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <input id="Task-Leader" class="form-control" type="text" />
         <input id="emailId" class="form-control" type="number" style="visibility: hidden"/>
       </div>
+        NEW BODY -->
+        <div class="modal-body">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#projectBasics">Basic*</a></li>
+                        <li><a data-toggle="tab" href="#projectAdvanced">Erweiterte Optionen</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="projectBasics" class="tab-pane fade in active"><br>
+                        <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="Erkennung im E-Mail-Betreff" /><br></div>
+                            <div class="row">
+                                <?php
+                                if(count($available_companies ) > 2){
+                                    $result_fc = mysqli_query($conn, "SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+                                    echo '<div class="col-sm-4"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" id="Company" name="filterCompany" onchange="showClients(this.value, \''.$userID.'\', \'clientHint\');" >';
+                                    echo '<option value="0">...</option>';
+                                    while($result && ($row_fc = $result_fc->fetch_assoc())){
+                                        $checked = $dynrow['companyid'] == $row_fc['id'] ? 'selected' : '';
+                                        echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                                    }
+                                    echo '</select></div>';
+                                }
+                                ?>
+                                <div class="col-sm-4">
+                                    <label><?php echo $lang['CLIENT']; ?></label>
+                                    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, '<?php echo $dynrow['clientprojectid']; ?>', 'projectHint');">
+                                        <?php
+                                        if(count($available_companies) <= 2 ){
+                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
+                                        }
+                                        echo '<option value="0">...</option>';
+                                        while($result && ($row_fc = $result_fc->fetch_assoc())){
+                                            $checked = $dynrow['clientid'] == $row_fc['id'] ? 'selected' : '';
+                                            echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12"><small>*Auswahl ist Optional. Falls kein Projekt angegeben, entscheidet der Benutzer.</small><br><br></div>
+                            
+                            <?php
+                            $modal_options = '';
+                            $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
+                            while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
+                            ?>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["OWNER"]; ?>*</label>
+                                <select id="Owner" class="select2-team-icons required-field" name="owner">
+                                <?php echo $modal_options; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["LEADER"]; ?>*</label>
+                                <select id="Task-Leader" class="select2-team-icons required-field" name="leader">
+                                <?php echo $modal_options; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["EMPLOYEE"]; ?>*</label>
+                                <select id="Employees" class="select2-team-icons required-field" name="employees[]" multiple="multiple">
+                                    <?php
+                                    $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
+                                    echo $result;
+                                    $result = $conn->query("SELECT id, name FROM $teamTable");
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<option value="team;'.$row['id'].'" data-icon="group" >'.$row['name'].'</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div id="projectAdvanced" class="tab-pane fade"><br>
+                            <div class="col-md-6">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
+                                <select id="Priority" class="form-control js-example-basic-single" name="priority">
+                                    <?php
+                                    for($i = 1; $i < 6; $i++){
+                                        
+                                        echo '<option value="'.$i.'">'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
+                                    }
+                                    ?>
+                                </select><br>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Status*</label>
+                                <div class="input-group">
+                                    <select id="Status" class="form-control" name="status" >
+                                        <option value="DEACTIVATED" >Deaktiviert</option>
+                                        <option value="ACTIVE" >Aktiv</option>
+                                        <option value="DRAFT" >Entwurf</option>
+                                        <option value="COMPLETED" >Abgeschlossen</option>
+                                    </select>
+                                </div><br>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
+                                <input id="Color" type="color" class="form-control" name="color"><br>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
+                                <select id="Parent" class="form-control js-example-basic-single" name="parent">
+                                    <option value=''>Keines</option>
+                                    <?php
+                                    $result = $conn->query("SELECT projectid, projectname FROM dynamicprojects");
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<option value="'.$row["projectid"].'" >'.$row["projectname"].'</option>';
+                                    }
+                                    ?>
+                                </select><br>
+                            </div>
+                            <div class="col-md-4">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
+                                <select id="Opt. Employees" class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
+                                    <?php
+                                    echo str_replace('<option value="', '<option value="user;', $modal_options);
+                                    ?>
+                                </select>
+                            </div>
+                            <input id="emailId" class="form-control" type="number" style="visibility: hidden"/>
+                        </div>
+                    </div><!-- /tab-content -->
+                </div><!-- /modal-body -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
@@ -243,26 +371,34 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         document.getElementById("emailId").setAttribute("value", id);
     }
     function addRule(){
+        var Employees = [];
+        var OEmployees = [];
+        for(i=0;i<document.getElementById("Employees").selectedOptions.length;i++){
+            Employees.push(document.getElementById("Employees").selectedOptions[i].value);
+        }
+        for(i=0;i<document.getElementById("Opt. Employees").selectedOptions.length;i++){
+            OEmployees.push(document.getElementById("Opt. Employees").selectedOptions[i].value);
+        }
         $.post("../misc/newrule",{
             Identifier: document.getElementById("Identifier").value,
-            Company: document.getElementById("Company").value,
-            Client: document.getElementById("Client").value,
+            Company: document.getElementById("Company").selectedOptions[0].value,
+            Client: document.getElementById("clientHint").selectedOptions[0].value,
             Color: document.getElementById("Color").value,
-            Status: document.getElementById("Status").value,
-            Priority: document.getElementById("Priority").value,
-            Parent: document.getElementById("Parent").value,
-            Owner: document.getElementById("Owner").value,
-            Employees: document.getElementById("Employees").value,
-            OEmployees: document.getElementById("Opt. Employees").value,
-            Leader: document.getElementById("Task-Leader").value,
+            Status: document.getElementById("Status").selectedOptions[0].value,
+            Priority: document.getElementById("Priority").selectedOptions[0].value,
+            Parent: document.getElementById("Parent").selectedOptions[0].value,
+            Owner: document.getElementById("Owner").selectedOptions[0].value,
+            Employees: Employees,
+            OEmployees: OEmployees,
+            Leader: document.getElementById("Task-Leader").selectedOptions[0].value,
             id: document.getElementById("emailId").value,
         }, function(data){
-            console.log(data);
             editRules(null,data);
         });
     }
     function editRules(event,id){
         var body = document.getElementById("rulesBody");
+        var priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
         document.getElementById("addRule").setAttribute("onClick","changeIdForRule("+id+")");
         while(body.firstChild){
             body.removeChild(body.firstChild);
@@ -270,7 +406,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $.post("../misc/getrules",{
             id: id
         } , function(data){
-            //console.log(data);
             var rulesets = JSON.parse(data);
             for(i = 0;i<rulesets.length;i++){
                 var client = document.createElement("td");
@@ -284,9 +419,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 var parenttask = document.createElement("td");
                 var priority = document.createElement("td");
                 var status = document.createElement("td");
+                var buttons = document.createElement("td");
                 var parent = document.createElement("tr");
                 client.innerHTML = rulesets[i]['client'];
-                color.innerHTML = rulesets[i]['color'];
+                color.innerHTML = '<i style="color:'+rulesets[i]['color']+'" class="fa fa-circle"></i>';
                 company.innerHTML = rulesets[i]['company'];
                 employees.innerHTML = rulesets[i]['employees'];
                 identifier.innerHTML = rulesets[i]['identifier'];
@@ -294,8 +430,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 leader.innerHTML = rulesets[i]['leader'];
                 owner.innerHTML = rulesets[i]['owner'];
                 parenttask.innerHTML = rulesets[i]['parent'];
-                priority.innerHTML = rulesets[i]['priority'];
+                priority.innerHTML = '<span class="badge" style="background-color:' +priority_color[rulesets[i]['priority']] + '">' + rulesets[i]['priority'] + ' </span>';
                 status.innerHTML = rulesets[i]['status'];
+                buttons.innerHTML = '<button type="button" name="delete" onclick="deleteRule('+ rulesets[i]['id'] +','+ rulesets[i]['emailaccount'] +')" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
                 parent.appendChild(identifier);
                 parent.appendChild(company);
                 parent.appendChild(client);
@@ -307,6 +444,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 parent.appendChild(employees);
                 parent.appendChild(optionalemployees);
                 parent.appendChild(leader);
+                parent.appendChild(buttons);
                 body.appendChild(parent);
             }
             //console.log(rulesets);
@@ -317,6 +455,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           console.log(data);
           //alert(JSON.parse(data));
       });
+    }
+    function deleteRule(ruleID,emailID){
+        $.post("../misc/deleterule",{
+            emailid: emailID,
+            ruleid: ruleID
+        }, function (info){
+            editRules(null,info);
+        });
     }
     function checkEmail(element){
         $.post("../misc/checkemail",{
@@ -344,5 +490,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
       });
     }
+    function showClients(company, client, place){
+    if(company != ""){
+      $.ajax({
+        url:'ajaxQuery/AJAX_getClient.php',
+        data:{companyID:company, clientID:client},
+        type: 'get',
+        success : function(resp){
+          $("#"+place).html(resp);
+        },
+        error : function(resp){}
+      });
+    }
+  }
+  function showProjects(client, project, place){
+    if(client != ""){
+      $.ajax({
+        url:'ajaxQuery/AJAX_getProjects.php',
+        data:{clientID:client, projectID:project},
+        type: 'get',
+        success : function(resp){
+          $("#"+place).html(resp);
+        },
+        error : function(resp){}
+      });
+    }
+  }
 </script>
 <?php include dirname(__DIR__) . '/footer.php';?>
