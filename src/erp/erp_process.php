@@ -469,7 +469,7 @@ $x = $prod_row['id'];
         <div class="col-md-1"><label>+</label></div>
         <div class="col-md-3">
           <label><?php echo $lang['ADDITION']; ?> %</label>
-          <input id="salePercent" type="number" step='1' class="form-control" placeholder="zzgl %">
+          <input id="salePercent" type="number" step='1' class="form-control" name="add_product_addition" placeholder="zzgl %">
         </div>
         <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
@@ -691,6 +691,7 @@ function displayArticle(i){
       data:{articleID: i},
       type: 'get',
       success : function(resp){
+        console.log(resp);
         var res = resp.split("; ");
         $("[name='add_product_name']").val(res[0]);
         $("[name='add_product_description']").val(res[1]);
@@ -702,7 +703,8 @@ function displayArticle(i){
         } else {
           $("[name='add_product_as_bar']").prop('checked', false);
         }
-        $("[name='add_product_purchase']").val(res[7]);
+        $("[name='add_product_purchase']").val(res[5]);
+        $("[name='add_product_addition']").val((res[2]/(res[5]/100))-100);
       },
       error : function(resp){}
     });
