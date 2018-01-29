@@ -1,4 +1,16 @@
 <?php
+
+function spellout_ordinal($num)
+{
+    $first_word = array('eth','First','Second','Third','Fouth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth','Elevents','Twelfth','Thirteenth','Fourteenth','Fifteenth','Sixteenth','Seventeenth','Eighteenth','Nineteenth','Twentieth');
+    $second_word =array('','','Twenty','Thirty','Forty','Fifty');
+    if($num <= 20)
+        return strtolower($first_word[$num]);
+    $first_num = substr($num,-1,1);
+    $second_num = substr($num,-2,1);
+    return strtolower(str_replace('y-eth','ieth',$second_word[$second_num].'-'.$first_word[$first_num]));
+}
+
 class ProjectSeries
 {
     public $once = true;
@@ -83,26 +95,21 @@ class ProjectSeries
                 }
                 break;
             case ($this->monthly_day_of_month):
-                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
-                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+               
                 while ($retDate < $now) {
-                    $ordinal = $formatter->format($monthly_day_of_month_day);
+                    $ordinal = spellout_ordinal($monthly_day_of_month_day);
                     $retDate->setTimestamp(strtotime("+${monthly_day_of_month_month} months ${ordinal} day", $retDate->getTimestamp()));
                 }
                 break;
             case ($this->monthly_nth_day_of_week):
-                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
-                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
                 while ($retDate < $now) {
-                    $ordinal = $formatter->format($monthly_nth_day_of_week_nth);
+                    $ordinal = spellout_ordinal($monthly_nth_day_of_week_nth);
                     $retDate->setTimestamp(strtotime("+${monthly_nth_day_of_week_month} months ${ordinal} ${monthly_nth_day_of_week_day}", $retDate->getTimestamp()));
                 }
                 break;
             case ($this->yearly_nth_day_of_month):
-                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
-                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
                 while ($retDate < $now) {
-                    $ordinal = $formatter->format($yearly_nth_day_of_month_nth);
+                    $ordinal = spellout_ordinal($yearly_nth_day_of_month_nth);
                     $retDate->setTimestamp(strtotime("${ordinal} day of ${yearly_nth_day_of_month_month}", $retDate->getTimestamp()));
                     // echo "<br>Current ret date: ".$retDate->format("Y-m-d")."<br>";
                     if ($retDate < $now) {
@@ -111,10 +118,8 @@ class ProjectSeries
                 }
                 break;
             case ($this->yearly_nth_day_of_week):
-                $formatter = new NumberFormatter('en_US', NumberFormatter::SPELLOUT);
-                $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
                 while ($retDate < $now) {
-                    $ordinal = $formatter->format($yearly_nth_day_of_week_nth);
+                    $ordinal = spellout_ordinal($yearly_nth_day_of_week_nth);
                     $retDate->setTimestamp(strtotime("${ordinal} day of ${yearly_nth_day_of_week_day} ${yearly_nth_day_of_week_month}", $retDate->getTimestamp()));
                 }
                 break;
