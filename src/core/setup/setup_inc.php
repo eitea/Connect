@@ -755,6 +755,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE articles (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6),
         taxID INT(4) UNSIGNED,
         name VARCHAR(255),
         description VARCHAR(1200),

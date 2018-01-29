@@ -1595,6 +1595,15 @@ if($row['version'] < 126){ //25.01.2018
     }
 }
 
+if($row['version'] < 127){ //29.01.2018
+    $conn->query("ALTER TABLE articles ADD companyID INT(6) AFTER id");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Artikel: Mandanten-Bezogen';
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';
