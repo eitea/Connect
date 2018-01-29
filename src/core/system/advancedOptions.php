@@ -37,38 +37,38 @@ if(isset($_POST['saveButton'])){
   redirect("../system/advanced");
 }
 
-if(isset($_POST['saveS3'])){
-  require dirname(dirname(__DIR__)) . "\misc\useS3Config.php";
-  if(isset($_POST['server'])){
-    try{
-      $credentials = array('key' => $_POST['aKey'], 'secret' => $_POST['sKey']);
-      $testconfig = array(
-        'version' => 'latest',
-        'region' => '',
-        'endpoint' => $_POST['server'],
-        'use_path_style_endpoint' => true,
-        'credentials' => $credentials
-      );
-      $test = new Aws\S3\S3Client($testconfig);
-      $test->listBuckets();
-      if(!setS3Config($_POST['server'],$_POST['aKey'],$_POST['sKey'])){
-        throw new S3Exception("Ups! Something went wrong");
-      }
-    }catch(Exception $e){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+if (isset($_POST['saveS3'])) {
+    require dirname(dirname(__DIR__)) . "\misc\useS3Config.php";
+    if (isset($_POST['server'])) {
+        try{
+            $credentials = array('key' => $_POST['aKey'], 'secret' => $_POST['sKey']);
+            $testconfig = array(
+                'version' => 'latest',
+                'region' => '',
+                'endpoint' => $_POST['server'],
+                'use_path_style_endpoint' => true,
+                'credentials' => $credentials
+            );
+            $test = new Aws\S3\S3Client($testconfig);
+            $test->listBuckets();
+            if(!setS3Config($_POST['server'],$_POST['aKey'],$_POST['sKey'])){
+                throw new S3Exception("Ups! Something went wrong");
+            }
+        } catch(Exception $e) {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+        }
+    } else {
+        if(!clearS3Config()){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.test.'</div>';
+        }
     }
-  }else{
-    if(!clearS3Config()){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.test.'</div>';
-    }
-  }
 }
 
 
 $result = $conn->query("SELECT sslVerify FROM $adminGitHubTable");
 $rowGitHubTable = $result->fetch_assoc();
 
-$result = $conn->query("SELECT * FROM $configTable");
+$result = $conn->query("SELECT * FROM configurationData");
 $rowConfigTable = $result->fetch_assoc();
 
 $result = $conn->query("SELECT * FROM archiveconfig");
@@ -113,19 +113,6 @@ $rowModuleTable = $result->fetch_assoc();
     <div class="checkbox col-md-12">
       <input <?php if($rowConfigTable['enableReadyCheck'] == 'TRUE'){echo 'checked';} ?> type='checkbox' name='enableReadyCheck' value='TRUE'>
       Display Attendance to all Users
-    </div>
-    <br>
-  </div>
-  <br><hr><br>
-
-  <h4>Modules</h4>
-  <div class="container-fluid">
-    <br>
-    <div class="checkbox col-md-12">
-      <label>
-        <input <?php if(isset($rowModuleTable['endpoint'])){echo "checked ";} ?> data-toggle='modal' data-target='#s3Input'  onChange="showS3Input(event)" type='checkbox' name='enableS3Archive' value='TRUE'>
-        S3 Archive
-      </label>
     </div>
     <br>
   </div>

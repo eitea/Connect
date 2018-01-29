@@ -10,7 +10,7 @@ $routes = array(
 
   'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
   'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
-  'system/teams' => 'core/system/teamConfig.php',                        'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
+  'system/teams' => 'core/system/system_teams.php',                      'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
   'system/password' => 'core/system/passwordOptions.php',                'system/email' => 'core/system/reportOptions.php',                'system/tasks' => 'core/system/taskScheduler.php',
   'system/update' => 'core/system/pullGitRepo.php',                      'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',
   'system/designer' => 'core/system/templateSelect.php',                 'system/clients' => 'core/system/editCustomers.php',              'system/clientDetail' => 'core/system/editCustomer_detail.php',
@@ -24,7 +24,7 @@ $routes = array(
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
   'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',
 
-  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',   'report/autotask' => 'schedule/autotask.php',
+  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',    'report/autotask' => 'schedule/autotask.php',
 
   'erp/view' => 'erp/erp_view.php',                                 'erp/articles' => 'erp/product_articles.php',                'erp/taxes' => 'erp/editTaxes.php',
   'erp/units' => 'erp/editUnits.php',                               'erp/payment' => 'erp/editPaymentMethods.php',               'erp/shipping' => 'erp/editShippingMethods.php',
