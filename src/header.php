@@ -534,14 +534,15 @@ echo $VERSION_TEXT;?>
                     </div>
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
-                    <textarea name="description" class="form-control"></textarea>
+                    <textarea required name="description" class="form-control"></textarea>
                     <div class="checkbox">
                         <label><input type="checkbox" name="includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
                         <br>
                     </div>
+                    <div style="width:100%; overflow-y: scroll; overflow-x: auto">
                     <div id="screenshot">
                     </div>
-                    
+                    </div>
                   
                     <!-- /modal body -->
                 </div>
@@ -1024,7 +1025,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     </div> <!-- /accordions -->
     <br><br><br>
     <!-- Section: Feedback -->
-    <button type='button' class='btn btn-primary feedback-button' data-toggle="modal" data-target="#feedbackModal">Feedback</button>
+    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
                   
     <!-- Section Ends: Feedback -->    
   </div>
@@ -1035,9 +1036,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     function takeScreenshot(){
         html2canvas(document.body).then(function(canvas) {
             document.getElementById("screenshot").appendChild(canvas)
+            $('#feedbackModal').modal('show');            
         });
     }
-    $(".feedback-button").onclick(function(){
+    $(".feedback-button").on("click",function(){
         takeScreenshot()
     })
 </script>
