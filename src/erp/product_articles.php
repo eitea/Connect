@@ -139,7 +139,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
                 $selected = '';
                 if($tax_row['id'] == 3) $selected = 'selected'; 
-                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' - '.$tax_row['percentage'].'% </option>';
+                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].'   '.$tax_row['percentage'].'% </option>';
               }
               ?>
             </select>
