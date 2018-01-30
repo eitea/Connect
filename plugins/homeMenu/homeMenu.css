@@ -361,3 +361,12 @@ span.select2.select2-container.select2-container--default {
   border-top-right-radius:0;
   background: forestgreen;
 }
+
+/* Feedback */
+.feedback-button {
+  position: absolute;   
+  display: inline-block;   
+  bottom: 70px;   
+  left: 15px; 
+  width: calc(100% - 30px);
+}

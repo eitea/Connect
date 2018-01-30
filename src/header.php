@@ -226,6 +226,8 @@ if ($_SESSION['color'] == 'light') {
   <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
   <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
+  <script src="plugins/html2canvas/html2canvas.min.js"></script>
+
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <link href="<?php echo $css_file; ?>" rel="stylesheet" />
   <title>Connect</title>
@@ -509,6 +511,49 @@ echo $VERSION_TEXT;?>
   </form>
   <!-- /social settings modal -->
   <?php endif;?>
+    <!-- feedback modal -->
+<form method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+        <div class="modal-dialog" role="form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="feedbackModalLabel"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
+                </div>
+                <br>
+                <div class="modal-body">
+                    <!-- modal body -->
+                    <div class="radio">
+                        <label><input type="radio" name="type" checked>I have a problem</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="type">I found a bug</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="type">I want an additional feature</label>
+                    </div>
+                    <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
+                    </label>
+                    <textarea name="description" class="form-control"></textarea>
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
+                        <br>
+                    </div>
+                    <div id="screenshot">
+                    </div>
+                    
+                  
+                    <!-- /modal body -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="giveFeedback"><?php echo $lang['GIVE_FEEDBACK']; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- /feedback modal -->
 <?php
 if(!isset($ckIn_disabled)) $ckIn_disabled = '';
 $showProjectBookingLink = $cd = $diff = 0;
@@ -978,9 +1023,24 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <br><br>
     </div> <!-- /accordions -->
     <br><br><br>
+    <!-- Section: Feedback -->
+    <button type='button' class='btn btn-primary feedback-button' data-toggle="modal" data-target="#feedbackModal">Feedback</button>
+                  
+    <!-- Section Ends: Feedback -->    
   </div>
 </div>
 <!-- /side menu -->
+
+<script>
+    function takeScreenshot(){
+        html2canvas(document.body).then(function(canvas) {
+            document.getElementById("screenshot").appendChild(canvas)
+        });
+    }
+    $(".feedback-button").onclick(function(){
+        takeScreenshot()
+    })
+</script>
 
 <div id="bodyContent" style="display:none;" >
   <div class="affix-content">

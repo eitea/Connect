@@ -567,6 +567,9 @@ $lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
 $lang_eng['GENERAL_SETTINGS'] = 'General Settings';
 $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 
+$lang_eng['GIVE_FEEDBACK'] = 'Give feedback';
+$lang_ger['GIVE_FEEDBACK'] = 'Feedback geben';
+
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
@@ -605,6 +608,9 @@ $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
 $lang_eng['INCOMING_INVOICE'] = 'Incoming Invoice';
 $lang_ger['INCOMING_INVOICE'] = 'Eingangsrechnung';
+
+$lang_eng['INCLUDE_SCREENSHOT'] = 'Include screenshot';
+$lang_ger['INCLUDE_SCREENSHOT'] = 'Screenshot hinzufügen';
 
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';
