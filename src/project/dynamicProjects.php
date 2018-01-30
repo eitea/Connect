@@ -196,7 +196,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($filterings['tasks']){ $query_status = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
-        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND (activity != 'VIEWED' OR userID = $userID) ORDER BY logTime DESC LIMIT 1"); //get the latest activity
+        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
+            ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with AJAX_dynamicInfo.php
         $stmt_viewed->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
@@ -222,9 +223,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         while($row = $result->fetch_assoc()){
             $x = $row['projectid'];
             $stmt_viewed->execute();
-            $viewed = $stmt_viewed->get_result();
+            $viewed_result = $stmt_viewed->get_result();
             $rowStyle = '';
-            if($row['projectowner'] != $userID && ($viewed = $viewed->fetch_assoc()) && ($viewed['activity'] == 'CREATED' || $viewed['activity'] == 'EDITED') ){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
+            if (!($viewed = $viewed_result->fetch_assoc()) || $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
@@ -483,6 +484,7 @@ $('.view-modal-open').click(function(){
           }
       }
      });
+     $(this).parent().parent().removeAttr('style');
   } else {
     $('#infoModal-'+index).modal('show');
   }
