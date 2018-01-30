@@ -977,7 +977,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php if ($isDSGVOAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
-            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-archive"></i><?php echo $lang['ARCHIVE'] ?></a>
+            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-folder-open-o"></i><?php echo $lang['ARCHIVE'] ?></a>
           </div>
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
