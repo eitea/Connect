@@ -22,7 +22,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(mysqli_error($conn)){
             echo mysqli_error($conn);
         } else {
-            echo '<script>document.getElementById("filterCompany_form").submit();</script>';
+            echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
         }
     } elseif(isset($_POST['create_client'])){
         echo '<div class="alert alert-danger fade in">';
