@@ -1555,7 +1555,7 @@ if($row['version'] < 125){
     $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT (projectid, userid, 'optional') FROM dynamicprojectsoptionalemployees");
     $conn->query("DROP TABLE dynamicprojectsoptionalemployees");
 
-    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");   
+    $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");
 }
 if($row['version'] < 126){ //25.01.2018
     $conn->query("CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,server VARCHAR(50) NOT NULL,port VARCHAR(50) NOT NULL,service ENUM('imap','pop3') NOT NULL,smtpSecure ENUM('','tls','ssl') NOT NULL,username VARCHAR(50) NOT NULL,password VARCHAR(50) NOT NULL,logEnabled ENUM('TRUE','FALSE') NOT NULL,PRIMARY KEY (id))");
@@ -1596,19 +1596,6 @@ if($row['version'] < 126){ //25.01.2018
 }
 
 if($row['version'] < 127){ //29.01.2018
-    $conn->query("ALTER TABLE articles ADD companyID INT(6) AFTER id");
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Artikel: Mandanten-Bezogen';
-    }
-
-    $conn->query("ALTER TABLE teamdata ADD leader INT(6), ADD leaderreplacement INT(6)");
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Teams: Leader-Update';
-    }
     $conn->query("ALTER TABLE teamRelationshipData ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
     if ($conn->error) {
         echo $conn->error;
@@ -1621,6 +1608,22 @@ if($row['version'] < 127){ //29.01.2018
         echo $conn->error;
     } else {
         echo '<br>Tasks: Skill-Level';
+    }
+}
+
+if($row['version'] < 128){ //30.01.2018
+    $conn->query("ALTER TABLE articles ADD companyID INT(6) AFTER id");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Artikel: Mandanten-Bezogen';
+    }
+
+    $conn->query("ALTER TABLE teamData ADD leader INT(6), ADD leaderreplacement INT(6)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Teams: Leader-Update';
     }
 }
 
