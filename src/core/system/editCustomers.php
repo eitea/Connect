@@ -50,7 +50,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <?php
         while ($row = $result->fetch_assoc()) {
           $i = $row['id'];
-          echo '<tr>';
+          echo '<tr style="cursor: pointer" class="clickable-row" data-href="../system/clientDetail?custID='.$i.'">';
           echo "<td><input type='checkbox' name='index[]' value='$i'></td>";
           echo "<td>".$row['companyName']."</td>";
           echo "<td>".$row['name']."</td>";
@@ -75,5 +75,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     }
   });
+
+  jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
