@@ -97,7 +97,7 @@ $validation_output = $error_output = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
-        require __DIR__ . "/misc//ckInOut.php";
+        require __DIR__ . "/misc/ckInOut.php";
         $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
@@ -510,9 +510,8 @@ echo $VERSION_TEXT;?>
   <!-- /social settings modal -->
   <?php endif;?>
 <?php
+if(!isset($ckIn_disabled)) $ckIn_disabled = '';
 $showProjectBookingLink = $cd = $diff = 0;
-$disabled = '';
-
 $result = mysqli_query($conn, "SELECT * FROM $configTable");
 if ($result && ($row = $result->fetch_assoc())) {
     $cd = $row['cooldownTimer'];
@@ -521,21 +520,27 @@ if ($result && ($row = $result->fetch_assoc())) {
     $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
-$result = mysqli_query($conn,  "SELECT `time` FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+$result = mysqli_query($conn,  "SELECT `time`, indexIM FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
-  $buttonVal = $lang['CHECK_OUT'];
-  $buttonNam = 'stampOut';
-  //<img width="15px" height="15px" src="images/emji1.png">
-  $showProjectBookingLink = TRUE;
-  $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
-  if($diff < $cd / 60) { $disabled = 'disabled'; }
-  $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
-  <button type="submit" '.$disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'"></button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
-  <button type="submit" '.$disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
-  <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
+    //deny stampOut
+    $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
+    if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
+
+    $buttonVal = $lang['CHECK_OUT'];
+    $buttonNam = 'stampOut';
+    //<img width="15px" height="15px" src="images/emji1.png">
+    $showProjectBookingLink = TRUE;
+    $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
+    if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
+    $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
+    <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
+    <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
+    <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji3" name="stampOut" value="3" title="'.$lang['EMOJI_TOSTRING'][3].'"></button>
+    <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
+    <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
+    <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
+
+    if($ckIn_disabled){ $buttonEmoji .= '<br><small style="color:white;">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
@@ -544,10 +549,10 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $result = mysqli_query($conn, "SELECT timeEnd FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
     if ($result && ($row = $result->fetch_assoc())) {
         $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
-        if ($diff < $cd / 60) {$disabled = 'disabled';}
+        if ($diff < $cd / 60) {$ckIn_disabled = 'disabled';}
     }
 }
-$checkInButton = "<button $disabled type='submit' class='btn btn-warning btn-ckin' name='$buttonNam'>$buttonVal</button>";
+$checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning btn-ckin' name='$buttonNam'>$buttonVal</button>";
 ?>
 
 <div id="explain-emji" class="modal fade">

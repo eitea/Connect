@@ -12,7 +12,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
       $result = $conn->query("SELECT hoursOfRest, pauseAfterHours, $logTable.time FROM $intervalTable INNER JOIN $logTable ON $logTable.userID = $intervalTable.userID WHERE $logTable.indexIM = $indexIM AND endDate IS NULL");
-      if($result && ($row = $result->fetch_assoc())){        
+      if($result && ($row = $result->fetch_assoc())){
         $result_book = $conn->query("SELECT end FROM projectBookingData WHERE timestampID = $indexIM ORDER BY start DESC");
         if($result_book && ($row_book = $result_book->fetch_assoc())){
           //grab last booking
@@ -69,14 +69,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   }
   //user Requests
-  if(isset($_POST['okay'])){ //vacation, special leave, compensatory time or school
+  if(isset($_POST['okay'])){ //vacation, special leave, compensatory time, school, doc
     $requestID = $_POST['okay'];
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
       $i = $row['fromDate'];
       $days = (timeDiff_Hours($i, $row['toDate'])/24) + 1; //days
-      if($row['requestType'] == 'doc')$days = (timeDiff_Hours($i, $row['toDate'])/24); //days
+      if($row['requestType'] == 'doc') $days--;
       for($j = 0; $j < $days; $j++){
         $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
         if($expected != 0){ //only insert if expectedHours != 0
@@ -94,24 +94,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               $i = date('Y-m-d H:i:s',$coreTime->getTimestamp());
               if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
                 $i2 = $row['toDate'];
-                
-              }else{
+
+              } else {
                 echo "<script>console.log('".date('Y-m-d H:i',$coreTime->getTimestamp())."')</script>";
                 $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
-            }else{
+            } else {
               $i = $row['fromDate'];
               if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
                 $i2 = $row['toDate'];
-                
-              }else{
+
+              } else {
                 echo "<script>console.log('".$expectedHours."')</script>";
                 $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
                 $rndBoolForScience = true;
               }
             }
-            
+
             $alreadyWorked = $conn->query("SELECT indexIM, time, timeEnd  FROM $logTable WHERE userID = ".$row['userID']." AND DATE(time) = '".date('Y-m-d',$fromTime->getTimestamp())."'");
             if($alreadyWorked){
               $alreadyWorked = $alreadyWorked->fetch_assoc();
@@ -132,7 +132,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }else{
               $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '5')";
             }
-            
+
           }
           if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
@@ -393,12 +393,12 @@ if($result && $result->num_rows > 0):
     <br><hr><br>
   <?php endif;  ?>
 
-  
+
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
   <?php
   $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
   INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60) 
+  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
   AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
 
   $result = $conn->query($sql);

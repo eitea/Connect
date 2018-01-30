@@ -1442,7 +1442,7 @@ if ($row['version'] < 123) {
 }
 
 if ($row['version'] < 124) {
-    $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50))");
+    $conn->query("CREATE TABLE archiveconfig(endpoint VARCHAR(50),awskey VARCHAR(50),secret VARCHAR(50));");
     $conn->query("INSERT INTO archiveconfig VALUE (null,null,null)");
     if ($conn->error) {
         echo $conn->error;
@@ -1466,7 +1466,7 @@ if ($row['version'] < 124) {
 
     echo '<br>S3 Configuration';
 
-    $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType ENUM('vac', 'log', 'acc', 'scl', 'spl', 'brk', 'cto', 'div','doc') DEFAULT 'vac'";
+    $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType VARCHAR(3) DEFAULT 'vac' NOT NULL;";
     if ($conn->query($sql)) {
         echo '<br> Extended requests by splitted lunchbreaks';
     }
@@ -1608,6 +1608,19 @@ if($row['version'] < 127){ //29.01.2018
         echo $conn->error;
     } else {
         echo '<br>Teams: Leader-Update';
+    }
+    $conn->query("ALTER TABLE teamRelationshipData ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Teams: Skill-Level';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN level INT(3) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Skill-Level';
     }
 }
 

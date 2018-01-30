@@ -406,7 +406,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
     LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
     LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
     $bookingQuery $userIDs_query
-    ORDER BY $userTable.firstname, $projectBookingTable.end ASC";
+    ORDER BY $userTable.firstname, $projectBookingTable.start ASC";
 
         $result = $conn->query($sql);
         $prevName = "";

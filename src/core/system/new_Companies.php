@@ -17,6 +17,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $accept .= $conn->error;
     $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES($ins_id, $userID)");
     $accept .= $conn->error;
+    $conn->query("INSERT INTO erp_settings (companyID, clientNum, clientStep, supplierNum, supplierStep) VALUES($ins_id, '1000',1,'1000',1)");
+    $accept .= $conn->error;
 
     $file = fopen(dirname(dirname(__DIR__)).'/setup/Kontoplan.csv', 'r');
     if($file){

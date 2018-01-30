@@ -4,7 +4,8 @@ require dirname(__DIR__) . "/language.php";
 
 $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
 
-$userID = intval($_GET['userid']);
+session_start();
+$userID = $_SESSION["userid"] or die("0");
 
 $result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
@@ -37,6 +38,11 @@ if($x){
     $dynrow['projectowner'] = $dynrow['projectleader'] = $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
+    if(isset($_SESSION['filterings'])){
+        $dynrow['companyid'] = $_SESSION['filterings']['company'];
+        $dynrow['clientid'] = $_SESSION['filterings']['client'];
+        $dynrow['clientprojectid'] = $_SESSION['filterings']['project'];
+    }
 }
 ?>
 
@@ -74,9 +80,9 @@ if($x){
                                     <select id="clientHint<?php echo $x; ?>" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, '<?php echo $dynrow['clientprojectid']; ?>', 'projectHint<?php echo $x; ?>');">
                                         <?php
                                         if(count($available_companies) <= 2 ){
-                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
+                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).");");
                                         } elseif($dynrow['companyid']){
-                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID = '".$dynrow['companyid']."';");
+                                            $result_fc = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = '".$dynrow['companyid']."';");
                                         }
                                         echo '<option value="0">...</option>';
                                         while($result && ($row_fc = $result_fc->fetch_assoc())){
@@ -102,8 +108,8 @@ if($x){
                                 </div>
                             </div>
 
-                            <div class="col-md-12"><small>*Auswahl ist Optional. Falls kein Projekt angegeben, entscheidet der Benutzer.</small><br><br></div>
-                            <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                            <div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
+                            <div class="col-md-12"><label>Task Name*</label><input class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
                             $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
@@ -122,7 +128,7 @@ if($x){
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label><?php echo $lang["EMPLOYEE"]; ?>*</label>
+                                <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
                                 <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                                     <?php
                                     $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
@@ -143,8 +149,15 @@ if($x){
                                     ?>
                                 </select>
                             </div>
-
-                            <div class="col-md-12"><br>
+                            <div class="col-md-6"><br>
+                                <label>Geschätzte Zeit</label>
+                                <input type='number' class="form-control" placeholder='Coming Soon..' value="" disabled /><br>
+                            </div>
+                            <div class="col-md-6"><br>
+                                <label><?php echo $lang["BEGIN"]; ?>*</label>
+                                <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
+                            </div>
+                            <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
                                 <textarea class="form-control projectDescriptionEditor" name="description" ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
@@ -209,11 +222,7 @@ if($x){
                         <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>
                             <div class="well">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <label><?php echo $lang["BEGIN"]; ?></label>
-                                        <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
-                                    </div>
-                                    <div class="col-md-6">
+                                    <div class="col-sm-8">
                                         <label><?php echo $lang["END"]; ?></label><br>
                                         <label><input type="radio" name="endradio" value="" checked ><?php echo $lang["DYNAMIC_PROJECTS_SERIES_NO_END"]; ?></label><br>
                                         <input type="radio" name="endradio" value="date">
@@ -301,6 +310,7 @@ if($x){
                     </div><!-- /tab-content -->
                 </div><!-- /modal-body -->
                 <div class="modal-footer">
+                    <div class="pull-left"><?php echo $x; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                     <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
                 </div>

@@ -230,70 +230,70 @@ echo mysqli_error($conn);
           <th>Intern</th>
         </thead>
         <tbody>
-          <?php
-          $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
-          LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
-          LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-          WHERE $projectBookingTable.timestampID = $indexIM ORDER BY start ASC;";
-          $result = mysqli_query($conn, $sql);
-          if($result && $result->num_rows > 0){
-            $numRows = $result->num_rows;
-            if(isset($_POST['undo'])){
-              $numRows--;
-            }
-            for($i=0; $i<$numRows; $i++){
-              $row = $result->fetch_assoc();
-              if($row['bookingType'] == 'break'){
-                $icon = "fa fa-cutlery";
-              } elseif($row['bookingType'] == 'drive'){
-                $icon = "fa fa-car";
-              } elseif($row['bookingType'] == 'mixed'){
-                $icon = "fa fa-plus";
-                $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
-              } else {
-                $icon = "fa fa-bookmark"; //snowflake-o, heart, umbrella, tree, music, bookmark, globe
-              }
-              $interninfo = $row['internInfo'];
-              $expensesinfo = $optionalinfo = '';
-              $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
-              if($extraFldRes && $extraFldRes->num_rows > 0){
-                $extraFldRow = $extraFldRes->fetch_assoc();
-                if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; }
-              }
-              if($extraFldRes && $extraFldRes->num_rows > 1){
-                $extraFldRow = $extraFldRes->fetch_assoc();
-                if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; }
-              }
-              if($extraFldRes && $extraFldRes->num_rows > 2){
-                $extraFldRow = $extraFldRes->fetch_assoc();
-                if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
-              }
-              if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
-              if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
-              if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
+            <?php
+            $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
+            LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
+            LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
+            WHERE $projectBookingTable.timestampID = $indexIM ORDER BY start, end;";
+            $result = mysqli_query($conn, $sql);
+            if($result && $result->num_rows > 0){
+                $numRows = $result->num_rows;
+                if(isset($_POST['undo'])){
+                    $numRows--;
+                }
+                for($i=0; $i<$numRows; $i++){
+                    $row = $result->fetch_assoc();
+                    if($row['bookingType'] == 'break'){
+                        $icon = "fa fa-cutlery";
+                    } elseif($row['bookingType'] == 'drive'){
+                        $icon = "fa fa-car";
+                    } elseif($row['bookingType'] == 'mixed'){
+                        $icon = "fa fa-plus";
+                        $row['infoText'] = $lang['ACTIVITY_TOSTRING'][$row['mixedStatus']];
+                    } else {
+                        $icon = "fa fa-bookmark"; //snowflake-o, heart, umbrella, tree, music, bookmark, globe
+                    }
+                    $interninfo = $row['internInfo'];
+                    $expensesinfo = $optionalinfo = '';
+                    $extraFldRes = $conn->query("SELECT name FROM $companyExtraFieldsTable WHERE companyID = ".$row['companyID']);
+                    if($extraFldRes && $extraFldRes->num_rows > 0){
+                        $extraFldRow = $extraFldRes->fetch_assoc();
+                        if($row['extra_1']){$optionalinfo = '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_1'].'<br>'; }
+                    }
+                    if($extraFldRes && $extraFldRes->num_rows > 1){
+                        $extraFldRow = $extraFldRes->fetch_assoc();
+                        if($row['extra_2']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_2'].'<br>'; }
+                    }
+                    if($extraFldRes && $extraFldRes->num_rows > 2){
+                        $extraFldRow = $extraFldRes->fetch_assoc();
+                        if($row['extra_3']){$optionalinfo .= '<strong>'.$extraFldRow['name'].'</strong><br>'.$row['extra_3']; }
+                    }
+                    if($row['exp_unit'] > 0) $expensesinfo .= $lang['QUANTITY'].': '.$row['exp_unit'].'<br>';
+                    if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
+                    if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
 
-              echo "<tr>";
-              echo "<td><i class='$icon'></i></td>";
-              echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
-              echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
-              echo "<td>". $row['name'] ."</td>";
-              echo "<td>". $row['projectName'] ."</td>";
-              echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
-              echo "<td style='text-align:left'>";
-              if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
-              if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
-              if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
-              echo "</tr>";
+                    echo "<tr>";
+                    echo "<td><i class='$icon'></i></td>";
+                    echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
+                    echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
+                    echo "<td>". $row['name'] ."</td>";
+                    echo "<td>". $row['projectName'] ."</td>";
+                    echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
+                    echo "<td style='text-align:left'>";
+                    if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+                    if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+                    if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
+                    echo "</tr>";
 
-              $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
+                    $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
+                }
+                if(isset($_POST['undo'])){
+                    $row = $result->fetch_assoc();
+                    $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
+                    $conn->query($sql);
+                }
             }
-            if(isset($_POST['undo'])){
-              $row = $result->fetch_assoc();
-              $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
-              $conn->query($sql);
-            }
-          }
-          ?>
+            ?>
         </tbody>
       </table>
     </div>
@@ -468,21 +468,21 @@ function fill_keepFields(){}
 
 <?php
 if($keepFields){
-  echo '<script>';
-  if(isset($_POST['filterCompany'])){
-    echo '$("#companyHint").val("'.$_POST['filterCompany'].'");';
-  }
-  if(isset($_POST['filterCompany']) && isset($_POST['filterClient'])){
-    echo 'showClients('.$_POST['filterCompany'].', '.$_POST['filterClient'].', '.$_POST['filterProject'].');';
-  }
-  if(isset($_POST['filterClient']) && isset($_POST['filterProject'])){
-    echo 'fill_keepFields = function() {
-      $("#pro_field_1").val("'.substr($field_1,1,-1).'");
-      $("#pro_field_2").val("'.substr($field_2,1,-1).'");
-      $("#pro_field_3").val("'.substr($field_3,1,-1).'");
-    };';
-  }
-  echo '</script>';
+    echo '<script>';
+    if(isset($_POST['filterClient']) && isset($_POST['filterProject'])){
+        echo 'fill_keepFields = function() {
+            $("#pro_field_1").val("'.substr($field_1,1,-1).'");
+            $("#pro_field_2").val("'.substr($field_2,1,-1).'");
+            $("#pro_field_3").val("'.substr($field_3,1,-1).'");
+        };';
+    }
+    if(isset($_POST['filterCompany'])){
+        echo '$("#companyHint").val("'.$_POST['filterCompany'].'");';
+        if(isset($_POST['filterClient'])){
+            echo 'showClients('.$_POST['filterCompany'].', '.$_POST['filterClient'].', '.$_POST['filterProject'].');';
+        }
+    }
+    echo '</script>';
 }
 ?>
 
