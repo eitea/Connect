@@ -160,7 +160,7 @@ if($x){
                                 </div>
                                 <div class="col-md-4"><br>
                                     <label>Geschätzte Zeit</label>
-                                    <input type='number' class="form-control" placeholder='Coming Soon..' value="" disabled /><br>
+                                    <input type='number' class="form-control" placeholder='Coming Soon..' value="<?php //echo $dynrow['estimatedHours']; ?>" disabled /><br>
                                 </div>
                                 <div class="col-md-4"><br>
                                     <label><?php echo $lang["BEGIN"]; ?>*</label>

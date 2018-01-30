@@ -217,7 +217,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level)) $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstart ASC");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){
@@ -360,18 +361,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 </select>
                             </div>
                         <?php endif; ?>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <?php
-                        $result = $conn->query("SELECT infoText, internInfo, userID FROM projectBookingData p LEFT JOIN logs ON p.timestampID = logs.indexIM WHERE `end` != '0000-00-00 00:00:00' AND dynamicID = '".  $occupation['dynamicID']."'");
-                        echo $conn->error;
-                        while($result && ($row = $result->fetch_assoc())){
-                            echo '<div class="col-md-3" >'.$userID_toName[$row['userID']].'</div>';
-                            echo '<div class="col-md-2">'.$row['internInfo'].'</div>';
-                            echo '<div class="col-md-8">'.$row['infoText'].'</div>';
-                        }
-                        ?>
                     </div>
                 </div>
                 <div class="modal-footer">
