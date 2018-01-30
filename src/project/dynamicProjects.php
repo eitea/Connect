@@ -191,27 +191,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </thead>
     <tbody>
         <?php
-        $modals = $occupation = $query_status = '';
+        $occupation = $query_status = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
         if($filterings['tasks']){ $query_status = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
-        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? ORDER BY logTime DESC LIMIT 1"); //get the latest activity
+        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND (activity != 'VIEWED' OR userID = $userID) ORDER BY logTime DESC LIMIT 1"); //get the latest activity
         $stmt_viewed->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
-        $stmt_booking->bind_param('s', $x); //shall always return max 1 row
+        $stmt_booking->bind_param('s', $x);
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
-        if($isDynamicProjectsAdmin == 'TRUE'){
-            //see all access-legal tasks
+        if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstart ASC");
-        } else {
-            //see open tasks user is part of
+        } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
@@ -223,13 +221,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo $conn->error;
         while($row = $result->fetch_assoc()){
             $x = $row['projectid'];
-            $rowStyle = '';
             $stmt_viewed->execute();
             $viewed = $stmt_viewed->get_result();
-            if(($viewed = $viewed->fetch_assoc()) && ($viewed['activity'] == 'CREATED' || $viewed['activity'] == 'EDITED') ){ $rowStyle = 'style="color:blue; font-weight:bold;"'; }
+            $rowStyle = '';
+            if($row['projectowner'] != $userID && ($viewed = $viewed->fetch_assoc()) && ($viewed['activity'] == 'CREATED' || $viewed['activity'] == 'EDITED') ){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
-            echo '<td><button type="button" class="btn btn-default view-modal-open" data-toggle="modal" data-target="#view-'.$x.'" value="'.$x.'" >View</button></td>';
+            echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
@@ -261,39 +259,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
 
             echo '<td><form method="POST">';
-            $showButton = '';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is NOT in use and user has no active bookings
-                $showButton = 'play';
+            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
             }
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) {
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
             }
-            echo '<button type="button" name="infoModal" value="'.$x.'" class="btn btn-default" title="Verlauf Anzeigen"><i class="fa fa-info"></i></button> '; //not sure if everyone should see this.
+
             echo '</form></td>';
             echo '</tr>';
-
-            if($showButton == 'play'){
-                $modals .= '<div id="view-'.$x.'" class="modal fade"><div class="modal-dialog modal-content modal-md">
-                <div class="modal-header h4">'.$row['projectname'].'</div><div class="modal-body" style="max-height:50vh">'.$row['projectdescription'].'</div><div class="modal-footer">
-                <form method="POST"><button type="submit" class="btn btn-default" title="Jetzt starten" name="play" value="'.$x.'"><i class="fa fa-play" ></i></button>
-                <div class="pull-left">'.$x.'</div><button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button></form></div></div></div>';
-            } else {
-                $modals .= '<div id="view-'.$x.'" class="modal fade"><div class="modal-dialog modal-content modal-md">
-                <div class="modal-header h4">'.$row['projectname'].'</div><div class="modal-body" style="max-height:50vh">'.$row['projectdescription'].'</div>
-                <div class="modal-footer"><div class="pull-left">'.$x.'</div><button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button></div></div></div>';
-            }
         }
         ?>
     </tbody>
 </table>
 
 <div id="editingModalDiv">
-    <?php echo $modals; ?>
     <?php if($occupation): ?>
     <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">
@@ -481,7 +465,7 @@ $('button[name=editModal]').click(function(){
 appendModal('');
 
 var existingModals_info = new Array();
-$('button[name=infoModal]').click(function(){
+$('.view-modal-open').click(function(){
     var index = $(this).val();
   if(existingModals_info.indexOf(index) == -1){
       $.ajax({
@@ -504,18 +488,6 @@ $('button[name=infoModal]').click(function(){
   }
 });
 
-$('.view-modal-open').click(function(){
-    var o = $(this);
-    $.ajax({
-    url:'ajaxQuery/AJAX_dynamicView.php',
-    data:{projectid: o.val()},
-    type: 'get',
-    success : function(resp){
-        o.parent().parent().removeAttr('style');
-    },
-    error : function(resp){ alert(resp); }
-   });
-});
 $(document).ready(function() {
     dynamicOnLoad();
     $('.table').DataTable({
