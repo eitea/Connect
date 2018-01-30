@@ -300,9 +300,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
                       <ul class="dropdown-menu">
                           <form method="POST" class="navbar-form navbar-left">
-                              <li><button type="submit" style="background:none;border:none" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
+                              <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
                               <li class="divider"></li>
-                              <li><button type="submit" style="background:none;border:none"  name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
+                              <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
                           </form>
                       </ul>
                   </li>
@@ -540,7 +540,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 
-    if($ckIn_disabled){ $buttonEmoji .= '<br><small style="color:white;">Task läuft</small>'; }
+    if($ckIn_disabled){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';

@@ -361,3 +361,8 @@ span.select2.select2-container.select2-container--default {
   border-top-right-radius:0;
   background: forestgreen;
 }
+
+.btn-empty{
+    background:none;
+    border:none;
+}

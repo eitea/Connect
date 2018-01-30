@@ -2,6 +2,16 @@
 <?php
 require dirname(__DIR__) . "/connection.php";
 $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
+
+session_start();
+$userID = $_SESSION["userid"] or die("Session died");
+$x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
+$result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectID = '$x' AND
+    ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1");//changes here have to be synced with dynamicProjects.php
+if (!($row = $result->fetch_assoc()) || $row['activity'] != 'VIEWED') {
+        $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
+}
+echo $conn->error;
 ?>
 
 <div id="infoModal-<?php echo $x; ?>" class="modal fade">
@@ -9,11 +19,19 @@ $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
         <div class="modal-header h4">Verlauf</div>
         <div class="modal-body">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
+                <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
+                <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
             </ul>
             <div class="tab-content">
-                <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade in active"><br>
+                <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
+                    <?php
+                    $result = $conn->query("SELECT projectdescription, projectstatus FROM dynamicprojects WHERE projectid = '$x'");
+                    $dynrow =  $result->fetch_assoc();
+                    echo $dynrow['projectdescription'];
+                    ?>
+                </div>
+                <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade"><br>
                     <table class="table table-hover">
                         <thead><tr>
                                 <th>Benutzer</th>
@@ -83,8 +101,18 @@ $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
             </div>
         </div>
         <div class="modal-footer">
-            <div class="pull-left"><?php echo $x; ?></div>
-            <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
+            <form method="POST">
+                <div class="pull-left"><?php echo $x; ?></div>
+                <?php
+                $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
+                $hasActiveBooking = $result->num_rows;
+                $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
+                if($dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
+                    echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
+                }
+                 ?>
+                <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
+            </form>
         </div>
     </div>
 </div>

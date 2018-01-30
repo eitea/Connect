@@ -32,9 +32,16 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
         $skill = intval($_POST['hire_'.$user]);
         $conn->query("INSERT INTO $teamRelationshipTable (teamID, userID, skill) VALUES ($teamID, $user, $skill)");
     }
+} elseif(isset($_POST['changeTeamName']) && !empty($_POST['teamName'])){
+    $teamID = intval($_POST['changeTeamName']);
+    $name = test_input($_POST['teamName']);
+    $conn->query("UPDATE teamData SET name = '$name' WHERE id = $teamID");
 }
+
 $activeTab = $teamID;
-echo mysqli_error($conn);
+if($conn->error){
+	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+}
 
 $percentage_select = '';
 for($i = 0; $i < 11; $i++){
@@ -47,7 +54,7 @@ for($i = 0; $i < 11; $i++){
 </div>
 
 <?php
-$result = $conn->query("SELECT * FROM teamData");
+$result = $conn->query("SELECT id, name FROM teamData");
 while($result && ($row = $result->fetch_assoc())):
     $teamID = $row['id'];
     ?>
@@ -56,20 +63,28 @@ while($result && ($row = $result->fetch_assoc())):
         <div class="panel panel-default">
             <div class="panel-heading container-fluid">
                 <div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a></div>
-                <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
-                    <button type="submit" style="background:none;border:none;color:#0078e7;" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button></div>
+                <div class="col-xs-6 text-right">
+                    <?php $taskResult = $conn->query("SELECT projectid FROM dynamicprojectsteams WHERE teamid = $teamID");
+                    if($taskResult->num_rows < 1): ?>
+                        <button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
+                    <?php else: ?>
+                        <button type="button" class="btn-empty" style="color:brown;" title="Bearbeiten" data-toggle="modal" data-target="#rename-team-<?php echo $teamID; ?>" ><i class="fa fa-pencil"></i></button>
+                    <?php endif; ?>
+                    <button type="submit" class="btn-empty" style="color:#0078e7;" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
+                </div>
             </div>
             <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
                 <div class="panel-body container-fluid">
                     <?php
                     $userResult = $conn->query("SELECT userID, skill FROM teamRelationshipData WHERE teamID = $teamID");
                     while($userResult && ($userRow = $userResult->fetch_assoc())){
-                        echo '<div class="col-md-4">';
+                        echo '<div class="col-xs-8 col-md-3">';
                         echo '<input type="hidden" name="saveTeam_users[]" value="'.$userRow['userID'].'">';
                         echo '<button type="submit" style="background:none;border:none" name="removeMember" value="'.$userRow['userID'].'"><i style="color:red" class="fa fa-times"></i></button>';
                         echo $userID_toName[$userRow['userID']];
-                        echo ' <select name="saveTeam_skill_'.$userRow['userID'].'" style="max-width:75px;display:inline;">'
-                        .str_replace('value="'.$userRow['skill'].'">', 'value="'.$userRow['skill'].'" selected>', $percentage_select).'</select>';
+                        echo '</div><div class="col-xs-4 col-md-1">';
+                        echo '<select name="saveTeam_skill_'.$userRow['userID'].'" style="max-width:75px;display:inline;">'.
+                        str_replace('value="'.$userRow['skill'].'">', 'value="'.$userRow['skill'].'" selected>', $percentage_select).'</select>';
                         echo '</div>';
                     }
                     ?>
@@ -77,9 +92,11 @@ while($result && ($row = $result->fetch_assoc())):
                 </div>
             </div>
         </div>
+    </form>
 
-        <div class="modal fade addTeamMember_<?php echo $teamID; ?>">
-            <div class="modal-dialog modal-content modal-md">
+    <div class="modal fade addTeamMember_<?php echo $teamID; ?>">
+        <div class="modal-dialog modal-content modal-md">
+            <form method="POST">
                 <div class="modal-header"></div>
                 <div class="modal-body">
                     <table class="table table-hover">
@@ -107,9 +124,24 @@ while($result && ($row = $result->fetch_assoc())):
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-warning" name="hire" value="<?php echo $teamID; ?>">Benutzer einstellen</button>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
+    <div id="rename-team-<?php echo $teamID; ?>" class="modal fade">
+        <div class="modal-dialog modal-content modal-md">
+            <form method="POST">
+                <div class="modal-header h4"></div>
+                <div class="modal-body">
+                    <label>Name</label>
+                    <input type="text" name="teamName" value="<?php echo $row['name']; ?>" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning" name="changeTeamName" value="<?php echo $teamID; ?>"><?php echo $lang['SAVE']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
 <?php endwhile; ?>
 
 <form method="post">
