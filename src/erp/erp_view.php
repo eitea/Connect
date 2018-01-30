@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToERP($userID);
+require dirname(__DIR__) . "/misc/helpcenter.php"; 
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, ''), 'company' => 0, 'client' => 0);
 

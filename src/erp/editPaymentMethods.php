@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToClients($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['add']) && !empty($_POST['add_name'])){

@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <script>
   document.onreadystatechange = () => {
     if (document.readyState === "complete"){

@@ -573,6 +573,10 @@ $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
+$lang_eng['HELP'] = 'Help';
+$lang_ger['HELP'] = 'Hilfe';
+
+
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
 

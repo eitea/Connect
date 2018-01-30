@@ -1,5 +1,6 @@
 <?php
 include dirname(__DIR__) . '/header.php';
+require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE'); //set_filter requirement
 ?>

@@ -1,5 +1,7 @@
 <?php
 include dirname(__DIR__) . '/header.php';
+?><?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 $filterings = array('company' => 0, 'supplier' => 0, 'date' => array(substr(getCurrentTimestamp(), 0, 8).'01', date('Y-m-t', strtotime(getCurrentTimestamp()))));
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){

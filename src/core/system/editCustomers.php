@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToClients($userID); ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }

@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php';
+  require dirname(__DIR__) . "/misc/helpcenter.php"; 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);

@@ -1,4 +1,6 @@
-<?php include dirname(__DIR__) . '/header.php';
+<?php include dirname(__DIR__) . '/header.php';?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 $result = $conn->query("SELECT endpoint FROM archiveconfig");
 if($result){
   $enabled = $result->fetch_assoc();

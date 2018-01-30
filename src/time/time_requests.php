@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 
 <div class="page-header">
   <?php $filterings = array("savePage" => $this_page, 'user' => 0, 'date' => array('2016-06-01', substr(getCurrentTimestamp(), 0, 10)), 'acceptance' => -1, 'requestType' => ''); ?>

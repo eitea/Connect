@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToBookings($userID); ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL LIMIT 1");
 if($result->num_rows > 0){

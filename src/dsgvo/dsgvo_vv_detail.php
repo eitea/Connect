@@ -1,4 +1,5 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID);
+<?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID);?>
+<?php
 if(empty($_GET['v'])){
     echo "Invalid Access.";
     include dirname(__DIR__) . '/footer.php';

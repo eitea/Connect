@@ -1,4 +1,6 @@
-<?php include dirname(__DIR__) . '/header.php';
+<?php include dirname(__DIR__) . '/header.php';?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 
 if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ include dirname(__DIR__) . '/footer.php'; die("Invalid Access");}
 $cmpID = intval($_GET['cmp']);

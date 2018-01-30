@@ -111,6 +111,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
         </table>
       </div>
     </div> <!-- End tab content -->
+    
     <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
       <table class="table table-striped">

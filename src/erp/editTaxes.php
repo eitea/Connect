@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToERP($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
   <div class="page-header">
     <h3><?php echo $lang['TAX_RATES']; ?></h3>
   </div>

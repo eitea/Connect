@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
