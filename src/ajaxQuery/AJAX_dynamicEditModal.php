@@ -38,11 +38,9 @@ if($x){
     $dynrow['projectowner'] = $dynrow['projectleader'] = $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
-    if(isset($_SESSION['filterings'])){
-        $dynrow['companyid'] = $_SESSION['filterings']['company'];
-        $dynrow['clientid'] = $_SESSION['filterings']['client'];
-        $dynrow['clientprojectid'] = $_SESSION['filterings']['project'];
-    }
+    $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
+    $dynrow['clientid'] = $_SESSION['filterings']['client'] ?? 0;
+    $dynrow['clientprojectid'] = $_SESSION['filterings']['project'] ?? 0;
 }
 ?>
 
@@ -115,47 +113,59 @@ if($x){
                             $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
                             ?>
-                            <div class="col-md-4">
-                                <label><?php echo $lang["OWNER"]; ?>*</label>
-                                <select class="select2-team-icons required-field" name="owner">
-                                <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label><?php echo $lang["LEADER"]; ?>*</label>
-                                <select class="select2-team-icons required-field" name="leader">
-                                <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
-                                    <?php
-                                    $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
-                                    for($i = 0; $i < count($dynrow_emps); $i++){
-                                        if($dynrow_emps[$i]['position'] == 'normal'){
-                                            $result = str_replace('<option value="user;'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="user;'.$dynrow_emps[$i]['userid'].'" ', $result);
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label><?php echo $lang["OWNER"]; ?>*</label>
+                                    <select class="select2-team-icons required-field" name="owner">
+                                    <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label><?php echo $lang["LEADER"]; ?>*</label>
+                                    <select class="select2-team-icons required-field" name="leader">
+                                    <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
+                                    <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
+                                        <?php
+                                        $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
+                                        for($i = 0; $i < count($dynrow_emps); $i++){
+                                            if($dynrow_emps[$i]['position'] == 'normal'){
+                                                $result = str_replace('<option value="user;'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="user;'.$dynrow_emps[$i]['userid'].'" ', $result);
+                                            }
                                         }
-                                    }
-                                    echo $result;
-                                    $result = $conn->query("SELECT id, name FROM $teamTable");
-                                    while ($row = $result->fetch_assoc()) {
-                                        $selected = '';
-                                        if(in_array($row['id'], $dynrow_teams)){
-                                            $selected = 'selected';
+                                        echo $result;
+                                        $result = $conn->query("SELECT id, name FROM $teamTable");
+                                        while ($row = $result->fetch_assoc()) {
+                                            $selected = '';
+                                            if(in_array($row['id'], $dynrow_teams)){
+                                                $selected = 'selected';
+                                            }
+                                            echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
                                         }
-                                        echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
-                                    }
-                                    ?>
-                                </select>
+                                        ?>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-6"><br>
-                                <label>Geschätzte Zeit</label>
-                                <input type='number' class="form-control" placeholder='Coming Soon..' value="" disabled /><br>
-                            </div>
-                            <div class="col-md-6"><br>
-                                <label><?php echo $lang["BEGIN"]; ?>*</label>
-                                <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
+                            <div class="row">
+                                <div class="col-md-2"><br>
+                                    <label>Skill Minimum</label>
+                                    <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
+                                </div>
+                                <div class="col-md-2"><br>
+                                    <label>Level</label>
+                                    <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>">
+                                </div>
+                                <div class="col-md-4"><br>
+                                    <label>Geschätzte Zeit</label>
+                                    <input type='number' class="form-control" placeholder='Coming Soon..' value="" disabled /><br>
+                                </div>
+                                <div class="col-md-4"><br>
+                                    <label><?php echo $lang["BEGIN"]; ?>*</label>
+                                    <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*</label>

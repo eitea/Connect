@@ -621,6 +621,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE teamRelationshipData (
         teamID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
+        skill INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (teamID) REFERENCES teamData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1200,6 +1201,7 @@ function create_tables($conn) {
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        level INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

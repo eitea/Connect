@@ -103,6 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
+                $skill = intval($_POST['projectskill']);
 
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
@@ -130,13 +131,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param("ssbiiissssisiisbi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage);
+                $stmt->bind_param("ssbiiissssisiisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $skill);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
-
                 if(!$stmt->error){
                     $stmt->close();
                     //EMPLOYEES
@@ -217,7 +217,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR teamRelationshipData.userID = $userID) $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level)) $query_status ORDER BY projectpriority DESC, projectstart ASC");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){
@@ -304,21 +304,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <textarea name="description" rows="4" class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
                         </div>
                         <div class="col-md-6">
-                            <input id="bookRanger" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>"><br>
+                            <input id="bookRanger" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>" oninput="document.getElementById('bookCompleted').value = this.value;"><br>
                         </div>
                         <div class="col-md-3">
                             <div class="input-group">
                                 <input type="number" class="form-control" name="bookCompleted" id="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
                                 <span class="input-group-addon">%</span>
-                                <script>
-                                var slider = document.getElementById("bookRanger");
-                                var output = document.getElementById("bookCompleted");
-                                output.innerHTML = slider.value; // Display the default slider value
-
-                                slider.oninput = function() {
-                                    output.value = this.value;
-                                }
-                                </script>
                             </div><br>
                         </div>
                         <div class="col-md-3">
@@ -399,6 +390,7 @@ $("#bookCompletedCheckbox").change(function(event){
     $("#bookCompleted").attr('readonly', this.checked);
     $("#bookRanger").attr('disabled', this.checked);
     if(this.checked){
+        $("#bookRanger").val(100);
         $("#bookCompleted").val(100);
     }
 });

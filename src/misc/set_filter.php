@@ -139,26 +139,28 @@ if($scale > 2){ //3 columns
         <div class="filter_column">
           <?php
           if(isset($filterings['company'])){
-            $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
-            if($result_fc && $result_fc->num_rows > 1){
-              echo '<label>'.$lang['COMPANY'].'</label>';
-              if(isset($filterings['client'])){
-                echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showClients(this.value, \''.$filterings['client'].'\');" >';
-              } elseif(isset($filterings['supplier'])){
-                echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showSupplier(this.value, \''.$filterings['supplier'].'\');" >';
+              $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+              if($result_fc && $result_fc->num_rows > 1){
+                  echo '<label>'.$lang['COMPANY'].'</label>';
+                  if(isset($filterings['client'])){
+                      echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showClients(this.value, \''.$filterings['client'].'\');" >';
+                  } elseif(isset($filterings['supplier'])){
+                      echo '<select class="js-example-basic-single" name="searchCompany" onchange="set_filter.showSupplier(this.value, \''.$filterings['supplier'].'\');" >';
+                  } else {
+                      echo '<select class="js-example-basic-single" name="searchCompany">';
+                  }
+                  echo '<option value="0">...</option>';
+                  while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+                      $checked = '';
+                      if($filterings['company'] == $row_fc['id']) {
+                          $checked = 'selected';
+                      }
+                      echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                  }
+                  echo '</select><br><br>';
               } else {
-                echo '<select class="js-example-basic-single" name="searchCompany">';
+                  $filterings['company'] == $available_companies[1];
               }
-              echo '<option value="0">...</option>';
-              while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
-                $checked = '';
-                if($filterings['company'] == $row_fc['id']) {
-                  $checked = 'selected';
-                }
-                echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
-              }
-              echo '</select><br><br>';
-            }
           }
           if(isset($filterings['supplier'])){
             echo '<label>'.$lang['SUPPLIER'].'</label>';

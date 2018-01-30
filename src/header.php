@@ -540,7 +540,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 
-    if($ckIn_disabled){ $buttonEmoji .= '<br><small style="color:white;">Task läuft</small>'; }
+    if($ckIn_disabled){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
