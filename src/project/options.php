@@ -188,34 +188,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="modal fade" id="add-rule">
     <div class="modal-dialog modal-content modal-lg">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
-      <!--TODO: Get the Form-Layout from AJAX_dynamicEditModal.php but keep the id's for the inputs -->
-      <!-- OLD BODY 
-      <div class="modal-body">
-        <label>Identifier</label>
-        <input id="Identifier" class="form-control" type="text" />
-        <label>Company</label>
-        <input id="Company" class="form-control" type="text" />
-        <label>Client</label>
-        <input id="Client" class="form-control" type="text" />
-        <label>Color</label>
-        <input id="Color" class="form-control" type="text" />
-        <label>Status</label>
-        <input id="Status" class="form-control" type="text" />
-        <label>Priority</label>
-        <input id="Priority" class="form-control" type="text" />
-        <label>Parent</label>
-        <input id="Parent" class="form-control" type="text" />
-        <label>Owner</label>
-        <input id="Owner" class="form-control" type="text" />
-        <label>Employees</label>
-        <input id="Employees" class="form-control" type="text" />
-        <label>Opt. Employees</label>
-        <input id="Opt. Employees" class="form-control" type="text" />
-        <label>Task-Leader</label>
-        <input id="Task-Leader" class="form-control" type="text" />
-        <input id="emailId" class="form-control" type="number" style="visibility: hidden"/>
-      </div>
-        NEW BODY -->
         <div class="modal-body">
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#projectBasics">Basic*</a></li>
