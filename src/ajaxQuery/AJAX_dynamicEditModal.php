@@ -170,7 +170,7 @@ if($x){
                             </div>
                             <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
-                                <textarea class="form-control projectDescriptionEditor" name="description" ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <textarea class="form-control projectDescriptionEditor" name="description" maxlength="20000" ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>
