@@ -1,4 +1,3 @@
-
 <?php
 require dirname(__DIR__) . "/connection.php";
 $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
