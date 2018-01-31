@@ -92,6 +92,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
+
+
+
+
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
                 $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
@@ -432,7 +436,19 @@ function dynamicOnLoad(modID){
         menubar: false,
         statusbar: false,
         height: 300,
-        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code',
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code | InsertMicroTask',
+        setup: function(editor){
+            function insertMicroTask(){
+                var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
+                editor.insertContent(html);
+            }
+
+            editor.addButton("InsertMicroTask",{
+                tooltip: "Insert MicroTask",
+                icon: "template",
+                onclick: insertMicroTask,
+            });
+        },
         // enable title field in the Image dialog
         image_title: true,
         // enable automatic uploads of images represented by blob or data URIs
