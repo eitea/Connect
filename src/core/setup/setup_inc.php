@@ -623,6 +623,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE teamRelationshipData (
         teamID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
+        skill INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (teamID) REFERENCES teamData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1203,6 +1204,7 @@ function create_tables($conn) {
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        level INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1340,26 +1342,26 @@ function create_tables($conn) {
         endpoint VARCHAR(50),
         awskey VARCHAR(50),
         secret VARCHAR(50)
-        )";
-        if (!$conn->query($sql)) {
-            echo $conn->error;
-        }
-        
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
     $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
-        if(!$conn->query($sql)){
-            echo $conn->error;
-        }
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 
     $sql = "CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,
-        server VARCHAR(50) NOT NULL,
-        port VARCHAR(50) NOT NULL,
-        service ENUM('imap','pop3') NOT NULL,
-        smtpSecure ENUM('','tls','ssl') NOT NULL,
-        username VARCHAR(50) NOT NULL,
-        password VARCHAR(50) NOT NULL,
-        logEnabled ENUM('TRUE','FALSE') NOT NULL,
-        PRIMARY KEY (id))";
-        if(!$conn->query($sql)){
-            echo $conn->error;
-        }
+    server VARCHAR(50) NOT NULL,
+    port VARCHAR(50) NOT NULL,
+    service ENUM('imap','pop3') NOT NULL,
+    smtpSecure ENUM('','tls','ssl') NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    logEnabled ENUM('TRUE','FALSE') NOT NULL,
+    PRIMARY KEY (id))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
