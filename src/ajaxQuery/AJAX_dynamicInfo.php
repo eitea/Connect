@@ -8,7 +8,7 @@ $userID = $_SESSION["userid"] or die("Session died");
 $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
 $result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectID = '$x' AND
     ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1");//changes here have to be synced with dynamicProjects.php
-if (!($row = $result->fetch_assoc()) || $row['activity'] != 'VIEWED') {
+if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
         $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
 echo $conn->error;

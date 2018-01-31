@@ -229,7 +229,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = '';
-            if (!($viewed = $viewed_result->fetch_assoc()) || $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
+            if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
@@ -353,6 +353,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <div class="pull-left"><?php echo $occupation['dynamicID']; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-warning" name="createBooking" value="<?php echo $occupation['bookingID']; ?>"><?php echo $lang['SAVE']; ?></button>
                 </div>
