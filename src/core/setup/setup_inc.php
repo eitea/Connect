@@ -517,7 +517,7 @@ function create_tables($conn) {
         sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername',
-        feedbackRecipient VARCHAR(50) DEFAULT 'admin@mail.com',
+        feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at',
         isDefault TINYINT(1) NOT NULL DEFAULT 1
     )";
     if (!$conn->query($sql)) {

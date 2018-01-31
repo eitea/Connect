@@ -1605,7 +1605,7 @@ if($row['version'] < 127){ //29.01.2018
     }
 }
 if($row['version'] < 128){ //31.01.2018
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'admin@mail.com'");
+    $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
     if ($conn->error) {
         echo $conn->error;
     } else {
