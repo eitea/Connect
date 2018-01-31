@@ -41,6 +41,7 @@ if($x){
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
     $dynrow['clientid'] = $_SESSION['filterings']['client'] ?? 0;
     $dynrow['clientprojectid'] = $_SESSION['filterings']['project'] ?? 0;
+    $dynrow['level'] = 0;
 }
 ?>
 
