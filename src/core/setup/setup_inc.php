@@ -1290,7 +1290,7 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
-
+    
     $sql = "CREATE TABLE sharedgroups (
         id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
@@ -1352,7 +1352,8 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,
+    $sql = "CREATE TABLE emailprojects (
+    id INT(10) NOT NULL AUTO_INCREMENT,
     server VARCHAR(50) NOT NULL,
     port VARCHAR(50) NOT NULL,
     service ENUM('imap','pop3') NOT NULL,

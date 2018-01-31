@@ -213,7 +213,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
@@ -221,7 +221,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
-                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){
@@ -436,6 +436,25 @@ function dynamicOnLoad(modID){
             };
             input.click();
         }
+    });
+    $(".convert-estimate").click(function(event){
+        var str = $('#estimatedHours-'+$(this).val()).val();
+        var hours = 0;
+
+        if(val = /^\d+(?:(?:\.|,)\d+)?(?: |!.|$)/.exec(str)){
+            hours = parseInt(val[0].slice(0,-1));
+        }
+        if(val = /\d+m/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) / 60;
+        }
+        if(val = /\d+t/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) * 24;
+        }
+        if(val = /\d+w/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) * 24 * 7;
+        }
+
+        $('#estimatedHours-'+$(this).val()).val(hours);
     });
 } //end dnymaicOnLoad()
 
