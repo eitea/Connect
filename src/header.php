@@ -378,22 +378,32 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                           <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
                       </a>
                   <?php endif;?>
-                  <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+                  <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
               </div>
           </div>
       </nav>
   <!-- /navbar -->
-  <div class="collapse" id="infoDiv_collapse">
-    <div class="well" style="margin:0">
-      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php';
-echo $VERSION_TEXT;?>
-      <br>
-      The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
-      the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
-    </div>
+
+  <div id="infoDiv_collapse" class="modal fade">
+      <div class="modal-dialog modal-content modal-sm">
+          <div class="modal-header h4">Information</div>
+          <div class="modal-body">
+              <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT;?><br><br>
+              The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
+              the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
+              <br><br>
+              LIZENZHINWEIS<br>
+              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+          </div>
+      </div>
   </div>
+
   <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
   <!-- modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
