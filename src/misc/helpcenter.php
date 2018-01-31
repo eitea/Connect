@@ -16,7 +16,7 @@
           <!-- <video controls preload="none" width="100%">
             <source src="<?php echo $helpsource["$this_page"] ?? null ?>" type="video/mp4" >
           </video> -->
-          <label>Hilfe befindet sich derzeit im Aufbau.</label>
+          <label><?php echo "ID = ".$sourceid["$this_page"] ?? null ?></label>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
