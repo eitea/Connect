@@ -1195,7 +1195,7 @@ function create_tables($conn) {
         projectcolor VARCHAR(10),
         projectstart VARCHAR(12),
         projectend VARCHAR(12),
-        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE',
         projectpriority INT(6),
         projectparent VARCHAR(100),
         projectowner INT(6),
@@ -1204,6 +1204,7 @@ function create_tables($conn) {
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE

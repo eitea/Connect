@@ -1641,6 +1641,14 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Teams: Leader-Update';
     }
+    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE'");
+    $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Review-Update';
+    }
+    
 }
 
 // ------------------------------------------------------------------------------

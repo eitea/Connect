@@ -39,16 +39,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
         $bookingID = test_input($_POST['createBooking']);
-        $result = $conn->query("SELECT dynamicID, clientprojectid FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
+        $result = $conn->query("SELECT dynamicID, clientprojectid, needsreview FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
         if($row = $result->fetch_assoc()){
             $dynamicID = $row['dynamicID'];
+            $needsReview = $row['needsreview'];
             $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
             if($projectID){
                 $result->free();
                 $percentage = intval($_POST['bookCompleted']);
                 if($percentage == 100 || isset($_POST['bookCompletedCheckbox'])){
                     $percentage = 100; //safety
-                    $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
+                    if($needsReview == 'TRUE'){
+                        $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
+                    }else{
+                        $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
+                    }
+                    
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
 
@@ -191,6 +197,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
             <th><?php echo $lang["OWNER"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
+            <th>Review</th>
             <th></th>
         </tr>
     </thead>
@@ -212,12 +219,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName
+                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
@@ -264,6 +271,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo implode(',<br>', $employees);
             echo '</td>';
 
+            echo '<td>';
+            $checkbox = '<input type="checkbox" ';
+            if($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) $checkbox= $checkbox.'disabled ';
+            if($row['needsreview'] == 'TRUE') $checkbox= $checkbox.'checked ';
+            $checkbox= $checkbox.'></input>';
+            echo $checkbox;
+            echo '</td>';
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
