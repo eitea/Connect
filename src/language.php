@@ -501,6 +501,18 @@ $lang_ger['EXPENSES'] = 'Spesen';
 $lang_eng['EXPIRATION_DATE'] = 'Expiration Date';
 $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
+$lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
+$lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
+
+$lang_eng['FEEDBACK_BUG'] = 'Expiration Date';
+$lang_ger['FEEDBACK_BUG'] = 'Ich habe einen Bug gefunden';
+
+$lang_eng['FEEDBACK_FEATURES'] = 'Expiration Date';
+$lang_ger['FEEDBACK_FEATURES'] = 'Ich will ein neues Feature vorschlagen';
+
+$lang_eng['FEEDBACK_POSITIVE'] = 'Expiration Date';
+$lang_ger['FEEDBACK_POSITIVE'] = 'Ich habe etwas positives zu berichten';
+
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 

@@ -523,16 +523,16 @@ echo $VERSION_TEXT;?>
                 <div class="modal-body">
                     <!-- modal body -->
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have a problem" checked>Ich habe ein Problem</label>
+                        <label><input type="radio" name="feedback_type" value="I have a problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I found a bug">Ich habe einen Bug gefunden</label>
+                        <label><input type="radio" name="feedback_type" value="I found a bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I want an additional feature">Ich will ein neues Feature vorschlagen</label>
+                        <label><input type="radio" name="feedback_type" value="I want an additional feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have positive feedback">Ich habe etwas positives zu berichten</label>
+                        <label><input type="radio" name="feedback_type" value="I have positive feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
                     </div>
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
@@ -1030,6 +1030,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 </div>
 <!-- /side menu -->
 
+<!-- feedback script -->
 <script>
     $("#feedback_form").submit(function(event){
         event.preventDefault();
@@ -1054,9 +1055,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     })
     function takeScreenshot(){
         html2canvas(document.body).then(function(canvas) {
-            // document.getElementById("screenshot").appendChild(canvas)
-            // $("#screenshot").html(canvas)
-
             canvas.toBlob(function(blob) {
                 var newImg = document.createElement('img'),
                 url = URL.createObjectURL(blob);
@@ -1064,11 +1062,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 newImg.onload = function() {
                     URL.revokeObjectURL(url);
                 };
-
                 newImg.src = url;
                 $("#screenshot").html(newImg)
             });
-
             window.feedbackCanvasObject = canvas
             $('#feedbackModal').modal('show');       
         });
@@ -1077,6 +1073,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         takeScreenshot()
     })
 </script>
+<!-- /feedback script -->
 
 <div id="bodyContent" style="display:none;" >
   <div class="affix-content">
