@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
     <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?> - Templates <div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-template" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
     </div></h3></div>

@@ -611,7 +611,9 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(60),
         companyID INT(6) UNSIGNED,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        FOREIGN KEY (companyID) REFERENCES companyData(id),
+        leader INT(6),
+        leaderreplacement INT(6)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
@@ -622,6 +624,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE teamRelationshipData (
         teamID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
+        skill INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (teamID) REFERENCES teamData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -651,7 +654,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE taskData(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        repeatPattern ENUM('-1', '0', '1', '2', '3', '4') DEFAULT '-1',
+        repeatPattern ENUM('-1', '0', '1', '2', '3', '4','5') DEFAULT '-1',
         runtime DATETIME DEFAULT CURRENT_TIMESTAMP,
         description VARCHAR(200),
         lastRuntime DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -755,6 +758,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE articles (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6),
         taxID INT(4) UNSIGNED,
         name VARCHAR(255),
         description VARCHAR(1200),
@@ -1192,7 +1196,7 @@ function create_tables($conn) {
         projectcolor VARCHAR(10),
         projectstart VARCHAR(12),
         projectend VARCHAR(12),
-        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED') DEFAULT 'ACTIVE',
+        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE',
         projectpriority INT(6),
         projectparent VARCHAR(100),
         projectowner INT(6),
@@ -1201,6 +1205,8 @@ function create_tables($conn) {
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
+        level INT(3) DEFAULT 0 NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1286,7 +1292,7 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
-
+    
     $sql = "CREATE TABLE sharedgroups (
         id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
@@ -1338,13 +1344,27 @@ function create_tables($conn) {
         endpoint VARCHAR(50),
         awskey VARCHAR(50),
         secret VARCHAR(50)
-        )";
-        if (!$conn->query($sql)) {
-            echo $conn->error;
-        }
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 
-        $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
-        if(!$conn->query($sql)){
-            echo $conn->error;
-        }
+    $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE emailprojects (
+    id INT(10) NOT NULL AUTO_INCREMENT,
+    server VARCHAR(50) NOT NULL,
+    port VARCHAR(50) NOT NULL,
+    service ENUM('imap','pop3') NOT NULL,
+    smtpSecure ENUM('','tls','ssl') NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    logEnabled ENUM('TRUE','FALSE') NOT NULL,
+    PRIMARY KEY (id))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }

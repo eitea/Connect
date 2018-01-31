@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 
 <div class="page-header">
   <h3><?php echo $lang['USER_INACTIVE']; ?></h3>

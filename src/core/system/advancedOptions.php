@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 if(isset($_POST['saveButton'])){
   if(isset($_POST['ssl'])){
@@ -117,6 +118,19 @@ $rowModuleTable = $result->fetch_assoc();
     <br>
   </div>
   <br><hr><br>
+
+  <h4>Archive</h4>
+  <div class="container-fluid">
+    <br>
+    <div class="checkbox col-md-12">
+      <label>
+        <input <?php if(isset($rowModuleTable['endpoint'])){echo "checked ";} ?> data-toggle='modal' data-target='#s3Input'  onChange="showS3Input(event)" type='checkbox' name='enableS3Archive' value='TRUE'>
+        S3 Archive
+      </label>
+    </div>
+    <br>
+  </div>
+<br><hr><br>
 
   <h4>Self Registration</h4>
   <div class="container-fluid">

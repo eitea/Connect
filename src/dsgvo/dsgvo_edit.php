@@ -1,5 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
-
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 $docID = 0;
 if(!empty($_GET['d'])){

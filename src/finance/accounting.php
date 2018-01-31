@@ -1,5 +1,7 @@
 <?php
-include dirname(__DIR__) . '/header.php';
+include dirname(__DIR__) . '/header.php';?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 enableToFinance($userID);
 
 $filterings = array("savePage" => $this_page, 'date' => array(date('Y-m')));

@@ -22,7 +22,7 @@ $routes = array(
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
 
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
-  'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',
+  'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',     'project/options'    => 'project/options.php',
 
   'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',    'report/autotask' => 'schedule/autotask.php',
 
@@ -42,7 +42,9 @@ $routes = array(
 
   'upload/file' => 'archive/uploadToS3.php',
 
-  'pgp/keygen' => 'pgp/pgpKeyGen.php',                              'misc/sharedfiles' => 'misc/getSharedFiles.php'
+  'pgp/keygen' => 'pgp/pgpKeyGen.php',                              'misc/sharedfiles' => 'misc/getSharedFiles.php',              'misc/taskemails' => 'schedule/getAllEmailTasks.php',
+  'misc/checkemail' => 'misc/checkEmailAvailability.php',            'misc/getrules'    => 'misc/getRules.php',                   'misc/newrule'    => 'misc/newRule.php',
+  'misc/deleterule' => 'misc/deleteRule.php',
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",

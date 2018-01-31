@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToProject($userID);  ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 

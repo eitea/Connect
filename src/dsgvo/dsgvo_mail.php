@@ -1,4 +1,6 @@
-<?php include dirname(__DIR__) . '/header.php';
+<?php include dirname(__DIR__) . '/header.php';?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';

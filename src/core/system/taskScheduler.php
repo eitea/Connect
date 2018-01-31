@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 if(isset($_POST['save_task'])){
   $error = false;
@@ -27,6 +28,14 @@ if(isset($_POST['save_task'])){
     if(!empty($_POST['lunchbreak_repeat'])){
       $pattern = intval($_POST['lunchbreak_repeat']);
       $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (3, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Lunchbreak Control', 'task_lunchbreak.php')
+                  ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
+      if(mysqli_error($conn)){
+        $error = $conn->error;
+      }
+    }
+    if(!empty($_POST['email_task'])){
+      $pattern = intval($_POST['email_task']);
+      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (4, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Email Tasks', 'getAllEmailtasks.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
       if(mysqli_error($conn)){
         $error = $conn->error;
@@ -145,6 +154,38 @@ if($result && ($row = $result->fetch_assoc())){
           if($pattern == 1){ $checked = 'selected'; } else { $checked = ''; }
             echo "<option value='-1' >".$lang['SCHEDULE_TOSTRING'][-1] .'</option>';
             echo "<option $checked value='1' >".$lang['SCHEDULE_TOSTRING'][1] .'</option>';
+          ?>
+        </select>
+      </div>
+      <div class="col-sm-8 col-sm-offset-1">
+        <?php echo $lang['INFO_LUNCHBREAK_TASK']; ?>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="page-seperated-section">
+  <?php 
+  $result = $conn->query("SELECT * FROM taskData WHERE id = 4");
+  if($result && ($row = $result->fetch_assoc())){
+    $pattern = $row['repeatPattern'];
+    $runtime = carryOverAdder_Hours($row['runtime'], $timeToUTC);
+  } else {
+    $pattern = '-1';
+    $runtime = getCurrentTimestamp();
+  }
+  ?>
+    <h4><?php echo $lang['EMAIL_TASK']; ?></h4><br>
+    <div class="container-fluid">
+      <div class="col-sm-2">
+        <label>Status</label>
+        <select class="js-example-basic-single btn-block" name='email_task'>
+        <?php
+          for($i = -1; $i < 6; $i++){
+            if($pattern == $i){ $checked = 'selected'; } else { $checked = ''; }
+            echo "<option $checked value='$i' >".$lang['SCHEDULE_TOSTRING'][$i] .'</option>';
+          }
           ?>
         </select>
       </div>

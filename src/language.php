@@ -432,6 +432,9 @@ $lang_ger['END'] = 'Ende';
 $lang_eng['ENTRANCE_DATE'] = 'Date of Entry';
 $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 
+$lang_eng['EMAIL_TASK'] = 'Automatic Task Builder';
+$lang_ger['EMAIL_TASK'] = 'Automatischer Task Builder';
+
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
 
@@ -585,6 +588,10 @@ $lang_ger['GIVE_FEEDBACK'] = 'Feedback geben';
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
+$lang_eng['HELP'] = 'Help';
+$lang_ger['HELP'] = 'Hilfe';
+
+
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
 
@@ -710,6 +717,9 @@ $lang_ger['LASTNAME'] = 'Nachname';
 
 $lang_eng['LEADER'] = 'Leader';
 $lang_ger['LEADER'] = 'Verantwortlicher Mitarbeiter';
+
+$lang_eng['LEADER_REPLACEMENT'] = 'Leader Replacement';
+$lang_ger['LEADER_REPLACEMENT'] = 'Stellvertretender Mitarbeiter';
 
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
@@ -942,6 +952,9 @@ $lang_ger['PROJECT_INFORMATION'] = 'Reports';
 $lang_eng['PROJECT_LOGS'] = 'Project Logs';
 $lang_ger['PROJECT_LOGS'] = 'Buchungsprotokoll ';
 
+$lang_eng['PROJECT_OPTIONS'] = 'Options';
+$lang_ger['PROJECT_OPTIONS'] = 'Optionen';
+
 $lang_eng['PROP_OUR_SIGN'] = 'Our Sign';
 $lang_ger['PROP_OUR_SIGN'] = 'Unser Zeichen';
 
@@ -1025,6 +1038,9 @@ $lang_ger['REQUEST_TYPE'] = "Art des Antrags";
 
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
+
+$lang_eng['RULES'] = 'Rules';
+$lang_ger['RULES'] = 'Regeln';
 
 $lang_eng['RUNTIME'] = 'Runtime';
 $lang_ger['RUNTIME'] = 'Laufzeit';
@@ -1370,8 +1386,8 @@ $lang_ger['REQUEST_TOSTRING'] = array("vac" => "Urlaub", "acc" => "Neuer Account
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
 $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
 
-$lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly');
-$lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich');
+$lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly', '5' => 'Once every Five Minutes');
+$lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich', '5' => 'Einmal alle Fünf Minuten');
 
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");

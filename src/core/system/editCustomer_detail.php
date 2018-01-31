@@ -1,5 +1,7 @@
 <?php
-include dirname(dirname(__DIR__)) . '/header.php';
+include dirname(dirname(__DIR__)) . '/header.php';?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
+<?php
 enableToClients($userID);
 
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {

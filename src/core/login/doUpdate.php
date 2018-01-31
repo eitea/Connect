@@ -1558,7 +1558,7 @@ if($row['version'] < 125){
     $conn->query("DELETE FROM dynamicprojectsemployees WHERE projectid IN (SELECT projectid FROM dynamicprojectsteams)");
 }
 
-if ($row['version'] < 126) { //25.01.2018
+if($row['version'] < 126){ //25.01.2018
     $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectleader INT(6)");
     $conn->query("UPDATE dynamicprojects SET projectleader = projectowner");
     if ($conn->error) {
@@ -1604,7 +1604,54 @@ if($row['version'] < 127){ //29.01.2018
         echo '<br>Tasks: Skill-Level';
     }
 }
-if($row['version'] < 128){ //31.01.2018
+
+if($row['version'] < 128){ //30.01.2018
+    $conn->query("ALTER TABLE taskData CHANGE repeatPattern repeatPattern ENUM('-1','0','1','2','3','4','5') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT '-1'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Email Projekte';
+    }
+
+    $conn->query("CREATE TABLE emailprojects (
+    id INT(10) NOT NULL AUTO_INCREMENT,
+    server VARCHAR(50) NOT NULL,
+    port VARCHAR(50) NOT NULL,
+    service ENUM('imap','pop3') NOT NULL,
+    smtpSecure ENUM('','tls','ssl') NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    logEnabled ENUM('TRUE','FALSE') NOT NULL,
+    PRIMARY KEY (id))");
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Projekte: Emails';
+    }
+    $conn->query("ALTER TABLE articles ADD companyID INT(6) AFTER id");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Artikel: Mandanten-Bezogen';
+    }
+
+    $conn->query("ALTER TABLE teamData ADD leader INT(6), ADD leaderreplacement INT(6)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Teams: Leader-Update';
+    }
+    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE'");
+    $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Review-Update';
+    }
+    
+}
+
+if($row['version'] < 129){ //31.01.2018
     $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
     if ($conn->error) {
         echo $conn->error;
@@ -1612,6 +1659,7 @@ if($row['version'] < 128){ //31.01.2018
         echo '<br>Mailing: Feedback recipient';
     }
 }
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

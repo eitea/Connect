@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php';?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <!-- BODY -->
 
 <div class="page-header">

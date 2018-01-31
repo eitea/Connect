@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 require_once dirname(__DIR__) . '/Calculators/IntervalCalculator.php';
 $day = date('w');

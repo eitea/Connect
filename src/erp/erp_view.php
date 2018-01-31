@@ -1,4 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToERP($userID);
+require dirname(__DIR__) . "/misc/helpcenter.php"; 
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, ''), 'company' => 0, 'client' => 0);
 
@@ -190,7 +191,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
 
           if($transitable){ //if open positions
             if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$i.'"><i class="fa fa-trash-o"></i></button> '; }
-            echo '<a data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+            echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
 
             $modal_transits = '';
             foreach($available_transitions as $t){

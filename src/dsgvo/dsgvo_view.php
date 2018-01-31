@@ -1,4 +1,6 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); 
+<?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php
 if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
   $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
   echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
@@ -104,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         //contactPerson
         $result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $contactID");
         if(!$contact_row = $result->fetch_assoc()) $accept = false;
-        
+
         //build link
         $link_id = '';
         if (getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) {
@@ -180,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>" .
                 "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsch eingegebene Passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
           }
-
+          
           $content = str_replace("[LINK]", $link, $content);
           $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
           $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
@@ -227,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           }
         } else {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Dokument oder Kontakperson unzulässig.</div>';
-        }        
+        }
     }
 }
 ?>

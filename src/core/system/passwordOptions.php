@@ -1,4 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 //just encrypt the values from current to new, MasterCrypt will handle the masterPass settings
 function mc_update_values($current, $new, $statement = '') {

@@ -3,6 +3,7 @@
 <script src="plugins/chartsjs/Chart.min.js"></script>
 <script src='plugins/fullcalendar/lib/moment.min.js'></script>
 <script src='plugins/fullcalendar/fullcalendar.js'></script>
+<script src='plugins/fullcalendar/locale/de-at.js'></script>
 <style>
 #statisticChart, #analysisChart{
   margin:50px 0px 50px 0px;
@@ -34,7 +35,7 @@ if($logSums->saldo < 0){
   $color = 'style="color:#00ba29"';
 }
 
-$result_Sum = $conn->query("SELECT * FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $userID AND endDate IS NULL");
+$result_Sum = $conn->query("SELECT $intervalTable.*, beginningDate FROM $userTable INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id WHERE $userTable.id = $userID AND endDate IS NULL");
 if($result_Sum && $result_Sum->num_rows > 0){
   $userRow = $result_Sum->fetch_assoc();
 } else {
@@ -111,6 +112,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
         </table>
       </div>
     </div> <!-- End tab content -->
+
     <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
       <table class="table table-striped">

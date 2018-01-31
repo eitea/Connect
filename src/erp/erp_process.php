@@ -234,10 +234,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
         </ul>
       </div>
-      <a data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
       <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
       <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
       <a href="download?proc=<?php echo $historyID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+      <a style="margin-left: 20px" data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
     </div>
   </h3>
 </div>
@@ -469,7 +469,7 @@ $x = $prod_row['id'];
         <div class="col-md-1"><label>+</label></div>
         <div class="col-md-3">
           <label><?php echo $lang['ADDITION']; ?> %</label>
-          <input id="salePercent" type="number" step='1' class="form-control" placeholder="zzgl %">
+          <input id="salePercent" type="number" step='1' class="form-control" name="add_product_addition" placeholder="zzgl %">
         </div>
         <div class="col-md-1"><label>=</label></div>
         <div class="col-md-4">
@@ -691,6 +691,7 @@ function displayArticle(i){
       data:{articleID: i},
       type: 'get',
       success : function(resp){
+        console.log(resp);
         var res = resp.split("; ");
         $("[name='add_product_name']").val(res[0]);
         $("[name='add_product_description']").val(res[1]);
@@ -702,7 +703,8 @@ function displayArticle(i){
         } else {
           $("[name='add_product_as_bar']").prop('checked', false);
         }
-        $("[name='add_product_purchase']").val(res[7]);
+        $("[name='add_product_purchase']").val(res[5]);
+        $("[name='add_product_addition']").val((res[2]/(res[5]/100))-100);
       },
       error : function(resp){}
     });
