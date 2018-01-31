@@ -252,7 +252,6 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
             echo 'document.getElementById("options").click();';
         }
     }
-
 }
 ?>
   });
@@ -311,7 +310,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
           <div class="navbar-right" style="margin-right:10px;">
               <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
               <?php
-              $result = $conn->query("SELECT * FROM socialprofile WHERE userID = $userID");
+              $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID");
               $row = $result->fetch_assoc();
               $social_status = $row["status"];
               $social_isAvailable = $row["isAvailable"];
@@ -378,22 +377,32 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                           <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
                       </a>
                   <?php endif;?>
-                  <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="collapse" href="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+                  <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
               </div>
           </div>
       </nav>
   <!-- /navbar -->
-  <div class="collapse" id="infoDiv_collapse">
-    <div class="well" style="margin:0">
-      <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php';
-echo $VERSION_TEXT;?>
-      <br>
-      The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
-      the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
-    </div>
+
+  <div id="infoDiv_collapse" class="modal fade">
+      <div class="modal-dialog modal-content modal-sm">
+          <div class="modal-header h4">Information</div>
+          <div class="modal-body">
+              <a href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT;?><br><br>
+              The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
+              the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
+              <br><br>
+              LIZENZHINWEIS<br>
+              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+          </div>
+      </div>
   </div>
+
   <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
   <!-- modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
@@ -522,16 +531,17 @@ if ($result && ($row = $result->fetch_assoc())) {
 //display checkin or checkout + disabled
 $result = mysqli_query($conn,  "SELECT `time`, indexIM FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
-    //deny stampOut
-    $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
-    if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
-
     $buttonVal = $lang['CHECK_OUT'];
     $buttonNam = 'stampOut';
     //<img width="15px" height="15px" src="images/emji1.png">
     $showProjectBookingLink = TRUE;
     $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
     if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
+
+    //deny stampOut
+    $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
+    if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
+
     $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
@@ -540,7 +550,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
 
-    if($ckIn_disabled){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
+    if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
@@ -982,16 +992,13 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li>
-                    <a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a>
-                </li>
-
+                <li><a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
               </ul>
             </div>
           </div>
         </div>
       <?php endif;?>
-      <!-- Section Ends : ARCHIVE -->
+      <!-- END SECTIONS -->
       <br><br>
     </div> <!-- /accordions -->
     <br><br><br>

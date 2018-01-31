@@ -41,6 +41,7 @@ if($x){
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
     $dynrow['clientid'] = $_SESSION['filterings']['client'] ?? 0;
     $dynrow['clientprojectid'] = $_SESSION['filterings']['project'] ?? 0;
+    $dynrow['level'] = 0;
 }
 ?>
 
@@ -118,13 +119,13 @@ if($x){
                                     <label><?php echo $lang["OWNER"]; ?>*</label>
                                     <select class="select2-team-icons required-field" name="owner">
                                     <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
-                                    </select>
+                                    </select><br>
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["LEADER"]; ?>*</label>
                                     <select class="select2-team-icons required-field" name="leader">
                                     <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
-                                    </select>
+                                    </select><br>
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
@@ -146,30 +147,36 @@ if($x){
                                             echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
                                         }
                                         ?>
-                                    </select>
+                                    </select><br>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-2"><br>
+                                <div class="col-md-2">
                                     <label>Skill Minimum</label>
                                     <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
                                 </div>
-                                <div class="col-md-2"><br>
+                                <div class="col-md-2">
                                     <label>Level</label>
-                                    <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>">
+                                    <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
                                 </div>
-                                <div class="col-md-4"><br>
-                                    <label>Geschätzte Zeit</label>
-                                    <input type='number' class="form-control" placeholder='Coming Soon..' value="<?php //echo $dynrow['estimatedHours']; ?>" disabled /><br>
+                                <div class="col-md-4">
+                                    <label>Geschätzte Zeit <small>(Stunden)</small></label>
+                                    <div class="input-group">
+                                        <input id="estimatedHours-<?php echo $x; ?>" type='text' class="form-control" value="<?php echo $dynrow['estimatedHours']; ?>" name="estimatedHours" title="Angaben in Stunden umawndeln" />
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default convert-estimate" value="<?php echo $x; ?>"><i class="fa fa-refresh"></i></button>
+                                        </span>
+                                    </div>
+                                    <small>7m = 7 Minuten, 1t = 1 Tag, 2w = 2 Wochen</small><br>
                                 </div>
-                                <div class="col-md-4"><br>
+                                <div class="col-md-4">
                                     <label><?php echo $lang["BEGIN"]; ?>*</label>
                                     <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
-                                <textarea class="form-control projectDescriptionEditor" name="description" ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <textarea class="form-control projectDescriptionEditor" name="description" maxlength="20000" ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>
