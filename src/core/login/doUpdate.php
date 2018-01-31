@@ -1604,7 +1604,14 @@ if($row['version'] < 127){ //29.01.2018
         echo '<br>Tasks: Skill-Level';
     }
 }
-
+if($row['version'] < 128){ //31.01.2018
+    $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'admin@mail.com'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Mailing: Feedback recipient';
+    }
+}
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

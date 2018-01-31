@@ -364,9 +364,13 @@ span.select2.select2-container.select2-container--default {
 
 /* Feedback */
 .feedback-button {
-  position: absolute;   
+  position: fixed;   
   display: inline-block;   
-  bottom: 70px;   
-  left: 15px; 
-  width: calc(100% - 30px);
+  bottom: 15px;   
+  left: 15px;
+}
+
+#screenshot img {
+  width:100%;
+  height:100%;
 }

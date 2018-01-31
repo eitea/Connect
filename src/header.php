@@ -512,7 +512,7 @@ echo $VERSION_TEXT;?>
   <!-- /social settings modal -->
   <?php endif;?>
     <!-- feedback modal -->
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" id="feedback_form">
     <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
@@ -520,29 +520,30 @@ echo $VERSION_TEXT;?>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="feedbackModalLabel"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
                 </div>
-                <br>
                 <div class="modal-body">
                     <!-- modal body -->
                     <div class="radio">
-                        <label><input type="radio" name="type" checked>I have a problem</label>
+                        <label><input type="radio" name="feedback_type" value="I have a problem" checked>Ich habe ein Problem</label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="type">I found a bug</label>
+                        <label><input type="radio" name="feedback_type" value="I found a bug">Ich habe einen Bug gefunden</label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="type">I want an additional feature</label>
+                        <label><input type="radio" name="feedback_type" value="I want an additional feature">Ich will ein neues Feature vorschlagen</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="feedback_type" value="I have positive feedback">Ich habe etwas positives zu berichten</label>
                     </div>
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
-                    <textarea required name="description" class="form-control"></textarea>
+                    <textarea required name="description" id="feedback_message" class="form-control"></textarea>
                     <div class="checkbox">
-                        <label><input type="checkbox" name="includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
+                        <label><input type="checkbox" name="includeScreenshot" id="feedback_includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
                         <br>
                     </div>
-                    <div style="width:100%; overflow-y: scroll; overflow-x: auto">
-                    <div id="screenshot">
+                    <div id="screenshot"> <!-- image will be placed here -->
                     </div>
-                    </div>
+                    
                   
                     <!-- /modal body -->
                 </div>
@@ -1024,19 +1025,52 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <br><br>
     </div> <!-- /accordions -->
     <br><br><br>
-    <!-- Section: Feedback -->
-    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
-                  
-    <!-- Section Ends: Feedback -->    
   </div>
+    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>              
 </div>
 <!-- /side menu -->
 
 <script>
+    $("#feedback_form").submit(function(event){
+        event.preventDefault();
+        var img = window.feedbackCanvasObject.toDataURL()
+        var postData =  {
+            location:window.location.href, 
+            message: $("#feedback_message").val(), 
+            type:$('input[name=feedback_type]:checked').val() 
+        };
+        if(document.getElementById("feedback_includeScreenshot").checked){
+            postData.screenshot = img; 
+        }
+        $.post("ajaxQuery/AJAX_sendFeedback.php", 
+            postData, 
+            function (response){
+                alert(response)
+                //clear form
+                $("#feedback_message").val("")
+                $('#feedbackModal').modal('hide');  
+            }
+        );   
+    })
     function takeScreenshot(){
         html2canvas(document.body).then(function(canvas) {
-            document.getElementById("screenshot").appendChild(canvas)
-            $('#feedbackModal').modal('show');            
+            // document.getElementById("screenshot").appendChild(canvas)
+            // $("#screenshot").html(canvas)
+
+            canvas.toBlob(function(blob) {
+                var newImg = document.createElement('img'),
+                url = URL.createObjectURL(blob);
+
+                newImg.onload = function() {
+                    URL.revokeObjectURL(url);
+                };
+
+                newImg.src = url;
+                $("#screenshot").html(newImg)
+            });
+
+            window.feedbackCanvasObject = canvas
+            $('#feedbackModal').modal('show');       
         });
     }
     $(".feedback-button").on("click",function(){
