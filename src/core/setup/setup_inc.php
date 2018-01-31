@@ -1365,4 +1365,15 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+    $sql = "CREATE TABLE microtasks (
+        projectid varchar(100) NOT NULL,
+        microtaskid varchar(100) NOT NULL,
+        title varchar(50) NOT NULL,
+        ischecked enum('TRUE','FALSE') NOT NULL DEFAULT 'FALSE',
+        finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
+        completed timestamp NULL DEFAULT NULL,
+        PRIMARY KEY (projectid,microtaskid))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
