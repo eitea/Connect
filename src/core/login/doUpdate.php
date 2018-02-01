@@ -1648,11 +1648,11 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Tasks: Review-Update';
     }
-    
+
 }
 
 if($row['version'] < 129){ //31.01.2018
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
     if ($conn->error) {
         echo $conn->error;
     } else {
