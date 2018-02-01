@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th><button type="button" title="Test" onClick="test()" class="btn btn-default" ><i class="fa fa-plus"></i></button></th>
+    <th></th>
   </tr></thead>
   <tbody>
   <?php
@@ -81,7 +81,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 
-<form method="POST">
+<form method="POST" autocomplete="off">
   <div class="modal fade" id="new-account">
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
@@ -145,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <input type="number" value="-1" style="visibility: hidden" name="edit_id" id="edit_id"/>
       </div>
       <div class="modal-footer">
-        <button style="float:left" type="button" class="btn btn-default" onblur="this.setAttribute('style','float:left');" onClick="edit_checkEmail(this)">Check</button>
+        <button id="checkEmailBtn" style="float:left" type="button" class="btn btn-default" onClick="edit_checkEmail(this)">Check</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" name="editAccount"><?php echo $lang['EDIT']; ?></button>
       </div>
@@ -186,6 +186,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     
 </div>
     <div class="modal fade" id="add-rule">
+    <form id="resetForm" >
     <div class="modal-dialog modal-content modal-lg">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
         <div class="modal-body">
@@ -195,7 +196,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </ul>
                     <div class="tab-content">
                         <div id="projectBasics" class="tab-pane fade in active"><br>
-                        <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="Erkennung im E-Mail-Betreff" /><br></div>
+                        <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="<?php echo $lang['FILTER_PLACEHOLDER'] ?>" /><small style="margin-bottom:50px;" ><?php echo $lang['FILTER_HELP'] ?><br></small><br></div>
                             <div class="row">
                                 <?php
                                 if(count($available_companies ) > 2){
@@ -211,7 +212,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 ?>
                                 <div class="col-sm-4">
                                     <label><?php echo $lang['CLIENT']; ?></label>
-                                    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, '<?php echo $dynrow['clientprojectid']; ?>', 'projectHint');">
+                                    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 'projectHint');">
                                         <?php
                                         if(count($available_companies) <= 2 ){
                                             $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
@@ -221,6 +222,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                             $checked = $dynrow['clientid'] == $row_fc['id'] ? 'selected' : '';
                                             echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
                                         }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><?php echo $lang['PROJECT']; ?></label>
+                                    <select id="projectHint" class="js-example-basic-single" name="filterProject">
+                                        <?php
+                                            if($dynrow['clientid']){
+                                                $result_fc = $conn->query("SELECT id, name FROM projectData WHERE clientID = ". $dynrow['clientid']);
+                                                while($result && ($row_fc = $result_fc->fetch_assoc())){
+                                                    $checked = $dynrow['clientprojectid'] == $row_fc['id'] ? 'selected' : '';
+                                                    echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                                                }
+                                            }
                                         ?>
                                     </select>
                                 </div>
@@ -316,11 +331,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
+    </form>
   </div>
 
 
 
 <script>
+    function clearInputs(){
+        document.getElementById("resetForm").reset();
+        $(".select2-team-icons").val(null).trigger('change');
+        $(".js-example-basic-single").val(null).trigger('change');
+        $("#Priority").val(1).trigger('change');
+    }
     function editAccount(event,e_id){
         var id = document.getElementById("edit_id");
         var server = document.getElementById("edit_server");
@@ -330,15 +352,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var username = document.getElementById("edit_username");
         var password = document.getElementById("edit_password");
         var logging = document.getElementById("edit_logging");
-        var row = event.target.parentNode.parentNode.parentNode.childNodes;
-        server.setAttribute("value",row[0].textContent)
-        port.setAttribute("value",row[1].textContent)
-        username.setAttribute("value",row[4].textContent)
-        service.selectedIndex = row[2].textContent == "IMAP" ? 0 : 1;
-        security.selectedIndex = row[3].textContent == "none" ? 0 : row[0].textContent == "tls" ? 1 : 2;
-        logging.checked = row[4].textContent == "FALSE" ? false : true;
-        id.setAttribute("value",e_id);
-        //TODO: Hier forstsetzten mit setzen der Werte
+        var row = null;
+        $.post("../misc/getAccount",{id: e_id},function(data){
+            row = JSON.parse(data);
+            console.log(row);
+            server.setAttribute("value",row['server']);
+            port.setAttribute("value",row['port']);
+            console.log(port);
+            username.setAttribute("value",row['username']);
+            service.selectedIndex = row['service'].toUpperCase() == "IMAP" ? 0 : 1;
+            security.selectedIndex = row['smtpSecure'] == "none" ? 0 : row[0] == "tls" ? 1 : 2;
+            logging.checked = row['logEnabled'] == "FALSE" ? false : true;
+            id.setAttribute("value",e_id);
+            //TODO: Hier forstsetzten mit setzen der Werte
+        });
+        
     }
     function changeIdForRule(id){
         document.getElementById("emailId").setAttribute("value", id);
@@ -356,6 +384,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Identifier: document.getElementById("Identifier").value,
             Company: document.getElementById("Company").selectedOptions[0].value,
             Client: document.getElementById("clientHint").selectedOptions[0].value,
+            ClientProject: document.getElementById("projectHint").selectedOptions[0].value,
             Color: document.getElementById("Color").value,
             Status: document.getElementById("Status").selectedOptions[0].value,
             Priority: document.getElementById("Priority").selectedOptions[0].value,
@@ -366,6 +395,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Leader: document.getElementById("Task-Leader").selectedOptions[0].value,
             id: document.getElementById("emailId").value,
         }, function(data){
+            console.log(data);
             editRules(null,data);
         });
     }
@@ -476,11 +506,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
   }
-  function showProjects(client, project, place){
+  function showProjects(client, place){
     if(client != ""){
       $.ajax({
         url:'ajaxQuery/AJAX_getProjects.php',
-        data:{clientID:client, projectID:project},
+        data:{clientID:client},
         type: 'get',
         success : function(resp){
           $("#"+place).html(resp);
@@ -489,5 +519,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
   }
+  $(document).ready(function() {
+    $(".select2-team-icons").select2({
+        templateResult: formatState,
+        templateSelection: formatState
+    });
+    document.getElementById("addRule").addEventListener("click", clearInputs);
+    $("#edit-account input, #edit-account select, #new-account input, #new-account select").on("change",function(){
+        document.getElementById("checkEmailBtn").setAttribute('style','float:left');
+    });
+  });
+  function formatState (state) {
+    if (!state.id) { return state.text; }
+    var $state = $(
+        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+    );
+    return $state;
+};
+ 
 </script>
 <?php include dirname(__DIR__) . '/footer.php';?>

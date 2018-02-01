@@ -1499,8 +1499,7 @@ if($row['version'] < 125){
     $conn->query("DELETE FROM projectData WHERE dynamicprojectid IS NOT NULL");
     $conn->query("ALTER TABLE projectData DROP COLUMN dynamicprojectid");
 
-
-    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription TEXT NOT NULL");
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription MEDIUMTEXT NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1641,25 +1640,73 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Teams: Leader-Update';
     }
-    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE'");
+}
+
+if($row['version'] < 129){ //31.01.2018
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Mailing: Feedback recipient';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL");
     $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Tasks: Review-Update';
     }
-    
 }
 
-if($row['version'] < 129){ //31.01.2018
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
+if($row['version'] < 130){ //01.02.2018
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projecttags VARCHAR(250) DEFAULT '' NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Mailing: Feedback recipient';
+        echo '<br>';
     }
-}
+    
+    $conn->query("CREATE TABLE microtasks (
+        projectid varchar(100) NOT NULL,
+        microtaskid varchar(100) NOT NULL,
+        title varchar(50) NOT NULL,
+        ischecked enum('TRUE','FALSE') NOT NULL DEFAULT 'FALSE',
+        finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
+        completed timestamp NULL DEFAULT NULL,
+        PRIMARY KEY (projectid,microtaskid))");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: MicroTask-Update';
+    }
 
+    $conn->query("CREATE TABLE taskemailrules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        identifier varchar(20) NOT NULL,
+        company int(6) NOT NULL,
+        client int(6) NOT NULL,
+        clientproject int(6) DEFAULT NULL,
+        color varchar(10) NOT NULL DEFAULT '#FFFFFF',
+        status enum('ACTIVE','DEACTIVATED','DRAFT','COMPLETED') NOT NULL DEFAULT 'ACTIVE',
+        priority int(6) NOT NULL DEFAULT '3',
+        parent varchar(100) DEFAULT NULL,
+        owner int(6) NOT NULL,
+        employees varchar(100) NOT NULL,
+        optionalemployees varchar(100) DEFAULT NULL,
+        emailaccount int(6) NOT NULL,
+        leader int(6) DEFAULT NULL,
+        PRIMARY KEY (id)
+       )");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Email-Projects: Rulesets';
+    }
+
+
+}
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

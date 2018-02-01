@@ -38,6 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
     if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
+        var_dump($_POST);
         $bookingID = test_input($_POST['createBooking']);
         $result = $conn->query("SELECT dynamicID, clientprojectid, needsreview FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
         if($row = $result->fetch_assoc()){
@@ -51,12 +52,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $percentage = 100; //safety
                     if($needsReview == 'TRUE'){
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
-                    }else{
+                    } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
 
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
+
+                $microtasks = $conn->query("SELECT microtaskid, ischecked FROM microtasks WHERE projectid='$dynamicID'");
+                if($microtasks){
+                    while($microrow = $microtasks->fetch_assoc()){
+                        if($microrow['ischecked']=='FALSE'){
+                            if(isset($_POST["mtask".$microrow['microtaskid']])){ // IS ALLWAYS SET?!?!?!?!
+                                $conn->query("UPDATE microtasks SET ischecked='TRUE', finisher = $userID, completed = CURRENT_TIMESTAMP WHERE microtaskid = '".$microrow['microtaskid']."'");
+                            }
+                        }
+                    }
+                }
 
                 $description = test_input($_POST['description']);
                 $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% Abgeschlossen'  WHERE id = $bookingID");
@@ -99,8 +111,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
 
-
-
+                if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
+                    for($i = 0;$i<count($matches[0]);$i++){
+                        $mname = strip_tags($matches[1][$i]);
+                        $info = strip_tags($matches[2][$i]);
+                        $mid = uniqid();
+                        $conn->query("INSERT INTO microtasks VALUES('$id','$mid','$mname','FALSE',null,null)");
+                        $checkbox = "<input type='checkbox' id='$mid' disabled title=''><b>".$mname."</b><br>".$info."</input>";
+                        $mname = preg_quote($mname);
+                        $description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);
+                        if($conn->error){
+                            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                        }
+                    }
+                }
 
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
@@ -114,8 +138,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
+                $estimate = floatval($_POST['estimatedHours']);
                 $skill = intval($_POST['projectskill']);
-
+                $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
@@ -145,9 +170,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param("ssbiiissssisiisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $skill);
+                $stmt->bind_param("ssbiiissssisiisbidis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -222,12 +247,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
@@ -239,10 +264,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $x = $row['projectid'];
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
-            $rowStyle = '';
+            $rowStyle = $tags = '';
+
+            foreach(explode(',', $row['projecttags']) as $tag){
+                if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
+            }
             if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
-            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
+            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
@@ -275,15 +304,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
 
             echo '<td>';
-            $checkbox = '<input type="checkbox" ';
-            if($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) $checkbox= $checkbox.'disabled ';
-            if($row['needsreview'] == 'TRUE') $checkbox= $checkbox.'checked ';
-            $checkbox= $checkbox.'></input>';
-            echo $checkbox;
+            $review = '<input type="checkbox" ';
+            if($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) $review= $review.' disabled ';
+            if($row['needsreview'] == 'TRUE') $review= $review.'checked ';
+            $review= $review.'></input>';
+            echo $review;
             echo '</td>';
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
-                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
+                echo '<button class="btn btn-default" onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
@@ -296,6 +325,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</form></td>';
             echo '</tr>';
         }
+
         ?>
     </tbody>
 </table>
@@ -325,6 +355,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         </div>
                     </div>
                     <div class="row">
+                    <div class="col-md-16">
+                        <?php
+                                    $microtasks = $conn->query("SELECT * FROM microtasks WHERE projectid = '".$occupation['dynamicID']."'");
+                                    if($microtasks){
+                                    echo '<table id="microlist" class="dataTable table">';
+                                    echo '<thead><tr>';
+                                    echo '<td>Completed</td>';
+                                    echo '<td>Micro Task</td>';
+                                    echo '</tr></thead>';
+                                    echo '<tbody>';
+                                    while($mtask = $microtasks->fetch_assoc()){
+                                        if($mtask['ischecked']=='FALSE'){
+                                        $mid = $mtask['microtaskid'];
+                                        $title = $mtask['title'];
+                                        echo '<tr><td>';
+                                        echo '<input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
+                                        echo '<td><label>'.$title.'</label></td>';
+                                        echo '</tr>';
+                                        }
+                                    }
+                                    echo '</tbody>';
+                                    echo '</table>';
+                                    }
+                        ?>
+                    </div>
+                    </div>
+                    <div class="row">
                         <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
                             <div class="col-md-4">
                                 <label><?php echo $lang['COMPANY']; ?></label>
@@ -345,10 +402,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                     <option value="0"> ... </option>
                                 <?php
                                 $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
-                                if($occupation['companyid']){
+                                if ($occupation['companyid']){
                                     $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = ".$occupation['companyid']);
                                 }
-                                while($row = $result->fetch_assoc()){
+                                while ($row = $result->fetch_assoc()){
                                     echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
                                 }
                                 ?>
@@ -391,9 +448,53 @@ $("#bookCompletedCheckbox").change(function(event){
         $("#bookCompleted").val(100);
     }
 });
+function checkMicroTasks(){
+    if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
+        $("#bookCompletedCheckbox").attr('disabled',false);
+    }else{
+        $("#bookCompletedCheckbox").attr('disabled',true);
+        $("#bookCompleted").attr('max',99);
+        $("#bookRanger").attr('max',99);
+    }
+}
+
+$("#microlist input[type='checkbox']").change(function(){
+    var allisgood = true;
+    $("#microlist input[type='checkbox']").each(function(){
+        if(!(this.checked)) allisgood = false;
+    });
+    if(allisgood){
+        $("#bookCompletedCheckbox").attr('disabled',false);
+        $("#bookCompleted").attr('max',100);
+        $("#bookRanger").attr('max',100);
+    }else{
+        $("#bookCompletedCheckbox").attr('disabled',true);
+        $("#bookCompleted").attr('max',99);
+        $("#bookRanger").attr('max',99);
+    }
+});
+
+$("#bookRanger").change(function(event){
+    console.log("'Range' \n");
+    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
+    if(event.currentTarget.value>event.currentTarget.max){
+        event.currentTarget.value=event.currentTarget.max;
+    }
+});
+
+$("#bookCompleted").change(function(event){
+    console.log("'Number' \n");
+    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
+    if(event.currentTarget.value>event.currentTarget.max){
+        event.currentTarget.value=event.currentTarget.max;
+    }
+    $("#bookRanger").val(event.currentTarget.value);
+});
+
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
-        $("#bookCompletedCheckbox").prop('checked', true);
+        $("#bookCompleted").prop('value',99);
+        console.log('LOOOG');
     } else {
         $("#bookCompletedCheckbox").prop('checked', false);
     }
@@ -410,6 +511,10 @@ function dynamicOnLoad(modID){
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
+    });
+    $(".js-example-tokenizer").select2({
+        tags: true,
+        tokenSeparators: [',', ' ']
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',

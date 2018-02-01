@@ -63,11 +63,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'>Firmenname</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companystreet]'>Straße</button>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyplace]'>Ort</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>        
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>
         </div>
         <?php elseif(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $documentContent, $matches)): ?>
         <div class="col-md-10 col-md-offset-1">
-            <?php            
+            <?php //16:30..
             $result = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
             $result = $result->fetch_all(MYSQLI_ASSOC);
             //TODO: combine these arrays so i can say $result[$match]['content'] AND $result[$match]['id]
@@ -81,7 +81,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo $split[0];
                 $documentContent = $split[1];
                 //remove the braces for html & sql conform posting
-                $match = substr($match, 1, -1); 
+                $match = substr($match, 1, -1);
                 $customtext = isset($result[$match]) ? $result[$match] : '';
                 if(isset($_POST['save']) && isset($_POST[$match])){
                     $customtext = test_input($_POST[$match]);
@@ -89,7 +89,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         $val = $result_ids[$match];
                         $conn->query("UPDATE document_customs SET content = '$customtext' WHERE id = $val");
                     } else {
-                        $conn->query("INSERT INTO document_customs (doc_id, companyID, identifier, content, status) VALUES ('$doc_ident', $cmpID, '$match', '$customtext', 'visible') ");  
+                        $conn->query("INSERT INTO document_customs (doc_id, companyID, identifier, content, status) VALUES ('$doc_ident', $cmpID, '$match', '$customtext', 'visible') ");
                     }
                 }
                 echo '<textarea name="'.$match.'" class="form-control" rows="3" >'.$customtext.'</textarea>';

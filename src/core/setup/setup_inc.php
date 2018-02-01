@@ -1189,7 +1189,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE dynamicprojects(
         projectid VARCHAR(100) NOT NULL PRIMARY KEY,
         projectname VARCHAR(60) NOT NULL,
-        projectdescription TEXT NOT NULL,
+        projectdescription MEDIUMTEXT NOT NULL,
         companyid INT(6) UNSIGNED NOT NULL,
         clientid INT(6) UNSIGNED,
         clientprojectid INT(6) UNSIGNED,
@@ -1207,6 +1207,7 @@ function create_tables($conn) {
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
+        projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1292,7 +1293,7 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
-    
+
     $sql = "CREATE TABLE sharedgroups (
         id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
@@ -1364,6 +1365,39 @@ function create_tables($conn) {
     password VARCHAR(50) NOT NULL,
     logEnabled ENUM('TRUE','FALSE') NOT NULL,
     PRIMARY KEY (id))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE taskemailrules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        identifier varchar(20) NOT NULL,
+        company int(6) NOT NULL,
+        client int(6) NOT NULL,
+        clientproject int(6) DEFAULT NULL,
+        color varchar(10) NOT NULL DEFAULT '#FFFFFF',
+        status enum('ACTIVE','DEACTIVATED','DRAFT','COMPLETED') NOT NULL DEFAULT 'ACTIVE',
+        priority int(6) NOT NULL DEFAULT '3',
+        parent varchar(100) DEFAULT NULL,
+        owner int(6) NOT NULL,
+        employees varchar(100) NOT NULL,
+        optionalemployees varchar(100) DEFAULT NULL,
+        emailaccount int(6) NOT NULL,
+        leader int(6) DEFAULT NULL,
+        PRIMARY KEY (id)
+       )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }
+
+    $sql = "CREATE TABLE microtasks (
+        projectid varchar(100) NOT NULL,
+        microtaskid varchar(100) NOT NULL,
+        title varchar(50) NOT NULL,
+        ischecked enum('TRUE','FALSE') NOT NULL DEFAULT 'FALSE',
+        finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
+        completed timestamp NULL DEFAULT NULL,
+        PRIMARY KEY (projectid,microtaskid))";
     if(!$conn->query($sql)){
         echo $conn->error;
     }
