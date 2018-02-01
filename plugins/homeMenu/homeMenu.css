@@ -364,9 +364,9 @@ span.select2.select2-container.select2-container--default {
 
 /* Feedback */
 .feedback-button {
-  position: fixed;   
-  display: inline-block;   
-  bottom: 15px;   
+  position: fixed;
+  display: inline-block;
+  bottom: 15px;
   left: 15px;
 }
 #screenshot img {
@@ -377,4 +377,8 @@ span.select2.select2-container.select2-container--default {
 .btn-empty{
     background:none;
     border:none;
+}
+.help-button{
+    float:right;
+    margin-top:10px;
 }
