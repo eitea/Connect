@@ -552,8 +552,8 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                     </div>
                     <div id="screenshot"> <!-- image will be placed here -->
                     </div>
-                    
-                  
+
+
                     <!-- /modal body -->
                 </div>
                 <div class="modal-footer">
@@ -1050,61 +1050,16 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     </div> <!-- /accordions -->
     <br><br><br>
   </div>
-    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>              
+    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 </div>
 <!-- /side menu -->
-
-<!-- feedback script -->
-<script>
-    $("#feedback_form").submit(function(event){
-        event.preventDefault();
-        var img = window.feedbackCanvasObject.toDataURL()
-        var postData =  {
-            location:window.location.href, 
-            message: $("#feedback_message").val(), 
-            type:$('input[name=feedback_type]:checked').val() 
-        };
-        if(document.getElementById("feedback_includeScreenshot").checked){
-            postData.screenshot = img; 
-        }
-        $.post("ajaxQuery/AJAX_sendFeedback.php", 
-            postData, 
-            function (response){
-                alert(response)
-                //clear form
-                $("#feedback_message").val("")
-                $('#feedbackModal').modal('hide');  
-            }
-        );   
-    })
-    function takeScreenshot(){
-        html2canvas(document.body).then(function(canvas) {
-            canvas.toBlob(function(blob) {
-                var newImg = document.createElement('img'),
-                url = URL.createObjectURL(blob);
-
-                newImg.onload = function() {
-                    URL.revokeObjectURL(url);
-                };
-                newImg.src = url;
-                $("#screenshot").html(newImg)
-            });
-            window.feedbackCanvasObject = canvas
-            $('#feedbackModal').modal('show');       
-        });
-    }
-    $(".feedback-button").on("click",function(){
-        takeScreenshot()
-    })
-</script>
-<!-- /feedback script -->
 
 <div id="bodyContent" style="display:none;" >
   <div class="affix-content">
     <div class="container-fluid">
       <span><?php echo $validation_output; ?></span>
       <span><?php echo $error_output; ?></span>
-
+      
 <?php
   $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
   $row = $result->fetch_assoc();
