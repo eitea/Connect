@@ -1040,6 +1040,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <li><a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
+                <li><a href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
             </div>
           </div>

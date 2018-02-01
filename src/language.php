@@ -922,6 +922,9 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PRIVATE'] = 'Private';
+$lang_ger['PRIVATE'] = 'Persöhnlich';
+
 $lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
 $lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
 
@@ -1354,6 +1357,9 @@ $lang_ger['YES'] = 'Ja';
 
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
+
+$lang_eng['YOUR_ARCHIVE'] = 'Your Archive';
+$lang_ger['YOUR_ARCHIVE'] = 'Ihr Archiv';
 
 $lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
 $lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');

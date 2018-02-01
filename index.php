@@ -38,7 +38,7 @@ $routes = array(
   'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
-  'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',
+  'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
 
   'upload/file' => 'archive/uploadToS3.php',
 
