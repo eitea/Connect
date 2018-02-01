@@ -145,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <input type="number" value="-1" style="visibility: hidden" name="edit_id" id="edit_id"/>
       </div>
       <div class="modal-footer">
-        <button style="float:left" type="button" class="btn btn-default" onblur="this.setAttribute('style','float:left');" onClick="edit_checkEmail(this)">Check</button>
+        <button id="checkEmailBtn" style="float:left" type="button" class="btn btn-default" onClick="edit_checkEmail(this)">Check</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-warning" name="editAccount"><?php echo $lang['EDIT']; ?></button>
       </div>
@@ -525,6 +525,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         templateSelection: formatState
     });
     document.getElementById("addRule").addEventListener("click", clearInputs);
+    $("#edit-account input, #edit-account select, #new-account input, #new-account select").on("change",function(){
+        document.getElementById("checkEmailBtn").setAttribute('style','float:left');
+    });
   });
   function formatState (state) {
     if (!state.id) { return state.text; }
