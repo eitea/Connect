@@ -196,7 +196,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </ul>
                     <div class="tab-content">
                         <div id="projectBasics" class="tab-pane fade in active"><br>
-                        <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="Erkennung im E-Mail-Betreff" /><br></div>
+                        <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="<?php echo $lang['FILTER_PLACEHOLDER'] ?>" /><small style="margin-bottom:50px;" ><?php echo $lang['FILTER_HELP'] ?><br></small><br></div>
                             <div class="row">
                                 <?php
                                 if(count($available_companies ) > 2){
