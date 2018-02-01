@@ -186,6 +186,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     
 </div>
     <div class="modal fade" id="add-rule">
+    <form id="resetForm" >
     <div class="modal-dialog modal-content modal-lg">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
         <div class="modal-body">
@@ -330,11 +331,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
+    </form>
   </div>
 
 
 
 <script>
+    function clearInputs(){
+        document.getElementById("resetForm").reset();
+        $(".select2-team-icons").val(null).trigger('change');
+        $(".js-example-basic-single").val(null).trigger('change');
+        $("#Priority").val(1).trigger('change');
+    }
     function editAccount(event,e_id){
         var id = document.getElementById("edit_id");
         var server = document.getElementById("edit_server");
@@ -516,6 +524,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         templateResult: formatState,
         templateSelection: formatState
     });
+    document.getElementById("addRule").addEventListener("click", clearInputs);
   });
   function formatState (state) {
     if (!state.id) { return state.text; }
