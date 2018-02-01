@@ -175,6 +175,20 @@ if($x){
                                 </div>
                             </div>
                             <div class="col-md-12">
+                                <label>Tags</label>
+                                <select class="form-control js-example-tokenizer" name="projecttags[]" multiple="multiple">
+                                    <option value="Bug">Bug</option>
+                                    <option value="Erweiterung">Erweiterung</option>
+                                    <option value="GUI">GUI</option>
+                                    <option value="Verbesserung">Verbesserung</option>
+                                    <?php
+                                    foreach(explode(',', $dynrow['projecttags']) as $tag){
+                                        if($tag) echo '<option value="'.$tag.'" selected>'.$tag.'</option>';
+                                    }
+                                    ?>
+                                </select><small>Tags werden durch ',' oder ' ' automatisch getrennt.</small><br><br>
+                            </div>
+                            <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
                                 <textarea class="form-control projectDescriptionEditor" name="description" maxlength="20000" ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>

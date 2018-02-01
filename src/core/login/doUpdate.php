@@ -1660,6 +1660,15 @@ if($row['version'] < 129){ //31.01.2018
     }
 }
 
+if($row['version'] < 130){ //01.02.2018
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projecttags VARCHAR(250) DEFAULT '' NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>';
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';
