@@ -76,7 +76,7 @@ try{
     }
     $company = $ruleset['company'];
     $client = $ruleset['client'];
-    $project = '';
+    $project = $ruleset['clientproject'];
     $color = $ruleset['color'];
     $start = date('Y-m-d');
     $end = '';

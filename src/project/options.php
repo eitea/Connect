@@ -211,7 +211,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 ?>
                                 <div class="col-sm-4">
                                     <label><?php echo $lang['CLIENT']; ?></label>
-                                    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, '<?php echo $dynrow['clientprojectid']; ?>', 'projectHint');">
+                                    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 'projectHint');">
                                         <?php
                                         if(count($available_companies) <= 2 ){
                                             $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
@@ -221,6 +221,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                             $checked = $dynrow['clientid'] == $row_fc['id'] ? 'selected' : '';
                                             echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
                                         }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label><?php echo $lang['PROJECT']; ?></label>
+                                    <select id="projectHint" class="js-example-basic-single" name="filterProject">
+                                        <?php
+                                            if($dynrow['clientid']){
+                                                $result_fc = $conn->query("SELECT id, name FROM projectData WHERE clientID = ". $dynrow['clientid']);
+                                                while($result && ($row_fc = $result_fc->fetch_assoc())){
+                                                    $checked = $dynrow['clientprojectid'] == $row_fc['id'] ? 'selected' : '';
+                                                    echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                                                }
+                                            }
                                         ?>
                                     </select>
                                 </div>
@@ -362,6 +376,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Identifier: document.getElementById("Identifier").value,
             Company: document.getElementById("Company").selectedOptions[0].value,
             Client: document.getElementById("clientHint").selectedOptions[0].value,
+            ClientProject: document.getElementById("projectHint").selectedOptions[0].value,
             Color: document.getElementById("Color").value,
             Status: document.getElementById("Status").selectedOptions[0].value,
             Priority: document.getElementById("Priority").selectedOptions[0].value,
@@ -372,6 +387,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Leader: document.getElementById("Task-Leader").selectedOptions[0].value,
             id: document.getElementById("emailId").value,
         }, function(data){
+            console.log(data);
             editRules(null,data);
         });
     }
@@ -482,11 +498,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
   }
-  function showProjects(client, project, place){
+  function showProjects(client, place){
     if(client != ""){
       $.ajax({
         url:'ajaxQuery/AJAX_getProjects.php',
-        data:{clientID:client, projectID:project},
+        data:{clientID:client},
         type: 'get',
         success : function(resp){
           $("#"+place).html(resp);
@@ -495,5 +511,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
   }
+  $(document).ready(function() {
+    $(".select2-team-icons").select2({
+        templateResult: formatState,
+        templateSelection: formatState
+    });
+  });
+  function formatState (state) {
+    if (!state.id) { return state.text; }
+    var $state = $(
+        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+    );
+    return $state;
+};
+ 
 </script>
 <?php include dirname(__DIR__) . '/footer.php';?>
