@@ -984,13 +984,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 if(count($available_companies) == 2){
                   echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
                   echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                  echo '<li>';
-                  echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$available_companies[1].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
-                  echo '<div class="collapse" id="tdsgvo-sets-'.$available_companies[1].'" >';
-                  echo '<ul class="nav nav-list">';
                   echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
-                  echo '</ul></div></li>';
+
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1000,15 +996,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<ul class="nav nav-list">';
                     echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
                     echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-
-                    echo '<li>';
-                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-sets-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$lang['SETTINGS'].' <i class="fa fa-caret-down"></i></a>';
-                    echo '<div class="collapse" id="tdsgvo-sets-'.$row['id'].'" >';
-                    echo '<ul class="nav nav-list">';
                     echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
-                    echo '</ul></div></li>';
-
                     echo '</ul></div></li>';
                   }
                 }
@@ -1018,13 +1007,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php " || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
-            }
-            if ($this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_mail.php") {
-                echo "$('#tdsgvo-sets-" . $_GET['n'] . "').toggle();";
             }
             echo '</script>';
         }
@@ -1059,7 +1045,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     <div class="container-fluid">
       <span><?php echo $validation_output; ?></span>
       <span><?php echo $error_output; ?></span>
-      
+
 <?php
   $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
   $row = $result->fetch_assoc();
