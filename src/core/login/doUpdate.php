@@ -1648,6 +1648,19 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Tasks: Review-Update';
     }
+
+}
+
+if($row['version'] < 129){ //31.01.2018
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Mailing: Feedback recipient';
+    }
+}
+
+if($row['version'] < 130){ //31.01.2018
     $conn->query("CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
         microtaskid varchar(100) NOT NULL,
@@ -1661,9 +1674,7 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Tasks: MicroTask-Update';
     }
-    
 }
-
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

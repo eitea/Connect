@@ -48,6 +48,10 @@ if(isset($_POST['saveButton'])){
             $val = test_input($_POST['mail_sender_name']);
             $conn->query("UPDATE $mailOptionsTable SET sendername = '$val'");
         }
+        if(!empty($_POST['feedback_mail_recipient'])){
+            $val = test_input($_POST['feedback_mail_recipient']);
+            $conn->query("UPDATE $mailOptionsTable SET feedbackRecipient = '$val'");
+        }
         $conn->query("UPDATE $mailOptionsTable SET isDefault = null");
     }
     echo mysqli_error($conn);
@@ -130,6 +134,17 @@ $row = $result->fetch_assoc();
     <div class="col-md-8"><input type="password" class="form-control" name="mail_password" /></div>
     <br>
   </div>
+  <div class="col-md-4">
+        <h4>Feedback Einstellungen</h4>
+    </div>
+    <br/>
+    <br/>
+    <div class="container-fluid">
+    <br/>    
+    <div class="col-md-4"> Feedback-Empfänger </div>
+    <div class="col-md-8"><input type="text" class="form-control" name="feedback_mail_recipient"  value="<?php echo $row['feedbackRecipient']; ?>" /></div>
+    <br><br>
+    </div>
 </form>
 
 <!-- /BODY -->

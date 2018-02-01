@@ -517,6 +517,7 @@ function create_tables($conn) {
         sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername',
+        feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at',
         isDefault TINYINT(1) NOT NULL DEFAULT 1
     )";
     if (!$conn->query($sql)) {
@@ -1291,7 +1292,7 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
-
+    
     $sql = "CREATE TABLE sharedgroups (
         id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
@@ -1353,7 +1354,8 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE emailprojects ( id INT(10) NOT NULL AUTO_INCREMENT,
+    $sql = "CREATE TABLE emailprojects (
+    id INT(10) NOT NULL AUTO_INCREMENT,
     server VARCHAR(50) NOT NULL,
     port VARCHAR(50) NOT NULL,
     service ENUM('imap','pop3') NOT NULL,

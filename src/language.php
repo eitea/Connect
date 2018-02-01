@@ -504,6 +504,18 @@ $lang_ger['EXPENSES'] = 'Spesen';
 $lang_eng['EXPIRATION_DATE'] = 'Expiration Date';
 $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
+$lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
+$lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
+
+$lang_eng['FEEDBACK_BUG'] = 'Expiration Date';
+$lang_ger['FEEDBACK_BUG'] = 'Ich habe einen Bug gefunden';
+
+$lang_eng['FEEDBACK_FEATURES'] = 'Expiration Date';
+$lang_ger['FEEDBACK_FEATURES'] = 'Ich will ein neues Feature vorschlagen';
+
+$lang_eng['FEEDBACK_POSITIVE'] = 'Expiration Date';
+$lang_ger['FEEDBACK_POSITIVE'] = 'Ich habe etwas positives zu berichten';
+
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 
@@ -570,6 +582,9 @@ $lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
 $lang_eng['GENERAL_SETTINGS'] = 'General Settings';
 $lang_ger['GENERAL_SETTINGS'] = 'Allgemeine Einstellungen';
 
+$lang_eng['GIVE_FEEDBACK'] = 'Give feedback';
+$lang_ger['GIVE_FEEDBACK'] = 'Feedback geben';
+
 $lang_eng['HEADLINE'] = 'Headline';
 $lang_ger['HEADLINE'] = 'Überschrift';
 
@@ -612,6 +627,9 @@ $lang_ger['ILLEGAL_TIMESTAMPS'] = 'Ungültige Zeitstempel';
 
 $lang_eng['INCOMING_INVOICE'] = 'Incoming Invoice';
 $lang_ger['INCOMING_INVOICE'] = 'Eingangsrechnung';
+
+$lang_eng['INCLUDE_SCREENSHOT'] = 'Include screenshot';
+$lang_ger['INCLUDE_SCREENSHOT'] = 'Screenshot hinzufügen';
 
 $lang_eng['INFO_CHARGED'] = 'Entries can only be edited if they have not been charged yet';
 $lang_ger['INFO_CHARGED'] = 'Bereits verrechnete Buchungen können nicht mehr editiert werden';

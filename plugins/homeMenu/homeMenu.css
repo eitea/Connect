@@ -362,6 +362,18 @@ span.select2.select2-container.select2-container--default {
   background: forestgreen;
 }
 
+/* Feedback */
+.feedback-button {
+  position: fixed;   
+  display: inline-block;   
+  bottom: 15px;   
+  left: 15px;
+}
+#screenshot img {
+  width:100%;
+  height:100%;
+}
+
 .btn-empty{
     background:none;
     border:none;

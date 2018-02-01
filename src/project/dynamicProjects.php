@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }else{
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
-                    
+
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
 
@@ -146,6 +146,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
                     $end = $_POST["enddate"] ?? "";
+                }
+                while(strlen($description) > 65000){
+                    $description = substr($description, 0, -1000); //truncate the last characters
                 }
 
                 $series = $_POST["series"] ?? "once";
@@ -247,7 +250,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
@@ -255,7 +258,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
-                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstart ASC");
+                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){
@@ -263,7 +266,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = '';
-            if (!($viewed = $viewed_result->fetch_assoc()) || $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
+            if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
@@ -421,6 +424,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <div class="pull-left"><?php echo $occupation['dynamicID']; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-warning" name="createBooking" value="<?php echo $occupation['bookingID']; ?>"><?php echo $lang['SAVE']; ?></button>
                 </div>
@@ -506,8 +510,7 @@ function dynamicOnLoad(modID){
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',
-        plugins: 'image code',
-        plugins: 'paste',
+        plugins: 'image code paste',
         relative_urls: false,
         paste_data_images: true,
         menubar: false,
@@ -560,6 +563,25 @@ function dynamicOnLoad(modID){
             };
             input.click();
         }
+    });
+    $(".convert-estimate").click(function(event){
+        var str = $('#estimatedHours-'+$(this).val()).val();
+        var hours = 0;
+
+        if(val = /^\d+(?:(?:\.|,)\d+)?(?: |!.|$)/.exec(str)){
+            hours = parseInt(val[0].slice(0,-1));
+        }
+        if(val = /\d+m/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) / 60;
+        }
+        if(val = /\d+t/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) * 24;
+        }
+        if(val = /\d+w/.exec(str)){
+            hours += parseInt(val[0].slice(0,-1)) * 24 * 7;
+        }
+
+        $('#estimatedHours-'+$(this).val()).val(hours);
     });
 } //end dnymaicOnLoad()
 
