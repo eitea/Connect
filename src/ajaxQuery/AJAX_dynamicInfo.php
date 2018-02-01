@@ -27,7 +27,23 @@ echo $conn->error;
                     <?php
                     $result = $conn->query("SELECT projectdescription, projectstatus FROM dynamicprojects WHERE projectid = '$x'");
                     $dynrow =  $result->fetch_assoc();
-                    echo $dynrow['projectdescription'];
+                    $description = $dynrow['projectdescription'];
+                    $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
+                    if($micro){
+                        while($nextmtask = $micro->fetch_assoc()){
+                            if($nextmtask['ischecked'] == 'TRUE'){
+                                $mtaskid = $nextmtask['microtaskid'];
+                                $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
+                                $user = $nextmtask['finisher'];
+                                $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
+                                if($username){
+                                    $username = $username->fetch_assoc()['name'];
+                                    $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
+                                }
+                            }
+                        }
+                    }
+                    echo $description;
                     ?>
                 </div>
                 <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade"><br>

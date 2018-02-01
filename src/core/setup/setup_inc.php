@@ -1369,5 +1369,36 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE taskemailrules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        identifier varchar(20) NOT NULL,
+        company int(6) NOT NULL,
+        client int(6) NOT NULL,
+        clientproject int(6) DEFAULT NULL,
+        color varchar(10) NOT NULL DEFAULT '#FFFFFF',
+        status enum('ACTIVE','DEACTIVATED','DRAFT','COMPLETED') NOT NULL DEFAULT 'ACTIVE',
+        priority int(6) NOT NULL DEFAULT '3',
+        parent varchar(100) DEFAULT NULL,
+        owner int(6) NOT NULL,
+        employees varchar(100) NOT NULL,
+        optionalemployees varchar(100) DEFAULT NULL,
+        emailaccount int(6) NOT NULL,
+        leader int(6) DEFAULT NULL,
+        PRIMARY KEY (id)
+       )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }
 
+    $sql = "CREATE TABLE microtasks (
+        projectid varchar(100) NOT NULL,
+        microtaskid varchar(100) NOT NULL,
+        title varchar(50) NOT NULL,
+        ischecked enum('TRUE','FALSE') NOT NULL DEFAULT 'FALSE',
+        finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
+        completed timestamp NULL DEFAULT NULL,
+        PRIMARY KEY (projectid,microtaskid))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
