@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th><button type="button" title="Test" onClick="test()" class="btn btn-default" ><i class="fa fa-plus"></i></button></th>
+    <th></th>
   </tr></thead>
   <tbody>
   <?php
