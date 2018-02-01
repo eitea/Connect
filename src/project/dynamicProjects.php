@@ -64,7 +64,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     while($microrow = $microtasks->fetch_assoc()){
                         if($microrow['ischecked']=='FALSE'){
                             if(isset($_POST["mtask".$microrow['microtaskid']])){ // IS ALLWAYS SET?!?!?!?!
-                                $conn->query("UPDATE microtasks SET ischecked='TRUE', finisher = $userID, completed = CURRENT_TIMESTAMP");
+                                $conn->query("UPDATE microtasks SET ischecked='TRUE', finisher = $userID, completed = CURRENT_TIMESTAMP WHERE microtaskid = '".$microrow['microtaskid']."'");
                             }
                         }
                     }
@@ -445,6 +445,8 @@ function checkMicroTasks(){
         $("#bookCompletedCheckbox").attr('disabled',false);
     }else{
         $("#bookCompletedCheckbox").attr('disabled',true);
+        $("#bookCompleted").attr('max',99);
+        $("#bookRanger").attr('max',99);
     }
 }
 
@@ -455,10 +457,31 @@ $("#microlist input[type='checkbox']").change(function(){
     });
     if(allisgood){
         $("#bookCompletedCheckbox").attr('disabled',false);
+        $("#bookCompleted").attr('max',100);
+        $("#bookRanger").attr('max',100);
     }else{
         $("#bookCompletedCheckbox").attr('disabled',true);
+        $("#bookCompleted").attr('max',99);
+        $("#bookRanger").attr('max',99);
     }
-})
+});
+
+$("#bookRanger").change(function(event){
+    console.log("'Range' \n");
+    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
+    if(event.currentTarget.value>event.currentTarget.max){
+        event.currentTarget.value=event.currentTarget.max;
+    }
+});
+
+$("#bookCompleted").change(function(event){
+    console.log("'Number' \n");
+    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
+    if(event.currentTarget.value>event.currentTarget.max){
+        event.currentTarget.value=event.currentTarget.max;
+    }
+    $("#bookRanger").val(event.currentTarget.value);
+});
 
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
