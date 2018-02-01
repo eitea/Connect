@@ -1499,8 +1499,7 @@ if($row['version'] < 125){
     $conn->query("DELETE FROM projectData WHERE dynamicprojectid IS NOT NULL");
     $conn->query("ALTER TABLE projectData DROP COLUMN dynamicprojectid");
 
-
-    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription TEXT NOT NULL");
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectdescription MEDIUMTEXT NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1641,14 +1640,6 @@ if($row['version'] < 128){ //30.01.2018
     } else {
         echo '<br>Teams: Leader-Update';
     }
-    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE'");
-    $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Tasks: Review-Update';
-    }
-
 }
 
 if($row['version'] < 129){ //31.01.2018
@@ -1658,7 +1649,16 @@ if($row['version'] < 129){ //31.01.2018
     } else {
         echo '<br>Mailing: Feedback recipient';
     }
+    
+    $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL");
+    $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Review-Update';
+    }
 }
+
 
 // ------------------------------------------------------------------------------
 

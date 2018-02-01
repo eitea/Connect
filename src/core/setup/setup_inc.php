@@ -1189,7 +1189,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE dynamicprojects(
         projectid VARCHAR(100) NOT NULL PRIMARY KEY,
         projectname VARCHAR(60) NOT NULL,
-        projectdescription TEXT NOT NULL,
+        projectdescription MEDIUMTEXT NOT NULL,
         companyid INT(6) UNSIGNED NOT NULL,
         clientid INT(6) UNSIGNED,
         clientprojectid INT(6) UNSIGNED,
@@ -1292,7 +1292,7 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
-    
+
     $sql = "CREATE TABLE sharedgroups (
         id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
