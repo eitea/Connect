@@ -87,8 +87,16 @@
     </div>
     <!--<span class="info" >Drop Files to Upload</span>-->
 </div>
-
-
+<!-- LOGIC 
+    TODO: Every Folder is a new Table / first one should be root(No Folder)
+        ->table archive_folders with FIRST being root without a parentfolder
+        ->table archive_savedfiles with files like the shared ones, but also the information about with folder
+        ->ALSO drag and drop for folders NOT FILES(?)
+        ->rename - possability ?
+        ->dynamic File_icons ?
+        ->File_Size_Limit ?
+        ->possibly cross-share function (?!)
+-->
 <script>
     $("#dropbox").on({
         dragenter: function(event){
