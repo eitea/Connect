@@ -81,7 +81,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 
-<form method="POST">
+<form method="POST" autocomplete="off">
   <div class="modal fade" id="new-account">
     <div class="modal-dialog modal-content modal-md">
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
@@ -330,15 +330,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var username = document.getElementById("edit_username");
         var password = document.getElementById("edit_password");
         var logging = document.getElementById("edit_logging");
-        var row = event.target.parentNode.parentNode.parentNode.childNodes;
-        server.setAttribute("value",row[0].textContent)
-        port.setAttribute("value",row[1].textContent)
-        username.setAttribute("value",row[4].textContent)
-        service.selectedIndex = row[2].textContent == "IMAP" ? 0 : 1;
-        security.selectedIndex = row[3].textContent == "none" ? 0 : row[0].textContent == "tls" ? 1 : 2;
-        logging.checked = row[4].textContent == "FALSE" ? false : true;
-        id.setAttribute("value",e_id);
-        //TODO: Hier forstsetzten mit setzen der Werte
+        var row = null;
+        $.post("../misc/getAccount",{id: e_id},function(data){
+            row = JSON.parse(data);
+            console.log(row);
+            server.setAttribute("value",row['server']);
+            port.setAttribute("value",row['port']);
+            console.log(port);
+            username.setAttribute("value",row['username']);
+            service.selectedIndex = row['service'].toUpperCase() == "IMAP" ? 0 : 1;
+            security.selectedIndex = row['smtpSecure'] == "none" ? 0 : row[0] == "tls" ? 1 : 2;
+            logging.checked = row['logEnabled'] == "FALSE" ? false : true;
+            id.setAttribute("value",e_id);
+            //TODO: Hier forstsetzten mit setzen der Werte
+        });
+        
     }
     function changeIdForRule(id){
         document.getElementById("emailId").setAttribute("value", id);

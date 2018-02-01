@@ -1660,7 +1660,7 @@ if($row['version'] < 129){ //31.01.2018
     }
 }
 
-if($row['version'] < 130){ //31.01.2018
+if($row['version'] < 130){ //01.02.2018
     $conn->query("CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
         microtaskid varchar(100) NOT NULL,
