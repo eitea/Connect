@@ -32,7 +32,11 @@
   <!-- /modal -->
 <?php endif; ?>
 
+<button type='button' class='btn btn-primary feedback-button'>Feedback</button> 
 <script>
+$(".feedback-button").on("click",function(){
+    takeScreenshot()
+})
 var reload = 0;
 function onPageLoad(){
   if($(".js-example-basic-single")[0]){

@@ -1050,7 +1050,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     </div> <!-- /accordions -->
     <br><br><br>
   </div>
-    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>              
+  <!-- moved feedback button to footer -->       
 </div>
 <!-- /side menu -->
 
@@ -1093,9 +1093,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             $('#feedbackModal').modal('show');       
         });
     }
-    $(".feedback-button").on("click",function(){
-        takeScreenshot()
-    })
 </script>
 <!-- /feedback script -->
 

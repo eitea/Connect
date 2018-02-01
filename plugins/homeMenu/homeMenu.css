@@ -368,6 +368,8 @@ span.select2.select2-container.select2-container--default {
   display: inline-block;   
   bottom: 15px;   
   left: 15px;
+  z-index: 1100; /*1040 is the modal backdrop*/
+  visibility: visible;
 }
 #screenshot img {
   width:100%;
