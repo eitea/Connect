@@ -1400,4 +1400,32 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+
+    $sql = "CREATE TABLE archive_folders (
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        parent_folder INT(6) NOT NULL,
+        PRIMARY KEY (userid, folderid),
+        INDEX (parent_folder))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE archive_savedfiles (
+        id INT(12) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(20) NOT NULL,
+        type VARCHAR(10) NOT NULL,
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        hashkey` VARCHAR(32) NOT NULL,
+        filesize BIGINT(20) NOT NULL,
+        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE (hashkey))";
+
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
