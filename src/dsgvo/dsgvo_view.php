@@ -12,7 +12,7 @@ if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventu
     <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
     <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
   </div>
-  <span style="position:fixed; right:15px;"><a href="https://consulio.at/dokumente" class="btn btn-default" target="_blank">Laden Sie sich hier die neuesten Vereinbarungen runter</a> </span>
+  <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank">Neueste Dokumente von Consulio laden</a> </span>
 </h3></div>
 
 <?php
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>" .
                 "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsch eingegebene Passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
           }
-          
+
           $content = str_replace("[LINK]", $link, $content);
           $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
           $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);

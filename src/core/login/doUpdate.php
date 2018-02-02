@@ -1649,7 +1649,7 @@ if($row['version'] < 129){ //31.01.2018
     } else {
         echo '<br>Mailing: Feedback recipient';
     }
-    
+
     $conn->query("ALTER TABLE dynamicprojects ADD needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL");
     $conn->query("ALTER TABLE dynamicprojects CHANGE projectstatus projectstatus ENUM('ACTIVE','DEACTIVATED','DRAFT','COMPLETED','REVIEW') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'ACTIVE';");
     if ($conn->error) {
@@ -1660,6 +1660,14 @@ if($row['version'] < 129){ //31.01.2018
 }
 
 if($row['version'] < 130){ //01.02.2018
+
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projecttags VARCHAR(250) DEFAULT '' NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>';
+    }
+    
     $conn->query("CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
         microtaskid varchar(100) NOT NULL,
@@ -1696,6 +1704,7 @@ if($row['version'] < 130){ //01.02.2018
     } else {
         echo '<br>Email-Projects: Rulesets';
     }
+
 
 }
 // ------------------------------------------------------------------------------

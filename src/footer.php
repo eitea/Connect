@@ -1,6 +1,42 @@
 </div>
 </div>
 <script>
+$("#feedback_form").submit(function(event){
+    event.preventDefault();
+    var img = window.feedbackCanvasObject.toDataURL()
+    var postData =  {
+        location:window.location.href,
+        message: $("#feedback_message").val(),
+        type:$('input[name=feedback_type]:checked').val()
+    };
+    if(document.getElementById("feedback_includeScreenshot").checked){
+        postData.screenshot = img;
+    }
+    $.post("ajaxQuery/AJAX_sendFeedback.php",
+    postData,
+    function (response){
+        alert(response)
+        //clear form
+        $("#feedback_message").val("")
+        $('#feedbackModal').modal('hide');
+    }
+);
+});
+$(".feedback-button").on("click",function(){
+    html2canvas(document.body).then(function(canvas) {
+        canvas.toBlob(function(blob) {
+            var newImg = document.createElement('img'), url = URL.createObjectURL(blob);
+            newImg.onload = function() {
+                URL.revokeObjectURL(url);
+            };
+            newImg.src = url;
+            $("#screenshot").html(newImg);
+        });
+        window.feedbackCanvasObject = canvas
+        $('#feedbackModal').modal('show');
+    });
+})
+
 var reload = 0;
 function onPageLoad(){
   if($(".js-example-basic-single")[0]){
@@ -16,8 +52,6 @@ function onPageLoad(){
         }
     });
   }
-
-
 
   $('input:checkbox').keypress(function(e) {
       if((e.keyCode ? e.keyCode : e.which) == 13){

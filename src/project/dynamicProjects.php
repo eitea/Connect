@@ -52,7 +52,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $percentage = 100; //safety
                     if($needsReview == 'TRUE'){
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
-                    }else{
+                    } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
 
@@ -111,7 +111,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
 
-
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
                         $mname = strip_tags($matches[1][$i]);
@@ -120,13 +119,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         $conn->query("INSERT INTO microtasks VALUES('$id','$mid','$mname','FALSE',null,null)");
                         $checkbox = "<input type='checkbox' id='$mid' disabled title=''><b>".$mname."</b><br>".$info."</input>";
                         $mname = preg_quote($mname);
-                        $description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);         
+                        $description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);
                         if($conn->error){
                             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-                        }              
+                        }
                     }
                 }
-
 
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
@@ -140,8 +138,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
+                $estimate = floatval($_POST['estimatedHours']);
                 $skill = intval($_POST['projectskill']);
-
+                $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
@@ -171,9 +170,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param("ssbiiissssisiisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $skill);
+                $stmt->bind_param("ssbiiissssisiisbidis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -248,12 +247,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
@@ -265,10 +264,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $x = $row['projectid'];
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
-            $rowStyle = '';
+            $rowStyle = $tags = '';
+
+            foreach(explode(',', $row['projecttags']) as $tag){
+                if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
+            }
             if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
-            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].'</td>';
+            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
@@ -322,6 +325,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</form></td>';
             echo '</tr>';
         }
+
         ?>
     </tbody>
 </table>
@@ -352,7 +356,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     </div>
                     <div class="row">
                     <div class="col-md-16">
-                        <?php 
+                        <?php
                                     $microtasks = $conn->query("SELECT * FROM microtasks WHERE projectid = '".$occupation['dynamicID']."'");
                                     if($microtasks){
                                     echo '<table id="microlist" class="dataTable table">';
@@ -398,10 +402,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                     <option value="0"> ... </option>
                                 <?php
                                 $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
-                                if($occupation['companyid']){
+                                if ($occupation['companyid']){
                                     $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = ".$occupation['companyid']);
                                 }
-                                while($row = $result->fetch_assoc()){
+                                while ($row = $result->fetch_assoc()){
                                     echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
                                 }
                                 ?>
@@ -507,6 +511,10 @@ function dynamicOnLoad(modID){
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
+    });
+    $(".js-example-tokenizer").select2({
+        tags: true,
+        tokenSeparators: [',', ' ']
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',

@@ -1207,6 +1207,7 @@ function create_tables($conn) {
         estimatedHours INT(4) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
+        projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
