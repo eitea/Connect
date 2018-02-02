@@ -1707,6 +1707,40 @@ if($row['version'] < 130){ //01.02.2018
 
 
 }
+
+if($row['version'] < 131){ //02.02.2018
+
+    
+    $conn->query("CREATE TABLE archive_folders (
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        parent_folder INT(6) NOT NULL,
+        PRIMARY KEY (userid, folderid),
+        INDEX (parent_folder))");
+    $conn->query("CREATE TABLE archive_savedfiles (
+        id INT(12) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(20) NOT NULL,
+        type VARCHAR(10) NOT NULL,
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        hashkey` VARCHAR(32) NOT NULL,
+        filesize BIGINT(20) NOT NULL,
+        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE (hashkey))");
+    $users = $conn->query("SELECT id FROM userdata");
+    while($userid = $users->fetch_assoc()){
+        $conn->query("INSERT INTO archive_folders VALUES(0,".intval($userid).",'ROOT',-1)");
+    }
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Private Archive: Data Tables';
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';
