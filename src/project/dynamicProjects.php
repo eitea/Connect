@@ -518,13 +518,13 @@ function dynamicOnLoad(modID){
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',
-        plugins: 'image code paste emoticons',
+        plugins: 'image code paste emoticons table',
         relative_urls: false,
         paste_data_images: true,
         menubar: false,
         statusbar: false,
         height: 300,
-        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code | InsertMicroTask | emoticons',
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
             function insertMicroTask(){
                 var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
