@@ -40,7 +40,21 @@ if(isset($_POST['createTraining']) && !empty($_POST['name'])){
     $onLogin = test_input($_POST["onLogin"]);
     $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
     if(isset($_POST["employees"])){
-        var_dump($_POST["employees"]);
+        $employeeID = $teamID = "";
+        $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)"); echo $conn->error;
+        $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)"); echo $conn->error;
+        $stmtUser->bind_param("i", $employeeID);
+        $stmtTeam->bind_param("i", $teamID);
+        foreach ($_POST["employees"] as $employee) {
+            $emp_array = explode(";", $employee);
+            if ($emp_array[0] == "user") {
+                $employeeID = intval($emp_array[1]);
+                $stmtUser->execute();
+            } else { //team
+                $teamID = intval($emp_array[1]);
+                $stmtTeam->execute();
+            }
+        }
     }else{
         echo "no employees";
     }

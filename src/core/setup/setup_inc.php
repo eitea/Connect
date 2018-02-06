@@ -1429,4 +1429,26 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+    $sql = "CREATE TABLE dsgvo_training_user_relations (
+        trainingID int(6),
+        userID INT(6) UNSIGNED,
+        PRIMARY KEY (trainingID, userID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_team_relations (
+        trainingID int(6),
+        teamID INT(6) UNSIGNED,
+        PRIMARY KEY (trainingID, teamID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
