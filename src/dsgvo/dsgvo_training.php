@@ -39,6 +39,8 @@ if(isset($_POST['createTraining']) && !empty($_POST['name'])){
     $name = test_input($_POST["name"]);
     $onLogin = test_input($_POST["onLogin"]);
     $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
+    $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
+    $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
     if(isset($_POST["employees"])){
         $employeeID = $teamID = "";
         $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)"); echo $conn->error;
@@ -55,8 +57,6 @@ if(isset($_POST['createTraining']) && !empty($_POST['name'])){
                 $stmtTeam->execute();
             }
         }
-    }else{
-        echo "no employees";
     }
 }
 $activeTab = $trainingID;
@@ -149,7 +149,7 @@ echo mysqli_error($conn);
 
 <!-- /new training modal -->
 
-<div id="currentQuestionModal"></div>
+<div id="currentQuestionModal"></div> <!-- for question and training edit modals -->
 
 <script>
 function setCurrentQuestionModal(index){
@@ -204,27 +204,28 @@ function formatState (state) {
 };
 function onModalLoad(){
     tinymce.init({
-            selector: '.tinymce',
-            toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
-            setup: function(editor){
-                function insertQuestion(){
-                    var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
-                    editor.insertContent(html);
-                }
+        selector: '.tinymce',
+        toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
+        setup: function(editor){
+            function insertQuestion(){
+                var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
+                editor.insertContent(html);
+            }
 
-                editor.addButton("insertquestion",{
-                    tooltip: "Insert question",
-                    icon: "template",
-                    onclick: insertQuestion,
-                });
-            },
-            height : "480",
+            editor.addButton("insertquestion",{
+                tooltip: "Insert question",
+                icon: "template",
+                onclick: insertQuestion,
+            });
+        },
+        height : "480",
     });
     $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
     });
 }
+onModalLoad();
 </script>
 
 <!-- /BODY -->
