@@ -1410,6 +1410,7 @@ function create_tables($conn) {
         name varchar(100),
         companyID INT(6) UNSIGNED,
         version INT(6),
+        onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
         FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";

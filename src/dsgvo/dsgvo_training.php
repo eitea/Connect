@@ -37,7 +37,13 @@ if(isset($_POST['createTraining']) && !empty($_POST['name'])){
         $version = intval($_POST["version"]);
     }
     $name = test_input($_POST["name"]);
-    $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name' WHERE id = $trainingID");
+    $onLogin = test_input($_POST["onLogin"]);
+    $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
+    if(isset($_POST["employees"])){
+        var_dump($_POST["employees"]);
+    }else{
+        echo "no employees";
+    }
 }
 $activeTab = $trainingID;
 echo mysqli_error($conn);
@@ -183,27 +189,27 @@ function formatState (state) {
     return $state;
 };
 function onModalLoad(){
-tinymce.init({
-        selector: '.tinymce',
-        toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
-        setup: function(editor){
-            function insertQuestion(){
-                var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
-                editor.insertContent(html);
-            }
+    tinymce.init({
+            selector: '.tinymce',
+            toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
+            setup: function(editor){
+                function insertQuestion(){
+                    var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
+                    editor.insertContent(html);
+                }
 
-            editor.addButton("insertquestion",{
-                tooltip: "Insert question",
-                icon: "template",
-                onclick: insertQuestion,
-            });
-        },
-        height : "480",
-});
-$(".select2-team-icons").select2({
-    templateResult: formatState,
-    templateSelection: formatState
-});
+                editor.addButton("insertquestion",{
+                    tooltip: "Insert question",
+                    icon: "template",
+                    onclick: insertQuestion,
+                });
+            },
+            height : "480",
+    });
+    $(".select2-team-icons").select2({
+        templateResult: formatState,
+        templateSelection: formatState
+    });
 }
 </script>
 
