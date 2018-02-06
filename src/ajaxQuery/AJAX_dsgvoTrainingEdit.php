@@ -12,6 +12,17 @@ $name = $row["name"];
 $version = $row["version"];
 $companyID = $row["companyID"];
 $onLogin = $row["onLogin"];
+
+$userArray = array();
+$teamArray = array();
+$result = $conn->query("SELECT userID id FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
+while($row = $result->fetch_assoc()){
+    $userArray[] = $row["id"];
+}
+$result = $conn->query("SELECT teamID id FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
+while($row = $result->fetch_assoc()){
+    $teamArray[] = $row["id"];
+}
 ?>
  <form method="POST">
  <div class="modal fade">
@@ -21,21 +32,25 @@ $onLogin = $row["onLogin"];
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
             <label>Version</label>
-            <input type="number" class="form-control" name="version" placeholder="1" value="<?php echo $version ?>" />
+            <input type="number" class="form-control" name="version" placeholder="1" min="1" step="1" value="<?php echo $version ?>" />
             <label>Zugeordnete Personen</label>
             <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
                 <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                 <?php
                 $result = $conn->query("SELECT UserData.id id, firstname, lastname FROM relationship_company_client INNER JOIN UserData on UserData.id = relationship_company_client.userID WHERE companyID = $companyID GROUP BY UserData.id");
                 while($row = $result->fetch_assoc()){
+                    $selected = '';
+                    if(in_array($row['id'], $userArray)){
+                        $selected = 'selected';
+                    }
                     echo '<option value="user;'.$row['id'].'" data-icon="user" '.$selected.' >'.$row['firstname'].' '.$row['lastname'].'</option>';
                 }
                 $result = $conn->query("SELECT id, name FROM $teamTable");
                 while ($row = $result->fetch_assoc()) {
                     $selected = '';
-                    // if(in_array($row['id'], $dynrow_teams)){
-                    //     $selected = 'selected';
-                    // }
+                    if(in_array($row['id'], $teamArray)){
+                        $selected = 'selected';
+                    }
                     echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
                 }
                 ?>
