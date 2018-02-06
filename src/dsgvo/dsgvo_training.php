@@ -27,8 +27,17 @@ if(isset($_POST['createTraining']) && !empty($_POST['name'])){
 } elseif(isset($_POST["editQuestion"])){
     $questionID = intval($_POST["editQuestion"]);
     $title = test_input($_POST["title"]);
-    $text = test_input($_POST["question"]);
+    $text = $_POST["question"];
+    echo "question text hasn't been sanitized";
     $conn->query("UPDATE dsgvo_training_questions SET text = '$text', title = '$title' WHERE id = $questionID");
+} elseif(isset($_POST["editTraining"])){
+    $trainingID = $_POST["editTraining"];
+    $version = 1;
+    if(isset($_POST["version"])){
+        $version = intval($_POST["version"]);
+    }
+    $name = test_input($_POST["name"]);
+    $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name' WHERE id = $trainingID");
 }
 $activeTab = $trainingID;
 echo mysqli_error($conn);
@@ -179,7 +188,7 @@ tinymce.init({
         toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
         setup: function(editor){
             function insertQuestion(){
-                var html = "<p>[<label style='color: red;font-weight:bold'>Question Name</label>] { </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
+                var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
                 editor.insertContent(html);
             }
 
@@ -189,6 +198,7 @@ tinymce.init({
                 onclick: insertQuestion,
             });
         },
+        height : "480",
 });
 $(".select2-team-icons").select2({
     templateResult: formatState,
