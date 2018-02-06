@@ -16,6 +16,9 @@ MAKING CHANGES TO EXISTING TABLE:
 
 Please test the setup after every change.
 */
+
+ini_set('max_execution_time',999);
+
 function create_tables($conn) {
     $sql = "CREATE TABLE UserData (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1398,6 +1401,29 @@ function create_tables($conn) {
         finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
         completed timestamp NULL DEFAULT NULL,
         PRIMARY KEY (projectid,microtaskid))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE dsgvo_training (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(100),
+        companyID INT(6) UNSIGNED,
+        PRIMARY KEY (id),
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+    
+    $sql = "CREATE TABLE dsgvo_training_questions (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        title varchar(100),
+        text varchar(500),
+        trainingID INT(6),
+        PRIMARY KEY (id),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
     if(!$conn->query($sql)){
         echo $conn->error;
     }
