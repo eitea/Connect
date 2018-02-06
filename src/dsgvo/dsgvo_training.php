@@ -8,53 +8,55 @@
 
 $trainingID = 0;
 $companyID = intval($_REQUEST['n']);
-if(isset($_POST['createTraining']) && !empty($_POST['name'])){
-    $name = test_input($_POST['name']);
-    $conn->query("INSERT INTO dsgvo_training (name,companyID) VALUES('$name', $companyID)");
-    $trainingID = mysqli_insert_id($conn);
-} elseif(isset($_POST['removeTraining'])){
-    $trainingID = intval($_POST['removeTraining']);
-    $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
-} elseif(isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])){
-    $trainingID = intval($_POST['addQuestion']);
-    $title = test_input($_POST["title"]);
-    $text = test_input($_POST["question"]);
-    $conn->query("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, '$text', '$title')");
-} elseif(isset($_POST["removeQuestion"])){
-    $trainingID = $_POST["trainingID"];
-    $questionID = intval($_POST["removeQuestion"]);
-    $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
-} elseif(isset($_POST["editQuestion"])){
-    $questionID = intval($_POST["editQuestion"]);
-    $title = test_input($_POST["title"]);
-    $text = $_POST["question"];
-    echo "question text hasn't been sanitized";
-    $conn->query("UPDATE dsgvo_training_questions SET text = '$text', title = '$title' WHERE id = $questionID");
-} elseif(isset($_POST["editTraining"])){
-    $trainingID = $_POST["editTraining"];
-    $version = 1;
-    if(isset($_POST["version"])){
-        $version = intval($_POST["version"]);
-    }
-    $name = test_input($_POST["name"]);
-    $onLogin = test_input($_POST["onLogin"]);
-    $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
-    $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
-    $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
-    if(isset($_POST["employees"])){
-        $employeeID = $teamID = "";
-        $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)"); echo $conn->error;
-        $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)"); echo $conn->error;
-        $stmtUser->bind_param("i", $employeeID);
-        $stmtTeam->bind_param("i", $teamID);
-        foreach ($_POST["employees"] as $employee) {
-            $emp_array = explode(";", $employee);
-            if ($emp_array[0] == "user") {
-                $employeeID = intval($emp_array[1]);
-                $stmtUser->execute();
-            } else { //team
-                $teamID = intval($emp_array[1]);
-                $stmtTeam->execute();
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(isset($_POST['createTraining']) && !empty($_POST['name'])){
+        $name = test_input($_POST['name']);
+        $conn->query("INSERT INTO dsgvo_training (name,companyID) VALUES('$name', $companyID)");
+        $trainingID = mysqli_insert_id($conn);
+    } elseif(isset($_POST['removeTraining'])){
+        $trainingID = intval($_POST['removeTraining']);
+        $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
+    } elseif(isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])){
+        $trainingID = intval($_POST['addQuestion']);
+        $title = test_input($_POST["title"]);
+        $text = test_input($_POST["question"]);
+        $conn->query("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, '$text', '$title')");
+    } elseif(isset($_POST["removeQuestion"])){
+        $trainingID = $_POST["trainingID"];
+        $questionID = intval($_POST["removeQuestion"]);
+        $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
+    } elseif(isset($_POST["editQuestion"])){
+        $questionID = intval($_POST["editQuestion"]);
+        $title = test_input($_POST["title"]);
+        $text = $_POST["question"];
+        echo "question text hasn't been sanitized";
+        $conn->query("UPDATE dsgvo_training_questions SET text = '$text', title = '$title' WHERE id = $questionID");
+    } elseif(isset($_POST["editTraining"])){
+        $trainingID = $_POST["editTraining"];
+        $version = 1;
+        if(isset($_POST["version"])){
+            $version = intval($_POST["version"]);
+        }
+        $name = test_input($_POST["name"]);
+        $onLogin = test_input($_POST["onLogin"]);
+        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
+        $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
+        $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
+        if(isset($_POST["employees"])){
+            $employeeID = $teamID = "";
+            $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)"); echo $conn->error;
+            $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)"); echo $conn->error;
+            $stmtUser->bind_param("i", $employeeID);
+            $stmtTeam->bind_param("i", $teamID);
+            foreach ($_POST["employees"] as $employee) {
+                $emp_array = explode(";", $employee);
+                if ($emp_array[0] == "user") {
+                    $employeeID = intval($emp_array[1]);
+                    $stmtUser->execute();
+                } else { //team
+                    $teamID = intval($emp_array[1]);
+                    $stmtTeam->execute();
+                }
             }
         }
     }
