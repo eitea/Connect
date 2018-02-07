@@ -1069,3 +1069,30 @@ if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($u
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
 }
 ?>
+
+<?php
+
+$result = $conn->query("SELECT * FROM dsgvo_training_user_relations"); // check if user has uncompleted surveys
+
+//todo open automatically if onLogin is true
+//todo place button somewhere else
+
+?>
+<div id="currentSurveyModal"></div> <!-- for question and training edit modals -->
+<button type="button" id="openSurvey" class="btn btn-primary"><i class="fa fa-question-circle"></i></button>
+<script>
+$("#openSurvey").click(function(){
+    $.ajax({
+        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
+        data:{},
+        type: 'get',
+        success : function(resp){
+            $("#currentSurveyModal").html(resp);
+        },
+        error : function(resp){console.error(resp)},
+        complete: function(resp){
+            $("#currentSurveyModal .modal").modal('show');
+        }
+   });
+})
+</script>
