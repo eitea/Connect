@@ -95,6 +95,16 @@ while ($result && ($row = $result->fetch_assoc())) {
 }
 $validation_output = $error_output = '';
 
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations WHERE userID = $userID 
+        UNION 
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID WHERE tr.userID = $userID
+    ) temp"
+);
+echo $conn->error;
+$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
@@ -379,6 +389,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                           <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
                       </a>
                   <?php endif;?>
+                  <?php if($userHasUnansweredSurveys): ?>
+                  <a type="button" id="openSurvey" class="btn navbar-btn navbar-link"><i class="fa fa-question-circle"></i></a><!-- surveys -->
+                  <?php endif; ?>
                   <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -1072,14 +1085,12 @@ if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($u
 
 <?php
 
-$result = $conn->query("SELECT * FROM dsgvo_training_user_relations"); // check if user has uncompleted surveys
-
-//todo open automatically if onLogin is true
+if($userHasUnansweredSurveys): //test if user has unanswered surveys
+//todo open automatically if onLogin in table is true
 //todo place button somewhere else
 
 ?>
 <div id="currentSurveyModal"></div> <!-- for question and training edit modals -->
-<button type="button" id="openSurvey" class="btn btn-primary"><i class="fa fa-question-circle"></i></button>
 <script>
 $("#openSurvey").click(function(){
     $.ajax({
@@ -1096,3 +1107,4 @@ $("#openSurvey").click(function(){
    });
 })
 </script>
+<?php endif; ?>
