@@ -140,7 +140,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $percentage = intval($_POST['completed']);
                 $estimate = floatval($_POST['estimatedHours']);
                 $skill = intval($_POST['projectskill']);
-                $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
+                if(!empty($_POST['projecttags'])){
+                    $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
+                }else{
+                    $tags = '';
+                }
+                
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
