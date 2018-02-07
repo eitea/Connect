@@ -628,6 +628,18 @@ $('button[name=editModal]').click(function(){
 });
 appendModal('');
 
+$("tbody").on("click",function(){
+    $('button[name=editModal]').click(function(){
+            var index = $(this).val();
+        if(existingModals.indexOf(index) == -1){
+            appendModal(index);
+        } else {
+            $('#editingModal-'+index).modal('show');
+        }
+        });
+        appendModal('');
+})
+
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
     var index = $(this).val();
@@ -670,7 +682,10 @@ $(document).ready(function() {
         },
         paging: false
     });
-    setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
+    setTimeout(function(){ 
+        window.dispatchEvent(new Event('resize')); 
+        $('.table').trigger('column-reorder.dt'); 
+        }, 500);
 });
 
 
