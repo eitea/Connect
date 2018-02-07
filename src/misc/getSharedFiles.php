@@ -7,7 +7,7 @@ require dirname(__DIR__)."\connection.php";
         $s3 = new Aws\S3\S3Client(getS3Config());
            //var_dump($_POST);
            //var_dump($_FILES);
-           print_r($_POST);
+           //print_r($_POST);
           if($_POST['functions']==="addGroup"){
             $companyID = $_POST['filterCompany'];
             $name = $_POST['add_groupName'];

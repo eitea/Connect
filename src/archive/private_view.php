@@ -8,13 +8,15 @@ if($result){
     include dirname(__DIR__) . '/footer.php';
     return;
   }
-}?>
+}
+$folderID = 0;
+?>
 
-<link href="plugins/homeMenu/fileUpload.css" rel="stylesheet" />
+
 <style>
 .dropbox{
     width: 100%;
-    height: 100vh;
+    height: 100%;
     z-index: 0;
     
 }
@@ -50,10 +52,11 @@ if($result){
 }
 .dropDiv{
     display: none;
-    position: absolute;
+    position: relative;
     cursor: pointer;
     background-color: rgb(238, 238, 238);
     min-width: 160px;
+    max-width: 180px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
 }
@@ -64,11 +67,41 @@ if($result){
     text-decoration: none;
     display: block;
 }
-.dropDiv button {
+.lbl{
     color: black;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    font-weight: 100;
+    cursor: pointer;
+}
+.lbl:hover{
+    background-color: #ddd
+}
+.simpleBtnWrapper{
+    float:left;
+    overflow: hidden;
+    
+}
+.fileInput {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+    position: absolute;
+    
+    
+    z-index: -1;
+    -webkit-border-radius: 0!important;
+    -moz-border-radius: 0!important;
+    border-radius: 0!important;
+}
+.hidden{
+    width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+    position: absolute;
 }
 </style>
 <?php 
@@ -97,6 +130,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $folderID = $parentID;
         }else{
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+            $folderID = $parentID;
+        }
+    }elseif(isset($_POST['addDocument'])){
+        $filename = $_POST['docName'];
+        $body = $_POST['body'];
+        $hashkey = hash('md5',random_bytes(10));
+        $conn->query("INSERT INTO archive_savedfiles VALUES(null,'$filename','html',$folderID,".intval($userID).",'$hashkey',0,null,'FALSE')");
+        if ($conn->error) {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+        }else{
+            $conn->query("INSERT INTO archive_editfiles VALUES('$hashkey','$body',1)");
+            if ($conn->error) {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+            }else{
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+            }
         }
     }
 
@@ -107,14 +156,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 <div id="title" class="page-header"><h3><?php echo $lang['YOUR_ARCHIVE']; ?>
 </h3><div class="page-header-button-group">
-    <button id="dropbtn" onblur="setTimeout(function(){document.getElementById('dropDiv').classList.remove('show');},100);" onclick="document.getElementById('dropDiv').classList.toggle('show');" type="button" class="btn btn-default" title="New..."><i class="fa fa-plus"></i><?php echo $lang['NEW'] ?><i class="fa fa-caret-down"></i></button><div class="dropDiv" id="dropDiv" >
-    <a >Dokument</a>
-    <a data-toggle="modal" data-target="#new-folder">Folder</a>
-    </div>
+    <div class="simpleBtnWrapper">
+    <button onblur="setTimeout(function(){document.getElementById('dropDiv').classList.remove('show');},100);" onclick="document.getElementById('dropDiv').classList.toggle('show');" type="button" class="btn btn-default" title="New..."><i class="fa fa-plus"></i><?php echo $lang['NEW'] ?><i class="fa fa-caret-down"></i></button><div class="dropDiv" id="dropDiv" >
+    <a data-toggle="modal" data-target="#new-document" onclick="clearDoc()" ><?php echo $lang['FILE'] ?></a>
+    <a data-toggle="modal" data-target="#new-folder"><?php echo $lang['FOLDER'] ?></a>
+    </div></div><div class="simpleBtnWrapper">
+    <button onblur="setTimeout(function(){document.getElementById('dropUpload').classList.remove('show');},500);" onclick="document.getElementById('dropUpload').classList.toggle('show');" type="button" class="btn btn-default" title="Upload..."><i class="fa fa-arrow-up"></i><?php echo $lang['UPLOAD'] ?><i class="fa fa-caret-down"></i></button><div class="dropDiv" id="dropUpload" >
+    <input class="fileInput" type="file" id="uploadFile" onChange="uploadFiles(this)" multiple ><label class="lbl" for="uploadFile" ><?php echo $lang['FILE'] ?></label></input>
+    <input class="fileInput" type="file" id="uploadFolder" onChange="uploadFolder(this)" multiple ><label class="lbl" for="uploadFolder" ><?php echo $lang['FOLDER'] ?></label></input>
+    </div></div>
   </div><input id="currentFolder" value="<?php echo $folderID ?>" style="visibility: hidden; height:1px; width:1px;"/></div>
 <div id="dropbox" class="dropbox" >
     <div class="content" >
-    <table class="table" >
+    <table class="table" id="fileTable">
         <thead>
             <tr>
                 <td></td>
@@ -132,8 +186,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </div>
 <!-- LOGIC 
     TODO: Every Folder is a new Table / first one should be root(No Folder)
-        ->table archive_folders with FIRST being root without a parentfolder ** No AUTO_INCREMENT !!!DONE
-        ->table archive_savedfiles with files like the shared ones, but also the information about with folder !!!DONE
         ->ALSO drag and drop for folders NOT FILES(?)
         ->rename - possability ?
         ->dynamic File_icons ?
@@ -156,7 +208,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <button type="submit" class="btn btn-warning" name="addFolder"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
-    </form>
+</div>
+</form>
+<form method="POST">
+<div class="modal fade" id="new-document">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header h4"><?php echo $lang['ADD']; ?>
+      </div>
+      <div class="modal-body">
+        <label>Name</label>
+        <input class="form-control" name="docName"/>
+        <label>Inhalt</label>
+        <textarea class="form-control Editor" name="body" maxlength="20000" ></textarea>
+        <input style="visibility:hidden;width:1px;height:1px;" value="<?php echo $folderID ?>" id="parentID" name="folderid" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="submit" id="addDoc" class="btn btn-warning " name="addDocument"><?php echo $lang['ADD']; ?></button>
+        <button type="submit" id="editDoc" class="btn btn-warning " name="editDocument"><?php echo $lang['EDIT']; ?></button>
+      </div>
+    </div>
+</div>
+</form>
+<script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
     $("#dropbox").on({
         dragenter: function(event){
@@ -208,6 +282,67 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     });
     $(document).ready(function(){
         getCurrentFolderContent();
+        
+        // $("tbody").sortable({
+        //     items: "> tr:not(:first)",
+        //     appendTo: "parent",
+        //     helper: "clone"
+        // }).disableSelection();
+        
+        // $("#tabs ul li a").droppable({
+        //     hoverClass: "drophover",
+        //     tolerance: "pointer",
+        //     drop: function(e, ui) {
+        //         var tabdiv = $(this).attr("href");
+        //         $(tabdiv + " table tr:last").after("<tr>" + ui.draggable.html() + "</tr>");
+        //         ui.draggable.remove();
+        //     }
+        // });
+        tinymce.init({
+        selector: '.Editor',
+        plugins: 'image code paste',
+        relative_urls: false,
+        paste_data_images: true,
+        menubar: false,
+        statusbar: false,
+        height: 300,
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code ',
+        
+        // enable title field in the Image dialog
+        image_title: true,
+        // enable automatic uploads of images represented by blob or data URIs
+        automatic_uploads: true,
+        // URL of our upload handler (for more details check: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url)
+        // images_upload_url: 'postAcceptor.php',
+        // here we add custom filepicker only to Image dialog
+        file_picker_types: 'file image media',
+        // and here's our custom image picker
+        file_picker_callback: function(cb, value, meta) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', '*');
+            input.onchange = function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function () {
+                    // Note: Now we need to register the blob in TinyMCEs image blob
+                    // registry. In the next release this part hopefully won't be
+                    // necessary, as we are looking to handle it internally.
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+                    console.log(reader.result.split(";")[0].split(":")[1]) //mime type
+                    var base64 = reader.result.split(',')[1];
+                    alert("Base64 size: "+base64.length+" chars")
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+                    // call the callback and populate the Title field with the file name
+                    cb(blobInfo.blobUri(), { title: file.name, text:file.name,alt:file.name,source:"images/Question_Circle.jpg",poster:"images/Question_Circle.jpg" });
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+    });
     });
     function getCurrentFolderContent(){
         //console.log('start');
@@ -242,7 +377,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             getCurrentFolderContent();
     }
     function fillTable(data){
-        //console.log(data);
+        console.log(data);
         var rowcount = data[0].length + data[1].length;
         var parent = data[2];
         var rows = [];
@@ -260,15 +395,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             row.appendChild(buttons);
             rows.push(row);
         }
-        //console.log(parent);
+        
         if(data[0]){
             for(i=0;i<data[0].length;i++){
+                data[0][i]['isS3']=="TRUE" ? isS3 = true : isS3 = false;
                 rows[i].className = "file";
-                rows[i].children[0].innerHTML = "<i class='fa fa-file'></i>";
+                if(isS3){rows[i].children[0].innerHTML = "<i class='fa fa-file'></i>";}else{rows[i].children[0].innerHTML = "<i class='fa fa-paperclip'></i>";}
                 rows[i].children[1].innerHTML = data[0][i]['name'];
-                rows[i].children[2].innerHTML = new Date(data[0][i]['uploaddate']).toLocaleString();
+                rows[i].children[2].innerHTML = new Intl.DateTimeFormat('de-AT').format(new Date(data[0][i]['uploaddate']));
                 rows[i].children[3].innerHTML = data[0][i]['filesize'] + " KB";
-                rows[i].children[4].innerHTML = "<button class='btn btn-default'><i class='fa fa-download'></i>";
+                if(isS3){
+                    rows[i].children[4].innerHTML = "<a class='btn btn-default' download href='../private/files?n="+data[0][i]['hashkey']+"' ><i class='fa fa-download'></i></a>";
+                }else{
+                    rows[i].children[4].innerHTML = "<button class='btn btn-default' onclick='fillEditor("+data[0][i]['id']+")' data-toggle='modal' data-target='#new-document' ><i class='fa fa-edit'></i></button>";
+                }
+                rows[i].children[4].innerHTML = rows[i].children[4].innerHTML + "<button class='btn btn-default' onclick='deleteFile("+data[0][i]['id']+")' ><i class='fa fa-trash'></i></button>";
             }
         }
         if(data[1]){
@@ -282,13 +423,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 rows[i+data[0].length].children[1].innerHTML = data[1][i]['name'];
                 rows[i+data[0].length].children[2].innerHTML = "---";
                 rows[i+data[0].length].children[3].innerHTML = "---";
-                rows[i+data[0].length].children[4].innerHTML = "<button class='btn btn-default'><i class='fa fa-download'></i>";
+                rows[i+data[0].length].children[4].innerHTML = "<a class='btn btn-default'><i class='fa fa-download'></i></a>";
+                rows[i+data[0].length].children[4].innerHTML = rows[i+data[0].length].children[4].innerHTML + "<button class='btn btn-default' ><i class='fa fa-trash'></i></button>";
             }
         }
         
         rows.sort(function(a,b){
-            var x = a.children[1].innerHTML;
-            var y = b.children[1].innerHTML;
+            var x = a.children[1].innerHTML.toLowerCase();
+            var y = b.children[1].innerHTML.toLowerCase();
             if(x<y) {return -1;}
             if(y<x) {return 1;}
             return 0;
@@ -309,6 +451,63 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         for(i = 0;i<rowcount;i++){
             table.appendChild(rows[i]);
         }
+    }
+    function uploadFiles(element){
+        //Upload selected files
+        console.log(element.files);
+        //evt.preventDefault();
+        var formData = new FormData();
+        var fileIndex = [];
+        for(var i = 0;i<element.files.length;i++){
+        formData.append('file'+i,element.files[i]);
+        }
+        formData.append('amount',element.files.length);
+        formData.append('userID',<?php echo $userID ?>);
+        formData.append('function','addFile');
+        formData.append('fileIndex',fileIndex);
+        formData.append('folderid',document.getElementById('currentFolder').value);
+        $.ajax({
+        url: '../private/files',
+        type: 'POST',
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        encType: 'multipart/form-data',
+        processData: false,
+        success: function(response){
+            //alert(response);
+            console.log(response);
+            getCurrentFolderContent();
+        }
+        });
+    }
+    function deleteFile(id){
+        $.post("../private/files",{
+            id: id,
+            function: "deleteFile",
+        },function(data){
+            getCurrentFolderContent();
+        });
+    }
+    function fillEditor(id){
+        $.post("../private/files",{
+            id: id,
+            function: "getFileData",
+        },function(data){
+            var info = JSON.parse(data);
+            console.log(data);
+            $("[name='docName']").val(info[0]);
+            tinymce.activeEditor.execCommand('mceSetContent', false, info[1]); 
+            document.getElementById("addDoc").classList.toggle("hidden");
+            document.getElementById("editDoc").classList.remove("hidden");
+        });
+    }
+    function clearDoc(){
+        $("[name='docName']").val('');
+        tinymce.activeEditor.execCommand('mceSetContent', false, ''); 
+        document.getElementById("addDoc").classList.remove("hidden");
+        document.getElementById("editDoc").classList.toggle("hidden");
     }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -531,6 +531,9 @@ $lang_ger['FORWARDED'] = 'Weitergeleitet';
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 
+$lang_eng['FILE'] = 'File';
+$lang_ger['FILE'] = 'Datei';
+
 $lang_eng['FILTER_HELP'] = '*Your E-Mail Subject will be scaned for this EXACT term and if an E-Mail gets found this Part of the Subject will be cut out, the rest will be the Title for the Task.';
 $lang_ger['FILTER_HELP'] = '*Der Betreff Ihrer E-Mails wird nach GENAU diesem Begriff untersucht und sollte es einen Treffer geben wird dieser Teil aus dem Betreff herausgeschnitten und der Rest des Betreffs wird der Titel des Tasks.';
 
@@ -557,6 +560,9 @@ $lang_ger['FREE_TEXT'] = 'Produkt';
 
 $lang_eng['FROM'] = 'From';
 $lang_ger['FROM'] = 'Von';
+
+$lang_eng['FOLDER'] = 'Folder';
+$lang_ger['FOLDER'] = 'Ordner';
 
 $lang_eng['FORMS'] = 'Forms';
 $lang_ger['FORMS'] = 'Formulare';

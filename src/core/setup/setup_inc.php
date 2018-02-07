@@ -1413,10 +1413,18 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
+    $sql = "CREATE TABLE archive_editfiles (
+        hashid VARCHAR(32) NOT NULL,
+        body TEXT NOT NULL,
+        version INT(6) NOT NULL DEFAULT 1,
+        PRIMARY KEY (hashid))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+    
     $sql = "CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
-        name VARCHAR(20) NOT NULL,
+        name VARCHAR(100) NOT NULL,
         type VARCHAR(10) NOT NULL,
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,

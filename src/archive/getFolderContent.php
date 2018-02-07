@@ -21,6 +21,7 @@ require dirname(__DIR__) . "/connection.php";
                     $files[$i]['hashkey'] = $row['hashkey'];
                     $files[$i]['filesize'] = $row['filesize'];
                     $files[$i]['uploaddate'] = $row['uploaddate'];
+                    $files[$i]['isS3'] = $row['isS3'];
                     $i++;
                 }
             }

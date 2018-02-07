@@ -1708,7 +1708,7 @@ if($row['version'] < 130){ //01.02.2018
 
 }
 
-if($row['version'] < 131){ //02.02.2018
+if($row['version'] < 131){ //07.02.2018
 
     
     $conn->query("CREATE TABLE archive_folders (
@@ -1718,15 +1718,21 @@ if($row['version'] < 131){ //02.02.2018
         parent_folder INT(6) NOT NULL,
         PRIMARY KEY (userid, folderid),
         INDEX (parent_folder))");
+    $conn->query("CREATE TABLE archive_editfiles (
+        hashid VARCHAR(32) NOT NULL,
+        body TEXT NOT NULL,
+        version INT(6) NOT NULL DEFAULT 1,
+        PRIMARY KEY (hashid))");
     $conn->query("CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
-        name VARCHAR(20) NOT NULL,
+        name VARCHAR(100) NOT NULL,
         type VARCHAR(10) NOT NULL,
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,
         hashkey` VARCHAR(32) NOT NULL,
         filesize BIGINT(20) NOT NULL,
         uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL,
         PRIMARY KEY (id),
         UNIQUE (hashkey))");
     $users = $conn->query("SELECT id FROM userdata");
