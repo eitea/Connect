@@ -111,6 +111,9 @@ $lang_ger['AVAILABLE'] = 'Verfügbar';
 $lang_eng['AVERAGE'] = 'Average';
 $lang_ger['AVERAGE'] = 'Durschnitt';
 
+$lang_eng['BACK'] = 'Back';
+$lang_ger['BACK'] = 'Zurück';
+
 $lang_eng['BEGIN'] = 'Begin';
 $lang_ger['BEGIN'] = 'Anfang';
 
@@ -1354,7 +1357,7 @@ $lang_ger['YEAR'] = 'Jahr';
 
 $lang_eng['YES'] = 'Yes';
 $lang_ger['YES'] = 'Ja';
-
+//Will you marry me?
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
 
