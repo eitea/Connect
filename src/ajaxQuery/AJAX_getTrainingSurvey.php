@@ -1,8 +1,27 @@
 <?php
+session_start();
+$userID = $_SESSION['userid'];
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 
+"SELECT * FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training tr ON tr.id = tur.trainingID WHERE tur.userID = 1"
 
+//this is currently only one survey
+$result = $conn->query(
+    "SELECT tur.trainingID, tr.name FROM dsgvo_training_user_relations tur 
+    INNER JOIN dsgvo_training_team_relations ttr 
+    ON tur.trainingID = ttr.trainingID 
+    INNER JOIN teamRelationshipData trd 
+    ON trd.teamID = ttr.teamID 
+    INNER JOIN dsgvo_training tr 
+    ON tr.id = tur.trainingID 
+    WHERE trd.userID = $userID OR tur.userID = $userID"
+);
+$trainingArray = array(); // a training contains many questions
+while ($row = $result->fetch_assoc()){
+    $trainingArray[] = array("id"=>$row["trainingID"],"name"=>$row["name"]);
+}
+var_dump($trainingArray);
 ?>
 <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
 
