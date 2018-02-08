@@ -1722,7 +1722,7 @@ if($row['version'] < 131){ //07.02.2018
         hashid VARCHAR(32) NOT NULL,
         body TEXT NOT NULL,
         version INT(6) NOT NULL DEFAULT 1,
-        PRIMARY KEY (hashid))");
+        PRIMARY KEY (hashid,version))");
     $conn->query("CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,

@@ -775,6 +775,9 @@ $lang_ger['MISSING'] = 'Fehlend';
 $lang_eng['MONTH'] ='Month';
 $lang_ger['MONTH'] ='Monat';
 
+$lang_eng['MOVE'] ='Move';
+$lang_ger['MOVE'] ='Verschieben';
+
 $lang_eng['MONTHLY_REPORT'] ='Monthly Report';
 $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 

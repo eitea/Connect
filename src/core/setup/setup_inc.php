@@ -1417,7 +1417,7 @@ function create_tables($conn) {
         hashid VARCHAR(32) NOT NULL,
         body TEXT NOT NULL,
         version INT(6) NOT NULL DEFAULT 1,
-        PRIMARY KEY (hashid))";
+        PRIMARY KEY (hashid,version))";
     if(!$conn->query($sql)){
         echo $conn->error;
     }
