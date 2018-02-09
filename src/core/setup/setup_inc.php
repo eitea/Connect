@@ -1451,4 +1451,16 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+    $sql = "CREATE TABLE dsgvo_training_completed_questions (
+        questionID int(6),
+        userID INT(6) UNSIGNED,
+        correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        PRIMARY KEY (questionID, userID),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }

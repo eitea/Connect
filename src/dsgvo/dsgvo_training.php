@@ -19,7 +19,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } elseif(isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])){
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
-        $text = test_input($_POST["question"]);
+        $text = $_POST["question"]; // todo: test input
         $conn->query("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, '$text', '$title')");
     } elseif(isset($_POST["removeQuestion"])){
         $trainingID = $_POST["trainingID"];
@@ -94,8 +94,9 @@ echo mysqli_error($conn);
                 ?>
                  <div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
                  <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
+                 <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-bar-chart"></i></button>
             <?php echo $title ?></div>
-<?php
+            <?php
             endwhile;
 
             ?>
@@ -193,6 +194,26 @@ function setCurrentTrainingModal(index){
 }
 $("button[name=editTraining]").click(function(){
     setCurrentTrainingModal($(this).val())
+})
+function setCurrentQuestionInfoModal(index){
+    $.ajax({
+        url:'ajaxQuery/AJAX_dsgvoQuestionInfo.php',
+        data:{questionID: index},
+        type: 'get',
+        success : function(resp){
+            $("#currentQuestionModal").html(resp);
+        },
+        error : function(resp){console.error(resp)},
+        complete: function(resp){
+            if(index){
+                onModalLoad();
+                $("#currentQuestionModal .modal").modal('show');
+            }
+        }
+   });
+}
+$("button[name=infoQuestion]").click(function(){
+    setCurrentQuestionInfoModal($(this).val())
 })
 </script>
 

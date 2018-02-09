@@ -60,6 +60,37 @@ while ($row = $result->fetch_assoc()){
             "colCount"=>1,
             "choices"=>parse_questions($row_question["text"])
         );
+    }
+    $trainingArray[] = array("id"=>$row["id"],"name"=>$row["name"]);
+}
+?>
+    <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
+
+    <div class="modal fade">
+        <div class="modal-dialog modal-content modal-md">
+            <div class="modal-header">Bitte beantworten Sie folgende Fragen</div>
+            <div class="modal-body">
+                <div id="surveyElement"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Survey.Survey.cssType = "bootstrap";
+        Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
+
+        var json = <?php echo json_encode(array("questions"=> $questionArray)) ?>;
+
+        // var json = { // example
+        //     questions: [
+        //         {
+        //             type: "html",
+        //             name: "info",
+        //             html: "<table><body><row><td><img src='/Content/Images/examples/26178-20160417.jpg' width='100px' /></td><td style='padding:20px'>You may put here any html code. For example images, <b>text</b> or <a href='https://surveyjs.io/Survey/Builder'  target='_blank'>links</a></td></row></body></table>"
+        //         },
         //         {
         //             type: "radiogroup",
         //             name: "car",
@@ -73,63 +104,29 @@ while ($row = $result->fetch_assoc()){
         //                 "Volkswagen"
         //             ]
         //         }
-    }
-    $trainingArray[] = array("id"=>$row["id"],"name"=>$row["name"]);
-}
-// var_dump($trainingArray);
-// $questionArray[] = array("type"=>"radiogroup","name"=>"car","choices"=>array("none","one","two"),"title"=>"title","colCount"=>1);
-?>
-<script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
+        //     ]
+        // };
 
-<div class="modal fade">
-    <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header">Bitte beantworten Sie folgende Fragen</div>
-        <div class="modal-body">
-            <div id="surveyElement"></div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-        </div>
-    </div>
-</div>
+        window.survey = new Survey.Model(json);
 
-<script>
-    Survey.Survey.cssType = "bootstrap";
-    Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
-
-    var json = <?php echo json_encode(array("questions"=>$questionArray)) ?>;
-
-    // var json = { // example
-    //     questions: [
-    //         {
-    //             type: "html",
-    //             name: "info",
-    //             html: "<table><body><row><td><img src='/Content/Images/examples/26178-20160417.jpg' width='100px' /></td><td style='padding:20px'>You may put here any html code. For example images, <b>text</b> or <a href='https://surveyjs.io/Survey/Builder'  target='_blank'>links</a></td></row></body></table>"
-    //         },
-    //         {
-    //             type: "radiogroup",
-    //             name: "car",
-    //             title: "What car are you driving?",
-    //             isRequired: true,
-    //             colCount: 1,
-    //             choices: [
-    //                 "None",
-    //                 "Ford",
-    //                 "Vauxhall",
-    //                 "Volkswagen"
-    //             ]
-    //         }
-    //     ]
-    // };
-
-    window.survey = new Survey.Model(json);
-
-    survey
-        .onComplete
-        .add(function (result) {
-            alert("result: " + JSON.stringify(result.data));
-        });
+        survey
+            .onComplete
+            .add(function (result) {
+                $.ajax({
+                    url: 'ajaxQuery/AJAX_validateTrainingSurvey.php',
+                    data: { result: JSON.stringify(result.data) },
+                    type: 'post',
+                    success: function (resp) {
+                        // $("#currentSurveyModal").html(resp);
+                        alert(resp);
+                    },
+                    error: function (resp) { 
+                        alert(resp);
+                    }
+                });
+                // alert("result: " + JSON.stringify(result.data));
+            });
 
 
-    $("#surveyElement").Survey({ model: survey });
-</script>
+        $("#surveyElement").Survey({ model: survey });
+    </script>
