@@ -129,6 +129,9 @@ $lang_ger['BOOK_PROJECTS'] = 'Projekte Buchen';
 $lang_eng['BOOKED'] = 'Booked';
 $lang_ger['BOOKED'] = 'Verbucht';
 
+$lang_eng['BOOK'] = 'Book';
+$lang_ger['BOOK'] = 'Buchen';
+
 $lang_eng['BOOKED_NOT'] = 'Not Booked';
 $lang_ger['BOOKED_NOT'] = 'Nicht Verbucht';
 
