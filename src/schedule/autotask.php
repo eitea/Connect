@@ -16,6 +16,7 @@ require dirname(__DIR__) . '/utilities.php';
 $result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
   //needed task data
+  echo json_encode($row);
   $task_id = $row['id'];
   $pattern = $row['repeatPattern'];
   $lastRuntime = $row['lastRuntime'];
@@ -42,7 +43,11 @@ while($result && ($row = $result->fetch_assoc())){
     $expiryDate = $expiryDate->format('Y-m-d H:i:s');
     if($pattern && timeDiff_Hours($now, $expiryDate) < 0){ //execute if schedule has expired
       //4. execute task
+      try{
       require $row['callee'];
+      }catch(Excetion $e){
+        echo $e;
+      }
       //5. update last runtime
       if($task_id < 3){
         $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");

@@ -1,6 +1,6 @@
 <?php
-require dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
-require dirname(__DIR__)."/connection.php";
+require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
+require_once dirname(__DIR__)."/connection.php";
 
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;
@@ -120,7 +120,7 @@ try{
     $stmt->close();
     $imap->deleteMessage($messages->header->uid);
 }catch(Exception $e){
-
+    echo $e;
 }
 }
 ?>
