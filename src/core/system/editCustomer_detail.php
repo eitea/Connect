@@ -342,7 +342,7 @@ if (!empty($_POST['saveAll'])) {
     }
 }
 
-if (isset($_POST['addContact']) && !empty($_POST['contacts_firstname']) && empty($_POST['contacts_lastname']) && !empty($_POST['contacts_email'])) {
+if (isset($_POST['addContact']) && !empty($_POST['contacts_firstname']) && !empty($_POST['contacts_lastname']) && !empty($_POST['contacts_email'])) {
     $firstname = test_input($_POST['contacts_firstname']);
     $lastname = test_input($_POST['contacts_lastname']);
     $mail = test_input($_POST['contacts_email']);
@@ -563,6 +563,8 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 		</div>
 		<br><br>
 		<div class="row form-group">
+        </form>
+        <form method="POST" >
 			<div class="col-xs-2 text-right">Ansprechpartner</div>
 			<div class="col-sm-10">
 				<table class="table">
@@ -625,33 +627,8 @@ while ($contactRow = $resultContacts->fetch_assoc()) {
 			</div>
 		</div>
 	</div>
-	<?php echo $modals; ?>
-	<div id="add-contact-person" class="modal fade">
-		<div class="modal-dialog modal-content modal-md">
-			<div class="modal-header h4">Ansprechpartner Hinzufügen</div>
-			<div class="modal-body">
-				<div class="row form-group">
-					<div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
-					<div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-					<div class="col-md-4"><label>Position</label><input type="text" name="contacts_position" placeholder="Position" class="form-control"/></div>
-					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-			</div>
-		</div>
-	</div>
-
+    </form>
+    <form method="POST" >
 	<div id="menuTaxes" class="tab-pane fade <?php if ($activeTab == 'taxes') {echo 'in active';}?>">
 		<div class="row checkbox">
 			<div class="col-sm-9"> <h3>Steuerinformationen</h3> </div>
@@ -1014,7 +991,7 @@ while ($rowProc = $resultProc->fetch_assoc()) {
     echo '<td></td>';
     echo '<td></td>';
     echo '</tr>';
-
+    
     $processHistory = array();
     $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '" . $rowProc['id'] . "'");
     while ($row = $result->fetch_assoc()) {
@@ -1197,6 +1174,36 @@ if ($resF->num_rows > 2) {
       </div>
     </div>
   </div>
+</form>
+
+<!-- ADD CONTACT PERSON -->
+<form method="POST">
+<?php echo $modals; ?>
+	<div id="add-contact-person" class="modal fade">
+		<div class="modal-dialog modal-content modal-md">
+			<div class="modal-header h4">Ansprechpartner Hinzufügen</div>
+			<div class="modal-body">
+				<div class="row form-group">
+					<div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
+					<div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
+				</div>
+				<div class="row form-group">
+					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
+					<div class="col-md-4"><label>Position</label><input type="text" name="contacts_position" placeholder="Position" class="form-control"/></div>
+					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
+				</div>
+				<div class="row form-group">
+					<div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
+					<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
+					<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+			</div>
+		</div>
+	</div>
 </form>
 
 <script>
