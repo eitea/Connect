@@ -152,7 +152,7 @@ echo mysqli_error($conn);
 
 <!-- /new training modal -->
 
-<div id="currentQuestionModal"></div> <!-- for question and training edit modals -->
+<div id="currentQuestionModal"></div> <!-- for question and training edit modals and question info -->
 
 <script>
 function setCurrentQuestionModal(index){
