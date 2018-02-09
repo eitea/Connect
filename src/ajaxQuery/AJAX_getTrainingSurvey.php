@@ -8,8 +8,22 @@ function strip_questions($html){ // this will be the html type for the survey
     $regexp = '/\{.*?\}/';
     return preg_replace($regexp, "", $html);
 }
-function parseQuestions($html){ // this will return an array of questions
-
+function parse_questions($html){ // this will return an array of questions
+    $questionRegex = '/\{.*?\}/';
+    $htmlRegex = '/<\/*\w+\/*>/';
+    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
+    preg_match($questionRegex,$html,$matches);
+    // I only parse the first question for now
+    if(sizeof($matches)==0) return array();
+    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
+    $answerRegex = '/\[([+-])\]([^\[\}]+)/';
+    preg_match_all($answerRegex,$question,$matches);
+    if(sizeof($matches)==0) return array();
+    $ret_array = array();
+    foreach ($matches[2] as $key => $value) {
+        $ret_array[] = array("value"=>$key,"text"=>$value);
+    }
+    return $ret_array;
 }
 
 $result = $conn->query( // this gets all trainings the user can complete
@@ -44,10 +58,7 @@ while ($row = $result->fetch_assoc()){
             "title"=>"Welche dieser Antworten ist richtig?",
             "isRequired"=>true,
             "colCount"=>1,
-            "choices"=>array(
-                array("value"=>"1","text"=>"This is the first answer"),
-                array("value"=>"2","text"=>"This is the second answer"),                
-            )
+            "choices"=>parse_questions($row_question["text"])
         );
         //         {
         //             type: "radiogroup",
