@@ -172,7 +172,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
         
         <div id="moveBtn" class="simpleBtnWrapper hidden">
-            <button type="button" data-toggle="modal" data-target="#folder-view" class="btn btn-default" title="Move"><i class="fa fa-folder-open-o"></i><i style="margin-left: -10px;font-size:11px;" class="fa fa-reply"></i><?php echo $lang['MOVE'] ?></button>
+            <button type="button" onClick="showFolders()" data-toggle="modal" data-target="#folder-view" class="btn btn-default" title="Move"><i class="fa fa-folder-open-o"></i><i style="margin-left: -10px;font-size:11px;" class="fa fa-reply"></i><?php echo $lang['MOVE'] ?></button>
         </div>
         <div id="deleteBtn" class="simpleBtnWrapper hidden">
             <button type="button" onClick="deleteSelected()" class="btn btn-default" title="Delete"><i class="fa fa-trash"></i><?php echo $lang['DELETE'] ?></button>
@@ -251,7 +251,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" id="editDoc" class="btn btn-warning hidden" name="editDocument"><?php echo $lang['EDIT']; ?></button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal" onClick="moveSelected()" ><?php echo $lang['MOVE']; ?></button>
       </div>
     </div>
 </div>
@@ -476,6 +476,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                table.appendChild(rows[i]);
             }
         }
+        changeMenu();
     }
     function uploadFiles(element){
         //Upload selected files
@@ -624,24 +625,48 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         getCurrentFolderContent();
     }
     function moveSelected(){
-
+        var selectedNodes = $("#tableContent :checked");
+        var selectedFolder = $('#folderTree').treeview('getSelected')[0];
+        var folderID = selectedFolder.tags[0];
+        for(i=0;i<selectedNodes.length;i++){
+            element = selectedNodes[i].parentElement.parentElement;
+            console.log(element);
+            if(element.classList.contains("file")){
+                moveFile(element.fileID,folderID)
+            }else{
+                moveFolder(element.folderID,folderID)
+            }
+        }
+    }
+    function moveFile(fileid,folderid){
+        $.post("../private/files",{
+            id: fileid,
+            folder: folderid,
+            function: "moveFile"
+        },function(data){
+            console.log(data);
+            getCurrentFolderContent();
+        });
+    }
+    function moveFolder(folder,moveto){
+        // $.post("../private/files",{
+        //     id:
+        // })
     }
     function showFolders(){
-        var treeData = [];
         $.post("../private/files",{
             userID: <?php echo $userID ?>,
             function: "getFolders"
         },function(data){
-            console.log(data);
-            //treeData = data;
+            console.log('['+data+']');
+            $("#folderTree").treeview({
+            data: '['+data+']',
+            
+            });
+            $("#folderTree .badge").each(function(){
+                this.classList.add("hidden");
+            });
         })
-        $("#folderTree").treeview({
-            data: treeData,
-            showTags: true,
-        });
-        $("#folderTree .badge").each(function(){
-            this.classList.add("hidden");
-        });
     }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -119,22 +119,33 @@ require dirname(__DIR__)."\connection.php";
                 $userID = $_POST['userID'];
                 $folders = array();
                 $result = $conn->query("SELECT * FROM archive_folders WHERE userid = $userID ORDER BY parent_folder ASC");
-                $levels = $conn->query("SELECT folderid FROM archive_folders WHERE userid = $userID GROUP BY parent_folder");
-                $levels = $levels->num_rows;
-                $noChilds = $conn->query("SELECT name FROM archive_folders WHERE userid = $userID AND folderid NOT IN (SELECT parent_folder FROM archive_folders WHERE userid = $userID GROUP BY parent_folder)");
-                while($rowChilds = $noChilds->fetch_assoc()){
-
+                //$levels = $conn->query("SELECT folderid FROM archive_folders WHERE userid = $userID GROUP BY parent_folder");
+                //$levels = $levels->num_rows;
+                //$noChilds = $conn->query("SELECT name FROM archive_folders WHERE userid = $userID AND folderid NOT IN (SELECT parent_folder FROM archive_folders WHERE userid = $userID GROUP BY parent_folder)");
+                $firstRow = $result->fetch_assoc();
+                array_push($folders,new folderNode("root",0,-1));
+                while($row = $result->fetch_assoc()){
+                    array_push($folders,new folderNode($row['name'],intval($row['folderid']),intval($row['parent_folder'])));
                 }
-                $folders[$levels-1] = [
-                    "text" => "root"
-                ];
-                for($i = $levels;$i > 0;$i--){
-                    $subfolders = array();
-
-
+                foreach($folders as $node){
+                    $childs = array();
+                    foreach($folders as $child){
+                        if($node->getId()==$child->getparent()){
+                            array_push($childs,$child);
+                        }
+                    }
+                    if(!empty($childs)) $node->setChilds($childs);
                 }
-                
-                echo json_encode($folders);
+                echo json_encode($folders[0]->getNode());
+            }elseif($_POST['function'] ==="moveFile"){
+                $fileid = $_POST['id'];
+                $folderid = $_POST['folder'];
+                $conn->query("UPDATE archive_savedfiles SET folderid = $folderid WHERE id = $fileid");
+                if($conn->error){
+                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                  } else {
+                    echo "EZ";
+                  }
             }
 
         }elseif(!empty($_GET['n'])){
@@ -157,12 +168,51 @@ require dirname(__DIR__)."\connection.php";
         }
 
 
+        class folderNode
+        {
+            private $name = "";
+            private $id = 0;
+            private $childs;
+            private $parent = -1;
 
-
-        function getSubfolders($id,$userID){
-            $result = $conn->query("SELECT name, folderid FROM archive_folders WHERE parent_folder = $id AND userid = $userID");
-            return $result;
-            //TODO: Use Braincells to make a recursive Folder-View.
+            public function __construct($name,$id,$parent,$childs = null){
+                $this->name = $name;
+                $this->id = $id;
+                $this->parent = $parent;
+                $this->childs = $childs;
+            }
+            public function getNode(){
+                if(isset($this->childs)){
+                    $thisNode = [
+                        "text" => $this->name,
+                        "tags" => ["$this->id"],
+                        "nodes" => getChilds($this->childs)
+                    ];
+                }else{
+                    $thisNode = [
+                        "text" => $this->name,
+                        "tags" => ["$this->id"],
+                    ];
+                }
+				return $thisNode;
+            }
+            public function setChilds($childs){
+                $this->childs = $childs;
+            }
+            public function getParent(){
+                return $this->parent;
+            }
+            public function getId(){
+                return $this->id;
+            }
+            
+        }
+        function getChilds($childArray){
+            $resultArray = array();
+            foreach($childArray as $child){
+                array_push($resultArray,$child->getNode());
+            }
+            return $resultArray;
         }
 
 ?>
