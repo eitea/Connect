@@ -1710,7 +1710,6 @@ if($row['version'] < 130){ //01.02.2018
 
 if($row['version'] < 131){ //07.02.2018
 
-    
     $conn->query("CREATE TABLE archive_folders (
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,
@@ -1745,7 +1744,17 @@ if($row['version'] < 131){ //07.02.2018
     } else {
         echo '<br>Private Archive: Data Tables';
     }
+
+    $conn->query("DELETE FROM taskdata WHERE id = 4");
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>BugFix: Email Tasks';
+    }
 }
+
+
 
 // ------------------------------------------------------------------------------
 

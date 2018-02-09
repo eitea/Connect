@@ -1,5 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php';
-  require dirname(__DIR__) . "/misc/helpcenter.php"; 
+  require dirname(__DIR__) . "/misc/helpcenter.php";
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -31,7 +31,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $service = test_input($_POST['edit_service']);
         $username = test_input($_POST['edit_username']);
         $password = test_input($_POST['edit_password']);
-        $logging = $_POST['edit_logging']=="on" ? 'TRUE' : 'FALSE';
+        $logging = isset($_POST['edit_logging']) ? 'TRUE' : 'FALSE';
         $id = $_POST['edit_id'];
         preg_match_all('!\d+!', $id, $id);
         $conn->query("UPDATE emailprojects SET server='$server',port='$port',service='$service',smtpSecure='$security',username='$username',password='$password',logEnabled='$logging' WHERE id = ".$id[0][0]);
