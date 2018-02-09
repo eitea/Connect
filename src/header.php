@@ -94,12 +94,20 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
-
+//todo only incomplete trainings should be counted
 $result = $conn->query(
     "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations WHERE userID = $userID 
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
         UNION 
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID WHERE tr.userID = $userID
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
     ) temp"
 );
 echo $conn->error;
