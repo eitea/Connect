@@ -45,7 +45,15 @@ $trainingArray = array(); // a training contains many questions
 $questionArray = array(); // could maybe be allocated in loop and added to trainingArray
 while ($row = $result->fetch_assoc()){
     $trainingID = $row["id"];
-    $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+    $result_question = $conn->query(
+        "SELECT * FROM dsgvo_training_questions tq 
+         WHERE tq.trainingID = $trainingID AND 
+         NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )"
+    ); // only select not completed questions
     while($row_question = $result_question->fetch_assoc()){
         $questionArray[] = array(
             "type"=>"html",
