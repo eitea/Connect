@@ -8,6 +8,7 @@ function strip_questions($html){ // this will be the html type for the survey
     $regexp = '/\{.*?\}/';
     return preg_replace($regexp, "", $html);
 }
+
 function parse_questions($html){ // this will return an array of questions
     $questionRegex = '/\{.*?\}/';
     $htmlRegex = '/<\/*\w+\/*>/';
@@ -41,9 +42,9 @@ $result = $conn->query( // this gets all trainings the user can complete
      ON tr.id = ttr.trainingID 
      WHERE trd.userID = $userID"
 );
-$trainingArray = array(); // a training contains many questions
-$questionArray = array(); // could maybe be allocated in loop and added to trainingArray
+$trainingArray = array(); // those are the survey pages
 while ($row = $result->fetch_assoc()){
+    $questionArray = array();
     $trainingID = $row["id"];
     $result_question = $conn->query(
         "SELECT * FROM dsgvo_training_questions tq 
@@ -66,10 +67,15 @@ while ($row = $result->fetch_assoc()){
             "title"=>"Welche dieser Antworten ist richtig?",
             "isRequired"=>true,
             "colCount"=>1,
+            "choicesOrder"=>"random",
             "choices"=>parse_questions($row_question["text"])
         );
     }
-    $trainingArray[] = array("id"=>$row["id"],"name"=>$row["name"]);
+    $trainingArray[] = array(
+        "name"=>$row["name"],
+        "title"=>$row["name"],
+        "elements"=>$questionArray
+    );
 }
 ?>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
@@ -89,34 +95,11 @@ while ($row = $result->fetch_assoc()){
     <script>
         Survey.Survey.cssType = "bootstrap";
         Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
-
-        var json = <?php echo json_encode(array("questions"=> $questionArray)) ?>;
-
-        // var json = { // example
-        //     questions: [
-        //         {
-        //             type: "html",
-        //             name: "info",
-        //             html: "<table><body><row><td><img src='/Content/Images/examples/26178-20160417.jpg' width='100px' /></td><td style='padding:20px'>You may put here any html code. For example images, <b>text</b> or <a href='https://surveyjs.io/Survey/Builder'  target='_blank'>links</a></td></row></body></table>"
-        //         },
-        //         {
-        //             type: "radiogroup",
-        //             name: "car",
-        //             title: "What car are you driving?",
-        //             isRequired: true,
-        //             colCount: 1,
-        //             choices: [
-        //                 "None",
-        //                 "Ford",
-        //                 "Vauxhall",
-        //                 "Volkswagen"
-        //             ]
-        //         }
-        //     ]
-        // };
-
+        var json = <?php echo json_encode(array(
+            "pages"=> $trainingArray,
+            "showProgressBar"=>"top"    
+        )) ?>;
         window.survey = new Survey.Model(json);
-
         survey
             .onComplete
             .add(function (result) {
@@ -125,16 +108,12 @@ while ($row = $result->fetch_assoc()){
                     data: { result: JSON.stringify(result.data) },
                     type: 'post',
                     success: function (resp) {
-                        // $("#currentSurveyModal").html(resp);
                         alert(resp);
                     },
                     error: function (resp) { 
                         alert(resp);
                     }
                 });
-                // alert("result: " + JSON.stringify(result.data));
             });
-
-
         $("#surveyElement").Survey({ model: survey });
     </script>
