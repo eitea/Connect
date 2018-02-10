@@ -26,15 +26,6 @@ function validate_questions($html, $answer){ // this will true or false (will wo
     return false;
 }
 
-// CREATE TABLE dsgvo_training_completed_questions (
-//     questionID int(6),
-//     userID INT(6) UNSIGNED,
-//     correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-//     PRIMARY KEY (questionID, userID),
-//     FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
-//     FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
-// )
-
 $right = $wrong = 0;
 foreach ($result as $questionID => $answer) {
     $html = $conn->query("SELECT text FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc()["text"];
@@ -47,5 +38,15 @@ foreach ($result as $questionID => $answer) {
     $questionRight = $questionRight?"TRUE":"FALSE";
     $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct) VALUES ($questionID, $userID, '$questionRight')");    
 }
-echo "right:$right, wrong:$wrong";
 ?>
+
+<table class="table table-hover">
+    <tr class="success">
+        <th>Right</th>
+        <td><?php echo $right ?></td>
+    </tr>
+    <tr class="danger">
+        <th>Wrong</th>
+        <td><?php echo $wrong ?></td>
+    </tr>
+</table>

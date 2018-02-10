@@ -116,12 +116,14 @@ while ($row = $result->fetch_assoc()){
                     data: { result: JSON.stringify(result.data) },
                     type: 'post',
                     success: function (resp) {
-                        alert(resp);
-                        $(".survey-modal").modal("hide");
+                        $("#surveyElement").html(resp) //stats
+                        $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
+                        // $(".survey-modal").modal("hide");
                     },
                     error: function (resp) { 
-                        alert(resp);
-                        $(".survey-modal").modal("hide");
+                        $("#surveyElement").html(resp) //stats
+                        $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
+                        // $(".survey-modal").modal("hide");
                     }
                 });
             });
