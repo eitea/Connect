@@ -1724,7 +1724,7 @@ if($row['version'] < 130){ //01.02.2018
         $sql = "CREATE TABLE dsgvo_training_questions (
             id int(6) NOT NULL AUTO_INCREMENT,
             title varchar(100),
-            text varchar(500),
+            text varchar(2000),
             trainingID INT(6),
             PRIMARY KEY (id),
             FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE

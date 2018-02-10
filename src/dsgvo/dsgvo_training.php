@@ -20,7 +20,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
-        $conn->query("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, '$text', '$title')");
+        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
+        echo $conn->error;
+        $stmt->bind_param("s",$text);
+        $stmt->execute();
+        echo $stmt->error;
     } elseif(isset($_POST["removeQuestion"])){
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
@@ -28,9 +32,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } elseif(isset($_POST["editQuestion"])){
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
-        $text = $_POST["question"];
+        $text = $_POST["question"]; //todo: test input
         echo "question text hasn't been sanitized";
-        $conn->query("UPDATE dsgvo_training_questions SET text = '$text', title = '$title' WHERE id = $questionID");
+        $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title' WHERE id = $questionID");
+        echo $conn->error;
+        $stmt->bind_param("s",$text);
+        $stmt->execute();
+        echo $stmt->error;
     } elseif(isset($_POST["editTraining"])){
         $trainingID = $_POST["editTraining"];
         $version = 1;
@@ -114,7 +122,7 @@ echo mysqli_error($conn);
         <div class="modal-header">Neue Aufgabenstellung/Schulung</div>
         <div class="modal-body">
             <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
-            <input type="text" name="question" class="form-control tinymce" placeholder="Question"></input>
+            <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
