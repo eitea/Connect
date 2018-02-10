@@ -1705,7 +1705,76 @@ if($row['version'] < 130){ //01.02.2018
         echo '<br>Email-Projects: Rulesets';
     }
 
-
+    if($row['version'] < 131){ //10.02.2018
+        $sql = "CREATE TABLE dsgvo_training (
+            id int(6) NOT NULL AUTO_INCREMENT,
+            name varchar(100),
+            companyID INT(6) UNSIGNED,
+            version INT(6) DEFAULT 0,
+            onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+            PRIMARY KEY (id),
+            FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }else {
+            echo '<br>Training: trainings';
+        }
+        
+        $sql = "CREATE TABLE dsgvo_training_questions (
+            id int(6) NOT NULL AUTO_INCREMENT,
+            title varchar(100),
+            text varchar(500),
+            trainingID INT(6),
+            PRIMARY KEY (id),
+            FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
+        )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }else {
+            echo '<br>Training: questions';
+        }
+    
+        $sql = "CREATE TABLE dsgvo_training_user_relations (
+            trainingID int(6),
+            userID INT(6) UNSIGNED,
+            PRIMARY KEY (trainingID, userID),
+            FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }else {
+            echo '<br>Training: user_relations';
+        }
+    
+        $sql = "CREATE TABLE dsgvo_training_team_relations (
+            trainingID int(6),
+            teamID INT(6) UNSIGNED,
+            PRIMARY KEY (trainingID, teamID),
+            FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }else {
+            echo '<br>Training: team_relations';
+        }
+    
+        $sql = "CREATE TABLE dsgvo_training_completed_questions (
+            questionID int(6),
+            userID INT(6) UNSIGNED,
+            correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+            PRIMARY KEY (questionID, userID),
+            FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        )";
+        if(!$conn->query($sql)){
+            echo $conn->error;
+        }else {
+            echo '<br>Training: completed_quesitons';
+        }
+    }
 }
 // ------------------------------------------------------------------------------
 
