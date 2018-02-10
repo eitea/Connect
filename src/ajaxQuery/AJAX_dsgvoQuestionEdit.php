@@ -17,7 +17,7 @@ $text = $row["text"];
     <div class="modal-header">Bestehende Aufgabenstellung/Schulung bearbeiten</div>
     <div class="modal-body">
         <input type="text" name="title" class="form-control" placeholder="Title" value="<?php echo $title; ?>"></input><br/>
-        <input type="text" name="question" class="form-control tinymce" placeholder="Question" value="<?php echo $text; ?>"></input>
+        <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>

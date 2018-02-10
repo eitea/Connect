@@ -9,24 +9,24 @@ if(isset($_REQUEST["onLogin"])){
 }
 
 function strip_questions($html){ // this will be the html type for the survey
-    $regexp = '/\{.*?\}/';
+    $regexp = '/\{.*?\}/s';
     return preg_replace($regexp, "", $html);
 }
 
 function parse_questions($html){ // this will return an array of questions
-    $questionRegex = '/\{.*?\}/';
-    $htmlRegex = '/<\/*\w+\/*>/';
+    $questionRegex = '/\{.*?\}/s';
+    $htmlRegex = '/\<\/*.+?\/*\>/s';
     $html = preg_replace($htmlRegex,"",$html); // strip all html tags
     preg_match($questionRegex,$html,$matches);
     // I only parse the first question for now
     if(sizeof($matches)==0) return array();
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([+-])\]([^\[\}]+)/';
+    $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
     preg_match_all($answerRegex,$question,$matches);
     if(sizeof($matches)==0) return array();
     $ret_array = array();
     foreach ($matches[2] as $key => $value) {
-        $ret_array[] = array("value"=>$key,"text"=>$value);
+        $ret_array[] = array("value"=>$key,"text"=>html_entity_decode($value));
     }
     return $ret_array;
 }
@@ -80,7 +80,7 @@ while ($row = $result->fetch_assoc()){
         "name"=>$row["name"],
         "title"=>$row["name"],
         "elements"=>$questionArray,
-        "questionsOrder"=>"random",
+        // "questionsOrder"=>"random",
     );
 }
 ?>

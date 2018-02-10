@@ -11,14 +11,14 @@ $result = json_decode($_POST["result"]);
 
 function validate_questions($html, $answer){ // this will true or false (will work with multiple right questions)
     $answer = intval($answer);
-    $questionRegex = '/\{.*?\}/';
-    $htmlRegex = '/<\/*\w+\/*>/';
+    $questionRegex = '/\{.*?\}/s';
+    $htmlRegex = '/<\/*\w+\/*>/s';
     $html = preg_replace($htmlRegex,"",$html); // strip all html tags
     preg_match($questionRegex,$html,$matches);
     // I only parse the first question for now
     if(sizeof($matches)==0) return array();
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([+-])\]([^\[\}]+)/';
+    $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
     preg_match_all($answerRegex,$question,$matches);
     if(sizeof($matches)==0) return array();
     if(!isset($matches[1][$answer])) return false;
