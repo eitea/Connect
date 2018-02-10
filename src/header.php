@@ -112,6 +112,26 @@ $result = $conn->query(
 );
 echo $conn->error;
 $userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredOnLoginSurveys = false;
+if($userHasUnansweredSurveys){
+    $result = $conn->query(
+        "SELECT count(*) count FROM (
+            SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+            UNION 
+            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+        ) temp"
+    );
+    echo $conn->error;
+    $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
@@ -1103,16 +1123,20 @@ if($userHasUnansweredSurveys): //test if user has unanswered surveys
 $("#openSurvey").click(function(){
     $.ajax({
         url:'ajaxQuery/AJAX_getTrainingSurvey.php',
-        data:{},
+        data:{<?php echo $userHasUnansweredOnLoginSurveys?"onLogin:true":"" ?>},
         type: 'get',
         success : function(resp){
             $("#currentSurveyModal").html(resp);
         },
         error : function(resp){console.error(resp)},
         complete: function(resp){
-            $("#currentSurveyModal .modal").modal('show');
+            $("#currentSurveyModal .modal").modal({
+                backdrop: 'static',
+                keyboard: false
+            });
         }
    });
 })
+<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ $('#openSurvey').click() },500)";} ?>
 </script>
 <?php endif; ?>
