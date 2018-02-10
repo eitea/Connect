@@ -1,8 +1,12 @@
 <?php
 session_start();
-$userID = $_SESSION['userid'];
+$userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
+$onLogin = false;
+if(isset($_REQUEST["onLogin"])){
+    $onLogin = true;
+}
 
 function strip_questions($html){ // this will be the html type for the survey
     $regexp = '/\{.*?\}/';
@@ -47,7 +51,8 @@ while ($row = $result->fetch_assoc()){
     $questionArray = array();
     $trainingID = $row["id"];
     $result_question = $conn->query(
-        "SELECT * FROM dsgvo_training_questions tq 
+        "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
+         INNER JOIN dsgvo_training t ON t.id = tq.trainingID
          WHERE tq.trainingID = $trainingID AND 
          NOT EXISTS (
              SELECT userID 
@@ -65,7 +70,7 @@ while ($row = $result->fetch_assoc()){
             "type"=>"radiogroup",
             "name"=>$row_question["id"],
             "title"=>"Welche dieser Antworten ist richtig?",
-            "isRequired"=>true,
+            "isRequired"=>$row_question["onLogin"] == 'TRUE',
             "colCount"=>1,
             "choicesOrder"=>"random",
             "choices"=>parse_questions($row_question["text"])
@@ -74,20 +79,21 @@ while ($row = $result->fetch_assoc()){
     $trainingArray[] = array(
         "name"=>$row["name"],
         "title"=>$row["name"],
-        "elements"=>$questionArray
+        "elements"=>$questionArray,
+        "questionsOrder"=>"random",
     );
 }
 ?>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
 
-    <div class="modal fade">
+    <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header">Bitte beantworten Sie folgende Fragen</div>
             <div class="modal-body">
                 <div id="surveyElement"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+                <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button> <?php endif; ?>
             </div>
         </div>
     </div>
@@ -97,7 +103,9 @@ while ($row = $result->fetch_assoc()){
         Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
         var json = <?php echo json_encode(array(
             "pages"=> $trainingArray,
-            "showProgressBar"=>"top"    
+            "showProgressBar"=>"top",
+            "requiredText"=>"(required)",
+            "showPageNumbers"=>true,
         )) ?>;
         window.survey = new Survey.Model(json);
         survey
@@ -109,9 +117,11 @@ while ($row = $result->fetch_assoc()){
                     type: 'post',
                     success: function (resp) {
                         alert(resp);
+                        $(".survey-modal").modal("hide");
                     },
                     error: function (resp) { 
                         alert(resp);
+                        $(".survey-modal").modal("hide");
                     }
                 });
             });
