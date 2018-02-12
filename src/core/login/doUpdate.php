@@ -1705,7 +1705,7 @@ if($row['version'] < 130){ //01.02.2018
         echo '<br>Email-Projects: Rulesets';
     }
 
-    if($row['version'] < 131){ //10.02.2018
+    if($row['version'] < 131){ //12.02.2018
         $sql = "CREATE TABLE dsgvo_training (
             id int(6) NOT NULL AUTO_INCREMENT,
             name varchar(100),
