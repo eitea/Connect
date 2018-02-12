@@ -212,6 +212,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } else {
     echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
   }
+ }elseif(isset($_POST["refreshTtl"])){
+  $ttl = intval($_POST['radioChoose']);
+
  }
 }
 
@@ -225,14 +228,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $link = explode('/', $link);
     array_pop($link);
     $link = implode('/', $link) . "/files?n=".$row['uri'];
-    echo '<td><a target="blank_" href='.$link.'> Click Me </a></td>';
     $daysLeft = ((int)(($row['ttl']*86400 - (strtotime(date('Y-m-d H:i:s')) - strtotime($row['dateOfBirth'])))/86400));
-    $days = ' Tag';
-    if($daysLeft>1) $days = $days . "e";
-    echo '<td>'.$daysLeft. $days .' </td>';
+    $expired = $daysLeft<0;
+    if($expired){
+      echo '<td><label style="color: red;" >'.$lang['EXPIRED'].'</label></td>';
+      echo '<td><button type="button" class="btn btn-default" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" ><i class="fa fa-refresh"></i></button></td>';
+    }else{
+      echo '<td><a target="blank_" href='.$link.'> Click Me </a></td>';
+      $days = ' Tag';
+      if($daysLeft>1) $days = $days . "e";
+      echo '<td>'.$daysLeft. $days .' </td>';
+    }
+    
     echo '<td>';
     echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
-    echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')"  data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+    if($expired){
+      echo '<button type="button" name="setSelect" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+    }else{
+      echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')" data-target="#send-as-mail" data-toggle="modal"  class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+    }
     echo '<button onclick="deleteGroup('.$row['id'].')" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
     echo '</td>';
     echo '</tr>';
@@ -241,6 +255,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </table>
 
 <form method="POST" enctype="multipart/form-data" id="form">
+  <div id="refresh-ttl" class="modal fade">
+    <div class="modal-dialog modal-content modal-md">
+      <div class="modal-header h4">Link <?php echo $lang['REFRESH'] ?></div>
+        <div class="modal-body">
+        <input class="radioChoose" checked type="radio" name="ttlE" value="1">Ein Tag</input>
+        <input class="radioChoose" type="radio" name="ttlE" value="7">Eine Woche</input>
+        <input class="radioChoose" type="radio" name="ttlE" value="30">Ein Monat</input>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="refreshTtl" name="refreshTtl"><?php echo $lang['EDIT'] ?></button>
+      </div>
+      </div>
+    </div>
+  </div>
   <div id="send-as-mail" class="modal fade">
     <div class="modal-dialog modal-content modal-md"><div class="modal-header h4">Link Senden</div>
       <div class="modal-body">
@@ -376,11 +405,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </form>
 
 
-
-
-
-
-
 <script>
   function deleteGroup(groupID){
     $.ajax({
@@ -505,7 +529,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     });
   }
 
-  async function createGroup(evt){
+  function createGroup(evt){
     var formData = new FormData();
     var amount = 0;
     if(filesGotDropped){
@@ -513,16 +537,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         formData.append('file'+i,droppedFiles2[i]);
       }
       amount = droppedFiles2.length;
-      console.log(droppedFiles2);
     }else{
       for(var i = 0;i<document.getElementById('file').files.length;i++){
         formData.append('file'+i,document.getElementById('file').files[i]);
       }
       amount = document.getElementById('file').files.length;
-      console.log(document.getElementById('file').files);
     }
     formData.append('amount',amount);
-    formData.append('functions','addGroup');
+    formData.append('function','addGroup');
     formData.append('userid',<?php echo $userID ?>);
     formData.append('ttl',document.querySelector('input[name = "ttl"]:checked').value);
     formData.append('add_groupName',document.getElementById('add_groupName').value);
@@ -532,17 +554,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       url: '../misc/sharedfiles',
       type: 'POST',
       async: true,
-      dataType: "text",
       data: formData,
       cache: false,
-      contentType: 'multipart/form-data',
+      contentType: false,
       processData: false,
+      enctype: 'multipart/form-data',
       complete: function(res){
         console.log("____________________________________");
-        console.log(res);
+        console.log(res.responseText);
       }
     });
-    console.log(formData.get("function"));
   }
 
   function sleep(ms) {
@@ -584,6 +605,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
       ev.dataTransfer.clearData();
     }
+  }
+  function refreshLink(id){
+    var ttl = $("#refresh-ttl :checked")[0].value;
+    $.post("../misc/sharedfiles",{
+      ttl: ttl,
+      id: id,
+      function: "refreshTtl",
+    },function(data){
+      if(data){
+        console.log(data);
+      }else{
+        location.href = "../archive/share";
+      }
+    });
   }
 </script>
 <script>

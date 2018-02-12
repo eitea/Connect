@@ -510,6 +510,9 @@ $lang_ger['EXPENSES'] = 'Spesen';
 $lang_eng['EXPIRATION_DATE'] = 'Expiration Date';
 $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
+$lang_eng['EXPIRED'] = 'Expired';
+$lang_ger['EXPIRED'] = 'Abgelaufen';
+
 $lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
 
@@ -1026,6 +1029,9 @@ $lang_ger['RECORD'] = 'Datenstamm';
 
 $lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
 $lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
+
+$lang_eng['REFRESH'] = 'Refresh';
+$lang_ger['REFRESH'] = 'Erneuern';
 
 $lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';

@@ -7,8 +7,10 @@ require dirname(__DIR__)."\connection.php";
         $s3 = new Aws\S3\S3Client(getS3Config());
            //var_dump($_POST);
            //var_dump($_FILES);
-           //print_r($_POST);
-          if($_POST['functions']==="addGroup"){
+           //echo "\n";
+           //echo json_encode($_FILES);
+           //exit();
+          if($_POST['function']==="addGroup"){
             $companyID = $_POST['filterCompany'];
             $name = $_POST['add_groupName'];
             $amount = $_POST['amount'];
@@ -17,6 +19,7 @@ require dirname(__DIR__)."\connection.php";
             try{
             $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)");
             $groupID = $conn->insert_id;
+            $conn->query("CREATE EVENT ttl_$groupID ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL $radio DAY DO UPDATE sharedgroups SET uri='' WHERE id=$groupID");
             $buckets = $s3->listBuckets();
             $thereisabucket = false;
             foreach($buckets['Buckets'] as $bucket){
@@ -134,6 +137,11 @@ require dirname(__DIR__)."\connection.php";
                 } else {
                   echo $groupID;
                 }
+        }elseif($_POST['function']==="refreshTtl"){
+            $ttl = intval($_POST['ttl']);
+            $id = intval($_POST['id']);
+            $conn->query("UPDATE sharedgroups SET ttl=$ttl, dateOfBirth=CURRENT_TIMESTAMP WHERE id=$id");
+            $conn->query("CREATE EVENT ttl_$id ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL $ttl DAY DO UPDATE sharedgroups SET uri='' WHERE id=$id");
         }else{
             return;
         }
