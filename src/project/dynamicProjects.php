@@ -7,8 +7,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
+
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE'); //set_filter requirement
 ?>
+
+<script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
+<script src="plugins/rtfConverter/rtf.js-master/samples/symboltable.js"></script>
+<script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
     <?php if($isDynamicProjectsAdmin == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
@@ -523,7 +528,7 @@ function dynamicOnLoad(modID){
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',
-        plugins: 'image code paste',
+        plugins: 'image code ',
         relative_urls: false,
         paste_data_images: true,
         menubar: false,
@@ -550,6 +555,42 @@ function dynamicOnLoad(modID){
         // images_upload_url: 'postAcceptor.php',
         // here we add custom filepicker only to Image dialog
         file_picker_types: 'file image media',
+        init_instance_callback: function (editor) {
+            editor.on('paste', function (e) {
+                console.log('Here');
+                
+                console.log(e.clipboardData.types.includes("text/rtf"));
+                if(e.clipboardData.types.includes("text/rtf")){
+                    var clipboardData, pastedData;
+
+                // Stop data actually being pasted into div
+                e.preventDefault();
+
+                // Get pasted data via clipboard API
+                clipboardData = e.clipboardData || window.clipboardData;
+                pastedData = clipboardData.getData('text/rtf');
+
+                var stringToBinaryArray = function(txt) {
+                        var buffer = new ArrayBuffer(txt.length);
+                        var bufferView = new Uint8Array(buffer);
+                        for (var i = 0; i < txt.length; i++) {
+                            bufferView[i] = txt.charCodeAt(i);
+                        }
+                        return buffer;
+                    }
+
+
+                var settings = {};
+                var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
+                var part = doc.render();
+                console.log(part);
+                for(i=0;i<part.length;i++){
+                    part[i][0].innerHTML = part[i][0].innerHTML.replace("[Unsupported image format]","");
+                    this.execCommand("mceInsertContent",false,part[i][0].innerHTML);
+                }
+                }
+            });
+        },
         // and here's our custom image picker
         file_picker_callback: function(cb, value, meta) {
             var input = document.createElement('input');
