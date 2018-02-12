@@ -109,9 +109,12 @@ echo mysqli_error($conn);
 
             ?>
           
-           <div class="col-md-12 text-right">
+           <div class="col-md-12 float-right">
+           <div class="btn-group float-right" style="float:right!important">
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
+            <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
             <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
+           </div>
            </div>
         </div>
       </div>
@@ -163,65 +166,32 @@ echo mysqli_error($conn);
 <div id="currentQuestionModal"></div> <!-- for question and training edit modals and question info -->
 
 <script>
-function setCurrentQuestionModal(index){
+function setCurrentModal(data, type, url){
     $.ajax({
-        url:'ajaxQuery/AJAX_dsgvoQuestionEdit.php',
-        data:{questionID: index},
-        type: 'get',
+        url: url,
+        data: data,
+        type: type,
         success : function(resp){
             $("#currentQuestionModal").html(resp);
         },
         error : function(resp){console.error(resp)},
         complete: function(resp){
-            if(index){
-                onModalLoad();
-                $("#currentQuestionModal .modal").modal('show');
-            }
+            onModalLoad();
+            $("#currentQuestionModal .modal").modal('show');
         }
    });
 }
 $("button[name=editQuestion]").click(function(){
-    setCurrentQuestionModal($(this).val())
+    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionEdit.php')
 })
-function setCurrentTrainingModal(index){
-    $.ajax({
-        url:'ajaxQuery/AJAX_dsgvoTrainingEdit.php',
-        data:{trainingID: index},
-        type: 'get',
-        success : function(resp){
-            $("#currentQuestionModal").html(resp);
-        },
-        error : function(resp){console.error(resp)},
-        complete: function(resp){
-            if(index){
-                onModalLoad();
-                $("#currentQuestionModal .modal").modal('show');
-            }
-        }
-   });
-}
 $("button[name=editTraining]").click(function(){
-    setCurrentTrainingModal($(this).val())
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingEdit.php')
 })
-function setCurrentQuestionInfoModal(index){
-    $.ajax({
-        url:'ajaxQuery/AJAX_dsgvoQuestionInfo.php',
-        data:{questionID: index},
-        type: 'get',
-        success : function(resp){
-            $("#currentQuestionModal").html(resp);
-        },
-        error : function(resp){console.error(resp)},
-        complete: function(resp){
-            if(index){
-                onModalLoad();
-                $("#currentQuestionModal .modal").modal('show');
-            }
-        }
-   });
-}
 $("button[name=infoQuestion]").click(function(){
-    setCurrentQuestionInfoModal($(this).val())
+    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionInfo.php')
+})
+$("button[name=infoTraining]").click(function(){
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingInfo.php')
 })
 </script>
 
