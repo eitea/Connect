@@ -497,6 +497,12 @@ $(document).ready(function(){
                     ?>
                     </select>
                   </div>
+                  <div class="col-md-3" >
+                    <label style="float:right;"  ><?php echo "Last Password Change: ".(date_create($row['lastPswChange'])->format('d.m.Y')); ?></label>
+                  </div>
+                  <div class="col-md-3" >
+                    <button type="button" class="btn btn-danger" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
+                  </div>
                 </div>
               </div>
               <div class="container-fluid radio">
@@ -754,5 +760,20 @@ $(document).ready(function(){
   ?>
   <br><br>
 </div>
+
+<script>
+  //ALTER TABLE `userdata`  ADD `forcedPwdChange` TINYINT(1) NULL DEFAULT NULL  AFTER `privatePGPKey`;
+  function forcePswChange(id,event){
+    $.post("../misc/db_utility",{function: "forcePwdChange",userid: id},function(data){
+      if(data){
+        console.log(data);
+        event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-check' ></i>"
+      }else{
+        event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-times' ></i>"
+      }
+        
+      });
+  }
+</script>
 <!-- /BODY -->
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

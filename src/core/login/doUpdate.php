@@ -1752,6 +1752,14 @@ if($row['version'] < 131){ //07.02.2018
     } else {
         echo '<br>BugFix: Email Tasks';
     }
+
+    $conn->query("ALTER TABLE userdata  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Forced Change Password';
+    }
 }
 
 
