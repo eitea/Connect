@@ -48,7 +48,7 @@ if($x){
 <div class="modal fade" id="editingModal-<?php echo $x; ?>">
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
-            <form method="POST" id="projectForm<?php echo $x; ?>">
+            <form method="POST" onSubmit="return  checkInput(event)" id="projectForm<?php echo $x; ?>">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Task editieren</h4>
@@ -129,7 +129,7 @@ if($x){
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                    <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
+                                    <select required class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                                         <?php
                                         $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
                                         for($i = 0; $i < count($dynrow_emps); $i++){

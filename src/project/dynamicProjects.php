@@ -766,5 +766,14 @@ $(document).ready(function() {
       });
     }
   }
+
+  function checkInput(event){
+      //check Input
+    console.log(event);
+    if(tinymce.activeEditor.getContent()==""){
+        alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
+        return false;
+    }
+  }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
