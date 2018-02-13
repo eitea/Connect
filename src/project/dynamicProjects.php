@@ -8,7 +8,7 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE'); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => []); //set_filter requirement
 ?>
 
 <script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
@@ -241,9 +241,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </thead>
     <tbody>
         <?php
-        $occupation = $query_status = '';
+        $occupation = $query_filter = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
-        if($filterings['tasks']){ $query_status = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
+        if($filterings['tasks']){ $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
+        if($filterings['priority']>0){ $query_filter = $query_filter . " AND d.projectpriority = ".$filterings['priority'];}
+        if(!empty($filterings['employees'])){
+            echo "<script>console.log('".json_encode($filterings['employees'])."')</script>";
+            for($i=0;$i<count($filterings['employees']);$i++){
+                $mapNode = explode(";",$filterings['employees'][$i]);
+                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
+            }
+        }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
@@ -259,7 +267,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
@@ -267,7 +277,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
-                AND d.projectstart <= UTC_TIMESTAMP $query_status ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                AND d.projectstart <= UTC_TIMESTAMP $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($row = $result->fetch_assoc()){

@@ -13,6 +13,8 @@
 * requestType => type
 * regexField
 * tasks => status
+* priority => int
+* employees => array<string>()
 **/
 
 if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){
@@ -96,6 +98,13 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
   }
   if(isset($_POST['searchTask'])){
     $filterings['tasks'] = test_input($_POST['searchTask']);
+  }
+  if(isset($_POST['searchPriority'])){
+    $filterings['priority'] = intval($_POST['searchPriority']);
+  }
+  if(isset($_POST['searchEmployees'])){
+    echo "<script>console.log('".json_encode($_POST['searchEmployees'])."')</script>";
+    $filterings['employees'] = $_POST['searchEmployees'];
   }
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
@@ -268,11 +277,49 @@ if($scale > 2){ //3 columns
                   <option value="DEACTIVATED" <?php if($filterings['tasks'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
                   <option value="ACTIVE" <?php if($filterings['tasks'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
                   <option value="DRAFT" <?php if($filterings['tasks'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
+                  <option value="REVIEW" <?php if($filterings['tasks'] == 'REVIEW') echo 'selected'; ?>>Review</option>
                   <option value="COMPLETED" <?php if($filterings['tasks'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
               </select>
+              <br><br>
           <?php endif; ?>
+          <?php if(isset($filterings['priority'])): ?>
+              <label><?php echo $lang['DYNAMIC_PROJECTS_PROJECT_PRIORITY']; ?></label>
+              <select name="searchPriority" class="js-example-basic-single">
+                  <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
+                  <option value="1" <?php if($filterings['priority'] == 1) echo 'selected'; ?>><?php echo $lang['PRIORITY_TOSTRING'][1] ?></option>
+                  <option value="2" <?php if($filterings['priority'] == 2) echo 'selected'; ?>><?php echo $lang['PRIORITY_TOSTRING'][2] ?></option>
+                  <option value="3" <?php if($filterings['priority'] == 3) echo 'selected'; ?>><?php echo $lang['PRIORITY_TOSTRING'][3] ?></option>
+                  <option value="4" <?php if($filterings['priority'] == 4) echo 'selected'; ?>><?php echo $lang['PRIORITY_TOSTRING'][4] ?></option>
+                  <option value="5" <?php if($filterings['priority'] == 5) echo 'selected'; ?>><?php echo $lang['PRIORITY_TOSTRING'][5] ?></option>
+              </select>
+              <br><br>
+          <?php endif; ?>
+          <?php if(isset($filterings['employees'])): ?>
+          <label><?php echo $lang["EMPLOYEE"]; ?>/ Team</label>
+          <select class="select2-team-icons js-example-basic-single " name="searchEmployees[]" multiple="multiple">
+          <?php
+            $modal_options = '';
+            $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
+            while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
+            $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
+            for($i = 0; $i < count($filterings['employees']); $i++){
+              $result = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $result);
+            }
+            echo $result;
+            $selected = '';
+            $result = $conn->query("SELECT id, name FROM $teamTable");
+            while ($row = $result->fetch_assoc()) {
+              $selected .= '<option value="team;'.$row['id'].'" data-icon="group" >'.$row['name'].'</option>';
+            }
+            for($i = 0; $i < count($filterings['employees']); $i++){
+              $selected = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $selected);
+            }
+            echo $selected;
+          ?>
+          </select>
+          
         </div>
-
+        <?php endif;?>
         <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
           <div class="filter_column">
             <?php if(isset($filterings['date'][1])): ?>
