@@ -1705,11 +1705,77 @@ if($row['version'] < 130){ //01.02.2018
     }
 }
 
-if($row['version'] < 130){}
-if($row['version'] < 131){}
+if($row['version'] < 131){ //14.02.2018
+    $conn->query("CREATE TABLE archive_folders (
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        parent_folder INT(6) NOT NULL,
+        UNIQUE KEY user_folder (userid, folderid),
+        INDEX (parent_folder))");
+    $conn->query("CREATE TABLE archive_editfiles (
+        hashid VARCHAR(32) NOT NULL,
+        body TEXT NOT NULL,
+        version INT(6) NOT NULL DEFAULT 1,
+        PRIMARY KEY (hashid,version))");
+    $conn->query("CREATE TABLE archive_savedfiles (
+        id INT(12) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        type VARCHAR(10) NOT NULL,
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        hashkey VARCHAR(32) UNIQUE NOT NULL,
+        filesize BIGINT(20) NOT NULL,
+        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL)");
+
+    $conn->query("INSERT INTO archive_folders(folderid, userid, name, parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Private Archive: Data Tables';
+    }
+
+    $conn->query("DELETE FROM taskData WHERE id = 4");
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>BugFix: Email Tasks';
+    }
+
+    $conn->query("ALTER TABLE UserData  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Forced Change Password';
+    }
+
+    $conn->query("ALTER TABLE contactPersons ADD form_of_address ENUM('Herr','Frau') NOT NULL,
+    ADD titel VARCHAR(20),
+    ADD pgpKey TEXT;");
+
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Contact Persons: More Details';
+    }
+
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Geschätzte Zeit';
+    }
+}
+
+
 if($row['version'] < 132){}
 if($row['version'] < 133){}
 if($row['version'] < 134){}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

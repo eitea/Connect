@@ -79,6 +79,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($conn->query($sql)){
         $curID = mysqli_insert_id($conn);
         echo mysqli_error($conn);
+        $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
         //create interval
         $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
         VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '25', '$overTimeLump','6', '0.5', '$begin');";

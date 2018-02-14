@@ -111,6 +111,9 @@ $lang_ger['AVAILABLE'] = 'Verfügbar';
 $lang_eng['AVERAGE'] = 'Average';
 $lang_ger['AVERAGE'] = 'Durschnitt';
 
+$lang_eng['BACK'] = 'Back';
+$lang_ger['BACK'] = 'Zurück';
+
 $lang_eng['BEGIN'] = 'Begin';
 $lang_ger['BEGIN'] = 'Anfang';
 
@@ -125,6 +128,9 @@ $lang_ger['BOOK_PROJECTS'] = 'Projekte Buchen';
 
 $lang_eng['BOOKED'] = 'Booked';
 $lang_ger['BOOKED'] = 'Verbucht';
+
+$lang_eng['BOOK'] = 'Book';
+$lang_ger['BOOK'] = 'Buchen';
 
 $lang_eng['BOOKED_NOT'] = 'Not Booked';
 $lang_ger['BOOKED_NOT'] = 'Nicht Verbucht';
@@ -504,6 +510,9 @@ $lang_ger['EXPENSES'] = 'Spesen';
 $lang_eng['EXPIRATION_DATE'] = 'Expiration Date';
 $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
+$lang_eng['EXPIRED'] = 'Expired';
+$lang_ger['EXPIRED'] = 'Abgelaufen';
+
 $lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
 
@@ -522,11 +531,17 @@ $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 $lang_eng['FOOT_NOTE'] = 'Foot Note';
 $lang_ger['FOOT_NOTE'] = 'Fußzeile';
 
+$lang_eng['FORM_OF_ADDRESS'] = 'Form of Address';
+$lang_ger['FORM_OF_ADDRESS'] = 'Anrede';
+
 $lang_eng['FORWARDED'] = 'Forwarded';
 $lang_ger['FORWARDED'] = 'Weitergeleitet';
 
 $lang_eng['FIELDS_REQUIRED'] = 'Fields are required';
 $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
+
+$lang_eng['FILE'] = 'File';
+$lang_ger['FILE'] = 'Datei';
 
 $lang_eng['FILTER_HELP'] = '*Your E-Mail Subject will be scaned for this EXACT term and if an E-Mail gets found this Part of the Subject will be cut out, the rest will be the Title for the Task.';
 $lang_ger['FILTER_HELP'] = '*Der Betreff Ihrer E-Mails wird nach GENAU diesem Begriff untersucht und sollte es einen Treffer geben wird dieser Teil aus dem Betreff herausgeschnitten und der Rest des Betreffs wird der Titel des Tasks.';
@@ -554,6 +569,9 @@ $lang_ger['FREE_TEXT'] = 'Produkt';
 
 $lang_eng['FROM'] = 'From';
 $lang_ger['FROM'] = 'Von';
+
+$lang_eng['FOLDER'] = 'Folder';
+$lang_ger['FOLDER'] = 'Ordner';
 
 $lang_eng['FORMS'] = 'Forms';
 $lang_ger['FORMS'] = 'Formulare';
@@ -766,6 +784,9 @@ $lang_ger['MISSING'] = 'Fehlend';
 $lang_eng['MONTH'] ='Month';
 $lang_ger['MONTH'] ='Monat';
 
+$lang_eng['MOVE'] ='Move';
+$lang_ger['MOVE'] ='Verschieben';
+
 $lang_eng['MONTHLY_REPORT'] ='Monthly Report';
 $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 
@@ -922,6 +943,9 @@ $lang_ger['PREVIOUS'] = 'Vorheriges';
 $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
+$lang_eng['PRIVATE'] = 'Private';
+$lang_ger['PRIVATE'] = 'Persöhnlich';
+
 $lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
 $lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
 
@@ -1008,6 +1032,9 @@ $lang_ger['RECORD'] = 'Datenstamm';
 
 $lang_eng['REFERENCE_NUMERAL_ROW'] = 'Reference Numeral Row';
 $lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
+
+$lang_eng['REFRESH'] = 'Refresh';
+$lang_ger['REFRESH'] = 'Erneuern';
 
 $lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';
@@ -1351,9 +1378,12 @@ $lang_ger['YEAR'] = 'Jahr';
 
 $lang_eng['YES'] = 'Yes';
 $lang_ger['YES'] = 'Ja';
-
+//Will you marry me?
 $lang_eng['YES_I_WILL'] = 'Yes, I do.';
 $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
+
+$lang_eng['YOUR_ARCHIVE'] = 'Your Archive';
+$lang_ger['YOUR_ARCHIVE'] = 'Ihr Archiv';
 
 $lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
 $lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');

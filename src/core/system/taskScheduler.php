@@ -35,7 +35,7 @@ if(isset($_POST['save_task'])){
     }
     if(!empty($_POST['email_task'])){
       $pattern = intval($_POST['email_task']);
-      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (4, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Email Tasks', 'getAllEmailtasks.php')
+      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (4, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Email Tasks', 'getAllEmailTasks.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
       if(mysqli_error($conn)){
         $error = $conn->error;

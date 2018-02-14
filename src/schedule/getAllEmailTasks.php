@@ -1,6 +1,6 @@
 <?php
-require dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
-require dirname(__DIR__)."/connection.php";
+require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
+require_once dirname(__DIR__)."/connection.php";
 
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;
@@ -12,6 +12,7 @@ if($result){
         $mailbox = $row['server'];
         $username = $row['username'];
         $password = $row['password'];
+        //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
         $service = strtoupper($row['service'])=="IMAP" ? ImapConnect::SERVICE_IMAP : ImapConnect::SERVICE_POP3;
         if($row['smtpSecure']=='null'){
             $encryption = null;
@@ -50,12 +51,12 @@ if($result){
             }
             
         }catch(Exception $e){
-            echo $e;
+            $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$e')");
         }
         
     }
 }else{
-    echo json_encode("NÖ");
+    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'ERROR')");
 }
 return;
 
@@ -120,7 +121,7 @@ try{
     $stmt->close();
     $imap->deleteMessage($messages->header->uid);
 }catch(Exception $e){
-
+    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$e')");
 }
 }
 ?>

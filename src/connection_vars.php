@@ -1,6 +1,7 @@
 <?php
 /*
 Update: This file is no longer maintained. Substitution of variables into hardcoded strings
+TODO: remove this file.
 */
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";

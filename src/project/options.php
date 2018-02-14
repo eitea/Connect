@@ -1,5 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php';
-  require dirname(__DIR__) . "/misc/helpcenter.php"; 
+  require dirname(__DIR__) . "/misc/helpcenter.php";
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -31,7 +31,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $service = test_input($_POST['edit_service']);
         $username = test_input($_POST['edit_username']);
         $password = test_input($_POST['edit_password']);
-        $logging = $_POST['edit_logging']=="on" ? 'TRUE' : 'FALSE';
+        $logging = isset($_POST['edit_logging']) ? 'TRUE' : 'FALSE';
         $id = $_POST['edit_id'];
         preg_match_all('!\d+!', $id, $id);
         $conn->query("UPDATE emailprojects SET server='$server',port='$port',service='$service',smtpSecure='$security',username='$username',password='$password',logEnabled='$logging' WHERE id = ".$id[0][0]);
@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th></th>
+    <th><button type="button" onclick="runAutotask()" class="btn btn-default" ><i class="fa fa-refresh"></i></button></th>
   </tr></thead>
   <tbody>
   <?php
@@ -494,7 +494,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
     function showClients(company, client, place){
-    if(company != ""){
+        if(company != ""){
       $.ajax({
         url:'ajaxQuery/AJAX_getClient.php',
         data:{companyID:company, clientID:client},
@@ -503,11 +503,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $("#"+place).html(resp);
         },
         error : function(resp){}
-      });
+        });
+        }
     }
-  }
-  function showProjects(client, place){
-    if(client != ""){
+    function showProjects(client, place){
+        if(client != ""){
       $.ajax({
         url:'ajaxQuery/AJAX_getProjects.php',
         data:{clientID:client},
@@ -517,25 +517,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         },
         error : function(resp){}
       });
+        }
     }
-  }
-  $(document).ready(function() {
-    $(".select2-team-icons").select2({
+    $(document).ready(function() {
+        $(".select2-team-icons").select2({
         templateResult: formatState,
         templateSelection: formatState
-    });
-    document.getElementById("addRule").addEventListener("click", clearInputs);
-    $("#edit-account input, #edit-account select, #new-account input, #new-account select").on("change",function(){
+        });
+        document.getElementById("addRule").addEventListener("click", clearInputs);
+        $("#edit-account input, #edit-account select, #new-account input, #new-account select").on("change",function(){
         document.getElementById("checkEmailBtn").setAttribute('style','float:left');
+        });
     });
-  });
-  function formatState (state) {
-    if (!state.id) { return state.text; }
-    var $state = $(
+    function formatState (state) {
+        if (!state.id) { return state.text; }
+        var $state = $(
         '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
-    );
-    return $state;
-};
+        );
+        return $state;
+    };
+    function runAutotask(){
+        $.post("../report/autotask",{},function(data){
+            console.log(data);
+        });
+    }
  
 </script>
 <?php include dirname(__DIR__) . '/footer.php';?>

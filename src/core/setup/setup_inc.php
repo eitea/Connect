@@ -1091,6 +1091,9 @@ function create_tables($conn) {
         dial VARCHAR(20),
         faxDial VARCHAR(20),
         phone VARCHAR(25),
+        form_of_address ENUM('Herr','Frau') NOT NULL,
+        titel VARCHAR(20),
+        pgpKey TEXT,
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1398,6 +1401,42 @@ function create_tables($conn) {
         finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
         completed timestamp NULL DEFAULT NULL,
         PRIMARY KEY (projectid,microtaskid))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+
+    $sql = "CREATE TABLE archive_folders (
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        parent_folder INT(6) NOT NULL,
+        PRIMARY KEY (userid, folderid),
+        INDEX (parent_folder))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+    $sql = "CREATE TABLE archive_editfiles (
+        hashid VARCHAR(32) NOT NULL,
+        body TEXT NOT NULL,
+        version INT(6) NOT NULL DEFAULT 1,
+        PRIMARY KEY (hashid,version))";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+    
+    $sql = "CREATE TABLE archive_savedfiles (
+        id INT(12) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        type VARCHAR(10) NOT NULL,
+        folderid INT(6) NOT NULL,
+        userid INT(6) NOT NULL,
+        hashkey` VARCHAR(32) NOT NULL,
+        filesize BIGINT(20) NOT NULL,
+        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE (hashkey))";
+
     if(!$conn->query($sql)){
         echo $conn->error;
     }

@@ -1,7 +1,7 @@
 <?php
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_tester.php',                  'setup/run' => 'core/setup/setup.php',
+  'login/access' => 'core/login/login_tester.php',                  'setup/run' => 'core/setup/setup.php',                      'login/passwordChange' => 'core/login/passwordChange.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
   'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
@@ -38,13 +38,12 @@ $routes = array(
   'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
-  'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',
-
-  'upload/file' => 'archive/uploadToS3.php',
+  'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
+  'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
 
   'pgp/keygen' => 'pgp/pgpKeyGen.php',                              'misc/sharedfiles' => 'misc/getSharedFiles.php',              'misc/taskemails' => 'schedule/getAllEmailTasks.php',
   'misc/checkemail' => 'misc/checkEmailAvailability.php',            'misc/getrules'    => 'misc/getRules.php',                   'misc/newrule'    => 'misc/newRule.php',
-  'misc/deleterule' => 'misc/deleteRule.php',                       'misc/getAccount'   => 'misc/getEmailAccountInfo.php',
+  'misc/deleterule' => 'misc/deleteRule.php',                       'misc/getAccount'   => 'misc/getEmailAccountInfo.php',        'misc/db_utility' => 'misc/db_utility.php',
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",

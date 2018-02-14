@@ -23,6 +23,10 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     $row = $result->fetch_assoc();
   }
   if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
+    $redirect = "../user/home";
+    if($row['forcedPwdChange']==='1'){
+      $redirect = "../login/passwordChange";
+    }
     $_SESSION['userid'] = $row['id'];
     $_SESSION['firstname'] = $row['firstname'];
     $_SESSION['language'] = $row['preferredLang'];
@@ -49,7 +53,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
         die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
       }
     }
-    redirect('../user/home');
+    redirect($redirect);
   } else {
     $invalidLogin = "Invalid Username/ Password!";
   }
