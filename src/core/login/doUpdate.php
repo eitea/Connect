@@ -1769,6 +1769,14 @@ if($row['version'] < 131){ //14.02.2018
     } else {
         echo '<br>Contact Persons: More Details';
     }
+
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Geschätzte Zeit';
+    }
 }
 
 
