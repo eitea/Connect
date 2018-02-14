@@ -1086,7 +1086,7 @@ function create_tables($conn) {
         firstname VARCHAR(150),
         lastname VARCHAR(150) NOT NULL,
         email VARCHAR(150) NOT NULL,
-        position VARCHAR(250),
+        position INT(6) NOT NULL,
         responsibility VARCHAR(250),
         dial VARCHAR(20),
         faxDial VARCHAR(20),
@@ -1436,6 +1436,14 @@ function create_tables($conn) {
         uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE (hashkey))";
+
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(20) NOT NULL,
+        PRIMARY KEY (id))";
 
     if(!$conn->query($sql)){
         echo $conn->error;

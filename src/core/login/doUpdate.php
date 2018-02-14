@@ -1764,9 +1764,25 @@ if($row['version'] < 131){ //07.02.2018
 
 if($row['version'] < 132){ //14.02.2018
 
+    $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(20) NOT NULL,
+    PRIMARY KEY (id))");
+
+    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    if($result){
+        for($i=0;$i<$result->num_rows;$i++){
+            //TODO merge tables
+        }
+    }
+
+
     $conn->query("ALTER TABLE contactpersons ADD form_of_address ENUM('Herr','Frau') NOT NULL,
-    ADD titel VARCHAR(20),
-    ADD pgpKey TEXT;");
+        ADD titel VARCHAR(20),
+        ADD pgpKey TEXT,
+        CHANGE position position INT(6) NOT NULL;");
+
     
     if ($conn->error) {
         echo $conn->error;

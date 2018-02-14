@@ -577,6 +577,8 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 			<div class="col-sm-10">
 				<table class="table">
 					<thead><tr>
+                    <th><?php echo $lang['FORM_OF_ADDRESS'] ?></th>
+                    <th>Titel</th>
 					<th>Name</th>
 					<th>E-Mail</th>
 					<th>Position</th>
@@ -591,6 +593,8 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 $editmodals = '';
 while ($contactRow = $resultContacts->fetch_assoc()) {
     echo '<tr>';
+    echo '<td>' . $contactRow['form_of_address'] . '</td>';
+    echo '<td>' . $contactRow['titel'] . '</td>';
     echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
     echo '<td>' . $contactRow['email'] . '</td>';
     echo '<td>' . $contactRow['position'] . '</td>';
@@ -1217,7 +1221,9 @@ if ($resF->num_rows > 2) {
 				</div>
 				<div class="row form-group">
 					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-					<div class="col-md-4"><label>Position</label><input type="text" name="contacts_position" placeholder="Position" class="form-control"/></div>
+					<div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="form-control">
+                        
+                    </select></div>
 					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
 				</div>
 				<div class="row form-group">
@@ -1255,6 +1261,9 @@ $('#uidCheck').click(function(e){
 });
 $(".select2").select2({
     minimumResultsForSearch: Infinity
+});
+$(".select2-position").select2({
+
 });
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php';?>
