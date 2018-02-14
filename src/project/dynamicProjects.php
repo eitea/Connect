@@ -55,7 +55,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
-
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
 
@@ -63,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if($microtasks){
                     while($microrow = $microtasks->fetch_assoc()){
                         if($microrow['ischecked']=='FALSE'){
-                            if(isset($_POST["mtask".$microrow['microtaskid']])){ // IS ALLWAYS SET?!?!?!?!
+                            if(isset($_POST["mtask".$microrow['microtaskid']])){ // IS ALLWAYS SET?
                                 $conn->query("UPDATE microtasks SET ischecked='TRUE', finisher = $userID, completed = CURRENT_TIMESTAMP WHERE microtaskid = '".$microrow['microtaskid']."'");
                             }
                         }
@@ -355,31 +354,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         </div>
                     </div>
                     <div class="row">
-                    <div class="col-md-16">
-                        <?php
-                                    $microtasks = $conn->query("SELECT * FROM microtasks WHERE projectid = '".$occupation['dynamicID']."'");
-                                    if($microtasks){
-                                    echo '<table id="microlist" class="dataTable table">';
-                                    echo '<thead><tr>';
-                                    echo '<td>Completed</td>';
-                                    echo '<td>Micro Task</td>';
-                                    echo '</tr></thead>';
-                                    echo '<tbody>';
-                                    while($mtask = $microtasks->fetch_assoc()){
-                                        if($mtask['ischecked']=='FALSE'){
+                        <div class="col-md-12">
+                            <?php
+                            $microtasks = $conn->query("SELECT * FROM microtasks WHERE projectid = '".$occupation['dynamicID']."'");
+                            if($microtasks){
+                                echo '<table id="microlist" class="dataTable table">';
+                                echo '<thead><tr>';
+                                echo '<td>Completed</td>';
+                                echo '<td>Micro Task</td>';
+                                echo '</tr></thead>';
+                                echo '<tbody>';
+                                while($mtask = $microtasks->fetch_assoc()){
+                                    if($mtask['ischecked']=='FALSE'){
                                         $mid = $mtask['microtaskid'];
                                         $title = $mtask['title'];
                                         echo '<tr><td>';
                                         echo '<input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
                                         echo '<td><label>'.$title.'</label></td>';
                                         echo '</tr>';
-                                        }
                                     }
-                                    echo '</tbody>';
-                                    echo '</table>';
-                                    }
-                        ?>
-                    </div>
+                                }
+                                echo '</tbody>';
+                                echo '</table>';
+                            }
+                            ?>
+                        </div>
                     </div>
                     <div class="row">
                         <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
@@ -571,25 +570,6 @@ function dynamicOnLoad(modID){
             };
             input.click();
         }
-    });
-    $(".convert-estimate").click(function(event){
-        var str = $('#estimatedHours-'+$(this).val()).val();
-        var hours = 0;
-
-        if(val = /^\d+(?:(?:\.|,)\d+)?(?: |!.|$)/.exec(str)){
-            hours = parseInt(val[0].slice(0,-1));
-        }
-        if(val = /\d+m/.exec(str)){
-            hours += parseInt(val[0].slice(0,-1)) / 60;
-        }
-        if(val = /\d+t/.exec(str)){
-            hours += parseInt(val[0].slice(0,-1)) * 24;
-        }
-        if(val = /\d+w/.exec(str)){
-            hours += parseInt(val[0].slice(0,-1)) * 24 * 7;
-        }
-
-        $('#estimatedHours-'+$(this).val()).val(hours);
     });
 } //end dnymaicOnLoad()
 

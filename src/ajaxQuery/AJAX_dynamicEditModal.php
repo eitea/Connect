@@ -160,18 +160,23 @@ if($x){
                                     <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Geschätzte Zeit <small>(Stunden)</small></label>
-                                    <div class="input-group">
-                                        <input id="estimatedHours-<?php echo $x; ?>" type='text' class="form-control" value="<?php echo $dynrow['estimatedHours']; ?>" name="estimatedHours" title="Angaben in Stunden umawndeln" />
-                                        <span class="input-group-btn">
-                                            <button type="button" class="btn btn-default convert-estimate" value="<?php echo $x; ?>"><i class="fa fa-refresh"></i></button>
-                                        </span>
-                                    </div>
-                                    <small>7m = 7 Minuten, 1t = 1 Tag, 2w = 2 Wochen</small><br>
+                                    <label>Geschätzte Zeit <a data-toggle="collapse" href="#estimateCollapse-<?php echo $x; ?>"><i class="fa fa-question-circle-o"></i></a></label>
+                                    <input type="text" class="form-control" value="<?php echo $dynrow['estimatedHours']; ?>" name="estimatedHours" /><br>
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["BEGIN"]; ?>*</label>
                                     <input type='text' class="form-control datepicker" name='start' placeholder='Anfangsdatum' value="<?php echo $dynrow['projectstart']; ?>" /><br>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="collapse" id="estimateCollapse-<?php echo $x; ?>">
+                                        <div class="well">
+                                            Die <strong>Geschätzte Zeit</strong> wird per default in Stunden angegeben. D.h. 120 = 120 Stunden. <br>
+                                            Mit "m", "t", "w" oder "M" können genauere Angaben gemacht werden: z.B. 2M für 2 Monate, 7m = 7 Minuten, 4t = 4 Tage und 6w = 6 Wochen.<br>
+                                            Konkret: "2M 3w 50" würde also für 2 Monate, 3 Wochen und 50 Stunden stehen. (Alle anderen Angaben werden gespeichert, aber vom Programm ignoriert)
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">

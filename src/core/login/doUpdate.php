@@ -1660,14 +1660,13 @@ if($row['version'] < 129){ //31.01.2018
 }
 
 if($row['version'] < 130){ //01.02.2018
-
     $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projecttags VARCHAR(250) DEFAULT '' NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>';
+        echo '<br>Tasks: Tags';
     }
-    
+
     $conn->query("CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
         microtaskid varchar(100) NOT NULL,
@@ -1704,9 +1703,13 @@ if($row['version'] < 130){ //01.02.2018
     } else {
         echo '<br>Email-Projects: Rulesets';
     }
-
-
 }
+
+if($row['version'] < 130){}
+if($row['version'] < 131){}
+if($row['version'] < 132){}
+if($row['version'] < 133){}
+if($row['version'] < 134){}
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

@@ -49,6 +49,8 @@ if ($result) {
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
     $userKeyCode = $row['keyCode'];
+} else {
+    echo $conn->error;
 }
 
 $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
@@ -129,7 +131,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
             if($newMasterPass) $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
-            $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
+            if(!$conn->error){
+                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
+            } else {
+                $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
         } else {
             $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
         }
