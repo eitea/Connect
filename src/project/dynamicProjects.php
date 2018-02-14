@@ -142,14 +142,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
-                $estimate = floatval($_POST['estimatedHours']);
+                $estimate = test_input($_POST['estimatedHours']);
                 $skill = intval($_POST['projectskill']);
                 if(!empty($_POST['projecttags'])){
                     $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
                 }else{
                     $tags = '';
                 }
-                
+
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
@@ -181,7 +181,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                     projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param("ssbiiissssisiisbidis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
+                $stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -567,7 +567,7 @@ function dynamicOnLoad(modID){
         init_instance_callback: function (editor) {
             editor.on('paste', function (e) {
                 console.log('Here');
-                
+
                 console.log(e.clipboardData.types.includes("text/rtf"));
                 if(e.clipboardData.types.includes("text/rtf")){
                     var clipboardData, pastedData;
@@ -713,9 +713,9 @@ $(document).ready(function() {
         },
         paging: false
     });
-    setTimeout(function(){ 
-        window.dispatchEvent(new Event('resize')); 
-        $('.table').trigger('column-reorder.dt'); 
+    setTimeout(function(){
+        window.dispatchEvent(new Event('resize'));
+        $('.table').trigger('column-reorder.dt');
         }, 500);
 });
 
