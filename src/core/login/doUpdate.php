@@ -1667,7 +1667,7 @@ if($row['version'] < 130){ //01.02.2018
     } else {
         echo '<br>';
     }
-    
+
     $conn->query("CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
         microtaskid varchar(100) NOT NULL,
@@ -1708,8 +1708,7 @@ if($row['version'] < 130){ //01.02.2018
 
 }
 
-if($row['version'] < 131){ //07.02.2018
-
+if($row['version'] < 131){ //14.02.2018
     $conn->query("CREATE TABLE archive_folders (
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,
@@ -1760,9 +1759,6 @@ if($row['version'] < 131){ //07.02.2018
     } else {
         echo '<br>Forced Change Password';
     }
-}
-
-if($row['version'] < 132){ //14.02.2018
 
     $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
     name VARCHAR(20) NOT NULL,
