@@ -1458,8 +1458,8 @@ if ($row['version'] < 124) {
     $id = $conn->query("SELECT * FROM identification");
     $identifier = $id->fetch_assoc()['id'];
     $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = "'.$identifier.'";
-    $s3SharedFiles=$identifier."_sharedFiles";
+    $txt = '$identifier = \''.$identifier.'\';
+    $s3SharedFiles=$identifier.\'_sharedFiles\';
     $s3uploadedFiles=$identifier."_uploadedFiles";';
     fwrite($myfile, $txt);
     fclose($myfile);

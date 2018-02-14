@@ -500,23 +500,6 @@ $("#microlist input[type='checkbox']").change(function(){
     }
 });
 
-$("#bookRanger").change(function(event){
-    console.log("'Range' \n");
-    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
-    if(event.currentTarget.value>event.currentTarget.max){
-        event.currentTarget.value=event.currentTarget.max;
-    }
-});
-
-$("#bookCompleted").change(function(event){
-    console.log("'Number' \n");
-    console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
-    if(event.currentTarget.value>event.currentTarget.max){
-        event.currentTarget.value=event.currentTarget.max;
-    }
-    $("#bookRanger").val(event.currentTarget.value);
-});
-
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
         $("#bookCompleted").prop('value',99);

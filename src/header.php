@@ -99,14 +99,14 @@ $validation_output = $error_output = '';
 $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
-             SELECT userID 
-             FROM dsgvo_training_completed_questions 
+             SELECT userID
+             FROM dsgvo_training_completed_questions
              WHERE questionID = tq.id AND userID = $userID
          )
-        UNION 
+        UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
-             SELECT userID 
-             FROM dsgvo_training_completed_questions 
+             SELECT userID
+             FROM dsgvo_training_completed_questions
              WHERE questionID = tq.id AND userID = $userID
          )
     ) temp"
@@ -118,14 +118,14 @@ if($userHasUnansweredSurveys){
     $result = $conn->query(
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                 SELECT userID 
-                 FROM dsgvo_training_completed_questions 
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
                  WHERE questionID = tq.id AND userID = $userID
              )
-            UNION 
+            UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                 SELECT userID 
-                 FROM dsgvo_training_completed_questions 
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
                  WHERE questionID = tq.id AND userID = $userID
              )
         ) temp"
@@ -370,50 +370,6 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                       <i class="fa fa-commenting"></i>
                       <span class="badge pull-right alert-badge" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
                       </a>
-                      <script>
-                      var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
-                      setInterval(function(){
-                          $.ajax({
-                              url: 'ajaxQuery/AJAX_socialGetAlerts.php',
-                              type: 'GET',
-                              success: function (response) {
-                                  $("#numberOfSocialAlerts").html(response)
-                                  if(response == "0"){
-                                      $("#numberOfSocialAlerts").hide()
-                                      alertsBeforeUpdate = parseInt(response)
-                                  }else{
-                                      $("#numberOfSocialAlerts").show()
-                                      var alertDifference = parseInt(response) - alertsBeforeUpdate
-                                      alertsBeforeUpdate = parseInt(response)
-                                      if(alertDifference > 0){
-                                          generateNotification(parseInt(response),alertDifference)
-                                      }
-                                  }
-                              },
-                          });
-                      },10000) //10 seconds
-
-                      function generateNotification(messages, newMessages){
-                          var image = 'images/messageIcon.png';
-                          var options = {
-                              body: newMessages + " new\n"+messages+" unread",
-                              icon: image,
-                              tag: "tagToUpdateNotification",
-                              badge: image
-                          }
-                          var n = new Notification('Connect Social',options);
-                          setTimeout(n.close.bind(n), 5000);
-                          n.onclick = function(){
-                              console.info("Click");
-                          }
-                          n.onerror = function(){
-                              console.warn("Error while displaying notification");
-                          }
-                          n.onshow = function(){
-                              console.info("Show");
-                          }
-                      }
-                      </script>
                   <?php else: ?>
                       <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
                   <?php endif;?>
