@@ -291,7 +291,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
-            echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
+            if(!preg_match('/\[Training \d+\]/',$row['projectname'])){
+                echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
+            }else{
+                echo '<td></td>';
+            }
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
@@ -333,12 +337,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 echo '<button class="btn btn-default" onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
+            } elseif(($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking)&&!preg_match('/\[Training \d+\]/',$row['projectname'])){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
             }
-            if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) {
+            if(($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID)&&!preg_match('/\[Training \d+\]/',$row['projectname'])) { //don't show edit tools for trainings
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
+            }
+            if(preg_match('/\[Training \d+\]/',$row['projectname'])){
+                echo '<a type="button" id="openSurvey" class="btn btn-default"><i class="fa fa-question-circle"></i></a>';
             }
 
             echo '</form></td>';
@@ -537,13 +544,13 @@ function dynamicOnLoad(modID){
     });
     tinymce.init({
         selector: '.projectDescriptionEditor',
-        plugins: 'image code ',
+        plugins: 'image code paste emoticons table',
         relative_urls: false,
         paste_data_images: true,
         menubar: false,
         statusbar: false,
         height: 300,
-        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code | InsertMicroTask',
+        toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
             function insertMicroTask(){
                 var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";

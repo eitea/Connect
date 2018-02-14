@@ -96,6 +96,43 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
+        UNION 
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
+    ) temp"
+);
+echo $conn->error;
+$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredOnLoginSurveys = false;
+if($userHasUnansweredSurveys){
+    $result = $conn->query(
+        "SELECT count(*) count FROM (
+            SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+            UNION 
+            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+        ) temp"
+    );
+    echo $conn->error;
+    $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
@@ -385,6 +422,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                           <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
                       </a>
                   <?php endif;?>
+                  <?php if($userHasUnansweredSurveys): ?>
+                <!--  <a type="button" id="openSurvey" class="btn navbar-btn navbar-link"><i class="fa fa-question-circle"></i></a> (surveys now moved to tasks) -->
+                  <?php endif; ?>
                   <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
@@ -991,7 +1031,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
-
+                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung/Training</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1003,6 +1043,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
+                    echo '<li><a href="../dsgvo/training?n='.$row['id'].'" >Schulung/Training</a></li>';
                     echo '</ul></div></li>';
                   }
                 }
@@ -1012,7 +1053,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php") {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
@@ -1042,7 +1083,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     </div> <!-- /accordions -->
     <br><br><br>
   </div>
-    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 </div>
 <!-- /side menu -->
 
