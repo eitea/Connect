@@ -506,15 +506,20 @@ $("#bookCompleted").change(function(event){
     console.log("'Number' \n");
     console.log(event.currentTarget.value + "\n" + event.currentTarget.max);
     if(event.currentTarget.value>event.currentTarget.max){
-        event.currentTarget.value=event.currentTarget.max;
+        event.target.value=event.currentTarget.max;
     }
-    $("#bookRanger").val(event.currentTarget.value);
+    $("#bookRanger").val(event.target.value);
+    console.log(event);
 });
 
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
-        $("#bookCompleted").prop('value',99);
-        console.log('LOOOG');
+        if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
+            $("#bookCompletedCheckbox").prop('checked', true);
+        }else{
+            $("#bookCompleted").prop('value',99);
+            console.log('LOOOG');
+        }
     } else {
         $("#bookCompletedCheckbox").prop('checked', false);
     }

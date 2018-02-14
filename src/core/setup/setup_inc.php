@@ -613,7 +613,7 @@ function create_tables($conn) {
         companyID INT(6) UNSIGNED,
         FOREIGN KEY (companyID) REFERENCES companyData(id),
         leader INT(6),
-        leaderreplacement INT(6)
+        leaderreplacement INT(6),
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
@@ -1447,5 +1447,7 @@ function create_tables($conn) {
 
     if(!$conn->query($sql)){
         echo $conn->error;
+    }else{
+        $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     }
 }

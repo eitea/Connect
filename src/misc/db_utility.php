@@ -13,6 +13,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             echo "\n" . $e;
         }
     }
+    if($_POST['function']==="addPosition"){
+        $name = $_POST['name'];
+        try{
+            $conn->query("INSERT INTO position (name) VALUES ('$name')");
+            if($conn->error){
+                echo $conn->error;
+            }else{
+                $id = $conn->insert_id;
+                $data = [ 'id' => $id, 'name' => $name];
+                echo json_encode($data);
+            }
+        }catch(Exception $e){
+            echo "\n" . $e;
+        }
+    }
     
 }
 ?>

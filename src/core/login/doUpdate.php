@@ -1458,7 +1458,7 @@ if ($row['version'] < 124) {
     $id = $conn->query("SELECT * FROM identification");
     $identifier = $id->fetch_assoc()['id'];
     $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = "'.$identifier.'";
+    $txt = '$identifier = "'.hash('sha1',$identifier).'";
     $s3SharedFiles=$identifier."_sharedFiles";
     $s3uploadedFiles=$identifier."_uploadedFiles";';
     fwrite($myfile, $txt);
@@ -1756,21 +1756,6 @@ if($row['version'] < 131){ //14.02.2018
     name VARCHAR(20) NOT NULL,
     PRIMARY KEY (id))");
 
-    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
-    if($result){
-        for($i=0;$i<$result->num_rows;$i++){
-            //TODO merge tables
-        }
-    }
-
-
-    $conn->query("ALTER TABLE contactpersons ADD form_of_address ENUM('Herr','Frau') NOT NULL,
-        ADD titel VARCHAR(20),
-        ADD pgpKey TEXT,
-        CHANGE position position INT(6) NOT NULL;");
-
     
     if ($conn->error) {
         echo $conn->error;
@@ -1786,7 +1771,19 @@ if($row['version'] < 131){ //14.02.2018
         echo '<br>Tasks: Geschätzte Zeit';
     }
 }
+if($row['version'] < 132){ //14.02.2018
+    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    if($result){
+        while($row = $result->fetch_assoc()){
+            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+        }
+    }
 
+
+    $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
+}
 
 // ------------------------------------------------------------------------------
 
