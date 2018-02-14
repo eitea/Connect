@@ -1762,6 +1762,18 @@ if($row['version'] < 131){ //07.02.2018
     }
 }
 
+if($row['version'] < 132){ //14.02.2018
+
+    $conn->query("ALTER TABLE contactpersons ADD form_of_address ENUM('Herr','Frau') NOT NULL,
+    ADD titel VARCHAR(20),
+    ADD pgpKey TEXT;");
+    
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Contact Persons: More Details';
+    }
+}
 
 
 // ------------------------------------------------------------------------------

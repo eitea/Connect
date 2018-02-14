@@ -531,6 +531,9 @@ $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
 $lang_eng['FOOT_NOTE'] = 'Foot Note';
 $lang_ger['FOOT_NOTE'] = 'Fußzeile';
 
+$lang_eng['FORM_OF_ADDRESS'] = 'Form of Address';
+$lang_ger['FORM_OF_ADDRESS'] = 'Anrede';
+
 $lang_eng['FORWARDED'] = 'Forwarded';
 $lang_ger['FORWARDED'] = 'Weitergeleitet';
 
