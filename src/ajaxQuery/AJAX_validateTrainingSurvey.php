@@ -40,13 +40,40 @@ foreach ($result as $questionID => $answer) {
 }
 ?>
 
-<table class="table table-hover">
-    <tr class="success">
-        <th>Right</th>
-        <td><?php echo $right ?></td>
-    </tr>
-    <tr class="danger">
-        <th>Wrong</th>
-        <td><?php echo $wrong ?></td>
-    </tr>
-</table>
+<script src="plugins/chartsjs/Chart.min.js"></script>
+<canvas id="myChart" width="600" height="300"></canvas>
+<script>
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [
+                    <?php echo $right ?>,
+                    <?php echo $wrong ?>
+                ],
+                backgroundColor: [
+                    "green","red"
+                ],
+            }],
+            labels: [
+                "Right","Wrong"
+            ]
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Results'
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    }
+)
+</script>

@@ -3,8 +3,8 @@
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
-// A "training" is a group of questions (set)
-// A Question is a text with different answers
+// A training is a group of questions (set)
+// A question is a text with different answers
 
 $trainingID = 0;
 $companyID = intval($_REQUEST['n']);
@@ -15,6 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $trainingID = mysqli_insert_id($conn);
     } elseif(isset($_POST['removeTraining'])){
         $trainingID = intval($_POST['removeTraining']);
+        deleteProject($trainingID);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
     } elseif(isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])){
         $trainingID = intval($_POST['addQuestion']);
@@ -67,6 +68,73 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
             }
         }
+        // INSERT INTO TASKS
+        foreach ($_POST["employees"] as $employee) {
+            $emp_array = explode(";", $employee);
+            if ($emp_array[0] == "user") {
+                addProject(intval($emp_array[1]));
+            } else { //team
+                $teamID = intval($emp_array[1]);
+                $result = $conn->query("SELECT userID FROM teamRelationshipData WHERE teamID = $teamID");
+                while($row = $result->fetch_assoc()){
+                    addProject(intval($row["userID"]));
+                }
+            }
+        }
+    }
+}
+function addProject($user){
+    global $userID;
+    global $conn;
+    global $companyID;
+    $id = uniqid();
+    $start =  date('Y-m-d');
+    $status = 'ACTIVE';
+    $priority = 1;
+    $owner = "$userID";
+    $leader = "$userID";
+    $description = "This is a training";
+    $position = 'normal';
+    $conn->query("DELETE FROM dynamicprojects WHERE projectname = '[Training $user]'");
+    $name = "[Training $user]"; //Name can only be A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ 
+    $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectname, projectid, projectdescription, companyid, projectstart, projectstatus, projectpriority, projectowner, projectleader) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssissiii",$name,$id,$description,$companyID,$start,$status,$priority,$owner,$leader);
+    $stmt->execute();
+    echo $conn->error;
+    echo $stmt->error;
+    $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES (?, ?, ?)");
+    $stmt->bind_param("sis", $id, $user, $position);
+    $stmt->execute();
+    echo $conn->error;
+    echo $stmt->error;
+}
+function deleteProject($trainingID){
+    global $conn;
+  $result= $conn->query( 
+       "SELECT userID FROM dsgvo_training_user_relations 
+        WHERE trainingID = $trainingID
+        UNION
+        SELECT teamRelationshipData.userID
+        FROM dsgvo_training_team_relations 
+        INNER JOIN teamRelationshipData 
+        ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
+        WHERE dsgvo_training_team_relations.trainingID = $trainingID"
+    );
+    while ($row = $result->fetch_assoc()){
+        $user = $row["userID"];
+        $result_inner= $conn->query( 
+            "SELECT userID FROM dsgvo_training_user_relations 
+             WHERE trainingID != $trainingID AND userID = $user 
+             UNION
+             SELECT teamRelationshipData.userID
+             FROM dsgvo_training_team_relations 
+             INNER JOIN teamRelationshipData 
+             ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
+             WHERE dsgvo_training_team_relations.trainingID != $trainingID AND teamRelationshipData.userID = $user"
+         ); //test if user has other trainings
+         if(!$result || $result_inner->num_rows == 0){
+             $conn->query("DELETE FROM dynamicprojects WHERE projectname = '[Training $user]'");
+         }
     }
 }
 $activeTab = $trainingID;

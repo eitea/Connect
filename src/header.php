@@ -94,7 +94,6 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
-//todo only incomplete trainings should be counted
 $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
@@ -418,7 +417,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                       </a>
                   <?php endif;?>
                   <?php if($userHasUnansweredSurveys): ?>
-                  <a type="button" id="openSurvey" class="btn navbar-btn navbar-link"><i class="fa fa-question-circle"></i></a><!-- surveys -->
+                <!--  <a type="button" id="openSurvey" class="btn navbar-btn navbar-link"><i class="fa fa-question-circle"></i></a> (surveys now moved to tasks) -->
                   <?php endif; ?>
                   <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
@@ -1110,33 +1109,3 @@ if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($u
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
 }
 ?>
-
-<?php
-
-if($userHasUnansweredSurveys): //test if user has unanswered surveys
-//todo open automatically if onLogin in table is true
-//todo place button somewhere else
-
-?>
-<div id="currentSurveyModal"></div> <!-- for question and training edit modals -->
-<script>
-$("#openSurvey").click(function(){
-    $.ajax({
-        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
-        data:{<?php echo $userHasUnansweredOnLoginSurveys?"onLogin:true":"" ?>},
-        type: 'get',
-        success : function(resp){
-            $("#currentSurveyModal").html(resp);
-        },
-        error : function(resp){console.error(resp)},
-        complete: function(resp){
-            $("#currentSurveyModal .modal").modal({
-                backdrop: 'static',
-                keyboard: false
-            });
-        }
-   });
-})
-<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ $('#openSurvey').click() },500)";} ?>
-</script>
-<?php endif; ?>

@@ -8,7 +8,39 @@ if(isset($_REQUEST["onLogin"])){
     $onLogin = true;
 }
 
-function strip_questions($html){ // this will be the html type for the survey
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
+        UNION 
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             WHERE questionID = tq.id AND userID = $userID
+         )
+    ) temp"
+);
+echo $conn->error;
+$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+
+if(!$userHasUnansweredSurveys){
+    ?>
+        <div class="modal fade survey-modal">
+            <div class="modal-dialog modal-content modal-md">
+                <div class="modal-header">Sie haben keine offenen Fragen mehr</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    <?php
+    die();
+}
+
+function strip_questions($html){ // this will be the question
     $regexp = '/\{.*?\}/s';
     return preg_replace($regexp, "", $html);
 }
