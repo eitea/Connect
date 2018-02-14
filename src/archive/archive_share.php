@@ -560,8 +560,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       processData: false,
       enctype: 'multipart/form-data',
       complete: function(res){
-        console.log("____________________________________");
-        console.log(res.responseText);
+        // console.log("____________________________________");
+        // console.log(res.responseText);
+        location.href='../archive/share';
       }
     });
   }
