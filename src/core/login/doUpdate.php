@@ -1660,7 +1660,6 @@ if($row['version'] < 129){ //31.01.2018
 }
 
 if($row['version'] < 130){ //01.02.2018
-
     $conn->query("ALTER TABLE dynamicprojects ADD COLUMN projecttags VARCHAR(250) DEFAULT '' NOT NULL");
     if ($conn->error) {
         echo $conn->error;
@@ -1704,8 +1703,6 @@ if($row['version'] < 130){ //01.02.2018
     } else {
         echo '<br>Email-Projects: Rulesets';
     }
-
-
 }
 
 if($row['version'] < 131){ //14.02.2018
@@ -1714,7 +1711,7 @@ if($row['version'] < 131){ //14.02.2018
         userid INT(6) NOT NULL,
         name VARCHAR(30) NOT NULL,
         parent_folder INT(6) NOT NULL,
-        PRIMARY KEY (userid, folderid),
+        UNIQUE KEY user_folder (userid, folderid),
         INDEX (parent_folder))");
     $conn->query("CREATE TABLE archive_editfiles (
         hashid VARCHAR(32) NOT NULL,
@@ -1722,29 +1719,24 @@ if($row['version'] < 131){ //14.02.2018
         version INT(6) NOT NULL DEFAULT 1,
         PRIMARY KEY (hashid,version))");
     $conn->query("CREATE TABLE archive_savedfiles (
-        id INT(12) NOT NULL AUTO_INCREMENT,
+        id INT(12) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         type VARCHAR(10) NOT NULL,
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,
-        hashkey` VARCHAR(32) NOT NULL,
+        hashkey VARCHAR(32) UNIQUE NOT NULL,
         filesize BIGINT(20) NOT NULL,
         uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL,
-        PRIMARY KEY (id),
-        UNIQUE (hashkey))");
-    $users = $conn->query("SELECT id FROM userdata");
-    while($userid = $users->fetch_assoc()){
-        $conn->query("INSERT INTO archive_folders VALUES(0,".intval($userid).",'ROOT',-1)");
-    }
+        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL)");
 
+    $conn->query("INSERT INTO archive_folders(folderid, userid, name, parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Private Archive: Data Tables';
     }
 
-    $conn->query("DELETE FROM taskdata WHERE id = 4");
+    $conn->query("DELETE FROM taskData WHERE id = 4");
 
     if ($conn->error) {
         echo $conn->error;
@@ -1752,7 +1744,7 @@ if($row['version'] < 131){ //14.02.2018
         echo '<br>BugFix: Email Tasks';
     }
 
-    $conn->query("ALTER TABLE userdata  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
+    $conn->query("ALTER TABLE UserData  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
 
     if ($conn->error) {
         echo $conn->error;
@@ -1784,6 +1776,14 @@ if($row['version'] < 131){ //14.02.2018
         echo $conn->error;
     } else {
         echo '<br>Contact Persons: More Details';
+    }
+
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Geschätzte Zeit';
     }
 }
 
