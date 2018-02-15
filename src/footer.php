@@ -9,7 +9,7 @@
 ?>
 <div id="currentSurveyModal"></div>
 <script>
-$("#openSurvey").click(function(){
+$(".openSurvey").click(function(){
     openSurveyModal()
 })
 function openSurveyModal(){
