@@ -1415,12 +1415,11 @@ function create_tables($conn) {
         version INT(6) DEFAULT 0,
         onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
-        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
-    )";
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE)";
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
+	
     $sql = "CREATE TABLE dsgvo_training_questions (
         id int(6) NOT NULL AUTO_INCREMENT,
         title varchar(100),
@@ -1443,7 +1442,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
+	
     $sql = "CREATE TABLE dsgvo_training_team_relations (
         trainingID int(6),
         teamID INT(6) UNSIGNED,
@@ -1454,7 +1453,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
+	
     $sql = "CREATE TABLE dsgvo_training_completed_questions (
         questionID int(6),
         userID INT(6) UNSIGNED,
@@ -1463,6 +1462,9 @@ function create_tables($conn) {
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 
     $sql = "CREATE TABLE archive_folders (
         folderid INT(6) NOT NULL,
@@ -1473,6 +1475,8 @@ function create_tables($conn) {
         INDEX (parent_folder))";
     if(!$conn->query($sql)){
         echo $conn->error;
+    }else{
+		$conn->query("INSERT INTO archive_folders (folderid,userid,name,parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
     }
     $sql = "CREATE TABLE archive_editfiles (
         hashid VARCHAR(32) NOT NULL,
@@ -1492,10 +1496,21 @@ function create_tables($conn) {
         hashkey VARCHAR(32) NOT NULL,
         filesize BIGINT(20) NOT NULL,
         uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL,
         PRIMARY KEY (id),
         UNIQUE (hashkey))";
 
     if(!$conn->query($sql)){
         echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(20) NOT NULL,
+        PRIMARY KEY (id))";
+
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }else{
+        $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     }
 }

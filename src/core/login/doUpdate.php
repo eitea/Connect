@@ -1458,9 +1458,10 @@ if ($row['version'] < 124) {
     $id = $conn->query("SELECT * FROM identification");
     $identifier = $id->fetch_assoc()['id'];
     $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = \''.$identifier.'\';
+    $txt = '$identifier = \''.hash('sha1',$identifier).'\';
     $s3SharedFiles=$identifier.\'_sharedFiles\';
-    $s3uploadedFiles=$identifier."_uploadedFiles";';
+    $s3uploadedFiles=$identifier.\'_uploadedFiles\';
+    $s3privateFiles=$identifier.\'_privateFiles\'';
     fwrite($myfile, $txt);
     fclose($myfile);
 
@@ -1752,10 +1753,11 @@ if($row['version'] < 131){ //14.02.2018
         echo '<br>Forced Change Password';
     }
 
-    $conn->query("ALTER TABLE contactPersons ADD form_of_address ENUM('Herr','Frau') NOT NULL,
-    ADD titel VARCHAR(20),
-    ADD pgpKey TEXT;");
+    $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(20) NOT NULL,
+    PRIMARY KEY (id))");
 
+    
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1839,8 +1841,17 @@ if($row['version'] < 131){ //14.02.2018
     }
 }
 
-
-if($row['version'] < 132){}
+if($row['version'] < 132){//14.02.2018
+    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    if($result){
+        while($row = $result->fetch_assoc()){
+            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+        }
+    }
+    $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
+}
 if($row['version'] < 133){}
 if($row['version'] < 134){}
 

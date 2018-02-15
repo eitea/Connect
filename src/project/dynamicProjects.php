@@ -299,11 +299,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
-            if(!preg_match('/\[Training \d+\]/',$row['projectname'])){
-                echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
-            } else {
-                echo '<td></td>';
-            }
+            echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
@@ -345,15 +341,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 echo '<button class="btn btn-default" onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif(($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking)&&!preg_match('/\[Training \d+\]/',$row['projectname'])){ //only if project is active, this task is not already in use and this user has no other active bookings
+            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
             }
-            if(($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID)&&!preg_match('/\[Training \d+\]/',$row['projectname'])) { //don't show edit tools for trainings
+            if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
-            }
-            if(preg_match('/\[Training \d+\]/',$row['projectname'])){
-                echo '<a type="button" id="openSurvey" class="btn btn-default"><i class="fa fa-question-circle"></i></a>';
             }
 
             echo '</form></td>';
@@ -361,6 +354,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
 
         ?>
+        <!--training-->
+        <?php if($userHasUnansweredSurveys): ?>
+            <tr>
+                <td><i style="color: #efefef" class="fa fa-circle"></i>Unbeantwortete Schulung<div></div></td>
+                <td><a type="button" class="btn btn-default openSurvey">View</a></td>
+                <td>-</td>
+                <td><?=date("Y-m-d")?></td>
+                <td></td>
+                <td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>
+                <td>ACTIVE</td>
+                <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
+                <td>-</td>
+                <td>-</td>
+                <td><input type="checkbox" disabled /></td>
+                <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
+
+
+            </tr>
+        <?php endif; ?>
+        <!--/training-->
     </tbody>
 </table>
 
@@ -513,7 +526,11 @@ $("#microlist input[type='checkbox']").change(function(){
 
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
-        $("#bookCompleted").prop('value',99);
+        if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
+            $("#bookCompletedCheckbox").prop('checked', true);
+        } else {
+            $("#bookCompleted").prop('value',99);
+        }
     } else {
         $("#bookCompletedCheckbox").prop('checked', false);
     }

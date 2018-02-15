@@ -378,9 +378,6 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                           <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
                       </a>
                   <?php endif;?>
-                  <?php if($userHasUnansweredSurveys): ?>
-                <!--  <a type="button" id="openSurvey" class="btn navbar-btn navbar-link"><i class="fa fa-question-circle"></i></a> (surveys now moved to tasks) -->
-                  <?php endif; ?>
                   <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>

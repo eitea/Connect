@@ -262,48 +262,48 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         dragenter: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragenter");
+            //console.log("dragenter");
             $("#dropbox").addClass('highlight');
         },
         dragleave: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragleave");
+            //console.log("dragleave");
             $("#dropbox").removeClass('highlight');
         },
         drop: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log(event);
+            //console.log(event);
         }
     });
     $(".folder").on({
         dragenter: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragenter");
+            //console.log("dragenter");
             $(this).addClass('highlight');
         },
         dragleave: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragleave");
+            //console.log("dragleave");
             $(this).removeClass('highlight');
         },
         dragstart: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragstart");
+            //console.log("dragstart");
         },
         dragend: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log("dragend");
+            //console.log("dragend");
         },
         drop: function(event){
             event.preventDefault();  
             event.stopPropagation();
-            console.log(event);
+            //console.log(event);
         },
     });
     $(document).ready(function(){
@@ -340,7 +340,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         // necessary, as we are looking to handle it internally.
                         var id = 'blobid' + (new Date()).getTime();
                         var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                        console.log(reader.result.split(";")[0].split(":")[1]) //mime type
+                        //console.log(reader.result.split(";")[0].split(":")[1]) //mime type
                         var base64 = reader.result.split(',')[1];
                         alert("Base64 size: "+base64.length+" chars")
                         var blobInfo = blobCache.create(id, file, base64);
@@ -377,7 +377,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function changeFolder(event){
         if(event.target.nodeName=="TD"){
             var id = event.target.parentElement.folderID;
-            console.log(event);
+            //console.log(event);
             document.getElementById("currentFolder").value = id;
             var deleteE = document.getElementById("parentid");
             var form = document.getElementById("docForm");
@@ -480,7 +480,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     function uploadFiles(element){
         //Upload selected files
-        console.log(element.files);
+        //console.log(element.files);
         //evt.preventDefault();
         var formData = new FormData();
         var fileIndex = [];
@@ -503,7 +503,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         processData: false,
         success: function(response){
             //alert(response);
-            console.log(response);
+            //console.log(response);
             getCurrentFolderContent();
         }
         });
@@ -516,16 +516,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     id: id[i],
                     function: "deleteFile",
                 },function(data){
-                    console.log(data);
+                    getCurrentFolderContent();
                 });
             }
-            
         }else{
             $.post("../private/files",{
                 id: id,
                 function: "deleteFile",
             },function(data){
-                
+                getCurrentFolderContent();
             });
         }
     }
@@ -564,13 +563,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function deleteFolder(id){
         
 
-            console.log(id);
+            //console.log(id);
             $.post("../private/files",{
                 id: id,
                 userID: <?php echo $userID ?>,
                 function: "deleteFolder"
             },function(data){
-                console.log(data);
+                //console.log(data);
                 ids = JSON.parse(data);
                 deleteFile(ids);
             });
@@ -610,17 +609,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         });
     }
     function deleteSelected(){
-        if(window.confirm("Are you sure you want to delete this Folder?")){
             var selectedFiles = $("#tableContent :checked");
             for(i=0;i<selectedFiles.length;i++){
                 element = selectedFiles[i].parentElement.parentElement;
-                console.log(element);
+                //console.log(element);
                 if(element.classList.contains("file")){
                     deleteFile(element.fileID)
                 }else{
+                if(window.confirm("Are you sure you want to delete this Folder?")){
                     deleteFolder(element.folderID)
                 }
+                    
             }
+        
         }
         getCurrentFolderContent();
     }
@@ -630,7 +631,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var folderID = selectedFolder.tags[0];
         for(i=0;i<selectedNodes.length;i++){
             element = selectedNodes[i].parentElement.parentElement;
-            console.log(element);
+            //console.log(element);
             if(element.classList.contains("file")){
                 moveFile(element.fileID,folderID)
             }else{
@@ -644,7 +645,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             folder: folderid,
             function: "moveFile"
         },function(data){
-            console.log(data);
+            //console.log(data);
             getCurrentFolderContent();
         });
     }
@@ -658,7 +659,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             userID: <?php echo $userID ?>,
             function: "getFolders"
         },function(data){
-            console.log('['+data+']');
+            //console.log('['+data+']');
             $("#folderTree").treeview({
             data: '['+data+']',
             

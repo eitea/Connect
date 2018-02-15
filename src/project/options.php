@@ -17,7 +17,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $service = test_input($_POST['service']);
         $username = test_input($_POST['username']);
         $password = test_input($_POST['password']);
-        $logging = $_POST['logging']=="on" ? 'TRUE' : 'FALSE';
+        $logging = isset($_POST['logging']) ? 'TRUE' : 'FALSE';
         $conn->query("INSERT INTO emailprojects(server,port,service,smtpSecure,username,password,logEnabled) VALUES('$server','$port','$service','$security','$username','$password','$logging') ");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
@@ -199,7 +199,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         <div class="col-md-12"><label>Subject Filter*</label><input id="Identifier" class="form-control required-field" type="text" name="name" placeholder="<?php echo $lang['FILTER_PLACEHOLDER'] ?>" /><small style="margin-bottom:50px;" ><?php echo $lang['FILTER_HELP'] ?><br></small><br></div>
                             <div class="row">
                                 <?php
-                                if(count($available_companies ) > 2){
+                                
                                     $result_fc = mysqli_query($conn, "SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
                                     echo '<div class="col-sm-4"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" id="Company" name="filterCompany" onchange="showClients(this.value, \''.$userID.'\', \'clientHint\');" >';
                                     echo '<option value="0">...</option>';
@@ -208,7 +208,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                         echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
                                     }
                                     echo '</select></div>';
-                                }
+                                
                                 ?>
                                 <div class="col-sm-4">
                                     <label><?php echo $lang['CLIENT']; ?></label>
@@ -328,7 +328,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div><!-- /modal-body -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
+        <button type="button" class="btn btn-warning" onclick="addRuleFunc()" name="addRule"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
     </form>
@@ -371,7 +371,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function changeIdForRule(id){
         document.getElementById("emailId").setAttribute("value", id);
     }
-    function addRule(){
+    function addRuleFunc(){
+        if(!document.getElementById("Identifier").value) return false;
         var Employees = [];
         var OEmployees = [];
         for(i=0;i<document.getElementById("Employees").selectedOptions.length;i++){
@@ -380,11 +381,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         for(i=0;i<document.getElementById("Opt. Employees").selectedOptions.length;i++){
             OEmployees.push(document.getElementById("Opt. Employees").selectedOptions[i].value);
         }
+        var Company = document.getElementById("Company").selectedOptions.length>0 ? document.getElementById("Company").selectedOptions[0].value : null;
+        var Client = document.getElementById("clientHint").selectedOptions.length>0 ? document.getElementById("clientHint").selectedOptions[0].value : null;
+        var ClientProject = document.getElementById("projectHint").selectedOptions.length>0 ? document.getElementById("projectHint").selectedOptions[0].value : null;
         $.post("../misc/newrule",{
             Identifier: document.getElementById("Identifier").value,
-            Company: document.getElementById("Company").selectedOptions[0].value,
-            Client: document.getElementById("clientHint").selectedOptions[0].value,
-            ClientProject: document.getElementById("projectHint").selectedOptions[0].value,
+            Company: Company,
+            Client: Client,
+            ClientProject: ClientProject,
             Color: document.getElementById("Color").value,
             Status: document.getElementById("Status").selectedOptions[0].value,
             Priority: document.getElementById("Priority").selectedOptions[0].value,
@@ -395,8 +399,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Leader: document.getElementById("Task-Leader").selectedOptions[0].value,
             id: document.getElementById("emailId").value,
         }, function(data){
-            console.log(data);
+            //console.log(data);
             editRules(null,data);
+            $("#add-rule").modal("hide");
         });
     }
     function editRules(event,id){

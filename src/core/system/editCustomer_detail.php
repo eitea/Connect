@@ -344,7 +344,7 @@ if (!empty($_POST['saveAll'])) {
     $firstname = test_input($_POST['contacts_firstname']);
     $lastname = test_input($_POST['contacts_lastname']);
     $mail = test_input($_POST['contacts_email']);
-    $position = test_input($_POST['contacts_position']);
+    $position = intval($_POST['contacts_position']);
     $resp = test_input($_POST['contacts_responsibility']);
     $dial = test_input($_POST['contacts_dial']);
     $faxDial = test_input($_POST['contacts_faxDial']);
@@ -353,7 +353,7 @@ if (!empty($_POST['saveAll'])) {
         $titel = test_input($_POST['contacts_titel']);
         $pgp = trim($_POST['contacts_pgp']);
         $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, form_of_address, titel, pgpKey)
-        VALUES ($filterClient, '$firstname', '$lastname', '$mail', '$position', '$resp', '$dial', '$faxDial', '$phone', '$gender', '$titel', '$pgp')");
+        VALUES ($filterClient, '$firstname', '$lastname', '$mail', $position, '$resp', '$dial', '$faxDial', '$phone', '$gender', '$titel', '$pgp')");
     if ($conn->error) {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
     } else {
@@ -364,7 +364,7 @@ if (!empty($_POST['saveAll'])) {
     $firstname = test_input($_POST['edit_contacts_firstname']);
     $lastname = test_input($_POST['edit_contacts_lastname']);
     $mail = test_input($_POST['edit_contacts_email']);
-    $position = test_input($_POST['edit_contacts_position']);
+    $position = intval($_POST['edit_contacts_position']);
     $resp = test_input($_POST['edit_contacts_responsibility']);
     $dial = test_input($_POST['edit_contacts_dial']);
     $faxDial = test_input($_POST['edit_contacts_faxDial']);
@@ -372,7 +372,7 @@ if (!empty($_POST['saveAll'])) {
         $gender = test_input($_POST['edit_contacts_gender']);
         $titel = test_input($_POST['edit_contacts_titel']);
         $pgp = trim($_POST['edit_contacts_pgp']);
-        $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = '$position', responsibility = '$resp', dial = '$dial', faxDial = '$faxDial', phone = '$phone' , form_of_address = '$gender', titel = '$titel', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
+        $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = $position, responsibility = '$resp', dial = '$dial', faxDial = '$faxDial', phone = '$phone' , form_of_address = '$gender', titel = '$titel', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
     if ($conn->error) {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
     } else {
@@ -577,6 +577,8 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 			<div class="col-sm-10">
 				<table class="table">
 					<thead><tr>
+                    <th><?php echo $lang['FORM_OF_ADDRESS'] ?></th>
+                    <th>Titel</th>
 					<th>Name</th>
 					<th>E-Mail</th>
 					<th>Position</th>
@@ -590,10 +592,14 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 					<?php
 $editmodals = '';
 while ($contactRow = $resultContacts->fetch_assoc()) {
+    $positionName = $conn->query("SELECT name FROM position WHERE id = ".$contactRow['position']);
+    $positionName = $positionName->fetch_assoc()['name'];
     echo '<tr>';
+    echo '<td>' . $contactRow['form_of_address'] . '</td>';
+    echo '<td>' . $contactRow['titel'] . '</td>';
     echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
     echo '<td>' . $contactRow['email'] . '</td>';
-    echo '<td>' . $contactRow['position'] . '</td>';
+    echo '<td>' . $positionName . '</td>';
     echo '<td>' . $contactRow['responsibility'] . '</td>';
     echo '<td>' . $contactRow['dial'] . '</td>';
     echo '<td>' . $contactRow['faxDial'] . '</td>';
@@ -619,7 +625,15 @@ while ($contactRow = $resultContacts->fetch_assoc()) {
 								</div>
 								<div class="row form-group">
 									<div class="col-md-4"><label>E-Mail</label><input type="email" name="edit_contacts_email" value="' . $contactRow['email'] . '" class="form-control required-field"/></div>
-									<div class="col-md-4"><label>Position</label><input type="text" name="edit_contacts_position" value="' . $contactRow['position'] . '" class="form-control"/></div>
+									<div class="col-md-4"><label>Position</label><select type="text" name="edit_contacts_position" placeholder="Position" class="form-control select2-position">';
+                                        $currentmodal .= '<option value="-1" >New...</option>';
+                                            $result = $conn->query("SELECT * FROM position");
+                                            while($row = $result->fetch_assoc()){
+                                                $currentmodal .= '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
+                                            }
+                                            $currentmodal = str_replace('<option value="'.$contactRow['position'].'" >','<option selected value="'.$contactRow['position'].'" >',$currentmodal);
+
+                                            $currentmodal .= '</select></div>
 									<div class="col-md-4"><label>Verantwortung</label><input type="text" name="edit_contacts_responsibility" value="' . $contactRow['responsibility'] . '" class="form-control"/></div>
 								</div>
 								<div class="row form-group">
@@ -1217,7 +1231,15 @@ if ($resF->num_rows > 2) {
 				</div>
 				<div class="row form-group">
 					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-					<div class="col-md-4"><label>Position</label><input type="text" name="contacts_position" placeholder="Position" class="form-control"/></div>
+					<div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="form-control select2-position">
+                        <?php 
+                            echo '<option value="-1" >New...</option>';
+                            $result = $conn->query("SELECT * FROM position");
+                            while($row = $result->fetch_assoc()){
+                                echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
+                            }
+                        ?>
+                    </select></div>
 					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
 				</div>
 				<div class="row form-group">
@@ -1231,11 +1253,25 @@ if ($resF->num_rows > 2) {
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+                <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+                <button id="newPositionModal" type="button" data-target="new-position" data-toggle="modal" style="visibility:hidden; width:1px; height:1px;" ></button>
 			</div>
 		</div>
 	</div>
 </form>
+<div id="new-position" class="modal fade">
+		<div class="modal-dialog modal-content modal-sm">
+			<div class="modal-header h4">Position Hinzufügen</div>
+			<div class="modal-body">
+                <label>Name</label>
+                <input type="text" id="positionName" class="form-control" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" onClick="addPosition()" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+			</div>
+		</div>
+</div>
 
 <script>
 $('#uidCheck').click(function(e){
@@ -1256,5 +1292,37 @@ $('#uidCheck').click(function(e){
 $(".select2").select2({
     minimumResultsForSearch: Infinity
 });
+$(".select2-position").select2({
+
+});
+$("#add-contact-person .select2-position").val(null).trigger("change");
+$(".select2-position").on("select2:select", function (e) { checkIfNew(e) })
+function checkIfNew(event){
+    if(event.params.data.id == -1){
+        //console.log(event);
+        $("#new-position").modal("show");
+    }
+}
+function addPosition(){
+    var name = $("#positionName").val();
+    console.log(name);
+    if(name!=""){
+        $.post("../misc/db_utility",{
+            name: name,
+            function: "addPosition",
+        },function(data){
+            console.log(data);
+            data = JSON.parse(data);
+            newOption = new Option(data.name,data.id,false,true);
+            console.log(newOption);
+            $(".select2-position").append(newOption);
+            $(".select2-position").select2('destroy');
+            $(".select2-position").select2();
+            $("#new-position").modal("hide");
+        });
+    }else{
+        $("#positionName").focus();
+    }
+}
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php';?>
