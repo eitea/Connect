@@ -3,8 +3,8 @@
 <?php
 require_once dirname(__DIR__) . '/Calculators/IntervalCalculator.php';
 $day = date('w');
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, "users" => array(), "bookings" => array(1, '', 'checked'),
-"date" => array(date('Y-m-d', strtotime('-'.$day.' days')), substr(getCurrentTimestamp(), 0, 10)), "logs" => array(0, 'checked'));
+$filterings = array("savePage" => $this_page, 'company' => 0, 'client' => 0, 'project' => 0, 'users' => array(), 'bookings' => array(1, '', 'checked'),
+'date' => array(date('Y-m-d', strtotime('-'.$day.' days')), substr(getCurrentTimestamp(), 0, 10)), 'logs' => array(0, 'checked'));
 $activeTab = 'home';
 ?>
 
@@ -12,286 +12,286 @@ $activeTab = 'home';
 
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['setActiveTab'])){$activeTab = $_POST['setActiveTab']; }
+    if(!empty($_POST['setActiveTab'])){$activeTab = $_POST['setActiveTab']; }
 
-  if (isset($_POST['ts_remove'])){
-    $x = intval($_POST['ts_remove']);
-    $conn->query("DELETE FROM logs WHERE indexIM=$x;");
-    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
-  } elseif(isset($_POST['bk_remove'])){
-    $x = intval($_POST['bk_remove']);
-    $conn->query("DELETE FROM projectBookingData WHERE id=$x;");
-    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
-  }
-  if(isset($_POST['saveTimestamp'])){
-    $imm = $_POST['saveTimestamp'];
-    $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
-    $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
-    $status = intval($_POST['newActivity']);
-    $addBreakVal = floatval($_POST['addBreakValues']);
-    if($addBreakVal){ //add a break
-      $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
-      $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
+    if (isset($_POST['ts_remove'])){
+        $x = intval($_POST['ts_remove']);
+        $conn->query("DELETE FROM logs WHERE indexIM=$x;");
+        if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
+    } elseif(isset($_POST['bk_remove'])){
+        $x = intval($_POST['bk_remove']);
+        $conn->query("DELETE FROM projectBookingData WHERE id=$x;");
+        if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
     }
-    if($timeFin == '0000-00-00 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
-      $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', status='$status' WHERE indexIM = $imm";
-    } else {
-      $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), status='$status' WHERE indexIM = $imm";
-    }
-    if($conn->query($sql)){
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-    } else {
-      echo mysqli_error($conn);
-    }
-  } elseif(isset($_POST['addTimestamp'])){
-    $creatUser = intval($_POST['addTimestamp']);
-    $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
-    $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
-    $status = intval($_POST['newActivity']);
-    $timeToUTC = intval($_POST['creatTimeZone']);
-    $newBreakVal = floatval($_POST['newBreakValues']);
-    if($_POST['is_open']){
-      $timeFin = '0000-00-00 00:00:00';
-    } else {
-      if($timeFin != '0000-00-00 00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
-    }
-    $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
-    $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $creatUser, '$status', '$timeToUTC');";
-    $conn->query($sql);
-    $insertID = mysqli_insert_id($conn);
-    //create break for new timestamp
-    if($newBreakVal != 0){
-      $timeStart = carryOverAdder_Hours($timeStart, 4);
-      $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
-      $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
-    }
-    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
-  } elseif(isset($_POST['add_multiple'])){
-    $filterID = intval($_POST['add_multiple']);
-    if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
-      $status = intval($_POST['add_multiple_status']);
-      $i = $_POST['add_multiple_start'].' 08:00:00';
-      $days = (timeDiff_Hours($i, $_POST['add_multiple_end'].' 08:00:00')/24) + 1; //days
-      for($j = 0; $j < $days; $j++){
-        //get the expected Hours for currenct day (read the latest interval which matches criteria)
-        $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) <= DATE('$i') ORDER BY startDate DESC");
-        if ($result && ($row = $result->fetch_assoc())) {
-          $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
-          if($expected != 0){
-            $i2 = carryOverAdder_Minutes($i, intval($expected * 60));
-            $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', $filterID, '0', '$status')";
-            $conn->query($sql);
-          }
-          $i = carryOverAdder_Hours($i, 24);
+    if(isset($_POST['saveTimestamp'])){
+        $imm = $_POST['saveTimestamp'];
+        $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
+        $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
+        $status = intval($_POST['newActivity']);
+        $addBreakVal = floatval($_POST['addBreakValues']);
+        if($addBreakVal){ //add a break
+            $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
+            $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
         }
-      }
-    } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
-    }
-    if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-    } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
-    }
-  }
-  if(!empty($_POST['editing_save'])){
-      //TODO: maybe if the user edits the date and there is another, more fitting timestamp (talking about date) we should change timestampIDs. maybe with a checkbox 'move if available' ?
-
-    $accept = true;
-    $x = $_POST['editing_save'];
-    $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
-    if(!$result || $result->num_rows < 1){
-      $accept = false;
-      echo mysqli_error($conn);
-    }
-    $row = $result->fetch_assoc();
-    $toUtc = $row['timeToUTC'] * -1;
-    if(!test_Date($_POST["editing_time_from_".$x].':00')  || !test_Date($_POST["editing_time_to_".$x].':00')){
-      $accept = false;
-    }
-    $new_projectID = 'NULL';
-    if(!empty($_POST["editing_projectID_".$x])){
-      $new_projectID = $_POST["editing_projectID_".$x];
-    } elseif(isset($_POST["editing_projectID_".$x])) { //breaks dont have this set
-      echo 'No ID found';
-      $accept = false;
-    }
-
-    $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
-    $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
-
-    $chargedTimeStart= '0000-00-00 00:00:00';
-    $chargedTimeFin = '0000-00-00 00:00:00';
-    if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
-      $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
-    }
-    if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
-      $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
-    }
-
-    $new_text = test_input($_POST['editing_infoText_'.$x]);
-    if(!$new_text) $accept = false;
-
-    $new_charged = 'FALSE';
-    if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
-      $new_charged = 'TRUE';
-    }
-    if($accept){
-      $conn->query("UPDATE $projectBookingTable SET start='$new_A', end='$new_B', projectID=$new_projectID, infoText='$new_text', booked='$new_charged', chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $x");
-      //update charged
-      if(isset($_POST['editing_charge'])){
-        if($chargedTimeStart != '0000-00-00 00:00:00'){
-          $new_A = $chargedTimeStart;
+        if($timeFin == '0000-00-00 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
+            $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd='0000-00-00 00:00:00', status='$status' WHERE indexIM = $imm";
+        } else {
+            $sql = "UPDATE $logTable SET time= DATE_SUB('$timeStart', INTERVAL timeToUTC HOUR), timeEnd=DATE_SUB('$timeFin', INTERVAL timeToUTC HOUR), status='$status' WHERE indexIM = $imm";
         }
-        if($chargedTimeFin != '0000-00-00 00:00:00'){
-          $new_B = $chargedTimeFin;
-        }
-        $hours = timeDiff_Hours($new_A, $new_B);
-        $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
-        $conn->query($sql);
-      }
-      if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
-    } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
-    }
-  } elseif(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
-    $accept = true;
-    $filterUserID = intval($_POST['user']);
-
-    if(!test_Date(trim($_POST['add_date']).' 08:00:00')){
-      $accept = false;
-      echo $_POST['add_date'];
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>1: '.$lang['ERROR_TIMES_INVALID'].'.</div>';
-    }
-    if($accept){
-      $result = $conn->query("SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'");
-      if(!$result || $result->num_rows < 1){
-        $accept = false;
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
-      } else {
-        $row = $result->fetch_assoc();
-        $indexIM = $row['indexIM'];
-        $timeToUTC = $row['timeToUTC'];
-      }
-    }
-    if($accept){
-      $startDate = $_POST['add_date']." ".$_POST['start'];
-      $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-
-      $endDate = $_POST['add_date']." ".$_POST['end'];
-      $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-
-      $insertInfoText = test_input($_POST['infoText']);
-      $insertInternInfoText = test_input($_POST['internInfoText']);
-
-      if(timeDiff_Hours($startDate, $endDate) < 0){
-        $endDate = carryOverAdder_Hours($endDate, 24);
-      }
-      if(timeDiff_Hours($startDate, $endDate) < 0 ||  timeDiff_Hours($startDate, $endDate) > 12){
-        $accept = false;
-      }
-    }
-    if($accept){
-      if(isset($_POST['addBreak'])){ //checkbox
-        $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
-        $conn->query($sql);
-        $duration = timeDiff_Hours($startDate, $endDate);
-        $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
         if($conn->query($sql)){
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
         } else {
-          echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            echo mysqli_error($conn);
         }
-      } else {
-        if(isset($_POST['addExpenses'])){
-          $expenses_price = test_input($_POST['expenses_price']);
-          $expenses_info = test_input($_POST['expenses_info']);
-          $expenses_unit = test_input($_POST['expenses_unit']);
+    } elseif(isset($_POST['addTimestamp'])){
+        $creatUser = intval($_POST['addTimestamp']);
+        $timeStart = str_replace('T', ' ',$_POST['timesFrom']) .':00';
+        $timeFin = str_replace('T', ' ',$_POST['timesTo']) .':00';
+        $status = intval($_POST['newActivity']);
+        $timeToUTC = intval($_POST['creatTimeZone']);
+        $newBreakVal = floatval($_POST['newBreakValues']);
+        if($_POST['is_open']){
+            $timeFin = '0000-00-00 00:00:00';
         } else {
-          $expenses_price = $expenses_unit = 0;
-          $expenses_info = '';
+            if($timeFin != '0000-00-00 00:00:00' && $timeFin != ':00'){ $timeFin = carryOverAdder_Hours($timeFin, ($timeToUTC * -1)); } else {$timeFin = '0000-00-00 00:00:00';}
         }
-        if(isset($_POST['project'])){
-          $projectID = test_input($_POST['project']);
-          if(isset($_POST['required_1'])){
-            $field_1 = "'".test_input($_POST['required_1'])."'";
-            if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
-          } elseif(!empty($_POST['optional_1'])){
-            $field_1 = "'".test_input($_POST['optional_1'])."'";
-          } else {
-            $field_1 = 'NULL';
-          }
-          if(isset($_POST['required_2'])){
-            $field_2 = "'".test_input($_POST['required_2'])."'";
-            if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
-          } elseif(!empty($_POST['optional_2'])){
-            $field_2 = "'".test_input($_POST['optional_2'])."'";
-          } else {
-            $field_2 = 'NULL';
-          }
-          if(isset($_POST['required_3'])){
-            $field_3 = "'".test_input($_POST['required_3'])."'";
-            if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
-          } elseif(!empty($_POST['optional_3'])){
-            $field_3 = "'".test_input($_POST['optional_3'])."'";
-          } else {
-            $field_3 = 'NULL';
-          }
-          if($accept){
-            if(isset($_POST['addDrive'])){ //add as driving time
-              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
-              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
-            } else { //normal booking
-              $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
-              VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+        $timeStart = carryOverAdder_Hours($timeStart, $timeToUTC * -1); //UTC
+        $sql = "INSERT INTO $logTable (time, timeEnd, userID, status, timeToUTC) VALUES('$timeStart', '$timeFin', $creatUser, '$status', '$timeToUTC');";
+        $conn->query($sql);
+        $insertID = mysqli_insert_id($conn);
+        //create break for new timestamp
+        if($newBreakVal != 0){
+            $timeStart = carryOverAdder_Hours($timeStart, 4);
+            $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
+            $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
+        }
+        if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+    } elseif(isset($_POST['add_multiple'])){
+        $filterID = intval($_POST['add_multiple']);
+        if(test_Date($_POST['add_multiple_start'].' 08:00:00') && test_Date($_POST['add_multiple_end'].' 08:00:00')){
+            $status = intval($_POST['add_multiple_status']);
+            $i = $_POST['add_multiple_start'].' 08:00:00';
+            $days = (timeDiff_Hours($i, $_POST['add_multiple_end'].' 08:00:00')/24) + 1; //days
+            for($j = 0; $j < $days; $j++){
+                //get the expected Hours for currenct day (read the latest interval which matches criteria)
+                $result = $conn->query("SELECT * FROM $intervalTable WHERE userID = $filterID AND DATE(startDate) <= DATE('$i') ORDER BY startDate DESC");
+                if ($result && ($row = $result->fetch_assoc())) {
+                    $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
+                    if($expected != 0){
+                        $i2 = carryOverAdder_Minutes($i, intval($expected * 60));
+                        $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', $filterID, '0', '$status')";
+                        $conn->query($sql);
+                    }
+                    $i = carryOverAdder_Hours($i, 24);
+                }
             }
-            $conn->query($sql);
-            if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
-            $insertInfoText = $insertInternInfoText = '';
-          } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
-          }
         } else {
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
         }
-      }
-    }
-  } elseif(isset($_POST['add'])) {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
-  } elseif(isset($_POST['saveCharged'])){
-    //update free of charge
-    if(isset($_POST['noCheckCheckingIndeces'])){
-      foreach ($_POST["noCheckCheckingIndeces"] as $e) {
-        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
-        $conn->query($sql);
-      }
-    }
-    //charged
-    if(isset($_POST['checkingIndeces'])){
-      foreach ($_POST["checkingIndeces"] as $e) {
-        $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
-        $conn->query($sql);
-        $sql = "SELECT start, end, chargedTimeStart, chargedTimeEnd, projectID FROM $projectBookingTable WHERE id = $e";
-        if($result = $conn->query($sql)){
-          $row = $result->fetch_assoc();
-          $A = $row['start'];
-          $B = $row['end'];
-          if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
-            $A = $row['chargedTimeStart'];
-          }
-          if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
-            $B = $row['chargedTimeEnd'];
-          }
-          $hours = timeDiff_Hours($A, $B);
-          $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
-          $conn->query($sql);
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
         }
-      }
     }
-    if(!mysqli_error($conn)){
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+    if(!empty($_POST['editing_save'])){
+        //TODO: maybe if the user edits the date and there is another, more fitting timestamp (talking about date) we should change timestampIDs. maybe with a checkbox 'move if available' ?
+
+        $accept = true;
+        $x = $_POST['editing_save'];
+        $result = $conn->query("SELECT $logTable.timeToUTC FROM $logTable, $projectBookingTable WHERE $projectBookingTable.id = $x AND $projectBookingTable.timestampID = $logTable.indexIM");
+        if(!$result || $result->num_rows < 1){
+            $accept = false;
+            echo mysqli_error($conn);
+        }
+        $row = $result->fetch_assoc();
+        $toUtc = $row['timeToUTC'] * -1;
+        if(!test_Date($_POST["editing_time_from_".$x].':00')  || !test_Date($_POST["editing_time_to_".$x].':00')){
+            $accept = false;
+        }
+        $new_projectID = 'NULL';
+        if(!empty($_POST["editing_projectID_".$x])){
+            $new_projectID = $_POST["editing_projectID_".$x];
+        } elseif(isset($_POST["editing_projectID_".$x])) { //breaks dont have this set
+            echo 'No ID found';
+            $accept = false;
+        }
+
+        $new_A = carryOverAdder_Hours($_POST["editing_time_from_".$x].':00', $toUtc);
+        $new_B = carryOverAdder_Hours($_POST["editing_time_to_".$x].':00', $toUtc);
+
+        $chargedTimeStart= '0000-00-00 00:00:00';
+        $chargedTimeFin = '0000-00-00 00:00:00';
+        if(isset($_POST['editing_chargedtime_from_'.$x]) && $_POST['editing_chargedtime_from_'.$x] != '0000-00-00 00:00'){
+            $chargedTimeStart = carryOverAdder_Hours($_POST['editing_chargedtime_from_'.$x].':00', $toUtc);
+        }
+        if(isset($_POST['editing_chargedtime_to_'.$x]) && $_POST['editing_chargedtime_to_'.$x] != '0000-00-00 00:00'){
+            $chargedTimeFin = carryOverAdder_Hours($_POST['editing_chargedtime_to_'.$x].':00', $toUtc);
+        }
+
+        $new_text = test_input($_POST['editing_infoText_'.$x]);
+        if(!$new_text) $accept = false;
+
+        $new_charged = 'FALSE';
+        if(isset($_POST['editing_charge']) || isset($_POST['editing_nocharge'])){
+            $new_charged = 'TRUE';
+        }
+        if($accept){
+            $conn->query("UPDATE $projectBookingTable SET start='$new_A', end='$new_B', projectID=$new_projectID, infoText='$new_text', booked='$new_charged', chargedTimeStart='$chargedTimeStart', chargedTimeEnd='$chargedTimeFin' WHERE id = $x");
+            //update charged
+            if(isset($_POST['editing_charge'])){
+                if($chargedTimeStart != '0000-00-00 00:00:00'){
+                    $new_A = $chargedTimeStart;
+                }
+                if($chargedTimeFin != '0000-00-00 00:00:00'){
+                    $new_B = $chargedTimeFin;
+                }
+                $hours = timeDiff_Hours($new_A, $new_B);
+                $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = $x";
+                $conn->query($sql);
+            }
+            if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+        }
+    } elseif(isset($_POST["add"]) && !empty($_POST['user']) && !empty($_POST['add_date']) && isset($_POST['start']) && isset($_POST['end']) && !empty(trim($_POST['infoText']))){
+        $accept = true;
+        $filterUserID = intval($_POST['user']);
+
+        if(!test_Date(trim($_POST['add_date']).' 08:00:00')){
+            $accept = false;
+            echo $_POST['add_date'];
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>1: '.$lang['ERROR_TIMES_INVALID'].'.</div>';
+        }
+        if($accept){
+            $result = $conn->query("SELECT * FROM $logTable WHERE userID = $filterUserID AND DATE(time) = DATE(DATE_SUB('".$_POST['add_date']." ".$_POST['start']."', INTERVAL timeToUTC HOUR)) AND status = '0'");
+            if(!$result || $result->num_rows < 1){
+                $accept = false;
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_TIMESTAMP'].'</div>';
+            } else {
+                $row = $result->fetch_assoc();
+                $indexIM = $row['indexIM'];
+                $timeToUTC = $row['timeToUTC'];
+            }
+        }
+        if($accept){
+            $startDate = $_POST['add_date']." ".$_POST['start'];
+            $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+
+            $endDate = $_POST['add_date']." ".$_POST['end'];
+            $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+
+            $insertInfoText = test_input($_POST['infoText']);
+            $insertInternInfoText = test_input($_POST['internInfoText']);
+
+            if(timeDiff_Hours($startDate, $endDate) < 0){
+                $endDate = carryOverAdder_Hours($endDate, 24);
+            }
+            if(timeDiff_Hours($startDate, $endDate) < 0 ||  timeDiff_Hours($startDate, $endDate) > 12){
+                $accept = false;
+            }
+        }
+        if($accept){
+            if(isset($_POST['addBreak'])){ //checkbox
+                $sql = "INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$startDate', '$endDate', $indexIM, '$insertInfoText', 'break')";
+                $conn->query($sql);
+                $duration = timeDiff_Hours($startDate, $endDate);
+                $sql= "UPDATE $logTable SET breakCredit = (breakCredit + $duration) WHERE indexIm = $indexIM";
+                if($conn->query($sql)){
+                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                } else {
+                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+                }
+            } else {
+                if(isset($_POST['addExpenses'])){
+                    $expenses_price = test_input($_POST['expenses_price']);
+                    $expenses_info = test_input($_POST['expenses_info']);
+                    $expenses_unit = test_input($_POST['expenses_unit']);
+                } else {
+                    $expenses_price = $expenses_unit = 0;
+                    $expenses_info = '';
+                }
+                if(isset($_POST['project'])){
+                    $projectID = test_input($_POST['project']);
+                    if(isset($_POST['required_1'])){
+                        $field_1 = "'".test_input($_POST['required_1'])."'";
+                        if(empty(test_input($_POST['required_1']))){ $accept = FALSE; }
+                    } elseif(!empty($_POST['optional_1'])){
+                        $field_1 = "'".test_input($_POST['optional_1'])."'";
+                    } else {
+                        $field_1 = 'NULL';
+                    }
+                    if(isset($_POST['required_2'])){
+                        $field_2 = "'".test_input($_POST['required_2'])."'";
+                        if(empty(test_input($_POST['required_2']))){ $accept = FALSE; }
+                    } elseif(!empty($_POST['optional_2'])){
+                        $field_2 = "'".test_input($_POST['optional_2'])."'";
+                    } else {
+                        $field_2 = 'NULL';
+                    }
+                    if(isset($_POST['required_3'])){
+                        $field_3 = "'".test_input($_POST['required_3'])."'";
+                        if(empty(test_input($_POST['required_3']))){ $accept = FALSE; }
+                    } elseif(!empty($_POST['optional_3'])){
+                        $field_3 = "'".test_input($_POST['optional_3'])."'";
+                    } else {
+                        $field_3 = 'NULL';
+                    }
+                    if($accept){
+                        if(isset($_POST['addDrive'])){ //add as driving time
+                            $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                            VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'drive', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                        } else { //normal booking
+                            $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, extra_1, extra_2, extra_3, exp_info, exp_unit, exp_price)
+                            VALUES('$startDate', '$endDate', $projectID, $indexIM, '$insertInfoText', '$insertInternInfoText', 'project', $field_1, $field_2, $field_3, '$expenses_info', '$expenses_unit', '$expenses_price')";
+                        }
+                        $conn->query($sql);
+                        if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+                        $insertInfoText = $insertInternInfoText = '';
+                    } else {
+                        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+                    }
+                } else {
+                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].'</div>';
+                }
+            }
+        }
+    } elseif(isset($_POST['add'])) {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    } elseif(isset($_POST['saveCharged'])){
+        //update free of charge
+        if(isset($_POST['noCheckCheckingIndeces'])){
+            foreach ($_POST["noCheckCheckingIndeces"] as $e) {
+                $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+                $conn->query($sql);
+            }
+        }
+        //charged
+        if(isset($_POST['checkingIndeces'])){
+            foreach ($_POST["checkingIndeces"] as $e) {
+                $sql = "UPDATE $projectBookingTable SET booked = 'TRUE'  WHERE id = $e;";
+                $conn->query($sql);
+                $sql = "SELECT start, end, chargedTimeStart, chargedTimeEnd, projectID FROM $projectBookingTable WHERE id = $e";
+                if($result = $conn->query($sql)){
+                    $row = $result->fetch_assoc();
+                    $A = $row['start'];
+                    $B = $row['end'];
+                    if($row['chargedTimeStart'] != '0000-00-00 00:00:00'){
+                        $A = $row['chargedTimeStart'];
+                    }
+                    if($row['chargedTimeEnd'] != '0000-00-00 00:00:00'){
+                        $B = $row['chargedTimeEnd'];
+                    }
+                    $hours = timeDiff_Hours($A, $B);
+                    $sql = "UPDATE $projectTable SET hours = hours - $hours WHERE id = ".$row['projectID'];
+                    $conn->query($sql);
+                }
+            }
+        }
+        if(!mysqli_error($conn)){
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        }
     }
-  }
 } //endif post
 ?>
 
@@ -484,10 +484,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $csv .= "\n";
           $sum_min += timeDiff_Hours($row['start'], $row['end']);
         } //end while fetch_assoc
-
         echo "<tr>";
         echo '<td style="font-weight:bold">'.$lang['SUM'].'</td> <td></td> <td></td> <td></td> <td></td> <td></td>';
-        echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td> <td></td>";
+        echo "<td>".number_format($sum_min*60, 2, '.', '')."</td> <td></td> <td></td>";
         echo "</tr>";
         ?>
       </tbody>
@@ -918,7 +917,7 @@ if(Cookies.get('checkboxValues') !== undefined){
       var elem = document.getElementById(key)
       if(elem){
         elem.checked = value;
-      }
+    }
     });
   }
 } else {
@@ -955,7 +954,7 @@ $(document).ready(function(){
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     },
     responsive: true,
-    dom: 'tf',
+    dom: 'ft',
     autoWidth: false,
     fixedHeader: {
       header: true,

@@ -147,10 +147,10 @@ ignore_user_abort(1);
             //add lines to connection file
             $identifier = uniqid('', true);
             $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-            $txt = '$identifier = "'.hash('sha1',$identifier).'";
-            $s3SharedFiles=$identifier."_sharedFiles";
-            $s3uploadedFiles=$identifier."_uploadedFiles";
-            $s3privateFiles=$identifier."_privateFiles";';
+            $txt = '$identifier = \''.$identifier.'\';
+            $s3SharedFiles=$identifier.\'_sharedFiles\';
+            $s3uploadedFiles=$identifier.\'_uploadedFiles\';
+            $s3privateFiles=$identifier.\'_privateFiles\';';
             fwrite($myfile, $txt);
             fclose($myfile);
 

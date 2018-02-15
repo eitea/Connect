@@ -49,6 +49,8 @@ if ($result) {
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
     $userKeyCode = $row['keyCode'];
+} else {
+    echo $conn->error;
 }
 
 $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
@@ -94,6 +96,43 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
+             SELECT userID
+             FROM dsgvo_training_completed_questions
+             WHERE questionID = tq.id AND userID = $userID
+         )
+        UNION
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+             SELECT userID
+             FROM dsgvo_training_completed_questions
+             WHERE questionID = tq.id AND userID = $userID
+         )
+    ) temp"
+);
+echo $conn->error;
+$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredOnLoginSurveys = false;
+if($userHasUnansweredSurveys){
+    $result = $conn->query(
+        "SELECT count(*) count FROM (
+            SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+            UNION
+            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
+                 WHERE questionID = tq.id AND userID = $userID
+             )
+        ) temp"
+    );
+    echo $conn->error;
+    $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
@@ -129,7 +168,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
             if($newMasterPass) $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
-            $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed.</div>';
+            if(!$conn->error){
+                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
+            } else {
+                $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
         } else {
             $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
         }
@@ -327,50 +370,6 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                       <i class="fa fa-commenting"></i>
                       <span class="badge pull-right alert-badge" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
                       </a>
-                      <script>
-                      var alertsBeforeUpdate = <?php echo $numberOfSocialAlerts; ?>;
-                      setInterval(function(){
-                          $.ajax({
-                              url: 'ajaxQuery/AJAX_socialGetAlerts.php',
-                              type: 'GET',
-                              success: function (response) {
-                                  $("#numberOfSocialAlerts").html(response)
-                                  if(response == "0"){
-                                      $("#numberOfSocialAlerts").hide()
-                                      alertsBeforeUpdate = parseInt(response)
-                                  }else{
-                                      $("#numberOfSocialAlerts").show()
-                                      var alertDifference = parseInt(response) - alertsBeforeUpdate
-                                      alertsBeforeUpdate = parseInt(response)
-                                      if(alertDifference > 0){
-                                          generateNotification(parseInt(response),alertDifference)
-                                      }
-                                  }
-                              },
-                          });
-                      },10000) //10 seconds
-
-                      function generateNotification(messages, newMessages){
-                          var image = 'images/messageIcon.png';
-                          var options = {
-                              body: newMessages + " new\n"+messages+" unread",
-                              icon: image,
-                              tag: "tagToUpdateNotification",
-                              badge: image
-                          }
-                          var n = new Notification('Connect Social',options);
-                          setTimeout(n.close.bind(n), 5000);
-                          n.onclick = function(){
-                              console.info("Click");
-                          }
-                          n.onerror = function(){
-                              console.warn("Error while displaying notification");
-                          }
-                          n.onshow = function(){
-                              console.info("Show");
-                          }
-                      }
-                      </script>
                   <?php else: ?>
                       <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
                   <?php endif;?>
@@ -985,7 +984,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
-
+                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung/Training</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -997,6 +996,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
+                    echo '<li><a href="../dsgvo/training?n='.$row['id'].'" >Schulung/Training</a></li>';
                     echo '</ul></div></li>';
                   }
                 }
@@ -1006,7 +1006,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php") {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
@@ -1036,7 +1036,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
     </div> <!-- /accordions -->
     <br><br><br>
   </div>
-    <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 </div>
 <!-- /side menu -->
 

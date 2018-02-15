@@ -1,5 +1,39 @@
 </div>
 </div>
+
+
+<?php
+
+// if($userHasUnansweredSurveys): //test if user has unanswered surveys
+
+?>
+<div id="currentSurveyModal"></div>
+<script>
+$(".openSurvey").click(function(){
+    openSurveyModal()
+})
+function openSurveyModal(){
+  $.ajax({
+        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
+        data:{<?php echo $userHasUnansweredOnLoginSurveys?"onLogin:true":"" ?>},
+        type: 'get',
+        success : function(resp){
+            $("#currentSurveyModal").html(resp);
+        },
+        error : function(resp){console.error(resp)},
+        complete: function(resp){
+            $("#currentSurveyModal .modal").modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+   });
+}
+<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500)";} ?>
+</script>
+<?php // endif; ?>
+
+<button type='button' class='btn btn-primary feedback-button'>Feedback</button> 
 <script>
 $("#feedback_form").submit(function(event){
     event.preventDefault();

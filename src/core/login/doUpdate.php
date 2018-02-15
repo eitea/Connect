@@ -1458,9 +1458,10 @@ if ($row['version'] < 124) {
     $id = $conn->query("SELECT * FROM identification");
     $identifier = $id->fetch_assoc()['id'];
     $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = "'.hash('sha1',$identifier).'";
-    $s3SharedFiles=$identifier."_sharedFiles";
-    $s3uploadedFiles=$identifier."_uploadedFiles";';
+    $txt = '$identifier = \''.hash('sha1',$identifier).'\';
+    $s3SharedFiles=$identifier.\'_sharedFiles\';
+    $s3uploadedFiles=$identifier.\'_uploadedFiles\';
+    $s3privateFiles=$identifier.\'_privateFiles\'';
     fwrite($myfile, $txt);
     fclose($myfile);
 
@@ -1664,7 +1665,7 @@ if($row['version'] < 130){ //01.02.2018
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>';
+        echo '<br>Tasks: Tags';
     }
 
     $conn->query("CREATE TABLE microtasks (
@@ -1763,15 +1764,84 @@ if($row['version'] < 131){ //14.02.2018
         echo '<br>Contact Persons: More Details';
     }
 
-
     $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Tasks: Geschätzte Zeit';
     }
+
+    $sql = "CREATE TABLE dsgvo_training (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(100),
+        companyID INT(6) UNSIGNED,
+        version INT(6) DEFAULT 0,
+        onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        PRIMARY KEY (id),
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: trainings';
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_questions (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        title varchar(100),
+        text varchar(2000),
+        trainingID INT(6),
+        PRIMARY KEY (id),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: questions';
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_user_relations (
+        trainingID int(6),
+        userID INT(6) UNSIGNED,
+        PRIMARY KEY (trainingID, userID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: user_relations';
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_team_relations (
+        trainingID int(6),
+        teamID INT(6) UNSIGNED,
+        PRIMARY KEY (trainingID, teamID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: team_relations';
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_completed_questions (
+        questionID int(6),
+        userID INT(6) UNSIGNED,
+        correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        PRIMARY KEY (questionID, userID),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: completed_quesitons';
+    }
 }
-if($row['version'] < 132){ //14.02.2018
+
+if($row['version'] < 132){//14.02.2018
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
     $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
@@ -1780,10 +1850,10 @@ if($row['version'] < 132){ //14.02.2018
             $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-
-
     $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
 }
+if($row['version'] < 133){}
+if($row['version'] < 134){}
 
 // ------------------------------------------------------------------------------
 

@@ -11,7 +11,6 @@
 * procedures => [transitions[id], status, hideAll]
 * acceptance => status
 * requestType => type
-* regexField
 * tasks => status
 * priority => int
 * employees => array<string>()
@@ -204,7 +203,7 @@ if($scale > 2){ //3 columns
             echo '</select><br><br>';
           }
           if(isset($filterings['project'])): ?>
-            <label><?php echo $lang['PROJECT']; ?></label>
+            <label for="searchProjectHint"><?php echo $lang['PROJECT']; ?></label>
             <select id="searchProjectHint" class="js-example-basic-single" name="searchProject" >
             </select>
           <?php endif; ?>

@@ -55,10 +55,10 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
     </tr></thead>
     <tbody>
     <?php
-    $result = $conn->query("SELECT * FROM templateData WHERE type = 'document' AND userIDs = $cmpID"); //tiny misuse/recycling of table
+    $result = $conn->query("SELECT id, name FROM templateData WHERE type = 'document' AND userIDs = $cmpID"); //tiny misuse/recycling of table
     while($row = $result->fetch_assoc()){
         echo '<tr>';
-        echo '<td>'.$row['name'].'</td>';        
+        echo '<td>'.$row['name'].'</td>';
         echo '<td>';
         echo '<button type="submit" name="delete_report" value="'.$row['id'].'" class="btn btn-default" title="Delete"><i class="fa fa-trash-o"></i></button> ';
         echo '<button type="submit" name="edit_report" value="'.$row['id'].'" class="btn btn-default" title="Edit" ><i class="fa fa-pencil"></i></button>';
@@ -86,11 +86,10 @@ if($action == 'edit'){
 }
 ?>
 <div class="row">
-    <div class="col-sm-1 text-right"><strong>Name</strong></div>
-    <div class="col-xs-6"><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
+    <div class="col-xs-6"><label>Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
+    <div class="col-xs-3"><label>Speichern</label><br><button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button></div>
 </div>
 <div class="row">
-    <div class="col-sm-1 text-right"><strong>Inhalt</strong></div>
     <div class="col-sm-9" style="max-width:790px;"><textarea name="report_content"><?php echo $templateContent; ?></textarea></div>
     <div class="col-sm-2">
       <br>Click to Insert: <br><br>

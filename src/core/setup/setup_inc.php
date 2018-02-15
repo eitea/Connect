@@ -1486,7 +1486,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,

@@ -1,5 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToERP($userID);
-require dirname(__DIR__) . "/misc/helpcenter.php"; 
+require dirname(__DIR__) . "/misc/helpcenter.php";
 $transitions = array('ANG', 'AUB', 'RE', 'LFS', 'GUT', 'STN');
 $filterings = array('savePage' => $this_page, 'procedures' => array(array(), 0, ''), 'company' => 0, 'client' => 0);
 
@@ -101,21 +101,21 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['PROCESSES']; ?>
-    <div class="page-header-button-group">
-      <?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
-      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add_process" title="<?php echo $lang['NEW_PROCESS']; ?>"><i class="fa fa-plus"></i></button>
-      <form method="post" style="display:inline-block">
-        <?php
-        if($showBalance == 'TRUE'){
-          echo '<button type="submit" name="turnBalanceOff" class="btn btn-warning" title="Bilanz deaktivieren"><i class="fa fa-check"></i> Bilanz</button>';
-        } else {
-          echo '<button type="submit" name="turnBalanceOn" class="btn btn-default" title="Bilanz aktivieren"><i class="fa fa-times"></i> Bilanz</button>';
-        }
-        ?>
-      </form>
-    </div>
-  </h3>
+    <h3><?php echo $lang['PROCESSES']; ?>
+        <div class="page-header-button-group">
+            <?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add_process" title="<?php echo $lang['NEW_PROCESS']; ?>"><i class="fa fa-plus"></i></button>
+            <form method="post" style="display:inline-block">
+                <?php
+                if($showBalance == 'TRUE'){
+                    echo '<button type="submit" name="turnBalanceOff" class="btn btn-warning" title="Bilanz deaktivieren"><i class="fa fa-check"></i> Bilanz</button>';
+                } else {
+                    echo '<button type="submit" name="turnBalanceOn" class="btn btn-default" title="Bilanz aktivieren"><i class="fa fa-times"></i> Bilanz</button>';
+                }
+                ?>
+            </form>
+        </div>
+    </h3>
 </div>
 
 <?php
@@ -123,7 +123,6 @@ $filtered_transitions = empty($filterings['procedures'][0]) ? $transitions : $fi
 $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$filterings['company'] : "";
 $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
-
 $result = $conn->query("SELECT proposals.*, companyID, clientData.name as clientName, companyData.name as companyName
 FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query");
@@ -143,7 +142,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     $modals = '';
       while($result && ($row = $result->fetch_assoc())){
         echo '<tr style="background-color:#e4e4e4">';
-        if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>';}
+        if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>'; }
         echo '<td>'.$row['clientName'].'</td><td></td>';
         echo '<td><form method="POST"><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
         echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$row['id'].'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
@@ -151,7 +150,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
         echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$row['id'].'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
         echo '</ul></div></form></td>';
         if($showBalance == 'TRUE') echo '<td></td>';
-        echo '<td></td>';
+        echo '<td>'.substr(md5($row['id']),0,8).'</td>';
         echo '</tr>';
 
         $filterings['procedures'][2];
@@ -169,7 +168,6 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
             $product_placements[$current_transition][$rowB['origin']] += $rowB['quantity'];
             $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
           }
-
           $transitable = false;
           if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
           if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
@@ -177,7 +175,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
 
           echo "<tr>";
           if(count($available_companies) > 2){ echo '<td></td>'; }
-          echo '<td></td>';
+          echo '<td style="color:white">'.substr(md5($row['id']),0,8).'</td>'; //semi-hide it for the datatables search
           echo '<td>'.$row_history['id_number'].'</td>';
 
           echo "<td></td>";
@@ -259,4 +257,20 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     </div>
   </div>
 </form>
+
+
+<script>
+$(document).ready(function(){
+  $('.table').DataTable({
+    ordering: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    responsive: true,
+    dom: 'f',
+    autoWidth: false,
+    paging: true
+  });
+});
+</script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
