@@ -253,7 +253,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(!empty($filterings['employees'])){
             for($i=0;$i<count($filterings['employees']);$i++){
                 $mapNode = explode(";",$filterings['employees'][$i]);
-                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
+                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
             }
         }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
