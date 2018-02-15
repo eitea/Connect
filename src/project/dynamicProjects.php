@@ -11,9 +11,6 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => []); //set_filter requirement
 ?>
 
-<script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
-<script src="plugins/rtfConverter/rtf.js-master/samples/symboltable.js"></script>
-<script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
     <?php if($isDynamicProjectsAdmin == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
@@ -475,6 +472,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <?php endif; //endif occupation ?>
 </div>
 
+<script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
+<script src="plugins/rtfConverter/rtf.js-master/samples/symboltable.js"></script>
+<script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
 $("#bookCompletedCheckbox").change(function(event){

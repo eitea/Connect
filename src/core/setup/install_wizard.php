@@ -20,10 +20,12 @@
 </head>
 <body>
     <?php
-    if($_SERVER['REQUEST_METHID'])
-    if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
-        $conn->query("");
-        //TODO: Update password, create pgp pair, save
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
+            $hash = password_hash($_POST['encryption_pass'], PASSWORD_BCRYPT);
+            $conn->query("UPDATE UserData SET psw = '$hash' WHERE id = 2");
+            
+        }
     }
     ?>
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
