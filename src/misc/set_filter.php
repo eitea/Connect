@@ -102,8 +102,9 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     $filterings['priority'] = intval($_POST['searchPriority']);
   }
   if(isset($_POST['searchEmployees'])){
-    echo "<script>console.log('".json_encode($_POST['searchEmployees'])."')</script>";
     $filterings['employees'] = $_POST['searchEmployees'];
+  }else{
+    $filterings['employees'] = array();
   }
   if(isset($filterings['savePage'])){
     $_SESSION['filterings'] = $filterings;
