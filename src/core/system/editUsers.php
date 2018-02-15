@@ -409,6 +409,7 @@ $(document).ready(function(){
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
       $canUseSocialMedia = $row['canUseSocialMedia'];
+      $canCreateTasks = $row['canCreateTasks'];
 
       $eOut = "$firstname $lastname";
       ?>
@@ -571,21 +572,28 @@ $(document).ready(function(){
                 <div class="col-md-4">
                   <?php echo $lang['USER_MODULES']; ?>:
                   <div class="checkbox">
-                    <label>
-                      <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
-                    </label>
-                    <br>
-                    <label>
-                      <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
-                    </label>
-                    <br>
-                    <label>
-                      <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
-                    </label>
-                    <br>
-                    <label>
-                      <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
-                    </label>
+                    <div class="col-md-6">
+                      <label>
+                        <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
+                      </label>
+                    </div>
+                    <div class="col-md-6">
+                      <label>
+                        <input type="checkbox" name="canCreateTasks<?php echo $x; ?>" <?php if($canCreateTasks == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
+                      </label>
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-4">
