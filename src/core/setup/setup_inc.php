@@ -614,9 +614,9 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(60),
         companyID INT(6) UNSIGNED,
-        FOREIGN KEY (companyID) REFERENCES companyData(id),
         leader INT(6),
         leaderreplacement INT(6),
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
@@ -1288,9 +1288,9 @@ function create_tables($conn) {
         name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
         type varchar(10) NOT NULL COMMENT 'Dateiendung',
         owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
-        sharegroup int(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
-        hashkey varchar(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
-        filesize bigint(20) NOT NULL,
+        sharegroup INT(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
+        hashkey VARCHAR(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
+        filesize BIGINT(20) NOT NULL,
         uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY hashkey (hashkey),
@@ -1482,14 +1482,14 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
+    
     $sql = "CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,
         type VARCHAR(10) NOT NULL,
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,
-        hashkey` VARCHAR(32) NOT NULL,
+        hashkey VARCHAR(32) NOT NULL,
         filesize BIGINT(20) NOT NULL,
         uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),

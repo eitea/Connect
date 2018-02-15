@@ -255,7 +255,7 @@ if($scale > 2){ //3 columns
                 $selected = '';
                 if($key == $filterings['requestType']) $selected = 'selected';
                 echo '<option '.$selected.' value="'.$key.'">'.$value.'</option>';
-              }
+            }
               ?>
             </select>
             <br><br>

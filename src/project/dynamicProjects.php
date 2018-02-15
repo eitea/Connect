@@ -242,13 +242,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         $occupation = $query_filter = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
-        if($filterings['tasks']){ $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' "; }
-        if($filterings['priority']>0){ $query_filter = $query_filter . " AND d.projectpriority = ".$filterings['priority'];}
+        if($filterings['tasks']){
+            if($filterings['tasks'] == 'REVIEW_1'){
+                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
+            } elseif($filterings['tasks'] == 'REVIEW_2'){
+                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
+            } else {
+                $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
+            }
+        }
+        if($filterings['priority']>0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority'];}
         if(!empty($filterings['employees'])){
-            echo "<script>console.log('".json_encode($filterings['employees'])."')</script>";
             for($i=0;$i<count($filterings['employees']);$i++){
                 $mapNode = explode(";",$filterings['employees'][$i]);
-                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
+                if($mapNode[0] === "user"){
+                    $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
+                } else {
+                    $query_filter .= " AND dynamicprojectsteams.teamid = ".$mapNode[1];
+                }
             }
         }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
@@ -293,7 +304,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             if(!preg_match('/\[Training \d+\]/',$row['projectname'])){
                 echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
-            }else{
+            } else {
                 echo '<td></td>';
             }
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
