@@ -28,7 +28,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             //$m = $wkey->sign($ttl);
             // Serialize private key
             $private_bytes = $m->to_bytes();
-
             // Serialize public key message
             $pubm = clone($m);
             $pubm[0] = new OpenPGP_PublicKeyPacket($pubm[0]);

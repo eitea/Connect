@@ -1216,13 +1216,7 @@ function create_tables($conn) {
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (clientid) REFERENCES clientData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL,
-        FOREIGN KEY (clientprojectid) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1419,7 +1413,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_questions (
         id int(6) NOT NULL AUTO_INCREMENT,
         title varchar(100),
@@ -1442,7 +1436,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_team_relations (
         trainingID int(6),
         teamID INT(6) UNSIGNED,
@@ -1453,7 +1447,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_completed_questions (
         questionID int(6),
         userID INT(6) UNSIGNED,
@@ -1486,7 +1480,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE archive_savedfiles (
         id INT(12) NOT NULL AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,
