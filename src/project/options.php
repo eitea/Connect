@@ -328,7 +328,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div><!-- /modal-body -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="addRule()" name="addRule"><?php echo $lang['ADD']; ?></button>
+        <button type="button" class="btn btn-warning" onclick="addRuleFunc()" name="addRule"><?php echo $lang['ADD']; ?></button>
       </div>
     </div>
     </form>
@@ -371,7 +371,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function changeIdForRule(id){
         document.getElementById("emailId").setAttribute("value", id);
     }
-    function addRule(){
+    function addRuleFunc(){
         var Employees = [];
         var OEmployees = [];
         for(i=0;i<document.getElementById("Employees").selectedOptions.length;i++){
@@ -380,11 +380,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         for(i=0;i<document.getElementById("Opt. Employees").selectedOptions.length;i++){
             OEmployees.push(document.getElementById("Opt. Employees").selectedOptions[i].value);
         }
+        var Company = document.getElementById("Company").selectedOptions.length>0 ? document.getElementById("Company").selectedOptions[0].value : null;
+        var Client = document.getElementById("clientHint").selectedOptions.length>0 ? document.getElementById("clientHint").selectedOptions[0].value : null;
+        var ClientProject = document.getElementById("projectHint").selectedOptions.length>0 ? document.getElementById("projectHint").selectedOptions[0].value : null;
         $.post("../misc/newrule",{
             Identifier: document.getElementById("Identifier").value,
-            Company: document.getElementById("Company").selectedOptions[0].value,
-            Client: document.getElementById("clientHint").selectedOptions[0].value,
-            ClientProject: document.getElementById("projectHint").selectedOptions[0].value,
+            Company: Company,
+            Client: Client,
+            ClientProject: ClientProject,
             Color: document.getElementById("Color").value,
             Status: document.getElementById("Status").selectedOptions[0].value,
             Priority: document.getElementById("Priority").selectedOptions[0].value,
@@ -397,6 +400,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }, function(data){
             console.log(data);
             editRules(null,data);
+            $("#add-rule").modal("hide");
         });
     }
     function editRules(event,id){
