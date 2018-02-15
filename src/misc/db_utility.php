@@ -5,7 +5,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($_POST['function']==="forcePwdChange"){
         $id = intval($_POST['userid']);
         try{
-            $conn->query("UPDATE UserData SET forcedPwdChange = 1 WHERE id=$id");
+            $conn->query("UPDATE userdata SET forcedPwdChange = 1 WHERE id=$id");
             if($conn->error){
                 echo $conn->error;
             }

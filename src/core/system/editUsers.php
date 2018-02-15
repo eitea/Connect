@@ -772,7 +772,7 @@ $(document).ready(function(){
 <script>
   //ALTER TABLE `userdata`  ADD `forcedPwdChange` TINYINT(1) NULL DEFAULT NULL  AFTER `privatePGPKey`;
   function forcePswChange(id,event){
-    $.post("ajaxQuery/AJAX_db_utility.php",{function: "forcePwdChange",userid: id},function(data){
+    $.post("../misc/db_utility",{function: "forcePwdChange",userid: id},function(data){
       if(data){
         console.log(data);
         event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-check' ></i>"

@@ -1307,7 +1307,7 @@ function addPosition(){
     var name = $("#positionName").val();
     console.log(name);
     if(name!=""){
-        $.post("ajaxQuery/AJAX_db_utility.php",{
+        $.post("../misc/db_utility",{
             name: name,
             function: "addPosition",
         },function(data){

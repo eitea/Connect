@@ -102,9 +102,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <option value="ssl">ssl</option>
         </select>
         <label>Username</label>
-        <input autocomplete="off" type="email" class="form-control" name="username" id="username"/>
+        <input type="email" class="form-control" name="username" id="username"/>
         <label>Password</label>
-        <input autocomplete="off" type="password" class="form-control" name="password" id="password"/>
+        <input type="password" class="form-control" name="password" id="password"/>
         <label>Log</label>
         <input type="checkbox" class="form-control" name="logging" id="logging" />
       </div>
@@ -353,7 +353,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var password = document.getElementById("edit_password");
         var logging = document.getElementById("edit_logging");
         var row = null;
-        $.post("ajaxQuery/AJAX_getEmailAccountInfo.php",{id: e_id},function(data){
+        $.post("../misc/getAccount",{id: e_id},function(data){
             row = JSON.parse(data);
             console.log(row);
             server.setAttribute("value",row['server']);
@@ -384,7 +384,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var Company = document.getElementById("Company").selectedOptions.length>0 ? document.getElementById("Company").selectedOptions[0].value : null;
         var Client = document.getElementById("clientHint").selectedOptions.length>0 ? document.getElementById("clientHint").selectedOptions[0].value : null;
         var ClientProject = document.getElementById("projectHint").selectedOptions.length>0 ? document.getElementById("projectHint").selectedOptions[0].value : null;
-        $.post("ajaxQuery/AJAX_newRule.php",{
+        $.post("../misc/newrule",{
             Identifier: document.getElementById("Identifier").value,
             Company: Company,
             Client: Client,
@@ -411,7 +411,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         while(body.firstChild){
             body.removeChild(body.firstChild);
         }
-        $.post("ajaxQuery/AJAX_getRules.php",{
+        $.post("../misc/getrules",{
             id: id
         } , function(data){
             var rulesets = JSON.parse(data);
@@ -465,7 +465,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
     function deleteRule(ruleID,emailID){
-        $.post("ajaxQuery/AJAX_deleteRule.php",{
+        $.post("../misc/deleterule",{
             emailid: emailID,
             ruleid: ruleID
         }, function (info){
@@ -473,7 +473,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         });
     }
     function checkEmail(element){
-        $.post("ajaxQuery/AJAX_checkEmailAvailability.php",{
+        $.post("../misc/checkemail",{
             server: document.getElementById("server").value,
             port: document.getElementById("port").value,
             security: document.getElementById("security").selectedOptions[0].value,
@@ -486,7 +486,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       });
     }
     function edit_checkEmail(element){
-        $.post("ajaxQuery/AJAX_checkEmailAvailability.php",{
+        $.post("../misc/checkemail",{
             server: document.getElementById("edit_server").value,
             port: document.getElementById("edit_port").value,
             security: document.getElementById("edit_security").selectedOptions[0].value,
