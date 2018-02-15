@@ -1,12 +1,12 @@
 <?php
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_tester.php',                  'setup/run' => 'core/setup/setup.php',                      'login/passwordChange' => 'core/login/passwordChange.php',
+  'login/access' => 'core/login/login_tester.php',                   'php/info' => 'core/system/phpinfo.php',                   'login/passwordChange' => 'core/login/passwordChange.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
   'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
 
-  'social/home' => 'core/system/socialMedia.php',                   'php/info' => 'core/system/phpinfo.php',
+  'social/home' => 'core/system/socialMedia.php',                   'setup/run' => 'core/setup/setup.php',                      'setup/wizard' => 'core/setup/install_wizard.php',
 
   'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
   'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
@@ -41,8 +41,8 @@ $routes = array(
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
   'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
 
-  'pgp/keygen' => 'pgp/pgpKeyGen.php',                              'misc/sharedfiles' => 'misc/getSharedFiles.php',              'misc/taskemails' => 'schedule/getAllEmailTasks.php',
-  'misc/checkemail' => 'misc/checkEmailAvailability.php',            'misc/getrules'    => 'misc/getRules.php',                   'misc/newrule'    => 'misc/newRule.php',
+  'misc/sharedfiles' => 'misc/getSharedFiles.php',                  'misc/taskemails' => 'schedule/getAllEmailTasks.php',
+  'misc/checkemail' => 'misc/checkEmailAvailability.php',           'misc/getrules'    => 'misc/getRules.php',                    'misc/newrule'    => 'misc/newRule.php',
   'misc/deleterule' => 'misc/deleteRule.php',                       'misc/getAccount'   => 'misc/getEmailAccountInfo.php',        'misc/db_utility' => 'misc/db_utility.php',
 );
 $mime_types = array(

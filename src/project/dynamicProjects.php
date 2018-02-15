@@ -477,7 +477,7 @@ $("#bookCompletedCheckbox").change(function(event){
 function checkMicroTasks(){
     if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
         $("#bookCompletedCheckbox").attr('disabled',false);
-    }else{
+    } else {
         $("#bookCompletedCheckbox").attr('disabled',true);
         $("#bookCompleted").attr('max',99);
         $("#bookRanger").attr('max',99);
@@ -493,7 +493,7 @@ $("#microlist input[type='checkbox']").change(function(){
         $("#bookCompletedCheckbox").attr('disabled',false);
         $("#bookCompleted").attr('max',100);
         $("#bookRanger").attr('max',100);
-    }else{
+    } else {
         $("#bookCompletedCheckbox").attr('disabled',true);
         $("#bookCompleted").attr('max',99);
         $("#bookRanger").attr('max',99);
@@ -503,7 +503,6 @@ $("#microlist input[type='checkbox']").change(function(){
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
         $("#bookCompleted").prop('value',99);
-        console.log('LOOOG');
     } else {
         $("#bookCompletedCheckbox").prop('checked', false);
     }
@@ -706,36 +705,35 @@ $(document).ready(function() {
     setTimeout(function(){
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');
-        }, 500);
+    }, 500);
 });
 
-
-  function showClients(company, client, place){
+function showClients(company, client, place){
     if(company != ""){
-      $.ajax({
-        url:'ajaxQuery/AJAX_getClient.php',
-        data:{companyID:company, clientID:client},
-        type: 'get',
-        success : function(resp){
-          $("#"+place).html(resp);
-        },
-        error : function(resp){}
-      });
+        $.ajax({
+            url:'ajaxQuery/AJAX_getClient.php',
+            data:{companyID:company, clientID:client},
+            type: 'get',
+            success : function(resp){
+                $("#"+place).html(resp);
+            },
+            error : function(resp){}
+        });
     }
-  }
-  function showProjects(client, project, place){
+}
+function showProjects(client, project, place){
     if(client != ""){
-      $.ajax({
-        url:'ajaxQuery/AJAX_getProjects.php',
-        data:{clientID:client, projectID:project},
-        type: 'get',
-        success : function(resp){
-          $("#"+place).html(resp);
-        },
-        error : function(resp){}
-      });
+        $.ajax({
+            url:'ajaxQuery/AJAX_getProjects.php',
+            data:{clientID:client, projectID:project},
+            type: 'get',
+            success : function(resp){
+                $("#"+place).html(resp);
+            },
+            error : function(resp){}
+        });
     }
-  }
+}
 
   function checkInput(event){
       //check Input
