@@ -324,7 +324,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             echo '<td>';
             $review = '<input type="checkbox" ';
-            if($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) $review= $review.' disabled ';
+            ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? $review= $review.' disabled ' : $review= $review.' onchange="reviewChange(event,\''.$x.'\')" ' ;
             if($row['needsreview'] == 'TRUE') $review= $review.'checked ';
             $review= $review.'></input>';
             echo $review;
@@ -761,6 +761,18 @@ $(document).ready(function() {
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
         return false;
     }
+  }
+  function reviewChange(event,id){
+      console.log(event);
+      projectid = id;
+      needsReview = event.target.checked ? 'TRUE' : 'FALSE';
+      $.post("../misc/db_utility",{
+          needsReview: needsReview,
+          function: "changeReview",
+          projectid: projectid
+      },function(data){
+          console.log(data);
+      });
   }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

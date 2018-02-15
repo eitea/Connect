@@ -28,6 +28,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             echo "\n" . $e;
         }
     }
+    if($_POST['function']==="changeReview"){
+        $id = $_POST['projectid'];
+        $needsReview = $_POST['needsReview'];
+        try{
+            $conn->query("UPDATE dynamicprojects SET needsreview = '$needsReview' WHERE projectid = '$id'");
+            if($conn->error){
+                echo $conn->error;
+            }
+        }catch(Exception $e){
+            echo "\n" . $e;
+        }
+    }
     
 }
 ?>
