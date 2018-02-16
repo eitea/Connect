@@ -7,7 +7,7 @@ use SSilence\ImapClient\ImapConnect;
 use SSilence\ImapClient\ImapClient;
 
 $result = $conn->query("SELECT * FROM emailprojects");
-echo $result->num_rows;
+//echo $result->num_rows;
 if($result){
     while($row = $result->fetch_assoc()){
         $mailbox = $row['server'];
@@ -22,7 +22,7 @@ if($result){
         }
         $port = $row['port'];
         $validation = ImapConnect::VALIDATE_CERT;
-        echo json_encode($row);
+        //echo json_encode($row);
         $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')");
         try{
         $imap = new ImapClient(array(

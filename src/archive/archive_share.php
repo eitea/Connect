@@ -364,9 +364,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         $result_fc = $conn->query("SELECT * FROM companyData WHERE id IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID)");
         if($result_fc && $result_fc->num_rows > 0){
-          echo '<div class="col-sm-12"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" ;" >';
+          echo '<div class="col-sm-12"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" >';
           echo '<option value="0">...</option>';
-          while($result && ($row_fc = $result_fc->fetch_assoc())){
+          while($row_fc = $result_fc->fetch_assoc()){
             $checked = '';
             if($filterCompany == $row_fc['id']) {
               $checked = 'selected';

@@ -1,7 +1,7 @@
 <?php
 
-require dirname(dirname(__DIR__)) . "\src\misc\useS3Config.php";
-require dirname(__DIR__)."\connection.php";
+require dirname(dirname(__DIR__)) . "/src/misc/useS3Config.php";
+require dirname(__DIR__)."/connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $s3 = new Aws\S3\S3Client(getS3Config());
@@ -17,6 +17,7 @@ require dirname(__DIR__)."\connection.php";
             $radio = $_POST['ttl'];
             $url = hash('whirlpool',random_bytes(100));
             try{
+                echo "INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)";
             $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)");
             $groupID = $conn->insert_id;
             $conn->query("CREATE EVENT ttl_$groupID ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL $radio DAY DO UPDATE sharedgroups SET uri='' WHERE id=$groupID");
