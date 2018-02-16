@@ -428,7 +428,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     $.ajax({
       type: "POST",
-      url: "../misc/sharedfiles",
+      url: "ajaxQuery/AJAX_getSharedFiles.php",
       data: { groupID: groupID,
               'function': 'editGroup',
               'editName': document.getElementById('editName').value,
@@ -469,7 +469,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   function deleteFile(evt,fileID){
     $.ajax({
       type: "POST",
-      url: "../misc/sharedfiles",
+      url: "ajaxQuery/AJAX_getSharedFiles.php",
       data: { fileID: fileID,
               'function': 'deleteFile'}
     }).done(function(groupID){
@@ -491,7 +491,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     formData.append('fileIndex',fileIndex);
     formData.append('groupID',document.getElementById('groupID').value);
     $.ajax({
-      url: '../misc/sharedfiles',
+      url: 'ajaxQuery/AJAX_getSharedFiles.php',
       type: 'POST',
       async: true,
       data: formData,
@@ -514,7 +514,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     formData.append('userID',<?php echo $userID ?>)
     formData.append('groupID',document.getElementById('groupID').value);
     $.ajax({
-      url: '../misc/sharedfiles',
+      url: 'ajaxQuery/AJAX_getSharedFiles.php',
       type: 'POST',
       async: true,
       data: formData,
@@ -551,7 +551,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     formData.append('filterCompany',document.getElementsByName('filterCompany')[0].value);
     
     $.ajax({
-      url: '../misc/sharedfiles',
+      url: 'ajaxQuery/AJAX_getSharedFiles.php',
       type: 'POST',
       async: true,
       data: formData,
@@ -609,7 +609,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
   function refreshLink(id){
     var ttl = $("#refresh-ttl :checked")[0].value;
-    $.post("../misc/sharedfiles",{
+    $.post("ajaxQuery/AJAX_getSharedFiles.php",{
       ttl: ttl,
       id: id,
       function: "refreshTtl",

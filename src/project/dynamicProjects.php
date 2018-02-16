@@ -8,7 +8,7 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => []); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
 ?>
 
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
@@ -253,7 +253,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             for($i=0;$i<count($filterings['employees']);$i++){
                 $mapNode = explode(";",$filterings['employees'][$i]);
                 if($mapNode[0] === "user"){
-                    $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
+                    $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d
+                    JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
                 } else {
                     $query_filter .= " AND dynamicprojectsteams.teamid = ".$mapNode[1];
                 }
@@ -287,7 +288,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 AND d.projectstart <= UTC_TIMESTAMP $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
-        while($row = $result->fetch_assoc()){
+        while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -332,7 +333,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             echo '<td>';
             $review = '<input type="checkbox" ';
-            if($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) $review= $review.' disabled ';
+            ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? $review= $review.' disabled ' : $review= $review.' onchange="reviewChange(event,\''.$x.'\')" ' ;
             if($row['needsreview'] == 'TRUE') $review= $review.'checked ';
             $review= $review.'></input>';
             echo $review;
@@ -770,6 +771,18 @@ function showProjects(client, project, place){
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
         return false;
     }
+  }
+  function reviewChange(event,id){
+      console.log(event);
+      projectid = id;
+      needsReview = event.target.checked ? 'TRUE' : 'FALSE';
+      $.post("ajaxQuery/AJAX_db_utility.php",{
+          needsReview: needsReview,
+          function: "changeReview",
+          projectid: projectid
+      },function(data){
+          console.log(data);
+      });
   }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

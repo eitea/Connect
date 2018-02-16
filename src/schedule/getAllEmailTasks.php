@@ -42,8 +42,8 @@ if($result){
             $imap->selectFolder("INBOX");
             $messages = $imap->getMessages();
             $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
-            for($i = 0;$i<count($messages);$i++){
-                while($rule = $rulesets->fetch_assoc()){
+            while($rule = $rulesets->fetch_assoc()){
+                for($i = 0;$i<count($messages);$i++){
                     if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
                         insertTask($imap,$messages[$i],$conn,$rule);
                     }

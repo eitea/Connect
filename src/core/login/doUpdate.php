@@ -1852,7 +1852,19 @@ if($row['version'] < 132){//14.02.2018
     }
     $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
 }
-if($row['version'] < 133){}
+if($row['version'] < 133){
+    $sql = "CREATE TABLE emailprojectlogs (
+        id int(11),
+        timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        body text,
+        PRIMARY KEY (id),
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Debugging: Email Projects';
+    }
+}
 if($row['version'] < 134){}
 
 // ------------------------------------------------------------------------------
