@@ -23,6 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 'service' => $service,
                 'encrypt' => $encryption,
                 'validateCertificates' => $validation,
+                'debug' => ImapConnect::DEBUG,
             ),
             'mailbox' => array(
                 'remote_system_name' => $mailbox,
@@ -36,6 +37,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $imap->selectFolder("INBOX");
         echo true;
     }catch(Exception $e){
+        echo $e;
         echo false;
     }
 }
