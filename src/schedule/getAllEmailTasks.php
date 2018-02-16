@@ -22,6 +22,7 @@ if($result){
         $port = $row['port'];
         $validation = ImapConnect::VALIDATE_CERT;
         //echo json_encode($row);
+        $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')");
         try{
         $imap = new ImapClient(array(
                 'flags' => array(
@@ -64,6 +65,7 @@ return;
 
 function insertTask($imap,$messages,$conn,$ruleset){
     $message = $messages->message;
+    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$message')");
     $allowedTags = "<div><p><b><img><a><br><em><hr><i><li><ol><s><span><table><tr><td><u><ul>";
 try{
     $id = uniqid();
