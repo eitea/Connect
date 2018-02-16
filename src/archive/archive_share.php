@@ -10,8 +10,8 @@ if($result){
     return;
   }
 }
-require dirname(dirname(__DIR__))."\plugins\aws\autoload.php";
-require dirname(__DIR__) . "\connection.php";
+require dirname(dirname(__DIR__))."/plugins/aws/autoload.php";
+require dirname(__DIR__) . "/connection.php";
 use PHPMailer\PHPMailer\PHPMailer;
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 
