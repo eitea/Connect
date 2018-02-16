@@ -7,6 +7,7 @@ use SSilence\ImapClient\ImapConnect;
 use SSilence\ImapClient\ImapClient;
 
 $result = $conn->query("SELECT * FROM emailprojects");
+echo $result->num_rows;
 if($result){
     while($row = $result->fetch_assoc()){
         $mailbox = $row['server'];
