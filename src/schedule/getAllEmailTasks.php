@@ -21,7 +21,7 @@ if($result){
         }
         $port = $row['port'];
         $validation = ImapConnect::VALIDATE_CERT;
-        //echo json_encode($row);
+        echo json_encode($row);
         $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')");
         try{
         $imap = new ImapClient(array(
