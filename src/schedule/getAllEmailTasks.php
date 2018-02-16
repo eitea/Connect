@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
+require_once dirname(dirname(__DIR__))."/plugins/imap-client/ssilence/php-imap-client/autoload.php";
 require_once dirname(__DIR__)."/connection.php";
 
 use SSilence\ImapClient\ImapClientException;
