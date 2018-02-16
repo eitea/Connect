@@ -247,7 +247,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(!empty($filterings['employees'])){
             for($i=0;$i<count($filterings['employees']);$i++){
                 $mapNode = explode(";",$filterings['employees'][$i]);
-                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
+                $mapNode[0]==="user" ? $query_filter = $query_filter. " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )" : $query_filter = $query_filter. " AND dynamicprojectsteams.teamid = ".$mapNode[1];
             }
         }
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
@@ -278,7 +278,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 AND d.projectstart <= UTC_TIMESTAMP $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
-        while($row = $result->fetch_assoc()){
+        while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -360,7 +360,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <td>-</td>
                 <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
-                
+
 
             </tr>
         <?php endif; ?>
