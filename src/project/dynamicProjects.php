@@ -278,7 +278,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 AND d.projectstart <= UTC_TIMESTAMP $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
-        while($row = $result->fetch_assoc()){
+        while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -360,7 +360,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <td>-</td>
                 <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
-                
+
 
             </tr>
         <?php endif; ?>
