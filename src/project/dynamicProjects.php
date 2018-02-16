@@ -765,7 +765,7 @@ $(document).ready(function() {
       console.log(event);
       projectid = id;
       needsReview = event.target.checked ? 'TRUE' : 'FALSE';
-      $.post("../misc/db_utility",{
+      $.post("ajaxQuery/AJAX_db_utility.php",{
           needsReview: needsReview,
           function: "changeReview",
           projectid: projectid
