@@ -48,7 +48,7 @@ require dirname(__DIR__)."/connection.php";
             if($conn->error){
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             }
-          }elseif($_POST['function']==='editGroup'&&!empty($_POST['editName'])){
+          }elseif($_POST['function']==='editGroup'){
             $name = $_POST['editName'];
             $conn->query("UPDATE sharedgroups SET name = '$name' WHERE id=".$_POST['groupID']);
             if(!empty($_POST['ttl'])){
@@ -56,7 +56,7 @@ require dirname(__DIR__)."/connection.php";
               $conn->query("UPDATE sharedgroups SET ttl = $ttl WHERE id = ".$_POST['groupID']);
               $conn->query("UPDATE sharedgroups SET dateOfBirth=CURRENT_TIMESTAMP WHERE id= ".$_POST['groupID']);
             }
-          }if($_POST['function']==='editGroup'){
+          }if($_POST['function']==='getGroup'){
             $groupID = $_POST['groupID'];
             $groupName = $conn->query("SELECT name FROM sharedgroups WHERE id = $groupID");
             if(!$groupName){

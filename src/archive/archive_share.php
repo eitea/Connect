@@ -242,7 +242,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       }
       
       echo '<td>';
-      echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
+      echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="getGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
       if($expired){
         echo '<button type="button" name="setSelect" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
       }else{
@@ -437,6 +437,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               'ttl': ttl}
     }).done(function(info){
       console.log(info);
+    });
+  }
+
+  function getGroup(evt, groupID){
+    $.ajax({
+      type: "POST",
+      url: "ajaxQuery/AJAX_getSharedFiles.php",
+      data: { groupID: groupID,
+              'function': 'getGroup'}
+    }).done(function(info){
       info = JSON.parse(info);
       document.getElementById('editName').value = info[0]['name'];
       document.getElementById('groupID').value = groupID;
