@@ -68,13 +68,13 @@ function parse_questions($html){ // this will return an array of questions
 }
 
 $result = $conn->query( // this gets all trainings the user can complete
-    "SELECT tur.trainingID id, tr.name 
+    "SELECT tur.trainingID id, tr.name, tr.random
      FROM dsgvo_training_user_relations tur 
      INNER JOIN dsgvo_training tr 
      ON tr.id = tur.trainingID 
      WHERE tur.userID = $userID
      UNION
-     SELECT ttr.trainingID id, tr.name 
+     SELECT ttr.trainingID id, tr.name, tr.random
      FROM dsgvo_training_team_relations ttr 
      INNER JOIN teamRelationshipData trd 
      ON trd.teamID = ttr.teamID  
@@ -86,6 +86,7 @@ $trainingArray = array(); // those are the survey pages
 while ($row = $result->fetch_assoc()){
     $questionArray = array();
     $trainingID = $row["id"];
+    $random = $row["random"];
     $result_question = false;
     if(!$doneSurveys){
         $result_question = $conn->query(
@@ -122,7 +123,7 @@ while ($row = $result->fetch_assoc()){
             "title"=>"Welche dieser Antworten ist richtig?",
             "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
             "colCount"=>1,
-            "choicesOrder"=>"random",
+            "choicesOrder"=>$random == 'TRUE'?"random":"none",
             "choices"=>parse_questions($row_question["text"])
         );
     }
@@ -137,11 +138,14 @@ while ($row = $result->fetch_assoc()){
 
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
-            <div class="modal-header">Bitte beantworten Sie folgende Fragen</div>
+            <div class="modal-header">Bitte beantworten Sie folgende Fragen 
+            <a data-toggle="modal" data-target="#explain-surveys"><i class="fa fa-question-circle-o"></i></a>
+            </div>
             <div class="modal-body">
                 <div id="surveyElement"></div>
             </div>
             <div class="modal-footer">
+                <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button">Hilfe</a>
                 <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button> <?php endif; ?>
             </div>
         </div>
@@ -153,8 +157,9 @@ while ($row = $result->fetch_assoc()){
         var json = <?php echo json_encode(array(
             "pages"=> $trainingArray,
             "showProgressBar"=>"top",
-            "requiredText"=>"(required)",
+            "requiredText"=>"(".$lang['REQUIRED_FIELD'].") ",
             "showPageNumbers"=>true,
+            "locale"=>$lang['LOCALE']
         )) ?>;
         window.survey = new Survey.Model(json);
         survey
@@ -178,3 +183,23 @@ while ($row = $result->fetch_assoc()){
             });
         $("#surveyElement").Survey({ model: survey });
     </script>
+<div id="explain-surveys" class="modal fade">
+  <div class="modal-dialog modal-content modal-sm">
+    <div class="modal-header h4">Trainings</div>
+    <div class="modal-body">
+        <div>
+            Jede dieser Seiten stellt ein Set von Fragen dar. 
+            Jede Frage, die nicht mit (Pflichtfeld) markiert ist, ist optional und kann einfach übersprungen werden.
+            Übersprungene Fragen können später jederzeit nachgeholt werden. 
+        </div><br/>
+        <div>
+            Fragen können beliebig oft wiederholt werden, aber der Administrator kann auswählen, ob diese den vorhergehenden Versuch überschreiben.
+        </div><br/>
+        <div>
+            Die Auswertung der Fragen erfolgt am Schluss, wobei die Anzahl der richtigen und falschen Fragen ersichtlich ist.
+        </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+    </div>
+  </div>
+</div>

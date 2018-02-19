@@ -15,7 +15,7 @@ function openSurveyModal(){
         },
         error : function(resp){console.error(resp)},
         complete: function(resp){
-            $("#currentSurveyModal .modal").modal({
+            $("#currentSurveyModal .survey-modal").modal({
                 backdrop: 'static',
                 keyboard: false
             });

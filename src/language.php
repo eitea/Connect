@@ -86,6 +86,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
 
+$lang_eng['ANSWER'] = 'Answer';
+$lang_ger['ANSWER'] = 'Antwort';
+
 $lang_eng['APPLY'] = 'Apply';
 $lang_ger['APPLY'] = 'Anwenden';
 
@@ -748,6 +751,9 @@ $lang_ger['LEADER_REPLACEMENT'] = 'Stellvertretender Mitarbeiter';
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
 
+$lang_eng['LOCALE'] = 'en';
+$lang_ger['LOCALE'] = 'de';
+
 $lang_eng['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
 $lang_ger['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
 
@@ -1072,6 +1078,9 @@ $lang_ger['REQUEST_TYPE'] = "Art des Antrags";
 $lang_eng['REQUIRED_FIELD'] = 'Required Field';
 $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 
+$lang_eng['RESULT'] = 'Result';
+$lang_ger['RESULT'] = 'Ergebnis';
+
 $lang_eng['RULES'] = 'Rules';
 $lang_ger['RULES'] = 'Regeln';
 
@@ -1255,6 +1264,9 @@ $lang_ger['TRAVEL_FORM'] = 'Reisekosten';
 $lang_eng['TRAVEL_TIME'] = 'Travel Time';
 $lang_ger['TRAVEL_TIME'] = 'Fahrzeit';
 
+$lang_eng['TRIES'] = 'Tries';
+$lang_ger['TRIES'] = 'Versuche';
+
 $lang_eng['TYPE'] = 'Type';
 $lang_ger['TYPE'] = 'Art';
 
@@ -1426,7 +1438,10 @@ $lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' =>
 $lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich', '5' => 'Einmal alle Fünf Minuten');
 
 $lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
-$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Keine Antwort');
+$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet');
+
+$lang_eng['TRAINING_RESULT'] = array('RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right, but not updated', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong, but not updated');
+$lang_ger['TRAINING_RESULT'] = array('RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Right, aber nicht gespeichert', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch, aber nicht gespeichert');
 
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");

@@ -8,13 +8,16 @@ require dirname(__DIR__) . "/language.php";
 
 $questionID = $_REQUEST["questionID"];
 $result = $conn->query(
-    "SELECT userID, correct, firstname, lastname, tcq.version
+    "SELECT userID, correct, firstname, lastname, tcq.version, tries
      FROM dsgvo_training_questions tq 
      INNER JOIN dsgvo_training_completed_questions tcq ON tcq.questionID = tq.id 
      INNER JOIN UserData ON UserData.id = tcq.userID
      WHERE tq.id = $questionID"
 );
 echo $conn->error;
+$nameArray = array();
+$triesArray = array();
+$triesColorsArray = array();
 ?>
 <form method="POST">
 <div class="modal fade">
@@ -29,9 +32,10 @@ echo $conn->error;
         <table class="table">
             <thead>
                 <tr>
-                    <th>User</th>
-                    <th>Correct</th>
+                    <th><?php echo $lang['USERS']?></th>
+                    <th><?php echo $lang['ANSWER']?></th>
                     <th>Version</th>
+                    <th><?php echo $lang['TRIES']?></th>
                 </tr>
             </thead>
             <tbody>
@@ -40,15 +44,21 @@ echo $conn->error;
             while($row = $result->fetch_assoc()){
                 $name = "${row['firstname']} ${row['lastname']}";
                 $correct = $lang['TRAINING_QUESTION_CORRECT'][$row['correct']];
+                $tries = $row['tries'];
+                $version = $row['version'];
                 if($row['correct'] == 'TRUE'){
                     $right++;
                 }else{
                     $wrong++;
                 }
+                $nameArray[] = $name;
+                $triesArray[] = $tries;
+                $triesColorsArray[] = "orange";
                 echo "<tr>";
                 echo "<td>$name</td>";
                 echo "<td>$correct</td>";
-                echo "<td>${row['version']}</td>";
+                echo "<td>$version</td>";
+                echo "<td>$tries</td>";
                 echo "</tr>";
             }
             $result = $conn->query(
@@ -61,8 +71,12 @@ echo $conn->error;
                 $name = "${row['firstname']} ${row['lastname']}";
                 $unanswered++;
                 $correct = $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'];
+                $nameArray[] = $name;
+                $triesArray[] = 0;
+                $triesColorsArray[] = "orange";
                 echo "<tr>";
                 echo "<td>$name</td>";
+                echo "<td>$correct</td>";
                 echo "<td>$correct</td>";
                 echo "<td>$correct</td>";
                 echo "</tr>";
@@ -109,6 +123,36 @@ var myChart = new Chart(ctx, {
         }
     }
 )
+</script>
+<canvas id="triesChart" width="600" height="300"></canvas>
+<script>
+var ctx = document.getElementById("triesChart").getContext('2d');
+var triesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($nameArray) ?>,
+        datasets: [{
+            label: "<?php echo $lang['TRIES']?>",
+            data: <?php echo json_encode($triesArray) ?>,
+            backgroundColor: <?php echo json_encode($triesColorsArray) ?>
+        }]
+    },
+    options: {
+        scales: {
+            xAxes: [{
+                stacked: true,ticks: {
+                    beginAtZero:true
+                }
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        },
+        tooltips: {
+            mode: 'nearest'
+        }
+    }
+});
 </script>
 
     </div>

@@ -799,7 +799,7 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
         },
         error : function(resp){console.error(resp)},
         complete: function(resp){
-            $("#currentSurveyModal .modal").modal("show");
+            $("#currentSurveyModal .survey-modal").modal("show");
         }
    });
 })

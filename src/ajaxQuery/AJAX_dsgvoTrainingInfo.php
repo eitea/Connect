@@ -81,7 +81,7 @@ var ctx = document.getElementById("myChart").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: <?php echo json_encode($nameArray) ?>, // ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        labels: <?php echo json_encode($nameArray) ?>,
         datasets: [{
             label: "<?=$lang['TRAINING_QUESTION_CORRECT']['TRUE']?>",
             data: <?php echo json_encode($pointsRightArray) ?>,

@@ -1878,7 +1878,19 @@ if ($row['version'] < 135) {
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Training: version';
+        echo '<br>Training: overwrite';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN tries INT(6) DEFAULT 1");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: tries';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
     }
 }
 

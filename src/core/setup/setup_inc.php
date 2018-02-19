@@ -1460,6 +1460,8 @@ function create_tables($conn) {
         userID INT(6) UNSIGNED,
         correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         version INT(6) DEFAULT 0,
+        tries INT(6) DEFAULT 1,
+        random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         PRIMARY KEY (questionID, userID),
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE

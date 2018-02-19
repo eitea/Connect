@@ -44,7 +44,7 @@ foreach ($result as $questionID => $answer) {
         }
         $questionRightQuery = $questionRight?"TRUE":"FALSE";
         $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version) VALUES ($questionID, $userID, '$questionRightQuery',$version)
-            ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version");
+            ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1");
     } else {
         if($questionRight){
             $rightNoOverwrite++;
@@ -74,7 +74,10 @@ var myChart = new Chart(ctx, {
                 ],
             }],
             labels: [
-                "Right","Right, but not updated","Wrong","Wrong, but not updated"
+                "<?php echo $lang["TRAINING_RESULT"]["RIGHT"]?>",
+                "<?php echo $lang["TRAINING_RESULT"]["RIGHT_NO_UPDATE"]?>",
+                "<?php echo $lang["TRAINING_RESULT"]["WRONG"]?>",
+                "<?php echo $lang["TRAINING_RESULT"]["WRONG_NO_UPDATE"]?>"
             ]
         },
         options: {
@@ -84,7 +87,7 @@ var myChart = new Chart(ctx, {
             },
             title: {
                 display: true,
-                text: 'Results'
+                text: '<?php echo $lang["RESULT"] ?>'
             },
             animation: {
                 animateScale: true,
