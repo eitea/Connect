@@ -17,7 +17,7 @@ require dirname(__DIR__)."/connection.php";
             $radio = $_POST['ttl'];
             $url = hash('whirlpool',random_bytes(100));
             try{
-                echo "INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)";
+                //echo "INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)";
             $conn->query("INSERT INTO sharedgroups VALUES (null,'$name', null, $radio, '$url', ".$_POST['userid'].", NULL, $companyID)");
             $groupID = $conn->insert_id;
             $conn->query("CREATE EVENT ttl_$groupID ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL $radio DAY DO UPDATE sharedgroups SET uri='' WHERE id=$groupID");
@@ -67,7 +67,7 @@ require dirname(__DIR__)."/connection.php";
             }
             $groupName = $groupName->fetch_assoc();
             $groupName = $groupName['name'];
-            $result = $conn->query("SELECT id,concat(name,concat('.',type)) AS name, uploaddate FROM sharedFiles  WHERE sharegroup = $groupID");
+            $result = $conn->query("SELECT id,concat(name,concat('.',type)) AS name, uploaddate FROM sharedfiles  WHERE sharegroup = $groupID");
             if($result){
                 $info = array();
                 $info[0] = array( 'name' => $groupName );
@@ -88,7 +88,7 @@ require dirname(__DIR__)."/connection.php";
             $s3 = new Aws\S3\S3Client(getS3Config());
             try{
             $fileID = $_POST['fileID'];
-            $hash = $conn->query("SELECT hashkey FROM sharedFiles WHERE id = $fileID");
+            $hash = $conn->query("SELECT hashkey FROM sharedfiles WHERE id = $fileID");
             if(!$hash){
                 $info = array();
                 $info[0] = array('name' => $_POST['fileID']);
@@ -96,7 +96,7 @@ require dirname(__DIR__)."/connection.php";
                 exit();
             }
             $hash = $hash->fetch_assoc()['hashkey'];
-            $groupID = $conn->query("SELECT sharegroup AS groupID FROM sharedFiles WHERE id = $fileID");
+            $groupID = $conn->query("SELECT sharegroup AS groupID FROM sharedfiles WHERE id = $fileID");
             if(!$groupID){
                 $info = array();
                 $info[0] = array('name' => 'FEHLER HASH');
@@ -108,7 +108,7 @@ require dirname(__DIR__)."/connection.php";
                 'Bucket' => $s3SharedFiles,
                 'Key' => $hash
             ));
-            $conn->query("DELETE FROM sharedFiles WHERE id = $fileID");
+            $conn->query("DELETE FROM sharedfiles WHERE id = $fileID");
             echo $groupID;
             }catch(Exception $e){
                 echo $e;

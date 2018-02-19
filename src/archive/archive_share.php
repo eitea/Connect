@@ -219,37 +219,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 
   $doc_selects = '';
-  $result = $conn->query("SELECT s.name AS name, s.uri AS uri, s.ttl AS ttl, s.id AS id, s.dateOfBirth AS dateOfBirth, c.name AS company, s.company AS companyID FROM sharedGroups s JOIN companyData c ON s.company = c.id WHERE s.owner = $userID");
-  while($row = $result->fetch_assoc()){
-    echo '<tr>';
-    echo '<td>'.$row['name'].'</td>';
-    echo '<td>'.$row['company'].'</td>';
-    $link = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-    $link = explode('/', $link);
-    array_pop($link);
-    $link = implode('/', $link) . "/files?n=".$row['uri'];
-    $daysLeft = ((int)(($row['ttl']*86400 - (strtotime(date('Y-m-d H:i:s')) - strtotime($row['dateOfBirth'])))/86400));
-    $expired = $daysLeft<0;
-    if($expired){
-      echo '<td><label style="color: red;" >'.$lang['EXPIRED'].'</label></td>';
-      echo '<td><button type="button" class="btn btn-default" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" ><i class="fa fa-refresh"></i></button></td>';
-    }else{
-      echo '<td><a target="blank_" href='.$link.'> Click Me </a></td>';
-      $days = ' Tag';
-      if($daysLeft>1) $days = $days . "e";
-      echo '<td>'.$daysLeft. $days .' </td>';
+  $result = $conn->query("SELECT s.name AS name, s.uri AS uri, s.ttl AS ttl, s.id AS id, s.dateOfBirth AS dateOfBirth, c.name AS company, s.company AS companyID FROM sharedgroups s JOIN companyData c ON s.company = c.id WHERE s.owner = $userID");
+  if($result){
+    while($row = $result->fetch_assoc()){
+      echo '<tr>';
+      echo '<td>'.$row['name'].'</td>';
+      echo '<td>'.$row['company'].'</td>';
+      $link = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+      $link = explode('/', $link);
+      array_pop($link);
+      $link = implode('/', $link) . "/files?n=".$row['uri'];
+      $daysLeft = ((int)(($row['ttl']*86400 - (strtotime(date('Y-m-d H:i:s')) - strtotime($row['dateOfBirth'])))/86400));
+      $expired = $daysLeft<0;
+      if($expired){
+        echo '<td><label style="color: red;" >'.$lang['EXPIRED'].'</label></td>';
+        echo '<td><button type="button" class="btn btn-default" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" ><i class="fa fa-refresh"></i></button></td>';
+      }else{
+        echo '<td><a target="blank_" href='.$link.'> Click Me </a></td>';
+        $days = ' Tag';
+        if($daysLeft>1) $days = $days . "e";
+        echo '<td>'.$daysLeft. $days .' </td>';
+      }
+      
+      echo '<td>';
+      echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
+      if($expired){
+        echo '<button type="button" name="setSelect" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+      }else{
+        echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')" data-target="#send-as-mail" data-toggle="modal"  class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+      }
+      echo '<button onclick="deleteGroup('.$row['id'].')" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
+      echo '</td>';
+      echo '</tr>';
     }
-    
-    echo '<td>';
-    echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="editGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
-    if($expired){
-      echo '<button type="button" name="setSelect" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
-    }else{
-      echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')" data-target="#send-as-mail" data-toggle="modal"  class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
-    }
-    echo '<button onclick="deleteGroup('.$row['id'].')" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
-    echo '</td>';
-    echo '</tr>';
   }
 ?>
 </table>
@@ -434,7 +436,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               'editName': document.getElementById('editName').value,
               'ttl': ttl}
     }).done(function(info){
-      document.getElementById('editName').value = info;
+      console.log(info);
       info = JSON.parse(info);
       document.getElementById('editName').value = info[0]['name'];
       document.getElementById('groupID').value = groupID;

@@ -1868,7 +1868,7 @@ if($row['version'] < 133){
 }
 if($row['version'] < 134){
     $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
-    $sql = "ALTER TABLE sharedfiles CHANGE uri uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten'";
+    $sql = "ALTER TABLE sharedgroups CHANGE uri uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten'";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
