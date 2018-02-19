@@ -1,6 +1,7 @@
 <?php
-require dirname(__DIR__)."/connection.php";
-require dirname(__DIR__)."/language.php";
+
+require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . "/language.php";
 
 $x = intval($_POST['id']);
 $account_select = urldecode($_POST['acc']);
@@ -27,4 +28,4 @@ echo '<div class="modal fade edit-journal-' . $row['id'] . '"><div class="modal-
 <div class="col-md-4"><label>' . $lang['RECEIPT_DATE'] . '</label><input type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div></span>
 </div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 <button type="submit" class="btn btn-warning" value="' . $row['id'] . '" name="editJournalEntry">' . $lang['SAVE'] . '</button></div></form></div></div>';
- ?>
+?>
