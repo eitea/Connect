@@ -1865,9 +1865,7 @@ if($row['version'] < 133){
         echo '<br>Debugging: Email Projects';
     }
 }
-if($row['version'] < 134){}
-
-if ($row['version'] < 135) {
+if ($row['version'] < 134) {
     $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN version INT(6) DEFAULT 0");
     if ($conn->error) {
         echo $conn->error;
