@@ -262,6 +262,7 @@ function create_tables($conn) {
         canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

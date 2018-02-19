@@ -1875,6 +1875,14 @@ if($row['version'] < 134){
         echo '<br>Repairing: Archive';
     }
 }
+if($row['version'] < 135){
+    $sql = "ALTER TABLE roles ADD canCreateTasks ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can Create Task';
+    }
+}
 
 // ------------------------------------------------------------------------------
 
