@@ -1879,6 +1879,19 @@
                     echo '<br>Role: Can Create Task';
                 }
             }
+            if ($row['version'] < 136) {
+                $sql = "CREATE OR REPLACE TABLE emailprojectlogs (
+        id int(11),
+        timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        body text,
+        PRIMARY KEY (id)
+        )";
+                if (!$conn->query($sql)) {
+                    echo $conn->error;
+                } else {
+                    echo '<br>Debugging: Email Projects';
+                }
+            }
 
 // ------------------------------------------------------------------------------
 
