@@ -16,7 +16,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
-    <?php if($isDynamicProjectsAdmin == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
+    <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
 </div></h3></div>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -90,7 +90,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Project not Available.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
     }
-    if($isDynamicProjectsAdmin == 'TRUE'){
+    if($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
             $conn->query("DELETE FROM dynamicprojectslogs WHERE projectid = '$val'");
@@ -102,6 +102,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
+            if($isDynamicProjectsAdmin != 'TRUE') echo '<script>console.log(\''.json_encode($_POST).'\')</script>';
             if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
@@ -138,12 +139,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $end = $_POST["endradio"];
                 $status = $_POST["status"];
                 $priority = intval($_POST["priority"]); //1-5
-                $parent = test_input($_POST["parent"]); //dynamproject id
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
                 $estimate = test_input($_POST['estimatedHours']);
-                $skill = intval($_POST['projectskill']);
+                if($isDynamicProjectsAdmin == 'TRUE'){
+                    $skill = intval($_POST['projectskill']);
+                    $parent = test_input($_POST["parent"]); //dynamproject id
+                }else{
+                    $skill = 0;
+                    $parent = null;
+                }
                 if(!empty($_POST['projecttags'])){
                     $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
                 }else{
@@ -478,6 +484,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
+$("#projectForm").on("submit",function(){
+    console.log("here");
+    
+})
 $("#bookCompletedCheckbox").change(function(event){
     $("#bookCompleted").attr('readonly', this.checked);
     $("#bookRanger").attr('disabled', this.checked);
@@ -638,8 +648,8 @@ function dynamicOnLoad(modID){
 function appendModal(index){
     $.ajax({
     url:'ajaxQuery/AJAX_dynamicEditModal.php',
-    data:{projectid: index},
-    type: 'get',
+    data:{projectid: index,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
+    type: 'post',
     success : function(resp){
       $("#editingModalDiv").append(resp);
       existingModals.push(index);
@@ -760,6 +770,7 @@ $(document).ready(function() {
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
         return false;
     }
+    <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
   }
   function reviewChange(event,id){
       console.log(event);
