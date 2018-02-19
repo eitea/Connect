@@ -207,7 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
                         }
                     }
-                    if(!empty($_POST['optionalemployees'])){
+                    if(isset($_POST['optionalemployees']) && !empty($_POST['optionalemployees'])){
                         $position = 'optional';
                         foreach ($_POST['optionalemployees'] as $optional_employee) {
                             $employee = intval($optional_employee);

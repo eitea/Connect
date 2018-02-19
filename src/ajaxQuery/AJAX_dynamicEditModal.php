@@ -260,6 +260,7 @@ if($x){
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-4">
+                            <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
                                 <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
                                     <?php
@@ -271,6 +272,7 @@ if($x){
                                     echo $result;
                                     ?>
                                 </select>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>
