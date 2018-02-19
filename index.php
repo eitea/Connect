@@ -25,6 +25,7 @@ $routes = array(
   'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',     'project/options'    => 'project/options.php',
 
   'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',    'report/autotask' => 'schedule/autotask.php',
+  'report/tasks' => 'schedule/getAllEmailTasks.php',
 
   'erp/view' => 'erp/erp_view.php',                                 'erp/articles' => 'erp/product_articles.php',                'erp/taxes' => 'erp/editTaxes.php',
   'erp/units' => 'erp/editUnits.php',                               'erp/payment' => 'erp/editPaymentMethods.php',               'erp/shipping' => 'erp/editShippingMethods.php',
