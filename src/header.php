@@ -313,13 +313,13 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
             function generateKeys($userID) {
                 $.ajax({
                     type: "POST",
-                    url: "../pgp/keygen",
+                    url: "ajaxQuery/AJAX_genPgpKey.php",
                     data: {userID: $userID}
                 }).done(function (keys) {
                     keys = JSON.parse(keys);
                     document.getElementsByName('privatePGP')[0].value = keys[0];
                     document.getElementsByName('publicPGP')[0].value = keys[1];
-                })
+                });
             }
 
             function clearPGP() {

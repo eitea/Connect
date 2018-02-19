@@ -39,9 +39,7 @@ $routes = array(
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
-  'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
-
-  'pgp/keygen' => 'pgp/pgpKeyGen.php',
+  'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php'
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",

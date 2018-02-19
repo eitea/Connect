@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'u' => $rsa->coefficients[2]->toBytes()
         ));
 
-        $result = $conn->query("SELECT firstname, lastname, email FROM userdata WHERE id = $userID");
+        $result = $conn->query("SELECT firstname, lastname, email FROM UserData WHERE id = $userID");
         if ($result) {
             $row = $result->fetch_assoc();
             $uid = new OpenPGP_UserIDPacket($row['firstname'] . ' ' . $row['lastname'] . ' <' . $row['email'] . '>');
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $keys[1] = OpenPGP::enarmor($public_bytes, "PGP PUBLIC KEY BLOCK");
             echo json_encode($keys);
         } else {
-            return $lol = "LOL FUNTZT NED";
+            return "Something Went Wrong";
         }
     }
 }
