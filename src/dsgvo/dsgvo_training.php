@@ -47,7 +47,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         $name = test_input($_POST["name"]);
         $onLogin = test_input($_POST["onLogin"]);
-        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
+        $allowOverwrite = test_input($_POST["allowOverwrite"]);
+        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite' WHERE id = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
         if(isset($_POST["employees"])){

@@ -4,8 +4,12 @@ $userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 $onLogin = false;
+$doneSurveys = false;
 if(isset($_REQUEST["onLogin"])){
     $onLogin = true;
+}
+if(isset($_REQUEST["done"])){
+    $doneSurveys = true;
 }
 
 $result = $conn->query(
@@ -26,7 +30,7 @@ $result = $conn->query(
 echo $conn->error;
 $userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 
-if(!$userHasUnansweredSurveys){
+if(!$userHasUnansweredSurveys && !$doneSurveys){
     ?>
         <div class="modal fade survey-modal">
             <div class="modal-dialog modal-content modal-md">
@@ -82,16 +86,30 @@ $trainingArray = array(); // those are the survey pages
 while ($row = $result->fetch_assoc()){
     $questionArray = array();
     $trainingID = $row["id"];
-    $result_question = $conn->query(
-        "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
-         INNER JOIN dsgvo_training t ON t.id = tq.trainingID
-         WHERE tq.trainingID = $trainingID AND 
-         NOT EXISTS (
-             SELECT userID 
-             FROM dsgvo_training_completed_questions 
-             WHERE questionID = tq.id AND userID = $userID
-         )"
-    ); // only select not completed questions
+    $result_question = false;
+    if(!$doneSurveys){
+        $result_question = $conn->query(
+            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
+            INNER JOIN dsgvo_training t ON t.id = tq.trainingID
+            WHERE tq.trainingID = $trainingID AND 
+            NOT EXISTS (
+                SELECT userID 
+                FROM dsgvo_training_completed_questions 
+                WHERE questionID = tq.id AND userID = $userID
+            )"
+        ); // only select not completed questions
+    }else{
+        $result_question = $conn->query(
+            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
+            INNER JOIN dsgvo_training t ON t.id = tq.trainingID
+            WHERE tq.trainingID = $trainingID AND 
+            EXISTS (
+                SELECT userID 
+                FROM dsgvo_training_completed_questions 
+                WHERE questionID = tq.id AND userID = $userID
+            )"
+        ); //only select completed questions
+    }
     while($row_question = $result_question->fetch_assoc()){
         $questionArray[] = array(
             "type"=>"html",
@@ -102,7 +120,7 @@ while ($row = $result->fetch_assoc()){
             "type"=>"radiogroup",
             "name"=>$row_question["id"],
             "title"=>"Welche dieser Antworten ist richtig?",
-            "isRequired"=>$row_question["onLogin"] == 'TRUE',
+            "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
             "colCount"=>1,
             "choicesOrder"=>"random",
             "choices"=>parse_questions($row_question["text"])
@@ -112,7 +130,6 @@ while ($row = $result->fetch_assoc()){
         "name"=>$row["name"],
         "title"=>$row["name"],
         "elements"=>$questionArray,
-        // "questionsOrder"=>"random",
     );
 }
 ?>

@@ -1867,6 +1867,21 @@ if($row['version'] < 133){
 }
 if($row['version'] < 134){}
 
+if ($row['version'] < 135) {
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN version INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: version';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: version';
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

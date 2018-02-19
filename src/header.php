@@ -113,6 +113,20 @@ $result = $conn->query(
 );
 echo $conn->error;
 $userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations tur 
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID 
+        WHERE userID = $userID
+        UNION
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr 
+        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID 
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID 
+        WHERE tr.userID = $userID
+    ) temp"
+);
+echo $conn->error;
+$userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 $userHasUnansweredOnLoginSurveys = false;
 if($userHasUnansweredSurveys){
     $result = $conn->query(
@@ -663,7 +677,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                           WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
                           echo $conn->error;
-                          if ($result && $result->num_rows > 0): ?>
+                          if (($result && $result->num_rows > 0)||$userHasSurveys): ?>
                           <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
                               <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                           </a></li>

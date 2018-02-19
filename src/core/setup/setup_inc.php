@@ -1414,6 +1414,7 @@ function create_tables($conn) {
         companyID INT(6) UNSIGNED,
         version INT(6) DEFAULT 0,
         onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
         FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE)";
     if(!$conn->query($sql)){
@@ -1458,6 +1459,7 @@ function create_tables($conn) {
         questionID int(6),
         userID INT(6) UNSIGNED,
         correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        version INT(6) DEFAULT 0,
         PRIMARY KEY (questionID, userID),
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE

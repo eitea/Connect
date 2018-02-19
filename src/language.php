@@ -1425,6 +1425,9 @@ $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
 $lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly', '5' => 'Once every Five Minutes');
 $lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich', '5' => 'Einmal alle Fünf Minuten');
 
+$lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
+$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Keine Antwort');
+
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");
 

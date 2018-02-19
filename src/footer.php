@@ -1,12 +1,5 @@
 </div>
 </div>
-
-
-<?php
-
-// if($userHasUnansweredSurveys): //test if user has unanswered surveys
-
-?>
 <div id="currentSurveyModal"></div>
 <script>
 $(".openSurvey").click(function(){
