@@ -1892,6 +1892,12 @@ if ($row['version'] < 135) {
     } else {
         echo '<br>Training: random';
     }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN duration INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
+    }
 }
 
 // ------------------------------------------------------------------------------

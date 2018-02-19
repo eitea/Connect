@@ -25,9 +25,26 @@ function validate_questions($html, $answer){ // this will true or false (will wo
     if($matches[1][$answer] == "+") return true;
     return false;
 }
+$times = array();
+$numberOfAnsweredQuestions = array(); // per set (for average time)
+foreach ($result as $formVal => $time) {
+    $arr = explode(";", $formVal);
+    if(sizeof($arr) == 2){
+        $times[intval($arr[1])] = intval($time);
+    }else{
+        $questionID = intval($formVal);
+        $trainingID = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc()["trainingID"];
+        $numberOfAnsweredQuestions[$trainingID] = 1 + (isset($numberOfAnsweredQuestions[$trainingID])?$numberOfAnsweredQuestions[$trainingID]:0);
+    }
+}
 
 $right = $wrong = $rightNoOverwrite = $wrongNoOverwrite = 0;
-foreach ($result as $questionID => $answer) {
+foreach ($result as $formVal => $answer) {
+    $arr = explode(";", $formVal);
+    if(sizeof($arr) == 2){ //formVal can contain "training;<id>" (for time) or "<id>" (for answer)
+        continue;
+    }
+    $questionID = intval($formVal); 
     $question_row = $conn->query("SELECT text,trainingID FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc();
     $html = $question_row["text"];
     $trainingID = $question_row["trainingID"];
@@ -36,6 +53,10 @@ foreach ($result as $questionID => $answer) {
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
     $questionRight = validate_questions($html, $answer);
     $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
+    $time = 0;
+    if(isset($times[$trainingID],$numberOfAnsweredQuestions[$trainingID])){
+        $time = floor($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
+    }
     if($allowOverwrite || !$questionExists){
         if($questionRight){
             $right++;
@@ -43,8 +64,9 @@ foreach ($result as $questionID => $answer) {
             $wrong++;
         }
         $questionRightQuery = $questionRight?"TRUE":"FALSE";
-        $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version) VALUES ($questionID, $userID, '$questionRightQuery',$version)
-            ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1");
+        $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time)
+            ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time");
+        echo $conn->error;
     } else {
         if($questionRight){
             $rightNoOverwrite++;

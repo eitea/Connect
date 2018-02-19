@@ -8,7 +8,7 @@ require dirname(__DIR__) . "/language.php";
 
 $questionID = $_REQUEST["questionID"];
 $result = $conn->query(
-    "SELECT userID, correct, firstname, lastname, tcq.version, tries
+    "SELECT userID, correct, firstname, lastname, tcq.version, tries, tcq.duration
      FROM dsgvo_training_questions tq 
      INNER JOIN dsgvo_training_completed_questions tcq ON tcq.questionID = tq.id 
      INNER JOIN UserData ON UserData.id = tcq.userID
@@ -17,7 +17,9 @@ $result = $conn->query(
 echo $conn->error;
 $nameArray = array();
 $triesArray = array();
+$timesArray = array();
 $triesColorsArray = array();
+$timesColorsArray = array();
 ?>
 <form method="POST">
 <div class="modal fade">
@@ -53,7 +55,9 @@ $triesColorsArray = array();
                 }
                 $nameArray[] = $name;
                 $triesArray[] = $tries;
+                $timesArray[] = $row["duration"];
                 $triesColorsArray[] = "orange";
+                $timesColorsArray[] = "blue";
                 echo "<tr>";
                 echo "<td>$name</td>";
                 echo "<td>$correct</td>";
@@ -73,7 +77,9 @@ $triesColorsArray = array();
                 $correct = $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'];
                 $nameArray[] = $name;
                 $triesArray[] = 0;
+                $timesArray[] = 0;
                 $triesColorsArray[] = "orange";
+                $timesColorsArray[] = "blue";
                 echo "<tr>";
                 echo "<td>$name</td>";
                 echo "<td>$correct</td>";
@@ -84,7 +90,6 @@ $triesColorsArray = array();
        ?>
             </tbody>
        </table>
-        <?php } ?>
 
 <script src="plugins/chartsjs/Chart.min.js"></script>
 <canvas id="myChart" width="600" height="300"></canvas>
@@ -134,19 +139,49 @@ var triesChart = new Chart(ctx, {
         datasets: [{
             label: "<?php echo $lang['TRIES']?>",
             data: <?php echo json_encode($triesArray) ?>,
-            backgroundColor: <?php echo json_encode($triesColorsArray) ?>
+            backgroundColor: <?php echo json_encode($triesColorsArray) ?>,
+            yAxisID: 'first-y-axis'
+        },{
+            label: "Geschätzte Zeit in Sekunden",
+            data: <?php echo json_encode($timesArray) ?>,
+            backgroundColor: <?php echo json_encode($timesColorsArray) ?>,
+            yAxisID: 'second-y-axis'
         }]
     },
     options: {
         scales: {
-            xAxes: [{
-                stacked: true,ticks: {
-                    beginAtZero:true
+            xAxes: [
+                {
+                    stacked: false, 
+                    ticks: { 
+                        beginAtZero: true 
+                    },
+                    gridLines: {
+                        color: "rgba(0, 0, 0, 0)",
+                    }
                 }
-            }],
-            yAxes: [{
-                stacked: true
-            }]
+            ],
+            yAxes: [
+                {
+                    id: 'first-y-axis',
+                    stacked: false,
+                    position: 'left',
+                    ticks: { 
+                        beginAtZero: true,
+                        display:false
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                },
+                {
+                    id: 'second-y-axis',
+                    stacked: false,
+                    position: 'right',
+                    display:false,
+                    ticks: { beginAtZero: true },
+                }
+            ]
         },
         tooltips: {
             mode: 'nearest'
@@ -154,7 +189,7 @@ var triesChart = new Chart(ctx, {
     }
 });
 </script>
-
+<?php } ?>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>

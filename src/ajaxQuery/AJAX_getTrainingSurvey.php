@@ -128,7 +128,7 @@ while ($row = $result->fetch_assoc()){
         );
     }
     $trainingArray[] = array(
-        "name"=>$row["name"],
+        "name"=>$trainingID,
         "title"=>$row["name"],
         "elements"=>$questionArray,
     );
@@ -140,6 +140,7 @@ while ($row = $result->fetch_assoc()){
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header">Bitte beantworten Sie folgende Fragen 
             <a data-toggle="modal" data-target="#explain-surveys"><i class="fa fa-question-circle-o"></i></a>
+            <span id="timeElement"></span>
             </div>
             <div class="modal-body">
                 <div id="surveyElement"></div>
@@ -165,6 +166,8 @@ while ($row = $result->fetch_assoc()){
         survey
             .onComplete
             .add(function (result) {
+                $("#timeElement").hide()
+                clearInterval(timerID);
                 $.ajax({
                     url: 'ajaxQuery/AJAX_validateTrainingSurvey.php',
                     data: { result: JSON.stringify(result.data) },
@@ -181,8 +184,36 @@ while ($row = $result->fetch_assoc()){
                     }
                 });
             });
-        $("#surveyElement").Survey({ model: survey });
+            var timeElement = $("#timeElement");
+            var timerID = null;
+            function padZero(number){
+                number = (number || '0')+"";
+                return (number.length == 1)?("0"+number):number
+            }
+            function renderTime(seconds) {
+                var hours = Math.floor(seconds / 3600);
+                var minutes = Math.floor((seconds - (hours*3600)) / 60);
+                seconds = Math.floor(seconds % 60);
+                timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
+            }
+            function timerCallback() {
+                var page = survey.currentPage;
+                if(!page) return;
+                var valueName = "training;" + page.name; // training id
+                var seconds = survey.getValue(valueName);
+                if(seconds == null) seconds = 0;
+                else seconds ++;
+                survey.setValue(valueName, seconds);
+                renderTime(seconds)
+            }
+            survey.onCurrentPageChanged.add(timerCallback);
+            timerID = window.setInterval(timerCallback, 1000);
+            $("#surveyElement").Survey({ model: survey });
     </script>
+
+
+
+
 <div id="explain-surveys" class="modal fade">
   <div class="modal-dialog modal-content modal-sm">
     <div class="modal-header h4">Trainings</div>
