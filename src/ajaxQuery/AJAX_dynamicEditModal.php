@@ -257,8 +257,8 @@ if($x){
                                     }
                                     ?>
                                 </select><br>
+                                <?php endif; ?>
                             </div>
-                            <?php endif; ?>
                             <div class="col-md-4">
                                 <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
                                 <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
