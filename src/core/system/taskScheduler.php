@@ -189,9 +189,6 @@ if($result && ($row = $result->fetch_assoc())){
           ?>
         </select>
       </div>
-      <div class="col-sm-8 col-sm-offset-1">
-        <?php echo $lang['INFO_LUNCHBREAK_TASK']; ?>
-      </div>
     </div>
   </div>
 </div>
