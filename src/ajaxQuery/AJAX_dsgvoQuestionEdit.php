@@ -14,7 +14,7 @@ $text = $row["text"];
 <form method="POST">
 <div class="modal fade">
     <div class="modal-dialog modal-content modal-md">
-    <div class="modal-header">Bestehende Aufgabenstellung/Schulung bearbeiten</div>
+    <div class="modal-header">Frage beantworten</div>
     <div class="modal-body">
         <input type="text" name="title" class="form-control" placeholder="Title" value="<?php echo $title; ?>"></input><br/>
         <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea>
