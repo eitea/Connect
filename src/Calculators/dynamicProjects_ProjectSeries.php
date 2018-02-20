@@ -1,18 +1,17 @@
 <?php
 
-function spellout_ordinal($num)
-{
-    $first_word = array('eth','First','Second','Third','Fouth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth','Elevents','Twelfth','Thirteenth','Fourteenth','Fifteenth','Sixteenth','Seventeenth','Eighteenth','Nineteenth','Twentieth');
-    $second_word =array('','','Twenty','Thirty','Forty','Fifty');
-    if($num <= 20)
+function spellout_ordinal($num) {
+    $first_word = array('eth', 'First', 'Second', 'Third', 'Fouth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Elevents', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth', 'Twentieth');
+    $second_word = array('', '', 'Twenty', 'Thirty', 'Forty', 'Fifty');
+    if ($num <= 20)
         return strtolower($first_word[$num]);
-    $first_num = substr($num,-1,1);
-    $second_num = substr($num,-2,1);
-    return strtolower(str_replace('y-eth','ieth',$second_word[$second_num].'-'.$first_word[$first_num]));
+    $first_num = substr($num, -1, 1);
+    $second_num = substr($num, -2, 1);
+    return strtolower(str_replace('y-eth', 'ieth', $second_word[$second_num] . '-' . $first_word[$first_num]));
 }
 
-class ProjectSeries
-{
+class ProjectSeries {
+
     public $once = true;
     public $daily_every_nth;
     public $daily_days = 1;
@@ -38,7 +37,7 @@ class ProjectSeries
     public $end;
     public $last_date;
 
-    public function __construct($series/*eg once, daily_every_nth, ...*/, $start, $end){
+    public function __construct($series/* eg once, daily_every_nth, ... */, $start, $end) {
         // $start and $end are both strings like "2018-01-01" end can also be "" or "no" for no end or "3" for 3 repetions
         $this->once = $series == "once" || $series == "";
         $this->daily_every_nth = $series == "daily_every_nth";
@@ -95,7 +94,7 @@ class ProjectSeries
                 }
                 break;
             case ($this->monthly_day_of_month):
-               
+
                 while ($retDate < $now) {
                     $ordinal = spellout_ordinal($monthly_day_of_month_day);
                     $retDate->setTimestamp(strtotime("+${monthly_day_of_month_month} months ${ordinal} day", $retDate->getTimestamp()));
@@ -146,8 +145,7 @@ class ProjectSeries
         return "not DateTime";
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         $text_before = "Dieses Projekt wiederholt sich ";
         $nextdate = $this->get_next_date();
         $text_after = " (nächste: ${nextdate})";
@@ -195,8 +193,7 @@ class ProjectSeries
         }
     }
 
-    public function __sleep()
-    {
+    public function __sleep() {
         $this->start = $this->start->getTimestamp();
         $this->last_date = $this->last_date->getTimestamp();
         if (!is_numeric($this->end) && $this->end != false) {
@@ -206,8 +203,7 @@ class ProjectSeries
         return array_keys(get_object_vars($this));
     }
 
-    public function __wakeup()
-    {
+    public function __wakeup() {
         $startTimestamp = $this->start;
         $this->start = new DateTime();
         $this->start->setTimestamp($startTimestamp);
@@ -220,4 +216,5 @@ class ProjectSeries
             $this->end->setTimestamp($endTimestamp);
         }
     }
+
 }

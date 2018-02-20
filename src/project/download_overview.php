@@ -1,19 +1,23 @@
 <?php
-require dirname(dirname(__DIR__))."/plugins/fpdf/fpdf.php";
+
+require dirname(dirname(__DIR__)) . "/plugins/fpdf/fpdf.php";
 
 class PDF extends FPDF {
+
     public $glob = array();
-    function Header(){
+
+    function Header() {
         $this->Image($this->glob['logo'], 10, 10, 0, 27); //Image(string file [, float x [, float y [, float w [, float h [, string type [, mixed link]]]]]])
-        $this->SetFont('Helvetica','',8);
+        $this->SetFont('Helvetica', '', 8);
         // Address
-        $this->Cell(91,5);
+        $this->Cell(91, 5);
         $this->MultiCell(100, 4, $this->glob["headerAddress"], 0, 'R');
         //2cm Line break
-        $this->Line(10, 38, 210-10, 38);
+        $this->Line(10, 38, 210 - 10, 38);
         $this->Ln(5);
     }
-    function MultiColCell($w, $h, $txt, $border=0, $align='J', $fill=false, $offset=0){
+
+    function MultiColCell($w, $h, $txt, $border = 0, $align = 'J', $fill = false, $offset = 0) {
         $x = $this->GetX();
         $y = $this->GetY();
         $this->SetX($x + $offset);
@@ -22,13 +26,14 @@ class PDF extends FPDF {
         $this->SetXY($x + $w + $offset, $y);
         return $maxY;
     }
+
 }
 
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 
 //projectbookings
-$sql="SELECT $projectTable.id AS projectID,
+$sql = "SELECT $projectTable.id AS projectID,
 $companyTable.id AS companyID, $companyTable.name AS companyName,
 $companyTable.logo, $companyTable.cmpDescription, $companyTable.uid, $companyTable.phone, $companyTable.mail,
 $companyTable.homepage, $companyTable.address, $companyTable.companyPostal, $companyTable.companyCity,
@@ -62,77 +67,79 @@ $pdf->SetRightMargin(10);
 $companyID = $sum = 0;
 $w = array(35, 25, 15, 85, 30); //190
 $h = 5;
-while($result && ($row = $result->fetch_assoc())){
-    if($companyID != $row['companyID']){
-        if(empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription'])){
-            die($lang['ERROR_MISSING_DATA']. "(Name, Logo, Adr.)");
+while ($result && ($row = $result->fetch_assoc())) {
+    if ($companyID != $row['companyID']) {
+        if (empty($row['logo']) || empty($row['address']) || empty($row['cmpDescription'])) {
+            die($lang['ERROR_MISSING_DATA'] . "(Name, Logo, Adr.)");
         }
-        $logo_path = dirname(dirname(__DIR__))."/images/ups/".str_replace(' ', '-',$row['companyName']).'.jpg';
+        $logo_path = dirname(dirname(__DIR__)) . "/images/ups/" . str_replace(' ', '-', $row['companyName']) . '.jpg';
         file_put_contents($logo_path, $row['logo']) or die("Unable to create file");
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        if(finfo_file($finfo, $logo_path) == 'image/png'){
-            $logo_path = 'images/ups/'.$row['companyName'].'.png';
+        if (finfo_file($finfo, $logo_path) == 'image/png') {
+            $logo_path = 'images/ups/' . $row['companyName'] . '.png';
             file_put_contents($logo_path, $row['logo']);
         }
         $created_logos[] = $logo_path;
         $pdf->glob['logo'] = $logo_path;
-        $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription']."\n".$row['address']."\n".$row['companyPostal'].' '.$row['companyCity']."\n".$row['uid']."\n".$row['phone']."\n".$row['homepage']."\n".$row['mail']);
+        $pdf->glob['headerAddress'] = iconv('UTF-8', 'windows-1252', $row['cmpDescription'] . "\n" . $row['address'] . "\n" . $row['companyPostal'] . ' ' . $row['companyCity'] . "\n" . $row['uid'] . "\n" . $row['phone'] . "\n" . $row['homepage'] . "\n" . $row['mail']);
 
 
-        if($companyID){ //copy below
-            $pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
-            $pdf->SetFont('Helvetica','B',10);
-            $pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-            $pdf->Cell(30,10, round($sum, 2) .' '.$lang['MINUTES'] );
-            $pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
+        if ($companyID) { //copy below
+            $pdf->Line(10, $pdf->GetY() + 1, 200, $pdf->GetY() + 1);
+            $pdf->SetFont('Helvetica', 'B', 10);
+            $pdf->Cell($w[0] + $w[1] + $w[2], 10, $lang['SUM']);
+            $pdf->Cell(30, 10, round($sum, 2) . ' ' . $lang['MINUTES']);
+            $pdf->Cell(30, 10, round($sum / 60, 2) . ' ' . $lang['HOURS']);
         }
 
         $pdf->AddPage();
         $sum = 0;
         $companyID = $row['companyID'];
-        $pdf->SetFont('Helvetica','B',16);
+        $pdf->SetFont('Helvetica', 'B', 16);
         $pdf->Cell(0, 10, 'Projektaufstellung', 0, 1, 'R');
-        $pdf->SetFont('Helvetica','',10);
+        $pdf->SetFont('Helvetica', '', 10);
 
         $pdf->Ln(5);
-        $pdf->SetFillColor(200,200,200);
+        $pdf->SetFillColor(200, 200, 200);
 
-        $pdf->Cell($w[0],7,$lang['CLIENT'].'/'.$lang['PROJECT'],0,0,'L',1);
-        $pdf->Cell($w[1],7,$lang['TIMES'], '', 0, 'C', 1);
-        $pdf->Cell($w[2],7, "Min." , '', 0, 'C', 1);
-        $pdf->Cell($w[3],7,'Infotext', '', 0, 'C', 1);
-        $pdf->Cell($w[4],7,$lang['EMPLOYEE'], '', 1, 'C', 1);
+        $pdf->Cell($w[0], 7, $lang['CLIENT'] . '/' . $lang['PROJECT'], 0, 0, 'L', 1);
+        $pdf->Cell($w[1], 7, $lang['TIMES'], '', 0, 'C', 1);
+        $pdf->Cell($w[2], 7, "Min.", '', 0, 'C', 1);
+        $pdf->Cell($w[3], 7, 'Infotext', '', 0, 'C', 1);
+        $pdf->Cell($w[4], 7, $lang['EMPLOYEE'], '', 1, 'C', 1);
     }
 
-    $A = strtotime($row['start']) + $row['timeToUTC']*3600;
-    $B = strtotime($row['end']) + $row['timeToUTC']*3600;
+    $A = strtotime($row['start']) + $row['timeToUTC'] * 3600;
+    $B = strtotime($row['end']) + $row['timeToUTC'] * 3600;
     $y = array(0);
-    $y[] = $pdf->MultiColCell($w[0],$h,iconv('UTF-8', 'windows-1252', $row['clientName']."\n".$row['projectName']));
-    $pdf->MultiColCell($w[1],$h, date('d.m.Y', $A)."\n".date('H:i',$A).' - '.date('H:i',$B), 0, 'L');
-    $pdf->Cell($w[2],$h, sprintf('%.2f', ($B - $A)/60), 0, '', 'R');
+    $y[] = $pdf->MultiColCell($w[0], $h, iconv('UTF-8', 'windows-1252', $row['clientName'] . "\n" . $row['projectName']));
+    $pdf->MultiColCell($w[1], $h, date('d.m.Y', $A) . "\n" . date('H:i', $A) . ' - ' . date('H:i', $B), 0, 'L');
+    $pdf->Cell($w[2], $h, sprintf('%.2f', ($B - $A) / 60), 0, '', 'R');
 
     $sum += ($B - $A) / 60;
-    $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $row['infoText']));
-    $pdf->MultiColCell($w[4], $h,iconv('UTF-8', 'windows-1252', $row['firstname'].' '.$row['lastname']), '', 'R');
+    $y[] = $pdf->MultiColCell($w[3], $h, iconv('UTF-8', 'windows-1252', $row['infoText']));
+    $pdf->MultiColCell($w[4], $h, iconv('UTF-8', 'windows-1252', $row['firstname'] . ' ' . $row['lastname']), '', 'R');
     $pdf->Ln();
     $pdf->SetY(max($y));
     $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
-    if(280 - $pdf->GetY() < 10){ $pdf->AddPage(); }
+    if (280 - $pdf->GetY() < 10) {
+        $pdf->AddPage();
+    }
 }
 
-$pdf->Line(10, $pdf->GetY()+1, 200, $pdf->GetY()+1);
-$pdf->SetFont('Helvetica','B',10);
-$pdf->Cell($w[0]+$w[1]+$w[2],10,$lang['SUM']);
-$pdf->Cell(30,10, round($sum, 2) .' '.$lang['MINUTES'] );
-$pdf->Cell(30,10, round($sum / 60, 2) .' '.$lang['HOURS'] );
+$pdf->Line(10, $pdf->GetY() + 1, 200, $pdf->GetY() + 1);
+$pdf->SetFont('Helvetica', 'B', 10);
+$pdf->Cell($w[0] + $w[1] + $w[2], 10, $lang['SUM']);
+$pdf->Cell(30, 10, round($sum, 2) . ' ' . $lang['MINUTES']);
+$pdf->Cell(30, 10, round($sum / 60, 2) . ' ' . $lang['HOURS']);
 
 /*
-A4 = 210 x 297
-Cell(wdith, height, text, border, ln(right, Ln, below), align, fill, link)
-MultiCell(width, height, txt [, mixed border [, string align [, boolean fill]]])
-MultiColCell(width, height, $txt, $border=0, $align='J', $fill=false, $offset=0, maintainYAxis){
-Line(left margin, x, right margin, y)
-*/
+  A4 = 210 x 297
+  Cell(wdith, height, text, border, ln(right, Ln, below), align, fill, link)
+  MultiCell(width, height, txt [, mixed border [, string align [, boolean fill]]])
+  MultiColCell(width, height, $txt, $border=0, $align='J', $fill=false, $offset=0, maintainYAxis){
+  Line(left margin, x, right margin, y)
+ */
 
 $pdf->Output(0, 'Overview.pdf');
 

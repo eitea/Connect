@@ -1,23 +1,24 @@
 <?php
+
 /*
-SETTING UP A NEW TABLE:
-1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
-2. Append your information to the specs or add them here. TODO: Create specs.
-3. Put your CREATE TABLE statement in here, similar to already existing code.
-4. increment the version numbers in version_number.php.
-5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
-6. relog inside program with a core admin account. you should see an update.
+  SETTING UP A NEW TABLE:
+  1. [OPTIONAL] Put the name of your table as a new variable in connection_vars.php.
+  2. Append your information to the specs or add them here. TODO: Create specs.
+  3. Put your CREATE TABLE statement in here, similar to already existing code.
+  4. increment the version numbers in version_number.php.
+  5. for the new version number, append another if statement into the doUpdate.php, so your changes will be carried over to all existing databases on different systems.
+  6. relog inside program with a core admin account. you should see an update.
 
-MAKING CHANGES TO EXISTING TABLE:
-1. make your changes in here
-2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
-3. increment the numbers in version_number.php
-4. relog inisde program with an account with core priviliges.
+  MAKING CHANGES TO EXISTING TABLE:
+  1. make your changes in here
+  2. write an ALTER TABLE statement inside doUpdate.php, with the new version number
+  3. increment the numbers in version_number.php
+  4. relog inisde program with an account with core priviliges.
 
-Please test the setup after every change.
-*/
+  Please test the setup after every change.
+ */
 
-ini_set('max_execution_time',999);
+ini_set('max_execution_time', 999);
 
 function create_tables($conn) {
     $sql = "CREATE TABLE UserData (
@@ -566,10 +567,10 @@ function create_tables($conn) {
     }
 
     /*
-    * cOnDate is Date this correction was created On
-    * createdOn defines Month this corrections accounts for
-    * (used names were swapped by mistake.)
-    */
+     * cOnDate is Date this correction was created On
+     * createdOn defines Month this corrections accounts for
+     * (used names were swapped by mistake.)
+     */
     $sql = "CREATE TABLE correctionData(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED,
@@ -730,9 +731,9 @@ function create_tables($conn) {
     }
 
     /* IMPORTANT:
-    Tax IDs must always correspond to their current positon in place.
-    Taxes may only be altered under supervision of an accountant
-    */
+      Tax IDs must always correspond to their current positon in place.
+      Taxes may only be altered under supervision of an accountant
+     */
     $sql = "CREATE TABLE taxRates (
         id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         description VARCHAR(100),
@@ -887,7 +888,7 @@ function create_tables($conn) {
         awskey VARCHAR(255),
         awssecret VARCHAR(255),
         location VARCHAR(255)
-    )")){
+    )")) {
         echo mysqli_error($conn);
     }
 
@@ -1133,8 +1134,8 @@ function create_tables($conn) {
         info VARCHAR(450),
         userAgent VARCHAR(150)
     )";
-    if (! $conn->query ( $sql )) {
-        echo mysqli_error ( $conn );
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
     }
 
     $sql = "CREATE TABLE dsgvo_vv_templates(
@@ -1189,7 +1190,7 @@ function create_tables($conn) {
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1345,7 +1346,7 @@ function create_tables($conn) {
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
     $sql = "CREATE TABLE archiveconfig(
@@ -1358,7 +1359,7 @@ function create_tables($conn) {
     }
 
     $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1372,7 +1373,7 @@ function create_tables($conn) {
     password VARCHAR(50) NOT NULL,
     logEnabled ENUM('TRUE','FALSE') NOT NULL,
     PRIMARY KEY (id))";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1393,9 +1394,9 @@ function create_tables($conn) {
         leader int(6) DEFAULT NULL,
         PRIMARY KEY (id)
        )";
-        if(!$conn->query($sql)){
-            echo $conn->error;
-        }
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 
     $sql = "CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
@@ -1405,7 +1406,7 @@ function create_tables($conn) {
         finisher int(6) DEFAULT NULL COMMENT 'user who completes this microtask',
         completed timestamp NULL DEFAULT NULL,
         PRIMARY KEY (projectid,microtaskid))";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1417,10 +1418,10 @@ function create_tables($conn) {
         onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
         FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE)";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_questions (
         id int(6) NOT NULL AUTO_INCREMENT,
         title varchar(100),
@@ -1429,7 +1430,7 @@ function create_tables($conn) {
         PRIMARY KEY (id),
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1440,10 +1441,10 @@ function create_tables($conn) {
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_team_relations (
         trainingID int(6),
         teamID INT(6) UNSIGNED,
@@ -1451,10 +1452,10 @@ function create_tables($conn) {
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_completed_questions (
         questionID int(6),
         userID INT(6) UNSIGNED,
@@ -1463,7 +1464,7 @@ function create_tables($conn) {
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-	if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1474,17 +1475,17 @@ function create_tables($conn) {
         parent_folder INT(6) NOT NULL,
         PRIMARY KEY (userid, folderid),
         INDEX (parent_folder))";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
-    }else{
-		$conn->query("INSERT INTO archive_folders (folderid,userid,name,parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
+    } else {
+        $conn->query("INSERT INTO archive_folders (folderid,userid,name,parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
     }
     $sql = "CREATE TABLE archive_editfiles (
         hashid VARCHAR(32) NOT NULL,
         body TEXT NOT NULL,
         version INT(6) NOT NULL DEFAULT 1,
         PRIMARY KEY (hashid,version))";
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1501,7 +1502,7 @@ function create_tables($conn) {
         PRIMARY KEY (id),
         UNIQUE (hashkey))";
 
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1509,9 +1510,9 @@ function create_tables($conn) {
         name VARCHAR(20) NOT NULL,
         PRIMARY KEY (id))";
 
-    if(!$conn->query($sql)){
+    if (!$conn->query($sql)) {
         echo $conn->error;
-    }else{
+    } else {
         $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     }
 }

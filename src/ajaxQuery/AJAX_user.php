@@ -1,6 +1,6 @@
 <?php
 
-require dirname(__DIR__)."/connection.php";
+require dirname(__DIR__) . "/connection.php";
 
 $companyID = intval($_POST['companyID']);
 $userID = intval($_POST['userID']);
@@ -13,13 +13,13 @@ WHERE companyID = $companyID";
 
 $result = mysqli_query($conn, $query);
 if ($result && $result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    $clientName = $row['firstname'].' '.$row['lastname'];
-    $selected = "";
-    if($userID == $row['userID']){
-      $selected = "selected";
+    while ($row = $result->fetch_assoc()) {
+        $clientName = $row['firstname'] . ' ' . $row['lastname'];
+        $selected = "";
+        if ($userID == $row['userID']) {
+            $selected = "selected";
+        }
+        echo "<option $selected name='act' value=" . $row['userID'] . ">$clientName</option>";
     }
-    echo "<option $selected name='act' value=".$row['userID'].">$clientName</option>";
-  }
 }
 ?>

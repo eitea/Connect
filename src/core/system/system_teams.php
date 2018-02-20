@@ -1,51 +1,52 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php';
+enableToCore($userID); ?>
 <?php
 $teamID = 0;
-if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
+if (isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])) {
     $name = test_input($_POST['createTeam_name']);
     $conn->query("INSERT INTO teamData (name) VALUES('$name')");
     $teamID = mysqli_insert_id($conn);
-    foreach($_POST['createTeam_members'] AS $user){
+    foreach ($_POST['createTeam_members'] AS $user) {
         $user = intval($user);
-        $skill = intval($_POST['createTeam_skill_'.$user]);
+        $skill = intval($_POST['createTeam_skill_' . $user]);
         $conn->query("INSERT INTO $teamRelationshipTable(teamID, userID, skill) VALUES($teamID, $user, $skill)");
     }
-} elseif(isset($_POST['removeTeam'])){
+} elseif (isset($_POST['removeTeam'])) {
     $teamID = intval($_POST['removeTeam']);
     $conn->query("DELETE FROM teamData WHERE id = $teamID");
-} elseif(isset($_POST['removeMember']) && !empty($_POST['teamID'])){
+} elseif (isset($_POST['removeMember']) && !empty($_POST['teamID'])) {
     $teamID = intval($_POST['teamID']);
     $user = intval($_POST['removeMember']);
     $conn->query("DELETE FROM $teamRelationshipTable WHERE userID = $user AND teamID = $teamID");
-} elseif(isset($_POST['saveTeam']) && !empty($_POST['teamID'])){
+} elseif (isset($_POST['saveTeam']) && !empty($_POST['teamID'])) {
     $teamID = intval($_POST['teamID']);
-    foreach($_POST['saveTeam_users'] as $user){
+    foreach ($_POST['saveTeam_users'] as $user) {
         $user = intval($user);
-        $skill = intval($_POST['saveTeam_skill_'.$user]);
+        $skill = intval($_POST['saveTeam_skill_' . $user]);
         $conn->query("UPDATE $teamRelationshipTable SET skill = $skill WHERE teamID = $teamID AND userID = $user");
         echo $conn->error;
     }
-} elseif(isset($_POST['hire']) && !empty($_POST['userIDs'])){
+} elseif (isset($_POST['hire']) && !empty($_POST['userIDs'])) {
     $teamID = intval($_POST['hire']);
-    foreach($_POST['userIDs'] as $user){
+    foreach ($_POST['userIDs'] as $user) {
         $user = intval($user);
-        $skill = intval($_POST['hire_'.$user]);
+        $skill = intval($_POST['hire_' . $user]);
         $conn->query("INSERT INTO $teamRelationshipTable (teamID, userID, skill) VALUES ($teamID, $user, $skill)");
     }
-} elseif(isset($_POST['changeTeamName']) && !empty($_POST['teamName'])){
+} elseif (isset($_POST['changeTeamName']) && !empty($_POST['teamName'])) {
     $teamID = intval($_POST['changeTeamName']);
     $name = test_input($_POST['teamName']);
     $conn->query("UPDATE teamData SET name = '$name' WHERE id = $teamID");
 }
 
 $activeTab = $teamID;
-if($conn->error){
-	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+if ($conn->error) {
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
 }
 
 $percentage_select = '';
-for($i = 0; $i < 11; $i++){
-    $percentage_select .= '<option value="'.($i*10).'">'.($i*10).'%</option>';
+for ($i = 0; $i < 11; $i++) {
+    $percentage_select .= '<option value="' . ($i * 10) . '">' . ($i * 10) . '%</option>';
 }
 ?>
 
@@ -55,7 +56,7 @@ for($i = 0; $i < 11; $i++){
 
 <?php
 $result = $conn->query("SELECT id, name FROM teamData");
-while($result && ($row = $result->fetch_assoc())):
+while ($result && ($row = $result->fetch_assoc())):
     $teamID = $row['id'];
     ?>
     <form method="POST">
@@ -65,26 +66,27 @@ while($result && ($row = $result->fetch_assoc())):
                 <div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a></div>
                 <div class="col-xs-6 text-right">
                     <?php $taskResult = $conn->query("SELECT projectid FROM dynamicprojectsteams WHERE teamid = $teamID");
-                    if($taskResult->num_rows < 1): ?>
+                    if ($taskResult->num_rows < 1):
+                        ?>
                         <button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
                     <?php else: ?>
                         <button type="button" class="btn-empty" style="color:brown;" title="Bearbeiten" data-toggle="modal" data-target="#rename-team-<?php echo $teamID; ?>" ><i class="fa fa-pencil"></i></button>
-                    <?php endif; ?>
+    <?php endif; ?>
                     <button type="submit" class="btn-empty" style="color:#0078e7;" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
                 </div>
             </div>
-            <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
+            <div class="collapse <?php if ($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
                 <div class="panel-body container-fluid">
                     <?php
                     $userResult = $conn->query("SELECT userID, skill FROM teamRelationshipData WHERE teamID = $teamID");
-                    while($userResult && ($userRow = $userResult->fetch_assoc())){
+                    while ($userResult && ($userRow = $userResult->fetch_assoc())) {
                         echo '<div class="col-xs-8 col-md-3">';
-                        echo '<input type="hidden" name="saveTeam_users[]" value="'.$userRow['userID'].'">';
-                        echo '<button type="submit" style="background:none;border:none" name="removeMember" value="'.$userRow['userID'].'"><i style="color:red" class="fa fa-times"></i></button>';
+                        echo '<input type="hidden" name="saveTeam_users[]" value="' . $userRow['userID'] . '">';
+                        echo '<button type="submit" style="background:none;border:none" name="removeMember" value="' . $userRow['userID'] . '"><i style="color:red" class="fa fa-times"></i></button>';
                         echo $userID_toName[$userRow['userID']];
                         echo '</div><div class="col-xs-4 col-md-1">';
-                        echo '<select name="saveTeam_skill_'.$userRow['userID'].'" style="max-width:75px;display:inline;">'.
-                        str_replace('value="'.$userRow['skill'].'">', 'value="'.$userRow['skill'].'" selected>', $percentage_select).'</select>';
+                        echo '<select name="saveTeam_skill_' . $userRow['userID'] . '" style="max-width:75px;display:inline;">' .
+                        str_replace('value="' . $userRow['skill'] . '">', 'value="' . $userRow['skill'] . '" selected>', $percentage_select) . '</select>';
                         echo '</div>';
                     }
                     ?>
@@ -101,9 +103,9 @@ while($result && ($row = $result->fetch_assoc())):
                 <div class="modal-body">
                     <table class="table table-hover">
                         <thead>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Skill</th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Skill</th>
                         </thead>
                         <tbody>
                             <?php
@@ -111,9 +113,9 @@ while($result && ($row = $result->fetch_assoc())):
                             $res_addmem = mysqli_query($conn, $sql);
                             while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
                                 echo '<tr>';
-                                echo '<td><input type="checkbox" name="userIDs[]" value="'.$row_addmem['id'].'" ></td>';
-                                echo '<td>'.$row_addmem['firstname'].' '. $row_addmem['lastname'] .'</td>';
-                                echo '<td><select class="form-control" name="hire_'.$row_addmem['id'].'">'.$percentage_select.'</select></td>';
+                                echo '<td><input type="checkbox" name="userIDs[]" value="' . $row_addmem['id'] . '" ></td>';
+                                echo '<td>' . $row_addmem['firstname'] . ' ' . $row_addmem['lastname'] . '</td>';
+                                echo '<td><select class="form-control" name="hire_' . $row_addmem['id'] . '">' . $percentage_select . '</select></td>';
                                 echo '</tr>';
                             }
                             ?>
@@ -164,16 +166,16 @@ while($result && ($row = $result->fetch_assoc())):
                     </div>
                     <div class="row">
                         <?php
-                        $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
-                        while($result && ($row = $result->fetch_assoc())){
-                            echo '<div class="col-sm-4"><label><input type="checkbox" name="createTeam_members[]" value="'.$row['id'].'" />'.$row['firstname'].' '.$row['lastname'].'</label>
-                            </div><div class="col-sm-2"><select class="form-control" name="createTeam_skill_'.$row['id'].'">'.$percentage_select.'</select></div>';
+                        $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (" . implode(', ', $available_users) . ")");
+                        while ($result && ($row = $result->fetch_assoc())) {
+                            echo '<div class="col-sm-4"><label><input type="checkbox" name="createTeam_members[]" value="' . $row['id'] . '" />' . $row['firstname'] . ' ' . $row['lastname'] . '</label>
+                            </div><div class="col-sm-2"><select class="form-control" name="createTeam_skill_' . $row['id'] . '">' . $percentage_select . '</select></div>';
                         }
                         ?>
                     </div>
                     <div class="row"><small>* Der Skill Level regelt die automatische Task Zuweisung.
-                        Hat der Benutzer im Team einen Skill von 40% und man erstellt einen Task für ein Team mit einem minimum Skill Level von 50%,
-                        dann wird dieser Task nur bei Benutzern angezeigt, die ein Minimum Skill Level in diesem Team von 50% oder höher aufweisen.</small>
+                            Hat der Benutzer im Team einen Skill von 40% und man erstellt einen Task für ein Team mit einem minimum Skill Level von 50%,
+                            dann wird dieser Task nur bei Benutzern angezeigt, die ein Minimum Skill Level in diesem Team von 50% oder höher aufweisen.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
