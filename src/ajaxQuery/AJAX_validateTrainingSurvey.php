@@ -16,11 +16,11 @@ function validate_questions($html, $answer){ // this will true or false (will wo
     $html = preg_replace($htmlRegex,"",$html); // strip all html tags
     preg_match($questionRegex,$html,$matches);
     // I only parse the first question for now
-    if(sizeof($matches)==0) return false;
+    if(sizeof($matches)==0) return $answer == 0;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
     preg_match_all($answerRegex,$question,$matches);
-    if(sizeof($matches)==0) return false;
+    if(sizeof($matches)==0) return $answer == 0;
     if(!isset($matches[1][$answer])) return false;
     if($matches[1][$answer] == "+") return true;
     return false;
@@ -55,7 +55,7 @@ foreach ($result as $formVal => $answer) {
     $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
     $time = 0;
     if(isset($times[$trainingID],$numberOfAnsweredQuestions[$trainingID])){
-        $time = floor($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
+        $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
     }
     if($allowOverwrite || !$questionExists){
         if($questionRight){

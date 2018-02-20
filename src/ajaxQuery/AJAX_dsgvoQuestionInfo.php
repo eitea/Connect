@@ -28,7 +28,7 @@ $timesColorsArray = array();
     <div class="modal-body">
         <?php
         if(!$result || $result->num_rows == 0){
-            echo "no data yet";
+            echo "Noch keine Daten vorhanden";
         }else{
         ?>
         <table class="table">
@@ -178,8 +178,10 @@ var triesChart = new Chart(ctx, {
                     id: 'second-y-axis',
                     stacked: false,
                     position: 'right',
-                    display:false,
-                    ticks: { beginAtZero: true },
+                    ticks: { 
+                        beginAtZero: true,
+                        display:false
+                    }
                 }
             ]
         },

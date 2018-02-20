@@ -117,6 +117,10 @@ while ($row = $result->fetch_assoc()){
             "name"=>"question",
             "html"=>strip_questions($row_question["text"])
         );
+        $choices = parse_questions($row_question["text"]);
+        if(sizeof($choices) == 0){
+            $choices =  array(array("value"=>0,"text"=>"Ich habe den Text gelesen"));
+        }
         $questionArray[] = array(
             "type"=>"radiogroup",
             "name"=>$row_question["id"],
@@ -124,7 +128,7 @@ while ($row = $result->fetch_assoc()){
             "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
             "colCount"=>1,
             "choicesOrder"=>$random == 'TRUE'?"random":"none",
-            "choices"=>parse_questions($row_question["text"])
+            "choices"=>$choices
         );
     }
     $trainingArray[] = array(
