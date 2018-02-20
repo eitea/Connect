@@ -57,7 +57,7 @@ if($result){
                 throw new Exception($imap->getError());
             }
         }catch(Exception $e){
-            $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'".substr($e,0,50)."')");
+            $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'".substr($e,0,100)."')");
         }
     }
 }else{
