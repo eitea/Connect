@@ -366,8 +366,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <td>-</td>
                 <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
-
-
+            </tr>
+        <?php endif;
+        if($userHasSurveys): ?>
+            <tr>
+                <td><i style="color: #efefef" class="fa fa-circle"></i>Bereits beantwortete Schulungen erneut ansehen<div></div></td>
+                <td><a type="button" class="btn btn-default openDoneSurvey">View</a></td>
+                <td>-</td>
+                <td><?=date("Y-m-d")?></td>
+                <td></td>
+                <td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>
+                <td>ACTIVE</td>
+                <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
+                <td>-</td>
+                <td>-</td>
+                <td><input type="checkbox" disabled /></td>
+                <td><a type="button" class="btn btn-default openDoneSurvey"><i class="fa fa-question-circle"></i></a></td>
             </tr>
         <?php endif; ?>
         <!--/training-->
@@ -784,5 +798,21 @@ $(document).ready(function() {
           console.log(data);
       });
   }
+</script>
+<script>
+$(".openDoneSurvey").click(function(){ // answer already done surveys/trainings again
+    $.ajax({
+        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
+        data:{done:true},
+        type: 'get',
+        success : function(resp){
+            $("#currentSurveyModal").html(resp);
+        },
+        error : function(resp){console.error(resp)},
+        complete: function(resp){
+            $("#currentSurveyModal .survey-modal").modal("show");
+        }
+   });
+})
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

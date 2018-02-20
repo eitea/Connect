@@ -12,6 +12,8 @@ $name = $row["name"];
 $version = $row["version"];
 $companyID = $row["companyID"];
 $onLogin = $row["onLogin"];
+$allowOverwrite = $row["allowOverwrite"];
+$random = $row["random"];
 
 $userArray = array();
 $teamArray = array();
@@ -58,6 +60,12 @@ while($row = $result->fetch_assoc()){
             <label>Beantwortungsart</label><br/>
             <label><input type="radio" name="onLogin" value="TRUE" <?php if($onLogin == 'TRUE') echo "checked" ?> />Beantwortung bei Login</label><br/>
             <label><input type="radio" name="onLogin" value="FALSE" <?php if($onLogin == 'FALSE') echo "checked" ?> />Beantwortung freiwillig</label>
+            <br/><label>Überschreiben von Antworten</label><br/>
+            <label><input type="radio" name="allowOverwrite" value="TRUE" <?php if($allowOverwrite == 'TRUE') echo "checked" ?> />Alte Antworten werden durch das erneute Beantworten überschrieben.</label><br/>
+            <label><input type="radio" name="allowOverwrite" value="FALSE" <?php if($allowOverwrite == 'FALSE') echo "checked" ?> />User können das Training wiederholen, aber es bleiben die alten Antworten bestehen.</label>
+            <br/><label>Anordnung der Antworten</label><br/>
+            <label><input type="radio" name="random" value="TRUE" <?php if($random == 'TRUE') echo "checked" ?> />Antwortmöglichkeiten zufällig anordnen.</label><br/>
+            <label><input type="radio" name="random" value="FALSE" <?php if($random == 'FALSE') echo "checked" ?> />Antwortmöglichkeiten wie in der Frage belassen.</label>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
