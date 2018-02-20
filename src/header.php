@@ -1029,6 +1029,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+                <li><a <?php if ($this_page == 'archive_options.php') {echo $setActiveLink;}?> href="../archive/options" data-parent="#sidenav01" class="collapsed"><?php echo $lang['OPTIONS'] ?></a></li>
                 <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
                 <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
@@ -1036,7 +1037,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
       <?php
-        if ($this_page == "archive_share.php" || $this_page == "private_view.php") {
+        if ($this_page == "archive_share.php" || $this_page == "private_view.php" || $this_page == 'archive_options.php') {
             echo "<script>$('#adminOption_ARCHIVE').click();</script>";
         }
         ?>

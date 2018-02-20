@@ -13,7 +13,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }elseif (isset($_POST['addAccount']) && !empty($_POST['server'])&& !empty($_POST['service'])&& !empty($_POST['port'])&& !empty($_POST['username'])&& !empty($_POST['password'])) {
         $server = test_input($_POST['server']);
         $port = test_input($_POST['port']);
-        $security = test_input($_POST['security']) == "none" ? "null" : test_input($_POST['security']);
+        $security = test_input($_POST['security']) == "none" ? null : test_input($_POST['security']);
         $service = test_input($_POST['service']);
         $username = test_input($_POST['username']);
         $password = test_input($_POST['password']);

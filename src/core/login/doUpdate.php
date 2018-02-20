@@ -1885,18 +1885,54 @@ if($row['version'] < 135){
     }
 }
 if ($row['version'] < 136) {
-                $sql = "CREATE OR REPLACE TABLE emailprojectlogs (
+    $sql = "CREATE OR REPLACE TABLE emailprojectlogs (
         id int(11),
         timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         body text,
         PRIMARY KEY (id)
         )";
-                if (!$conn->query($sql)) {
-                    echo $conn->error;
-                } else {
-                    echo '<br>Debugging: Email Projects';
-                }
-            }
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Debugging: Email Projects';
+    }
+    $sql = "ALTER TABLE archiveconfig ADD isActive ENUM('TRUE','FALSE') NOT NULL DEFAULT 'FALSE';";
+    $conn->query($sql);
+    $sql = "ALTER TABLE archiveconfig ADD id INT(6) NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (id);";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Archive: Multible Configs';
+    }
+    $sql = "ALTER TABLE emailprojects CHANGE smtpSecure smtpSecure ENUM('tls','ssl','null') NOT NULL DEFAULT 'null';";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Bugfix: Email Tasks';
+    }
+    
+}
+if ($row['version'] < 137) {
+    $conn->query("CREATE OR REPLACE position (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(20) NOT NULL,
+        PRIMARY KEY (id)
+        )");
+    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    if($result){
+        while($row = $result->fetch_assoc()){
+            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+        }
+    }
+    $sql = "ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Position: Fixed List';
+    }
+}
 
 // ------------------------------------------------------------------------------
 
