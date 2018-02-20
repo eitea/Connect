@@ -384,9 +384,10 @@ $rowClient = $result->fetch_assoc();
 $result = $conn->query("SELECT * FROM clientInfoData WHERE id = $detailID");
 $row = $result->fetch_assoc();
 
-$resultNotes = $conn->query("SELECT * FROM clientInfoNotes WHERE parentID = $detailID");
-$resultBank = $conn->query("SELECT * FROM clientInfoBank WHERE parentID = $detailID");
-$resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName FROM contactPersons LEFT JOIN position ON position.id = position WHERE clientID = $filterClient");
+$resultNotes = $conn->query("SELECT * FROM clientInfoNotes WHERE parentID = $detailID"); echo $conn->error;
+$resultBank = $conn->query("SELECT * FROM clientInfoBank WHERE parentID = $detailID"); echo $conn->error;
+$resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName FROM contactPersons LEFT JOIN position ON position.id = position WHERE clientID = $filterClient"); echo $conn->error;
+
 ?>
 
 <div class="page-header">
@@ -580,7 +581,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                     <tbody>
                         <?php
                         $editmodals = '';
-                        while ($contactRow = $resultContacts->fetch_assoc()) {
+                        while ($contactRow && ($contactRow = $resultContacts->fetch_assoc())) {
                             echo '<tr>';
                             echo '<td>' . $lang['GENDER_TOSTRING'][$contactRow['gender']]. '</td>';
                             echo '<td>' . $contactRow['title'] . '</td>';
