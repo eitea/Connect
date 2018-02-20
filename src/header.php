@@ -1246,16 +1246,16 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                             <div id="collapse-archives" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <ul class="nav navbar-nav">
-                                        <li> <?php
+                                        <li> <a <?php
                                             if ($this_page == 'archive_share.php') {
                                                 echo $setActiveLink;
                                             }
-                                            ?> <a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
-                                        <li> <?php
+                                            ?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
+                                        <li> <a <?php
                                             if ($this_page == 'private_view.php') {
                                                 echo $setActiveLink;
                                             }
-                                            ?> <a href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
+                                            ?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
                                     </ul>
                                 </div>
                             </div>
