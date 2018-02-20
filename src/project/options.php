@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th><button type="button" onclick="runAutotask()" class="btn btn-default" ><i class="fa fa-refresh"></i></button></th>
+    <th><button type="button" onclick="checkEmails()" class="btn btn-default" ><i class="fa fa-refresh"></i></button></th>
   </tr></thead>
   <tbody>
   <?php
@@ -541,8 +541,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         );
         return $state;
     };
-    function runAutotask(){
-        $.post("../report/autotask",{},function(data){
+    function checkEmails(){
+        $.post("../report/tasks",{},function(data){
             console.log(data);
         });
     }

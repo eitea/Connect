@@ -304,7 +304,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
   function generateKeys($userID){
     $.ajax({
       type: "POST",
-      url: "../pgp/keygen",
+      url: "ajaxQuery/AJAX_genPgpKey.php",
       data: { userID: $userID}
     }).done(function(keys){
       keys = JSON.parse(keys);
@@ -800,7 +800,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                   <?php endif;?>
                 <?php if ($isProjectAdmin == 'TRUE'): ?>
-                <li><a <?php if ($this_page == 'project_options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
+                <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
                 <?php endif;?>
               </ul>
             </div>
@@ -1029,12 +1029,17 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
-                <li><a href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
+                <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
+                <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
             </div>
           </div>
         </div>
+      <?php
+        if ($this_page == "archive_share.php" || $this_page == "private_view.php") {
+            echo "<script>$('#adminOption_ARCHIVE').click();</script>";
+        }
+        ?>
       <?php endif;?>
       <!-- END SECTIONS -->
       <br><br>
