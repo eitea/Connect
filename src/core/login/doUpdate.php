@@ -1919,14 +1919,14 @@ if ($row['version'] < 137) {
         PRIMARY KEY (id)
         )");
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactPersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
     if($result){
         while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-    $sql = "ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;";
+    $sql = "ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL;";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
