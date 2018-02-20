@@ -513,7 +513,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <script>
 $("#projectForm").on("submit",function(){
     console.log("here");
-    
+
 })
 $("#bookCompletedCheckbox").change(function(event){
     $("#bookCompleted").attr('readonly', this.checked);

@@ -1211,7 +1211,7 @@ function create_tables($conn) {
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
-        estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,

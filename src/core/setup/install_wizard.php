@@ -20,18 +20,10 @@
 </head>
 <body>
     <?php
-    include dirname(dirname(__DIR__)).'/utilities.php';
-    $pgp_keys = pgp_generate_keys();
-    var_dump($pgp_keys);
-
-    
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
-            include dirname(dirname(__DIR__)).'/utilities.php';
-            include dirname(dirname(__DIR__)).'/connection.php';
             $hash = password_hash($_POST['encryption_pass'], PASSWORD_BCRYPT);
-            $pgp_keys = pgp_generate_keys();
-            var_dump($pgp_keys);
+            $conn->query("UPDATE UserData SET psw = '$hash' WHERE id = 2");
         }
     }
     ?>
