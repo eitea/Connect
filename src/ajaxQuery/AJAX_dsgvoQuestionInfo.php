@@ -27,7 +27,7 @@ $timesColorsArray = array();
 <div class="modal fade">
     <div class="modal-dialog modal-content modal-md">
     <div class="modal-header">Auswertung von <?php echo $title ?></div>
-    <div class="modal-body">
+    <div class="modal-body" style="overflow:scroll;">
         <?php
         if(!$result || $result->num_rows == 0){
             echo "Noch keine Daten vorhanden";
