@@ -6,9 +6,9 @@ session_start();
 $userID = $_SESSION["userid"] or die("Session died");
 $x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
 $result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectID = '$x' AND
-    ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with dynamicProjects.php
+    ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1");//changes here have to be synced with dynamicProjects.php
 if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
-    $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
+        $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
 echo $conn->error;
 ?>
@@ -26,19 +26,19 @@ echo $conn->error;
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
                     $result = $conn->query("SELECT projectdescription, projectstatus FROM dynamicprojects WHERE projectid = '$x'");
-                    $dynrow = $result->fetch_assoc();
+                    $dynrow =  $result->fetch_assoc();
                     $description = $dynrow['projectdescription'];
                     $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
-                    if ($micro) {
-                        while ($nextmtask = $micro->fetch_assoc()) {
-                            if ($nextmtask['ischecked'] == 'TRUE') {
+                    if($micro){
+                        while($nextmtask = $micro->fetch_assoc()){
+                            if($nextmtask['ischecked'] == 'TRUE'){
                                 $mtaskid = $nextmtask['microtaskid'];
-                                $description = preg_replace("/id=.$mtaskid./", "id=\"$mtaskid\" checked", $description);
+                                $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
                                 $user = $nextmtask['finisher'];
                                 $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
-                                if ($username) {
+                                if($username){
                                     $username = $username->fetch_assoc()['name'];
-                                    $description = preg_replace("/id=.$mtaskid. checked disabled title=../", "id=\"$mtaskid\" checked disabled title=\"$username\"", $description);
+                                    $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
                                 }
                             }
                         }
@@ -58,7 +58,6 @@ echo $conn->error;
                             </tr></thead>
                         <tbody>
                             <?php
-
                             function carryOverAdder_Hours($a, $b) {
                                 $b = round($b);
                                 if ($a == '0000-00-00 00:00:00') {
@@ -73,21 +72,19 @@ echo $conn->error;
                                 }
                                 return $date->format('Y-m-d H:i:s');
                             }
-
                             $result = $conn->query("SELECT p.start, p.end, infoText, internInfo, firstname, lastname, timeToUTC
                             FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID LEFT JOIN UserData ON logs.userID = UserData.id WHERE p.dynamicID = '$x' ORDER BY p.start DESC");
-                            while ($result && ($row = $result->fetch_assoc())) {
-                                $A = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
+                            while($result && ($row = $result->fetch_assoc())){
+                                $A = carryOverAdder_Hours($row['start'],$row['timeToUTC']);
                                 $B = 'Gerade in Arbeit';
-                                if ($row['end'] != '0000-00-00 00:00:00')
-                                    $B = substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']), 11, 5);
+                                if ($row['end'] != '0000-00-00 00:00:00') $B = substr(carryOverAdder_Hours($row['end'],$row['timeToUTC']), 11, 5);
                                 echo '<tr>';
-                                echo '<td>' . $row['firstname'] . ' ' . $row['lastname'] . '</td>';
-                                echo '<td>' . substr($A, 0, 10) . '</td>';
-                                echo '<td>' . substr($A, 11, 5) . '</td>';
-                                echo '<td>' . $B . '</td>';
-                                echo '<td>' . $row['infoText'] . '</td>';
-                                echo '<td>' . $row['internInfo'] . '</td>';
+                                echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+                                echo '<td>'.substr($A,0,10).'</td>';
+                                echo '<td>'.substr($A, 11, 5).'</td>';
+                                echo '<td>'.$B.'</td>';
+                                echo '<td>'.$row['infoText'].'</td>';
+                                echo '<td>'.$row['internInfo'].'</td>';
                                 echo '</tr>';
                             }
                             ?>
@@ -100,16 +97,16 @@ echo $conn->error;
                                 <th>Zeit <small>(System-Zeit)</small></th>
                                 <th>Benutzer</th>
                                 <th>Aktivität</th>
-                            </tr></thead>
+                        </tr></thead>
                         <tbody>
                             <?php
                             $result = $conn->query("SELECT firstname, lastname, p.activity, logTime FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
                             echo $conn->error;
-                            while ($result && ($row = $result->fetch_assoc())) {
+                            while($result && ($row = $result->fetch_assoc())){
                                 echo '<tr>';
-                                echo '<td>' . $row['logTime'] . '</td>';
-                                echo '<td>' . $row['firstname'] . ' ' . $row['lastname'] . '</td>';
-                                echo '<td>' . $row['activity'] . '</td>';
+                                echo '<td>'.$row['logTime'].'</td>';
+                                echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
+                                echo '<td>'.$row['activity'].'</td>';
                                 echo '</tr>';
                             }
                             ?>
@@ -125,10 +122,10 @@ echo $conn->error;
                 $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
                 $hasActiveBooking = $result->num_rows;
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
-                if ($dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking) {
+                if($dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
                     echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
                 }
-                ?>
+                 ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
             </form>
         </div>

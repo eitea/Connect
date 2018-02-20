@@ -1,5 +1,4 @@
 <?php
-
 function timeDiff_Hours($from, $to) {
     $timeBegin = strtotime($from);
     $timeEnd = strtotime($to);
@@ -49,16 +48,16 @@ function isHoliday($ts) {
 }
 
 /*
-  function isHoliday($ts){|
-  require "connection.php";
-  $sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%'";
-  $result = mysqli_query($conn, $sql);
-  return($result && $result->num_rows>0);
-  }
+function isHoliday($ts){|
+require "connection.php";
+$sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%'";
+$result = mysqli_query($conn, $sql);
+return($result && $result->num_rows>0);
+}
  */
 
 function test_input($data, $strong = false) {
-    if ($strong) {
+    if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
     } else {
         $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
@@ -102,18 +101,16 @@ function redirect($url) {
         echo '</script>';
         echo '<noscript>';
         echo '<meta http-equiv="refresh" content="0;url=' . $url . '" />';
-        echo '</noscript>';
-        exit;
+        echo '</noscript>';exit;
     }
 }
 
-/* see if password matches policy, returns true or false.
+/*see if password matches policy, returns true or false.
  * writes error message in optional output
  * low - at least x characters (x from policy table)
  * medium - at least one capital letter and one number
  * high - at least one special character
  */
-
 function match_passwordpolicy($p, &$out = '') {
     require "connection.php";
     $result = $conn->query("SELECT * FROM $policyTable");
@@ -149,6 +146,7 @@ function getNextERP($identifier, $companyID, $offset = 0) {
         if ($offset < 0) {
             $offset = 0;
         }
+
     }
     $vals = array($offset);
     $result = $conn->query("SELECT id_number FROM processHistory, proposals, clientData WHERE processID = proposals.id AND clientID = clientData.id AND companyID = $companyID AND id_number LIKE '$identifier%'");
@@ -173,8 +171,8 @@ function randomPassword($length = 8) {
 }
 
 /*
-  echo $test=strtotime('2016-02-3 05:44:21');
-  echo date('Y-m-d H:i:s', $test);
+echo $test=strtotime('2016-02-3 05:44:21');
+echo date('Y-m-d H:i:s', $test);
  */
 
 function simple_encryption($message, $key) {
@@ -210,7 +208,6 @@ function simple_decryption($message, $key) {
  * echo $c->decrypt($var2);
  */
 class MasterCrypt {
-
     public $iv;
     public $iv2;
     private $password;
@@ -225,7 +222,6 @@ class MasterCrypt {
             $this->iv = openssl_encrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
         }
     }
-
     function encrypt($unencrypted) {
         if ($this->password && $this->iv && $this->iv2) {
             $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
@@ -235,7 +231,6 @@ class MasterCrypt {
             return $unencrypted;
         }
     }
-
     function decrypt($encrypted) {
         if ($this->password) {
             $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
@@ -247,7 +242,6 @@ class MasterCrypt {
             return $encrypted;
         }
     }
-
     function getStatus($encrypt = false) {
         if ($encrypt) {
             if ($this->password) {
@@ -260,7 +254,6 @@ class MasterCrypt {
         }
         return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
     }
-
 }
 
 function mc_status() {
@@ -304,7 +297,6 @@ function mc_total_row_count() {
  *
  * query must contain WHERE clause
  */
-
 function getFilledOutTemplate($templateID, $bookingQuery = "") {
     set_time_limit(60);
     require "connection.php";
@@ -526,6 +518,7 @@ function uploadImage($file_field, $crop_square = false, $resize = true) { //shou
         } else {
             return file_get_contents($_FILES[$file_field]['tmp_name']);
         }
+
     } else {
         $out['error'][] = "No file uploaded";
         return $out;

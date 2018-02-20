@@ -1,5 +1,5 @@
-<?php
-if (!isset($_REQUEST["trainingID"])) {
+<?php 
+if (!isset($_REQUEST["trainingID"])){
     echo "error";
     die();
 }
@@ -15,7 +15,7 @@ $onLogin = $row["onLogin"];
 
 $userArray = array();
 $result = $conn->query(
-        "SELECT userID, firstname, lastname FROM dsgvo_training_user_relations 
+    "SELECT userID, firstname, lastname FROM dsgvo_training_user_relations 
      INNER JOIN UserData ON UserData.id = dsgvo_training_user_relations.userID 
      WHERE trainingID = $trainingID
      UNION
@@ -26,8 +26,8 @@ $result = $conn->query(
      INNER JOIN UserData ON UserData.id = teamRelationshipData.userID
      WHERE dsgvo_training_team_relations.trainingID = $trainingID"
 );
-while ($row = $result->fetch_assoc()) {
-    $userArray[] = array("id" => $row["userID"], "name" => $row["firstname"] . " " . $row["lastname"]);
+while($row = $result->fetch_assoc()){
+    $userArray[] = array("id"=>$row["userID"],"name"=>$row["firstname"]." ".$row["lastname"]);
 }
 $nameArray = array();
 foreach ($userArray as $user) {
@@ -69,61 +69,61 @@ foreach ($userArray as $user) {
 }
 ?>
 <script src="plugins/chartsjs/Chart.min.js"></script>
-<form method="POST">
-    <div class="modal fade">
-        <div class="modal-dialog modal-content modal-lg">
-            <div class="modal-header">Auswertung von <?php echo $name ?></div>
-            <div class="modal-body">
+ <form method="POST">
+ <div class="modal fade">
+      <div class="modal-dialog modal-content modal-lg">
+        <div class="modal-header">Auswertung von <?php echo $name ?></div>
+        <div class="modal-body">
 
-                <canvas id="myChart" width="600" height="300"></canvas>
-                <script>
-                    var ctx = document.getElementById("myChart").getContext('2d');
-                    var myChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: <?php echo json_encode($nameArray) ?>, // ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                            datasets: [{
-                                    label: 'right',
-                                    data: <?php echo json_encode($pointsRightArray) ?>,
-                                    backgroundColor: <?php echo json_encode($rightColors) ?>,
-                                    borderColor: <?php echo json_encode($rightColorsOutline) ?>,
-                                    borderWidth: 1
-                                }, {
-                                    label: 'wrong',
-                                    data: <?php echo json_encode($pointsWrongArray) ?>,
-                                    backgroundColor: <?php echo json_encode($wrongColors) ?>,
-                                    borderColor: <?php echo json_encode($wrongColorsOutline) ?>,
-                                    borderWidth: 1
-                                }, {
-                                    label: 'unanswered',
-                                    data: <?php echo json_encode($pointsUnansweredArray) ?>,
-                                    backgroundColor: <?php echo json_encode($unansweredColors) ?>,
-                                    borderColor: <?php echo json_encode($unansweredColorsOutline) ?>,
-                                    borderWidth: 1
-                                }]
-                        },
-                        options: {
-                            scales: {
-                                xAxes: [{
-                                        stacked: true, ticks: {
-                                            beginAtZero: true
-                                        }
-                                    }],
-                                yAxes: [{
-                                        stacked: true
-                                    }]
-                            },
-                            tooltips: {
-                                mode: 'nearest'
-                            }
-                        }
-                    });
-                </script>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-                <button type="submit" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>">Training bearbeiten</button>
-            </div>
+        <canvas id="myChart" width="600" height="300"></canvas>
+<script>
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($nameArray) ?>, // ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [{
+            label: 'right',
+            data: <?php echo json_encode($pointsRightArray) ?>,
+            backgroundColor: <?php echo json_encode($rightColors) ?>,
+            borderColor: <?php echo json_encode($rightColorsOutline) ?>,
+            borderWidth: 1
+        },{
+            label: 'wrong',
+            data: <?php echo json_encode($pointsWrongArray) ?>,
+            backgroundColor: <?php echo json_encode($wrongColors) ?>,
+            borderColor: <?php echo json_encode($wrongColorsOutline) ?>,
+            borderWidth: 1
+        },{
+            label: 'unanswered',
+            data: <?php echo json_encode($pointsUnansweredArray) ?>,
+            backgroundColor: <?php echo json_encode($unansweredColors) ?>,
+            borderColor: <?php echo json_encode($unansweredColorsOutline) ?>,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            xAxes: [{
+                stacked: true,ticks: {
+                    beginAtZero:true
+                }
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        },
+        tooltips: {
+            mode: 'nearest'
+        }
+    }
+});
+</script>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>">Training bearbeiten</button>
+        </div>
+      </div>
     </div>
 </form>

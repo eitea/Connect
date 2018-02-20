@@ -5,13 +5,13 @@
 </div>
 
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0) {
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
         $name = test_input($_POST['create_client_name']);
         $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
-        $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '" . $_POST['clientNumber'] . "')";
-        if ($conn->query($sql)) { //if ok, give him default projects
+        $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
+        if($conn->query($sql)){ //if ok, give him default projects
             $id = $conn->insert_id;
             $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
             SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
@@ -19,15 +19,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             //and his details
             $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
         }
-        if (mysqli_error($conn)) {
+        if(mysqli_error($conn)){
             echo mysqli_error($conn);
         } else {
-            echo '<script>window.location="../system/clientDetail?custID=' . $id . '";</script>';
+            echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
         }
-    } elseif (isset($_POST['create_client'])) {
+    } elseif(isset($_POST['create_client'])){
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Error: </strong>' . $lang['ERROR_MISSING_FIELDS'];
+        echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
         echo '</div>';
     }
 }
@@ -42,19 +42,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="modal-body">
                 <div class="col-md-12">
                     <label>Name</label>
-                    <input type="text" class="form-control required-field" name="create_client_name" placeholder="Name..." onkeydown="if (event.keyCode == 13)
-                                return false;">
+                    <input type="text" class="form-control required-field" name="create_client_name" placeholder="Name..." onkeydown="if (event.keyCode == 13) return false;">
                     <br>
                 </div>
                 <div class="col-md-6">
                     <label>Mandant</label>
                     <select id="create_client_company" name="create_client_company" class="js-example-basic-single" style="width:200px">
                         <?php
-                        $result_cc = $conn->query("SELECT * FROM companyData WHERE id IN (" . implode(', ', $available_companies) . ")");
+                        $result_cc = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
                         while ($result_cc && ($row_cc = $result_cc->fetch_assoc())) {
                             $cmpnyID = $row_cc['id'];
                             $cmpnyName = $row_cc['name'];
-                            if (isset($filterCompanyID) && $filterCompanyID == $cmpnyID) {
+                            if(isset($filterCompanyID) && $filterCompanyID == $cmpnyID){
                                 echo "<option selected value='$cmpnyID'>$cmpnyName</option>";
                             } else {
                                 echo "<option value='$cmpnyID'>$cmpnyName</option>";
@@ -68,13 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $clientNums = array(1 => '');
                     $numstrings = '';
                     $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
-                    while ($res_num && ($rowNum = $res_num->fetch_assoc())) {
+                    while($res_num && ($rowNum = $res_num->fetch_assoc())){
                         $cmpnyID = $rowNum['companyID'];
                         $step = $rowNum['clientStep'];
                         $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND clientNumber IS NOT NULL AND clientNumber != '' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
-                        if ($row_c_num = $res_c_num->fetch_assoc()) {
+                        if($row_c_num = $res_c_num->fetch_assoc()){
                             $num = $row_c_num['clientNumber'];
-                            if ($row_c_num['clientNumber'] < $rowNum['clientNum']) {
+                            if($row_c_num['clientNumber'] < $rowNum['clientNum']){
                                 $num = $rowNum['clientNum'];
                             }
                         } else {
@@ -82,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $step = 0;
                         }
                         $clientNums[$cmpnyID] = preg_replace('/[0-9]+/', '', $num) . (preg_replace('/[^0-9]+/', '', $num) + $step);
-                        $numstrings .= $cmpnyID . ':"' . $clientNums[$cmpnyID] . '",';
+                        $numstrings .= $cmpnyID .':"'. $clientNums[$cmpnyID] .'",';
                     }
                     ?>
                     <label>Kundennummer</label>
@@ -99,8 +98,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 <script>
-    $('#create_client_company').on('change', function () {
-        var clientNums = <?php echo "{ $numstrings }"; ?>;
-        $('#clientNumber').val(clientNums[$(this).val()]);
-    });
+$('#create_client_company').on('change', function(){
+    var clientNums = <?php echo "{ $numstrings }"; ?> ;
+    $('#clientNumber').val(clientNums[$(this).val()]);
+});
 </script>

@@ -1,5 +1,4 @@
 <?php
-
 $vatid = $_GET['vatNumber'];
 $url = "http://ec.europa.eu/taxation_customs/vies/services/checkVatService";
 $vatid = str_replace(array(' ', '.', '-', ',', ', '), '', trim($vatid));
@@ -15,21 +14,21 @@ $content = "<s11:Envelope xmlns:s11='http://schemas.xmlsoap.org/soap/envelope/'>
   </s11:Body>
 </s11:Envelope>";
 
-$ctx = stream_context_create(array(
-    'http' => array(
-        'method' => 'POST',
-        'header' => "Content-Type: text/xml; charset=utf-8; SOAPAction: checkVatService",
-        'content' => sprintf($content, $countryCode, $vatNumber),
-        'timeout' => 30
-        )));
-$result = file_get_contents($url, false, $ctx);
+$ctx = stream_context_create ( array (
+    'http' => array (
+    'method' => 'POST',
+    'header' => "Content-Type: text/xml; charset=utf-8; SOAPAction: checkVatService",
+    'content' => sprintf ( $content, $countryCode, $vatNumber ),
+    'timeout' => 30
+)));
+$result = file_get_contents ( $url, false, $ctx );
 
-$result = str_replace("<soap:Body>", "", $result);
-$result = str_replace("</soap:Body>", "", $result);
+$result = str_replace("<soap:Body>","",$result);
+$result = str_replace("</soap:Body>","",$result);
 
 $response = simplexml_load_string($result)->checkVatResponse;
 
-if ($response->valid == 'true') {
+if($response->valid == 'true'){
     echo $response->requestDate;
 }
 ?>

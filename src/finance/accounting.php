@@ -1,4 +1,5 @@
-<?php include dirname(__DIR__) . '/header.php'; ?>
+<?php
+include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 enableToFinance($userID);
@@ -40,9 +41,9 @@ if (!empty($_POST['webID']) && !isset($_POST['transferToWEB'])) {
     //TODO: if these dont match: STRIKE
     $_POST['add_should'] = $row['amount'];
     $_POST['add_tax'] = $row['taxID'];
-    if ($_POST['add_should'] != $_POST['add_tax']) {
+    if($_POST['add_should']!=$_POST['add_tax']){
         $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> ' . $lang['ERROR_STRIKE'] . '</div>';
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     }
 }
 $journalID = false;
@@ -70,11 +71,12 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
         $res = $conn->query("SELECT num FROM accounts WHERE id = $addAccount");
         if ($res && ($rowP = $res->fetch_assoc())) {
             $accNum = $rowP['num'];
-        } else {//else STRIKE
-            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Monat.</strong> ' . $lang['ERROR_STRIKE'] . '</div>';
         }
-
+        else{//else STRIKE
+            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Monat.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+        }
+        
 
         if ($accNum >= 5000 && $accNum < 8000 && $have) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 5, 6 und 7 dürfen nicht im Haben stehen.</div>';
@@ -87,7 +89,7 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
         }
         if (!empty($_POST['webID'] || isset($_POST['transferToWEB'])) && ($accNum < 5000 || $accNum >= 6000)) { //STRIKE
             $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültige Konto Klasse.</strong> Es dürfen nur Buchungen auf Konten der Klasse 5 ins WEB übertragen werden. ' . $lang['ERROR_STRIKE'] . '</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültige Konto Klasse.</strong> Es dürfen nur Buchungen auf Konten der Klasse 5 ins WEB übertragen werden. '.$lang['ERROR_STRIKE'].'</div>';
             $accept = false;
         }
         if ($accept) {
@@ -106,7 +108,7 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
             if (!$res || $res->num_rows < 1) {
                 $accept = false;
                 $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> ' . $lang['ERROR_STRIKE'] . '</div>';
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> '.$lang['ERROR_STRIKE'].'</div>';
             }
             //STRIKE
             $taxRow = $res->fetch_assoc();
@@ -250,27 +252,25 @@ while ($result && ($row = $result->fetch_assoc())) {
 ?>
 
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'] . ' <small>' . $account_row['num'] . ' - ' . $account_row['name'] . '</small>'; ?>
-        <div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php';
-$cmpID = $account_row['companyID'];
-include dirname(__DIR__) . '/misc/lockAccounting.php'; ?>
-            <?php if ($show_undo): ?>
-                <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
-            <?php endif; ?>
-        </div></h3></div>
+<div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; $cmpID = $account_row['companyID']; include dirname(__DIR__) . '/misc/lockAccounting.php';?>
+<?php if ($show_undo): ?>
+    <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
+<?php endif;?>
+</div></h3></div>
 <br>
 <table class="table table-hover">
     <thead><tr>
-            <th>Nr.</th>
-            <th><?php echo $lang['DATE']; ?></th>
-            <th><?php echo $lang['ACCOUNT']; ?></th>
-            <th>Text</th>
-            <th>Steuer Nr.</th>
-            <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
-            <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT']; ?></th>
-            <th style="text-align:right">Saldo</th>
-            <th>WEB</th>
-            <th></th>
-        </tr></thead>
+        <th>Nr.</th>
+        <th><?php echo $lang['DATE']; ?></th>
+        <th><?php echo $lang['ACCOUNT']; ?></th>
+        <th>Text</th>
+        <th>Steuer Nr.</th>
+        <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
+        <th style="text-align:right"><?php echo $lang['FINANCE_CREDIT']; ?></th>
+        <th style="text-align:right">Saldo</th>
+        <th>WEB</th>
+        <th></th>
+    </tr></thead>
     <tbody>
         <?php
         $dateQuery = '';
@@ -303,14 +303,10 @@ include dirname(__DIR__) . '/misc/lockAccounting.php'; ?>
             echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
             echo '<td style="text-align:right">' . number_format($row['netto_have'], 2, ',', '.') . '</td>';
             echo '<td style="text-align:right">' . number_format($saldo, 2, ',', '.') . '</td>';
-            if ($row['receiptID']) {
-                echo '<td>' . $lang['YES'] . '</td>';
-            } else {
-                echo '<td>' . $lang['NO'] . '</td>';
-            }
+            if ($row['receiptID']) {echo '<td>' . $lang['YES'] . '</td>';} else {echo '<td>' . $lang['NO'] . '</td>';}
 
             if ($account_row['manualBooking'] == 'TRUE' && !$row['receiptID'] && !in_array(substr($row['payDate'], 0, 8) . '01', $lockedMonths)) {
-                echo '<td><button type="button" class="btn btn-default editing-modal-butt" title="Editieren" value="' . $row['id'] . '" ><i class="fa fa-pencil"></i></button></td>';
+                echo '<td><button type="button" class="btn btn-default editing-modal-butt" title="Editieren" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
             } else {
                 echo '<td></td>';
             }
@@ -327,7 +323,7 @@ include dirname(__DIR__) . '/misc/lockAccounting.php'; ?>
     </tbody>
 </table>
 <hr><br><br>
-<?php if ($account_row['manualBooking'] == 'TRUE'): ?>
+<?php if($account_row['manualBooking'] == 'TRUE'): ?>
     <form method="POST" class="well">
         <div class="row form-group">
             <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'] . ' WEB'; ?></button></div>
@@ -337,242 +333,234 @@ include dirname(__DIR__) . '/misc/lockAccounting.php'; ?>
             <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" /></div>
             <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
                 <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
-                <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
+                    <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
+                </div>
+                <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
             </div>
-            <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
-        </div>
-        <div class="row form-group">
-            <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
-            <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
-            <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
-            <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
-        </div>
-        <div class="row">
-            <span id="transferToWebInputs" style="display:none">
-                <div class="col-md-3"><label><?php echo $lang['SUPPLIER']; ?></label><select name="add_supplier" class="js-example-basic-single"><?php echo $supplier_select; ?></select></div>
-                <div class="col-md-2"><label><?php echo $lang['RECEIPT_DATE']; ?></label><input id="receiptDate" type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div>
-            </span>
-        </div>
-        <input type="hidden" id="webID" name="webID" value=""/>
-    </form>
-    <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
-<?php else: ?>
-    <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als Gegenkonto markiert werden und ein Konto der Klasse 2 sein. </div>
-<?php endif; ?>
+            <div class="row form-group">
+                <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
+                <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
+                <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
+            </div>
+            <div class="row">
+                <span id="transferToWebInputs" style="display:none">
+                    <div class="col-md-3"><label><?php echo $lang['SUPPLIER']; ?></label><select name="add_supplier" class="js-example-basic-single"><?php echo $supplier_select; ?></select></div>
+                    <div class="col-md-2"><label><?php echo $lang['RECEIPT_DATE']; ?></label><input id="receiptDate" type="text" class="form-control datepicker" name="add_invoiceDate" value="" /></div>
+                </span>
+            </div>
+            <input type="hidden" id="webID" name="webID" value=""/>
+        </form>
+        <form method="POST"><button type="submit" class="btn btn-link btn-sm">Reset</button></form>
+    <?php else: ?>
+        <div class="alert alert-info">Gegen dieses Konto können keine Buchungen getätigt werden. Um gegen ein Konto buchen zu können, muss es unter den Einstellungen Ihres Mandanten als Gegenkonto markiert werden und ein Konto der Klasse 2 sein. </div>
+    <?php endif;?>
 
 <div id="editingModalDiv"></div>
 <div id="openWEB" class="modal fade">
-    <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header"><h4><?php echo $lang['RECEIPT_BOOK']; ?> - <small>Zeile auswählen</small></h4></div>
-        <div class="modal-body">
-            <table class="table table-hover">
-                <thead><tr>
-                        <th>Nr.</th>
-                        <th><?php echo $lang['RECEIPT_DATE']; ?></th>
-                        <th><?php echo $lang['SUPPLIER']; ?></th>
-                        <th>Infotext</th>
-                        <th><?php echo $lang['AMOUNT']; ?> <small>(Brutto)</small></th>
-                        <th><?php echo $lang['TAXES']; ?></th>
-                        <th><?php echo $lang['VAT']; ?></th>
-                    </tr></thead>
-                <tbody>
-                    <?php
-                    $val = $account_row['companyID'];
-                    $i = 1;
-                    $res = $conn->query("SELECT receiptBook.*, clientData.name, taxRates.percentage
+  <div class="modal-dialog modal-content modal-md">
+	<div class="modal-header"><h4><?php echo $lang['RECEIPT_BOOK']; ?> - <small>Zeile auswählen</small></h4></div>
+	<div class="modal-body">
+        <table class="table table-hover">
+            <thead><tr>
+                <th>Nr.</th>
+                <th><?php echo $lang['RECEIPT_DATE']; ?></th>
+                <th><?php echo $lang['SUPPLIER']; ?></th>
+                <th>Infotext</th>
+                <th><?php echo $lang['AMOUNT']; ?> <small>(Brutto)</small></th>
+                <th><?php echo $lang['TAXES']; ?></th>
+                <th><?php echo $lang['VAT']; ?></th>
+            </tr></thead>
+            <tbody>
+                <?php
+$val = $account_row['companyID'];
+$i = 1;
+$res = $conn->query("SELECT receiptBook.*, clientData.name, taxRates.percentage
                 FROM receiptBook INNER JOIN taxRates ON  taxRates.id = taxID INNER JOIN clientData ON clientData.id = supplierID WHERE companyID = $val AND (journalID IS NULL OR journalID = 0)");
-                    while ($row = $res->fetch_assoc()) {
-                        echo '<tr onclick="webFillout(' . $row['id'] . ', ' . $row['amount'] . ',  \'' . $row['info'] . '\', ' . $row['taxID'] . ');">';
-                        echo '<td>' . $i++ . '</td>';
-                        echo '<td>' . substr($row['invoiceDate'], 0, 10) . '</td>';
-                        echo '<td>' . $row['name'] . '</td>';
-                        echo '<td>' . $row['info'] . '</td>';
-                        echo '<td>' . number_format(($row['amount']), 2, ',', '.') . '</td>';
-                        echo '<td>' . $row['percentage'] . '% </td>';
-                        echo '<td>' . number_format($row['amount'] - ($row['amount'] * 100) / (100 + $row['percentage']), 2, ',', '.') . '</td>';
-                        echo '<td>' . '</td>';
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-        <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></div>
+while ($row = $res->fetch_assoc()) {
+    echo '<tr onclick="webFillout(' . $row['id'] . ', ' . $row['amount'] . ',  \'' . $row['info'] . '\', ' . $row['taxID'] . ');">';
+    echo '<td>' . $i++ . '</td>';
+    echo '<td>' . substr($row['invoiceDate'], 0, 10) . '</td>';
+    echo '<td>' . $row['name'] . '</td>';
+    echo '<td>' . $row['info'] . '</td>';
+    echo '<td>' . number_format(($row['amount']), 2, ',', '.') . '</td>';
+    echo '<td>' . $row['percentage'] . '% </td>';
+    echo '<td>' . number_format($row['amount'] - ($row['amount'] * 100) / (100 + $row['percentage']), 2, ',', '.') . '</td>';
+    echo '<td>' . '</td>';
+    echo '</tr>';
+}
+?>
+            </tbody>
+        </table>
     </div>
+	<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></div>
+  </div>
 </div>
 
 <script>
-    $("select[name=add_supplier]").change(function () {
-        if ($(this).val() == 'new') {
-            $('#create_client').modal().toggle();
-        }
-    });
+$("select[name=add_supplier]").change(function(){
+  if($(this).val() == 'new'){
+    $('#create_client').modal().toggle();
+  }
+});
 
-    var existingModals = new Array();
-    $('.editing-modal-butt').click(function () {
-        var index = $(this).val();
-        if (existingModals.indexOf(index) == -1) {
-            $.ajax({
-                url: 'ajaxQuery/AJAX_accountingModalEdit.php',
-                data: {
-                    id: index, acc: '<?php echo urlencode($account_select); ?>',
-                    tax: '<?php echo urlencode($tax_select); ?>',
-                    web: '<?php echo urlencode($web_select); ?>',
-                    sups: '<?php echo urlencode($supplier_select); ?>'
-                },
-                type: 'post',
-                success: function (resp) {
-                    $("#editingModalDiv").append(resp);
-                    existingModals.push(index);
-                    onPageLoad();
-                    $('.edit-journal-' + index).modal('show');
-                },
-                error: function (resp) {}
-            });
-        } else {
-            $('.edit-journal-' + index).modal('show');
-        }
-    });
-
-    var active_should = true;
-    var active_have = true;
-    function disenable(xor1, xor2, active) {
-        if ($('#' + xor1).val()) {
-            $('#' + xor2).val('');
-            $('#' + xor2).prop('readonly', true);
-            $('#' + xor2).attr('tabindex', '-1');
-        } else if (active) {
-            $('#' + xor2).prop('readonly', false);
-        }
+var existingModals = new Array();
+$('.editing-modal-butt').click(function(){
+    var index = $(this).val();
+    if(existingModals.indexOf(index) == -1){
+      $.ajax({
+      url:'ajaxQuery/AJAX_accountingModalEdit.php',
+      data:{
+          id: index, acc: '<?php echo urlencode($account_select); ?>',
+          tax: '<?php echo urlencode($tax_select); ?>',
+          web: '<?php echo urlencode($web_select); ?>',
+          sups: '<?php echo urlencode($supplier_select); ?>'
+      },
+      type: 'post',
+      success : function(resp){
+        $("#editingModalDiv").append(resp);
+        existingModals.push(index);
+        onPageLoad();
+        $('.edit-journal-'+index).modal('show');
+      },
+      error : function(resp){}
+     });
+    } else {
+      $('.edit-journal-'+index).modal('show');
     }
-    function showHide(show_id, hide_id) {
-        $('#' + show_id).show();
-        $('#' + hide_id).hide();
-    }
-    $('#should').keyup(function (e) {
-        disenable('should', 'have', active_have);
-    });
-    $('#have').keyup(function (e) {
-        disenable('have', 'should', active_should);
-    });
+});
 
-    $('#account').change(function (e) {
-        if ($('#webID').val())
-            return;
+var active_should = true;
+var active_have = true;
+function disenable(xor1, xor2, active){
+    if($('#' + xor1).val()){
+        $('#' + xor2).val('');
+        $('#' + xor2).prop('readonly', true);
+        $('#' + xor2).attr('tabindex', '-1');
+    } else if(active) {
+        $('#' + xor2).prop('readonly', false);
+    }
+}
+function showHide(show_id, hide_id){
+    $('#'+show_id).show();
+    $('#'+hide_id).hide();
+}
+$('#should').keyup(function(e) { disenable('should', 'have', active_have); });
+$('#have').keyup(function(e) { disenable('have', 'should', active_should); });
+
+$('#account').change(function(e) {
+    if($('#webID').val()) return;
+    active_should = true;
+    active_have = true;
+    disenable('should', 'have', true);
+    disenable('have', 'should', true);
+    $('#tax').select2().attr('disabled', false);
+    var account = $(this).select2('data')[0].text.split(' ')[0];
+    if(account >= 5000 && account < 8000){
         active_should = true;
-        active_have = true;
-        disenable('should', 'have', true);
-        disenable('have', 'should', true);
-        $('#tax').select2().attr('disabled', false);
-        var account = $(this).select2('data')[0].text.split(' ')[0];
-        if (account >= 5000 && account < 8000) {
-            active_should = true;
-            active_have = false;
-            $('#have').val('');
-            $('#have').prop('readonly', true);
-            $('#have').attr('tabindex', '-1');
-            $('#should').prop('readonly', false);
-        } else if (account >= 4000 && account < 5000) {
-            active_have = true;
-            active_should = false;
-            $('#should').val('');
-            $('#should').prop('readonly', true);
-            $('#should').attr('tabindex', '-1');
-            $('#have').prop('readonly', false);
-        } else if ((account >= 1000 && account < 4000) || account >= 8000 && account < 10000) {
-            $('#tax').val(1).trigger('change');
-            $('#tax').select2().attr('disabled', true);
-            $('#tax').select2().attr('tabindex', '-1');
-        }
-        if (account >= 5000 && account < 6000) {
-            $('#transferToWEB').show();
-        } else {
-            if ($('#transferToWEBc').is(':checked')) {
-                $('#transferToWEBc').trigger('click');
-            }
-            $('#transferToWEB').hide();
-        }
-    });
-    $('#transferToWEBc').click(function () {
-        if (this.checked) {
-            showHide('transferToWebInputs', 'openWebButton');
-        } else {
-            showHide('openWebButton', 'transferToWebInputs');
-        }
-        $('#receiptDate').trigger('change');
-    });
-    function webFillout(id, amount, text, tax) {
-        $('#openWEB').modal('toggle');
-        $('#webID').val(id);
-        $('#should').val(amount);
-        $('#should').prop('readonly', true);
-        $('#should').attr('tabindex', '-1');
+        active_have = false;
+        $('#have').val('');
         $('#have').prop('readonly', true);
         $('#have').attr('tabindex', '-1');
-        $('#infoText').val(text);
-        $('#tax').val(tax).trigger('change');
+        $('#should').prop('readonly', false);
+    } else if(account >= 4000 && account < 5000){
+        active_have = true;
+        active_should = false;
+        $('#should').val('');
+        $('#should').prop('readonly', true);
+        $('#should').attr('tabindex', '-1');
+        $('#have').prop('readonly', false);
+    } else if((account >= 1000 && account < 4000) || account >= 8000 && account < 10000){
+        $('#tax').val(1).trigger('change');
         $('#tax').select2().attr('disabled', true);
         $('#tax').select2().attr('tabindex', '-1');
-        $('#transferToWEB').hide();
-
-        $('#account').children().filter(function () { //remove all class 5
-            var account = $(this).text().split(' ')[0];
-            return (account < 5000 || account > 5999);
-        }).remove();
     }
-    $('#receiptDate').change(function (e) {
-        if ($("#receiptDate").val() == false && $('#transferToWEBc').is(':checked')) {
-            $('#addFinance').attr('disabled', true);
-        } else {
-            $('#addFinance').attr('disabled', false);
+    if(account >= 5000 && account < 6000){
+        $('#transferToWEB').show();
+    } else {
+        if($('#transferToWEBc').is(':checked')){
+            $('#transferToWEBc').trigger('click');
         }
-    });
+        $('#transferToWEB').hide();
+    }
+});
+$('#transferToWEBc').click(function(){
+    if(this.checked) {
+        showHide('transferToWebInputs', 'openWebButton');
+    } else {
+        showHide('openWebButton', 'transferToWebInputs');
+    }
+    $('#receiptDate').trigger('change');
+});
+function webFillout(id, amount, text, tax){
+    $('#openWEB').modal('toggle');
+    $('#webID').val(id);
+    $('#should').val(amount);
+    $('#should').prop('readonly', true);
+    $('#should').attr('tabindex', '-1');
+    $('#have').prop('readonly', true);
+    $('#have').attr('tabindex', '-1');
+    $('#infoText').val(text);
+    $('#tax').val(tax).trigger('change');
+    $('#tax').select2().attr('disabled', true);
+    $('#tax').select2().attr('tabindex', '-1');
+    $('#transferToWEB').hide();
 
-    $(document).ready(function () {
-        var tab = $('.table').DataTable({
-            order: [],
-            ordering: false,
-            language: {
-<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-            },
-            responsive: true,
-            autoWidth: false
-        });
-        tab.page('last').draw('page');
-        setTimeout(function () {
-            window.dispatchEvent(new Event('resize'));
-            $('.table').trigger('column-reorder.dt');
-        }, 500);
-    });
+    $('#account').children().filter(function(){ //remove all class 5
+        var account = $(this).text().split(' ')[0];
+        return (account < 5000 || account > 5999);
+    }).remove();
+}
+$('#receiptDate').change(function(e) {
+    if($("#receiptDate").val() == false && $('#transferToWEBc').is(':checked')){
+        $('#addFinance').attr('disabled', true);
+    } else {
+        $('#addFinance').attr('disabled', false);
+    }
+});
+
+$(document).ready(function(){
+  var tab = $('.table').DataTable({
+    order: [],
+    ordering: false,
+    language: {
+      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+    },
+    responsive: true,
+    autoWidth: false
+  });
+  tab.page('last').draw( 'page' );
+setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('.table').trigger('column-reorder.dt'); }, 500);
+});
 </script>
-<?php include dirname(__DIR__) . '/footer.php'; ?>
+<?php include dirname(__DIR__) . '/footer.php';?>
 
 <script>
-    $(document).ready(function () {
-        $('#account').select2({
-            matcher: function (params, data) {
-                var defaultMatcher = $.fn.select2.defaults.defaults.matcher;
-                if (data.text && $.isNumeric(params.term)) {
-                    if (params.term % 1000 == 0) {
-                        if ($.isNumeric(data.text.substr(0, 5)) && data.text.match("^" + (params.term / 1000))) {
-                            return data;
-                        }
-                    } else if (params.term < 1000 && params.term % 100 == 0) {
-                        var dat = data.text.substr(0, 4);
-                        if ($.isNumeric(dat) && dat < 1000 && data.text.match("^" + (params.term / 100))) {
-                            return data;
-                        }
-                        return null;
-                    } else {
-                        if (data.text.match("^" + params.term)) {
-                            return data;
-                        }
-                        return null;
+$(document).ready(function(){
+    $('#account').select2({
+        matcher: function(params, data){
+            var defaultMatcher = $.fn.select2.defaults.defaults.matcher;
+            if (data.text && $.isNumeric(params.term)) {
+                if (params.term % 1000 == 0){
+                    if ($.isNumeric(data.text.substr(0,5)) && data.text.match("^" + (params.term / 1000))) {
+                        return data;
                     }
+                } else if (params.term < 1000 && params.term % 100 == 0){
+                    var dat = data.text.substr(0,4);
+                    if ($.isNumeric(dat) && dat < 1000 && data.text.match("^" + (params.term / 100))) {
+                        return data;
+                    }
+                    return null;
+                } else {
+                    if(data.text.match("^" + params.term)){
+                        return data;
+                    }
+                    return null;
                 }
-                return defaultMatcher(params, data);
             }
-        });
+            return defaultMatcher(params, data);
+        }
     });
+});
 </script>

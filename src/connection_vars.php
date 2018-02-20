@@ -1,9 +1,8 @@
 <?php
-
 /*
-  Update: This file is no longer maintained. Substitution of variables into hardcoded strings
-  TODO: remove this file.
- */
+Update: This file is no longer maintained. Substitution of variables into hardcoded strings
+TODO: remove this file.
+*/
 $adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
 $auditLogsTable = "auditLogs";
@@ -49,7 +48,7 @@ $userTable = "UserData"; //users
 $userRequests = "userRequestsData"; //user requests for vacation
 $roleTable = "roles"; //all roles (admin/canBook)
 
-$taskTable = 'taskData';
+$taskTable ='taskData';
 $teamTable = 'teamData'; //users can be divided into teams
 $teamRelationshipTable = 'teamRelationshipData'; //team to users is a n:m relation
 $travelTable = "travelBookings";

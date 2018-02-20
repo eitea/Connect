@@ -1,5 +1,4 @@
 <?php
-
 $lang_eng = array();
 $lang_ger = array();
 
@@ -122,7 +121,7 @@ $lang_eng['BILLING'] = 'Billing';
 $lang_ger['BILLING'] = 'Abrechnung';
 
 $lang_eng['BLESSING'] = 'Have a nice day!';
-$lang_ger['BLESSING'] = 'Ich wünsche Ihnen einen angenehmen Tag!';
+$lang_ger['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
 
 $lang_eng['BOOK_PROJECTS'] = 'Book Projects';
 $lang_ger['BOOK_PROJECTS'] = 'Projekte Buchen';
@@ -785,14 +784,14 @@ $lang_ger['MINUTES'] = 'Minuten';
 $lang_eng['MISSING'] = 'Missing';
 $lang_ger['MISSING'] = 'Fehlend';
 
-$lang_eng['MONTH'] = 'Month';
-$lang_ger['MONTH'] = 'Monat';
+$lang_eng['MONTH'] ='Month';
+$lang_ger['MONTH'] ='Monat';
 
-$lang_eng['MOVE'] = 'Move';
-$lang_ger['MOVE'] = 'Verschieben';
+$lang_eng['MOVE'] ='Move';
+$lang_ger['MOVE'] ='Verschieben';
 
-$lang_eng['MONTHLY_REPORT'] = 'Monthly Report';
-$lang_ger['MONTHLY_REPORT'] = 'Monatsbericht';
+$lang_eng['MONTHLY_REPORT'] ='Monthly Report';
+$lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 
 $lang_eng['MY_REQUESTS'] = 'My Requests';
 $lang_ger['MY_REQUESTS'] = 'Meine Anträge';
@@ -1040,7 +1039,7 @@ $lang_ger['REFERENCE_NUMERAL_ROW'] = 'Bezugszeichenzeile';
 $lang_eng['REFRESH'] = 'Refresh';
 $lang_ger['REFRESH'] = 'Erneuern';
 
-$lang_eng['REGISTER'] = 'Register';
+$lang_eng['REGISTER'] ='Register';
 $lang_ger['REGISTER'] = 'Registrieren';
 
 $lang_eng['REGISTER_FROM_ACTIVE_DIR'] = 'Register Users from LDAP';
@@ -1049,7 +1048,7 @@ $lang_ger['REGISTER_FROM_ACTIVE_DIR'] = 'Von LDAP Registrieren';
 $lang_eng['REGISTER_FROM_FORM'] = 'Register by Forumlar';
 $lang_ger['REGISTER_FROM_FORM'] = 'Formular Registrierung';
 
-$lang_eng['REGISTER_NEW_USER'] = 'Register new User';
+$lang_eng['REGISTER_NEW_USER'] ='Register new User';
 $lang_ger['REGISTER_NEW_USER'] = 'Neuen Benutzer Registrieren';
 
 $lang_eng['REMOVE_USER'] = 'Remove User';
@@ -1188,10 +1187,10 @@ $lang_eng['STATIC_PROJECTS'] = 'Static Projects';
 $lang_ger['STATIC_PROJECTS'] = 'Statische Projekte';
 
 $lang_eng['STREET'] = 'Street';
-$lang_ger['STREET'] = 'Straße';
+$lang_ger['STREET'] ='Straße';
 
 $lang_eng['SUM'] = 'Sum';
-$lang_ger['SUM'] = 'Summe';
+$lang_ger['SUM'] ='Summe';
 
 $lang_eng['SUPERVISOR'] = 'Supervisor';
 $lang_ger['SUPERVISOR'] = 'Vorgesetzter';
@@ -1262,16 +1261,16 @@ $lang_ger['TRAVEL_TIME'] = 'Fahrzeit';
 $lang_eng['TYPE'] = 'Type';
 $lang_ger['TYPE'] = 'Art';
 
-$lang_eng['UNDO'] = 'Undo';
+$lang_eng['UNDO'] ='Undo';
 $lang_ger['UNDO'] = 'Rückgängig';
 
-$lang_eng['UNANSWERED_REQUESTS'] = 'Unanswered Requests';
-$lang_ger['UNANSWERED_REQUESTS'] = 'Unbeantwortete Anträge';
+$lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
+$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anträge';
 
-$lang_eng['UNIT'] = 'Unit';
+$lang_eng['UNIT'] ='Unit';
 $lang_ger['UNIT'] = 'Einheit';
 
-$lang_eng['UNITS'] = 'Units';
+$lang_eng['UNITS'] ='Units';
 $lang_ger['UNITS'] = 'Einheiten';
 
 $lang_eng['UPDATE_REQUIRED'] = 'Update required. ';
@@ -1280,11 +1279,11 @@ $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
 $lang_eng['UPTODATE'] = 'Version is up tp date. ';
 $lang_ger['UPTODATE'] = 'Version ist aktuell. ';
 
-$lang_eng['UPLOAD'] = 'Upload';
+$lang_eng['UPLOAD'] ='Upload';
 $lang_ger['UPLOAD'] = 'Hochladen';
 
-$lang_eng['USED_DAYS'] = 'Used Days';
-$lang_ger['USED_DAYS'] = 'Verbrauchte Tage';
+$lang_eng['USED_DAYS'] ='Used Days';
+$lang_ger['USED_DAYS'] ='Verbrauchte Tage';
 
 $lang_eng['USERS'] = 'Users';
 $lang_ger['USERS'] = 'Benutzer';
@@ -1392,10 +1391,10 @@ $lang_ger['YOUR_ARCHIVE'] = 'Ihr Archiv';
 $lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
 $lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');
 
-$lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent", "0" => "Work", "1" => "Vacation", "2" => "Special Leave",
-    "3" => "Sick", "4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");
-$lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend", "0" => "Dienst", "1" => "Urlaub", "2" => "Sonderurlaub",
-    "3" => "Krankenstand", "4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
+$lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Vacation","2" => "Special Leave",
+  "3" => "Sick","4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");
+$lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
+  "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
 
 $lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
 $lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");
@@ -1407,7 +1406,7 @@ $lang_eng['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Simple', "MEDIUM" => 'Medi
 $lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mittel', "STRONG" => 'Stark');
 
 $lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.');
-$lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr', 'female' => 'Frau');
+$lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau');
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
@@ -1418,10 +1417,10 @@ $lang_ger['PRIORITY_TOSTRING'] = array("-", "Sehr niedrig", "Niedrig", "Normal",
 $lang_eng['PROPOSAL_TOSTRING'] = array('ANG' => 'Offer', 'AUB' => 'Order Confirmation', 'RE' => 'Receipt', 'LFS' => 'Note of Delivery', 'GUT' => 'Credit', 'STN' => 'Cancellation');
 $lang_ger['PROPOSAL_TOSTRING'] = array('ANG' => 'Angebot', 'AUB' => 'Auftragsbestätigung', 'RE' => 'Rechnung', 'LFS' => 'Lieferschein', 'GUT' => 'Gutschrift', 'STN' => 'Stornierung');
 
-$lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education", "spl" => "Special Leave",
-    "brk" => "Missing Break", "cto" => "Compensatory time", "div" => "Split Lunchbreak", "doc" => "Doctor Appointment");
+$lang_eng['REQUEST_TOSTRING'] = array("vac" => "Vacation", "acc" => "New Account", "log" => "Time Change", "scl" => "Education","spl" => "Special Leave",
+  "brk" => "Missing Break","cto" => "Compensatory time", "div" => "Split Lunchbreak", "doc" => "Doctor Appointment");
 $lang_ger['REQUEST_TOSTRING'] = array("vac" => "Urlaub", "acc" => "Neuer Account", "log" => "Zeitänderung", "scl" => "Weiterbildung", "spl" => "Sonderurlaub",
-    "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen", "doc" => "Arzt Termin");
+  "brk" => "Fehlende Pause", "cto" => "Zeitausgleich", "div" => "Pause Aufteilen", "doc" => "Arzt Termin");
 
 $lang_eng['REQUESTSTATUS_TOSTRING'] = array("Open", "Declined", "Accepted");
 $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
@@ -1429,13 +1428,13 @@ $lang_ger['REQUESTSTATUS_TOSTRING'] = array("Offen", "Abgelehnt", "Bewilligt");
 $lang_eng['SCHEDULE_TOSTRING'] = array('-1' => 'Inactive', '0' => 'Once', '1' => 'Daily', '2' => 'Weekly', '3' => 'Monthly', '4' => 'Yearly', '5' => 'Once every Five Minutes');
 $lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1' => 'Täglich', '2' => 'Wöchentlich', '3' => 'Monatlich', '4' => 'Jährlich', '5' => 'Einmal alle Fünf Minuten');
 
-$lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday", "tue" => "Tuesday", "wed" => "Wednesday", "thu" => "Thursday", "fri" => "Friday", "sat" => "Saturday", "sun" => "Sunday");
-$lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag", "fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");
+$lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
+$lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");
 
 $lang = array();
-if (isset($_SESSION['language']) && $_SESSION['language'] == 'ENG') {
-    $lang = $lang_eng;
-} elseif (!isset($_SESSION['language']) || $_SESSION['language'] == 'GER') {
-    $lang = $lang_ger;
+if(isset($_SESSION['language']) && $_SESSION['language'] == 'ENG'){
+  $lang = $lang_eng;
+} elseif(!isset($_SESSION['language']) || $_SESSION['language'] == 'GER'){
+  $lang = $lang_ger;
 }
 ?>
