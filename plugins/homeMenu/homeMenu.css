@@ -392,6 +392,9 @@ span.select2.select2-container.select2-container--default {
 .page-content-fixed-100{ 
   margin-top:100px;
 }
+.page-content-fixed-150{ 
+  margin-top:130px;
+}
 .page-header-fixed{
   background-color: white;
   position:fixed;
