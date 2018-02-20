@@ -1914,6 +1914,27 @@ if($row['version'] < 134){
     }
 }
 
+if($row['version'] < 135){
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN gender ENUM('male','female') NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Gender';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN title VARCHAR(20)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Titel';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN pgpKey TEXT");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: PGP Key';
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';
