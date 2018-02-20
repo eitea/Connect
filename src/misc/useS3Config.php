@@ -1,7 +1,7 @@
 <?php
-    require dirname(dirname(__DIR__)) . "\plugins\aws\autoload.php";
+    require dirname(dirname(__DIR__)) . "/plugins/aws/autoload.php";
     function getS3Config(){
-        require dirname(__DIR__) . "\connection.php";
+        require dirname(__DIR__) . "/connection.php";
         $config = $conn->query("SELECT * FROM archiveconfig");
         if(isset($config)){
             $row = $config->fetch_assoc();
@@ -15,7 +15,7 @@
     }
 
     function setS3Config($server,$key,$secret){
-        require dirname(__DIR__) . "\connection.php";
+        require dirname(__DIR__) . "/connection.php";
         try{
             $conn->query("UPDATE archiveconfig SET endpoint='$server', awskey='$key', secret='$secret'");
             return true;
@@ -25,7 +25,7 @@
     }
 
     function clearS3Config(){
-        require dirname(__DIR__) . "\connection.php";
+        require dirname(__DIR__) . "/connection.php";
         try{
             $conn->query("UPDATE archiveconfig SET endpoint=null, awskey=null, secret=null");
             return true;

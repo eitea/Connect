@@ -162,6 +162,9 @@ $lang_ger['CANCELLATION'] = 'Stornierung';
 $lang_eng['CAN_CHECKIN'] = 'Can Checkin';
 $lang_ger['CAN_CHECKIN'] = 'Kann Einstempeln';
 
+$lang_eng['CAN_CREATE_TASKS'] = 'Can Create Tasks';
+$lang_ger['CAN_CREATE_TASKS'] = 'Kann Tasks erstellen';
+
 $lang_eng['CAN_BOOK'] = 'Can create Bookings';
 $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 

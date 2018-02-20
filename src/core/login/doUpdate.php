@@ -1757,7 +1757,7 @@ if($row['version'] < 131){ //14.02.2018
     name VARCHAR(20) NOT NULL,
     PRIMARY KEY (id))");
 
-    
+
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1865,7 +1865,20 @@ if($row['version'] < 133){
         echo '<br>Debugging: Email Projects';
     }
 }
-if ($row['version'] < 134) {
+if($row['version'] < 134){
+    $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
+    $sql = "ALTER TABLE sharedgroups CHANGE uri uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Repairing: Archive';
+    }
+    $sql = "ALTER TABLE roles ADD canCreateTasks ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can Create Task';
+    }
     $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN version INT(6) DEFAULT 0");
     if ($conn->error) {
         echo $conn->error;

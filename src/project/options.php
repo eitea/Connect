@@ -355,10 +355,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         var row = null;
         $.post("ajaxQuery/AJAX_getEmailAccountInfo.php",{id: e_id},function(data){
             row = JSON.parse(data);
-            console.log(row);
+            //console.log(row);
             server.setAttribute("value",row['server']);
             port.setAttribute("value",row['port']);
-            console.log(port);
+            //console.log(port);
             username.setAttribute("value",row['username']);
             service.selectedIndex = row['service'].toUpperCase() == "IMAP" ? 0 : 1;
             security.selectedIndex = row['smtpSecure'] == "none" ? 0 : row[0] == "tls" ? 1 : 2;
