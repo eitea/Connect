@@ -806,7 +806,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             </div>
           </div>
         </div>
-        <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
+        <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php" || $this_page == "options.php") {
             echo "<script>$('#adminOption_PROJECT').click();</script>";
         } ?>
       <?php endif;?>

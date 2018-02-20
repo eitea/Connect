@@ -481,8 +481,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             username: document.getElementById("username").value,
             password: document.getElementById("password").value
         }, function(data){
-          console.log(data==1);
-          data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+          //console.log(data==1);
+          //data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+          if(data==1){
+              alert('The credentials you entered seem to be working.');
+          }else{
+              alert('The credentials you entered are not working.');
+          }
       });
     }
     function edit_checkEmail(element){
@@ -494,8 +499,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             username: document.getElementById("edit_username").value,
             password: document.getElementById("edit_password").value
         }, function(data){
-            console.log(data==1);
-            data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+            //console.log(data==1);
+            //data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+            if(data==1){
+              alert('The credentials you entered seem to be working.');
+            }else{
+              alert('The credentials you entered are not working.');
+            }
       });
     }
     function showClients(company, client, place){
