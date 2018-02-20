@@ -381,8 +381,10 @@ span.select2.select2-container.select2-container--default {
     border:none;
 }
 .help-button{
-    float:right;
+    right:10px;
+    position:fixed;
     margin-top:10px;
+    z-index: 1001;
 }
 
 /* Fixed headers */
