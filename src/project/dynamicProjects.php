@@ -258,7 +258,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $mapNode = explode(";",$filterings['employees'][$i]);
                 if($mapNode[0] === "user"){
                     $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d
-                    JOIN teamrelationshipdata t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
+                    JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
                 } else {
                     $query_filter .= " AND dynamicprojectsteams.teamid = ".$mapNode[1];
                 }
