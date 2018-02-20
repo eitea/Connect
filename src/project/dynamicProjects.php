@@ -40,19 +40,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
     if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
-        var_dump($_POST);
         $bookingID = test_input($_POST['createBooking']);
         $result = $conn->query("SELECT dynamicID, clientprojectid, needsreview FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
         if($row = $result->fetch_assoc()){
             $dynamicID = $row['dynamicID'];
-            $needsReview = $row['needsreview'];
             $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
             if($projectID){
                 $result->free();
                 $percentage = intval($_POST['bookCompleted']);
                 if($percentage == 100 || isset($_POST['bookCompletedCheckbox'])){
                     $percentage = 100; //safety
-                    if($needsReview == 'TRUE'){
+                    if($row['needsreview'] == 'TRUE'){
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
                     } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
@@ -425,23 +423,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <div class="row">
                         <div class="col-md-12">
                             <?php
-                            $microtasks = $conn->query("SELECT * FROM microtasks WHERE projectid = '".$occupation['dynamicID']."'");
-                            if($microtasks){
+                            $microtasks = $conn->query("SELECT microtaskid, title, ischecked FROM microtasks WHERE projectid = '".$occupation['dynamicID']."' WHERE ischecked = 'FALSE'");
+                            if($microtasks && $microtasks->num_rows > 0){
                                 echo '<table id="microlist" class="dataTable table">';
                                 echo '<thead><tr>';
-                                echo '<td>Completed</td>';
-                                echo '<td>Micro Task</td>';
+                                echo '<th>Completed</th>';
+                                echo '<th>Micro Task</th>';
                                 echo '</tr></thead>';
                                 echo '<tbody>';
                                 while($mtask = $microtasks->fetch_assoc()){
-                                    if($mtask['ischecked']=='FALSE'){
-                                        $mid = $mtask['microtaskid'];
-                                        $title = $mtask['title'];
-                                        echo '<tr><td>';
-                                        echo '<input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
-                                        echo '<td><label>'.$title.'</label></td>';
-                                        echo '</tr>';
-                                    }
+                                    $mid = $mtask['microtaskid'];
+                                    $title = $mtask['title'];
+                                    echo '<tr>';
+                                    echo '<td><input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
+                                    echo '<td><label>'.$title.'</label></td>';
+                                    echo '</tr>';
                                 }
                                 echo '</tbody>';
                                 echo '</table>';
