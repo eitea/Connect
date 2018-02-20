@@ -41,17 +41,20 @@ if($result){
                     'password' => $password
                 )
             ));
-            $imap->selectFolder("INBOX");
-            $messages = $imap->getMessages();
-            $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
-            while($rule = $rulesets->fetch_assoc()){
-                for($i = 0;$i<count($messages);$i++){
-                    if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
-                        insertTask($imap,$messages[$i],$conn,$rule);
-                    }
-                } 
+            if($imap->isConnected()){
+                $imap->selectFolder("INBOX");
+                $messages = $imap->getMessages();
+                $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
+                while($rule = $rulesets->fetch_assoc()){
+                    for($i = 0;$i<count($messages);$i++){
+                        if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
+                            insertTask($imap,$messages[$i],$conn,$rule);
+                        }
+                    } 
+                }
+            }else{
+                throw new Exception($imap->getError());
             }
-            
         }catch(Exception $e){
             $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$e')");
         }
