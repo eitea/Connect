@@ -13,17 +13,17 @@
                 <td></td>
             </tr>
         </thead>
-        <tbody id="tableContent">
-            <?php 
+        <tbody id="tableContent"><?php 
                 while($row = $configs->fetch_assoc()){
+                    $checked = '';
+                    if($row['isActive']=="TRUE") $checked = 'checked';
                     echo '<tr>';
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
-                    echo '<td>'.$row['isActive'].'</td>';
+                    echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
                     echo '<td></td>';
                     echo '</tr>';
                 }
-            ?>
-        </tbody>
+            ?></tbody>
     </table>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -66,7 +66,7 @@ return;
 
 function insertTask($imap,$messages,$conn,$ruleset){
     $message = $messages->message;
-    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$message')");
+    //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$message->html')");
     $allowedTags = "<div><p><b><img><a><br><em><hr><i><li><ol><s><span><table><tr><td><u><ul>";
 try{
     $id = uniqid();
