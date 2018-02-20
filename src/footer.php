@@ -60,7 +60,7 @@ $(".feedback-button").on("click",function(){
             $("#screenshot").html(newImg);
         });
         window.feedbackCanvasObject = canvas
-        $('#feedbackModal').modal('show');
+        $('#feedbackModal').appendTo("body").modal('show');
     });
 })
 
