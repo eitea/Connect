@@ -1932,6 +1932,17 @@ if ($row['version'] < 137) {
     } else {
         echo '<br>Position: Fixed List';
     }
+    $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        $sql = "SET GLOBAL event_scheduler = ON;";
+        if (!$conn->query($sql)) {
+            echo $conn->error;
+        } else {
+            echo '<br>Auto-Delete Dead Links';
+        }
+    }
 }
 
 // ------------------------------------------------------------------------------
