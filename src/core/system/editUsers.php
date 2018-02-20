@@ -2,9 +2,10 @@
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php enableToCore($userID);?>
 <!-- BODY -->
-
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+</div>
 </div>
 <?php
 $activeTab = 0;
@@ -361,6 +362,7 @@ $(document).ready(function(){
 });
 </script>
 <br>
+<div class="page-content-fixed-100">
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
   $query = "SELECT *, $userTable.id AS user_id FROM $userTable
@@ -783,5 +785,6 @@ $(document).ready(function(){
       });
   }
 </script>
+</div>
 <!-- /BODY -->
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

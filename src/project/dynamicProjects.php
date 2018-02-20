@@ -44,7 +44,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
     <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
 </div></h3></div>
 </div>
-<div class="page-content-fixed">
+<div class="page-content-fixed-100">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){

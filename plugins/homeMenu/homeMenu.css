@@ -386,8 +386,11 @@ span.select2.select2-container.select2-container--default {
 }
 
 /* Fixed headers */
-.page-content-fixed{
+.page-content-fixed-50{ 
   margin-top:50px;
+}
+.page-content-fixed-100{ 
+  margin-top:100px;
 }
 .page-header-fixed{
   background-color: white;
