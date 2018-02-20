@@ -38,10 +38,13 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 <script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
 <script src="plugins/rtfConverter/rtf.js-master/samples/symboltable.js"></script>
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
+<div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
     <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
 </div></h3></div>
+</div>
+<div class="page-content-fixed">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){
@@ -770,7 +773,7 @@ $(document).ready(function() {
         autoWidth: false,
         fixedHeader: {
             header: true,
-            headerOffset: 50,
+            headerOffset: 150,
             zTop: 1
         },
         paging: false
@@ -847,4 +850,5 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
    });
 })
 </script>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
