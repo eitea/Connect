@@ -10,9 +10,8 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
 function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
-    if($estimate === 0) return "";
     if($current<$estimate){
-        $yellowBar = $current/$estimate; 
+        $yellowBar = $current/($estimate+0.0001); 
         $greenBar = 1-$yellowBar; 
         $timeLeft = $estimate - $current; 
         $redBar = 0;
@@ -21,7 +20,7 @@ function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both t
         $timeOver = $current - $estimate; 
         $timeLeft = 0;
         $greenBar = 0; 
-        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current); 
+        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current + 0.0001); 
         $redBar = 1-$yellowBar; 
         $current = $estimate;
     }
