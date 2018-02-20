@@ -1738,26 +1738,24 @@ if($row['version'] < 131){ //14.02.2018
     }
 
     $conn->query("DELETE FROM taskData WHERE id = 4");
-
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>BugFix: Email Tasks';
     }
 
-    $conn->query("ALTER TABLE UserData  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
-
+    $conn->query("ALTER TABLE UserData ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Forced Change Password';
     }
 
-    $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+    $conn->query("CREATE TABLE position (
+    id INT(6) NOT NULL AUTO_INCREMENT,
     name VARCHAR(20) NOT NULL,
-    PRIMARY KEY (id))");
-
-
+    PRIMARY KEY (id)
+    )");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1847,14 +1845,13 @@ if($row['version'] < 131){ //14.02.2018
 
 if($row['version'] < 132){//14.02.2018
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
     if($result){
         while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-    $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
+    $conn->query("ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL;");
 }
 if($row['version'] < 133){
     $sql = "CREATE TABLE emailprojectlogs (
