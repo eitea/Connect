@@ -6,7 +6,9 @@ if (!isset($_REQUEST["questionID"])){
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 
-$questionID = $_REQUEST["questionID"];
+$questionID = intval($_REQUEST["questionID"]);
+$result = $conn->query("SELECT title FROM dsgvo_training_questions WHERE id = $questionID");
+$title = $result->fetch_assoc()["title"];
 $result = $conn->query(
     "SELECT userID, correct, firstname, lastname, tcq.version, tries, tcq.duration
      FROM dsgvo_training_questions tq 
@@ -24,8 +26,8 @@ $timesColorsArray = array();
 <form method="POST">
 <div class="modal fade">
     <div class="modal-dialog modal-content modal-md">
-    <div class="modal-header">Statistik</div>
-    <div class="modal-body">
+    <div class="modal-header">Auswertung von <?php echo $title ?></div>
+    <div class="modal-body" style="overflow:scroll;">
         <?php
         if(!$result || $result->num_rows == 0){
             echo "Noch keine Daten vorhanden";

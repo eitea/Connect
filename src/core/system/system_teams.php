@@ -49,10 +49,12 @@ for($i = 0; $i < 11; $i++){
 }
 ?>
 
+<div class="page-header-fixed">
 <div class="page-header">
     <h3>Team <div class="page-header-button-group"><button type="button" data-toggle="modal" data-target=".bookingModal-newTeam" title="<?php echo $lang['ADD']; ?>" class="btn btn-default">+</button></div></h3>
 </div>
-
+</div>
+<div class="page-content-fixed-150">
 <?php
 $result = $conn->query("SELECT id, name FROM teamData");
 while($result && ($row = $result->fetch_assoc())):
@@ -184,6 +186,6 @@ while($result && ($row = $result->fetch_assoc())):
         </div>
     </div>
 </form>
-
+</div>
 <!-- /BODY -->
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

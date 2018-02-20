@@ -8,13 +8,40 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
+function formatPercent($num){ return ($num * 100)."%"; }
+function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+    if($estimate === 0) return "";
+    if($current<$estimate){
+        $yellowBar = $current/$estimate; 
+        $greenBar = 1-$yellowBar; 
+        $timeLeft = $estimate - $current; 
+        $redBar = 0;
+        $timeOver = 0;
+    }else{
+        $timeOver = $current - $estimate; 
+        $timeLeft = 0;
+        $greenBar = 0; 
+        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current); 
+        $redBar = 1-$yellowBar; 
+        $current = $estimate;
+    }
+    $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1); 
+    $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
+    $bar .= "<div data-toggle='tooltip' title='".round($current,2)." Stunden' class='progress-bar progress-bar-warning' style='height:10px;width:".formatPercent($yellowBar)."'></div>";
+    $bar .= "<div data-toggle='tooltip' title='".round($timeLeft,2)." Stunden' class='progress-bar progress-bar-success' style='height:10px;width:".formatPercent($greenBar)."'></div>";
+    $bar .= "<div data-toggle='tooltip' title='".round($timeOver,2)." Stunden' class='progress-bar progress-bar-danger' style='height:10px;width:".formatPercent($redBar)."'></div>";
+    return "$bar</div>";
+}
+
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
     <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
 </div></h3></div>
+</div>
+<div class="page-content-fixed-100">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['play'])){
@@ -273,18 +300,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
         $stmt_booking->bind_param('s', $x);
+        $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID WHERE p.dynamicID = ?");
+        $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
@@ -303,7 +332,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
             if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
-            echo '<td><i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
+            echo '<td>';
+            $stmt_time->execute();
+            $currentTime = 0;
+            if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
+            echo generate_progress_bar(floatval($currentTime),floatval($row["estimatedHours"])); // generate_progress_bar($cur,$estimate): string
+            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
@@ -317,7 +351,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             $stmt_booking->execute();
             $isInUse = $stmt_booking->get_result(); //max 1 row
-
+            
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
@@ -573,6 +607,7 @@ function dynamicOnLoad(modID){
         tags: true,
         tokenSeparators: [',', ' ']
     });
+    $('[data-toggle="tooltip"]').tooltip();
     tinymce.init({
         selector: '.projectDescriptionEditor',
         plugins: 'image code paste emoticons table',
@@ -746,7 +781,7 @@ $(document).ready(function() {
         autoWidth: false,
         fixedHeader: {
             header: true,
-            headerOffset: 50,
+            headerOffset: 150,
             zTop: 1
         },
         paging: false
@@ -822,4 +857,5 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
    });
 })
 </script>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

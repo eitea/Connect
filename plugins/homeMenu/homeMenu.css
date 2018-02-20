@@ -381,6 +381,25 @@ span.select2.select2-container.select2-container--default {
     border:none;
 }
 .help-button{
-    float:right;
+    right:10px;
+    position:fixed;
     margin-top:10px;
+    z-index: 1001;
+}
+
+/* Fixed headers */
+.page-content-fixed-50{ 
+  margin-top:50px;
+}
+.page-content-fixed-100{ 
+  margin-top:100px;
+}
+.page-content-fixed-150{ 
+  margin-top:130px;
+}
+.page-header-fixed{
+  background-color: white;
+  position:fixed;
+  width:100%;
+  z-index:1000;
 }
