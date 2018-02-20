@@ -1943,7 +1943,7 @@ if ($row['version'] < 137) {
             echo '<br>Auto-Delete Dead Links';
         }
     }
-    $sql = "ALTER TABLE emailprojectlogs CHANGE id id INT(11) NOT NULL AUTO_INCREMENT ";
+    $sql = "ALTER TABLE emailprojectlogs CHANGE id id INT(11) NOT NULL AUTO_INCREMENT, CHANGE body body LONGTEXT DEFAULT null ";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
