@@ -1757,7 +1757,7 @@ if($row['version'] < 131){ //14.02.2018
     name VARCHAR(20) NOT NULL,
     PRIMARY KEY (id))");
 
-    
+
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1864,7 +1864,6 @@ if($row['version'] < 133){
     } else {
         echo '<br>Debugging: Email Projects';
     }
-    
 }
 if($row['version'] < 134){
     $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
@@ -1874,13 +1873,41 @@ if($row['version'] < 134){
     } else {
         echo '<br>Repairing: Archive';
     }
-}
-if($row['version'] < 135){
     $sql = "ALTER TABLE roles ADD canCreateTasks ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
         echo '<br>Role: Can Create Task';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN version INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: version';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: overwrite';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN tries INT(6) DEFAULT 1");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: tries';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN duration INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
     }
 }
 

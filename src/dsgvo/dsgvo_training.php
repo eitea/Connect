@@ -47,7 +47,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         $name = test_input($_POST["name"]);
         $onLogin = test_input($_POST["onLogin"]);
-        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin' WHERE id = $trainingID");
+        $allowOverwrite = test_input($_POST["allowOverwrite"]);
+        $random = test_input($_POST["random"]);
+        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random' WHERE id = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
         if(isset($_POST["employees"])){
@@ -102,7 +104,7 @@ echo mysqli_error($conn);
                 ?>
                  <div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
                  <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
-                 <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-bar-chart"></i></button>
+                 <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
             <?php echo $title ?></div>
             <?php
             endwhile;
@@ -113,6 +115,7 @@ echo mysqli_error($conn);
            <div class="btn-group float-right" style="float:right!important">
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
             <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
+            <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
             <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
            </div>
            </div>
@@ -192,6 +195,9 @@ $("button[name=infoQuestion]").click(function(){
 })
 $("button[name=infoTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingInfo.php')
+})
+$("button[name=detailedInfoTraining]").click(function(){
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoDetailedTrainingInfo.php')
 })
 </script>
 

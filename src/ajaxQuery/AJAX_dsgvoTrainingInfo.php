@@ -81,21 +81,21 @@ var ctx = document.getElementById("myChart").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: <?php echo json_encode($nameArray) ?>, // ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        labels: <?php echo json_encode($nameArray) ?>,
         datasets: [{
-            label: 'right',
+            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['TRUE']?>",
             data: <?php echo json_encode($pointsRightArray) ?>,
             backgroundColor: <?php echo json_encode($rightColors) ?>,
             borderColor: <?php echo json_encode($rightColorsOutline) ?>,
             borderWidth: 1
         },{
-            label: 'wrong',
+            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['FALSE']?>",
             data: <?php echo json_encode($pointsWrongArray) ?>,
             backgroundColor: <?php echo json_encode($wrongColors) ?>,
             borderColor: <?php echo json_encode($wrongColorsOutline) ?>,
             borderWidth: 1
         },{
-            label: 'unanswered',
+            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['UNANSWERED']?>",
             data: <?php echo json_encode($pointsUnansweredArray) ?>,
             backgroundColor: <?php echo json_encode($unansweredColors) ?>,
             borderColor: <?php echo json_encode($unansweredColorsOutline) ?>,
@@ -122,7 +122,6 @@ var myChart = new Chart(ctx, {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-          <button type="submit" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>">Training bearbeiten</button>
         </div>
       </div>
     </div>
