@@ -660,8 +660,6 @@ while ($contactRow = $resultContacts->fetch_assoc()) {
 			</div>
 		</div>
 	</div>
-    </form>
-    <form method="POST" >
 	<div id="menuTaxes" class="tab-pane fade <?php if ($activeTab == 'taxes') {echo 'in active';}?>">
 		<div class="row checkbox">
 			<div class="col-sm-9"> <h3>Steuerinformationen</h3> </div>
