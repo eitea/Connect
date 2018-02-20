@@ -9,8 +9,8 @@ require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
 function formatPercent($num){ return ($num * 100)."%"; }
-function generate_progress_bar($current,$estimate){ //both in hours
-    if($estimate == 0) return "";
+function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+    if($estimate === 0) return "";
     if($current<$estimate){
         $yellowBar = $current/$estimate; 
         $greenBar = 1-$yellowBar; 
@@ -18,14 +18,14 @@ function generate_progress_bar($current,$estimate){ //both in hours
         $redBar = 0;
         $timeOver = 0;
     }else{
-        $greenBar = 0; 
-        $yellowBar = ($current-$estimate)/($estimate+$current); 
-        $redBar = 1-$yellowBar; 
-        $timeLeft = 0;
         $timeOver = $current - $estimate; 
+        $timeLeft = 0;
+        $greenBar = 0; 
+        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current); 
+        $redBar = 1-$yellowBar; 
         $current = $estimate;
     }
-    $progressLength = min(($timeLeft + $timeOver + $current)/8, 1); //should be 0-1: 0 is 0, 1 is 8 hours; everything over is 1
+    $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1); 
     $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
     $bar .= "<div data-toggle='tooltip' title='".round($current,2)." Stunden' class='progress-bar progress-bar-warning' style='height:10px;width:".formatPercent($yellowBar)."'></div>";
     $bar .= "<div data-toggle='tooltip' title='".round($timeLeft,2)." Stunden' class='progress-bar progress-bar-success' style='height:10px;width:".formatPercent($greenBar)."'></div>";
@@ -328,7 +328,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt_time->execute();
             $currentTime = 0;
             if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
-            echo generate_progress_bar($currentTime,$row["estimatedHours"]); // generate_progress_bar($cur,$estimate): string
+            echo generate_progress_bar(floatval($currentTime),floatval($row["estimatedHours"])); // generate_progress_bar($cur,$estimate): string
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
