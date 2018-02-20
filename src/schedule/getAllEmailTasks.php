@@ -41,6 +41,7 @@ if($result){
                     'password' => $password
                 )
             ));
+            echo $imap->isConnected();
             if($imap->isConnected()){
                 $imap->selectFolder("INBOX");
                 $messages = $imap->getMessages();
@@ -58,7 +59,6 @@ if($result){
         }catch(Exception $e){
             $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$e')");
         }
-        
     }
 }else{
     $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'ERROR')");
