@@ -34,13 +34,14 @@ if ($result && $result->num_rows > 0) {
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
+    $canCreateTasks = $row['canCreateTasks'];
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = 'TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = 'TRUE';
 }
 
 $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
@@ -781,7 +782,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
-      <?php if ($isProjectAdmin == 'TRUE'): ?>
+      <?php if ($isProjectAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab" id="headingProject">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
@@ -791,12 +792,16 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+                <?php if ($isProjectAdmin == 'TRUE'): ?>
                 <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                <?php if ($isDynamicProjectsAdmin == 'TRUE'): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
                 <?php endif;?>
+                <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
+                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
+                  <?php endif;?>
+                <?php if ($isProjectAdmin == 'TRUE'): ?>
                 <li><a <?php if ($this_page == 'project_options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
+                <?php endif;?>
               </ul>
             </div>
           </div>

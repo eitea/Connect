@@ -1,6 +1,7 @@
 <?php
 //new Rule
 require dirname(__DIR__)."/connection.php";
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['id'])){
         $id = intval($_POST['id']);

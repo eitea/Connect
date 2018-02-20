@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
+require_once dirname(dirname(__DIR__))."/plugins/imap-client/ssilence/php-imap-client/autoload.php";
 require_once dirname(__DIR__)."/connection.php";
 
 use SSilence\ImapClient\ImapClientException;
@@ -7,6 +7,7 @@ use SSilence\ImapClient\ImapConnect;
 use SSilence\ImapClient\ImapClient;
 
 $result = $conn->query("SELECT * FROM emailprojects");
+//echo $result->num_rows;
 if($result){
     while($row = $result->fetch_assoc()){
         $mailbox = $row['server'];
@@ -22,6 +23,7 @@ if($result){
         $port = $row['port'];
         $validation = ImapConnect::VALIDATE_CERT;
         //echo json_encode($row);
+        $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')");
         try{
         $imap = new ImapClient(array(
                 'flags' => array(
@@ -64,6 +66,7 @@ return;
 
 function insertTask($imap,$messages,$conn,$ruleset){
     $message = $messages->message;
+    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$message')");
     $allowedTags = "<div><p><b><img><a><br><em><hr><i><li><ol><s><span><table><tr><td><u><ul>";
 try{
     $id = uniqid();

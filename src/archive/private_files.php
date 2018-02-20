@@ -1,6 +1,6 @@
 <?php
-require dirname(dirname(__DIR__)) . "\src\misc\useS3Config.php";
-require dirname(__DIR__)."\connection.php";
+require dirname(dirname(__DIR__)) . "/src/misc/useS3Config.php";
+require dirname(__DIR__)."/connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         

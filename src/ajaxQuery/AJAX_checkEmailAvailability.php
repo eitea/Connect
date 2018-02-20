@@ -1,5 +1,5 @@
 <?php
-require dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
+require dirname(dirname(__DIR__))."/plugins/imap-client/ssilence/php-imap-client/autoload.php";
 require dirname(__DIR__)."/connection.php";
 
 use SSilence\ImapClient\ImapClientException;
@@ -23,6 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 'service' => $service,
                 'encrypt' => $encryption,
                 'validateCertificates' => $validation,
+                'debug' => ImapConnect::DEBUG,
             ),
             'mailbox' => array(
                 'remote_system_name' => $mailbox,
@@ -36,6 +37,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $imap->selectFolder("INBOX");
         echo true;
     }catch(Exception $e){
+        echo $e;
         echo false;
     }
 }

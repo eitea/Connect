@@ -262,6 +262,7 @@ function create_tables($conn) {
         canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1279,7 +1280,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE sharedfiles (
         id int(11) NOT NULL AUTO_INCREMENT,
-        name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
+        name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei',
         type varchar(10) NOT NULL COMMENT 'Dateiendung',
         owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
         sharegroup INT(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
@@ -1299,7 +1300,7 @@ function create_tables($conn) {
         name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
         dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
         ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
-        uri varchar(100) NOT NULL COMMENT 'URL zu den Objekten',
+        uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten',
         owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
         files varchar(200) DEFAULT NULL,
         company int(11) NOT NULL COMMENT 'Mandant',

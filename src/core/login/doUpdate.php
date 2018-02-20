@@ -1372,9 +1372,9 @@ if ($row['version'] < 123) {
         echo '<br>mailingoptions';
     }
 
-    $conn->query("ALTER TABLE userdata ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
+    $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
 
-    $conn->query("ALTER TABLE userdata ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
+    $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
     if ($conn->error) {
         $conn->error;
     } else {
@@ -1858,14 +1858,31 @@ if($row['version'] < 133){
         timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         body text,
         PRIMARY KEY (id),
-    )";
+        )";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
         echo '<br>Debugging: Email Projects';
     }
+    
 }
-if($row['version'] < 134){}
+if($row['version'] < 134){
+    $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
+    $sql = "ALTER TABLE sharedgroups CHANGE uri uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Repairing: Archive';
+    }
+}
+if($row['version'] < 135){
+    $sql = "ALTER TABLE roles ADD canCreateTasks ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can Create Task';
+    }
+}
 
 // ------------------------------------------------------------------------------
 

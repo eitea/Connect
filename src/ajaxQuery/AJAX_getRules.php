@@ -57,8 +57,10 @@ require dirname(__DIR__)."/connection.php";
                                 $employees[$y] = $company->fetch_assoc()['name'];
                             }
                         }
-                        
+                 
                     $rules[$i]['employees'] = rtrim(implode(", ",$employees),", ");
+
+
                     if(!empty($rules[$i]['optionalemployees'])){
                         $employees = explode(",",$rules[$i]['optionalemployees']);
                         for($y = 0;$y<count($employees)-1;$y++){
@@ -74,6 +76,7 @@ require dirname(__DIR__)."/connection.php";
                     }
                     $i++;
                 }
+                
                 echo json_encode($rules);
             }else{
                 return;

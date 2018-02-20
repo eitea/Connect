@@ -41,7 +41,7 @@ $routes = array(
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
   'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
 
-  'misc/taskemails' => 'schedule/getAllEmailTasks.php'
+  'pgp/keygen' => 'pgp/pgpKeyGen.php',
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",

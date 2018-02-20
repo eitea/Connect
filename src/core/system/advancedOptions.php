@@ -39,7 +39,7 @@ if(isset($_POST['saveButton'])){
 }
 
 if (isset($_POST['saveS3'])) {
-    require dirname(dirname(__DIR__)) . "\misc\useS3Config.php";
+    require dirname(dirname(__DIR__)) . "/misc/useS3Config.php";
     if (isset($_POST['server'])) {
         try{
             $credentials = array('key' => $_POST['aKey'], 'secret' => $_POST['sKey']);
