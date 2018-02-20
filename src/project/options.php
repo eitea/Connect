@@ -13,7 +13,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }elseif (isset($_POST['addAccount']) && !empty($_POST['server'])&& !empty($_POST['service'])&& !empty($_POST['port'])&& !empty($_POST['username'])&& !empty($_POST['password'])) {
         $server = test_input($_POST['server']);
         $port = test_input($_POST['port']);
-        $security = test_input($_POST['security']) == "none" ? "null" : test_input($_POST['security']);
+        $security = test_input($_POST['security']) == "none" ? null : test_input($_POST['security']);
         $service = test_input($_POST['service']);
         $username = test_input($_POST['username']);
         $password = test_input($_POST['password']);
@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th><button type="button" onclick="runAutotask()" class="btn btn-default" ><i class="fa fa-refresh"></i></button></th>
+    <th><button type="button" onclick="checkEmails()" class="btn btn-default" ><i class="fa fa-refresh"></i></button></th>
   </tr></thead>
   <tbody>
   <?php
@@ -481,8 +481,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             username: document.getElementById("username").value,
             password: document.getElementById("password").value
         }, function(data){
-          console.log(data==1);
-          data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+          //console.log(data==1);
+          //data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+          if(data==1){
+              alert('The credentials you entered seem to be working.');
+          }else{
+              alert('The credentials you entered are not working.');
+          }
       });
     }
     function edit_checkEmail(element){
@@ -494,8 +499,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             username: document.getElementById("edit_username").value,
             password: document.getElementById("edit_password").value
         }, function(data){
-            console.log(data==1);
-            data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+            //console.log(data==1);
+            //data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
+            if(data==1){
+              alert('The credentials you entered seem to be working.');
+            }else{
+              alert('The credentials you entered are not working.');
+            }
       });
     }
     function showClients(company, client, place){
@@ -541,8 +551,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         );
         return $state;
     };
-    function runAutotask(){
-        $.post("../report/autotask",{},function(data){
+    function checkEmails(){
+        $.post("../report/tasks",{},function(data){
             console.log(data);
         });
     }

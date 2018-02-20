@@ -16,7 +16,7 @@ require dirname(__DIR__) . '/utilities.php';
 $result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
   //needed task data
-  echo json_encode($row);
+  //echo json_encode($row);
   $task_id = $row['id'];
   $pattern = $row['repeatPattern'];
   $lastRuntime = $row['lastRuntime'];
