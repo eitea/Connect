@@ -19,8 +19,8 @@ function generate_progress_bar($current,$estimate){ //both in hours
         $timeOver = 0;
     }else{
         $greenBar = 0; 
-        $redBar = ($current-$estimate)/($estimate+$current); 
-        $yellowBar = 1-$redBar; 
+        $yellowBar = ($current-$estimate)/($estimate+$current); 
+        $redBar = 1-$yellowBar; 
         $timeLeft = 0;
         $timeOver = $current - $estimate; 
         $current = $estimate;
