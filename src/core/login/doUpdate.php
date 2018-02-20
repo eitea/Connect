@@ -1950,7 +1950,7 @@ if ($row['version'] < 136) {
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
-        echo '<br>Archive: Multible Configs';
+        echo '<br>Archive: Multiple Configs';
     }
     $sql = "ALTER TABLE emailprojects CHANGE smtpSecure smtpSecure ENUM('tls','ssl','null') NOT NULL DEFAULT 'null';";
     if (!$conn->query($sql)) {
