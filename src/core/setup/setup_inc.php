@@ -1211,19 +1211,13 @@ function create_tables($conn) {
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
-        estimatedHours INT(4) DEFAULT 0 NOT NULL,
+        estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (clientid) REFERENCES clientData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL,
-        FOREIGN KEY (clientprojectid) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1289,9 +1283,9 @@ function create_tables($conn) {
         name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei',
         type varchar(10) NOT NULL COMMENT 'Dateiendung',
         owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
-        sharegroup int(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
-        hashkey varchar(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
-        filesize bigint(20) NOT NULL,
+        sharegroup INT(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
+        hashkey VARCHAR(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
+        filesize BIGINT(20) NOT NULL,
         uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY hashkey (hashkey),
@@ -1421,7 +1415,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_questions (
         id int(6) NOT NULL AUTO_INCREMENT,
         title varchar(100),
@@ -1444,7 +1438,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_team_relations (
         trainingID int(6),
         teamID INT(6) UNSIGNED,
@@ -1455,7 +1449,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-	
+
     $sql = "CREATE TABLE dsgvo_training_completed_questions (
         questionID int(6),
         userID INT(6) UNSIGNED,

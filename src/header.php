@@ -318,7 +318,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
   function generateKeys($userID){
     $.ajax({
       type: "POST",
-      url: "../pgp/keygen",
+      url: "ajaxQuery/AJAX_pgpKeyGen.php",
       data: { userID: $userID}
     }).done(function(keys){
       keys = JSON.parse(keys);

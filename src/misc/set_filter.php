@@ -17,100 +17,99 @@
 **/
 
 if(isset($filterings['savePage']) && !empty($_SESSION['filterings']['savePage']) && $_SESSION['filterings']['savePage'] != $filterings['savePage']){
-  $_SESSION['filterings'] = array();
+    $_SESSION['filterings'] = array();
 }
 if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (THINK)
-  if(isset($_POST['searchCompany'])){
-    $filterings['company'] = intval($_POST['searchCompany']);
-  }
-  if(isset($_POST['searchClient'])){
-    $filterings['client'] = intval($_POST['searchClient']);
-  }
-  if(isset($_POST['searchSupplier'])){
-    $filterings['supplier'] = intval($_POST['searchSupplier']);
-  }
-  if(isset($_POST['searchProject'])){
-    $filterings['project'] = intval($_POST['searchProject']);
-  }
-  if(isset($_POST['searchUser'])){
-    $filterings['user'] = intval($_POST['searchUser']);
-  }
-  if(isset($_POST['searchUsers'])){
-    $filterings['users'] = array_map("intval", $_POST['searchUsers']);
-  }
-  if(isset($_POST['searchCharged'])){
-    $filterings['bookings'][0] = intval($_POST['searchCharged']);
-  }
-  if(isset($filterings['bookings'][1])){
-    if(isset($_POST['searchBreaks'])){
-      $filterings['bookings'][1] = 'checked';
-    } else {
-      $filterings['bookings'][1] = '';
+    if(isset($_POST['searchCompany'])){
+        $filterings['company'] = intval($_POST['searchCompany']);
     }
-  }
-  if(isset($filterings['bookings'][2])){
-    if(isset($_POST['searchDrives'])){
-      $filterings['bookings'][2] = 'checked';
-    } else {
-      $filterings['bookings'][2] = '';
+    if(isset($_POST['searchClient'])){
+        $filterings['client'] = intval($_POST['searchClient']);
     }
-  }
-  if(isset($_POST['searchActivity'])){
-    $filterings['logs'][0] = intval($_POST['searchActivity']);
-  }
-  if(isset($filterings['logs'][1])){
-    if(isset($_POST['searchAllTimestamps'])){
-      $filterings['logs'][1] = 'checked';
-    } else {
-      $filterings['logs'][1] = '';
+    if(isset($_POST['searchSupplier'])){
+        $filterings['supplier'] = intval($_POST['searchSupplier']);
     }
-  }
+    if(isset($_POST['searchProject'])){
+        $filterings['project'] = intval($_POST['searchProject']);
+    }
+    if(isset($_POST['searchUser'])){
+        $filterings['user'] = intval($_POST['searchUser']);
+    }
+    if(isset($_POST['searchUsers'])){
+        $filterings['users'] = array_map("intval", $_POST['searchUsers']);
+    }
+    if(isset($_POST['searchCharged'])){
+        $filterings['bookings'][0] = intval($_POST['searchCharged']);
+    }
+    if(isset($filterings['bookings'][1])){
+        if(isset($_POST['searchBreaks'])){
+            $filterings['bookings'][1] = 'checked';
+        } else {
+            $filterings['bookings'][1] = '';
+        }
+    }
+    if(isset($filterings['bookings'][2])){
+        if(isset($_POST['searchDrives'])){
+            $filterings['bookings'][2] = 'checked';
+        } else {
+            $filterings['bookings'][2] = '';
+        }
+    }
+    if(isset($_POST['searchActivity'])){
+        $filterings['logs'][0] = intval($_POST['searchActivity']);
+    }
+    if(isset($filterings['logs'][1])){
+        if(isset($_POST['searchAllTimestamps'])){
+            $filterings['logs'][1] = 'checked';
+        } else {
+            $filterings['logs'][1] = '';
+        }
+    }
 
-  if(!empty($_POST['searchDateFrom'])){
-    $filterings['date'][0] = test_input($_POST['searchDateFrom']);
-  }
-  if(!empty($_POST['searchDateTo'])){
-    $filterings['date'][1] = test_input($_POST['searchDateTo']);
-    if(strtotime($filterings['date'][0]) > strtotime($filterings['date'][1])){
-      $filterings['date'][1] = $filterings['date'][0];
+    if(!empty($_POST['searchDateFrom'])){
+        $filterings['date'][0] = test_input($_POST['searchDateFrom']);
     }
-  }
+    if(!empty($_POST['searchDateTo'])){
+        $filterings['date'][1] = test_input($_POST['searchDateTo']);
+        if(strtotime($filterings['date'][0]) > strtotime($filterings['date'][1])){
+            $filterings['date'][1] = $filterings['date'][0];
+        }
+    }
 
-  if(isset($_POST['searchTransitions'])){
-    $filterings['procedures'][0] = array_map("test_input", $_POST['searchTransitions']);
-  }
-  if(isset($_POST['searchProcessStatus'])){
-    $filterings['procedures'][1] = intval($_POST['searchProcessStatus']);
-  }
-  if(isset($filterings['procedures'][2])){
-    if(isset($_POST['searchAllProcesses'])){
-      $filterings['procedures'][2] = 'checked';
-    } else {
-      $filterings['procedures'][2] = '';
+    if(isset($_POST['searchTransitions'])){
+        $filterings['procedures'][0] = array_map("test_input", $_POST['searchTransitions']);
     }
-  }
-  if(isset($_POST['searchRequestType'])){
-    $filterings['requestType'] = test_input($_POST['searchRequestType']);
-  }
-  if(isset($_POST['searchAcceptance'])){
-    $filterings['acceptance'] = intval($_POST['searchAcceptance']);
-  }
-  if(isset($_POST['searchTask'])){
-    $filterings['tasks'] = test_input($_POST['searchTask']);
-  }
-  if(isset($_POST['searchPriority'])){
-    $filterings['priority'] = intval($_POST['searchPriority']);
-  }
-  if(isset($_POST['searchEmployees'])){
-    $filterings['employees'] = $_POST['searchEmployees'];
-  }else{
-    $filterings['employees'] = array();
-  }
-  if(isset($filterings['savePage'])){
-    $_SESSION['filterings'] = $filterings;
-  } else {
-    $_SESSION['filterings'] = array();
-  }
+    if(isset($_POST['searchProcessStatus'])){
+        $filterings['procedures'][1] = intval($_POST['searchProcessStatus']);
+    }
+    if(isset($filterings['procedures'][2])){
+        if(isset($_POST['searchAllProcesses'])){
+            $filterings['procedures'][2] = 'checked';
+        } else {
+            $filterings['procedures'][2] = '';
+        }
+    }
+    if(isset($_POST['searchRequestType'])){
+        $filterings['requestType'] = test_input($_POST['searchRequestType']);
+    }
+    if(isset($_POST['searchAcceptance'])){
+        $filterings['acceptance'] = intval($_POST['searchAcceptance']);
+    }
+    if(isset($_POST['searchTask'])){
+        $filterings['tasks'] = test_input($_POST['searchTask']);
+    }
+    if(isset($_POST['searchPriority'])){
+        $filterings['priority'] = intval($_POST['searchPriority']);
+    }
+    if(isset($_POST['searchEmployees'])){
+        echo "<script>console.log('".json_encode($_POST['searchEmployees'])."')</script>";
+        $filterings['employees'] = $_POST['searchEmployees'];
+    }
+    if(isset($filterings['savePage'])){
+        $_SESSION['filterings'] = $filterings;
+    } else {
+        $_SESSION['filterings'] = array();
+    }
 }
 
 //read saved filters
@@ -210,7 +209,7 @@ if($scale > 2){ //3 columns
           <?php endif; ?>
         </div>
 
-        <div class="filter_column">
+    <div class="filter_column">
           <?php if(isset($filterings['user'])){
             echo '<label>'.$lang['USERS'].'</label>';
             echo '<select class="js-example-basic-single" name="searchUser" >';
@@ -256,7 +255,7 @@ if($scale > 2){ //3 columns
                 $selected = '';
                 if($key == $filterings['requestType']) $selected = 'selected';
                 echo '<option '.$selected.' value="'.$key.'">'.$value.'</option>';
-              }
+            }
               ?>
             </select>
             <br><br>
@@ -277,7 +276,8 @@ if($scale > 2){ //3 columns
                   <option value="DEACTIVATED" <?php if($filterings['tasks'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
                   <option value="ACTIVE" <?php if($filterings['tasks'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
                   <option value="DRAFT" <?php if($filterings['tasks'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
-                  <option value="REVIEW" <?php if($filterings['tasks'] == 'REVIEW') echo 'selected'; ?>>Review</option>
+                  <option value="REVIEW_1" <?php if($filterings['tasks'] == 'REVIEW_1') echo 'selected'; ?>>Review (Aktiv)</option>
+                  <option value="REVIEW_2" <?php if($filterings['tasks'] == 'REVIEW_2') echo 'selected'; ?>>Review (Inaktiv)</option>
                   <option value="COMPLETED" <?php if($filterings['tasks'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
               </select>
               <br><br>
@@ -317,9 +317,9 @@ if($scale > 2){ //3 columns
             echo $selected;
           ?>
           </select>
-          
-        </div>
         <?php endif;?>
+    </div>
+
         <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
           <div class="filter_column">
             <?php if(isset($filterings['date'][1])): ?>

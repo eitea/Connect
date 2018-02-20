@@ -379,11 +379,9 @@ if (!empty($_POST['saveAll'])) {
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
         }
     } else {
-        
+
     }
 }
-
-
 
 $result = $conn->query("SELECT name, clientNumber, companyID FROM $clientTable WHERE id = $filterClient");
 $rowClient = $result->fetch_assoc();
@@ -397,14 +395,12 @@ $resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $f
 ?>
 
 <div class="page-header">
-	<h3><?php if (isset($_GET['supID'])) {echo $lang['SUPPLIER'];} else {echo $lang['CLIENT'];}
-echo ' - ' . $rowClient['name'];?>
+	<h3><?php if (isset($_GET['supID'])) {echo $lang['SUPPLIER'];} else {echo $lang['CLIENT'];} echo ' - ' . $rowClient['name']; ?>
 		<div class="page-header-button-group">
 			<button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
 		</div>
 	</h3>
 </div>
-
 
 <ul class="nav nav-tabs">
 	<li <?php if ($activeTab == 'project') {echo 'class="active"';}?>><a data-toggle="tab" href="#project" onclick="$('#sav').val('project');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
@@ -843,19 +839,19 @@ while ($resultBank && ($rowBank = $resultBank->fetch_assoc())) {
 				Versandart
 			</div>
 			<div class="col-sm-3">
-				<select class="js-example-basic-single" name="shipmentType">
-					<option value="0">...</option>
-					<?php
-$result_con = $conn->query("SELECT * FROM shippingMethods");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = '';
-    if ($row['shipmentType'] == $row_con['name']) {
-        $selected = 'selected';
-    }
-    echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
-}
-?>
-				</select>
+                <select class="js-example-basic-single" name="shipmentType">
+                    <option value="0">...</option>
+                    <?php
+                    $result_con = $conn->query("SELECT * FROM shippingMethods");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = '';
+                        if ($row['shipmentType'] == $row_con['name']) {
+                            $selected = 'selected';
+                        }
+                        echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
+                    }
+                    ?>
+                </select>
 			</div>
 		</div>
 	<br><hr><br>
@@ -869,20 +865,11 @@ while ($row_con = $result_con->fetch_assoc()) {
 			<div class="col-xs-2 text-center">
 				Rechnungsversand
 			</div>
-			<div class="col-sm-3">
-				<select name="billDelivery" class="js-example-basic-single">
-					<option <?php if ($row['billDelivery'] == 'Fax') {
-    echo 'selected';
-}
-?> value="Fax">Fax</option>
-					<option <?php if ($row['billDelivery'] == 'Post') {
-    echo 'selected';
-}
-?> value="Post">Post</option>
-					<option <?php if ($row['billDelivery'] == 'E-Mail') {
-    echo 'selected';
-}
-?> value="E-Mail">E-Mail</option>
+            <div class="col-sm-3">
+                <select name="billDelivery" class="js-example-basic-single">
+                    <option <?php if ($row['billDelivery'] == 'Fax') { echo 'selected'; } ?> value="Fax">Fax</option>
+                    <option <?php if ($row['billDelivery'] == 'Post') { echo 'selected'; } ?> value="Post">Post</option>
+                    <option <?php if ($row['billDelivery'] == 'E-Mail') { echo 'selected'; } ?> value="E-Mail">E-Mail</option>
 				</select>
 			</div>
 		</div>
@@ -898,16 +885,16 @@ while ($row_con = $result_con->fetch_assoc()) {
 			<div class="col-sm-5">
 				<select class="js-example-basic-single" name="paymentMethod">
 					<option value="0">...</option>
-					<?php
-$result_con = $conn->query("SELECT * FROM paymentMethods");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = '';
-    if ($row['paymentMethod'] == $row_con['name']) {
-        $selected = 'selected';
-    }
-    echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
-}
-?>
+                    <?php
+                    $result_con = $conn->query("SELECT * FROM paymentMethods");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = '';
+                        if ($row['paymentMethod'] == $row_con['name']) {
+                            $selected = 'selected';
+                        }
+                        echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
+                    }
+                    ?>
 				</select>
 			</div>
 			<div class="col-sm-3"><a href="../erp/payment" class="btn btn-warning">Zahlungsarten verwalten</a></div>
@@ -980,15 +967,15 @@ while ($row_con = $result_con->fetch_assoc()) {
 				<th>Datum</th>
 				<th style="width:75%">Info</th>
 			</thead>
-			<tbody>
-				<?php
-while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
-    echo "<tr><td><input type='checkbox' name='noteIndeces[]' /></td>";
-    echo "<td>" . $rowNotes['createDate'] . "</td>";
-    echo "<td>" . $rowNotes['infoText'] . "</td></tr>";
-}
-?>
-			</tbody>
+            <tbody>
+                <?php
+                while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
+                    echo "<tr><td><input type='checkbox' name='noteIndeces[]' /></td>";
+                    echo "<td>" . $rowNotes['createDate'] . "</td>";
+                    echo "<td>" . $rowNotes['infoText'] . "</td></tr>";
+                }
+                ?>
+            </tbody>
 		</table>
 		<div class="container-fluid">
 			<br><br> Neue Notiz Hinzufügen: <br><br>
@@ -1011,72 +998,72 @@ while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
 		<th></th>
 		<th></th>
 		</tr></thead>
-		<tbody>
-		<?php
-$resultProc = $conn->query("SELECT name, password, firstname, lastname, documentProcess.id FROM documents, documentProcess, contactPersons
-		WHERE clientID = $filterClient AND personID = contactPersons.id AND documentProcess.docID = documents.id");
-echo $conn->error;
-while ($rowProc = $resultProc->fetch_assoc()) {
-    echo '<tr style="background-color:#dedede">';
-    echo '<td>' . $rowProc['firstname'] . ' ' . $rowProc['lastname'] . '</td>';
-    echo '<td>' . $rowProc['name'] . '</td>';
-    echo $rowProc['password'] ? '<td>Ja</td>' : '<td>Nein</td>';
-    echo '<td></td>';
-    echo '<td></td>';
-    echo '</tr>';
-    
-    $processHistory = array();
-    $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '" . $rowProc['id'] . "'");
-    while ($row = $result->fetch_assoc()) {
-        if (isset($processHistory[$row['activity']])) {
-            $processHistory[$row['activity']]['count'] += 1;
-        } else {
-            $processHistory[$row['activity']]['info'] = $row['info'];
-            $processHistory[$row['activity']]['userAgent'] = $row['userAgent'];
-            $processHistory[$row['activity']]['logDate'] = $row['logDate'];
-            $processHistory[$row['activity']]['count'] = 1;
-        }
-    }
-    if (isset($processHistory['ENABLE_READ'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_read'])) {
-            $val_stat = 'Ja';
-            $val_date = $processHistory['ENABLE_READ']['logDate'];
-            $val_head = $processHistory['ENABLE_READ']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Als Gelesen markiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if (isset($processHistory['ENABLE_SIGN'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_sign'])) {
-            $val_stat = $processHistory['action_sign']['info'];
-            $val_date = $processHistory['action_sign']['logDate'];
-            $val_head = $processHistory['action_sign']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Unterschrieben</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if (isset($processHistory['ENABLE_ACCEPT'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_accept'])) {
-            $val_stat = $processHistory['action_accept'] == 'DECLINED' ? 'Nein' : 'Ja';
-            $val_date = $processHistory['action_accept']['logDate'];
-            $val_head = $processHistory['action_accept']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Akzeptiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if ($rowProc['password'] && isset($processHistory['password_denied'])) {
-        $val_stat = $processHistory['password_denied']['count'];
-        $val_date = $processHistory['password_denied']['logDate'];
-        $val_head = $processHistory['password_denied']['userAgent'];
+        <tbody>
+            <?php
+            $resultProc = $conn->query("SELECT name, password, firstname, lastname, documentProcess.id FROM documents, documentProcess, contactPersons
+                WHERE clientID = $filterClient AND personID = contactPersons.id AND documentProcess.docID = documents.id");
+                echo $conn->error;
+                while ($rowProc = $resultProc->fetch_assoc()) {
+                    echo '<tr style="background-color:#dedede">';
+                    echo '<td>' . $rowProc['firstname'] . ' ' . $rowProc['lastname'] . '</td>';
+                    echo '<td>' . $rowProc['name'] . '</td>';
+                    echo $rowProc['password'] ? '<td>Ja</td>' : '<td>Nein</td>';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '</tr>';
+                    
+                    $processHistory = array();
+                    $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '" . $rowProc['id'] . "'");
+                    while ($row = $result->fetch_assoc()) {
+                        if (isset($processHistory[$row['activity']])) {
+                            $processHistory[$row['activity']]['count'] += 1;
+                        } else {
+                            $processHistory[$row['activity']]['info'] = $row['info'];
+                            $processHistory[$row['activity']]['userAgent'] = $row['userAgent'];
+                            $processHistory[$row['activity']]['logDate'] = $row['logDate'];
+                            $processHistory[$row['activity']]['count'] = 1;
+                        }
+                    }
+                    if (isset($processHistory['ENABLE_READ'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_read'])) {
+                            $val_stat = 'Ja';
+                            $val_date = $processHistory['ENABLE_READ']['logDate'];
+                            $val_head = $processHistory['ENABLE_READ']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Als Gelesen markiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if (isset($processHistory['ENABLE_SIGN'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_sign'])) {
+                            $val_stat = $processHistory['action_sign']['info'];
+                            $val_date = $processHistory['action_sign']['logDate'];
+                            $val_head = $processHistory['action_sign']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Unterschrieben</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if (isset($processHistory['ENABLE_ACCEPT'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_accept'])) {
+                            $val_stat = $processHistory['action_accept'] == 'DECLINED' ? 'Nein' : 'Ja';
+                            $val_date = $processHistory['action_accept']['logDate'];
+                            $val_head = $processHistory['action_accept']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Akzeptiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if ($rowProc['password'] && isset($processHistory['password_denied'])) {
+                        $val_stat = $processHistory['password_denied']['count'];
+                        $val_date = $processHistory['password_denied']['logDate'];
+                        $val_head = $processHistory['password_denied']['userAgent'];
 
-        echo '<tr><td></td> <td>Passwort Falscheingaben</td> <td>' . intval($val_stat) . 'x Mal</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-}
-?>
-		</tbody>
+                        echo '<tr><td></td> <td>Passwort Falscheingaben</td> <td>' . intval($val_stat) . 'x Mal</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                }
+                ?>
+            </tbody>
 		</table>
     </div>
   </div>
@@ -1109,33 +1096,32 @@ while ($row = $result_p->fetch_assoc()):
 	            <div class="col-md-6">
 	              <label><input type="checkbox" name="productive" <?php echo $row['status']; ?> /><?php echo $lang['PRODUCTIVE']; ?></label>
 	            </div>
-	            <div class="col-md-6">
-	              <br>
-	              <?php
-    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-    if ($resF->num_rows > 0) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_1'] == 'TRUE' ? 'checked' : '';
-            echo '<label><input type="checkbox" ' . $checked . ' name="addField_1_' . $row['id'] . '"/> ' . $rowF['name'] . '</label>';
-        }
-    }
-    if ($resF->num_rows > 1) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_2'] == 'TRUE' ? 'checked' : '';
-            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_2_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-        }
-    }
-    if ($resF->num_rows > 2) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_3'] == 'TRUE' ? 'checked' : '';
-            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_3_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-        }
-    }
-    ?>
-	            </div>
+                <div class="col-md-6"><br>
+                    <?php
+                    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
+                    if ($resF->num_rows > 0) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_1'] == 'TRUE' ? 'checked' : '';
+                            echo '<label><input type="checkbox" ' . $checked . ' name="addField_1_' . $row['id'] . '"/> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    if ($resF->num_rows > 1) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_2'] == 'TRUE' ? 'checked' : '';
+                            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_2_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    if ($resF->num_rows > 2) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_3'] == 'TRUE' ? 'checked' : '';
+                            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_3_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    ?>
+                </div>
 	          </div>
 	        </div>
 	        <div class="modal-footer">
@@ -1172,32 +1158,32 @@ while ($row = $result_p->fetch_assoc()):
             <input type="checkbox" name="status" value="checked" checked> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?>
           </div>
           <div class="col-md-6">
-            <div class="checkbox">
-              <?php
-$resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-if ($resF->num_rows > 0) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<input type="checkbox" ' . $checked . ' name="createField_1"/>' . $rowF['name'];
-    }
-}
-if ($resF->num_rows > 1) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<br><input type="checkbox" ' . $checked . ' name="createField_2" />' . $rowF['name'];
-    }
-}
-if ($resF->num_rows > 2) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<br><input type="checkbox" ' . $checked . ' name="createField_3" />' . $rowF['name'];
-    }
-}
-?>
-            </div>
+              <div class="checkbox">
+                  <?php
+                  $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
+                  if ($resF->num_rows > 0) {
+                      $rowF = $resF->fetch_assoc();
+                      if ($rowF['isActive'] == 'TRUE') {
+                          $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                          echo '<input type="checkbox" ' . $checked . ' name="createField_1"/>' . $rowF['name'];
+                      }
+                  }
+                  if ($resF->num_rows > 1) {
+                      $rowF = $resF->fetch_assoc();
+                      if ($rowF['isActive'] == 'TRUE') {
+                          $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                          echo '<br><input type="checkbox" ' . $checked . ' name="createField_2" />' . $rowF['name'];
+                      }
+                  }
+                  if ($resF->num_rows > 2) {
+                      $rowF = $resF->fetch_assoc();
+                      if ($rowF['isActive'] == 'TRUE') {
+                          $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                          echo '<br><input type="checkbox" ' . $checked . ' name="createField_3" />' . $rowF['name'];
+                      }
+                  }
+                  ?>
+              </div>
           </div>
         </div>
       </div>
@@ -1211,66 +1197,66 @@ if ($resF->num_rows > 2) {
 
 <!-- ADD CONTACT PERSON -->
 <form method="POST">
-<?php echo $editmodals; ?>
+    <?php echo $editmodals; ?>
 </form>
 <form method="POST">
-	<div id="add-contact-person" class="modal fade">
-		<div class="modal-dialog modal-content modal-md">
-			<div class="modal-header h4">Ansprechpartner Hinzufügen</div>
-			<div class="modal-body">
-				<div class="row form-group">
-					<div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
-					<div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
-				</div>
-				<div class="row form-group">
+    <div id="add-contact-person" class="modal fade">
+        <div class="modal-dialog modal-content modal-md">
+            <div class="modal-header h4">Ansprechpartner Hinzufügen</div>
+            <div class="modal-body">
+                <div class="row form-group">
+                    <div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
+                    <div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
+                </div>
+                <div class="row form-group">
                     <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="form-control select2 required-field">
                         <option value="Herr" >Herr</option>
                         <option value="Frau" >Frau</option>
                     </select></div>
-					<div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-					<div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="form-control select2-position">
-                        <?php 
-                            echo '<option value="-1" >New...</option>';
-                            $result = $conn->query("SELECT * FROM position");
-                            while($row = $result->fetch_assoc()){
-                                echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
-                            }
+                    <div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
+                    <div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="form-control select2-position">
+                        <?php
+                        echo '<option value="-1" >New...</option>';
+                        $result = $conn->query("SELECT * FROM position");
+                        while($row = $result->fetch_assoc()){
+                            echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
+                        }
                         ?>
                     </select></div>
-					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
-				</div>
+                    <div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
+                    <div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
+                    <div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
+                </div>
                 <div class="row form-group">
                     <div class="col-md-12"><label>PGP-Key</label><textarea class="form-control" name="contacts_pgp" placeholder="Put PGP Key here..." ></textarea></div>
-			</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
                 <button id="newPositionModal" type="button" data-target="new-position" data-toggle="modal" style="visibility:hidden; width:1px; height:1px;" ></button>
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 </form>
 <div id="new-position" class="modal fade">
-		<div class="modal-dialog modal-content modal-sm">
-			<div class="modal-header h4">Position Hinzufügen</div>
-			<div class="modal-body">
-                <label>Name</label>
-                <input type="text" id="positionName" class="form-control" />
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="button" onClick="addPosition()" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-			</div>
-		</div>
+    <div class="modal-dialog modal-content modal-sm">
+        <div class="modal-header h4">Position Hinzufügen</div>
+        <div class="modal-body">
+            <label>Name</label>
+            <input type="text" id="positionName" class="form-control" />
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" onClick="addPosition()" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1320,7 +1306,7 @@ function addPosition(){
             $(".select2-position").select2();
             $("#new-position").modal("hide");
         });
-    }else{
+    } else {
         $("#positionName").focus();
     }
 }

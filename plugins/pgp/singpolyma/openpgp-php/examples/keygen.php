@@ -17,9 +17,13 @@ $nkey = new OpenPGP_SecretKeyPacket(array(
 ));
 
 $uid = new OpenPGP_UserIDPacket('Test <test@example.com>');
-
 $wkey = new OpenPGP_Crypt_RSA($nkey);
 $m = $wkey->sign_key_userid(array($nkey, $uid));
+
+//i  think we need a table name update. renaming tables is a pain though, so you will need something better.
+//variables get bulky, memory heavy and unclear
+//renaming the tables is a lot of work
+//an array.. hm. not advisable.
 
 // Serialize private key
 print $m->to_bytes();

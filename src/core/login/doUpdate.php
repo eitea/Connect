@@ -1461,7 +1461,7 @@ if ($row['version'] < 124) {
     $txt = '$identifier = \''.hash('sha1',$identifier).'\';
     $s3SharedFiles=$identifier.\'_sharedFiles\';
     $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-    $s3privateFiles=$identifier.\'_privateFiles\'';
+    $s3privateFiles=$identifier.\'_privateFiles\';';
     fwrite($myfile, $txt);
     fclose($myfile);
 
@@ -1831,8 +1831,12 @@ if($row['version'] < 131){ //14.02.2018
         userID INT(6) UNSIGNED,
         correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (questionID, userID),
-        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     )";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -1854,11 +1858,10 @@ if($row['version'] < 132){//14.02.2018
 }
 if($row['version'] < 133){
     $sql = "CREATE TABLE emailprojectlogs (
-        id int(11),
+        id int(11) PRIMARY KEY,
         timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        body text,
-        PRIMARY KEY (id),
-        )";
+        body text
+    )";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
