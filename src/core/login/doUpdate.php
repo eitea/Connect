@@ -1926,7 +1926,7 @@ if ($row['version'] < 137) {
             $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-    $sql = "ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL;";
+    $sql = "ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL, ADD form_of_address ENUM('Herr','Frau') NOT NULL, ADD titel VARCHAR(20) DEFAULT null, ADD pgpKey TEXT DEFAULT null";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
