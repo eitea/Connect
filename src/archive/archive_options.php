@@ -53,7 +53,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
                     echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
-                    echo '<td><button type="button" onClick="deleteConfig('.$row['id'].')" ><i class="fa fa-trash" /></button></td>';
+                    echo '<td><button class="btn btn-default" type="button" onClick="deleteConfig('.$row['id'].')" ><i class="fa fa-trash" /></button></td>';
                     echo '</tr>';
                 }
             ?></tbody>
