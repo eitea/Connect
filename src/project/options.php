@@ -1,6 +1,7 @@
 <?php
 require dirname(__DIR__) . '/header.php';
 include dirname(__DIR__) . "/misc/helpcenter.php";
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -57,7 +58,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <th>Security</th>
     <th>Username</th>
     <th><?php echo $lang['RULES'] ?></th>
-    <th><button type="button" onclick="checkEmails()" class="btn btn-default" title="Check Emails" ><i class="fa fa-refresh"></i></button></th>
+    <th><button type="button" onclick="retrieveEmails()" class="btn btn-default" title="Check Emails" ><i class="fa fa-refresh"></i></button></th>
   </tr></thead>
   <tbody>
   <?php
@@ -565,7 +566,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         );
         return $state;
     };
-    function checkEmails(){
+    function retrieveEmails(){
         $.post("../report/tasks",{},function(data){
             console.log(data);
         });

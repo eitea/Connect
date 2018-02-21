@@ -3,8 +3,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $username = $_POST['username'];
     $password = $_POST['password'];
     $security = empty($_POST['security']) ? '' : '/'.$_POST['security'];
-    $mailbox = '{'.$_POST['server'] .':'. $_POST['port']. '/'.$_POST['service'] . $security .'}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
-
+    $mailbox = '{'.$_POST['server'] .':'. $_POST['port']. '/'.$_POST['service'] . $security.'/novalidate-cert}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
     if(!function_exists('imap_open')){
         echo 'Imap not Installed'; //imap extension not installed
     } else {
@@ -14,9 +13,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo "Connection Successful!\n";
                 var_dump($headers);
                 imap_close($imap);
-            } else {
-                echo "Error in Connection\n";
+            } elseif($imap) {
                 var_dump($imap);
+                imap_close($imap);
+                echo "Error while retriving\n";
+            } else {
+                echo "Could not connect\n";
             }
         } catch(Exception $e) {
             echo 'ERROR DETECTED: ';
