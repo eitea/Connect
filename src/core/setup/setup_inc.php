@@ -261,6 +261,10 @@ function create_tables($conn) {
         canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canUseSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canEditSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         FOREIGN KEY (userID) REFERENCES UserData(id)

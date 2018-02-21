@@ -263,7 +263,9 @@ i{
 .grey{
   color:grey;
 }
-
+.no-margin {
+  margin: 0 !important;
+}
 .modal-body{
   max-height:80vh;
   overflow-y:auto;

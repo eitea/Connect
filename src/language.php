@@ -174,6 +174,18 @@ $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 $lang_eng['CAN_USE_SOCIAL_MEDIA'] = 'Can use Social Media';
 $lang_ger['CAN_USE_SOCIAL_MEDIA'] = 'Kann soziale Medien benutzen';
 
+$lang_eng['CAN_USE_CLIENTS'] = 'Can use clients';
+$lang_ger['CAN_USE_CLIENTS'] = 'Kann Kunden benutzen';
+
+$lang_eng['CAN_EDIT_CLIENTS'] = 'Can edit clients';
+$lang_ger['CAN_EDIT_CLIENTS'] = 'Kann Kunden bearbeiten';
+
+$lang_eng['CAN_USE_SUPPLIERS'] = 'Can use suppliers';
+$lang_ger['CAN_USE_SUPPLIERS'] = 'Kann Lieferanten benutzen';
+
+$lang_eng['CAN_EDIT_SUPPLIERS'] = 'Can edit suppliers';
+$lang_ger['CAN_EDIT_SUPPLIERS'] = 'Kann Lieferanten bearbeiten';
+
 $lang_eng['CASH_EXPENSE'] = 'Cash Expense';
 $lang_ger['CASH_EXPENSE'] = 'Barauslage';
 

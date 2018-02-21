@@ -1,14 +1,24 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
+isset($canUseSuppliers, $canEditSuppliers) or die ("no permission (you need canUseSuppliers or canEditSuppliers)");
+if(!($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE')){
+    echo "no permission (you need canUseSuppliers or canEditSuppliers)";
+    include dirname(__DIR__) . '/footer.php';  
+    die();
+}
 $filterings = array("company" => 0, "supplier" => 0);
 if(!empty($_POST['delete'])){
-    $id = intval($_POST['delete']);
-    $conn->query("DELETE FROM clientData WHERE id = $id");
-    if($conn->error){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-    } else {
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+    if($canEditSuppliers == 'TRUE'){
+         $id = intval($_POST['delete']);
+        $conn->query("DELETE FROM clientData WHERE id = $id");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+        }
+    }else{
+        echo "no permission (you need canEditSuppliers)";
     }
 }
 ?>
