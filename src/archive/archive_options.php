@@ -6,7 +6,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $server = $_POST['server'];
         $aKey = $_POST['aKey'];
         $sKey = $_POST['sKey'];
-        require dirname(dirname(__DIR__)) . "/misc/useS3Config.php";
+        require dirname(__DIR__) . "/misc/useS3Config.php";
         if (isset($_POST['server'])) {
             try{
                 $credentials = array('key' => $aKey, 'secret' => $sKey);

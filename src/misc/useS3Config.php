@@ -17,7 +17,10 @@
     function addS3Config($server,$key,$secret){
         require dirname(__DIR__) . "/connection.php";
         try{
-            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret) VALUES ('$server','$key','$secret')");
+            $active = 'FALSE';
+            $result = $conn->query("SELECT id FROM archievconfig");
+            if($result->num_rows<1) $active = 'TRUE';
+            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive) VALUES ('$server','$key','$secret','$active')");
             return true;
         }catch(Exception $e){
             return false;
