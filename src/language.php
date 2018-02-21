@@ -953,7 +953,7 @@ $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
 $lang_eng['PRIVATE'] = 'Private';
-$lang_ger['PRIVATE'] = 'Persöhnlich';
+$lang_ger['PRIVATE'] = 'Persönlich';
 
 $lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
 $lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
