@@ -76,7 +76,7 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
             $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Monat.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
-        
+
 
         if ($accNum >= 5000 && $accNum < 8000 && $have) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 5, 6 und 7 dürfen nicht im Haben stehen.</div>';
@@ -252,7 +252,7 @@ while ($result && ($row = $result->fetch_assoc())) {
 ?>
 
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'] . ' <small>' . $account_row['num'] . ' - ' . $account_row['name'] . '</small>'; ?>
-<div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; $cmpID = $account_row['companyID']; include dirname(__DIR__) . '/misc/lockAccounting.php';?>
+<div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__.'/lockAccounting.php';?>
 <?php if ($show_undo): ?>
     <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
 <?php endif;?>

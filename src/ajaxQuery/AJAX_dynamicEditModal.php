@@ -138,9 +138,9 @@ if($x){
                                     <select required <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                                         <?php
                                         if($isDynamicProjectsAdmin != 'TRUE'){
-                                            $result = str_replace('<option value="', '<option selected value="user;', $modal_options); //append 'user;' before every value
-                                        }else{
-                                            $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
+                                            $result = str_replace('<option value="', '<option selected value="user;', $modal_options);
+                                        } else {
+                                            $result = str_replace('<option value="', '<option value="user;', $modal_options);
                                         }
                                         for($i = 0; $i < count($dynrow_emps); $i++){
                                             if($dynrow_emps[$i]['position'] == 'normal'){

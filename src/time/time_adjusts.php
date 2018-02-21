@@ -1,5 +1,6 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['ADJUSTMENTS']; ?></h3>
 </div>
@@ -63,7 +64,9 @@ echo mysqli_error($conn);
   <button type="submit" class="btn btn-warning ">Select</button>
 </div>
 </form>
-
+<br><br><br>
+</div>
+<div class="page-content-fixed-150">
 <br><br><br>
 
 <?php if($filterID): ?>
@@ -212,4 +215,5 @@ echo mysqli_error($conn);
   </div>
 </div>
 <?php endif; ?>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

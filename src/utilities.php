@@ -89,7 +89,7 @@ function displayAsHoursMins($hour) {
     }
     $s .= round($hours * 60) . 'min';
     return $s;
-}
+} //oh lol.. yes, we can overwrite our connection o.o
 
 function redirect($url) {
     if (!headers_sent()) {
@@ -146,7 +146,6 @@ function getNextERP($identifier, $companyID, $offset = 0) {
         if ($offset < 0) {
             $offset = 0;
         }
-
     }
     $vals = array($offset);
     $result = $conn->query("SELECT id_number FROM processHistory, proposals, clientData WHERE processID = proposals.id AND clientID = clientData.id AND companyID = $companyID AND id_number LIKE '$identifier%'");
@@ -194,6 +193,40 @@ function simple_decryption($message, $key) {
     return $plaintext;
 }
 
+//just returns a public and a private key
+function pgp_generate_keys($user){
+    require_once dirname(__FILE__).'/../lib/openpgp.php';
+    require_once dirname(__FILE__).'/../lib/openpgp_crypt_rsa.php';
+
+    $rsa = new \phpseclib\Crypt\RSA();
+    $k = $rsa->createKey(512);
+    $rsa->loadKey($k['privatekey']);
+
+    $nkey = new OpenPGP_SecretKeyPacket(array(
+       'n' => $rsa->modulus->toBytes(),
+       'e' => $rsa->publicExponent->toBytes(),
+       'd' => $rsa->exponent->toBytes(),
+       'p' => $rsa->primes[2]->toBytes(),
+       'q' => $rsa->primes[1]->toBytes(),
+       'u' => $rsa->coefficients[2]->toBytes()
+   ));
+
+    $uid = new OpenPGP_UserIDPacket($user);
+
+    $wkey = new OpenPGP_Crypt_RSA($nkey);
+    $m = $wkey->sign_key_userid(array($nkey, $uid));
+
+    // Serialize private key
+    $key['private'] = $m->to_bytes();
+
+    // Serialize public key message
+    $pubm = clone($m);
+    $pubm[0] = new OpenPGP_PublicKeyPacket($pubm[0]);
+
+    $key['public'] = $pubm->to_bytes();
+
+    return $key;
+}
 /** Usage
  * Encrypt
  * $c = new MasterCrypt();
@@ -208,7 +241,7 @@ function simple_decryption($message, $key) {
  * echo $c->decrypt($var2);
  */
 class MasterCrypt {
-    public $iv;
+    public $iv; //initalization vector
     public $iv2;
     private $password;
 

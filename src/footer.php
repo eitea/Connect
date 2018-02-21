@@ -1,12 +1,5 @@
 </div>
 </div>
-
-
-<?php
-
-// if($userHasUnansweredSurveys): //test if user has unanswered surveys
-
-?>
 <div id="currentSurveyModal"></div>
 <script>
 $(".openSurvey").click(function(){
@@ -22,7 +15,7 @@ function openSurveyModal(){
         },
         error : function(resp){console.error(resp)},
         complete: function(resp){
-            $("#currentSurveyModal .modal").modal({
+            $("#currentSurveyModal .survey-modal").modal({
                 backdrop: 'static',
                 keyboard: false
             });
@@ -67,7 +60,7 @@ $(".feedback-button").on("click",function(){
             $("#screenshot").html(newImg);
         });
         window.feedbackCanvasObject = canvas
-        $('#feedbackModal').modal('show');
+        $('#feedbackModal').appendTo("body").modal('show');
     });
 })
 

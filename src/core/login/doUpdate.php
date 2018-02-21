@@ -1461,7 +1461,7 @@ if ($row['version'] < 124) {
     $txt = '$identifier = \''.hash('sha1',$identifier).'\';
     $s3SharedFiles=$identifier.\'_sharedFiles\';
     $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-    $s3privateFiles=$identifier.\'_privateFiles\'';
+    $s3privateFiles=$identifier.\'_privateFiles\';';
     fwrite($myfile, $txt);
     fclose($myfile);
 
@@ -1738,26 +1738,24 @@ if($row['version'] < 131){ //14.02.2018
     }
 
     $conn->query("DELETE FROM taskData WHERE id = 4");
-
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>BugFix: Email Tasks';
     }
 
-    $conn->query("ALTER TABLE UserData  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
-
+    $conn->query("ALTER TABLE UserData ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Forced Change Password';
     }
 
-    $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+    $conn->query("CREATE TABLE position (
+    id INT(6) NOT NULL AUTO_INCREMENT,
     name VARCHAR(20) NOT NULL,
-    PRIMARY KEY (id))");
-
-    
+    PRIMARY KEY (id)
+    )");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1831,8 +1829,12 @@ if($row['version'] < 131){ //14.02.2018
         userID INT(6) UNSIGNED,
         correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (questionID, userID),
-        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     )";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -1843,28 +1845,25 @@ if($row['version'] < 131){ //14.02.2018
 
 if($row['version'] < 132){//14.02.2018
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
     if($result){
         while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-    $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
+    $conn->query("ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL;");
 }
 if($row['version'] < 133){
     $sql = "CREATE TABLE emailprojectlogs (
-        id int(11),
+        id int(11) PRIMARY KEY,
         timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        body text,
-        PRIMARY KEY (id),
-        )";
+        body text
+    )";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
         echo '<br>Debugging: Email Projects';
     }
-    
 }
 if($row['version'] < 134){
     $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
@@ -1875,13 +1874,62 @@ if($row['version'] < 134){
     } else {
         echo '<br>Repairing: Archive';
     }
-}
-if($row['version'] < 135){
     $sql = "ALTER TABLE roles ADD canCreateTasks ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL";
     if(!$conn->query($sql)){
         echo $conn->error;
     } else {
         echo '<br>Role: Can Create Task';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN version INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: version';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: overwrite';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN tries INT(6) DEFAULT 1");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: tries';
+    }
+    $conn->query("ALTER TABLE dsgvo_training ADD COLUMN random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
+    }
+    $conn->query("ALTER TABLE dsgvo_training_completed_questions ADD COLUMN duration INT(6) DEFAULT 0");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Training: random';
+    }
+}
+
+if($row['version'] < 135){
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN gender ENUM('male','female') NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Gender';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN title VARCHAR(20)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Titel';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN pgpKey TEXT");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: PGP Key';
     }
 }
 if ($row['version'] < 136) {
@@ -1902,7 +1950,7 @@ if ($row['version'] < 136) {
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
-        echo '<br>Archive: Multible Configs';
+        echo '<br>Archive: Multiple Configs';
     }
     $sql = "ALTER TABLE emailprojects CHANGE smtpSecure smtpSecure ENUM('tls','ssl','null') NOT NULL DEFAULT 'null';";
     if (!$conn->query($sql)) {
@@ -1910,9 +1958,7 @@ if ($row['version'] < 136) {
     } else {
         echo '<br>Bugfix: Email Tasks';
     }
-    
-}
-if ($row['version'] < 137) {
+
     $conn->query("CREATE OR REPLACE position (
         id int(6) NOT NULL AUTO_INCREMENT,
         name varchar(20) NOT NULL,

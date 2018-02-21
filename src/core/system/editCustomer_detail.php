@@ -25,14 +25,12 @@ if ($result && ($row = $result->fetch_assoc())) {
 }
 
 $activeTab = 'home';
-
-if (!empty($_POST['saveAll'])) {
-    $activeTab = $_POST['saveAll'];
-    if (isset($_POST['contactType'])) {
-        $val = $_POST['contactType'];
-    } else {
-        $val = '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!empty($_POST['saveAll'])) {
+        $activeTab = $_POST['saveAll'];
     }
+    //always update
+    $val = isset($_POST['contactType']) ? test_input($_POST['contactType']) : '';
     $conn->query("UPDATE $clientDetailTable SET contactType = '$val' WHERE id = $detailID");
     if (!empty($_POST['edit_name'])) {
         $name = test_input($_POST['edit_name']);
@@ -197,8 +195,6 @@ if (!empty($_POST['saveAll'])) {
     } else {
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
     }
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    echo "<script>console.log('".json_encode($_POST)."')</script>";
     if (isset($_POST['addNotes']) && !empty($_POST['infoText'])) {
         $activeTab = 'notes';
         $val = test_input($_POST['infoText']);
@@ -341,70 +337,66 @@ if (!empty($_POST['saveAll'])) {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_DELETE'] . '</div>';
         }
     } elseif (isset($_POST['addContact']) && !empty($_POST['contacts_firstname']) && !empty($_POST['contacts_lastname']) && !empty($_POST['contacts_gender']) && !empty($_POST['contacts_email'])) {
-    $firstname = test_input($_POST['contacts_firstname']);
-    $lastname = test_input($_POST['contacts_lastname']);
-    $mail = test_input($_POST['contacts_email']);
-    $position = intval($_POST['contacts_position']);
-    $resp = test_input($_POST['contacts_responsibility']);
-    $dial = test_input($_POST['contacts_dial']);
-    $faxDial = test_input($_POST['contacts_faxDial']);
-    $phone = test_input($_POST['contacts_phone']);
+        $firstname = test_input($_POST['contacts_firstname']);
+        $lastname = test_input($_POST['contacts_lastname']);
+        $mail = test_input($_POST['contacts_email']);
+        $position = intval($_POST['contacts_position']);
+        $resp = test_input($_POST['contacts_responsibility']);
+        $dial = test_input($_POST['contacts_dial']);
+        $faxDial = test_input($_POST['contacts_faxDial']);
+        $phone = test_input($_POST['contacts_phone']);
         $gender = test_input($_POST['contacts_gender']);
-        $titel = test_input($_POST['contacts_titel']);
+        $title = test_input($_POST['contacts_titel']);
         $pgp = trim($_POST['contacts_pgp']);
-        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, form_of_address, titel, pgpKey)
-        VALUES ($filterClient, '$firstname', '$lastname', '$mail', $position, '$resp', '$dial', '$faxDial', '$phone', '$gender', '$titel', '$pgp')");
-    if ($conn->error) {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
-    } else {
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
-    }
-    } elseif (isset($_POST['editContact']) && !empty($_POST['edit_contacts_firstname']) && !empty($_POST['edit_contacts_lastname']) && !empty($_POST['edit_contacts_gender']) && !empty($_POST['edit_contacts_email'])) {
-    $id = intval($_POST['editContact']);
-    $firstname = test_input($_POST['edit_contacts_firstname']);
-    $lastname = test_input($_POST['edit_contacts_lastname']);
-    $mail = test_input($_POST['edit_contacts_email']);
-    $position = intval($_POST['edit_contacts_position']);
-    $resp = test_input($_POST['edit_contacts_responsibility']);
-    $dial = test_input($_POST['edit_contacts_dial']);
-    $faxDial = test_input($_POST['edit_contacts_faxDial']);
-    $phone = test_input($_POST['edit_contacts_phone']);
-        $gender = test_input($_POST['edit_contacts_gender']);
-        $titel = test_input($_POST['edit_contacts_titel']);
-        $pgp = trim($_POST['edit_contacts_pgp']);
-        $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = $position, responsibility = '$resp', dial = '$dial', faxDial = '$faxDial', phone = '$phone' , form_of_address = '$gender', titel = '$titel', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
-    if ($conn->error) {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
-    } else {
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
+        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, gender, title, pgpKey)
+        VALUES ($filterClient, '$firstname', '$lastname', '$mail', $position, '$resp', '$dial', '$faxDial', '$phone', '$gender', '$title', '$pgp')");
+        if ($conn->error) {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
         }
-    } else {
-        
+    } elseif (isset($_POST['editContact']) && !empty($_POST['edit_contacts_firstname']) && !empty($_POST['edit_contacts_lastname']) && !empty($_POST['edit_contacts_gender']) && !empty($_POST['edit_contacts_email'])) {
+        $id = intval($_POST['editContact']);
+        $firstname = test_input($_POST['edit_contacts_firstname']);
+        $lastname = test_input($_POST['edit_contacts_lastname']);
+        $mail = test_input($_POST['edit_contacts_email']);
+        $position = intval($_POST['edit_contacts_position']);
+        $resp = test_input($_POST['edit_contacts_responsibility']);
+        $dial = test_input($_POST['edit_contacts_dial']);
+        $faxDial = test_input($_POST['edit_contacts_faxDial']);
+        $phone = test_input($_POST['edit_contacts_phone']);
+        $gender = test_input($_POST['edit_contacts_gender']);
+        $title = test_input($_POST['edit_contacts_titel']);
+        $pgp = trim($_POST['edit_contacts_pgp']);
+        $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = $position, responsibility = '$resp', dial = '$dial',
+            faxDial = '$faxDial', phone = '$phone', gender = '$gender', title = '$title', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
+        if ($conn->error) {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
+        }
     }
 }
 
-
-
-$result = $conn->query("SELECT name, clientNumber, companyID FROM $clientTable WHERE id = $filterClient");
+$result = $conn->query("SELECT name, clientNumber, companyID FROM clientData WHERE id = $filterClient");
 $rowClient = $result->fetch_assoc();
 
-$result = $conn->query("SELECT * FROM $clientDetailTable WHERE id = $detailID");
+$result = $conn->query("SELECT * FROM clientInfoData WHERE id = $detailID");
 $row = $result->fetch_assoc();
 
-$resultNotes = $conn->query("SELECT * FROM $clientDetailNotesTable WHERE parentID = $detailID");
-$resultBank = $conn->query("SELECT * FROM $clientDetailBankTable WHERE parentID = $detailID");
-$resultContacts = $conn->query("SELECT * FROM contactPersons WHERE clientID = $filterClient");
+$resultNotes = $conn->query("SELECT * FROM clientInfoNotes WHERE parentID = $detailID"); echo $conn->error;
+$resultBank = $conn->query("SELECT * FROM clientInfoBank WHERE parentID = $detailID"); echo $conn->error;
+$resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName FROM contactPersons LEFT JOIN position ON position.id = position WHERE clientID = $filterClient"); echo $conn->error;
+
 ?>
 
 <div class="page-header">
-	<h3><?php if (isset($_GET['supID'])) {echo $lang['SUPPLIER'];} else {echo $lang['CLIENT'];}
-echo ' - ' . $rowClient['name'];?>
+	<h3><?php if (isset($_GET['supID'])) {echo $lang['SUPPLIER'];} else {echo $lang['CLIENT'];} echo ' - ' . $rowClient['name']; ?>
 		<div class="page-header-button-group">
 			<button id="sav" type="submit" class="btn btn-default blinking" name="saveAll" value="home" title="<?php echo $lang['SAVE']; ?>" form="mainForm"><i class="fa fa-floppy-o"></i></button>
 		</div>
 	</h3>
 </div>
-
 
 <ul class="nav nav-tabs">
 	<li <?php if ($activeTab == 'project') {echo 'class="active"';}?>><a data-toggle="tab" href="#project" onclick="$('#sav').val('project');"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
@@ -434,46 +426,46 @@ echo ' - ' . $rowClient['name'];?>
 			<th><?php echo $lang['HOURS']; ?></th>
 			<th><?php echo $lang['HOURLY_RATE']; ?></th>
 			<th></th>
-		</thead>
+        </thead>
         <tbody>
-          <?php
-$result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $filterClient");
-while ($row_p = $result_p->fetch_assoc()) {
-    $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
-    echo '<tr>';
-    echo '<td><input type="checkbox" name="delete_projects_index[]" value=' . $row_p['id'] . ' /></td>';
-    echo '<td>' . $productive . '</td>';
-    echo '<td>' . $row_p['name'] . '</td>';
-    echo '<td>';
-    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-    if ($resF->num_rows > 0) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE' && $row_p['field_1'] == 'TRUE') {
-            echo $rowF['name'];
-        }
-    }
-    if ($resF->num_rows > 1) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE' && $row_p['field_2'] == 'TRUE') {
-            echo $rowF['name'];
-        }
-    }
-    if ($resF->num_rows > 2) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE' && $row_p['field_3'] == 'TRUE') {
-            echo $rowF['name'];
-        }
-    }
-    echo '</td>';
-    echo '<td>' . $row_p['hours'] . '</td>';
-    echo '<td>' . $row_p['hourlyPrice'] . '</td>';
-    echo '<td><button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingProjectsModal-' . $row_p['id'] . '"><i class="fa fa-pencil"></i></td>';
-    echo '</tr>';
-}
-?>
+            <?php
+            $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $filterClient");
+            while ($row_p = $result_p->fetch_assoc()) {
+                $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
+                echo '<tr>';
+                echo '<td><input type="checkbox" name="delete_projects_index[]" value=' . $row_p['id'] . ' /></td>';
+                echo '<td>' . $productive . '</td>';
+                echo '<td>' . $row_p['name'] . '</td>';
+                echo '<td>';
+                $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
+                if ($resF->num_rows > 0) {
+                    $rowF = $resF->fetch_assoc();
+                    if ($rowF['isActive'] == 'TRUE' && $row_p['field_1'] == 'TRUE') {
+                        echo $rowF['name'];
+                    }
+                }
+                if ($resF->num_rows > 1) {
+                    $rowF = $resF->fetch_assoc();
+                    if ($rowF['isActive'] == 'TRUE' && $row_p['field_2'] == 'TRUE') {
+                        echo $rowF['name'];
+                    }
+                }
+                if ($resF->num_rows > 2) {
+                    $rowF = $resF->fetch_assoc();
+                    if ($rowF['isActive'] == 'TRUE' && $row_p['field_3'] == 'TRUE') {
+                        echo $rowF['name'];
+                    }
+                }
+                echo '</td>';
+                echo '<td>' . $row_p['hours'] . '</td>';
+                echo '<td>' . $row_p['hourlyPrice'] . '</td>';
+                echo '<td><button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingProjectsModal-' . $row_p['id'] . '"><i class="fa fa-pencil"></i></td>';
+                echo '</tr>';
+            }
+            ?>
         </tbody>
-      </table>
-    </div>
+    </table>
+</div>
 
 	<div id="home" class="tab-pane fade <?php if ($activeTab == 'home') {echo 'in active';}?>">
 	<h3><?php echo $lang['GENERAL_INFORMATION']; ?></h3>
@@ -487,15 +479,15 @@ while ($row_p = $result_p->fetch_assoc()) {
 			</div>
 			<div class="col-md-4">
 				<label><?php echo $lang['COMPANY']; ?></label>
-				<select class="js-example-basic-single" name="edit_company">
-					<?php
-$res_cmp = $conn->query("SELECT * FROM companyData WHERE id IN (" . implode(', ', $available_companies) . ")");
-while ($row_cmp = $res_cmp->fetch_assoc()) {
-    $selected = ($rowClient['companyID'] == $row_cmp['id']) ? 'selected' : '';
-    echo '<option ' . $selected . ' value="' . $row_cmp['id'] . '">' . $row_cmp['name'] . '</option>';
-}
-?>
-				</select>
+                <select class="js-example-basic-single" name="edit_company">
+                    <?php
+                    $res_cmp = $conn->query("SELECT id, name FROM companyData WHERE id IN (" . implode(', ', $available_companies) . ")");
+                    while ($row_cmp = $res_cmp->fetch_assoc()) {
+                        $selected = ($rowClient['companyID'] == $row_cmp['id']) ? 'selected' : '';
+                        echo '<option ' . $selected . ' value="' . $row_cmp['id'] . '">' . $row_cmp['name'] . '</option>';
+                    }
+                    ?>
+                </select>
 			</div>
 		</div>
 		<hr>
@@ -571,89 +563,40 @@ while ($row_cmp = $res_cmp->fetch_assoc()) {
 		</div>
 		<br><br>
 		<div class="row form-group">
-        </form>
-        <form method="POST" >
-			<div class="col-xs-2 text-right">Ansprechpartner</div>
-			<div class="col-sm-10">
-				<table class="table">
-					<thead><tr>
-                    <th><?php echo $lang['FORM_OF_ADDRESS'] ?></th>
-                    <th>Titel</th>
-					<th>Name</th>
-					<th>E-Mail</th>
-					<th>Position</th>
-					<th>Verantwortung</th>
-					<th>Durchwahl</th>
-					<th>Faxdurchwahl</th>
-					<th>Mobiltelefon</th>
-					<th></th>
-					</tr></thead>
-					<tbody>
-					<?php
-$editmodals = '';
-while ($contactRow = $resultContacts->fetch_assoc()) {
-    $positionName = $conn->query("SELECT name FROM position WHERE id = ".$contactRow['position']);
-    $positionName = $positionName->fetch_assoc()['name'];
-    echo '<tr>';
-    echo '<td>' . $contactRow['form_of_address'] . '</td>';
-    echo '<td>' . $contactRow['titel'] . '</td>';
-    echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
-    echo '<td>' . $contactRow['email'] . '</td>';
-    echo '<td>' . $positionName . '</td>';
-    echo '<td>' . $contactRow['responsibility'] . '</td>';
-    echo '<td>' . $contactRow['dial'] . '</td>';
-    echo '<td>' . $contactRow['faxDial'] . '</td>';
-    echo '<td>' . $contactRow['phone'] . '</td>';
-    echo '<td><button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
-    echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button></td>';
-    echo '</tr>';
-
-    $currentmodal = '<div id="edit-contact-' . $contactRow['id'] . '" class="modal fade">
-						<div class="modal-dialog modal-content modal-md">
-							<div class="modal-header h4">Ansprechpartner Editieren</div>
-							<div class="modal-body">
-								<div class="row form-group">
-									<div class="col-md-6"><label>Vorname</label><input type="text" name="edit_contacts_firstname" value="' . $contactRow['firstname'] . '" class="form-control required-field"/></div>
-									<div class="col-md-6"><label>Nachname</label><input type="text" name="edit_contacts_lastname" value="' . $contactRow['lastname'] . '" class="form-control required-field"/></div>
-								</div>
-								<div class="row form-group">
-                                    <div class="col-md-6"><label>'.$lang['FORM_OF_ADDRESS'].'</label><select name="edit_contacts_gender" class="form-control select2 required-field">
-                                        <option value="Herr" >Herr</option>
-                                        <option value="Frau" >Frau</option>
-                                    </select></div>
-									<div class="col-md-6"><label>Titel</label><input type="text" name="edit_contacts_titel" value="' . $contactRow['titel'] . '" class="form-control "/></div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md-4"><label>E-Mail</label><input type="email" name="edit_contacts_email" value="' . $contactRow['email'] . '" class="form-control required-field"/></div>
-									<div class="col-md-4"><label>Position</label><select type="text" name="edit_contacts_position" placeholder="Position" class="form-control select2-position">';
-                                        $currentmodal .= '<option value="-1" >New...</option>';
-                                            $result = $conn->query("SELECT * FROM position");
-                                            while($row = $result->fetch_assoc()){
-                                                $currentmodal .= '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
-                                            }
-                                            $currentmodal = str_replace('<option value="'.$contactRow['position'].'" >','<option selected value="'.$contactRow['position'].'" >',$currentmodal);
-
-                                            $currentmodal .= '</select></div>
-									<div class="col-md-4"><label>Verantwortung</label><input type="text" name="edit_contacts_responsibility" value="' . $contactRow['responsibility'] . '" class="form-control"/></div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md-4"><label>Durchwahl</label><input type="text" name="edit_contacts_dial" value="' . $contactRow['dial'] . '" class="form-control"/></div>
-									<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="edit_contacts_faxDial" value="' . $contactRow['faxDial'] . '" class="form-control"/></div>
-									<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="edit_contacts_phone" value="' . $contactRow['phone'] . '" class="form-control"/></div>
-								</div>
-                                <div class="row form-group">
-                                    <div class="col-md-12"><label>PGP-Key</label><textarea class="form-control" name="edit_contacts_pgp" placeholder="Put PGP Key here..." >'.$contactRow['pgpKey'].'</textarea></div>
-							</div>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="submit" name="editContact" value="' . $contactRow['id'] . '" class="btn btn-warning">' . $lang['SAVE'] . '</button>
-							</div>
-						</div>
-					</div>';
-    $editmodals .= str_replace('<option value="'.$contactRow['form_of_address'].'" />','<option selected value="'.$contactRow['form_of_address'].'" />',$currentmodal);
-}
-?>
+            <div class="col-xs-2 text-right">Ansprechpartner</div>
+            <div class="col-sm-10">
+                <table class="table">
+                    <thead><tr>
+                        <th><?php echo $lang['FORM_OF_ADDRESS'] ?></th>
+                        <th>Titel</th>
+                        <th>Name</th>
+                        <th>E-Mail</th>
+                        <th>Position</th>
+                        <th>Verantwortung</th>
+                        <th>Durchwahl</th>
+                        <th>Faxdurchwahl</th>
+                        <th>Mobiltelefon</th>
+                        <th></th>
+                    </tr></thead>
+                    <tbody>
+                        <?php
+                        $editmodals = '';
+                        while ($contactRow && ($contactRow = $resultContacts->fetch_assoc())) {
+                            echo '<tr>';
+                            echo '<td>' . $lang['GENDER_TOSTRING'][$contactRow['gender']]. '</td>';
+                            echo '<td>' . $contactRow['title'] . '</td>';
+                            echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
+                            echo '<td>' . $contactRow['email'] . '</td>';
+                            echo '<td>' . $contactRow['positionName'] . '</td>';
+                            echo '<td>' . $contactRow['responsibility'] . '</td>';
+                            echo '<td>' . $contactRow['dial'] . '</td>';
+                            echo '<td>' . $contactRow['faxDial'] . '</td>';
+                            echo '<td>' . $contactRow['phone'] . '</td>';
+                            echo '<td><button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+                            echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button></td>';
+                            echo '</tr>';
+                        }
+                        ?>
 					</tbody>
 				</table>
 				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
@@ -727,32 +670,28 @@ while ($contactRow = $resultContacts->fetch_assoc()) {
 				Vertreter
 			</div>
 			<div class="col-sm-4">
-				<select class="js-example-basic-single" name="representative">
-					<option value="0">...</option>
-					<?php
-$result_con = $conn->query("SELECT * FROM representatives");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = ($row['representative'] == $row_con['name']) ? 'selected' : '';
-    echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
-}
-$result_con = $conn->query("SELECT firstname, lastname FROM UserData WHERE id IN (" . implode(', ', $available_users) . ")");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = ($row['representative'] == $row_con['firstname'] . ' ' . $row_con['lastname']) ? 'selected' : '';
-    echo '<option ' . $selected . ' value="' . $row_con['firstname'] . ' ' . $row_con['lastname'] . '">' . $row_con['firstname'] . ' ' . $row_con['lastname'] . '</option>';
-}
-?>
-				</select>
+                <select class="js-example-basic-single" name="representative">
+                    <option value="0">...</option>
+                    <?php
+                    $result_con = $conn->query("SELECT * FROM representatives");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = ($row['representative'] == $row_con['name']) ? 'selected' : '';
+                        echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
+                    }
+                    $result_con = $conn->query("SELECT firstname, lastname FROM UserData WHERE id IN (" . implode(', ', $available_users) . ")");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = ($row['representative'] == $row_con['firstname'] . ' ' . $row_con['lastname']) ? 'selected' : '';
+                        echo '<option ' . $selected . ' value="' . $row_con['firstname'] . ' ' . $row_con['lastname'] . '">' . $row_con['firstname'] . ' ' . $row_con['lastname'] . '</option>';
+                    }
+                    ?>
+                </select>
 			</div>
 		</div>
 	</div>
 
 	<div id="menuBank" class="tab-pane fade <?php if ($activeTab == 'banking') {echo 'in active';}?>">
 		<div class="row form-group">
-			<h3>
-				<div class="col-sm-9">
-					Bankdaten
-				</div>
-			</h3>
+			<h3><div class="col-sm-9">Bankdaten</div></h3>
 		</div>
 		<hr>
 		<table class="table table-hover">
@@ -763,29 +702,29 @@ while ($row_con = $result_con->fetch_assoc()) {
 				<th></th>
 			</thead>
 			<tbody>
-				<?php
-$modals = '';
-while ($resultBank && ($rowBank = $resultBank->fetch_assoc())) {
-    $mc = new MasterCrypt($_SESSION["masterpassword"], $rowBank['iv'], $rowBank['iv2']);
-    echo '<tr>';
-    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bankName']) . '</td>';
-    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['iban']) . '</td>';
-    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bic']) . '</td>';
-    echo '<td><button type="submit" class="btn btn-default" name="removeBank" value="' . $rowBank['id'] . '" title="' . $lang['DELETE'] . '" ><i class="fa fa-trash-o"></i></button>
-<button type="button" class="btn btn-default" data-toggle="modal" data-target=".edit-bank-' . $rowBank['id'] . '" title="' . $lang['EDIT'] . '" ><i class="fa fa-pencil"></i></button></td>';
-    echo '</tr>';
+                <?php
+                $modals = '';
+                while ($resultBank && ($rowBank = $resultBank->fetch_assoc())) {
+                    $mc = new MasterCrypt($_SESSION["masterpassword"], $rowBank['iv'], $rowBank['iv2']);
+                    echo '<tr>';
+                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bankName']) . '</td>';
+                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['iban']) . '</td>';
+                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bic']) . '</td>';
+                    echo '<td><button type="submit" class="btn btn-default" name="removeBank" value="' . $rowBank['id'] . '" title="' . $lang['DELETE'] . '" ><i class="fa fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target=".edit-bank-' . $rowBank['id'] . '" title="' . $lang['EDIT'] . '" ><i class="fa fa-pencil"></i></button></td>';
+                    echo '</tr>';
 
-    $modals .= '<div class="modal fade edit-bank-' . $rowBank['id'] . '"><div class="modal-dialog modal-content modal-sm">
-<div class="modal-header h4">' . $lang['EDIT'] . '</div><div class="modal-body"><div class="container-fluid">
-<label><label>Bankname ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bankName" value="' . $mc->decrypt($rowBank['bankName']) . '" /><br>
-<label><label>IBAN ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_iban" value="' . $mc->decrypt($rowBank['iban']) . '" /><br>
-<label><label>BIC ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bic" value="' . $mc->decrypt($rowBank['bic']) . '" /><br>
-</div></div><div class="modal-footer">
-<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-<button type="submit" class="btn btn-warning" name="editBankingDetail" value="' . $rowBank['id'] . '" >' . $lang['SAVE'] . '</button>
-</div></div></div>';
-}
-?>
+                    $modals .= '<div class="modal fade edit-bank-' . $rowBank['id'] . '"><div class="modal-dialog modal-content modal-sm">
+                    <div class="modal-header h4">' . $lang['EDIT'] . '</div><div class="modal-body"><div class="container-fluid">
+                    <label><label>Bankname ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bankName" value="' . $mc->decrypt($rowBank['bankName']) . '" /><br>
+                    <label><label>IBAN ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_iban" value="' . $mc->decrypt($rowBank['iban']) . '" /><br>
+                    <label><label>BIC ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bic" value="' . $mc->decrypt($rowBank['bic']) . '" /><br>
+                    </div></div><div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning" name="editBankingDetail" value="' . $rowBank['id'] . '" >' . $lang['SAVE'] . '</button>
+                    </div></div></div>';
+                }
+                ?>
 			</tbody>
 		</table>
 		<?php echo $modals; ?>
@@ -841,19 +780,19 @@ while ($resultBank && ($rowBank = $resultBank->fetch_assoc())) {
 				Versandart
 			</div>
 			<div class="col-sm-3">
-				<select class="js-example-basic-single" name="shipmentType">
-					<option value="0">...</option>
-					<?php
-$result_con = $conn->query("SELECT * FROM shippingMethods");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = '';
-    if ($row['shipmentType'] == $row_con['name']) {
-        $selected = 'selected';
-    }
-    echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
-}
-?>
-				</select>
+                <select class="js-example-basic-single" name="shipmentType">
+                    <option value="0">...</option>
+                    <?php
+                    $result_con = $conn->query("SELECT * FROM shippingMethods");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = '';
+                        if ($row['shipmentType'] == $row_con['name']) {
+                            $selected = 'selected';
+                        }
+                        echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
+                    }
+                    ?>
+                </select>
 			</div>
 		</div>
 	<br><hr><br>
@@ -867,20 +806,11 @@ while ($row_con = $result_con->fetch_assoc()) {
 			<div class="col-xs-2 text-center">
 				Rechnungsversand
 			</div>
-			<div class="col-sm-3">
-				<select name="billDelivery" class="js-example-basic-single">
-					<option <?php if ($row['billDelivery'] == 'Fax') {
-    echo 'selected';
-}
-?> value="Fax">Fax</option>
-					<option <?php if ($row['billDelivery'] == 'Post') {
-    echo 'selected';
-}
-?> value="Post">Post</option>
-					<option <?php if ($row['billDelivery'] == 'E-Mail') {
-    echo 'selected';
-}
-?> value="E-Mail">E-Mail</option>
+            <div class="col-sm-3">
+                <select name="billDelivery" class="js-example-basic-single">
+                    <option <?php if ($row['billDelivery'] == 'Fax') { echo 'selected'; } ?> value="Fax">Fax</option>
+                    <option <?php if ($row['billDelivery'] == 'Post') { echo 'selected'; } ?> value="Post">Post</option>
+                    <option <?php if ($row['billDelivery'] == 'E-Mail') { echo 'selected'; } ?> value="E-Mail">E-Mail</option>
 				</select>
 			</div>
 		</div>
@@ -896,16 +826,16 @@ while ($row_con = $result_con->fetch_assoc()) {
 			<div class="col-sm-5">
 				<select class="js-example-basic-single" name="paymentMethod">
 					<option value="0">...</option>
-					<?php
-$result_con = $conn->query("SELECT * FROM paymentMethods");
-while ($row_con = $result_con->fetch_assoc()) {
-    $selected = '';
-    if ($row['paymentMethod'] == $row_con['name']) {
-        $selected = 'selected';
-    }
-    echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
-}
-?>
+                    <?php
+                    $result_con = $conn->query("SELECT * FROM paymentMethods");
+                    while ($row_con = $result_con->fetch_assoc()) {
+                        $selected = '';
+                        if ($row['paymentMethod'] == $row_con['name']) {
+                            $selected = 'selected';
+                        }
+                        echo '<option ' . $selected . ' value="' . $row_con['name'] . '">' . $row_con['name'] . '</option>';
+                    }
+                    ?>
 				</select>
 			</div>
 			<div class="col-sm-3"><a href="../erp/payment" class="btn btn-warning">Zahlungsarten verwalten</a></div>
@@ -978,15 +908,15 @@ while ($row_con = $result_con->fetch_assoc()) {
 				<th>Datum</th>
 				<th style="width:75%">Info</th>
 			</thead>
-			<tbody>
-				<?php
-while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
-    echo "<tr><td><input type='checkbox' name='noteIndeces[]' /></td>";
-    echo "<td>" . $rowNotes['createDate'] . "</td>";
-    echo "<td>" . $rowNotes['infoText'] . "</td></tr>";
-}
-?>
-			</tbody>
+            <tbody>
+                <?php
+                while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
+                    echo "<tr><td><input type='checkbox' name='noteIndeces[]' /></td>";
+                    echo "<td>" . $rowNotes['createDate'] . "</td>";
+                    echo "<td>" . $rowNotes['infoText'] . "</td></tr>";
+                }
+                ?>
+            </tbody>
 		</table>
 		<div class="container-fluid">
 			<br><br> Neue Notiz Hinzufügen: <br><br>
@@ -1009,75 +939,180 @@ while ($resultNotes && ($rowNotes = $resultNotes->fetch_assoc())) {
 		<th></th>
 		<th></th>
 		</tr></thead>
-		<tbody>
-		<?php
-$resultProc = $conn->query("SELECT name, password, firstname, lastname, documentProcess.id FROM documents, documentProcess, contactPersons
-		WHERE clientID = $filterClient AND personID = contactPersons.id AND documentProcess.docID = documents.id");
-echo $conn->error;
-while ($rowProc = $resultProc->fetch_assoc()) {
-    echo '<tr style="background-color:#dedede">';
-    echo '<td>' . $rowProc['firstname'] . ' ' . $rowProc['lastname'] . '</td>';
-    echo '<td>' . $rowProc['name'] . '</td>';
-    echo $rowProc['password'] ? '<td>Ja</td>' : '<td>Nein</td>';
-    echo '<td></td>';
-    echo '<td></td>';
-    echo '</tr>';
-    
-    $processHistory = array();
-    $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '" . $rowProc['id'] . "'");
-    while ($row = $result->fetch_assoc()) {
-        if (isset($processHistory[$row['activity']])) {
-            $processHistory[$row['activity']]['count'] += 1;
-        } else {
-            $processHistory[$row['activity']]['info'] = $row['info'];
-            $processHistory[$row['activity']]['userAgent'] = $row['userAgent'];
-            $processHistory[$row['activity']]['logDate'] = $row['logDate'];
-            $processHistory[$row['activity']]['count'] = 1;
-        }
-    }
-    if (isset($processHistory['ENABLE_READ'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_read'])) {
-            $val_stat = 'Ja';
-            $val_date = $processHistory['ENABLE_READ']['logDate'];
-            $val_head = $processHistory['ENABLE_READ']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Als Gelesen markiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if (isset($processHistory['ENABLE_SIGN'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_sign'])) {
-            $val_stat = $processHistory['action_sign']['info'];
-            $val_date = $processHistory['action_sign']['logDate'];
-            $val_head = $processHistory['action_sign']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Unterschrieben</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if (isset($processHistory['ENABLE_ACCEPT'])) {
-        $val_stat = 'Ausstehend';
-        $val_date = $val_head = '';
-        if (isset($processHistory['action_accept'])) {
-            $val_stat = $processHistory['action_accept'] == 'DECLINED' ? 'Nein' : 'Ja';
-            $val_date = $processHistory['action_accept']['logDate'];
-            $val_head = $processHistory['action_accept']['userAgent'];
-        }
-        echo '<tr><td></td> <td>Akzeptiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-    if ($rowProc['password'] && isset($processHistory['password_denied'])) {
-        $val_stat = $processHistory['password_denied']['count'];
-        $val_date = $processHistory['password_denied']['logDate'];
-        $val_head = $processHistory['password_denied']['userAgent'];
+        <tbody>
+            <?php
+            $resultProc = $conn->query("SELECT name, password, firstname, lastname, documentProcess.id FROM documents, documentProcess, contactPersons
+                WHERE clientID = $filterClient AND personID = contactPersons.id AND documentProcess.docID = documents.id");
+                echo $conn->error;
+                while ($rowProc = $resultProc->fetch_assoc()) {
+                    echo '<tr style="background-color:#dedede">';
+                    echo '<td>' . $rowProc['firstname'] . ' ' . $rowProc['lastname'] . '</td>';
+                    echo '<td>' . $rowProc['name'] . '</td>';
+                    echo $rowProc['password'] ? '<td>Ja</td>' : '<td>Nein</td>';
+                    echo '<td></td>';
+                    echo '<td></td>';
+                    echo '</tr>';
 
-        echo '<tr><td></td> <td>Passwort Falscheingaben</td> <td>' . intval($val_stat) . 'x Mal</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
-    }
-}
-?>
-		</tbody>
+                    $processHistory = array();
+                    $result = $conn->query("SELECT activity, info, userAgent, logDate FROM documentProcessHistory WHERE processID = '" . $rowProc['id'] . "'");
+                    while ($row = $result->fetch_assoc()) {
+                        if (isset($processHistory[$row['activity']])) {
+                            $processHistory[$row['activity']]['count'] += 1;
+                        } else {
+                            $processHistory[$row['activity']]['info'] = $row['info'];
+                            $processHistory[$row['activity']]['userAgent'] = $row['userAgent'];
+                            $processHistory[$row['activity']]['logDate'] = $row['logDate'];
+                            $processHistory[$row['activity']]['count'] = 1;
+                        }
+                    }
+                    if (isset($processHistory['ENABLE_READ'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_read'])) {
+                            $val_stat = 'Ja';
+                            $val_date = $processHistory['ENABLE_READ']['logDate'];
+                            $val_head = $processHistory['ENABLE_READ']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Als Gelesen markiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if (isset($processHistory['ENABLE_SIGN'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_sign'])) {
+                            $val_stat = $processHistory['action_sign']['info'];
+                            $val_date = $processHistory['action_sign']['logDate'];
+                            $val_head = $processHistory['action_sign']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Unterschrieben</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if (isset($processHistory['ENABLE_ACCEPT'])) {
+                        $val_stat = 'Ausstehend';
+                        $val_date = $val_head = '';
+                        if (isset($processHistory['action_accept'])) {
+                            $val_stat = $processHistory['action_accept'] == 'DECLINED' ? 'Nein' : 'Ja';
+                            $val_date = $processHistory['action_accept']['logDate'];
+                            $val_head = $processHistory['action_accept']['userAgent'];
+                        }
+                        echo '<tr><td></td> <td>Akzeptiert</td> <td>' . $val_stat . '</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                    if ($rowProc['password'] && isset($processHistory['password_denied'])) {
+                        $val_stat = $processHistory['password_denied']['count'];
+                        $val_date = $processHistory['password_denied']['logDate'];
+                        $val_head = $processHistory['password_denied']['userAgent'];
+
+                        echo '<tr><td></td> <td>Passwort Falscheingaben</td> <td>' . intval($val_stat) . 'x Mal</td> <td>' . $val_date . '</td> <td>' . $val_head . '</td></tr>';
+                    }
+                }
+                ?>
+            </tbody>
 		</table>
     </div>
-  </div>
+</div>
+
+<!-- ADD CONTACT PERSON -->
+<div id="add-contact-person" class="modal fade">
+    <div class="modal-dialog modal-content modal-md">
+        <div class="modal-header h4">Ansprechpartner Hinzufügen</div>
+        <div class="modal-body">
+            <div class="row form-group">
+                <div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
+                <div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="js-example-basic-single required-field">
+                    <option value="male" >Herr</option>
+                    <option value="female" >Frau</option>
+                </select></div>
+                <div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
+                <div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="js-example-basic-single select2-position">
+                    <?php
+                    $result = $conn->query("SELECT * FROM position ORDER BY name");
+                    while($row = $result->fetch_assoc()){
+                        echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
+                    }
+                    echo '<option value="-1" >+ Neu...</option>';
+                    ?>
+                </select></div>
+                <div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
+                <div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
+                <div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12"><label>PGP-Key</label><textarea class="form-control" name="contacts_pgp" placeholder="Put PGP Key here..." ></textarea></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+            <button id="newPositionModal" type="button" data-target="new-position" data-toggle="modal" style="visibility:hidden; width:1px; height:1px;" ></button>
+        </div>
+    </div>
+</div>
+<!-- ADD PROJECT -->
+<div class="modal fade add-project">
+    <div class="modal-dialog modal-content modal-md">
+        <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
+        <div class="modal-body">
+            <label>Name</label>
+            <input type=text class="form-control required-field" name='name' placeholder='Name'>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <label><?php echo $lang['HOURS']; ?></label>
+                    <input type="number" class="form-control" name='hours' step="any">
+                </div>
+                <div class="col-md-6">
+                    <label><?php echo $lang['HOURLY_RATE']; ?></label>
+                    <input type="number" class="form-control" name='hourlyPrice' step="any">
+                </div>
+            </div>
+            <br>
+            <div class="container-fluid">
+                <div class="col-md-6 checkbox">
+                    <input type="checkbox" name="status" value="checked" checked> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <?php
+                        $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
+                        if ($resF->num_rows > 0) {
+                            $rowF = $resF->fetch_assoc();
+                            if ($rowF['isActive'] == 'TRUE') {
+                                $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                                echo '<input type="checkbox" ' . $checked . ' name="createField_1"/>' . $rowF['name'];
+                            }
+                        }
+                        if ($resF->num_rows > 1) {
+                            $rowF = $resF->fetch_assoc();
+                            if ($rowF['isActive'] == 'TRUE') {
+                                $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                                echo '<br><input type="checkbox" ' . $checked . ' name="createField_2" />' . $rowF['name'];
+                            }
+                        }
+                        if ($resF->num_rows > 2) {
+                            $rowF = $resF->fetch_assoc();
+                            if ($rowF['isActive'] == 'TRUE') {
+                                $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
+                                echo '<br><input type="checkbox" ' . $checked . ' name="createField_3" />' . $rowF['name'];
+                            }
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
+        </div>
+    </div>
+</div>
 </form>
 
 <?php
@@ -1085,7 +1120,7 @@ mysqli_data_seek($result_p, 0);
 while ($row = $result_p->fetch_assoc()):
     $x = $row['id'];
     ?>
-	  <!-- Edit bookings (time only) -->
+	  <!-- Edit projects (time only) -->
 	  <form method="post">
 	    <div class="modal fade editingProjectsModal-<?php echo $x ?>">
 	      <div class="modal-dialog modal-md modal-content" role="document">
@@ -1107,33 +1142,32 @@ while ($row = $result_p->fetch_assoc()):
 	            <div class="col-md-6">
 	              <label><input type="checkbox" name="productive" <?php echo $row['status']; ?> /><?php echo $lang['PRODUCTIVE']; ?></label>
 	            </div>
-	            <div class="col-md-6">
-	              <br>
-	              <?php
-    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-    if ($resF->num_rows > 0) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_1'] == 'TRUE' ? 'checked' : '';
-            echo '<label><input type="checkbox" ' . $checked . ' name="addField_1_' . $row['id'] . '"/> ' . $rowF['name'] . '</label>';
-        }
-    }
-    if ($resF->num_rows > 1) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_2'] == 'TRUE' ? 'checked' : '';
-            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_2_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-        }
-    }
-    if ($resF->num_rows > 2) {
-        $rowF = $resF->fetch_assoc();
-        if ($rowF['isActive'] == 'TRUE') {
-            $checked = $row['field_3'] == 'TRUE' ? 'checked' : '';
-            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_3_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-        }
-    }
-    ?>
-	            </div>
+                <div class="col-md-6"><br>
+                    <?php
+                    $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
+                    if ($resF->num_rows > 0) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_1'] == 'TRUE' ? 'checked' : '';
+                            echo '<label><input type="checkbox" ' . $checked . ' name="addField_1_' . $row['id'] . '"/> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    if ($resF->num_rows > 1) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_2'] == 'TRUE' ? 'checked' : '';
+                            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_2_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    if ($resF->num_rows > 2) {
+                        $rowF = $resF->fetch_assoc();
+                        if ($rowF['isActive'] == 'TRUE') {
+                            $checked = $row['field_3'] == 'TRUE' ? 'checked' : '';
+                            echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_3_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
+                        }
+                    }
+                    ?>
+                </div>
 	          </div>
 	        </div>
 	        <div class="modal-footer">
@@ -1145,130 +1179,18 @@ while ($row = $result_p->fetch_assoc()):
 	  </form>
 	<?php endwhile;?>
 
-<!-- ADD PROJECT -->
-<form method="POST">
-  <div class="modal fade add-project">
-    <div class="modal-dialog modal-content modal-md">
-      <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
-      <div class="modal-body">
-        <label>Name</label>
-        <input type=text class="form-control required-field" name='name' placeholder='Name'>
-        <br>
-        <div class="row">
-          <div class="col-md-6">
-            <label><?php echo $lang['HOURS']; ?></label>
-            <input type="number" class="form-control" name='hours' step="any">
-          </div>
-          <div class="col-md-6">
-            <label><?php echo $lang['HOURLY_RATE']; ?></label>
-            <input type="number" class="form-control" name='hourlyPrice' step="any">
-          </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-          <div class="col-md-6 checkbox">
-            <input type="checkbox" name="status" value="checked" checked> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?>
-          </div>
-          <div class="col-md-6">
-            <div class="checkbox">
-              <?php
-$resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-if ($resF->num_rows > 0) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<input type="checkbox" ' . $checked . ' name="createField_1"/>' . $rowF['name'];
-    }
-}
-if ($resF->num_rows > 1) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<br><input type="checkbox" ' . $checked . ' name="createField_2" />' . $rowF['name'];
-    }
-}
-if ($resF->num_rows > 2) {
-    $rowF = $resF->fetch_assoc();
-    if ($rowF['isActive'] == 'TRUE') {
-        $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-        echo '<br><input type="checkbox" ' . $checked . ' name="createField_3" />' . $rowF['name'];
-    }
-}
-?>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
-      </div>
-    </div>
-  </div>
-</form>
-
-<!-- ADD CONTACT PERSON -->
-<form method="POST">
-<?php echo $editmodals; ?>
-</form>
-<form method="POST">
-	<div id="add-contact-person" class="modal fade">
-		<div class="modal-dialog modal-content modal-md">
-			<div class="modal-header h4">Ansprechpartner Hinzufügen</div>
-			<div class="modal-body">
-				<div class="row form-group">
-					<div class="col-md-6"><label>Vorname</label><input type="text" name="contacts_firstname" placeholder="Vorname" class="form-control required-field"/></div>
-					<div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
-				</div>
-				<div class="row form-group">
-                    <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="form-control select2 required-field">
-                        <option value="Herr" >Herr</option>
-                        <option value="Frau" >Frau</option>
-                    </select></div>
-					<div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-					<div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="form-control select2-position">
-                        <?php 
-                            echo '<option value="-1" >New...</option>';
-                            $result = $conn->query("SELECT * FROM position");
-                            while($row = $result->fetch_assoc()){
-                                echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
-                            }
-                        ?>
-                    </select></div>
-					<div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>
-				</div>
-				<div class="row form-group">
-					<div class="col-md-4"><label>Durchwahl</label><input type="text" name="contacts_dial" placeholder="Direct Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="contacts_faxDial" placeholder="Direct Fax Dial" class="form-control"/></div>
-					<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="contacts_phone" placeholder="Mobile Phone" class="form-control"/></div>
-				</div>
-                <div class="row form-group">
-                    <div class="col-md-12"><label>PGP-Key</label><textarea class="form-control" name="contacts_pgp" placeholder="Put PGP Key here..." ></textarea></div>
-			</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-                <button id="newPositionModal" type="button" data-target="new-position" data-toggle="modal" style="visibility:hidden; width:1px; height:1px;" ></button>
-			</div>
-		</div>
-	</div>
-</form>
 <div id="new-position" class="modal fade">
-		<div class="modal-dialog modal-content modal-sm">
-			<div class="modal-header h4">Position Hinzufügen</div>
-			<div class="modal-body">
-                <label>Name</label>
-                <input type="text" id="positionName" class="form-control" />
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="button" onClick="addPosition()" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-			</div>
-		</div>
+    <div class="modal-dialog modal-content modal-sm">
+        <div class="modal-header h4">Position Hinzufügen</div>
+        <div class="modal-body">
+            <label>Name</label>
+            <input type="text" id="positionName" class="form-control" />
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" onClick="addPosition()" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1282,43 +1204,29 @@ $('#uidCheck').click(function(e){
 			$("#uidValidate").html('<img width="25px" height="25px" src="images/okay.png" /> ' + resp);
 		} else {
 			$("#uidValidate").html('<img width="25px" height="25px" src="images/not_okay.png" />');
-		}
+		} //of equal weight. save them,
     },
     error : function(resp){}
   });
 });
-$(".select2").select2({
-    minimumResultsForSearch: Infinity
-});
-$(".select2-position").select2({
-
-});
-$("#add-contact-person .select2-position").val(null).trigger("change");
-$(".select2-position").on("select2:select", function (e) { checkIfNew(e) })
-function checkIfNew(event){
-    if(event.params.data.id == -1){
-        //console.log(event);
+$(".select2-position").on("select2:select", function (e) {
+    if(e.params.data.id == -1){
         $("#new-position").modal("show");
     }
-}
+});
 function addPosition(){
     var name = $("#positionName").val();
-    console.log(name);
     if(name!=""){
         $.post("ajaxQuery/AJAX_db_utility.php",{
             name: name,
             function: "addPosition",
         },function(data){
-            console.log(data);
             data = JSON.parse(data);
-            newOption = new Option(data.name,data.id,false,true);
-            console.log(newOption);
-            $(".select2-position").append(newOption);
-            $(".select2-position").select2('destroy');
-            $(".select2-position").select2();
+            var newOption = new Option(data.name,data.id,false,true);
+            $(".select2-position").append(newOption).trigger('change');
             $("#new-position").modal("hide");
         });
-    }else{
+    } else {
         $("#positionName").focus();
     }
 }

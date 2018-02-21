@@ -18,7 +18,7 @@ $filterings = array('user' => 0, "date" => array(substr(getCurrentTimestamp(), 0
 <div class="page-header"><h3><?php echo $lang['ACCOUNT_JOURNAL']; ?><div class="page-header-button-group">
     <?php include dirname(__DIR__).'/misc/set_filter.php'; ?>
     <button type="submit" form="csvForm" class="btn btn-default" title="CSV Download"><i class="fa fa-download"></i> CSV</button>
-    <?php include dirname(__DIR__).'/misc/lockAccounting.php'; ?>
+    <?php include __DIR__.'/lockAccounting.php'; ?>
 </div></h3></div>
 
 <table class="table table-hover">
@@ -41,7 +41,7 @@ $filterings = array('user' => 0, "date" => array(substr(getCurrentTimestamp(), 0
 $userQuery = $dateQuery = '';
 if($filterings['user']) $userQuery = "AND UserData.id = ".$filterings['user'];
 if($filterings['date']) $dateQuery = "AND DATE(payDate) >= DATE('".$filterings['date'][0]."') AND DATE(payDate) <=  DATE('".$filterings['date'][1]."') ";
-$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname, 
+$result = $conn->query("SELECT account_journal.*, taxRates.description, percentage, code, firstname, lastname,
 a1.num AS accNum, a2.num AS offNum, a1.name AS accName, a2.name AS offName, r1.id AS receiptID, taxRates.account2, taxRates.account3
 FROM account_journal INNER JOIN accounts a1 ON a1.id = account_journal.account
 INNER JOIN accounts a2 ON a2.id = account_journal.offAccount

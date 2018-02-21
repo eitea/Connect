@@ -114,6 +114,20 @@ $result = $conn->query(
 );
 echo $conn->error;
 $userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$result = $conn->query(
+    "SELECT count(*) count FROM (
+        SELECT userID FROM dsgvo_training_user_relations tur
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
+        WHERE userID = $userID
+        UNION
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
+        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
+        WHERE tr.userID = $userID
+    ) temp"
+);
+echo $conn->error;
+$userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 $userHasUnansweredOnLoginSurveys = false;
 if($userHasUnansweredSurveys){
     $result = $conn->query(
@@ -304,7 +318,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
   function generateKeys($userID){
     $.ajax({
       type: "POST",
-      url: "ajaxQuery/AJAX_genPgpKey.php",
+      url: "ajaxQuery/AJAX_pgpKeyGen.php",
       data: { userID: $userID}
     }).done(function(keys){
       keys = JSON.parse(keys);
@@ -664,7 +678,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                           WHERE d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
                           echo $conn->error;
-                          if ($result && $result->num_rows > 0): ?>
+                          if (($result && $result->num_rows > 0)||$userHasSurveys): ?>
                           <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
                               <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                           </a></li>
@@ -989,7 +1003,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
-                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung/Training</a></li>';
+                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1001,7 +1015,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
-                    echo '<li><a href="../dsgvo/training?n='.$row['id'].'" >Schulung/Training</a></li>';
+                    echo '<li><a href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
                     echo '</ul></div></li>';
                   }
                 }

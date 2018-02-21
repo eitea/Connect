@@ -1,12 +1,12 @@
 <?php
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_tester.php',                  'setup/run' => 'core/setup/setup.php',                      'login/passwordChange' => 'core/login/passwordChange.php',
+  'login/access' => 'core/login/login_tester.php',                   'php/info' => 'core/system/phpinfo.php',                   'login/passwordChange' => 'core/login/passwordChange.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
   'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
 
-  'social/home' => 'core/system/socialMedia.php',                   'php/info' => 'core/system/phpinfo.php',
+  'social/home' => 'core/system/socialMedia.php',                   'setup/run' => 'core/setup/setup.php',                      'setup/wizard' => 'core/setup/install_wizard.php',
 
   'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
   'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
@@ -54,21 +54,21 @@ $url = strtok($_SERVER['REQUEST_URI'], '?');
 $params = explode('/', $url);
 $l = count($params) -1 ;
 if($l > 1){
-  $route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
-  if(array_key_exists($route, $routes)){
-    $this_page = basename($routes[$route]);
-    include 'src/'.$routes[$route];
-  } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
-    if(array_key_exists($matches[4], $mime_types)){
-      header('Content-Type: '. $mime_types[$matches[4]]);
+    $route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
+    if(array_key_exists($route, $routes)){
+        $this_page = basename($routes[$route]);
+        include 'src/'.$routes[$route];
+    } elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
+        if(array_key_exists($matches[4], $mime_types)){
+            header('Content-Type: '. $mime_types[$matches[4]]);
+        }
+        echo file_get_contents($matches[0]);
+    } elseif($params[$l -1] == 'ajaxQuery'){
+        include 'src/'.$route;
+    } else {
+        header('HTTP/1.0 404 Not Found');
+        include '404.html';
     }
-    echo file_get_contents($matches[0]);
-  } elseif($params[$l -1] == 'ajaxQuery'){
-    include 'src/'.$route;
-  } else {
-    header('HTTP/1.0 404 Not Found');
-    include '404.html';
-}
 } else {
-  header('Location: login/auth');
+    header('Location: login/auth');
 }

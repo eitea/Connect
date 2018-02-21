@@ -356,7 +356,7 @@ $result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
 if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
 ?>
 
-<div class="page-seperated-body">
+<div class="page-seperated-body page-header-fixed">
 <div class="page-header page-seperated-section">
   <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
     <div class="page-header-button-group">
@@ -364,7 +364,8 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
   </h3>
 </div>
-
+</div>
+<div class="page-seperated-body page-content-fixed-130">
 <form method="POST">
   <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
     <div class="modal-dialog modal-sm" role="document">

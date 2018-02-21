@@ -7,9 +7,9 @@ $filterings = array("savePage" => $this_page, 'company' => 0, 'client' => 0, 'pr
 'date' => array(date('Y-m-d', strtotime('-'.$day.' days')), substr(getCurrentTimestamp(), 0, 10)), 'logs' => array(0, 'checked'));
 $activeTab = 'home';
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['TIMES'].' - '.$lang['OVERVIEW']; ?><div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; ?></div></h3></div>
-
+</div>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['setActiveTab'])){$activeTab = $_POST['setActiveTab']; }
@@ -295,7 +295,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif post
 ?>
 
-
+<div class="page-content-fixed-150">
 <ul class="nav nav-tabs">
   <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
   <?php foreach($filterings['users'] as $u){
@@ -966,5 +966,6 @@ $(document).ready(function(){
   setTimeout(function(){ window.dispatchEvent(new Event('resize')); $('#projectTable').trigger('column-reorder.dt'); }, 500);
 });
 </script>
+</div>
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>
