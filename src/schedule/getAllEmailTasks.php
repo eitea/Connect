@@ -1,7 +1,6 @@
 <?php
 require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
 require_once dirname(__DIR__)."/connection.php";
-
 $result = $conn->query("SELECT server, username, password FROM emailprojects");
 //echo $result->num_rows;
 if($result){
@@ -60,9 +59,6 @@ if($result){
     $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'ERROR')");
 }
 return;
-
-
-
 function insertTask($imap,$messages,$conn,$ruleset){
     $message = $messages->message;
     //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$message->html')");
@@ -90,7 +86,6 @@ try{
     $percentage = 0;
     $series = null;
     $projectleader = $ruleset['leader'];
-
     // PROJECT
     $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
         projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage, projectleader) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -98,14 +93,12 @@ try{
     $stmt->send_long_data(2, $description);
     $stmt->send_long_data(12, $series);
     $stmt->execute();
-
     if(!$stmt->error){
         $stmt->close();
         //EMPLOYEES
         $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
         $stmt->bind_param("is", $employee, $position);
         $position = 'normal';
-
         $employees = explode(",",$ruleset['employees']);
         foreach($employees as $employee){
                 $stmt->execute();
@@ -119,7 +112,6 @@ try{
             }
         }
     }
-
     $stmt->close();
     $imap->deleteMessage($messages->header->uid);
 }catch(Exception $e){
