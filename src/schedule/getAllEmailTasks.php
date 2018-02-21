@@ -22,7 +22,7 @@ if($result){
         }
         $port = $row['port'];
         $validation = ImapConnect::VALIDATE_CERT;
-        //echo json_encode($row);
+        echo "INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')";
         $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox ; $username ; $password ; $service ; $encryption ; $port')");
         try{
         $imap = new ImapClient(array(
@@ -41,21 +41,24 @@ if($result){
                     'password' => $password
                 )
             ));
-            $imap->selectFolder("INBOX");
-            $messages = $imap->getMessages();
-            $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
-            while($rule = $rulesets->fetch_assoc()){
-                for($i = 0;$i<count($messages);$i++){
-                    if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
-                        insertTask($imap,$messages[$i],$conn,$rule);
-                    }
-                } 
+            echo $imap->isConnected();
+            if($imap->isConnected()){
+                $imap->selectFolder("INBOX");
+                $messages = $imap->getMessages();
+                $rulesets = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
+                while($rule = $rulesets->fetch_assoc()){
+                    for($i = 0;$i<count($messages);$i++){
+                        if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
+                            insertTask($imap,$messages[$i],$conn,$rule);
+                        }
+                    } 
+                }
+            }else{
+                throw new Exception($imap->getError());
             }
-            
         }catch(Exception $e){
-            $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$e')");
+            $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'".substr($e,0,100)."')");
         }
-        
     }
 }else{
     $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'ERROR')");
