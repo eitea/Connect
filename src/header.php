@@ -797,32 +797,32 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
       <!-- Section Three: PROJECTS -->
       <?php if ($isProjectAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingProject">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
-            <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
-            </a>
+          <div class="panel panel-default panel-borderless">
+              <div class="panel-heading" role="tab" id="headingProject">
+                  <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
+                      <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                  </a>
+              </div>
+              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
+                  <div class="panel-body">
+                      <ul class="nav navbar-nav">
+                          <?php if ($isProjectAdmin == 'TRUE'): ?>
+                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                              <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
+                          <?php endif;?>
+                          <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
+                              <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
+                          <?php endif;?>
+                          <?php if ($isProjectAdmin == 'TRUE'): ?>
+                              <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
+                          <?php endif;?>
+                      </ul>
+                  </div>
+              </div>
           </div>
-          <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <?php if ($isProjectAdmin == 'TRUE'): ?>
-                <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
-                <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                <?php endif;?>
-                <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
-                  <?php endif;?>
-                <?php if ($isProjectAdmin == 'TRUE'): ?>
-                <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
-                <?php endif;?>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php" || $this_page == "options.php") {
-            echo "<script>$('#adminOption_PROJECT').click();</script>";
-        } ?>
+          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php" || $this_page == "options.php") {
+              echo "<script>$('#adminOption_PROJECT').click();</script>";
+          } ?>
       <?php endif;?>
 
       <!-- Section Four: REPORTS -->

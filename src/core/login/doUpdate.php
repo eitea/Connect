@@ -1959,25 +1959,6 @@ if ($row['version'] < 136) {
         echo '<br>Bugfix: Email Tasks';
     }
 
-    $conn->query("CREATE OR REPLACE position (
-        id int(6) NOT NULL AUTO_INCREMENT,
-        name varchar(20) NOT NULL,
-        PRIMARY KEY (id)
-        )");
-    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactPersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
-    if($result){
-        while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
-        }
-    }
-    $sql = "ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL, ADD form_of_address ENUM('Herr','Frau') NOT NULL, ADD titel VARCHAR(20) DEFAULT null, ADD pgpKey TEXT DEFAULT null";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Position: Fixed List';
-    }
     $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
     if (!$conn->query($sql)) {
         echo $conn->error;

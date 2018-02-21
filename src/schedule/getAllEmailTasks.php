@@ -1,12 +1,8 @@
 <?php
-require_once dirname(dirname(__DIR__))."/plugins/imap-client/ssilence/php-imap-client/autoload.php";
+require_once dirname(dirname(__DIR__))."/plugins/imap-client/autoload.php";
 require_once dirname(__DIR__)."/connection.php";
 
-use SSilence\ImapClient\ImapClientException;
-use SSilence\ImapClient\ImapConnect;
-use SSilence\ImapClient\ImapClient;
-
-$result = $conn->query("SELECT * FROM emailprojects");
+$result = $conn->query("SELECT server, username, password FROM emailprojects");
 //echo $result->num_rows;
 if($result){
     while($row = $result->fetch_assoc()){
@@ -17,7 +13,7 @@ if($result){
         $service = strtoupper($row['service'])=="IMAP" ? ImapConnect::SERVICE_IMAP : ImapConnect::SERVICE_POP3;
         if($row['smtpSecure']=='null'){
             $encryption = null;
-        }else{
+        } else {
             $encryption = $row['smtpSecure']=="tls" ? ImapClient::ENCRYPT_TLS : ImapClient::ENCRYPT_SSL;
         }
         $port = $row['port'];
@@ -51,7 +47,7 @@ if($result){
                         if(strstr($messages[$i]->header->subject,$rule['identifier'])){ //Identifies how to handle this email
                             insertTask($imap,$messages[$i],$conn,$rule);
                         }
-                    } 
+                    }
                 }
             }else{
                 throw new Exception($imap->getError());
@@ -109,7 +105,7 @@ try{
         $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
         $stmt->bind_param("is", $employee, $position);
         $position = 'normal';
-        
+
         $employees = explode(",",$ruleset['employees']);
         foreach($employees as $employee){
                 $stmt->execute();
