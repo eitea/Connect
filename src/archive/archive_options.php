@@ -59,7 +59,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
                     echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
-                    echo '<td><form method="POST" onSubmit="return deleteConfig()"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
+                    echo '<td><form method="POST" onSubmit="return confirmDelete()"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
                     echo '</tr>';
                 }
             ?></tbody>
@@ -91,7 +91,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
         });
     });
     
-    function deleteConfig(){
+    function confirmDelete(){
         return confirm("Ary you sure you want to delete this Configuration ?");
     }
 </script>
