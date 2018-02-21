@@ -28,6 +28,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }elseif(isset($_POST['deleteConfig'])){
         $id = $_POST['deleteConfig'];
+        $isActive = $conn->query("SELECT isActive FROM archiveconfig WHERE id = $id");
+        if($isActive && $isActive->fetch_assoc()['isActive']==="TRUE"){
+            $conn->query("UPDATE archiveconfig SET isActive = 'TRUE' WHERE isActive = 'FALSE' LIMIT 1;");
+        }
         $conn->query("DELETE FROM archiveconfig WHERE id = $id");
         if($conn->error){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';

@@ -1,10 +1,10 @@
 <?php include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
-$result = $conn->query("SELECT endpoint FROM archiveconfig");
+$result = $conn->query("SELECT id FROM archiveconfig WHERE isActive = 'TRUE'");
 if($result){
   $enabled = $result->fetch_assoc();
-  if(!isset($enabled['endpoint'])){
+  if(!isset($enabled['id'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
     include dirname(__DIR__) . '/footer.php';
     return;

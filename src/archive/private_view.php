@@ -1,9 +1,9 @@
 <?php include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; 
 $enabled = false;
-$result = $conn->query("SELECT endpoint FROM archiveconfig");
+$result = $conn->query("SELECT id FROM archiveconfig WHERE isActive = 'TRUE'");
 if($result){
-  $enabled = isset($result->fetch_assoc()['endpoint']);
+  $enabled = isset($result->fetch_assoc()['id']);
 }
 $folderID = 0;
 ?>
