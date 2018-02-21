@@ -583,7 +583,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                         $editmodals = '';
                         while ($contactRow && ($contactRow = $resultContacts->fetch_assoc())) {
                             echo '<tr>';
-                            echo '<td>' . $lang['GENDER_TOSTRING'][$contactRow['gender']]. '</td>';
+                            echo '<td>' . $contactRow['form_of_address']. '</td>';
                             echo '<td>' . $contactRow['title'] . '</td>';
                             echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
                             echo '<td>' . $contactRow['email'] . '</td>';
