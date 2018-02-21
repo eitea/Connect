@@ -1996,6 +1996,14 @@ if ($row['version'] < 136) {
         echo '<br>Bug Fixes';
     }
 }
+if($row['version'] < 137){
+    $sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Archive User Module';
+    }
+}
 
 // ------------------------------------------------------------------------------
 

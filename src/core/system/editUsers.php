@@ -277,6 +277,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
+    if(isset($_POST['canCreateTasks'.$x])){
+      $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
+    if(isset($_POST['canUseArchive'.$x])){
+      $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
 
     $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
 
@@ -412,6 +424,7 @@ $(document).ready(function(){
       $canEditTemplates = $row['canEditTemplates'];
       $canUseSocialMedia = $row['canUseSocialMedia'];
       $canCreateTasks = $row['canCreateTasks'];
+      $canUseArchive = $row['canUseArchive'];
 
       $eOut = "$firstname $lastname";
       ?>
@@ -594,6 +607,9 @@ $(document).ready(function(){
                     <div class="col-md-6">
                       <label>
                         <input type="checkbox" name="canCreateTasks<?php echo $x; ?>" <?php if($canCreateTasks == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
+                      </label>
+                      <label>
+                        <input type="checkbox" name="canUseArchive<?php echo $x; ?>" <?php if($canUseArchive == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
                       </label>
                     </div>
                   </div>

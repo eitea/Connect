@@ -1,5 +1,5 @@
-<?php include dirname(__DIR__) . '/header.php';?>
-<?php require dirname(__DIR__) . "/misc/helpcenter.php"; 
+<?php include dirname(dirname(__DIR__)) . '/header.php';?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; 
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['addConfig'])){
@@ -95,4 +95,4 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
         return confirm("Ary you sure you want to delete this Configuration ?");
     }
 </script>
-<?php include dirname(__DIR__) . '/footer.php'; ?>
+<?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

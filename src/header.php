@@ -35,13 +35,14 @@ if ($result && $result->num_rows > 0) {
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
     $canCreateTasks = $row['canCreateTasks'];
+    $canUseArchive = $row['canUseArchive'];
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks = $canUseArchive  = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = 'TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks = $canUseArchive  = 'TRUE';
 }
 
 $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
@@ -743,6 +744,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                       <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
                       <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                      <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                       <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                       <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                       <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
@@ -760,7 +762,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page == 'archiveOptions.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -1035,7 +1037,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Seven: ARCHIVE -->
-      <?php if ($isDSGVOAdmin == 'TRUE'): ?>
+      <?php if ($isCoreAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-folder-open-o"></i><?php echo $lang['ARCHIVE'] ?></a>
@@ -1043,7 +1045,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a <?php if ($this_page == 'archive_options.php') {echo $setActiveLink;}?> href="../archive/options" data-parent="#sidenav01" class="collapsed"><?php echo $lang['OPTIONS'] ?></a></li>
                 <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
                 <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
@@ -1051,7 +1052,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
       <?php
-        if ($this_page == "archive_share.php" || $this_page == "private_view.php" || $this_page == 'archive_options.php') {
+        if ($this_page == "archive_share.php" || $this_page == "private_view.php") {
             echo "<script>$('#adminOption_ARCHIVE').click();</script>";
         }
         ?>
