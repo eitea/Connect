@@ -1978,6 +1978,48 @@ if ($row['version'] < 136) {
     } else {
         echo '<br>Position: Fixed List';
     }
+}
+if($row['version'] < 137){
+    $sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Archive User Module';
+    }
+    $sql = "ALTER TABLE archiveconfig ADD name VARCHAR(30) NOT NULL DEFAULT 'NO_NAME'";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Archive User Module';
+    }
+    $sql = "ALTER TABLE contactPersons DROP title, DROP gender";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Fixing Contact Persons';
+    }  
+    $sql = "ALTER TABLE contactPersons CHANGE titel title VARCHAR(20) DEFAULT NULL";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Fixing Contact Persons v2';
+    }
+    $sql = "DELETE FROM TABLE position";
+    $conn->query($sql);
+    $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    $conn->query("INSERT INTO position (name) SELECT position FROM contactPersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
+    if($result){
+        while($row = $result->fetch_assoc()){
+            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+        }
+    }
+    $conn->query("ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Fixing Contact Persons v3';
+    }
     $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1994,14 +2036,6 @@ if ($row['version'] < 136) {
         echo $conn->error;
     } else {
         echo '<br>Bug Fixes';
-    }
-}
-if($row['version'] < 137){
-    $sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Archive User Module';
     }
 }
 
