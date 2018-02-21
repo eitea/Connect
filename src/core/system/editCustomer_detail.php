@@ -1020,8 +1020,8 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
             </div>
             <div class="row form-group">
                 <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="js-example-basic-single required-field">
-                    <option value="male" >Herr</option>
-                    <option value="female" >Frau</option>
+                    <option value="Herr" >Herr</option>
+                    <option value="Frau" >Frau</option>
                 </select></div>
                 <div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
             </div>
