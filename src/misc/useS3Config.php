@@ -18,7 +18,7 @@
         require dirname(__DIR__) . "/connection.php";
         try{
             $active = 'FALSE';
-            $result = $conn->query("SELECT id FROM archievconfig");
+            $result = $conn->query("SELECT id FROM archiveconfig");
             if($result->num_rows<1) $active = 'TRUE';
             $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive) VALUES ('$server','$key','$secret','$active')");
             return true;
