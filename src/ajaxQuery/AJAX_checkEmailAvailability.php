@@ -31,14 +31,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             ),
             'connect' => array(
                 'username' => $username,
-                'password' => $password
+                'password' => $password,
+                'n_retries' => 1
             )
         ));
-        $imap->selectFolder("INBOX");
-        echo true;
+        echo json_encode($imap->isConnected());
     }catch(Exception $e){
         echo $e;
-        echo false;
     }
 }
 return;

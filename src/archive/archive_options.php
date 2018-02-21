@@ -78,12 +78,26 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
 
 <script>
     $("[name='active']").on("click",function(event){
-        console.log(event.target.value);
         $.post("ajaxQuery/AJAX_changeActiveS3.php",{
             id: event.target.value
         },function(data){
             console.log(data);
         });
     });
+    
+    function deleteConfig(id){
+        if(confirm("Ary you sure you want to delete this Configuration ?")){
+            $.post("ajaxQuery/AJAX_db_utility.php",{
+                id: id,
+                function: "deleteConfig"
+            }, function(data){
+                if(data){
+                    console.log(data);
+                }else{
+                    location.href="../archive/options";
+                }
+            });
+        }
+    }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

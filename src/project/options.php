@@ -505,6 +505,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               alert('The credentials you entered seem to be working.');
             }else{
               alert('The credentials you entered are not working.');
+              console.log(data);
             }
       });
     }
