@@ -581,7 +581,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                     <tbody>
                         <?php
                         $editmodals = '';
-                        while ($contactRow && ($contactRow = $resultContacts->fetch_assoc())) {
+                        while ($resultContacts && ($contactRow = $resultContacts->fetch_assoc())) {
                             echo '<tr>';
                             echo '<td>' . $contactRow['form_of_address']. '</td>';
                             echo '<td>' . $contactRow['title'] . '</td>';
