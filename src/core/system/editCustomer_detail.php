@@ -1031,6 +1031,8 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                     <?php
                     $result = $conn->query("SELECT * FROM position ORDER BY name");
                     echo '<option value="-1" >+ Neu...</option>';
+                    $row = $result->fetch_assoc();
+                    echo '<option selected value="'.$row['id'].'" >'.$row['name'].'</option>';
                     while($row = $result->fetch_assoc()){
                         echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
                     }

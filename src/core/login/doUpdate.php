@@ -2007,7 +2007,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Fixing Contact Persons v2';
     }
-    $sql = "DELETE FROM TABLE position";
+    $sql = "DELETE FROM position";
     $conn->query($sql);
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     $conn->query("INSERT INTO position (name) SELECT position FROM contactPersons GROUP BY position");
