@@ -2,7 +2,7 @@
     require dirname(dirname(__DIR__)) . "/plugins/aws/autoload.php";
     function getS3Config(){
         require dirname(__DIR__) . "/connection.php";
-        $config = $conn->query("SELECT * FROM archiveconfig");
+        $config = $conn->query("SELECT * FROM archiveconfig WHERE isActive = 'TRUE'");
         if(isset($config)){
             $row = $config->fetch_assoc();
             if(isset($row['endpoint'])){
@@ -30,7 +30,7 @@
     function clearS3Config(){
         require dirname(__DIR__) . "/connection.php";
         try{
-            $conn->query("UPDATE archiveconfig SET endpoint=null, awskey=null, secret=null");
+            $conn->query("DELETE FROM archiveconfig");
             return true;
         }catch(Exception $e){
             return false;

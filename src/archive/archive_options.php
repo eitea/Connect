@@ -26,6 +26,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
             }
         }
+    }elseif(isset($_POST['deleteConfig'])){
+        $id = $_POST['deleteConfig'];
+        $conn->query("DELETE FROM archiveconfig WHERE id = $id");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        }
     }
 }
 
@@ -53,7 +59,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
                     echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
-                    echo '<td><button class="btn btn-default" type="button" onClick="deleteConfig('.$row['id'].')" ><i class="fa fa-trash" /></button></td>';
+                    echo '<td><form method="POST" onSubmit="return deleteConfig()"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
                     echo '</tr>';
                 }
             ?></tbody>
@@ -85,19 +91,8 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
         });
     });
     
-    function deleteConfig(id){
-        if(confirm("Ary you sure you want to delete this Configuration ?")){
-            $.post("ajaxQuery/AJAX_db_utility.php",{
-                id: id,
-                function: "deleteConfig"
-            }, function(data){
-                if(data){
-                    console.log(data);
-                }else{
-                    location.href="../archive/options";
-                }
-            });
-        }
+    function deleteConfig(){
+        return confirm("Ary you sure you want to delete this Configuration ?");
     }
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

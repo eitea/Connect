@@ -40,13 +40,5 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             echo "\n" . $e;
         }
     }
-    if($_POST['function']==="deleteConfig"){
-        $id = $_POST['id'];
-        $conn->query("DELETE FROM archiveconfig WHERE id = $id");
-        if($conn->error){
-            echo $conn->error;
-        }
-    }
-    
 }
 ?>
