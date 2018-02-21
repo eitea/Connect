@@ -47,6 +47,7 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
   if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
 }
 ?>
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['PROJECT']; ?>
     <div class="page-header-button-group">
@@ -57,6 +58,8 @@ if(isset($_POST['delete']) && isset($_POST['index'])) {
     </div>
   </h3>
 </div>
+</div>
+<div class="page-content-fixed-130">
 <br>
 <?php
 $result = $conn->query("SELECT * FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
@@ -272,4 +275,5 @@ $('.table').DataTable({
   }
 });
 </script>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

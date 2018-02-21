@@ -99,7 +99,7 @@ if(!$result || $result->num_rows <= 0){
 $result = $conn->query("SELECT erpOption FROM UserData WHERE id = $userID");
 if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption'];} else { $showBalance = 'FALSE'; }
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header">
     <h3><?php echo $lang['PROCESSES']; ?>
         <div class="page-header-button-group">
@@ -117,7 +117,8 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
         </div>
     </h3>
 </div>
-
+</div>
+<div class="page-content-fixed-130">
 <?php
 $filtered_transitions = empty($filterings['procedures'][0]) ? $transitions : $filterings['procedures'][0];
 $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$filterings['company'] : "";
@@ -273,4 +274,5 @@ $(document).ready(function(){
   });
 });
 </script>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

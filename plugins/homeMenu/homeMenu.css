@@ -400,6 +400,12 @@ span.select2.select2-container.select2-container--default {
 .page-content-fixed-150{ 
   margin-top:150px;
 }
+.page-content-fixed-170{ 
+  margin-top:150px;
+}
+.page-content-fixed-180{ 
+  margin-top:150px;
+}
 .page-header-fixed{
   background-color: white;
   position:fixed;

@@ -250,13 +250,15 @@ while ($result && ($row = $result->fetch_assoc())) {
     $supplier_select .= '<option value="' . $row['id'] . '">' . $row['name'] . '</option>';
 }
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['OFFSET_ACCOUNT'] . ' <small>' . $account_row['num'] . ' - ' . $account_row['name'] . '</small>'; ?>
 <div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; $cmpID = $account_row['companyID']; include __DIR__.'/lockAccounting.php';?>
 <?php if ($show_undo): ?>
     <form method="POST" style="display:inline"><button type="submit" name="undo" class="btn btn-warning" >Undo</button></form>
 <?php endif;?>
 </div></h3></div>
+</div>
+<div class="page-content-fixed-150">
 <br>
 <table class="table table-hover">
     <thead><tr>
@@ -564,3 +566,4 @@ $(document).ready(function(){
     });
 });
 </script>
+</div>

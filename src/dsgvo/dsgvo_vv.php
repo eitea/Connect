@@ -7,9 +7,12 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
     include dirname(__DIR__) . '/footer.php';
     die();
 }?>
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
 <div class="page-header-button-group"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+</button></div>
 </h3></div>
+</div>
+<div class="page-content-fixed-130"> 
 <?php
 $cmpID = intval($_GET['n']);
 
@@ -87,5 +90,6 @@ $row = $result->fetch_assoc();
         </div>
     </form>
   </div>
+</div>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

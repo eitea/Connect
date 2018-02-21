@@ -1,8 +1,10 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
 
+<div class="page-header-fixed">
 <div class="page-header"><h3>Template <?php echo $lang['EDIT']; ?> <div class="page-header-button-group">
 <button type="submit" form="main-form" class="btn btn-default" name="save_all"><i class="fa fa-floppy-o"></i></div></h3></div>
-
+</div>
+<div class="page-content-fixed-130">
 <?php
 if(empty($_GET['t'])){
     echo "Invalid Access.";
@@ -136,4 +138,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
 <?php endif; ?>
 </form>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -7,9 +7,12 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
     include dirname(__DIR__) . '/footer.php';
     die();
 }?>
+<div class="page-header-fixed">
 <div class="page-header"><h4>E-Mail Vorlagen
  <div class="page-header-button-group"><form method="POST" style="display:inline"><button type="submit" name="create_report" class="btn btn-default"><i class="fa fa-plus"></i></button></form>
 </h4></div>
+</div>
+<div class="page-content-fixed-130">
 <?php
 
 $cmpID = intval($_GET['n']);
@@ -122,5 +125,5 @@ $(".btn-insert-text").click(function (){
     tinymce.activeEditor.execCommand('mceInsertContent', false, inText);
 });
 </script>
-
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

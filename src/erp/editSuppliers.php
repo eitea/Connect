@@ -13,12 +13,13 @@ if(!empty($_POST['delete'])){
 }
 ?>
 <?php include dirname(__DIR__) . "/misc/new_supplier_buttonless.php"; ?>
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['SUPPLIERS']; ?><div class="page-header-button-group">
 <?php include dirname(__DIR__).'/misc/set_filter.php'; ?>
 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['NEW_CLIENT_CREATE']; ?>"><i class="fa fa-plus"></i></button>
 </div></h3></div>
-
-
+</div>
+<div class="page-content-fixed-130">
 <form method="POST">
     <table class="table table-hover">
         <thead>
@@ -65,5 +66,5 @@ if(!empty($_POST['delete'])){
     }
   });
 </script>
-
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -1,9 +1,11 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<div class="page-header-fixed">
     <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?> - Templates <div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-template" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
     </div></h3></div>
-
+</div>
+<div class="page-content-fixed-130">
 <?php
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){
     echo "Invalid Access.";
@@ -119,5 +121,6 @@ while($result && ($row = $result->fetch_assoc())){
             </div>
         </form>
     </div>
+</div>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
