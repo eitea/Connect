@@ -1,7 +1,6 @@
 <?php
 require dirname(__DIR__) . '/header.php';
 include dirname(__DIR__) . "/misc/helpcenter.php";
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -81,39 +80,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </table>
 
 <form method="POST" autocomplete="off">
-<<<<<<< HEAD
-  <div class="modal fade" id="new-account">
-    <div class="modal-dialog modal-content modal-md">
-      <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
-      <div class="modal-body">
-        <label>Server</label>
-        <input required type="text" class="form-control" name="server" id="server"/>
-        <label>Port</label>
-        <input required type="number" class="form-control" name="port" id="port"/>
-        <label>Service</label>
-        <select class="form-control" name="service" id="service">
-            <option value="imap">IMAP</option>
-            <option value="pop3">POP3</option>
-        </select>
-        <label>Security</label>
-        <select class="form-control" name="security" id="security">
-            <option value="none">none</option>
-            <option value="tls">tls</option>
-            <option value="ssl">ssl</option>
-        </select>
-        <label>Username</label>
-        <input required autocomplete="off" type="email" class="form-control" name="username" id="username"/>
-        <label>Password</label>
-        <input required autocomplete="off" type="password" class="form-control" name="password" id="password"/>
-        <label>Log</label>
-        <input type="checkbox" class="form-control" name="logging" id="logging" />
-      </div>
-      <div class="modal-footer">
-        <button style="float:left" type="button" class="btn btn-default" onblur="this.setAttribute('style','float:left');" onClick="checkEmail(this)">Check</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="addAccount"><?php echo $lang['ADD']; ?></button>
-      </div>
-=======
     <div class="modal fade" id="new-account">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
@@ -166,44 +132,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <button type="submit" class="btn btn-warning" name="addAccount"><?php echo $lang['ADD']; ?></button>
             </div>
         </div>
->>>>>>> master
     </div>
 </form>
 <form method="POST">
-<<<<<<< HEAD
-  <div class="modal fade" id="edit-account">
-    <div class="modal-dialog modal-content modal-md">
-      <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
-      <div class="modal-body">
-        <label>Server</label>
-        <input required type="text" class="form-control" id="edit_server" name="edit_server" />
-        <label>Port</label>
-        <input required type="number" class="form-control" id="edit_port" name="edit_port" />
-        <label>Service</label>
-        <select class="form-control" id="edit_service" name="edit_service">
-            <option value="imap">IMAP</option>
-            <option value="pop3">POP3</option>
-        </select>
-        <label>Security</label>
-        <select class="form-control" id="edit_security" name="edit_security">
-            <option value="none">none</option>
-            <option value="tls">tls</option>
-            <option value="ssl">ssl</option>
-        </select>
-        <label>Username</label>
-        <input required autocomplete="off" type="email" class="form-control" id="edit_username" name="edit_username" />
-        <label>Password</label>
-        <input required autocomplete="off" type="password" class="form-control" id="edit_password" name="edit_password" />
-        <label>Log</label>
-        <input type="checkbox" class="form-control" id="edit_logging" name="edit_logging" />
-        <input type="number" value="-1" style="visibility: hidden" name="edit_id" id="edit_id"/>
-      </div>
-      <div class="modal-footer">
-        <button id="checkEmailBtn" style="float:left" type="button" class="btn btn-default" onClick="edit_checkEmail(this)">Check</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="editAccount"><?php echo $lang['EDIT']; ?></button>
-      </div>
-=======
     <div class="modal fade" id="edit-account">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
@@ -257,7 +188,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <button type="submit" class="btn btn-warning" name="editAccount"><?php echo $lang['EDIT']; ?></button>
             </div>
         </div>
->>>>>>> master
     </div>
 </form>
 
@@ -386,7 +316,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <select id="Priority" class="form-control js-example-basic-single" name="priority">
                                 <?php
                                 for($i = 1; $i < 6; $i++){
-
                                     echo '<option value="'.$i.'">'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
                                 }
                                 ?>
@@ -589,18 +518,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             username: document.getElementById("edit_username").value,
             password: document.getElementById("edit_password").value
         }, function(data){
-<<<<<<< HEAD
-            //console.log(data==1);
-            //data==1 ? element.setAttribute("style","background-color: lime; float: left") : element.setAttribute("style","background-color: red; float: left");
-            if(data==1){
-              alert('The credentials you entered seem to be working.');
-            }else{
-              alert('The credentials you entered are not working.');
-              console.log(data);
-            }
-=======
             alert(data);
->>>>>>> master
       });
   }
     function showClients(company, client, place){
