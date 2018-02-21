@@ -2020,6 +2020,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Fixing Contact Persons v3';
     }
+
     $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
     if (!$conn->query($sql)) {
         echo $conn->error;
