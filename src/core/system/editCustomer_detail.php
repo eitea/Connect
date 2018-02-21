@@ -348,7 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $gender = test_input($_POST['contacts_gender']);
         $title = test_input($_POST['contacts_titel']);
         $pgp = trim($_POST['contacts_pgp']);
-        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, gender, title, pgpKey)
+        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, form_of_address, title, pgpKey)
         VALUES ($filterClient, '$firstname', '$lastname', '$mail', $position, '$resp', '$dial', '$faxDial', '$phone', '$gender', '$title', '$pgp')");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
@@ -369,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = test_input($_POST['edit_contacts_titel']);
         $pgp = trim($_POST['edit_contacts_pgp']);
         $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = $position, responsibility = '$resp', dial = '$dial',
-            faxDial = '$faxDial', phone = '$phone', gender = '$gender', title = '$title', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
+            faxDial = '$faxDial', phone = '$phone', form_of_address = '$gender', title = '$title', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
         } else {
@@ -1030,10 +1030,10 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                 <div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="js-example-basic-single select2-position">
                     <?php
                     $result = $conn->query("SELECT * FROM position ORDER BY name");
+                    echo '<option value="-1" >+ Neu...</option>';
                     while($row = $result->fetch_assoc()){
                         echo '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
                     }
-                    echo '<option value="-1" >+ Neu...</option>';
                     ?>
                 </select></div>
                 <div class="col-md-4"><label>Verantwortung</label><input type="text" name="contacts_responsibility" placeholder="Verantwortung" class="form-control"/></div>

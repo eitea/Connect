@@ -1998,7 +1998,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Fixing Contact Persons';
     }  
-    $sql = "ALTER TABLE contactPersons CHANGE titel title VARCHAR(20) DEFAULT NULL";
+    $sql = "ALTER TABLE contactPersons CHANGE titel title VARCHAR(20) DEFAULT NULL, form_of_address form_of_address ENUM('male','female') NOT NULL";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
