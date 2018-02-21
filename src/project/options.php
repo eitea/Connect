@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }elseif(isset($_POST['editAccount']) && !empty($_POST['edit_server'])&& !empty($_POST['edit_service'])&& !empty($_POST['edit_port'])&& !empty($_POST['edit_username'])&& !empty($_POST['edit_password'])){
         $server = test_input($_POST['edit_server']);
         $port = test_input($_POST['edit_port']);
-        $security = test_input($_POST['edit_security']) == "none" ? "null" : test_input($_POST['edit_security']);
+        $security = test_input($_POST['edit_security']) == "none" ? null : test_input($_POST['edit_security']);
         $service = test_input($_POST['edit_service']);
         $username = test_input($_POST['edit_username']);
         $password = test_input($_POST['edit_password']);
@@ -87,9 +87,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
       <div class="modal-body">
         <label>Server</label>
-        <input type="text" class="form-control" name="server" id="server"/>
+        <input required type="text" class="form-control" name="server" id="server"/>
         <label>Port</label>
-        <input type="number" class="form-control" name="port" id="port"/>
+        <input required type="number" class="form-control" name="port" id="port"/>
         <label>Service</label>
         <select class="form-control" name="service" id="service">
             <option value="imap">IMAP</option>
@@ -102,9 +102,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <option value="ssl">ssl</option>
         </select>
         <label>Username</label>
-        <input autocomplete="off" type="email" class="form-control" name="username" id="username"/>
+        <input required autocomplete="off" type="email" class="form-control" name="username" id="username"/>
         <label>Password</label>
-        <input autocomplete="off" type="password" class="form-control" name="password" id="password"/>
+        <input required autocomplete="off" type="password" class="form-control" name="password" id="password"/>
         <label>Log</label>
         <input type="checkbox" class="form-control" name="logging" id="logging" />
       </div>
@@ -122,9 +122,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
       <div class="modal-body">
         <label>Server</label>
-        <input type="text" class="form-control" id="edit_server" name="edit_server" />
+        <input required type="text" class="form-control" id="edit_server" name="edit_server" />
         <label>Port</label>
-        <input type="number" class="form-control" id="edit_port" name="edit_port" />
+        <input required type="number" class="form-control" id="edit_port" name="edit_port" />
         <label>Service</label>
         <select class="form-control" id="edit_service" name="edit_service">
             <option value="imap">IMAP</option>
@@ -137,9 +137,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <option value="ssl">ssl</option>
         </select>
         <label>Username</label>
-        <input type="email" class="form-control" id="edit_username" name="edit_username" />
+        <input required autocomplete="off" type="email" class="form-control" id="edit_username" name="edit_username" />
         <label>Password</label>
-        <input type="password" class="form-control" id="edit_password" name="edit_password" />
+        <input required autocomplete="off" type="password" class="form-control" id="edit_password" name="edit_password" />
         <label>Log</label>
         <input type="checkbox" class="form-control" id="edit_logging" name="edit_logging" />
         <input type="number" value="-1" style="visibility: hidden" name="edit_id" id="edit_id"/>
@@ -361,7 +361,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             //console.log(port);
             username.setAttribute("value",row['username']);
             service.selectedIndex = row['service'].toUpperCase() == "IMAP" ? 0 : 1;
-            security.selectedIndex = row['smtpSecure'] == "none" ? 0 : row[0] == "tls" ? 1 : 2;
+            security.selectedIndex = row['smtpSecure'] == null ? 0 : row['smtpSecure'] == "tls" ? 1 : 2;
             logging.checked = row['logEnabled'] == "FALSE" ? false : true;
             id.setAttribute("value",e_id);
             //TODO: Hier forstsetzten mit setzen der Werte
