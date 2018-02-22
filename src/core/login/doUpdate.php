@@ -2032,6 +2032,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Bigger Task Description (Max. 15MB)';
     }
+    
     $sql = "ALTER TABLE roles ADD COLUMN canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
     if(!$conn->query($sql)){
         echo $conn->error;
