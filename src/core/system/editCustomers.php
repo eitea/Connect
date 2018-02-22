@@ -1,17 +1,27 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToClients($userID); ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
+isset($canUseClients, $canEditClients) or die ("no permission (you need canUseClients or canEditClients)");
+if(!($canUseClients == 'TRUE' || $canEditClients == 'TRUE')){
+  echo "no permission (you need canUseClients or canEditClients)";
+  include dirname(dirname(__DIR__)) . '/footer.php';
+  die();
+}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-  if(isset($_POST['delete']) && isset($_POST['index'])){
-    foreach($_POST["index"] as $x) {
-      $sql = "DELETE FROM $clientTable WHERE id = $x;";
-      if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
+  if($canEditClients == 'TRUE'){
+    if(isset($_POST['delete']) && isset($_POST['index'])){
+      foreach($_POST["index"] as $x) {
+        $sql = "DELETE FROM $clientTable WHERE id = $x;";
+        if (!$conn->query($sql)) {
+          echo mysqli_error($conn);
+        }
       }
     }
+  }else{
+    echo "no permission (you need canEditClients)";
   }
 }
 ?>

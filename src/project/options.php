@@ -44,11 +44,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 ?>
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['PROJECT_OPTIONS']; ?>
   <div class="page-header-button-group">
     <button type="button" data-toggle="modal" data-target="#new-account" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
   </div>
 </h3></div>
+</div>
+<div class="page-content-fixed-130">
 
 <table class="table">
   <thead><tr>
@@ -570,4 +573,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         });
     }
 </script>
+<<<<<<< HEAD
 <?php include dirname(__DIR__) . '/footer.php';?>
+=======
+
+</div>
+<?php include dirname(__DIR__) . '/footer.php';?>
+>>>>>>> master

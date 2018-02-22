@@ -2,6 +2,7 @@
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <!-- BODY -->
 
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['DAYS'].' '.$lang['AVAILABLE'].': '. $lang['VACATION']; ?></h3>
 </div>
@@ -58,6 +59,8 @@ if($userID != 1 && (!$result || $result->num_rows <= 0)){
     </div>
   </div>
 </form>
+</div>
+<div class="page-content-fixed-150">
 <br>
 <h4> <?php echo $lang['USED_DAYS'] ?></h4>
 <table class="table table-hover">
@@ -123,6 +126,6 @@ if($userID != 1 && (!$result || $result->num_rows <= 0)){
     </ul>
   </div>
 </div>
-
+</div>
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>

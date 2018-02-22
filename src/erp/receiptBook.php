@@ -49,10 +49,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 ?>
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['RECEIPT_BOOK']; ?>
 <div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; ?></div></h3>
 </div>
-
+</div>
+<div class="page-content-fixed-170">
 <?php
 $supplierQuery = $companyQuery = '';
 if($filterings['supplier']) $supplierQuery = 'AND supplierID = '.$filterings['supplier'];
@@ -133,4 +135,5 @@ while($result && ($row = $result->fetch_assoc())){
         <div class="col-md-2"><label style="color:transparent">O.K.</label><button type="submit" class="btn btn-warning btn-block" name="addReceipt" ><?php echo $lang['ADD']; ?></button></div>
     </div>
 </form>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

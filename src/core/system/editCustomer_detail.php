@@ -3,6 +3,12 @@ include dirname(dirname(__DIR__)) . '/header.php';?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 enableToClients($userID);
+isset($canEditSuppliers, $canEditClients) or die ("no permission (you need canEditSuppliers or canEditClients)");
+if(!($canEditSuppliers == 'TRUE' || $canEditClients == 'TRUE')){
+    echo "no permission (you need canEditSuppliers or canEditClients)";
+    include dirname(dirname(__DIR__)) . '/footer.php';
+    die();
+} 
 
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
     $filterClient = intval($_GET['custID']);

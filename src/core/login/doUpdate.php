@@ -2033,6 +2033,32 @@ if($row['version'] < 137){
         echo '<br>Bigger Task Description (Max. 15MB)';
     }
 }
+if($row['version'] < 137){
+    $sql = "ALTER TABLE roles ADD COLUMN canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can use clients';
+    }
+    $sql = "ALTER TABLE roles ADD COLUMN canUseSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can use suppliers';
+    }
+    $sql = "ALTER TABLE roles ADD COLUMN canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can edit clients';
+    }
+    $sql = "ALTER TABLE roles ADD COLUMN canEditSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Role: Can edit suppliers';
+    }
+}
 
 // ------------------------------------------------------------------------------
 

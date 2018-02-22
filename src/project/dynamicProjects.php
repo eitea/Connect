@@ -76,6 +76,52 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.</div>';
         }
     }
+    if(!empty($_POST['createForgottenBooking']) && !empty($_POST['description']) && isset($_POST["time-range"])){
+        $timeRange =  explode(";",$_POST["time-range"]); //format date;start;end;timeToUTC;indexIM
+        $date = $timeRange[0];
+        $start = $timeRange[1];
+        $end = $timeRange[2];
+        $timeToUTC = intval($timeRange[3]);
+        $indexIM = intval($timeRange[4]);
+        $x = $dynamicID = test_input($_POST["createForgottenBooking"], true);
+        $result = $conn->query("SELECT clientprojectid, needsreview FROM dynamicprojects WHERE projectid = '$x'");
+        if(!test_Time($end) || !test_Time($start) || !$result){
+            echo "invalid time format or project id";
+        }else{
+            $row = $result->fetch_assoc();
+            $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
+            $description = test_input($_POST['description']);
+            $startDate = $date." ".$start;
+            $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
+        
+            $endDate = $date." ".$end;
+            $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
+            
+            if(timeDiff_Hours($startDate, $endDate) < 0){
+                $endDate = carryOverAdder_Hours($endDate, 24);
+                $date = substr($endDate, 0, 10);
+            }
+            if(timeDiff_Hours($startDate, $endDate) > 0 && timeDiff_Hours($startDate, $endDate) < 12){
+                $percentage = intval($_POST['bookCompleted']);
+                if($percentage == 100 || isset($_POST['bookCompletedCheckbox'])){
+                    $percentage = 100; //safety
+                    if($row['needsreview'] == 'TRUE'){
+                        $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
+                    } else {
+                        $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
+                    }
+                }
+                $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
+                //normal booking
+                $sql = "INSERT INTO projectBookingData (start, end, projectID, timestampID, infoText, internInfo, bookingType, dynamicID)
+                VALUES('$startDate', '$endDate', $projectID, $indexIM, '$description', '$percentage% Abgeschlossen', 'project', '$dynamicID')";
+                $conn->query($sql);
+                echo $conn->error;
+            }else{
+                echo "invalid time";
+            }
+        }
+    }
     if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
         $bookingID = test_input($_POST['createBooking']);
         $result = $conn->query("SELECT dynamicID, clientprojectid, needsreview FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
@@ -288,19 +334,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
-        /*
-        if(!empty($filterings['employees'])){
-            for($i = 0; $i < count($filterings['employees']); $i++){
-                $mapNode = explode(";", $filterings['employees'][$i]);
-                if($mapNode[0] === "user"){
-                    $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d
-                    JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
-                } else {
-                    $query_filter .= " AND dynamicprojectsteams.teamid = ".$mapNode[1];
-                }
-            }
-        }
-        */
+
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
@@ -317,11 +351,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
-        } else { //see open tasks user is part of
+        } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
@@ -333,6 +365,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
+
+            $stmt_team->execute();
+            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
+            $stmt_employee->execute();
+            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
+
+            if(!empty($filterings['employees'])){
+                
+            }
+
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = $tags = '';
@@ -372,10 +414,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             echo '<td>'; //employees
             echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
-            $stmt_team->execute();
-            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
-            $stmt_employee->execute();
-            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
+
             echo implode(',<br>', $employees);
             echo '</td>';
 
@@ -787,6 +826,7 @@ $('.view-modal-open').click(function(){
       success : function(resp){
         $("#editingModalDiv").append(resp);
         existingModals_info.push(index);
+        onPageLoad();
       },
       error : function(resp){},
       complete: function(resp){

@@ -6,29 +6,33 @@
 
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-        $name = test_input($_POST['create_client_name']);
-        $filterCompanyID = $companyID = intval($_POST['create_client_company']);
+    if($canEditClients == 'TRUE'){
+        if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
+            $name = test_input($_POST['create_client_name']);
+            $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
-        $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
-        if($conn->query($sql)){ //if ok, give him default projects
-            $id = $conn->insert_id;
-            $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
-            SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
-            $conn->query($sql);
-            //and his details
-            $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
+            $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
+            if($conn->query($sql)){ //if ok, give him default projects
+                $id = $conn->insert_id;
+                $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
+                SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
+                $conn->query($sql);
+                //and his details
+                $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
+            }
+            if(mysqli_error($conn)){
+                echo mysqli_error($conn);
+            } else {
+                echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
+            }
+        } elseif(isset($_POST['create_client'])){
+            echo '<div class="alert alert-danger fade in">';
+            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+            echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
+            echo '</div>';
         }
-        if(mysqli_error($conn)){
-            echo mysqli_error($conn);
-        } else {
-            echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
-        }
-    } elseif(isset($_POST['create_client'])){
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
-        echo '</div>';
+    }else{
+        echo "no permission (you need canEditClients)";
     }
 }
 ?>

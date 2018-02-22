@@ -1,24 +1,35 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
+isset($canUseSuppliers, $canEditSuppliers) or die ("no permission (you need canUseSuppliers or canEditSuppliers)");
+if(!($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE')){
+    echo "no permission (you need canUseSuppliers or canEditSuppliers)";
+    include dirname(__DIR__) . '/footer.php';  
+    die();
+}
 $filterings = array("company" => 0, "supplier" => 0);
 if(!empty($_POST['delete'])){
-    $id = intval($_POST['delete']);
-    $conn->query("DELETE FROM clientData WHERE id = $id");
-    if($conn->error){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-    } else {
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+    if($canEditSuppliers == 'TRUE'){
+         $id = intval($_POST['delete']);
+        $conn->query("DELETE FROM clientData WHERE id = $id");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+        }
+    }else{
+        echo "no permission (you need canEditSuppliers)";
     }
 }
 ?>
 <?php include dirname(__DIR__) . "/misc/new_supplier_buttonless.php"; ?>
+<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['SUPPLIERS']; ?><div class="page-header-button-group">
 <?php include dirname(__DIR__).'/misc/set_filter.php'; ?>
 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['NEW_CLIENT_CREATE']; ?>"><i class="fa fa-plus"></i></button>
 </div></h3></div>
-
-
+</div>
+<div class="page-content-fixed-130">
 <form method="POST">
     <table class="table table-hover">
         <thead>
@@ -65,5 +76,5 @@ if(!empty($_POST['delete'])){
     }
   });
 </script>
-
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

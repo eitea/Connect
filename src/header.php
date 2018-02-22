@@ -3,21 +3,17 @@ session_start();
 if (empty($_SESSION['userid'])) {
     die('Please <a href="../login/auth">login</a> first.');
 }
-
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
-
 require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
-
 if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
-
 $sql = "SELECT * FROM roles WHERE userID = $userID";
 $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
@@ -34,17 +30,24 @@ if ($result && $result->num_rows > 0) {
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
+    $canUseClients = $row['canUseClients'];
+    $canEditClients = $row['canEditClients'];
+    $canUseSuppliers = $row['canUseSuppliers'];
+    $canEditSuppliers = $row['canEditSuppliers'];
     $canCreateTasks = $row['canCreateTasks'];
     $canUseArchive = $row['canUseArchive'];
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks = $canUseArchive  = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
+    $canEditSuppliers = $canUseArchive  = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks = $canUseArchive  = 'TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = $canUseArchive  ='TRUE';
 }
-
+if($isERPAdmin == 'TRUE'){
+    $canEditClients = $canEditSuppliers = 'TRUE';
+}
 $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -54,7 +57,6 @@ if ($result) {
 } else {
     echo $conn->error;
 }
-
 $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -62,13 +64,10 @@ if ($result) {
     $masterPasswordHash = $row['masterPassword'];
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
-
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
-
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
-
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -537,7 +536,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
     <!-- feedback modal -->
 
     <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
-        <form method="post" enctype="multipart/form-data" id="feedback_form">
+<form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -600,11 +599,9 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $showProjectBookingLink = TRUE;
     $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
     if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
-
     //deny stampOut
     $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
     if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
-
     $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
@@ -612,7 +609,6 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
-
     if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
@@ -688,6 +684,52 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <?php endif; ?>
                   <?php endif;?>
               <?php endif; //endif(canStamp)?>
+              <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+              <div class="panel panel-default panel-borderless no-margin">
+          <div class="panel-heading" role="tab" id="headingSuppliers">
+            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-suppliers"  id="supplierOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Lieferanten</a>
+          </div>
+          <div id="collapse-suppliers" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingSuppliers">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+          <!--      <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
+                <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li> -->
+                <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <?php
+        if ($this_page == "editSuppliers.php") {
+            echo "<script>$('#supplierOption').click();</script>";
+        } 
+        ?>
+            <?php endif;//canUseSuppliers ?>
+              <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
+              <div class="panel panel-default panel-borderless no-margin">
+          <div class="panel-heading" role="tab" id="headingClients">
+            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-clients" id="clientOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Kunden</a>
+          </div>
+          <div id="collapse-clients" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingClients">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+                             
+            <!--  <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
+                          <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
+                          <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
+                          <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>-->
+                          <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                    
+              </ul>
+            </div>
+          </div>
+        </div>
+        <?php
+        if ($this_page == "editCustomers.php") {
+            echo "<script>$('#clientOption').click();</script>";
+        }
+        ?>
+                <?php endif;//canuseClients ?>
           </ul>
       </div>
     <div class="panel-group" id="sidebar-accordion">
