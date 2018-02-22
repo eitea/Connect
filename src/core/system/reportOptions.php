@@ -81,10 +81,6 @@ $row = $result->fetch_assoc();
         ?></div>
     </div>
 
-    <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
-    <input style="display:none" type="text" name="fakeusernameremembered"/>
-    <input style="display:none" type="password" name="fakepasswordremembered"/>
-
     <div class="col-md-4">
         <h4>SMTP Einstellungen</h4>
     </div>
@@ -104,48 +100,48 @@ $row = $result->fetch_assoc();
     <br><br>
     <div id="emailContainer" class="container-fluid">
 
-    <br>
-    <div class="col-md-4">SMTP Security</div>
+        <br>
+        <div class="col-md-4">SMTP Security</div>
 
-    <div class="col-md-8">
-      <select id = "smtpDropDown" class="js-example-basic-single" name="smtp_secure" style="width:200px">
-        <option value="" <?php if($row['smtpSecure'] == ''){echo "selected";} ?>> - </option>
-        <option value="tls" <?php if($row['smtpSecure'] == 'tls'){echo "selected";} ?>> TLS </option>
-        <option value="ssl" <?php if($row['smtpSecure'] == 'ssl'){echo "selected";} ?>> SSL </option>
-      </select>
-    </div>
-    <br><br>
-    <div class="col-md-4"> Absender-Adresse </div>
-    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" /></div>
-    <br><br>
-    <div class="col-md-4"> Absender-Name </div>
-    <div class="col-md-8"><input type="text" class="form-control" name="mail_sender_name"  value="<?php echo $row['senderName']; if(isset($_POST['defaultOptions'])) echo "<Kunde>";?>" /></div>
-    <br><br><br>
-    <div class="col-md-4">Host</div>
-    <div class="col-md-8"><input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" /></div>
-    <br><br>
-    <div class="col-md-4">Port</div>
-    <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
-    <br><br><br>
-    <div class="col-md-4">Username</div>
-    <div class="col-md-8"><input type="text" class="form-control" name="mail_username"  value="<?php echo $row['username']; ?>" /></div>
-    <br><br>
-    <div class="col-md-4">Passwort</div>
-    <div class="col-md-8"><input type="password" class="form-control" name="mail_password" /></div>
-    <br>
-  </div>
-  <div class="col-md-4">
-        <h4>Feedback Einstellungen</h4>
-    </div>
-    <br/>
-    <br/>
-    <div class="container-fluid">
-    <br/>    
-    <div class="col-md-4"> Feedback-Empfänger </div>
-    <div class="col-md-8"><input type="text" class="form-control" name="feedback_mail_recipient"  value="<?php echo $row['feedbackRecipient']; ?>" /></div>
-    <br><br>
-    </div>
-</form>
+        <div class="col-md-8">
+            <select id = "smtpDropDown" class="js-example-basic-single" name="smtp_secure" style="width:200px">
+                <option value="" <?php if($row['smtpSecure'] == ''){echo "selected";} ?>> - </option>
+                <option value="tls" <?php if($row['smtpSecure'] == 'tls'){echo "selected";} ?>> TLS </option>
+                <option value="ssl" <?php if($row['smtpSecure'] == 'ssl'){echo "selected";} ?>> SSL </option>
+            </select>
+        </div>
+        <br><br>
+        <div class="col-md-4"> Absender-Adresse </div>
+        <div class="col-md-8"><input type="text" class="form-control" name="mail_sender"  value="<?php echo $row['sender']; ?>" /></div>
+        <br><br>
+        <div class="col-md-4"> Absender-Name </div>
+        <div class="col-md-8"><input type="text" class="form-control" name="mail_sender_name"  value="<?php echo $row['senderName']; if(isset($_POST['defaultOptions'])) echo "<Kunde>";?>" /></div>
+            <br><br><br>
+            <div class="col-md-4">Host</div>
+            <div class="col-md-8"><input type="text" class="form-control" name="smtp_host" value="<?php echo $row['host']; ?>" /></div>
+            <br><br>
+            <div class="col-md-4">Port</div>
+            <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
+            <br><br><br>
+            <div class="col-md-4">Username</div>
+            <div class="col-md-8"><input type="text" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /></div>
+            <br><br>
+            <div class="col-md-4">Passwort</div>
+            <div class="col-md-8"><input type="text" class="form-control password" name="mail_password" /></div>
+            <br>
+        </div>
+        <div class="col-md-4">
+            <h4>Feedback Einstellungen</h4>
+        </div>
+        <br/>
+        <br/>
+        <div class="container-fluid">
+            <br/>
+            <div class="col-md-4"> Feedback-Empfänger </div>
+            <div class="col-md-8"><input type="text" class="form-control" name="feedback_mail_recipient"  value="<?php echo $row['feedbackRecipient']; ?>" /></div>
+            <br><br>
+        </div>
+    </form>
 
 <!-- /BODY -->
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

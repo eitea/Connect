@@ -26,7 +26,11 @@ if($result){
 
                     $attachments = $mail->getAttachments();
                     foreach($attachments as $attach){ //easy custom rawData
-                        $description = str_replace("cid:".$attach->contentId, "data:image/jpeg;base64,".base64_encode($attach->rawData), $description);
+                        if(strpos($description, $attach->contentId)){
+                            $description = str_replace("cid:".$attach->contentId, "data:image/jpeg;base64,".base64_encode($attach->rawData), $description);
+                        } else {
+                            $description .= '<img src="data:image/jpeg;base64,'.base64_encode($attach->rawData).'" />';
+                        }
                     }
 
                     $company = $rule['company'];
@@ -50,6 +54,7 @@ if($result){
                     $stmt->execute();
                     if(!$stmt->error){
                         $stmt->close();
+                        $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', 1)");
                         //EMPLOYEES TEAMS
                         $stmt_emp = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
                         $stmt_emp->bind_param("is", $employee, $position);
@@ -57,7 +62,7 @@ if($result){
                         $stmt_team->bind_param("i", $team);
 
                         $position = 'normal';
-                        $employees = explode(",", $rule['employees']); //team;10, user;1, user;5
+                        $employees = explode(",", $rule['employees']);
                         foreach($employees as $entry){
                             $entries = explode(";", $entry);
                             if($entries[0] == 'user'){
@@ -70,7 +75,7 @@ if($result){
                         }
                         if(!empty($rule['optionalemployees'])){
                             $position = 'optional';
-                            $employees = explode(",",$rule['optionalemployees']);
+                            $employees = explode(",", $rule['optionalemployees']);
                             foreach ($employees as $entry) {
                                 $entries = explode(";", $entry);
                                 if($entries[0] == 'user'){
@@ -84,12 +89,13 @@ if($result){
                         $stmt_emp->close();
                         $stmt_team->close();
 
-                        //$imap->deleteMail($mail_number);
+                        $imap->deleteMail($mail_number);
                     } else {
                         echo $stmt->error;
                     }
+                    break;
                 }
-            }
+            } //end foreach mail
         }
     }
 } else {

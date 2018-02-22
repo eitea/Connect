@@ -102,7 +102,6 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
         $filterings['priority'] = intval($_POST['searchPriority']);
     }
     if(isset($_POST['searchEmployees'])){
-        echo "<script>console.log('".json_encode($_POST['searchEmployees'])."')</script>";
         $filterings['employees'] = $_POST['searchEmployees'];
     }
     if(isset($filterings['savePage'])){
@@ -304,7 +303,7 @@ if($scale > 2){ //3 columns
             $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
             for($i = 0; $i < count($filterings['employees']); $i++){
               $result = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $result);
-            }
+          }
             echo $result;
             $selected = '';
             $result = $conn->query("SELECT id, name FROM $teamTable");

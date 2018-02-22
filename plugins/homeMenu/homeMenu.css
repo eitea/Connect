@@ -238,7 +238,7 @@ input[type="radio"]:checked {
 
 .alert-over{
   position:fixed;
-  z-index: 50;
+  z-index: 1080;
   right: 0px;
   margin-right:1px;
   width:30%;
@@ -329,6 +329,13 @@ span.select2.select2-container.select2-container--default {
   background-color:#dddddd;
 }
 
+/* Chrome Autofill workaround - cross browser not working */
+.password{
+    text-security: disc;
+    -webkit-text-security: disc;
+    -moz-text-security: disc;
+}
+
 /* EMOJI BUTTONING */
 .btn-ckin{
   width:111px;
@@ -402,10 +409,10 @@ span.select2.select2-container.select2-container--default {
 .page-content-fixed-150{
   margin-top:150px;
 }
-.page-content-fixed-170{ 
+.page-content-fixed-170{
   margin-top:150px;
 }
-.page-content-fixed-180{ 
+.page-content-fixed-180{
   margin-top:150px;
 }
 .page-header-fixed{

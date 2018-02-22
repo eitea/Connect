@@ -711,7 +711,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if ($this_page == "editSuppliers.php") {
             echo "<script>$('#supplierOption').click();</script>";
-        } 
+        }
         ?>
             <?php endif;//canUseSuppliers ?>
               <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
@@ -722,13 +722,13 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-clients" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingClients">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                             
+
             <!--  <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
                           <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                           <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                           <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>-->
                           <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
-                    
+
               </ul>
             </div>
           </div>
