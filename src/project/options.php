@@ -573,10 +573,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         });
     }
 </script>
-<<<<<<< HEAD
-<?php include dirname(__DIR__) . '/footer.php';?>
-=======
 
 </div>
 <?php include dirname(__DIR__) . '/footer.php';?>
->>>>>>> master
