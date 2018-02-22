@@ -3,21 +3,17 @@ session_start();
 if (empty($_SESSION['userid'])) {
     die('Please <a href="../login/auth">login</a> first.');
 }
-
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
-
 require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
-
 if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
-
 $sql = "SELECT * FROM roles WHERE userID = $userID";
 $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
@@ -39,19 +35,19 @@ if ($result && $result->num_rows > 0) {
     $canUseSuppliers = $row['canUseSuppliers'];
     $canEditSuppliers = $row['canEditSuppliers'];
     $canCreateTasks = $row['canCreateTasks'];
+    $canUseArchive = $row['canUseArchive'];
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
-    $canEditSuppliers = false;
+    $canEditSuppliers = $canUseArchive  = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = 'TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = $canUseArchive  ='TRUE';
 }
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-
 $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -61,7 +57,6 @@ if ($result) {
 } else {
     echo $conn->error;
 }
-
 $result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -69,13 +64,10 @@ if ($result) {
     $masterPasswordHash = $row['masterPassword'];
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
-
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
-
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
-
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -542,8 +534,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
   <!-- /social settings modal -->
   <?php endif;?>
     <!-- feedback modal -->
-<form method="post" enctype="multipart/form-data" id="feedback_form">
+
     <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+<form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -583,8 +576,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                 </div>
             </div>
         </div>
+            </form>
     </div>
-</form>
+
 <!-- /feedback modal -->
 <?php
 if(!isset($ckIn_disabled)) $ckIn_disabled = '';
@@ -605,11 +599,9 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $showProjectBookingLink = TRUE;
     $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
     if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
-
     //deny stampOut
     $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
     if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
-
     $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji2" name="stampOut" value="2" title="'.$lang['EMOJI_TOSTRING'][2].'"></button>
@@ -617,7 +609,6 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
-
     if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
     $buttonVal = $lang['CHECK_IN'];
@@ -797,6 +788,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
                       <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
                       <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                      <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                       <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                       <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                       <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
@@ -814,7 +806,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php"){
+        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page == 'archiveOptions.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -1089,7 +1081,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Seven: ARCHIVE -->
-      <?php if ($isDSGVOAdmin == 'TRUE'): ?>
+      <?php if ($canUseArchive == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-folder-open-o"></i><?php echo $lang['ARCHIVE'] ?></a>
@@ -1097,7 +1089,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <!--<li><a <?php //if ($this_page == 'archive_options.php') {echo $setActiveLink;}?> href="../archive/options" data-parent="#sidenav01" class="collapsed"><?php //echo $lang['OPTIONS'] ?></a></li> -->
                 <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
                 <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
@@ -1105,7 +1096,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
       <?php
-        if ($this_page == "archive_share.php" || $this_page == "private_view.php" || $this_page == 'archive_options.php') {
+        if ($this_page == "archive_share.php" || $this_page == "private_view.php") {
             echo "<script>$('#adminOption_ARCHIVE').click();</script>";
         }
         ?>

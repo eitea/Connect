@@ -1,7 +1,6 @@
 <?php
 require dirname(__DIR__) . '/header.php';
 include dirname(__DIR__) . "/misc/helpcenter.php";
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -317,7 +316,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <select id="Priority" class="form-control js-example-basic-single" name="priority">
                                 <?php
                                 for($i = 1; $i < 6; $i++){
-
                                     echo '<option value="'.$i.'">'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
                                 }
                                 ?>

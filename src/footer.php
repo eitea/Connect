@@ -35,6 +35,7 @@ $('input[type="password"]').on('focus', function(e){
 });
 */
 $("#feedback_form").submit(function(event){
+    console.log("feedBack");
     event.preventDefault();
     var img = window.feedbackCanvasObject.toDataURL()
     var postData =  {
@@ -45,15 +46,18 @@ $("#feedback_form").submit(function(event){
     if(document.getElementById("feedback_includeScreenshot").checked){
         postData.screenshot = img;
     }
-    $.post("ajaxQuery/AJAX_sendFeedback.php",
-    postData,
-    function (response){
-        alert(response)
-        //clear form
-        $("#feedback_message").val("")
-        $('#feedbackModal').modal('hide');
-    }
-);
+    $.ajax({
+        url: "ajaxQuery/AJAX_sendFeedback.php",
+        data: postData,
+        async: true,
+        method: "POST",
+        complete: function(response){
+            alert(response.responseText);
+            //clear form
+            $("#feedback_message").val("");
+            $('#feedbackModal').modal('hide');
+        }
+    });
 });
 $(".feedback-button").on("click",function(){
     html2canvas(document.body).then(function(canvas) {

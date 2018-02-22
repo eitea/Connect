@@ -103,6 +103,8 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     }
     if(isset($_POST['searchEmployees'])){
         $filterings['employees'] = $_POST['searchEmployees'];
+    }else{
+        $filterings['employees'] = array();
     }
     if(isset($filterings['savePage'])){
         $_SESSION['filterings'] = $filterings;

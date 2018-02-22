@@ -2,17 +2,14 @@
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
 require_once dirname(dirname(__DIR__)).'/plugins/imap/autoload.php';
-
 $result = $conn->query("SELECT * FROM emailprojects");
 if($result){
     while($row = $result->fetch_assoc()){
         $security = empty($row['security']) ? '' : '/'.$row['security'];
         $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX';
-
         $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
         $mailsIds = $imap->searchMailbox('ALL');
-
         $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']); echo $conn->error;
         while($rule = $result->fetch_assoc()){
             foreach($mailsIds as $mail_number){
@@ -23,7 +20,6 @@ if($result){
                     $null = null;
                     $name = str_replace($rule['identifier'],"",$subject);
                     $description = convToUTF8($mail->textHtml);
-
                     $attachments = $mail->getAttachments();
                     foreach($attachments as $attach){ //easy custom rawData
                         if(strpos($description, $attach->contentId)){
@@ -32,7 +28,6 @@ if($result){
                             $description .= '<img src="data:image/jpeg;base64,'.base64_encode($attach->rawData).'" />';
                         }
                     }
-
                     $company = $rule['company'];
                     $client = $rule['client'];
                     $project = $rule['clientproject'];
@@ -60,7 +55,6 @@ if($result){
                         $stmt_emp->bind_param("is", $employee, $position);
                         $stmt_team = $conn->prepare("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id', ?)"); echo $conn->error;
                         $stmt_team->bind_param("i", $team);
-
                         $position = 'normal';
                         $employees = explode(",", $rule['employees']);
                         foreach($employees as $entry){

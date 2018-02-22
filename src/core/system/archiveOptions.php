@@ -1,12 +1,12 @@
-<?php include dirname(__DIR__) . '/header.php';?>
-<?php require dirname(__DIR__) . "/misc/helpcenter.php"; 
+<?php include dirname(dirname(__DIR__)) . '/header.php';?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; 
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['addConfig'])){
         $server = $_POST['server'];
         $aKey = $_POST['aKey'];
         $sKey = $_POST['sKey'];
-        require dirname(dirname(__DIR__)) . "/misc/useS3Config.php";
+        require dirname(__DIR__) . "/misc/useS3Config.php";
         if (isset($_POST['server'])) {
             try{
                 $credentials = array('key' => $aKey, 'secret' => $sKey);
@@ -25,6 +25,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             } catch(Exception $e) {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
             }
+        }
+    }elseif(isset($_POST['deleteConfig'])){
+        $id = $_POST['deleteConfig'];
+        $isActive = $conn->query("SELECT isActive FROM archiveconfig WHERE id = $id");
+        if($isActive && $isActive->fetch_assoc()['isActive']==="TRUE"){
+            $conn->query("UPDATE archiveconfig SET isActive = 'TRUE' WHERE isActive = 'FALSE' LIMIT 1;");
+        }
+        $conn->query("DELETE FROM archiveconfig WHERE id = $id");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
         }
     }
 }
@@ -53,7 +63,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
                     echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
-                    echo '<td></td>';
+                    echo '<td><form method="POST" onSubmit="return confirmDelete()"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
                     echo '</tr>';
                 }
             ?></tbody>
@@ -78,12 +88,15 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
 
 <script>
     $("[name='active']").on("click",function(event){
-        console.log(event.target.value);
         $.post("ajaxQuery/AJAX_changeActiveS3.php",{
             id: event.target.value
         },function(data){
             console.log(data);
         });
     });
+    
+    function confirmDelete(){
+        return confirm("Ary you sure you want to delete this Configuration ?");
+    }
 </script>
-<?php include dirname(__DIR__) . '/footer.php'; ?>
+<?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
