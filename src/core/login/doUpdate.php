@@ -2003,6 +2003,30 @@ if($row['version'] < 137){
         echo '<br>Role: Can edit suppliers';
     }
 }
+if($row['version'] < 137){
+    $sql = "CREATE TABLE dsgvo_training_modules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(100),
+        PRIMARY KEY (id)
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: modules';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD COLUMN moduleID int(6)";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: module id';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD FOREIGN KEY (moduleID) REFERENCES dsgvo_training_modules(id) ON UPDATE CASCADE ON DELETE CASCADE";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: module constraint';
+    }
+}
 
 // ------------------------------------------------------------------------------
 

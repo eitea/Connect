@@ -1407,6 +1407,15 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE dsgvo_training_modules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(100),
+        PRIMARY KEY (id)
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+    
     $sql = "CREATE TABLE dsgvo_training (
         id int(6) NOT NULL AUTO_INCREMENT,
         name varchar(100),
@@ -1414,8 +1423,10 @@ function create_tables($conn) {
         version INT(6) DEFAULT 0,
         onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        moduleID int(6),
         PRIMARY KEY (id),
-        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE)";
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (moduleID) REFERENCES dsgvo_training_modules(id) ON UPDATE CASCADE ON DELETE CASCADE)";
     if(!$conn->query($sql)){
         echo $conn->error;
     }

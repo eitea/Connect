@@ -14,6 +14,7 @@ $companyID = $row["companyID"];
 $onLogin = $row["onLogin"];
 $allowOverwrite = $row["allowOverwrite"];
 $random = $row["random"];
+$moduleID = $row["moduleID"];
 
 $userArray = array();
 $teamArray = array();
@@ -33,6 +34,18 @@ while($row = $result->fetch_assoc()){
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
+            <label>Modul*</label>
+            <select class="js-example-basic-single" name="module" required>
+                <?php 
+                $result = $conn->query("SELECT * FROM dsgvo_training_modules");
+                while ($result && ($row = $result->fetch_assoc())) {
+                    $name = $row["name"];
+                    $id = $row["id"];
+                    $selected = ($id == $moduleID)?"selected":"";
+                    echo "<option $selected value='$id'>$name</option>";
+                }
+                ?>
+            </select>
             <label>Version</label>
             <input type="number" class="form-control" name="version" placeholder="1" min="1" step="1" value="<?php echo $version ?>" />
             <label>Zugeordnete Personen</label>
