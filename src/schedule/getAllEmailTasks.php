@@ -45,33 +45,49 @@ if($result){
                     // PROJECT
                     $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                         projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage, projectleader) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                        $stmt->bind_param("ssbiiissssisisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $series, $percentage, $projectleader);
-                        $stmt->send_long_data(2, $description);
-                        $stmt->execute();
-                        if(!$stmt->error){
-                            $stmt->close();
-                            //EMPLOYEES
-                            $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
-                            $stmt->bind_param("is", $employee, $position);
-                            $position = 'normal';
-                            $employees = explode(",", $rule['employees']);
-                            foreach($employees as $employee){
-                                $stmt->execute();
+                    $stmt->bind_param("ssbiiissssisisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $series, $percentage, $projectleader);
+                    $stmt->send_long_data(2, $description);
+                    $stmt->execute();
+                    if(!$stmt->error){
+                        $stmt->close();
+                        //EMPLOYEES TEAMS
+                        $stmt_emp = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
+                        $stmt_emp->bind_param("is", $employee, $position);
+                        $stmt_team = $conn->prepare("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id', ?)"); echo $conn->error;
+                        $stmt_team->bind_param("i", $team);
+
+                        $position = 'normal';
+                        $employees = explode(",", $rule['employees']); //team;10, user;1, user;5
+                        foreach($employees as $entry){
+                            $entries = explode(";", $entry);
+                            if($entries[0] == 'user'){
+                                $employee = $entries[1];
+                                $stmt_emp->execute();
+                            } elseif($entries[0] == 'team'){
+                                $team = $entries[1];
+                                $stmt_team->execute();
                             }
-                            if(!empty($rule['optionalemployees'])){
-                                $position = 'optional';
-                                $employees = explode(",",$rule['optionalemployees']);
-                                foreach ($employees as $optional_employee) {
-                                    $employee = intval($optional_employee);
-                                    $stmt->execute();
+                        }
+                        if(!empty($rule['optionalemployees'])){
+                            $position = 'optional';
+                            $employees = explode(",",$rule['optionalemployees']);
+                            foreach ($employees as $entry) {
+                                $entries = explode(";", $entry);
+                                if($entries[0] == 'user'){
+                                    $employee = $entries[1];
+                                    $stmt_emp->execute();
                                 }
                             }
-                        } else {
-                            echo $stmt->error;
                         }
-                        $stmt->close();
+                        echo $stmt_emp->error;
+                        echo $stmt_team->error;
+                        $stmt_emp->close();
+                        $stmt_team->close();
 
-                    //$imap->deleteMail($mail_number);
+                        //$imap->deleteMail($mail_number);
+                    } else {
+                        echo $stmt->error;
+                    }
                 }
             }
         }
