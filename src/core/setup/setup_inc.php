@@ -1099,8 +1099,8 @@ function create_tables($conn) {
         dial VARCHAR(20),
         faxDial VARCHAR(20),
         phone VARCHAR(25),
-        form_of_address ENUM('Herr','Frau') NOT NULL,
-        titel VARCHAR(20),
+        gender ENUM('male','female') NOT NULL,
+        title VARCHAR(20),
         pgpKey TEXT,
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE

@@ -393,7 +393,7 @@ endif;
         <span class="input-group-addon"> - </span>
         <input type="time" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  name="end" value="<?php echo $end; ?>" />
         <div class="input-group-btn">
-          <button style="margin-left: 15px;" class="btn btn-warning" type="submit"  name="add"> <?php echo $lang['BOOK'] ?> </button>
+          <button class="btn btn-warning" type="submit"  name="add"> <?php echo $lang['BOOK'] ?> </button>
         </div>
       </div>
     </div>

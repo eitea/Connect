@@ -124,13 +124,13 @@ echo $conn->error;
 $userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 $result = $conn->query(
     "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur 
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID 
+        SELECT userID FROM dsgvo_training_user_relations tur
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
         WHERE userID = $userID
         UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr 
-        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID 
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID 
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
+        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
         WHERE tr.userID = $userID
     ) temp"
 );
@@ -851,32 +851,32 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
       <!-- Section Three: PROJECTS -->
       <?php if ($isProjectAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingProject">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
-            <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
-            </a>
+          <div class="panel panel-default panel-borderless">
+              <div class="panel-heading" role="tab" id="headingProject">
+                  <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
+                      <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                  </a>
+              </div>
+              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
+                  <div class="panel-body">
+                      <ul class="nav navbar-nav">
+                          <?php if ($isProjectAdmin == 'TRUE'): ?>
+                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                              <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
+                          <?php endif;?>
+                          <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
+                              <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
+                          <?php endif;?>
+                          <?php if ($isProjectAdmin == 'TRUE'): ?>
+                              <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
+                          <?php endif;?>
+                      </ul>
+                  </div>
+              </div>
           </div>
-          <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <?php if ($isProjectAdmin == 'TRUE'): ?>
-                <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
-                <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                <?php endif;?>
-                <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
-                  <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
-                  <?php endif;?>
-                <?php if ($isProjectAdmin == 'TRUE'): ?>
-                <li><a <?php if ($this_page == 'project_options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
-                <?php endif;?>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php") {
-            echo "<script>$('#adminOption_PROJECT').click();</script>";
-        } ?>
+          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php" || $this_page == "options.php") {
+              echo "<script>$('#adminOption_PROJECT').click();</script>";
+          } ?>
       <?php endif;?>
 
       <!-- Section Four: REPORTS -->
@@ -1097,12 +1097,18 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-archives" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li><a href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
-                <li><a href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
+                <!--<li><a <?php //if ($this_page == 'archive_options.php') {echo $setActiveLink;}?> href="../archive/options" data-parent="#sidenav01" class="collapsed"><?php //echo $lang['OPTIONS'] ?></a></li> -->
+                <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
+                <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
               </ul>
             </div>
           </div>
         </div>
+      <?php
+        if ($this_page == "archive_share.php" || $this_page == "private_view.php" || $this_page == 'archive_options.php') {
+            echo "<script>$('#adminOption_ARCHIVE').click();</script>";
+        }
+        ?>
       <?php endif;?>
       <!-- END SECTIONS -->
       <br><br>

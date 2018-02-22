@@ -39,54 +39,54 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php include dirname(dirname(__DIR__)) . "/misc/new_client_buttonless.php"; ?>
 
 <form id="mainForm" method="POST">
-  <?php
-  $companyQuery = $clientQuery = "";
-  if($filterings['company']){$companyQuery = " AND $clientTable.companyID = ".$filterings['company']; }
-  if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
-  $query = "SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
-  WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSupplier = 'FALSE' $companyQuery $clientQuery ORDER BY name ASC";
-  $result = $conn->query($query);
-  if($result && $result->num_rows > 0):
-    ?>
-    <table class="table table-hover">
-      <thead>
-        <th><?php echo $lang['DELETE']; ?></th>
-        <th><?php echo $lang['COMPANY']; ?></th>
-        <th>Name </th>
-        <th><?php echo $lang['NUMBER']; ?></th>
-        <th><?php echo $lang['OPTIONS']; ?></th>
-      </thead>
-      <tbody>
-        <?php
-        while ($row = $result->fetch_assoc()) {
-          $i = $row['id'];
-          echo '<tr style="cursor: pointer" class="clickable-row" data-href="../system/clientDetail?custID='.$i.'">';
-          echo "<td><input type='checkbox' name='index[]' value='$i'></td>";
-          echo "<td>".$row['companyName']."</td>";
-          echo "<td>".$row['name']."</td>";
-          echo "<td>".$row['clientNumber']."</td>";
-          echo "<td><a class='btn btn-default' title='Bearbeiten' href='../system/clientDetail?custID=$i'><i class='fa fa-pencil'></i></a></td>";
-          echo '</tr>';
-        }
+    <?php
+    $companyQuery = $clientQuery = "";
+    if($filterings['company']){$companyQuery = " AND $clientTable.companyID = ".$filterings['company']; }
+    if($filterings['client']){$clientQuery = " AND $clientTable.id = ".$filterings['client']; }
+    $query = "SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
+    WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSupplier = 'FALSE' $companyQuery $clientQuery ORDER BY name ASC";
+    $result = $conn->query($query);
+    if($result && $result->num_rows > 0):
         ?>
-      </tbody>
-    </table>
-  <?php endif; echo $conn->error; ?>
+        <table class="table table-hover">
+            <thead>
+                <th><?php echo $lang['DELETE']; ?></th>
+                <th><?php echo $lang['COMPANY']; ?></th>
+                <th>Name </th>
+                <th><?php echo $lang['NUMBER']; ?></th>
+                <th><?php echo $lang['OPTIONS']; ?></th>
+            </thead>
+            <tbody>
+                <?php
+                while ($row = $result->fetch_assoc()) {
+                    $i = $row['id'];
+                    echo '<tr style="cursor: pointer" class="clickable-row" data-href="../system/clientDetail?custID='.$i.'">';
+                    echo "<td><input type='checkbox' name='index[]' value='$i'></td>";
+                    echo "<td>".$row['companyName']."</td>";
+                    echo "<td>".$row['name']."</td>";
+                    echo "<td>".$row['clientNumber']."</td>";
+                    echo "<td><a class='btn btn-default' title='Bearbeiten' href='../system/clientDetail?custID=$i'><i class='fa fa-pencil'></i></a></td>";
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    <?php endif; echo $conn->error; ?>
 </form>
 
 <script>
-  $('.table').DataTable({
+$('.table').DataTable({
     autoWidth: false,
     order: [[ 2, "asc" ]],
     columns: [{orderable: false}, null, null, null, {orderable: false}],
     responsive: true,
     colReorder: true,
     language: {
-      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+        <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     }
-  });
+});
 
-  jQuery(document).ready(function($) {
+jQuery(document).ready(function($) {
     $(".clickable-row").click(function() {
         window.location = $(this).data("href");
     });

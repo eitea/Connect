@@ -1738,26 +1738,24 @@ if($row['version'] < 131){ //14.02.2018
     }
 
     $conn->query("DELETE FROM taskData WHERE id = 4");
-
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>BugFix: Email Tasks';
     }
 
-    $conn->query("ALTER TABLE UserData  ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
-
+    $conn->query("ALTER TABLE UserData ADD forcedPwdChange TINYINT(1) NULL DEFAULT NULL;");
     if ($conn->error) {
         echo $conn->error;
     } else {
         echo '<br>Forced Change Password';
     }
 
-    $conn->query("CREATE TABLE position ( id INT(6) NOT NULL AUTO_INCREMENT,
+    $conn->query("CREATE TABLE position (
+    id INT(6) NOT NULL AUTO_INCREMENT,
     name VARCHAR(20) NOT NULL,
-    PRIMARY KEY (id))");
-
-
+    PRIMARY KEY (id)
+    )");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -1847,14 +1845,13 @@ if($row['version'] < 131){ //14.02.2018
 
 if($row['version'] < 132){//14.02.2018
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactpersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactpersons GROUP BY position");
+    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
     if($result){
         while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactpersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
+            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
         }
     }
-    $conn->query("ALTER TABLE contactpersons CHANGE position position INT(6) NOT NULL;");
+    $conn->query("ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL;");
 }
 if($row['version'] < 133){
     $sql = "CREATE TABLE emailprojectlogs (
@@ -1870,6 +1867,7 @@ if($row['version'] < 133){
 }
 if($row['version'] < 134){
     $sql = "ALTER TABLE sharedfiles CHANGE name name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei'";
+    $conn->query($sql);
     $sql = "ALTER TABLE sharedgroups CHANGE uri uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten'";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -1913,7 +1911,73 @@ if($row['version'] < 134){
         echo '<br>Training: random';
     }
 }
+
 if($row['version'] < 135){
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN gender ENUM('male','female') NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Gender';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN title VARCHAR(20)");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: Titel';
+    }
+    $conn->query("ALTER TABLE contactPersons ADD COLUMN pgpKey TEXT");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Kontaktpersonen: PGP Key';
+    }
+}
+if ($row['version'] < 136) {
+    $sql = "CREATE OR REPLACE TABLE emailprojectlogs (
+        id int(11),
+        timeofoccurence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        body text,
+        PRIMARY KEY (id)
+        )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Debugging: Email Projects';
+    }
+    $sql = "ALTER TABLE archiveconfig ADD isActive ENUM('TRUE','FALSE') NOT NULL DEFAULT 'FALSE';";
+    $conn->query($sql);
+    $sql = "ALTER TABLE archiveconfig ADD id INT(6) NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (id);";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Archive: Multiple Configs';
+    }
+    $sql = "ALTER TABLE emailprojects CHANGE smtpSecure smtpSecure ENUM('tls','ssl','null') NOT NULL DEFAULT 'null';";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Bugfix: Email Tasks';
+    }
+
+    $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        $sql = "SET GLOBAL event_scheduler = ON;";
+        if (!$conn->query($sql)) {
+            echo $conn->error;
+        } else {
+            echo '<br>Auto-Delete Dead Links';
+        }
+    }
+    $sql = "ALTER TABLE emailprojectlogs CHANGE id id INT(11) NOT NULL AUTO_INCREMENT, CHANGE body body LONGTEXT DEFAULT null ";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Bug Fixes';
+    }
+}
+if($row['version'] < 137){
     $sql = "ALTER TABLE roles ADD COLUMN canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -1939,6 +2003,7 @@ if($row['version'] < 135){
         echo '<br>Role: Can edit suppliers';
     }
 }
+
 // ------------------------------------------------------------------------------
 
 require dirname(dirname(__DIR__)) . '/version_number.php';

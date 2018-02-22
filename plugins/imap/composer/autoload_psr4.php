@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'SSilence\\ImapClient\\' => array($vendorDir . '/ssilence/php-imap-client/ImapClient'),
+    'PhpImap\\' => array($vendorDir . '/php-imap/php-imap/src/PhpImap'),
 );

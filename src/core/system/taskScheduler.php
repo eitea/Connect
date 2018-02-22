@@ -8,7 +8,7 @@ if(isset($_POST['save_task'])){
       $pattern = intval($_POST['mail_repeat']);
       $runtime = carryOverAdder_Hours($_POST['mail_runtime_date'].' '.$_POST['mail_runtime_time'], $timeToUTC * -1); //UTC
       $time = substr($runtime, 11, 8);
-      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (1, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Mailing schedule', 'sendMailReport.php')
+      $conn->query("INSERT INTO taskData (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (1, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Mailing schedule', 'sendMailReport.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern', runtime = '$runtime', lastRuntime = CONCAT(DATE(lastRuntime), ' $time')");
       if(mysqli_error($conn)){
         $error = $conn->error;
@@ -18,7 +18,7 @@ if(isset($_POST['save_task'])){
       $pattern = intval($_POST['restic_repeat']);
       $runtime = carryOverAdder_Hours($_POST['restic_runtime_date'].' '.$_POST['restic_runtime_time'], $timeToUTC * -1);
       $time = substr($runtime, 11, 8);
-      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (2, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Restic Backup schedule', 'executeResticBackup.php')
+      $conn->query("INSERT INTO taskData (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (2, '$pattern', '$runtime', '2000-01-01 12:00:00', 'Restic Backup schedule', 'executeResticBackup.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern', runtime = '$runtime', lastRuntime = CONCAT(DATE(lastRuntime), ' $time')");
       if(mysqli_error($conn)){
         $error = $conn->error;
@@ -27,7 +27,7 @@ if(isset($_POST['save_task'])){
 
     if(!empty($_POST['lunchbreak_repeat'])){
       $pattern = intval($_POST['lunchbreak_repeat']);
-      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (3, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Lunchbreak Control', 'task_lunchbreak.php')
+      $conn->query("INSERT INTO taskData (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (3, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Lunchbreak Control', 'task_lunchbreak.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
       if(mysqli_error($conn)){
         $error = $conn->error;
@@ -35,7 +35,7 @@ if(isset($_POST['save_task'])){
     }
     if(!empty($_POST['email_task'])){
       $pattern = intval($_POST['email_task']);
-      $conn->query("INSERT INTO $taskTable (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (4, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Email Tasks', 'getAllEmailTasks.php')
+      $conn->query("INSERT INTO taskData (id, repeatPattern, runtime, lastRuntime, description, callee) VALUES (4, '$pattern', '2000-01-01 12:00:00', '2000-01-01 12:00:00', 'Email Tasks', 'getAllEmailTasks.php')
                   ON DUPLICATE KEY UPDATE repeatPattern = '$pattern'");
       if(mysqli_error($conn)){
         $error = $conn->error;
@@ -166,7 +166,7 @@ if($result && ($row = $result->fetch_assoc())){
   <br>
 
   <div class="page-seperated-section">
-  <?php 
+  <?php
   $result = $conn->query("SELECT * FROM taskData WHERE id = 4");
   if($result && ($row = $result->fetch_assoc())){
     $pattern = $row['repeatPattern'];
@@ -188,9 +188,6 @@ if($result && ($row = $result->fetch_assoc())){
           }
           ?>
         </select>
-      </div>
-      <div class="col-sm-8 col-sm-offset-1">
-        <?php echo $lang['INFO_LUNCHBREAK_TASK']; ?>
       </div>
     </div>
   </div>

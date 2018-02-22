@@ -14,10 +14,10 @@
         return false;
     }
 
-    function setS3Config($server,$key,$secret){
+    function addS3Config($server,$key,$secret){
         require dirname(__DIR__) . "/connection.php";
         try{
-            $conn->query("UPDATE archiveconfig SET endpoint='$server', awskey='$key', secret='$secret'");
+            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret) VALUES ('$server','$key','$secret')");
             return true;
         }catch(Exception $e){
             return false;

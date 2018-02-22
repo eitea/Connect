@@ -965,7 +965,7 @@ $lang_eng['PRICE_STK'] = 'Unit Price';
 $lang_ger['PRICE_STK'] = 'Einzelpreis';
 
 $lang_eng['PRIVATE'] = 'Private';
-$lang_ger['PRIVATE'] = 'Persöhnlich';
+$lang_ger['PRIVATE'] = 'Persönlich';
 
 $lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
 $lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
@@ -1429,8 +1429,8 @@ $lang_ger['MONTH_TOSTRING'] = array("", "Januar", "Februar", "März", "April", "
 $lang_eng['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Simple', "MEDIUM" => 'Medium', "STRONG" => 'Strong');
 $lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mittel', "STRONG" => 'Stark');
 
-$lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.');
-$lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau');
+$lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.', '' => '');
+$lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau', '' => '');
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');
