@@ -34,14 +34,22 @@ if ($result && $result->num_rows > 0) {
     $canStamp = $row['canStamp'];
     $canEditTemplates = $row['canEditTemplates'];
     $canUseSocialMedia = $row['canUseSocialMedia'];
+    $canUseClients = $row['canUseClients'];
+    $canEditClients = $row['canEditClients'];
+    $canUseSuppliers = $row['canUseSuppliers'];
+    $canEditSuppliers = $row['canEditSuppliers'];
     $canCreateTasks = $row['canCreateTasks'];
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = false;
+    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
+    $canEditSuppliers = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = 'TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = 'TRUE';
+}
+if($isERPAdmin == 'TRUE'){
+    $canEditClients = $canEditSuppliers = 'TRUE';
 }
 
 $result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
@@ -685,6 +693,52 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <?php endif; ?>
                   <?php endif;?>
               <?php endif; //endif(canStamp)?>
+              <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+              <div class="panel panel-default panel-borderless no-margin">
+          <div class="panel-heading" role="tab" id="headingSuppliers">
+            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-suppliers"  id="supplierOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Lieferanten</a>
+          </div>
+          <div id="collapse-suppliers" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingSuppliers">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+          <!--      <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
+                <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li> -->
+                <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <?php
+        if ($this_page == "editSuppliers.php") {
+            echo "<script>$('#supplierOption').click();</script>";
+        } 
+        ?>
+            <?php endif;//canUseSuppliers ?>
+              <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
+              <div class="panel panel-default panel-borderless no-margin">
+          <div class="panel-heading" role="tab" id="headingClients">
+            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-clients" id="clientOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Kunden</a>
+          </div>
+          <div id="collapse-clients" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingClients">
+            <div class="panel-body">
+              <ul class="nav navbar-nav">
+                             
+            <!--  <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
+                          <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
+                          <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
+                          <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>-->
+                          <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                    
+              </ul>
+            </div>
+          </div>
+        </div>
+        <?php
+        if ($this_page == "editCustomers.php") {
+            echo "<script>$('#clientOption').click();</script>";
+        }
+        ?>
+                <?php endif;//canuseClients ?>
           </ul>
       </div>
     <div class="panel-group" id="sidebar-accordion">

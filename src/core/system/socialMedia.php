@@ -73,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
 }
 
 ?>
+<div class="page-header-fixed">
     <div class="page-header">
         <h3>
             <?php echo $lang['SOCIAL_MEDIA_HEADING']; ?>
@@ -81,8 +82,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
             </div>
         </h3>
     </div>
-
-
+</div>
+<div class="page-content-fixed-150">
         <h4><?php echo $lang['SOCIAL_CONTACTS']; ?></h4>
     <!-- contacts -->
     <table class="table table-hover">
@@ -572,6 +573,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
     }
     </script>
 
-
+</div>
     <!-- /BODY -->
     <?php include dirname(dirname(__DIR__)).'/footer.php'; ?>

@@ -39,7 +39,7 @@ while($result && ($row = $result->fetch_assoc())){
   $has_bookings = false;
   $i = $row['indexIM'];
   $A = $row['time'];
-  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC");
+  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC"); //changes must be carried over to AJAX_dynamicInfo
   while($row_b = $res_b->fetch_assoc()){ //changes must be carried over to addendum page
     $has_bookings = true;
     $B = $row_b['start'];

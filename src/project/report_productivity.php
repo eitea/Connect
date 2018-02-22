@@ -1,7 +1,7 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToReport($userID);?>
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
-
+<div class="page-header-fixed">
 <div class="page-header">
 <h3><?php echo $lang['PRODUCTIVITY']; ?></h3>
 </div>
@@ -55,6 +55,7 @@ if(!empty($_POST['filterUserIDs']) && !empty($_POST['addUserID'])){
     </div>
   </div>
 </form>
+</div>
 
 <?php
 $arr_IDs = explode(' ', $filterIDs);
@@ -117,7 +118,8 @@ echo "<br>Fahrzeiten: $drives";
 echo "<br>Nicht Produktiv: $nonproductives";
 */
 ?>
-
+<div class="page-content-fixed-180">
+<br>
   <div class="container-fluid">
     <canvas id="analysisChart" width="1000" height="<?php echo $height; ?>"></canvas>
   </div>
@@ -191,6 +193,6 @@ echo "<br>Nicht Produktiv: $nonproductives";
   });
   </script>
 <?php endif; ?>
-
+</div>
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>

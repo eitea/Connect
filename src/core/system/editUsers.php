@@ -277,6 +277,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
+    if(isset($_POST['canUseClients'.$x])){
+      $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
+    if(isset($_POST['canUseSuppliers'.$x])){
+      $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
+    if(isset($_POST['canEditClients'.$x])){
+      $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
+    if(isset($_POST['canEditSuppliers'.$x])){
+      $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
+    } else {
+      $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
+    }
+    $conn->query($sql);
 
     $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
 
@@ -411,6 +435,10 @@ $(document).ready(function(){
       $canStamp = $row['canStamp'];
       $canEditTemplates = $row['canEditTemplates'];
       $canUseSocialMedia = $row['canUseSocialMedia'];
+      $canUseClients = $row['canUseClients'];
+      $canEditClients = $row['canEditClients'];
+      $canUseSuppliers = $row['canUseSuppliers'];
+      $canEditSuppliers = $row['canEditSuppliers'];
       $canCreateTasks = $row['canCreateTasks'];
 
       $eOut = "$firstname $lastname";
@@ -554,6 +582,9 @@ $(document).ready(function(){
                       <label>
                         <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
                       </label><br>
+                      <label>
+                        <input type="checkbox" name="canEditSuppliers<?php echo $x; ?>" <?php if($canEditSuppliers == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
+                      </label>
                     </div>
                     <div class="col-md-6">
                       <label>
@@ -567,6 +598,10 @@ $(document).ready(function(){
                       </label><br>
                       <label>
                         <input type="checkbox" name="isDSGVOAdmin<?php echo $x; ?>" <?php if($isDSGVOAdmin == 'TRUE'){echo 'checked';} ?> />DSGVO
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canEditClients<?php echo $x; ?>" <?php if($canEditClients == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
                       </label>
                     </div>
                   </div>
@@ -594,6 +629,14 @@ $(document).ready(function(){
                     <div class="col-md-6">
                       <label>
                         <input type="checkbox" name="canCreateTasks<?php echo $x; ?>" <?php if($canCreateTasks == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canUseClients<?php echo $x; ?>" <?php if($canUseClients == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canUseSuppliers<?php echo $x; ?>" <?php if($canUseSuppliers == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
                       </label>
                     </div>
                   </div>

@@ -1,11 +1,13 @@
 <?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 
+<div class="page-header-fixed">
 <div class="page-header">
   <?php $filterings = array("savePage" => $this_page, 'user' => 0, 'date' => array('2016-06-01', substr(getCurrentTimestamp(), 0, 10)), 'acceptance' => -1, 'requestType' => ''); ?>
   <h3><?php echo $lang['REQUESTS'].' '.$lang['OVERVIEW']; ?> <div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; ?></div></h3>
 </div>
-
+</div>
+<div class="page-content-fixed-130">
 <table class="table table-hover">
   <thead><tr>
     <th>Name</th>
@@ -33,4 +35,5 @@
     ?>
   </tbody>
 </table>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

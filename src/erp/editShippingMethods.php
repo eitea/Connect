@@ -32,6 +32,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 }
 ?>
+<div class="page-header-fixed">
 <form method="POST">
   <div class="page-header">
     <h3><?php echo $lang['SHIPPING_METHODS']; ?>
@@ -42,6 +43,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
     </h3>
   </div>
+</div>
+<div class="page-content-fixed-130">
   <div class="container-fluid">
     <div class="col-md-6">
       <table class="table table-hover">
@@ -85,4 +88,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </div>
 </form>
+</div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

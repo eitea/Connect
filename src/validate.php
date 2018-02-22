@@ -123,9 +123,13 @@ function enableToClients($userID){
   $sql = "SELECT isERPAdmin, isCoreAdmin FROM $roleTable WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE')";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
-    include 'footer.php';
-    die();
+    $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND ( canUseClients = 'TRUE' OR canEditClients = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')";
+    $result = $conn->query($sql);
+    if($userID != 1 && (!$result || $result->num_rows <= 0)){
+      echo 'Access denied. <a href="../user/logout"> logout</a>';
+      include 'footer.php';
+      die();
+    }
   }
 }
 

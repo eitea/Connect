@@ -221,7 +221,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   }
 } //END POST
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$proposal_row['id_number'].'</small>'; ?>
     <div class="page-header-button-group">
@@ -241,6 +241,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
   </h3>
 </div>
+</div>
+<div class="page-content-fixed-150">
 <form id="positionForm" method="POST">
   <table id="sort" class="table table-hover">
     <thead>
@@ -744,4 +746,5 @@ $("#product_purchase").on("keyup", function(){
   }
 });
 </script>
+</div>
 <?php include dirname(__DIR__) . '/footer.php';?>

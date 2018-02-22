@@ -66,11 +66,12 @@ if(isset($_POST['request_submit'])){
   }
 }
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header">
   <h3><?php echo $lang['MONTHLY_REPORT']; ?><div class="page-header-button-group"><?php include dirname(dirname(__DIR__)) . '/misc/set_filter.php'; ?></div></h3>
 </div>
-
+</div>
+<div class="page-content-fixed-130">
 <table class="table table-hover datatable">
   <thead>
     <th><?php echo $lang['WEEKLY_DAY']?></th>
@@ -286,4 +287,5 @@ if(isset($_POST['request_submit'])){
   }
 });
 </script>
+</div>
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

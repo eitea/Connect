@@ -1,5 +1,6 @@
-<?php require dirname(__DIR__) . '/header.php'; enableToDSGVO($userID);?>
-<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
+<?php require dirname(__DIR__) . '/header.php';
+enableToDSGVO($userID);?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php";?>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
@@ -8,41 +9,41 @@
 
 $trainingID = 0;
 $companyID = intval($_REQUEST['n']);
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(isset($_POST['createTraining']) && !empty($_POST['name'])){
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training (name,companyID) VALUES('$name', $companyID)");
         $trainingID = mysqli_insert_id($conn);
-    } elseif(isset($_POST['removeTraining'])){
+    } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
-    } elseif(isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])){
+    } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
         echo $conn->error;
-        $stmt->bind_param("s",$text);
+        $stmt->bind_param("s", $text);
         $stmt->execute();
         echo $stmt->error;
-    } elseif(isset($_POST["removeQuestion"])){
+    } elseif (isset($_POST["removeQuestion"])) {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
-    } elseif(isset($_POST["editQuestion"])){
+    } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
         echo "question text hasn't been sanitized";
         $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title' WHERE id = $questionID");
         echo $conn->error;
-        $stmt->bind_param("s",$text);
+        $stmt->bind_param("s", $text);
         $stmt->execute();
         echo $stmt->error;
-    } elseif(isset($_POST["editTraining"])){
+    } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
         $version = 1;
-        if(isset($_POST["version"])){
+        if (isset($_POST["version"])) {
             $version = intval($_POST["version"]);
         }
         $name = test_input($_POST["name"]);
@@ -52,10 +53,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random' WHERE id = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
-        if(isset($_POST["employees"])){
+        if (isset($_POST["employees"])) {
             $employeeID = $teamID = "";
-            $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)"); echo $conn->error;
-            $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)"); echo $conn->error;
+            $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)");
+            echo $conn->error;
+            $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)");
+            echo $conn->error;
             $stmtUser->bind_param("i", $employeeID);
             $stmtTeam->bind_param("i", $teamID);
             foreach ($_POST["employees"] as $employee) {
@@ -74,72 +77,76 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 $activeTab = $trainingID;
 echo mysqli_error($conn);
 ?>
-
+<div class="page-header-fixed">
 <div class="page-header">
   <h3>Schulungen <div class="page-header-button-group"><button type="button" data-toggle="modal" data-target="#newTrainingModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default">+</button></div></h3>
 </div>
-
+</div>
+<div class="page-content-fixed-130">
 <div class="container-fluid">
     <?php
-    $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID");
-    while($result && ($row = $result->fetch_assoc())):
-        $trainingID = $row['id'];
+$result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID");
+while ($result && ($row = $result->fetch_assoc())):
+    $trainingID = $row['id'];
     ?>
-    <form method="post">
-        <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
-    <div class="panel panel-default">
-      <div class="panel-heading container-fluid">
-        <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><?php echo $row['name']; ?></a></div>
-        <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button></div>
-      </div>
-      <div class="collapse <?php if($trainingID == $activeTab) echo 'in'; ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
-        <div class="panel-body container-fluid"> 
-            <?php
+	    <form method="post">
+	        <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
+	    <div class="panel panel-default">
+	      <div class="panel-heading container-fluid">
+	        <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><?php echo $row['name']; ?></a></div>
+	        <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button></div>
+	      </div>
+	      <div class="collapse <?php if ($trainingID == $activeTab) {
+        echo 'in';
+    }
+    ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
+	        <div class="panel-body container-fluid">
+	            <?php
 
-            $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
-            while ($row_question = $result_question->fetch_assoc()):
-                $questionID = $row_question["id"];
-                $title = $row_question["title"];
-                $text = $row_question["text"];
-                ?>
-                 <div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
-                 <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
-                 <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
-            <?php echo $title ?></div>
-            <?php
-            endwhile;
+    $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+    while ($row_question = $result_question->fetch_assoc()):
+        $questionID = $row_question["id"];
+        $title = $row_question["title"];
+        $text = $row_question["text"];
+        ?>
+		                 <div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
+		                 <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
+		                 <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
+		            <?php echo $title ?></div>
+		            <?php
+    endwhile;
 
-            ?>
-          
-           <div class="col-md-12 float-right">
-           <div class="btn-group float-right" style="float:right!important">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
-            <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
-            <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
-            <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
-           </div>
-           </div>
-        </div>
-      </div>
-    </div>
-    <!-- question add modal -->
-     <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
-      <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header">Neue Aufgabenstellung/Schulung</div>
-        <div class="modal-body">
-            <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
-            <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-          <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">Frage erstellen</button>
-        </div>
-      </div>
-    </div>
-    <!-- /question add modal -->
-</form>
+    ?>
 
-  <?php endwhile; ?>
+	           <div class="col-md-12 float-right">
+	           <div class="btn-group float-right" style="float:right!important">
+	            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
+	            <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
+	            <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
+	            <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
+	           </div>
+	           </div>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- question add modal -->
+	     <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
+	      <div class="modal-dialog modal-content modal-md">
+	        <div class="modal-header">Neue Aufgabenstellung/Schulung</div>
+	        <div class="modal-body">
+	            <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
+	            <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
+	        </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+	          <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">Frage erstellen</button>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- /question add modal -->
+	</form>
+
+	  <?php endwhile;?>
 </div>
 
 <!-- new training modal -->
@@ -234,6 +241,6 @@ function onModalLoad(){
 }
 onModalLoad();
 </script>
-
+</div>
 <!-- /BODY -->
-<?php include dirname(__DIR__) . '/footer.php'; ?>
+<?php include dirname(__DIR__) . '/footer.php';?>

@@ -1,17 +1,21 @@
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-        $name = test_input($_POST['create_client_name']);
-        $filterCompanyID = $companyID = intval($_POST['create_client_company']);
-        $conn->query("INSERT INTO $clientTable (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '".$_POST['clientNumber']."', 'TRUE' )");
+    if($canEditSuppliers == 'TRUE'){
+        if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
+            $name = test_input($_POST['create_client_name']);
+            $filterCompanyID = $companyID = intval($_POST['create_client_company']);
+            $conn->query("INSERT INTO $clientTable (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '".$_POST['clientNumber']."', 'TRUE' )");
 
-        if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-        } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            if($conn->error){
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            } else {
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            }
+        } elseif(isset($_POST['create_client'])){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
         }
-    } elseif(isset($_POST['create_client'])){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    }else{
+        echo "no permission (you need canEditSuppliers)";
     }
 }
 ?>
