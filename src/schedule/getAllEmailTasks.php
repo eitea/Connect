@@ -45,12 +45,19 @@ if($result){
                         if(!$stmt->error){
                             $stmt->close();
                             //EMPLOYEES
-                            $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
-                            $stmt->bind_param("is", $employee, $position);
+                            $stmtE = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
+                            $stmtE->bind_param("is", $employee, $position);
+                            //TEAMS
+                            $stmtT = $conn->prepare("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id', ?)"); echo $conn->error;
+                            $stmtT->bind_param("is", $employee);
                             $position = 'normal';
                             $employees = explode(",", $rule['employees']);
                             foreach($employees as $employee){
-                                $stmt->execute();
+                                if(strstr($employee,'user;')){
+                                    $stmtE->execute();
+                                }else{
+                                    $stmtT->execute();
+                                }
                             }
                             if(!empty($rule['optionalemployees'])){
                                 $position = 'optional';
