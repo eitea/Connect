@@ -1052,7 +1052,6 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
     </div>
 </div>
 </form>
-
 <?php echo $editmodals ?>
 <form method="POST">
 <!-- ADD CONTACT PERSON -->
