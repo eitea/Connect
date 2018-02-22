@@ -13,11 +13,12 @@ if($result){
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
         $mailsIds = $imap->searchMailbox('ALL');
 
-        $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']);
+        $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']); echo $conn->error;
         while($rule = $result->fetch_assoc()){
             foreach($mailsIds as $mail_number){
                 $mail = $imap->getMail($mail_number);
                 if($subject = strstr($mail->subject, $rule['identifier'])){
+                    echo $subject .' - found<br>';
                     $id = uniqid();
                     $null = null;
                     $name = str_replace($rule['identifier'],"",$subject);

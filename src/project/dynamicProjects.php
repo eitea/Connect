@@ -279,19 +279,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
-        /*
-        if(!empty($filterings['employees'])){
-            for($i = 0; $i < count($filterings['employees']); $i++){
-                $mapNode = explode(";", $filterings['employees'][$i]);
-                if($mapNode[0] === "user"){
-                    $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d
-                    JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
-                } else {
-                    $query_filter .= " AND dynamicprojectsteams.teamid = ".$mapNode[1];
-                }
-            }
-        }
-        */
+
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
@@ -308,9 +296,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
@@ -324,6 +310,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
+
+            $stmt_team->execute();
+            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
+            $stmt_employee->execute();
+            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
+
+            if(!empty($filterings['employees'])){
+                
+            }
+
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = $tags = '';
@@ -363,10 +359,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             echo '<td>'; //employees
             echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
-            $stmt_team->execute();
-            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
-            $stmt_employee->execute();
-            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
+
             echo implode(',<br>', $employees);
             echo '</td>';
 
