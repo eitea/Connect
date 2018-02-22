@@ -138,7 +138,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
                     $id =  test_input($_POST['editDynamicProject']);
-                    $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
+                    //$conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
                     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'EDITED', $userID)");
                 } else { //new
                     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', $userID)");
@@ -146,7 +146,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
-
+                echo "<script>console.log('".strlen($description)."')</script>";
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
                         $mname = strip_tags($matches[1][$i]);
@@ -192,10 +192,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } elseif ($end == "date") {
                     $end = $_POST["enddate"] ?? "";
                 }
-                while(strlen($description) > 65000){
+                while(strlen($description) > 4000000){
                     $description = substr($description, 0, -1000); //truncate the last characters
                 }
-
+                $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
+                echo "<script>console.log('".strlen($description)."')</script>";
+                echo "<script>console.log('".$max->fetch_assoc()['Value']."')</script>";
+                
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -218,10 +221,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                     projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
-                $stmt->send_long_data(2, $description);
-                $stmt->send_long_data(12, $series);
-                $stmt->execute();
+                //$stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
+                //$stmt->send_long_data(2, $description);
+                //$stmt->send_long_data(12, $series);
+                //$stmt->execute();
                 if(!$stmt->error){
                     $stmt->close();
                     //EMPLOYEES

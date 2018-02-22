@@ -2026,11 +2026,11 @@ if($row['version'] < 137){
     } else {
         echo '<br>Bug Fixes';
     }
-    $sql = "ALTER TABLE dynamicprojects CHANGE projectdescription projectdescription LONGTEXT;";
+    $sql = "ALTER TABLE dynamicprojects CHANGE projectdescription projectdescription MEDIUMTEXT;";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
-        echo '<br>Bigger Task Description (Max. 4GB)';
+        echo '<br>Bigger Task Description (Max. 15MB)';
     }
 }
 

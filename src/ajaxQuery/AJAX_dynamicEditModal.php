@@ -209,8 +209,8 @@ if($x){
                                 </select><small>Tags werden durch ',' oder ' ' automatisch getrennt.</small><br><br>
                             </div>
                             <div class="col-md-12">
-                                <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 4GB)</small></label>
-                                <textarea class="form-control projectDescriptionEditor" name="description" maxlength="20000" ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
+                                <textarea class="form-control projectDescriptionEditor" name="description"  ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>
