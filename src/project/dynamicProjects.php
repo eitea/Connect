@@ -11,20 +11,20 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     if($current<$estimate){
-        $yellowBar = $current/($estimate+0.0001); 
-        $greenBar = 1-$yellowBar; 
-        $timeLeft = $estimate - $current; 
+        $yellowBar = $current/($estimate+0.0001);
+        $greenBar = 1-$yellowBar;
+        $timeLeft = $estimate - $current;
         $redBar = 0;
         $timeOver = 0;
     }else{
-        $timeOver = $current - $estimate; 
+        $timeOver = $current - $estimate;
         $timeLeft = 0;
-        $greenBar = 0; 
-        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current + 0.0001); 
-        $redBar = 1-$yellowBar; 
+        $greenBar = 0;
+        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current + 0.0001);
+        $redBar = 1-$yellowBar;
         $current = $estimate;
     }
-    $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1); 
+    $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
     $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
     $bar .= "<div data-toggle='tooltip' title='".round($current,2)." Stunden' class='progress-bar progress-bar-warning' style='height:10px;width:".formatPercent($yellowBar)."'></div>";
     $bar .= "<div data-toggle='tooltip' title='".round($timeLeft,2)." Stunden' class='progress-bar progress-bar-success' style='height:10px;width:".formatPercent($greenBar)."'></div>";
@@ -288,10 +288,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
             }
         }
-        if($filterings['priority']>0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority'];}
+        if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
+        /*
         if(!empty($filterings['employees'])){
-            for($i=0;$i<count($filterings['employees']);$i++){
-                $mapNode = explode(";",$filterings['employees'][$i]);
+            for($i = 0; $i < count($filterings['employees']); $i++){
+                $mapNode = explode(";", $filterings['employees'][$i]);
                 if($mapNode[0] === "user"){
                     $query_filter .= " AND d.projectid IN (SELECT projectid FROM dynamicprojectsemployees WHERE userid = ".$mapNode[1]." UNION SELECT projectid FROM dynamicprojectsteams d
                     JOIN teamRelationshipData t ON userid = t.userID WHERE userid= ".$mapNode[1]." )";
@@ -300,6 +301,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
             }
         }
+        */
         $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
@@ -319,7 +321,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid  LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
@@ -327,7 +329,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
-                AND d.projectstart <= UTC_TIMESTAMP $query_filter GROUP BY d.projectid ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                AND d.projectstart <= UTC_TIMESTAMP $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
@@ -360,7 +362,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             $stmt_booking->execute();
             $isInUse = $stmt_booking->get_result(); //max 1 row
-            
+
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
