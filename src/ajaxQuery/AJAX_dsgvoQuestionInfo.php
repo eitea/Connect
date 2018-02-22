@@ -67,12 +67,21 @@ $timesColorsArray = array();
                 echo "<td>$tries</td>";
                 echo "</tr>";
             }
+            //users who didn't answer yet
+
             $result = $conn->query(
-                "SELECT ud.id, firstname, lastname
-                 FROM dsgvo_training_questions tq 
-                 INNER JOIN UserData ud
-                 WHERE tq.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = tq.id)"
+                "SELECT dsgvo_training_user_relations.userID, ud.firstname, ud.lastname FROM dsgvo_training_user_relations
+                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_user_relations.trainingID
+                 INNER JOIN UserData ud ON ud.id = dsgvo_training_user_relations.userID
+                 WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)
+                 UNION
+                 SELECT teamRelationshipData.userID, ud.firstname, ud.lastname FROM dsgvo_training_team_relations
+                 INNER JOIN teamRelationshipData ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
+                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_team_relations.trainingID
+                 INNER JOIN UserData ud ON ud.id = teamRelationshipData.userID
+                 WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)"
             );
+            echo $conn->error;
             while($row = $result->fetch_assoc()){
                 $name = "${row['firstname']} ${row['lastname']}";
                 $unanswered++;
