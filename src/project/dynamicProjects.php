@@ -872,7 +872,7 @@ function showProjects(client, project, place){
     if(tinymce.activeEditor.getContent().length>(<?php
         $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
         $maxSQL = $max->fetch_assoc();
-        echo $maxSQL['Value'] ?>-500)){
+        echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
         alert("Description Too Big");
         return false;
     }
@@ -907,9 +907,6 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
    });
 })
 
-function checkContentLength(){
-    console.log(tinymce.activeEditor.getContent().length);
-}
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

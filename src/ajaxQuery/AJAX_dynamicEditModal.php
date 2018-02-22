@@ -369,7 +369,6 @@ if($x){
                 </div><!-- /modal-body -->
                 <div class="modal-footer">
                     <div class="pull-left"><?php echo $x; ?></div>
-                    <button type="button" class="btn btn-default" onclick="checkContentLength()" >Check Length</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                     <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
                 </div>
