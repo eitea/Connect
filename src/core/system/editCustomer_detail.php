@@ -346,9 +346,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $faxDial = test_input($_POST['contacts_faxDial']);
         $phone = test_input($_POST['contacts_phone']);
         $gender = test_input($_POST['contacts_gender']);
-        $title = test_input($_POST['contacts_titel']);
+        $title = test_input($_POST['contacts_title']);
         $pgp = trim($_POST['contacts_pgp']);
-        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, form_of_address, title, pgpKey)
+        $conn->query("INSERT INTO contactPersons (clientID, firstname, lastname, email, position, responsibility, dial, faxDial, phone, gender, title, pgpKey)
         VALUES ($filterClient, '$firstname', '$lastname', '$mail', $position, '$resp', '$dial', '$faxDial', '$phone', '$gender', '$title', '$pgp')");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
@@ -366,10 +366,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $faxDial = test_input($_POST['edit_contacts_faxDial']);
         $phone = test_input($_POST['edit_contacts_phone']);
         $gender = test_input($_POST['edit_contacts_gender']);
-        $title = test_input($_POST['edit_contacts_titel']);
+        $title = test_input($_POST['edit_contacts_title']);
         $pgp = trim($_POST['edit_contacts_pgp']);
         $conn->query("UPDATE contactPersons SET firstname = '$firstname', lastname = '$lastname', email = '$mail', position = $position, responsibility = '$resp', dial = '$dial',
-            faxDial = '$faxDial', phone = '$phone', form_of_address = '$gender', title = '$title', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
+            faxDial = '$faxDial', phone = '$phone', gender = '$gender', title = '$title', pgpKey = '$pgp' WHERE id = $id AND clientID = $filterClient");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
         } else {
@@ -583,7 +583,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                         $editmodals = '';
                         while ($resultContacts && ($contactRow = $resultContacts->fetch_assoc())) {
                             echo '<tr>';
-                            echo '<td>' . $contactRow['form_of_address']. '</td>';
+                            echo '<td>' . $lang['GENDER_TOSTRING'][$contactRow['gender']]. '</td>';
                             echo '<td>' . $contactRow['title'] . '</td>';
                             echo '<td>' . $contactRow['firstname'] . ' ' . $contactRow['lastname'] . '</td>';
                             echo '<td>' . $contactRow['email'] . '</td>';
@@ -595,8 +595,51 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                             echo '<td><button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
                             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button></td>';
                             echo '</tr>';
-                        }
-                        ?>
+                            $currentmodal = '<form method="POST"><div id="edit-contact-' . $contactRow['id'] . '" class="modal fade">
+						<div class="modal-dialog modal-content modal-md">
+							<div class="modal-header h4">Ansprechpartner Editieren</div>
+							<div class="modal-body">
+								<div class="row form-group">
+									<div class="col-md-6"><label>Vorname</label><input type="text" name="edit_contacts_firstname" value="' . $contactRow['firstname'] . '" class="form-control required-field"/></div>
+									<div class="col-md-6"><label>Nachname</label><input type="text" name="edit_contacts_lastname" value="' . $contactRow['lastname'] . '" class="form-control required-field"/></div>
+								</div>
+								<div class="row form-group">
+                                    <div class="col-md-6"><label>'.$lang['FORM_OF_ADDRESS'].'</label><select name="edit_contacts_gender" class="form-control select2 required-field">
+                                        <option value="male" >Herr</option>
+                                        <option value="female" >Frau</option>
+                                    </select></div>
+									<div class="col-md-6"><label>Titel</label><input type="text" name="edit_contacts_title" value="' . $contactRow['title'] . '" class="form-control "/></div>
+								</div>
+								<div class="row form-group">
+									<div class="col-md-4"><label>E-Mail</label><input type="email" name="edit_contacts_email" value="' . $contactRow['email'] . '" class="form-control required-field"/></div>
+									<div class="col-md-4"><label>Position</label><select type="text" name="edit_contacts_position" placeholder="Position" class="form-control select2-position">';
+                                        $currentmodal .= '<option value="-1" >New...</option>';
+                                            $result = $conn->query("SELECT * FROM position ORDER BY name");
+                                            while($row = $result->fetch_assoc()){
+                                                $currentmodal .= '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
+                                            }
+                                            $currentmodal = str_replace('<option value="'.$contactRow['position'].'" >','<option selected value="'.$contactRow['position'].'" >',$currentmodal);
+                                            $currentmodal .= '</select></div>
+									<div class="col-md-4"><label>Verantwortung</label><input type="text" name="edit_contacts_responsibility" value="' . $contactRow['responsibility'] . '" class="form-control"/></div>
+								</div>
+								<div class="row form-group">
+									<div class="col-md-4"><label>Durchwahl</label><input type="text" name="edit_contacts_dial" value="' . $contactRow['dial'] . '" class="form-control"/></div>
+									<div class="col-md-4"><label>Faxdurchwahl</label><input type="text" name="edit_contacts_faxDial" value="' . $contactRow['faxDial'] . '" class="form-control"/></div>
+									<div class="col-md-4"><label>Mobiltelefon</label><input type="text" name="edit_contacts_phone" value="' . $contactRow['phone'] . '" class="form-control"/></div>
+								</div>
+                                <div class="row form-group">
+                                    <div class="col-md-12"><label>PGP-Key</label><textarea class="form-control" name="edit_contacts_pgp" placeholder="Put PGP Key here..." >'.$contactRow['pgpKey'].'</textarea></div>
+							</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+								<button type="submit" name="editContact" value="' . $contactRow['id'] . '" class="btn btn-warning">' . $lang['SAVE'] . '</button>
+							</div>
+						</div>
+					</div></form>';
+    $editmodals .= str_replace('<option value="'.$contactRow['gender'].'" />','<option selected value="'.$contactRow['gender'].'" />',$currentmodal);
+}
+?>
 					</tbody>
 				</table>
 				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-contact-person" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
@@ -1008,7 +1051,10 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
 		</table>
     </div>
 </div>
+</form>
 
+<?php echo $editmodals ?>
+<form method="POST">
 <!-- ADD CONTACT PERSON -->
 <div id="add-contact-person" class="modal fade">
     <div class="modal-dialog modal-content modal-md">
@@ -1020,10 +1066,10 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
             </div>
             <div class="row form-group">
                 <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="js-example-basic-single required-field">
-                    <option value="Herr" >Herr</option>
-                    <option value="Frau" >Frau</option>
+                    <option value="male" >Herr</option>
+                    <option value="female" >Frau</option>
                 </select></div>
-                <div class="col-md-6"><label>Titel</label><input type="text" name="contacts_titel" class="form-control "/></div>
+                <div class="col-md-6"><label>Titel</label><input type="text" name="contacts_title" class="form-control "/></div>
             </div>
             <div class="row form-group">
                 <div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
@@ -1056,6 +1102,8 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
         </div>
     </div>
 </div>
+</form>
+<form method="POST">
 <!-- ADD PROJECT -->
 <div class="modal fade add-project">
     <div class="modal-dialog modal-content modal-md">

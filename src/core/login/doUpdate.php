@@ -1992,36 +1992,21 @@ if($row['version'] < 137){
     } else {
         echo '<br>Archive User Module';
     }
-    $sql = "ALTER TABLE contactPersons DROP title, DROP gender";
+    $sql = "ALTER TABLE contactPersons DROP titel, DROP form_of_address";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
         echo '<br>Fixing Contact Persons';
     }  
-    $sql = "ALTER TABLE contactPersons CHANGE titel title VARCHAR(20) DEFAULT NULL";
-    $conn->query($sql);
-    $sql = "ALTER TABLE contactPersons CHANGE form_of_address form_of_address ENUM('Herr','Frau') NOT NULL";
-    $conn->query($sql);
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Fixing Contact Persons v2';
-    }
     $sql = "DELETE FROM position";
     $conn->query($sql);
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
-    $conn->query("INSERT INTO position (name) SELECT position FROM contactPersons GROUP BY position");
-    $result = $conn->query("SELECT position FROM contactPersons GROUP BY position");
-    if($result){
-        while($row = $result->fetch_assoc()){
-            $conn->query("UPDATE contactPersons SET position = (SELECT id FROM position WHERE name = '".$row['position']."') WHERE position = '".$row['position']."'");
-        }
-    }
+    $conn->query("UPDATE contactPersons SET position = '';");
     $conn->query("ALTER TABLE contactPersons CHANGE position position INT(6) NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Fixing Contact Persons v3';
+        echo '<br>Fixing Contact Persons v2';
     }
 
     $sql = "ALTER TABLE sharedgroups DROP INDEX url;";
