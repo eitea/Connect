@@ -535,8 +535,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
   <!-- /social settings modal -->
   <?php endif;?>
     <!-- feedback modal -->
-<form method="post" enctype="multipart/form-data" id="feedback_form">
+
     <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+        <form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -576,8 +577,9 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                 </div>
             </div>
         </div>
+            </form>
     </div>
-</form>
+
 <!-- /feedback modal -->
 <?php
 if(!isset($ckIn_disabled)) $ckIn_disabled = '';
