@@ -613,7 +613,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
 								<div class="row form-group">
 									<div class="col-md-4"><label>E-Mail</label><input type="email" name="edit_contacts_email" value="' . $contactRow['email'] . '" class="form-control required-field"/></div>
 									<div class="col-md-4"><label>Position</label><select type="text" name="edit_contacts_position" placeholder="Position" class="form-control select2-position">';
-                                        $currentmodal .= '<option value="-1" >New...</option>';
+                                        $currentmodal .= '<option value="-1" >+ Neu...</option>';
                                             $result = $conn->query("SELECT * FROM position ORDER BY name");
                                             while($row = $result->fetch_assoc()){
                                                 $currentmodal .= '<option value="'.$row['id'].'" >'.$row['name'].'</option>';
@@ -1065,7 +1065,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                 <div class="col-md-6"><label>Nachname</label><input type="text" name="contacts_lastname" placeholder="Nachname" class="form-control required-field"/></div>
             </div>
             <div class="row form-group">
-                <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="js-example-basic-single required-field">
+                <div class="col-md-6"><label><?php echo $lang['FORM_OF_ADDRESS'] ?></label><select name="contacts_gender" class="form-control required-field">
                     <option value="male" >Herr</option>
                     <option value="female" >Frau</option>
                 </select></div>
@@ -1258,6 +1258,9 @@ $('#uidCheck').click(function(e){
     },
     error : function(resp){}
   });
+});
+$(".select2-position").select2({
+    minimumResultsForSearch: Infinity
 });
 $(".select2-position").on("select2:select", function (e) {
     if(e.params.data.id == -1){
