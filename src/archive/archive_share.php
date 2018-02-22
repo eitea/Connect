@@ -5,7 +5,11 @@ $result = $conn->query("SELECT id FROM archiveconfig WHERE isActive = 'TRUE'");
 if($result){
   $enabled = $result->fetch_assoc();
   if(!isset($enabled['id'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
+      if($isCoreAdmin == 'TRUE'){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['UNDEFINED_S3'].'<a href="../system/archive"><strong>Hier Ändern</strong></a></div>';
+      }else{
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['UNDEFINED_S3'].'</div>';
+      }
     include dirname(__DIR__) . '/footer.php';
     return;
   }

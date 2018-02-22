@@ -1291,6 +1291,9 @@ $lang_ger['TYPE'] = 'Art';
 $lang_eng['UNDO'] ='Undo';
 $lang_ger['UNDO'] = 'Rückgängig';
 
+$lang_eng['UNDEFINED_S3'] ='S3 Interface is not defined!';
+$lang_ger['UNDEFINED_S3'] = 'S3 Schnittstelle nicht definiert!';
+
 $lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
 $lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anträge';
 

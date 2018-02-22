@@ -288,6 +288,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
       $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
     }
+    $conn->query($sql);
     if(isset($_POST['canUseClients'.$x])){
       $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
     } else {
@@ -642,10 +643,10 @@ $(document).ready(function(){
                       <label>
                         <input type="checkbox" name="canCreateTasks<?php echo $x; ?>" <?php if($canCreateTasks == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
                       </label>
-<<<<<<< HEAD
+
                       <label>
                         <input type="checkbox" name="canUseArchive<?php echo $x; ?>" <?php if($canUseArchive == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
-=======
+                      </label>
                       <br>
                       <label>
                         <input type="checkbox" name="canUseClients<?php echo $x; ?>" <?php if($canUseClients == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
@@ -653,7 +654,7 @@ $(document).ready(function(){
                       <br>
                       <label>
                         <input type="checkbox" name="canUseSuppliers<?php echo $x; ?>" <?php if($canUseSuppliers == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
->>>>>>> master
+
                       </label>
                     </div>
                   </div>
