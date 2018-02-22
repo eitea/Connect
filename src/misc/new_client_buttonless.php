@@ -8,7 +8,7 @@
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($canEditClients == 'TRUE'){
         if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-            $name = test_input($_POST['create_client_name']);
+            $name = htmlentities($_POST['create_client_name'], ENT_QUOTES, "UTF-8");
             $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
             $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
