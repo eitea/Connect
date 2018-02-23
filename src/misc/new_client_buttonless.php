@@ -8,7 +8,12 @@
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($canEditClients == 'TRUE'){
         if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-            $name = htmlentities($_POST['create_client_name'], ENT_QUOTES, "UTF-8");
+            $input = $_POST['create_client_name'];
+
+            $output = preg_replace_callback("/([^-_@A-Za-z0-9áéíóúýÁÉÍÓÚÝöäüÖÄÜß]+)/", function($m) { return mb_convert_encoding($m[1], "UTF-8", "HTML-ENTITIES"); }, $input);
+
+            /* Plain UTF-8. */
+            $name = $output; 
             $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
             $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
@@ -23,7 +28,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(mysqli_error($conn)){
                 echo mysqli_error($conn);
             } else {
-                echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
+                //echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
             }
         } elseif(isset($_POST['create_client'])){
             echo '<div class="alert alert-danger fade in">';
