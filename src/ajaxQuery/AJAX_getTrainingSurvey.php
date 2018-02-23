@@ -5,6 +5,7 @@ require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 $onLogin = false;
 $doneSurveys = false;
+$hasQuestions = false; // some questions are not valid (invalid syntax)
 if(isset($_REQUEST["onLogin"])){
     $onLogin = true;
 }
@@ -52,6 +53,7 @@ function strip_questions($html){ // this will be the question
 function parse_questions($html){ // this will return an array of questions
     $questionRegex = '/\{.*?\}/s';
     $htmlRegex = '/\<\/*.+?\/*\>/s';
+    global $hasQuestions;
     $html = preg_replace($htmlRegex,"",$html); // strip all html tags
     preg_match($questionRegex,$html,$matches);
     // I only parse the first question for now
@@ -63,6 +65,9 @@ function parse_questions($html){ // this will return an array of questions
     $ret_array = array();
     foreach ($matches[2] as $key => $value) {
         $ret_array[] = array("value"=>$key,"text"=>html_entity_decode($value));
+    }
+    if(sizeof($ret_array) > 0){
+        $hasQuestions = true;
     }
     return $ret_array;
 }
@@ -136,6 +141,9 @@ while ($row = $result->fetch_assoc()){
         "title"=>$row["name"],
         "elements"=>$questionArray,
     );
+}
+if(!$hasQuestions){
+    return;
 }
 ?>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>

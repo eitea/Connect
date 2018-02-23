@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
+        echo $conn->error;
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
@@ -33,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
+        echo $conn->error;
     } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
@@ -55,8 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $random = test_input($_POST["random"]);
         $moduleID = intval($_POST["module"]);
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID WHERE id = $trainingID");
+        echo $conn->error;
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
+        echo $conn->error;
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
+        echo $conn->error;
         if (isset($_POST["employees"])) {
             $employeeID = $teamID = "";
             $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)");
@@ -79,10 +84,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST["createModule"])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
+        echo $conn->error;
         $moduleID = mysqli_insert_id($conn);
-    }elseif (isset($_POST['removeModule'])) {
+    } elseif (isset($_POST['removeModule'])) {
         $moduleID = intval($_POST['removeModule']);
         $conn->query("DELETE FROM dsgvo_training_modules WHERE id = $moduleID");
+        echo $conn->error;
+    } elseif (isset($_POST["jsonImport"])) {
+        $json = json_decode($_POST["jsonImport"], true);
+        foreach ($json as $module) {
+            $name = test_input($module["module"]);
+            $sets = $module["sets"];
+            $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
+            echo $conn->error;
+            $moduleID = mysqli_insert_id($conn);
+            foreach ($sets as $set) {
+                $name = test_input($set["set"]);
+                $version = intval($set["version"]);
+                $onLogin = test_input($set["onlogin"]);
+                $allowOverwrite = test_input($set["allowoverwrite"]);
+                $random = test_input($set["random"]);
+                $questions = $set["questions"];
+                $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
+                echo $conn->error;
+                $trainingID = mysqli_insert_id($conn);
+                foreach ($questions as $question) {
+                    $title = test_input($question["title"]);
+                    $text = $question["text"];
+                    echo "iNSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')<br>";
+                    $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
+                    echo $conn->error;
+                    $stmt->bind_param("s", $text);
+                    $stmt->execute();
+                }
+            }
+        }
     }
 }
 $activeTab = $trainingID;
@@ -92,10 +128,12 @@ echo mysqli_error($conn);
 ?>
 <div class="page-header-fixed">
 <div class="page-header">
-    <h3>Schulungen 
+    <h3>Schulungen
         <div class="page-header-button-group">
-            <button type="button" data-toggle="modal" data-target="#newModuleModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default">+ Modul</button>
-            <button type="button" data-toggle="modal" data-target="#newTrainingModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default">+ Set</button>
+            <button type="button" data-toggle="modal" data-target="#newModuleModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default"><i class="fa fa-plus-square"></i> Modul</button>
+            <button type="button" data-toggle="modal" data-target="#newTrainingModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default"><i class="fa fa-plus-square"></i> Set</button>
+            <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
+            <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
         </div>
     </h3>
 </div>
@@ -104,82 +142,88 @@ echo mysqli_error($conn);
 <div class="container-fluid">
     <?php
 $result_module = $conn->query("SELECT * FROM dsgvo_training_modules");
-while($result_module && ($row_module = $result_module->fetch_assoc())){
+while ($result_module && ($row_module = $result_module->fetch_assoc())) {
     $moduleID = $row_module["id"];
     $moduleName = $row_module["name"];
     ?>
-            <div class="panel panel-default">
-              <div class="panel-heading container-fluid">
-                <div class="col-xs-6"><a data-toggle="collapse" href="#moduleCollapse-<?php echo $moduleID; ?>"><?php echo $moduleName ?></a></div>
-                <div class="col-xs-6 text-right"><form method="post"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeModule" value="<?php echo $moduleID; ?>"><i class="fa fa-trash-o"></i></button></form></div>
-              </div>
-              <div class="collapse <?=$moduleID==$activeModule?'in':''?>" id="moduleCollapse-<?php echo $moduleID; ?>">
-                <div class="panel-body container-fluid">
+<div class="panel panel-default">
+    <div class="panel-heading container-fluid">
+    <div class="col-xs-6"><a data-toggle="collapse" href="#moduleCollapse-<?php echo $moduleID; ?>"><?php echo $moduleName ?></a></div>
+    <div class="col-xs-6 text-right">
+        <form method="post">   
+            <button type="button" style="background:none;border:none;color:black;" name="export" value="<?php echo $moduleID; ?>"><i class="fa fa-download"></i></button>
+            <button type="submit" style="background:none;border:none;color:#d90000;" name="removeModule" value="<?php echo $moduleID; ?>"><i class="fa fa-trash-o"></i></button>
+        </form>
+    </div>
+    </div>
+    <div class="collapse <?=$moduleID == $activeModule ? 'in' : ''?>" id="moduleCollapse-<?php echo $moduleID; ?>">
+    <div class="panel-body container-fluid">
     <?php
-    $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID AND moduleID = $moduleID");
+$result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID AND moduleID = $moduleID");
     while ($result && ($row = $result->fetch_assoc())):
         $trainingID = $row['id'];
         ?>
-            <form method="post">
-                <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
-            <div class="panel panel-default">
-              <div class="panel-heading container-fluid">
-                <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><?php echo $row['name']; ?></a></div>
-                <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button></div>
-              </div>
-              <div class="collapse <?php if ($trainingID == $activeTab) {
+<form method="post">
+    <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
+<div class="panel panel-default">
+    <div class="panel-heading container-fluid">
+    <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><?php echo $row['name']; ?></a></div>
+    <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button></div>
+    </div>
+    <div class="collapse <?php if ($trainingID == $activeTab) {
             echo 'in';
         }
         ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
-                <div class="panel-body container-fluid">
-                    <?php
-    
+						                <div class="panel-body container-fluid">
+						                    <?php
+
         $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
         while ($row_question = $result_question->fetch_assoc()):
             $questionID = $row_question["id"];
             $title = $row_question["title"];
             $text = $row_question["text"];
             ?>
-                             <div class="col-md-4"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
-                             <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
-                             <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
-                        <?php echo $title ?></div>
-                        <?php
-        endwhile;
-    
+            <div class="col-md-12"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
+            <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
+            <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
+    <?php echo $title ?></div>
+    <?php
+    endwhile;
+
         ?>
-    
-                   <div class="col-md-12 float-right">
-                   <div class="btn-group float-right" style="float:right!important">
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
-                    <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
-                    <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
-                    <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
-                   </div>
-                   </div>
-                </div>
-              </div>
+
+            <div class="col-md-12 float-right">
+            <div class="btn-group float-right" style="float:right!important">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
+            <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
+            <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
+            <button type="button" class="btn btn-default" name="testTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-play"></i></button>
+            <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
             </div>
-            <!-- question add modal -->
-             <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
-              <div class="modal-dialog modal-content modal-md">
-                <div class="modal-header">Neue Aufgabenstellung/Schulung</div>
-                <div class="modal-body">
-                    <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
-                    <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-                  <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">Frage erstellen</button>
-                </div>
-              </div>
             </div>
-            <!-- /question add modal -->
-        </form>
-    
-          <?php endwhile;?>
+        </div>
+        </div>
+    </div>
+    <!-- question add modal -->
+        <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
+        <div class="modal-dialog modal-content modal-md">
+        <div class="modal-header">Neue Aufgabenstellung/Schulung</div>
+        <div class="modal-body">
+            <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
+            <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">Frage erstellen</button>
+        </div>
+        </div>
+    </div>
+    <!-- /question add modal -->
+</form>
+
+    <?php endwhile;?>
 </div></div></div>
-<?php } ?>
+<?php }?>
 </div>
 
 <!-- new training modal -->
@@ -196,14 +240,14 @@ while($result_module && ($row_module = $result_module->fetch_assoc())){
         <input type="text" class="form-control" name="name" placeholder="Name des Sets" required/>
         <label>Modul*</label>
         <select class="js-example-basic-single" name="module" required>
-            <?php 
-            $result = $conn->query("SELECT * FROM dsgvo_training_modules");
-            while ($result && ($row = $result->fetch_assoc())) {
-                $name = $row["name"];
-                $id = $row["id"];
-                echo "<option value='$id'>$name</option>";
-            }
-            ?>
+            <?php
+$result = $conn->query("SELECT * FROM dsgvo_training_modules");
+while ($result && ($row = $result->fetch_assoc())) {
+    $name = $row["name"];
+    $id = $row["id"];
+    echo "<option value='$id'>$name</option>";
+}
+?>
             </select>
         </div>
         <div class="modal-footer">
@@ -273,6 +317,12 @@ $("button[name=infoTraining]").click(function(){
 })
 $("button[name=detailedInfoTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoDetailedTrainingInfo.php')
+})
+$("button[name=importExport]").click(function(){
+    setCurrentModal({operation: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingImportExport.php')
+})
+$("button[name=export]").click(function(){
+    setCurrentModal({operation:"export",module: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingImportExport.php')
 })
 </script>
 
