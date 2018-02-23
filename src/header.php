@@ -736,7 +736,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         </ul>
                     </div>
                 </li>
-                <li><a <?php if ((($canUseClients != 'TRUE' || $canEditClients != 'TRUE') &&$this_page == "editCustomers.php")) {echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                <li><a href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
                   <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
@@ -770,7 +770,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || (($canUseClients != 'TRUE' || $canEditClients != 'TRUE') &&$this_page == "editCustomers.php") || $this_page == "editCustomer_detail.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomer_detail.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
@@ -874,7 +874,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                           <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                           <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                          <li><a <?php if ($this_page == 'editCustomers.php' && ($canUseClients != 'TRUE' || $canEditClients != 'TRUE')) {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                          <li><a href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
                       </ul>
                   </div>
                 </li>
@@ -885,7 +885,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <ul class="nav nav-list">
                       <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
                       <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editSuppliers.php' &&  ($canUseSuppliers != 'TRUE' && $canEditSuppliers != 'TRUE')) {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                      <li><a href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -928,10 +928,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if (($canUseClients != 'TRUE' || $canEditClients != 'TRUE') && (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php")) {
+        if ($this_page == "erp_view.php" || $this_page == "erp_process.php") {
             echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
-        } elseif ( ($canUseSuppliers != 'TRUE' && $canEditSuppliers != 'TRUE') && $this_page == "editSuppliers.php") {
-            echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
         } elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
             echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
