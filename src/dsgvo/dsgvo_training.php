@@ -329,6 +329,9 @@ $("button[name=importExport]").click(function(){
 $("button[name=export]").click(function(){
     setCurrentModal({operation:"export",module: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingImportExport.php')
 })
+$("button[name=testTraining]").click(function(){
+    setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingTest.php')
+})
 </script>
 
 <script>
