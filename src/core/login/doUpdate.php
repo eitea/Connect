@@ -2081,6 +2081,20 @@ if($row['version'] < 138){
     } else {
         echo '<br>Training: module constraint';
     }
+    // add previous trainings to a module (can't be displayed otherwise)
+    $sql = "INSERT INTO dsgvo_training_modules (name) VALUES ('before module update')";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: add new module';
+    }
+    $moduleID = mysqli_insert_id($conn);
+    $sql = "UPDATE dsgvo_training SET moduleID = $moduleID";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: add to new module';
+    }
 }
 
 // ------------------------------------------------------------------------------
