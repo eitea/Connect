@@ -2,7 +2,7 @@
     require dirname(dirname(__DIR__)) . "/plugins/aws/autoload.php";
     function getS3Config(){
         require dirname(__DIR__) . "/connection.php";
-        $config = $conn->query("SELECT * FROM archiveconfig");
+        $config = $conn->query("SELECT * FROM archiveconfig WHERE isActive = 'TRUE'");
         if(isset($config)){
             $row = $config->fetch_assoc();
             if(isset($row['endpoint'])){
@@ -17,7 +17,10 @@
     function addS3Config($server,$key,$secret){
         require dirname(__DIR__) . "/connection.php";
         try{
-            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret) VALUES ('$server','$key','$secret')");
+            $active = 'FALSE';
+            $result = $conn->query("SELECT id FROM archiveconfig");
+            if($result->num_rows<1) $active = 'TRUE';
+            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive) VALUES ('$server','$key','$secret','$active')");
             return true;
         }catch(Exception $e){
             return false;
@@ -27,7 +30,7 @@
     function clearS3Config(){
         require dirname(__DIR__) . "/connection.php";
         try{
-            $conn->query("UPDATE archiveconfig SET endpoint=null, awskey=null, secret=null");
+            $conn->query("DELETE FROM archiveconfig");
             return true;
         }catch(Exception $e){
             return false;

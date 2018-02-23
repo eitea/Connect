@@ -163,18 +163,17 @@ if($x){
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-2">
-                                <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                    <label>Skill Minimum</label>
-                                    <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-2">
-                                <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                    <label>Level</label>
-                                    <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
-                                    <?php endif; ?>
-                                </div>
+                                <div class="col-md-4">
+                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
+                                <select class="form-control js-example-basic-single" name="priority">
+                                    <?php
+                                    for($i = 1; $i < 6; $i++){
+                                        $selected = $dynrow['projectpriority'] == $i ? 'selected' : '';
+                                        echo '<option value="'.$i.'" '.$selected.'>'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
+                                    }
+                                    ?>
+                                </select><br>
+                            </div>
                                 <div class="col-md-4">
                                     <label>Geschätzte Zeit <a data-toggle="collapse" href="#estimateCollapse-<?php echo $x; ?>"><i class="fa fa-question-circle-o"></i></a></label>
                                     <input type="text" class="form-control" value="<?php echo $dynrow['estimatedHours']; ?>" name="estimatedHours" /><br>
@@ -210,22 +209,25 @@ if($x){
                                 </select><small>Tags werden durch ',' oder ' ' automatisch getrennt.</small><br><br>
                             </div>
                             <div class="col-md-12">
-                                <label><?php echo $lang["DESCRIPTION"]; ?>*</label>
-                                <textarea class="form-control projectDescriptionEditor" name="description" maxlength="20000" ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
+                                <textarea class="form-control projectDescriptionEditor" name="description"  ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>
                         <div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>
                             <div class="col-md-6">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
-                                <select class="form-control js-example-basic-single" name="priority">
-                                    <?php
-                                    for($i = 1; $i < 6; $i++){
-                                        $selected = $dynrow['projectpriority'] == $i ? 'selected' : '';
-                                        echo '<option value="'.$i.'" '.$selected.'>'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
-                                    }
-                                    ?>
-                                </select><br>
+                                <div class="col-md-6">
+                                    <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                        <label>Skill Minimum</label>
+                                        <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                        <label>Level</label>
+                                        <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
+                                        <?php endif; ?>
+                                    </div>
                             </div>
                             <div class="col-md-6">
                                 <label>Status*</label>

@@ -16,7 +16,7 @@ $routes = array(
   'system/designer' => 'core/system/templateSelect.php',                 'system/clients' => 'core/system/editCustomers.php',              'system/clientDetail' => 'core/system/editCustomer_detail.php',
   'system/previewTem' => 'core/system/templatePreview.php',              'system/downloadTem' => 'core/system/templateDownload.php',       'system/editTemp' => 'core/system/templateEdit.php',
   'system/downloadSql' => 'core/system/system_backup_download.php',      'system/cryptlog'=> 'core/system/viewCryptLog.php',               'system/restic' => 'core/system/resticBackup.php',
-  'system/checkinLogs' => 'core/system/checkinLogs.php',
+  'system/checkinLogs' => 'core/system/checkinLogs.php',                 'system/archive' => 'core/system/archiveOptions.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
@@ -40,10 +40,7 @@ $routes = array(
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
-  'archive/getFolderContent' => 'archive/getFolderContent.php',     'private/files'   => 'archive/private_files.php',
-  'archive/options' => 'archive/archive_options.php',
-
-  'upload/file' => 'archive/uploadToS3.php',
+  'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
 );
 $mime_types = array(
   '.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",

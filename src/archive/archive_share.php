@@ -1,11 +1,15 @@
 <?php include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
-$result = $conn->query("SELECT endpoint FROM archiveconfig");
+$result = $conn->query("SELECT id FROM archiveconfig WHERE isActive = 'TRUE'");
 if($result){
   $enabled = $result->fetch_assoc();
-  if(!isset($enabled['endpoint'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Modul Nicht Aktiv <a href="../system/advanced"><strong>Hier Ändern</strong></a></div>';
+  if(!isset($enabled['id'])){
+      if($isCoreAdmin == 'TRUE'){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['UNDEFINED_S3'].'<a href="../system/archive"><strong>Hier Ändern</strong></a></div>';
+      }else{
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['UNDEFINED_S3'].'</div>';
+      }
     include dirname(__DIR__) . '/footer.php';
     return;
   }

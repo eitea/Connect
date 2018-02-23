@@ -1309,7 +1309,6 @@ function create_tables($conn) {
         files varchar(200) DEFAULT NULL,
         company int(11) NOT NULL COMMENT 'Mandant',
         PRIMARY KEY (id),
-        UNIQUE KEY url (uri),
         KEY owner (owner)
     )";
     if (!$conn->query($sql)) {
@@ -1527,5 +1526,15 @@ function create_tables($conn) {
         echo $conn->error;
     }else{
         $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
+    }
+    
+    $sql = "CREATE TABLE emailprojectlogs(
+        id int(11) NOT NULL AUTO_INCREMENT,
+        timeofoccurence timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        body longtext,
+        PRIMARY KEY (id)
+        )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
     }
 }

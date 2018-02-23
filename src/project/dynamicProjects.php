@@ -37,7 +37,18 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 <div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
     <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
-    <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?> <button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" type="button"><i class="fa fa-plus"></i></button><?php endif; ?>
+    <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
+            <div class="dropdown" style="display:inline;">
+                <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
+                    <div class="container-fluid">
+                        <li ><button class="btn btn-default form-control" data-toggle="modal" data-target="#editingModal-" >New</button></li>
+                        <li class="divider"></li>
+                        <li ><button class="btn btn-default form-control" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
+                    </div>
+                </ul>
+            </div>
+ <?php endif; ?>
 </div></h3></div>
 </div>
 <div class="page-content-fixed-100">
@@ -76,16 +87,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $result = $conn->query("SELECT clientprojectid, needsreview FROM dynamicprojects WHERE projectid = '$x'");
         if(!test_Time($end) || !test_Time($start) || !$result){
             echo "invalid time format or project id";
-        }else{
+        } else {
             $row = $result->fetch_assoc();
             $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
             $description = test_input($_POST['description']);
             $startDate = $date." ".$start;
             $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-        
+
             $endDate = $date." ".$end;
             $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-            
+
             if(timeDiff_Hours($startDate, $endDate) < 0){
                 $endDate = carryOverAdder_Hours($endDate, 24);
                 $date = substr($endDate, 0, 10);
@@ -106,7 +117,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 VALUES('$startDate', '$endDate', $projectID, $indexIM, '$description', '$percentage% Abgeschlossen', 'project', '$dynamicID')";
                 $conn->query($sql);
                 echo $conn->error;
-            }else{
+            } else {
                 echo "invalid time";
             }
         }
@@ -169,7 +180,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
-            if($isDynamicProjectsAdmin != 'TRUE') echo '<script>console.log(\''.json_encode($_POST).'\')</script>';
             if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
@@ -182,7 +192,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
-
+                echo "<script>console.log('".strlen($description)."')</script>";
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
                         $mname = strip_tags($matches[1][$i]);
@@ -219,7 +229,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
                 if(!empty($_POST['projecttags'])){
                     $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
-                }else{
+                } else {
                     $tags = '';
                 }
 
@@ -228,10 +238,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } elseif ($end == "date") {
                     $end = $_POST["enddate"] ?? "";
                 }
-                while(strlen($description) > 65000){
-                    $description = substr($description, 0, -1000); //truncate the last characters
-                }
 
+                
+                
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -326,12 +335,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
 
-        $stmt_team = $conn->prepare("SELECT name FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
+        $stmt_team = $conn->prepare("SELECT name, teamid FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
             ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with AJAX_dynamicInfo.php
         $stmt_viewed->bind_param('s', $x);
-        $stmt_employee = $conn->prepare("SELECT CONCAT(firstname, ' ', lastname) as name FROM dynamicprojectsemployees INNER JOIN UserData ON UserData.id = userid WHERE projectid = ? ");
+        $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
         $stmt_booking->bind_param('s', $x);
@@ -357,14 +366,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
 
+            $selection = array('user;'.$row['projectowner'], 'user;'.$row['projectleader']);
+            $employees = array();
             $stmt_team->execute();
-            $employees = array_column($stmt_team->get_result()->fetch_all(), 0);
-            $stmt_employee->execute();
-            $employees = array_merge($employees, array_column($stmt_employee->get_result()->fetch_all(), 0));
-
-            if(!empty($filterings['employees'])){
-                
+            $emp_result = $stmt_team->get_result();
+            while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['teamid']){
+                $employees[] = $emp_row['name'];
+                $selection[] = 'team;'.$emp_row['teamid'];
             }
+
+            $stmt_employee->execute();
+            $emp_result = $stmt_employee->get_result();
+            while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['userid']){
+                $employees[] = $userID_toName[$emp_row['userid']];
+                $selection[] = 'user;'.$emp_row['userid'];
+            }
+
+            if(!array_intersect($filterings['employees'], $selection)) continue;
 
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -469,7 +487,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <!--/training-->
     </tbody>
 </table>
-
+    <div id="selectTemplate" >
+        <div class="modal fade" id="template-list-modal">
+            <div class="modal-dialog modal-content modal-sm">
+                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "TEMPLATES" ?></div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        PLACEHOLDER
+<!--                        <label>Select Template</label>
+                        <select class="form-control select2-templates" >
+                            <option value="-1" >New...</option>
+                        </select>-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="activateTemplate(event)" ><?php echo $lang['APPLY']; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
 <div id="editingModalDiv">
     <?php if($occupation): ?>
     <div class="modal fade" id="dynamic-booking-modal">
@@ -646,6 +683,9 @@ function dynamicOnLoad(modID){
     $(".js-example-tokenizer").select2({
         tags: true,
         tokenSeparators: [',', ' ']
+    });
+    $(".select2-templates").select2({
+        minimumResultsForSearch: Infinity
     });
     $('[data-toggle="tooltip"]').tooltip();
     tinymce.init({
@@ -859,12 +899,30 @@ function showProjects(client, project, place){
         });
     }
 }
-
+ function activateTemplate(event){
+    id = $(".select2-templates").select2('data');
+    if(id === -1){
+        //Create new Template
+    }else{
+        $("#template-list-modal").modal('hide');
+        //Get Template Data
+        //Fill editingModal- with data
+        //open editingModal-
+    }
+ }
   function checkInput(event){
       //check Input
     console.log(event);
     if(tinymce.activeEditor.getContent()==""){
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
+        return false;
+    }
+    
+    if(tinymce.activeEditor.getContent().length>(<?php
+        $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
+        $maxSQL = $max->fetch_assoc();
+        echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
+        alert("Description Too Big");
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
@@ -897,6 +955,7 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
         }
    });
 })
+
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

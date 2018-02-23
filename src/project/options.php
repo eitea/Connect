@@ -1,7 +1,6 @@
 <?php
 require dirname(__DIR__) . '/header.php';
 include dirname(__DIR__) . "/misc/helpcenter.php";
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
         $id = ($_POST['delete']);
@@ -45,14 +44,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 ?>
-<div class="page-header-fixed">
 <div class="page-header"><h3><?php echo $lang['PROJECT_OPTIONS']; ?>
   <div class="page-header-button-group">
     <button type="button" data-toggle="modal" data-target="#new-account" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
   </div>
 </h3></div>
-</div>
-<div class="page-content-fixed-130">
 
 <table class="table">
   <thead><tr>
@@ -122,11 +118,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <div class="row">
                     <div class="col-md-6">
                         <label>Username</label>
-                        <input autocomplete="off" type="email" class="form-control" name="username" id="username"/>
+                        <input type="email" class="form-control" name="username" id="username"/>
                     </div>
                     <div class="col-md-6">
                         <label>Password</label>
-                        <input autocomplete="off" type="password" class="form-control" name="password" id="password"/>
+                        <input type="text" class="form-control password" name="password" id="password"/>
                     </div>
                 </div>
             </div>
@@ -320,7 +316,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <select id="Priority" class="form-control js-example-basic-single" name="priority">
                                 <?php
                                 for($i = 1; $i < 6; $i++){
-
                                     echo '<option value="'.$i.'">'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
                                 }
                                 ?>
@@ -575,6 +570,4 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         });
     }
 </script>
-
-</div>
 <?php include dirname(__DIR__) . '/footer.php';?>
