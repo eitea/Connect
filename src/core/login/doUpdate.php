@@ -2058,7 +2058,7 @@ if($row['version'] < 137){
         echo '<br>Role: Can edit suppliers';
     }
 }
-if($row['version'] < 137){
+if($row['version'] < 138){
     $sql = "CREATE TABLE dsgvo_training_modules (
         id int(6) NOT NULL AUTO_INCREMENT,
         name varchar(100),
