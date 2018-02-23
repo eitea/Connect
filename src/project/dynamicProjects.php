@@ -695,6 +695,7 @@ function dynamicOnLoad(modID){
         paste_data_images: true,
         menubar: false,
         statusbar: false,
+        browser_spellcheck: true,
         height: 300,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
