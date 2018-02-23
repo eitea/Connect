@@ -9,6 +9,11 @@ enableToDSGVO($userID);?>
 // A question is a text with different answers
 
 $trainingID = 0;
+if(!isset($_REQUEST["n"])){
+    echo "no company";
+    include dirname(__DIR__) . '/footer.php';
+    die();
+}
 $companyID = intval($_REQUEST['n']);
 $moduleID = 0;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -141,7 +146,7 @@ echo mysqli_error($conn);
 <div class="page-content-fixed-130">
 <div class="container-fluid">
     <?php
-$result_module = $conn->query("SELECT * FROM dsgvo_training_modules");
+$result_module = $conn->query("SELECT * FROM dsgvo_training_modules INNER JOIN dsgvo_training ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE dsgvo_training.companyID = $companyID");
 while ($result_module && ($row_module = $result_module->fetch_assoc())) {
     $moduleID = $row_module["id"];
     $moduleName = $row_module["name"];
