@@ -397,7 +397,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt_time->execute();
             $currentTime = 0;
             if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
-            echo generate_progress_bar(floatval($currentTime),floatval($row["estimatedHours"])); // generate_progress_bar($cur,$estimate): string
+            echo generate_progress_bar(floatval($currentTime),floatval(getEstimatedHours($row["estimatedHours"]))); // generate_progress_bar($cur,$estimate): string
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
