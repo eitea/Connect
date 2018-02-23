@@ -18,7 +18,7 @@ if($result){
                     echo $subject .' - found<br>';
                     $id = uniqid();
                     $null = null;
-                    $name = str_replace($rule['identifier'],"",$subject);
+                    $name = str_replace($rule['identifier'],"",$subject,1);
                     $description = convToUTF8($mail->textHtml);
                     $attachments = $mail->getAttachments();
                     foreach($attachments as $attach){ //easy custom rawData
