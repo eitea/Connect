@@ -6,7 +6,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $server = $_POST['server'];
         $aKey = $_POST['aKey'];
         $sKey = $_POST['sKey'];
-        require dirname(__DIR__) . "/misc/useS3Config.php";
+        $name = test_input($_POST['name']);
+        require dirname(dirname(__DIR__)) . "/misc/useS3Config.php";
         if (isset($_POST['server'])) {
             try{
                 $credentials = array('key' => $aKey, 'secret' => $sKey);
@@ -19,7 +20,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 );
                 $test = new Aws\S3\S3Client($testconfig);
                 $test->listBuckets();
-                if(!addS3Config($server,$aKey,$sKey)){
+                if(!addS3Config($server,$aKey,$sKey,$name)){
                     throw new S3Exception("Ups! Something went wrong");
                 }
             } catch(Exception $e) {
@@ -49,6 +50,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
     <table class="table" id="configTable">
         <thead>
             <tr>
+                <td><label>Name</label></td>
                 <td><label>Addresse</label></td>
                 <td><label>Key</label></td>
                 <td><label>Active</label></td>
@@ -60,6 +62,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
                     $checked = '';
                     if($row['isActive']=="TRUE") $checked = 'checked';
                     echo '<tr>';
+                    echo '<td>'.$row['name'].'</td>';
                     echo '<td>'.$row['endpoint'].'</td>';
                     echo '<td>'.$row['awskey'].'</td>';
                     echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
@@ -74,6 +77,7 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
         <div class="modal-dialog modal-content modal-sm">
             <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
             <div class="modal-body">
+                <div class="col-md-12"><label>Name</label><input class="form-control" name="name"><br></div>
                 <div class="col-md-12"><label>Server</label><input class="form-control" name="server"><br></div>
                 <div class="col-md-12"><label>Access Key</label><input class="form-control" name="aKey"><br></div>
                 <div class="col-md-12"><label>Secret Key</label><input class="form-control" name="sKey"><br></div>
