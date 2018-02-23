@@ -16,6 +16,8 @@ If you want to make packages available globally (outside webpack), use the https
 
 Your browser may cache the bundle file. To prevent this, go to DevTools > network tab > check "Disable cache".
 
+Add new packages with `npm i package-name`.
+
 ```js
 const somePackage = require("some-package");
 window.somePackage = somePackage; // somePackage would be available everywhere (this will be removed after all existing js is defined in /src/js)
