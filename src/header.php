@@ -546,16 +546,16 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                 <div class="modal-body">
                     <!-- modal body -->
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have a problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I found a bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I want an additional feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Additional Feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have positive feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Positive Feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
                     </div>
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
