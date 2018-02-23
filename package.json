@@ -1,0 +1,29 @@
+{
+  "name": "connect",
+  "version": "1.138.0",
+  "description": "Timemanagement (Zeiterfassung, Urlaub) als opensource app. Entwickelt durch ei-tea partner gmbh",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eitea/Connect.git"
+  },
+  "keywords": [
+    "connect"
+  ],
+  "author": "ei-tea partner gmbh",
+  "bugs": {
+    "url": "https://github.com/eitea/Connect/issues"
+  },
+  "homepage": "https://github.com/eitea/Connect#readme",
+  "dependencies": {
+    "bootstrap": "^4.0.0",
+    "expose-loader": "^0.7.4",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.12.9",
+    "webpack": "^3.11.0"
+  }
+}
