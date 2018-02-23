@@ -8,12 +8,8 @@
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($canEditClients == 'TRUE'){
         if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-            $input = $_POST['create_client_name'];
+            $name = test_input($_POST['create_client_name']);
 
-            $output = preg_replace_callback("/([^-_@A-Za-z0-9áéíóúýÁÉÍÓÚÝöäüÖÄÜß]+)/", function($m) { return mb_convert_encoding($m[1], "UTF-8", "HTML-ENTITIES"); }, $input);
-
-            /* Plain UTF-8. */
-            $name = $output; 
             $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
             $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";

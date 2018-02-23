@@ -56,11 +56,18 @@ return($result && $result->num_rows>0);
 }
  */
 
+
+
+
+
 function test_input($data, $strong = false) {
+    //REGEXString
+    $regex_names = "/([^-_@A-Za-z0-9áàȧâäǟǎăāãåǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ ẹġĝǧğg̃ ģĥḥíìiîïǐĭīĩịĵķǩĺļľŀḽm̂ m̄ ŉńn̂ ṅn̈ ňn̄ ñņṋóòôȯȱöȫǒŏōõȭőọǿơp̄ ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯÁÀȦÂÄǞǍĂĀÃÅǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ ẸĠĜǦĞG̃ ĢĤḤÍÌIÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂ M̄ ʼNŃN̂ ṄN̈ ŇN̄ ÑŅṊÓÒÔȮȰÖȪǑŎŌÕȬŐỌǾƠP̄ ŔŘŖŚŜṠŠŞṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮß]+)/";
     if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
     } else {
-        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+        //$data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data); OLD TEST
+        $data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
     $data = trim($data);
     return $data;
