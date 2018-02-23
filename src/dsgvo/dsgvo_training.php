@@ -146,7 +146,7 @@ echo mysqli_error($conn);
 <div class="page-content-fixed-130">
 <div class="container-fluid">
     <?php
-$result_module = $conn->query("SELECT * FROM dsgvo_training_modules INNER JOIN dsgvo_training ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE dsgvo_training.companyID = $companyID");
+$result_module = $conn->query("SELECT dsgvo_training_modules.id, dsgvo_training_modules.name FROM dsgvo_training_modules LEFT JOIN dsgvo_training ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE dsgvo_training.companyID = $companyID OR dsgvo_training.companyID IS NULL GROUP BY dsgvo_training_modules.id");
 while ($result_module && ($row_module = $result_module->fetch_assoc())) {
     $moduleID = $row_module["id"];
     $moduleName = $row_module["name"];
