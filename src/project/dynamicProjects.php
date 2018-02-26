@@ -389,7 +389,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $selection[] = 'user;'.$emp_row['userid'];
             }
 
-            if(!array_intersect($filterings['employees'], $selection)) continue;
+            if(count($filterings['employees']) && !array_intersect($filterings['employees'], $selection)) continue;
 
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();

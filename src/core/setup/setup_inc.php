@@ -104,7 +104,9 @@ function create_tables($conn) {
         detailMiddle VARCHAR(120),
         detailRight VARCHAR(120),
         uid VARCHAR(20),
-        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        publicPGPKey TEXT,
+        privatePGPKey TEXT
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1414,7 +1416,7 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE dsgvo_training (
         id int(6) NOT NULL AUTO_INCREMENT,
         name varchar(100),
@@ -1524,10 +1526,10 @@ function create_tables($conn) {
 
     if(!$conn->query($sql)){
         echo $conn->error;
-    }else{
+    } else {
         $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
     }
-    
+
     $sql = "CREATE TABLE emailprojectlogs(
         id int(11) NOT NULL AUTO_INCREMENT,
         timeofoccurence timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1537,4 +1539,30 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+
+    $sql = "CREATE TABLE security_modules(
+        userID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        privatePGPKey TEXT NOT NULL,
+        publicPGPKey TEXT NOT NULL,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+
+
+    $sql = "CREATE TABLE security_user(
+        userID INT(6) UNSIGNED,
+        key TEXT NOT NULL,
+        module VARCHAR(50) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+
+
+
 }

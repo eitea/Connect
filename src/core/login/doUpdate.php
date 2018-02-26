@@ -1997,7 +1997,7 @@ if($row['version'] < 137){
         echo $conn->error;
     } else {
         echo '<br>Fixing Contact Persons';
-    }  
+    }
     $sql = "DELETE FROM position";
     $conn->query($sql);
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
@@ -2032,7 +2032,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Bigger Task Description (Max. 15MB)';
     }
-    
+
     $sql = "ALTER TABLE roles ADD COLUMN canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -2081,6 +2081,57 @@ if($row['version'] < 138){
     } else {
         echo '<br>Training: module constraint';
     }
+}
+
+if($row['version'] < 139){
+    $conn->query("ALTER TABLE configurationData ADD COLUMN firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Setup: Installation Wizard';
+    }
+    $conn->query("UPDATE configurationData SET firstTimeWizard = 'TRUE'");
+
+    $conn->query("ALTER TABLE companyData ADD COLUMN publicPGPKey TEXT");
+
+    $conn->query("ALTER TABLE companyData ADD COLUMN privatePGPKey TEXT");
+    if ($conn->error) {
+        $conn->error;
+    } else {
+        echo '<br>Security Update: Mandanten Keys';
+    }
+
+    $sql = "CREATE TABLE security_modules(
+        userID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        privatePGPKey TEXT NOT NULL,
+        publicPGPKey TEXT NOT NULL,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: Module Keys';
+    }
+
+    $sql = "CREATE TABLE security_user(
+        userID INT(6) UNSIGNED,
+        key TEXT NOT NULL,
+        module VARCHAR(50) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: User Keys';
+    }
+
 }
 
 // ------------------------------------------------------------------------------

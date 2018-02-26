@@ -57,9 +57,10 @@ if ($result) {
 } else {
     echo $conn->error;
 }
-$result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
+$result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum, firstTimeWizard FROM configurationData");
 if ($result) {
     $row = $result->fetch_assoc();
+    if($row['firstTimeWizard'] == 'FALSE'){ redirect('../setup/wizard'); }
     $showReadyPlan = $row['enableReadyCheck'];
     $masterPasswordHash = $row['masterPassword'];
     $masterPass_checkSum = $row['checkSum']; //ABCabc123!
@@ -118,7 +119,7 @@ $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur
         LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-        WHERE userID = $userID 
+        WHERE userID = $userID
         AND NOT EXISTS (
                  SELECT userID
                  FROM dsgvo_training_completed_questions
@@ -311,32 +312,31 @@ if ($_SESSION['color'] == 'light') {
         document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
-    }
-    <?php
-if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
-    $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-    if ($result) {
-        $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
-        if ($privateDecoded != false) {
-            $unlockedPGP = $privateDecoded;
-            echo 'document.getElementById("options").click();';
-        }
-    }
-}
-?>
+  }
+  <?php
+  if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
+      $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
+      if ($result) {
+          $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
+          if ($privateDecoded != false) {
+              $unlockedPGP = $privateDecoded;
+              echo 'document.getElementById("options").click();';
+          }
+      }
+  }
+  ?>
   });
   function generateKeys($userID){
-    $.ajax({
-      type: "POST",
-      url: "ajaxQuery/AJAX_pgpKeyGen.php",
-      data: { userID: $userID}
-    }).done(function(keys){
-      keys = JSON.parse(keys);
-      document.getElementsByName('privatePGP')[0].value = keys[0];
-      document.getElementsByName('publicPGP')[0].value = keys[1];
-    })
+      $.ajax({
+          type: "POST",
+          url: "ajaxQuery/AJAX_pgpKeyGen.php",
+          data: { userID: $userID}
+      }).done(function(keys){
+          keys = JSON.parse(keys);
+          document.getElementsByName('privatePGP')[0].value = keys[0];
+          document.getElementsByName('publicPGP')[0].value = keys[1];
+      });
   }
-
   function clearPGP(){
     document.getElementsByName('privatePGP')[0].value = '';
   }
@@ -427,8 +427,6 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
           </div>
       </div>
   </div>
-
-  <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
   <!-- modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
@@ -621,7 +619,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
     if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
-    // only display surveys when user is stamped in 
+    // only display surveys when user is stamped in
     $userHasUnansweredOnLoginSurveys = false;
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
