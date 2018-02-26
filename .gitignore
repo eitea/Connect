@@ -8,4 +8,3 @@ backup.sql
 src/connection_s3admin.php
 plugins/dompdf/dompdf/dompdf/lib/fonts/*
 /nbproject/*
-node_modules

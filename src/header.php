@@ -281,8 +281,7 @@ if ($_SESSION['color'] == 'light') {
   <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
-  <!-- <script src="plugins/jQuery/jquery.min.js"></script> -->
-  <script src="plugins/webpack/bundle.js"></script>
+  <script src="plugins/jQuery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
