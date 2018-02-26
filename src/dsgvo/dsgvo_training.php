@@ -10,7 +10,7 @@ enableToDSGVO($userID);?>
 
 $trainingID = 0;
 if(!isset($_REQUEST["n"])){
-    echo "no company";
+    showError("no company");
     include dirname(__DIR__) . '/footer.php';
     die();
 }
@@ -21,35 +21,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
+        showError($conn->error);
         $trainingID = mysqli_insert_id($conn);
     } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
-        echo $conn->error;
+        showError($conn->error);
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
-        echo $conn->error;
+        showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
-        echo $stmt->error;
+        showError($stmt->error);
     } elseif (isset($_POST["removeQuestion"])) {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
-        echo $conn->error;
+        showError($conn->error);
     } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
-        echo "question text hasn't been sanitized";
+        showInfo("question text hasn't been sanitized");
         $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title' WHERE id = $questionID");
-        echo $conn->error;
+        showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
-        echo $stmt->error;
+        showError($stmt->error);
     } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
         $version = 1;
@@ -62,17 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $random = test_input($_POST["random"]);
         $moduleID = intval($_POST["module"]);
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID WHERE id = $trainingID");
-        echo $conn->error;
+        showError($conn->error);
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
-        echo $conn->error;
+        showError($conn->error);
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
-        echo $conn->error;
+        showError($conn->error);
         if (isset($_POST["employees"])) {
             $employeeID = $teamID = "";
             $stmtUser = $conn->prepare("INSERT INTO dsgvo_training_user_relations (trainingID, userID) VALUES ($trainingID, ?)");
-            echo $conn->error;
+            showError($conn->error);
             $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)");
-            echo $conn->error;
+            showError($conn->error);
             $stmtUser->bind_param("i", $employeeID);
             $stmtTeam->bind_param("i", $teamID);
             foreach ($_POST["employees"] as $employee) {
@@ -89,19 +90,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST["createModule"])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-        echo $conn->error;
+        showError($conn->error);
         $moduleID = mysqli_insert_id($conn);
     } elseif (isset($_POST['removeModule'])) {
         $moduleID = intval($_POST['removeModule']);
         $conn->query("DELETE FROM dsgvo_training_modules WHERE id = $moduleID");
-        echo $conn->error;
+        showError($conn->error);
     } elseif (isset($_POST["jsonImport"])) {
         $json = json_decode($_POST["jsonImport"], true);
         foreach ($json as $module) {
             $name = test_input($module["module"]);
             $sets = $module["sets"];
             $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-            echo $conn->error;
+            showError($conn->error);
             $moduleID = mysqli_insert_id($conn);
             foreach ($sets as $set) {
                 $name = test_input($set["set"]);
@@ -111,14 +112,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $random = test_input($set["random"]);
                 $questions = $set["questions"];
                 $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
-                echo $conn->error;
+                showError($conn->error);
                 $trainingID = mysqli_insert_id($conn);
                 foreach ($questions as $question) {
                     $title = test_input($question["title"]);
                     $text = $question["text"];
-                    echo "iNSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')<br>";
                     $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
-                    echo $conn->error;
+                    showError($conn->error);
                     $stmt->bind_param("s", $text);
                     $stmt->execute();
                 }
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $activeTab = $trainingID;
 $activeModule = $moduleID;
 //todo select module where trainingid and make that active
-echo mysqli_error($conn);
+showError($conn->error);
 ?>
 <div class="page-header-fixed">
 <div class="page-header">
