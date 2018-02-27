@@ -2096,6 +2096,20 @@ if($row['version'] < 138){
         echo '<br>Training: add to new module';
     }
 }
+if($row['version'] < 139){
+    $sql = "ALTER TABLE dsgvo_training_completed_questions ADD COLUMN lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: last answered';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD COLUMN answerEveryNDays int(6)";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: answer every n days';
+    }
+}
 
 // ------------------------------------------------------------------------------
 

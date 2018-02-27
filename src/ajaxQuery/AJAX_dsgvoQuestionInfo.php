@@ -10,7 +10,7 @@ $questionID = intval($_REQUEST["questionID"]);
 $result = $conn->query("SELECT title FROM dsgvo_training_questions WHERE id = $questionID");
 $title = $result->fetch_assoc()["title"];
 $result = $conn->query(
-    "SELECT userID, correct, firstname, lastname, tcq.version, tries, tcq.duration
+    "SELECT userID, correct, firstname, lastname, tcq.version, tries, tcq.duration, tcq.lastAnswered
      FROM dsgvo_training_questions tq 
      INNER JOIN dsgvo_training_completed_questions tcq ON tcq.questionID = tq.id 
      INNER JOIN UserData ON UserData.id = tcq.userID
@@ -40,6 +40,7 @@ $timesColorsArray = array();
                     <th><?php echo $lang['ANSWER']?></th>
                     <th>Version</th>
                     <th><?php echo $lang['TRIES']?></th>
+                    <th>Zuletzt beantwortet</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,6 +51,7 @@ $timesColorsArray = array();
                 $correct = $lang['TRAINING_QUESTION_CORRECT'][$row['correct']];
                 $tries = $row['tries'];
                 $version = $row['version'];
+                $lastAnswered = $row["lastAnswered"];
                 if($row['correct'] == 'TRUE'){
                     $right++;
                 }else{
@@ -65,6 +67,7 @@ $timesColorsArray = array();
                 echo "<td>$correct</td>";
                 echo "<td>$version</td>";
                 echo "<td>$tries</td>";
+                echo "<td>$lastAnswered</td>";
                 echo "</tr>";
             }
             //users who didn't answer yet
@@ -93,6 +96,7 @@ $timesColorsArray = array();
                 $timesColorsArray[] = "blue";
                 echo "<tr>";
                 echo "<td>$name</td>";
+                echo "<td>$correct</td>";
                 echo "<td>$correct</td>";
                 echo "<td>$correct</td>";
                 echo "<td>$correct</td>";

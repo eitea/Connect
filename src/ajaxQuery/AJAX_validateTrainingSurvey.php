@@ -69,7 +69,7 @@ foreach ($result as $formVal => $answer) {
         }
         if(!$test){
             $questionRightQuery = $questionRight?"TRUE":"FALSE";
-            $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time)
+            $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration,lastAnswered) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time, CURRENT_TIMESTAMP)
                 ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time");
             echo $conn->error;
         }
