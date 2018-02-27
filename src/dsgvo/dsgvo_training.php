@@ -61,9 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $allowOverwrite = test_input($_POST["allowOverwrite"]);
         $random = test_input($_POST["random"]);
         $moduleID = intval($_POST["module"]);
-        $answerEveryNDays = 0;
+        $answerEveryNDays = 0; // 0 means no interval
         if(isset($_POST["answerEveryNDays"])){
             $answerEveryNDays = intval($_POST["answerEveryNDays"]);
+        }
+        if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE'){
+            $answerEveryNDays = 0; // 0 means no interval
         }
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID, answerEveryNDays = $answerEveryNDays WHERE id = $trainingID");
         showError($conn->error);
