@@ -273,6 +273,7 @@ if ($_SESSION['color'] == 'light') {
 
   <script src="plugins/jQuery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
   <script src='plugins/select2/js/select2.min.js'></script>
@@ -330,6 +331,70 @@ if ($_SESSION['color'] == 'light') {
     document.getElementsByName('privatePGP')[0].value = '';
   }
   </script>
+  <script>
+    function showError(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-exclamation-triangle',
+	        title: '',
+            message: message 
+        },{
+            type: 'danger'
+        });
+    }
+    function showWarning(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-warning',
+	        title: '',
+            message: message 
+        },{
+            type: 'warning'
+        });
+    }
+    function showInfo(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-info',
+	        title: '',
+            message: message 
+        },{
+            type: 'info'
+        });
+    }
+    function showSuccess(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-check',
+	        title: '',
+            message: message 
+        },{
+            type: 'success'
+        });
+    }
+  </script>
+  <?php 
+    function showError($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showWarning($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showInfo($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showSuccess($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+  ?>
 </head>
 <body id="body_container" class="is-table-row">
   <div id="loader"></div>

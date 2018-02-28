@@ -30,11 +30,11 @@ while($row = $result->fetch_assoc()){
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header">Aufgabenstellung/Schulung Bearbeiten</div>
+        <div class="modal-header"><i class="fa fa-cube"></i> Aufgabenstellung/Schulung Bearbeiten</div>
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
-            <label>Modul*</label>
+            <label>Set*</label>
             <select class="js-example-basic-single" name="module" required>
                 <?php 
                 $result = $conn->query("SELECT * FROM dsgvo_training_modules");

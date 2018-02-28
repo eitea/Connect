@@ -8,6 +8,10 @@ require dirname(__DIR__) . "/language.php";
 
 $userID = $_SESSION['userid'];
 $result = json_decode($_POST["result"]);
+$test = false;
+if(isset($_POST["test"]) && $_POST["test"] == true){
+    $test = true;
+}
 
 function validate_questions($html, $answer){ // this will true or false (will work with multiple right questions)
     $answer = intval($answer);
@@ -57,16 +61,18 @@ foreach ($result as $formVal => $answer) {
     if(isset($times[$trainingID],$numberOfAnsweredQuestions[$trainingID])){
         $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
     }
-    if($allowOverwrite || !$questionExists){
+    if($allowOverwrite || !$questionExists || $test){
         if($questionRight){
             $right++;
         }else{
             $wrong++;
         }
-        $questionRightQuery = $questionRight?"TRUE":"FALSE";
-        $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time)
-            ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time");
-        echo $conn->error;
+        if(!$test){
+            $questionRightQuery = $questionRight?"TRUE":"FALSE";
+            $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time)
+                ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time");
+            echo $conn->error;
+        }
     } else {
         if($questionRight){
             $rightNoOverwrite++;
