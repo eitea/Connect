@@ -5,6 +5,7 @@ if (empty($_SESSION['userid'])) {
 }
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
+$privateKey = $_SESSION['privateKey'];
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
 require __DIR__ . "/connection.php";
@@ -49,11 +50,15 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange,forcedPwdChange FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
+
+    if($row['forcedPwdChange']==='1'){
+        redirect("../login/passwordChange");
+    }
 } else {
     echo $conn->error;
 }
@@ -85,12 +90,12 @@ if ($isTimeAdmin) {
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
 }
-$result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
+$result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
 }
-$result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
+$result = $conn->query("SELECT DISTINCT userID FROM relationship_company_client WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
 $available_users = array('-1');
 while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
@@ -337,7 +342,7 @@ if ($_SESSION['color'] == 'light') {
         $.notify({
             icon: 'fa fa-exclamation-triangle',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'danger'
         });
@@ -347,7 +352,7 @@ if ($_SESSION['color'] == 'light') {
         $.notify({
             icon: 'fa fa-warning',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'warning'
         });
@@ -357,7 +362,7 @@ if ($_SESSION['color'] == 'light') {
         $.notify({
             icon: 'fa fa-info',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'info'
         });
@@ -367,13 +372,13 @@ if ($_SESSION['color'] == 'light') {
         $.notify({
             icon: 'fa fa-check',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'success'
         });
     }
   </script>
-  <?php 
+  <?php
     function showError($message){
         if(!$message || strlen($message) == 0) return;
         $message = str_replace("'", "\\'", $message);

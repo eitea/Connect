@@ -26,7 +26,7 @@ $result = $conn->query("SELECT * FROM policyData");
 $row = $result->fetch_assoc();
 ?>
 
-<form method="POST" id="formPasswordOptions">
+<form method="POST">
     <div class="page-header">
         <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
             <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button></div>
@@ -93,4 +93,34 @@ $row = $result->fetch_assoc();
             <input type="radio" name="enableTimechange_type" value="FORCE" <?php if($row['expirationType'] == 'FORCE'){echo 'checked';} ?>/> Zwingend
         </div>
     </div>
+
+    <br><hr><br>
+</form>
+
+<form method="POST">
+    <?php
+    $result = $conn->query("SELECT activeEncryption FROM configurationData");
+    if($result && ($row = $result->fetch_assoc())){
+        if($row['activeEncryption'] == 'TRUE'){
+            echo '<button type="submit" name="deactive_encryption">Verschlüsselung DEAKTIVIEREN</button>';
+        } else {
+            echo '<div class="row">
+            <div class="col-md-4">
+            <label>Neues Passwort</label>
+            <input type="password" name="encryption_pass" class="form-control" />
+            </div>
+            <div class="col-md-4">
+            <label>Neues Passwort Bestätigen</label>
+            <input type="password" name="encryption_pass_confirm" class="form-control" />
+            </div>
+            <div class="col-md-4">
+            <label>OK</label><br>
+            <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
+            </div>
+            </div>';
+        }
+    }
+    ?>
+</form>
+
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

@@ -63,6 +63,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
             }
 
             if($accept){ //PAIR access
+                $nonce = random_bytes(24);
                 $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$admin_public);
                 $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
                 if($conn->error) $accept = false;

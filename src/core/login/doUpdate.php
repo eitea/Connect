@@ -2120,7 +2120,8 @@ if($row['version'] < 139){
         module VARCHAR(50) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         symmetricKey VARCHAR(150) NOT NULL,
-        publicPGPKey VARCHAR(150) NOT NULL
+        publicPGPKey VARCHAR(150) NOT NULL,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
     )";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -2134,6 +2135,7 @@ if($row['version'] < 139){
         module VARCHAR(50) NOT NULL,
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2152,6 +2154,7 @@ if($row['version'] < 139){
         companyID INT(6) UNSIGNED NOT NULL,
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

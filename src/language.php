@@ -171,8 +171,8 @@ $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 $lang_eng['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
 $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 
-$lang_eng['CAN_USE_ARCHIVE'] = 'Can use the Archive';
-$lang_ger['CAN_USE_ARCHIVE'] = 'Kann das Archiv benutzen';
+$lang_eng['CAN_USE_ARCHIVE'] = 'Can use Archive';
+$lang_ger['CAN_USE_ARCHIVE'] = 'Kann Archiv benutzen';
 
 $lang_eng['CAN_USE_SOCIAL_MEDIA'] = 'Can use Social Media';
 $lang_ger['CAN_USE_SOCIAL_MEDIA'] = 'Kann soziale Medien benutzen';

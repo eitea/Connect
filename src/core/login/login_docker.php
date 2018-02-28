@@ -17,7 +17,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
     if($row = $result->fetch_assoc()){
         session_start();
         echo '<p style="color:white">';
-        var_dump($row); //the if below will not work without this, do not ask why
+        var_dump($row); //the if below will sometimes not work without this, do not ask why
         echo '</p>';
         if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw']) {
             $_SESSION['userid'] = $row['id'];
@@ -26,11 +26,10 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
             $_SESSION['timeToUTC'] = intval($_POST['funZone']);
             $_SESSION['filterings'] = array();
             $_SESSION['color'] = $row['color'];
-            $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['password']);
+            $_SESSION['privateKey'] = $row['privatePGPKey'] ? base64_encode(simple_decryption($row['privatePGPKey'], $_POST['password'])) : false;
 
             //if core admin
-            $sql = "SELECT * FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
-            $result = $conn->query($sql);
+            $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");
             if($result && $result->num_rows > 0){
                 require dirname(dirname(__DIR__)) ."/language.php";
                 include dirname(dirname(__DIR__)) .'/version_number.php';

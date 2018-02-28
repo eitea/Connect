@@ -23,16 +23,13 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     }
     if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
         $redirect = "../user/home";
-        if($row['forcedPwdChange']==='1'){
-            $redirect = "../login/passwordChange";
-        }
         $_SESSION['userid'] = $row['id'];
         $_SESSION['firstname'] = $row['firstname'];
         $_SESSION['language'] = $row['preferredLang'];
         $_SESSION['timeToUTC'] = intval($_POST['funZone']);
         $_SESSION['filterings'] = array();
         $_SESSION['color'] = $row['color'];
-        $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['password']); //base64 encoded
+        $_SESSION['privateKey'] = $row['privatePGPKey'] ? base64_encode(simple_decryption($row['privatePGPKey'], $_POST['password'])) : false; //base64 encoded
 
         //if core admin
         $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";

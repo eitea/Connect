@@ -3,20 +3,21 @@
 <?php enableToCore($userID);?>
 <!-- BODY -->
 <div class="page-header-fixed">
-<div class="page-header">
-  <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+    <div class="page-header">
+      <h3><?php echo $lang['USERS']; ?><div class="page-header-button-group"><a class="btn btn-default" href='register' title="<?php echo $lang['REGISTER']; ?>">+</a></div></h3>
+    </div>
 </div>
-</div>
+<div class="page-content-fixed-100">
 <?php
 $activeTab = 0;
-if(isset($_GET['ACT'])){$activeTab = $_GET['ACT']; }
+if(isset($_GET['ACT'])){ $activeTab = $_GET['ACT']; }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_POST['deactivate']) && $_POST['deactivate'] != 1 && $_POST['deactivate'] != $userID){
     $x = $_POST['deactivate'];
     $acc = true;
     //copy user table
     $sql = "INSERT IGNORE INTO $deactivatedUserTable(id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney)
-    SELECT id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM $userTable WHERE id = $x";
+    SELECT id, firstname, lastname, psw, sid, email, gender, beginningDate, exitDate, preferredLang, terminalPin, kmMoney FROM UserData WHERE id = $x";
     if(!$conn->query($sql)){$acc = false; echo 'userErr: '.mysqli_error($conn);}
     //copy logs
     $sql = "INSERT IGNORE INTO $deactivatedUserLogs(userID, time, timeEnd, status, timeToUTC, indexIM)
@@ -47,8 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!$conn->query($sql)){$acc = false; echo '<br>travelErr: '.mysqli_error($conn);}
     //if successful, delete the user, On Cascade Delete does the rest.
     if($acc){
-      $sql  = "DELETE FROM UserData WHERE id = $x";
-      if(!$conn->query($sql)){echo mysqli_error($conn);}
+      if(!$conn->query("DELETE FROM UserData WHERE id = $x")){echo mysqli_error($conn);}
     }
   } elseif(isset($_POST['deactivate'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ADMIN_DELETE'].'</div>';
@@ -63,398 +63,309 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+  $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
+  if (isset($_POST['overTimeAll']) && is_numeric(str_replace(',','.',$_POST['overTimeAll']))){
+      $overTimeAll = str_replace(',','.',$_POST['overTimeAll']);
+  }
+  if (isset($_POST['daysPerYear']) && is_numeric($_POST['daysPerYear'])){
+      $vacDaysPerYear = intval($_POST['daysPerYear']);
+  }
+  if (isset($_POST['pauseAfter']) && is_numeric($_POST['pauseAfter'])){
+      $pauseAfter = $_POST['pauseAfter'];
+  }
+  if (isset($_POST['rest']) && is_numeric($_POST['rest'])){
+      $rest = $_POST['rest'];
+  }
+  if (isset($_POST['mon']) && is_numeric($_POST['mon'])){
+      $mon = test_input($_POST['mon']);
+  }
+  if (isset($_POST['tue']) && is_numeric($_POST['tue'])){
+      $tue = test_input($_POST['tue']);
+  }
+  if (isset($_POST['wed']) && is_numeric($_POST['wed'])){
+      $wed = test_input($_POST['wed']);
+  }
+  if (isset($_POST['thu']) && is_numeric($_POST['thu'])){
+      $thu = test_input($_POST['thu']);
+  }
+  if (isset($_POST['fri']) && is_numeric($_POST['fri'])){
+      $fri = test_input($_POST['fri']);
+  }
+  if (isset($_POST['sat']) && is_numeric($_POST['sat'])){
+      $sat = test_input($_POST['sat']);
+  }
+  if (isset($_POST['sun']) && is_numeric($_POST['sun'])){
+      $sun = test_input($_POST['sun']);
+  }
+
   if(isset($_POST['addNewInterval']) && !empty($_POST['intervalEnd']) && test_Date($_POST['intervalEnd'].' 05:00:00')){
-    $activeTab = $x = $_POST['addNewInterval'];
-    $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
-    $intervalEnd = $_POST['intervalEnd'].' 05:00:00';
+      $activeTab = $x = $_POST['addNewInterval'];
+      $intervalEnd = $_POST['intervalEnd'].' 05:00:00';
+      //close up the old one
+      $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun', vacPerYear='$vacDaysPerYear',
+          overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest', endDate='$intervalEnd' WHERE userID = $x AND endDate IS NULL");
+      //create a new one
+      $conn->query("INSERT INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate)
+      VALUES($x, '$mon', '$tue', '$wed', '$thu', '$fri', '$sat', '$sun', '$vacDaysPerYear', '$overTimeAll', '$pauseAfter', '$rest', '$intervalEnd')");
 
-    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
-      $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
-    }
-
-    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
-      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
-    }
-
-    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
-      $pauseAfter = $_POST['pauseAfter'.$x];
-    }
-
-    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
-      $rest = $_POST['rest'.$x];
-    }
-
-    if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
-      $mon = test_input($_POST['mon'.$x]);
-    }
-
-    if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
-      $tue = test_input($_POST['tue'.$x]);
-    }
-
-    if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
-      $wed = test_input($_POST['wed'.$x]);
-    }
-
-    if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
-      $thu = test_input($_POST['thu'.$x]);
-    }
-
-    if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
-      $fri = test_input($_POST['fri'.$x]);
-    }
-
-    if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
-      $sat = test_input($_POST['sat'.$x]);
-    }
-
-    if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
-      $sun = test_input($_POST['sun'.$x]);
-    }
-    //close up the old one
-    $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
-      vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest', endDate='$intervalEnd'
-      WHERE userID = $x AND endDate IS NULL");
-    //create a new one
-    $conn->query("INSERT INTO $intervalTable (userID, mon, tue, wed, thu, fri, sat, sun, vacPerYear, overTimeLump, pauseAfterHours, hoursOfRest, startDate)
-    VALUES($x, '$mon', '$tue', '$wed', '$thu', '$fri', '$sat', '$sun', '$vacDaysPerYear', '$overTimeAll', '$pauseAfter', '$rest', '$intervalEnd')");
-
-    echo mysqli_error($conn);
+      echo mysqli_error($conn);
   }
 
   if (isset($_POST['submitUser'])) {
-    $activeTab = $x = $_POST['submitUser'];
-
-    if (!empty($_POST['firstname'.$x])) {
-      $firstname = test_input($_POST['firstname'.$x]);
-      $sql = "UPDATE $userTable SET firstname= '$firstname' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if (!empty($_POST['lastname'.$x])) {
-      $lastname = test_input($_POST['lastname'.$x]);
-      $sql = "UPDATE $userTable SET lastname= '$lastname' WHERE id = '$x';";
-      $conn->query($sql);
-    }
-
-    if(!empty($_POST['exitDate'.$x]) && test_Date($_POST['exitDate'.$x] .' 00:00:00')) {
-      $exitDate = test_input($_POST['exitDate'.$x]) . ' 00:00:00';
-      $conn->query("UPDATE $userTable SET exitDate = '$exitDate' WHERE id = '$x'");
-    }
-
-    if(!empty($_POST['coreTime'.$x])) {
-      $coreTime = test_input($_POST['coreTime'.$x]);
-      $conn->query("UPDATE $userTable SET coreTime = '$coreTime' WHERE id = '$x'");
-    }
-
-    if (!empty($_POST['supervisor'.$x])){
-      $supervisor = intval($_POST['supervisor'.$x]);
-      $conn->query("UPDATE $userTable SET supervisor = $supervisor WHERE id = $x");
-    }
-
-    if (!empty($_POST['email'.$x]) && filter_var(test_input($_POST['email'.$x] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
-      $email = test_input($_POST['email'.$x]).'@';
-      $sql = "UPDATE $userTable SET email = CONCAT('$email', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$x';";
-      $conn->query($sql);
-      if($conn->error){
-        echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EXISTING_EMAIL'].'</div>';
+      $activeTab = $x = $_POST['submitUser'];
+      if (!empty($_POST['firstname'])) {
+          $val = test_input($_POST['firstname']);
+          $conn->query("UPDATE UserData SET firstname= '$val' WHERE id = '$x';");
       }
-    } else {
-      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EMAIL'].'</div>';
-    }
-
-    if (!empty($_POST['password'.$x]) && !empty($_POST['passwordConfirm'.$x])) {
-      $password = $_POST['password'.$x];
-      $passwordConfirm = $_POST['passwordConfirm'.$x];
-      if (strcmp($password, $passwordConfirm) == 0  && match_passwordpolicy($password)) {
-        $psw = password_hash($password, PASSWORD_BCRYPT);
-        $sql = "UPDATE $userTable SET psw = '$psw' WHERE id = '$x';";
-        $conn->query($sql);
+      if (!empty($_POST['lastname'])) {
+          $val = test_input($_POST['lastname']);
+          $conn->query("UPDATE UserData SET lastname= '$val' WHERE id = '$x';");
+      }
+      if(!empty($_POST['exitDate']) && test_Date($_POST['exitDate'] .' 00:00:00')) {
+          $val = test_input($_POST['exitDate']) . ' 00:00:00';
+          $conn->query("UPDATE UserData SET exitDate = '$val' WHERE id = '$x'");
+      }
+      if(!empty($_POST['coreTime'])) {
+          $val = test_input($_POST['coreTime']);
+          $conn->query("UPDATE UserData SET coreTime = '$val' WHERE id = '$x'");
+      }
+      if (!empty($_POST['supervisor'])){
+          $val = intval($_POST['supervisor']);
+          $conn->query("UPDATE UserData SET supervisor = $val WHERE id = $x");
+      }
+      if (!empty($_POST['email']) && filter_var(test_input($_POST['email'] .'@domain.com'), FILTER_VALIDATE_EMAIL)){
+          $val = test_input($_POST['email']).'@';
+          $conn->query("UPDATE UserData SET email = CONCAT('$val', SUBSTRING(email, LOCATE('@', email) + 1)) WHERE id = '$x';");
       } else {
-        echo '<div class="alert alert-danger fade in">';
-        echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-        echo '<strong>Could not change Passwords! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
-        echo '</div>';
+          echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EMAIL'].'</div>';
       }
-    }
+      if (!empty($_POST['gender'])) {
+          $val = test_input($_POST['gender']);
+          $conn->query("UPDATE UserData SET gender= '$val' WHERE id = '$x';");
+      }
+      if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
+          if (strcmp($_POST['password'], $_POST['passwordConfirm']) == 0  && match_passwordpolicy($_POST['password'])) {
+              $psw = password_hash($password, PASSWORD_BCRYPT);
+              $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP WHERE id = '$x';");
+          } else {
+              echo '<div class="alert alert-danger fade in">';
+              echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+              echo '<strong>Could not change Passwords! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
+              echo '</div>';
+          }
+      }
 
-    if (isset($_POST['company'.$x])){
-      $sql = "SELECT * FROM $companyTable";
-      $result = $conn->query($sql);
-      while($row = $result->fetch_assoc()){
-        //just completely delete the relationship from table to avoid duplicate entries.
-        $sql = "DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id'];
-        $conn->query($sql);
-        if(in_array($row['id'], $_POST['company'.$x])){  //if company is checked, insert again
-          $sql = "INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)";
-          $conn->query($sql);
+    //update latest interval
+    $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun', vacPerYear='$vacDaysPerYear',
+        overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest' WHERE userID = $x AND endDate IS NULL");
+
+    if(isset($_POST['company'])){
+        $result = $conn->query("SELECT id FROM companyData");
+        while($row = $result->fetch_assoc()){
+            //just completely delete the relationship from table to avoid duplicate entries.
+            $conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
+            if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
+                $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
+            }
         }
-      }
     }
 
-    if (!empty($_POST['enableProjecting'.$x])) {
-      $enableProjecting = test_input($_POST['enableProjecting'.$x]);
-      $sql = "UPDATE $userTable SET enableProjecting= '$enableProjecting' WHERE id = '$x';";
-      $conn->query($sql);
-    }
+    if(isset($_POST['isDSGVOAdmin'])){
+        if(secure_data('DSGVO', 'DUMMY', 'encrypt', $userID, $privateKey) != 'DUMMY'){ //encryption is active
+            $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $x");
+            if($result && ( $row = $result->fetch_assoc()) && $row['publicPGPKey']){
+                $public = $row['publicPGPKey'];
+            } elseif(isset($psw)) {
+                $keyPair = sodium_crypto_box_keypair();
+                $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+                $public = base64_encode(sodium_crypto_box_publickey($keyPair));
+                $content_personal = $private." \n".$public;
+                $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
+                $conn->query("UPDATE UserData SET publicPGPKey = '".$public."', privatePGPKey = '".$private_encrypt."' WHERE id = $userID");
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Das DSGVO Modul kann nicht ohne eine Passwortänderung des Benutzers aktiviert werden.</div>';
+            }
 
-    if (!empty($_POST['gender'.$x])) {
-      $gender = test_input($_POST['gender'.$x]);
-      $sql = "UPDATE $userTable SET gender= '$gender' WHERE id = '$x';";
-      $conn->query($sql);
-    }
+            if(issset($public)){
+                $public = base64_decode($public);
+                $result = $conn->query("SELECT privateKey, publicPGPKey FROM security_access a, security_modules m WHERE a.userID = $userID AND a.module = 'DSGVO'
+                    AND m.module = 'DSGVO' AND a.outDated = 'FALSE' AND m.outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+                if($result && ( $row=$result->fetch_assoc() )){
+                    $public_module = base64_decode($row['publicPGPKey']);
+                    $cipher_private_module = base64_decode($row['privateKey']);
 
-    if(isset($_POST['isCoreAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
+                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+
+                    $nonce = random_bytes(24);
+                    $private_encrypt = $nonce . sodium_crypto_box($private_module, $nonce, $private_module.$public);
+                    $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
+                    echo $conn->error;
+                    $conn->query("UPDATE UserData SET forcePswChange = 1 WHERE id = $x;");
+                    echo $conn->error;
+                    $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
+                 } else {
+                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Kein Schlüsselpaar gefunden. '.$conn->error.'</div>';
+                 }
+             }
+
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Keine Verschlüsselung</div>';
+            $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
+        }
     } else {
-      $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
+        $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['isDynamicProjectsAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
+
+    if(isset($_POST['isCoreAdmin'])){
+        $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
+    } else {
+        $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
+    }
+    $conn->query($sql);
+    if(isset($_POST['isDynamicProjectsAdmin'])){
+        $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
     } else {
         $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
     }
     $conn->query($sql);
-
-    if(isset($_POST['isTimeAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['isTimeAdmin'])){
+        $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-
-    if(isset($_POST['isProjectAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['isProjectAdmin'])){
+        $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['isReportAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['isReportAdmin'])){
+        $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['isERPAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['isERPAdmin'])){
+        $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['isFinanceAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['isFinanceAdmin'])){
+        $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
     }$conn->query($sql);
-    if(isset($_POST['isDSGVOAdmin'.$x])){
-      $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canStamp'])){
+        $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canStamp'.$x])){
-      $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
+        $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canStamp'.$x]) && isset($_POST['canBook'.$x])){
-      $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canEditTemplates'])){
+        $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canEditTemplates'.$x])){
-      $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canUseSocialMedia'])){
+        $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canUseSocialMedia'.$x])){
-      $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canCreateTasks'])){
+        $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canCreateTasks'.$x])){
-      $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canUseArchive'])){
+        $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canUseArchive'.$x])){
-      $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canUseClients'])){
+        $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canUseClients'.$x])){
-      $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canUseSuppliers'])){
+        $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canUseSuppliers'.$x])){
-      $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canEditClients'])){
+        $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canEditClients'.$x])){
-      $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
+    if(isset($_POST['canEditSuppliers'])){
+        $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
     } else {
-      $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
+        $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
     }
     $conn->query($sql);
-    if(isset($_POST['canEditSuppliers'.$x])){
-      $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
-    } else {
-      $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-
-    $overTimeAll = $vacDaysPerYear = $pauseAfter = $rest = $mon = $tue = $wed = $thu = $fri = $sat = $sun = 0;
-
-    if (isset($_POST['overTimeAll'.$x]) && is_numeric(str_replace(',','.',$_POST['overTimeAll'.$x]))){
-      $overTimeAll = str_replace(',','.',$_POST['overTimeAll'.$x]);
-    }
-
-    if (isset($_POST['daysPerYear'.$x]) && is_numeric($_POST['daysPerYear'.$x])){
-      $vacDaysPerYear = intval($_POST['daysPerYear'.$x]);
-    }
-
-    if (isset($_POST['pauseAfter'.$x]) && is_numeric($_POST['pauseAfter'.$x])){
-      $pauseAfter = $_POST['pauseAfter'.$x];
-    }
-
-    if (isset($_POST['rest'.$x]) && is_numeric($_POST['rest'.$x])){
-      $rest = $_POST['rest'.$x];
-    }
-
-    if(isset($_POST['mon'.$x]) && is_numeric($_POST['mon'.$x])){
-      $mon = test_input($_POST['mon'.$x]);
-    }
-
-    if (isset($_POST['tue'.$x]) && is_numeric($_POST['tue'.$x])){
-      $tue = test_input($_POST['tue'.$x]);
-    }
-
-    if (isset($_POST['wed'.$x]) && is_numeric($_POST['wed'.$x])){
-      $wed = test_input($_POST['wed'.$x]);
-    }
-
-    if (isset($_POST['thu'.$x]) && is_numeric($_POST['thu'.$x])){
-      $thu = test_input($_POST['thu'.$x]);
-    }
-
-    if (isset($_POST['fri'.$x]) && is_numeric($_POST['fri'.$x])){
-      $fri = test_input($_POST['fri'.$x]);
-    }
-
-    if (isset($_POST['sat'.$x]) && is_numeric($_POST['sat'.$x])){
-      $sat = test_input($_POST['sat'.$x]);
-    }
-
-    if (isset($_POST['sun'.$x]) && is_numeric($_POST['sun'.$x])){
-      $sun = test_input($_POST['sun'.$x]);
-    }
-
-    //update latest interval
-    $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun',
-      vacPerYear='$vacDaysPerYear', overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest'
-      WHERE userID = $x AND endDate IS NULL");
 
     echo mysqli_error($conn);
     if($userID == $x){
-      redirect("../system/users?ACT=$x");
+        redirect("../system/users?ACT=$x");
     }
   }//end if isset submitX
   if(!empty($_POST['saveProfilePicture'])){
-    $x = intval($_POST['saveProfilePicture']);
-    require_once dirname(dirname(__DIR__)) . "/utilities.php";
-    $pp = uploadImage('profilePicture', 1, 1);
-    if(!is_array($pp)) {
-      $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
-      echo $conn->error;
-      $null = NULL;
-      $stmt->bind_param("b", $null);
-      $stmt->send_long_data(0, $pp);
-      $stmt->execute();
-      if($stmt->errno) echo $stmt->error;
-      $stmt->close();
-    } else {
-      echo print_r($pp);
-    }
+      $x = intval($_POST['saveProfilePicture']);
+      require_once dirname(dirname(__DIR__)) . "/utilities.php";
+      $pp = uploadImage('profilePicture', 1, 1);
+      if(!is_array($pp)) {
+          $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $x");
+          echo $conn->error;
+          $null = NULL;
+          $stmt->bind_param("b", $null);
+          $stmt->send_long_data(0, $pp);
+          $stmt->execute();
+          if($stmt->errno) echo $stmt->error;
+          $stmt->close();
+      } else {
+          echo print_r($pp);
+      }
   }
-}
-?>
+} //end POST
 
-<script>
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover({
-      container: 'body'
-    });
-});
-</script>
+$selection_company = '';
+$result = $conn->query("SELECT id, name FROM companyData");
+while($row = $result->fetch_assoc()){
+    $selection_company .= '<label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br>';
+}
+$stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
+$stmt_company_relationship->bind_param('i', $x);
+?>
 <br>
-<div class="page-content-fixed-100">
+
 <div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <?php
-  $query = "SELECT *, $userTable.id AS user_id FROM $userTable
-  INNER JOIN $roleTable ON $roleTable.userID = $userTable.id
-  INNER JOIN $intervalTable ON $intervalTable.userID = $userTable.id
-  LEFT JOIN socialprofile ON socialprofile.userID = $userTable.id
-  WHERE endDate IS NULL ORDER BY $userTable.id ASC";
-  $result = mysqli_query($conn, $query);
-  if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+  $result = $conn->query("SELECT *, UserData.id AS user_id FROM UserData
+  INNER JOIN $roleTable ON $roleTable.userID = UserData.id
+  INNER JOIN $intervalTable ON $intervalTable.userID = UserData.id
+  LEFT JOIN socialprofile ON socialprofile.userID = UserData.id
+  WHERE endDate IS NULL ORDER BY UserData.id ASC");
+  if ($result && $result->num_rows > 0):
+    while ($row = $result->fetch_assoc()):
       $x = $row['user_id'];
-
-      $firstname = $row['firstname'];
-      $lastname = $row['lastname'];
-      $gender = $row['gender'];
-      $email = $row['email'];
-      $begin = $row['beginningDate'];
-      $end = $row['exitDate'];
-      $coreTime = $row['coreTime'];
-
-      $intervalStart = $row['startDate'];
       $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : "images/defaultProfilePicture.png";
-
-      $mon = $row['mon'];
-      $tue = $row['tue'];
-      $wed = $row['wed'];
-      $thu = $row['thu'];
-      $fri = $row['fri'];
-      $sat = $row['sat'];
-      $sun = $row['sun'];
-
-      $vacDaysPerYear = $row['vacPerYear'];
-      $overTimeAll = $row['overTimeLump'];
-      $pauseAfter = $row['pauseAfterHours'];
-      $rest = $row['hoursOfRest'];
-
-      $isCoreAdmin = $row['isCoreAdmin'];
-      $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
-      $isTimeAdmin = $row['isTimeAdmin'];
-      $isProjectAdmin = $row['isProjectAdmin'];
-      $isReportAdmin = $row['isReportAdmin'];
-      $isERPAdmin = $row['isERPAdmin'];
-      $isFinanceAdmin = $row['isFinanceAdmin'];
-      $isDSGVOAdmin = $row['isDSGVOAdmin'];
-      $canBook = $row['canBook'];
-      $canStamp = $row['canStamp'];
-      $canEditTemplates = $row['canEditTemplates'];
-      $canUseSocialMedia = $row['canUseSocialMedia'];
-      $canUseClients = $row['canUseClients'];
-      $canEditClients = $row['canEditClients'];
-      $canUseSuppliers = $row['canUseSuppliers'];
-      $canEditSuppliers = $row['canEditSuppliers'];
-      $canCreateTasks = $row['canCreateTasks'];
-      $canUseArchive = $row['canUseArchive'];
-
-      $eOut = "$firstname $lastname";
       ?>
 
       <div class="panel panel-default">
@@ -463,7 +374,7 @@ $(document).ready(function(){
             <div class="row">
               <div class="col-md-6">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>">
-                  <?php echo $eOut; ?>
+                  <?php echo $row['firstname'].' '.$row['lastname']; ?>
                 </a>
               </div>
               <div class="col-md-6 text-right">
@@ -476,9 +387,9 @@ $(document).ready(function(){
             </div>
           </h4>
         </div>
-        <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>" role="tabpanel" aria-labelledby="heading<?php echo $x; ?>">
-          <div class="panel-body">
 
+        <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>">
+          <div class="panel-body">
             <!-- #########  CONTENT ######## -->
             <form method="POST" enctype="multipart/form-data">
               <div class="container-fluid">
@@ -497,32 +408,32 @@ $(document).ready(function(){
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
-                    <input type="text" class="form-control" name="firstname<?php echo $x; ?>" value="<?php echo $firstname; ?>">
+                    <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>">
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
-                    <input type="text" class="form-control" name="lastname<?php echo $x; ?>" value="<?php echo $lastname; ?>">
+                    <input type="text" class="form-control" name="lastname" value="<?php echo $row['lastname']; ?>">
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
-                    <input type="text" class="form-control" name="email<?php echo $x; ?>" value="<?php echo explode('@', $email)[0]; ?>"/>
-                    <span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $email)[1]; ?></span>
+                    <input type="text" class="form-control" name="email" value="<?php echo explode('@', $row['email'])[0]; ?>"/>
+                    <span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $row['email'])[1]; ?></span>
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD']; ?></span>
-                    <input type="password" class="form-control" name="password<?php echo $x; ?>" placeholder="* * * *">
+                    <input type="password" class="form-control" name="password" placeholder="* * * *">
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
-                    <input type="password" class="form-control" name="passwordConfirm<?php echo $x; ?>" placeholder="* * * *">
+                    <input type="password" class="form-control" name="passwordConfirm" placeholder="* * * *">
                   </div>
                 </div>
                 <div class="form-group">
@@ -530,13 +441,12 @@ $(document).ready(function(){
                     <?php echo $lang['SUPERVISOR']; ?>:
                   </div>
                   <div class="col-md-3">
-                    <select name="supervisor<?php echo $x; ?>" class="js-example-basic-single" >
+                    <select name="supervisor" class="js-example-basic-single" >
                     <option value="0"> ... </option>
                     <?php
-                    $sup_result = $conn->query("SELECT id, firstname, lastname FROM UserData");
-                    while($sup_row = $sup_result->fetch_assoc()){
-                      $selected = ($row['supervisor'] == $sup_row['id']) ? 'selected' : '';
-                      echo '<option '.$selected.' value="'.$sup_row['id'].'" >'.$sup_row['firstname'].' '.$sup_row['lastname'].'</option>';
+                    foreach($userID_toName as $id => $name){
+                      $selected = ($row['supervisor'] == $id) ? 'selected' : '';
+                      echo '<option '.$selected.' value="'.$id.'" >'.$name.'</option>';
                     }
                     ?>
                     </select>
@@ -555,26 +465,26 @@ $(document).ready(function(){
                 </div>
                 <div class="col-md-2">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="female" <?php if($gender == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
+                    <input type="radio" name="gender" value="female" <?php if($row['gender'] == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
                   </label>
                 </div>
                 <div class="col-md-8">
                   <label>
-                    <input type="radio" name="gender<?php echo $x; ?>" value="male" <?php if($gender == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
+                    <input type="radio" name="gender" value="male" <?php if($row['gender'] == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
                   </label>
                 </div>
               </div>
               <div class="container-fluid">
                 <div class="col-md-5">
-                  <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($begin,0,10); ?></p>
+                  <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($row['beginningDate'],0,10); ?></p>
                 </div>
                 <div class="col-md-2">
                   <?php echo $lang['CORE_TIME']; ?>
-                  <p><input type="text" class="form-control timepicker" name="coreTime<?php echo $x; ?>" value="<?php echo $coreTime; ?>" /></p>
+                  <p><input type="text" class="form-control timepicker" name="coreTime" value="<?php echo $row['coreTime']; ?>" /></p>
                 </div>
                 <div class="col-md-5">
                   <?php echo $lang['EXIT_DATE']; ?>
-                  <input type="text" class="form-control datepicker" name="exitDate<?php echo $x; ?>" value="<?php echo substr($end,0,10); ?>"/>
+                  <input type="text" class="form-control datepicker" name="exitDate" value="<?php echo substr($row['exitDate'],0,10); ?>"/>
                 </div>
               </div>
               <br>
@@ -584,37 +494,37 @@ $(document).ready(function(){
                   <div class="checkbox">
                     <div class="col-md-6">
                       <label>
-                      <input type="checkbox" name="isCoreAdmin<?php echo $x; ?>" <?php if($isCoreAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
+                      <input type="checkbox" name="isCoreAdmin" <?php if($row['isCoreAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isTimeAdmin<?php echo $x; ?>" <?php if($isTimeAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
+                        <input type="checkbox" name="isTimeAdmin" <?php if($row['isTimeAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isProjectAdmin<?php echo $x; ?>" <?php if($isProjectAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                        <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isReportAdmin<?php echo $x; ?>" <?php if($isReportAdmin == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
+                        <input type="checkbox" name="isReportAdmin" <?php if($row['isReportAdmin'] == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="canEditSuppliers<?php echo $x; ?>" <?php if($canEditSuppliers == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
+                        <input type="checkbox" name="canEditSuppliers" <?php if($row['canEditSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
                       </label>
                     </div>
                     <div class="col-md-6">
                       <label>
-                        <input type="checkbox" name="isERPAdmin<?php echo $x; ?>" <?php if($isERPAdmin == 'TRUE'){echo 'checked';} ?> />ERP
+                        <input type="checkbox" name="isERPAdmin" <?php if($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isDynamicProjectsAdmin<?php echo $x; ?>" <?php if($isDynamicProjectsAdmin == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
+                        <input type="checkbox" name="isDynamicProjectsAdmin" <?php if($row['isDynamicProjectsAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isFinanceAdmin<?php echo $x; ?>" <?php if($isFinanceAdmin == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
+                        <input type="checkbox" name="isFinanceAdmin" <?php if($row['isFinanceAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
                       </label><br>
                       <label>
-                        <input type="checkbox" name="isDSGVOAdmin<?php echo $x; ?>" <?php if($isDSGVOAdmin == 'TRUE'){echo 'checked';} ?> />DSGVO
+                        <input type="checkbox" name="isDSGVOAdmin" <?php if($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
                       </label>
                       <br>
                       <label>
-                        <input type="checkbox" name="canEditClients<?php echo $x; ?>" <?php if($canEditClients == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
+                        <input type="checkbox" name="canEditClients" <?php if($row['canEditClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
                       </label>
                     </div>
                   </div>
@@ -624,59 +534,56 @@ $(document).ready(function(){
                   <div class="checkbox">
                   <div class="col-md-6">
                       <label>
-                        <input type="checkbox" name="canStamp<?php echo $x; ?>" <?php if($canStamp == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
+                        <input type="checkbox" name="canStamp" <?php if($row['canStamp'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
                       </label>
                       <br>
                       <label>
-                        <input type="checkbox" name="canBook<?php echo $x; ?>" <?php if($canBook == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
+                        <input type="checkbox" name="canBook" <?php if($row['canBook'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
                       </label>
                       <br>
                       <label>
-                        <input type="checkbox" name="canEditTemplates<?php echo $x; ?>" <?php if($canEditTemplates == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
+                        <input type="checkbox" name="canEditTemplates" <?php if($row['canEditTemplates'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
                       </label>
                       <br>
                       <label>
-                        <input type="checkbox" name="canUseSocialMedia<?php echo $x; ?>" <?php if($canUseSocialMedia == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
+                        <input type="checkbox" name="canUseSocialMedia" <?php if($row['canUseSocialMedia'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
                       </label>
                     </div>
                     <div class="col-md-6">
                       <label>
-                        <input type="checkbox" name="canCreateTasks<?php echo $x; ?>" <?php if($canCreateTasks == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
+                        <input type="checkbox" name="canCreateTasks" <?php if($row['canCreateTasks'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
                       </label>
-
                       <label>
-                        <input type="checkbox" name="canUseArchive<?php echo $x; ?>" <?php if($canUseArchive == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canUseClients<?php echo $x; ?>" <?php if($canUseClients == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
+                        <input type="checkbox" name="canUseArchive" <?php if($row['canUseArchive'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
                       </label>
                       <br>
                       <label>
-                        <input type="checkbox" name="canUseSuppliers<?php echo $x; ?>" <?php if($canUseSuppliers == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
-
+                        <input type="checkbox" name="canUseClients" <?php if($row['canUseClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
+                      </label>
+                      <br>
+                      <label>
+                        <input type="checkbox" name="canUseSuppliers" <?php if($row['canUseSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
                       </label>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <?php echo $lang['COMPANIES']; ?>: <br>
-                  <div class="checkbox">
-                    <?php
-                    $sql = "SELECT * FROM $companyTable";
-                    $companyResult = $conn->query($sql);
-                    while($companyRow = $companyResult->fetch_assoc()){
-                      $resultset2 = $conn->query("SELECT * FROM $companyToUserRelationshipTable WHERE companyID = " . $companyRow['id'] . " AND userID = $x");
-                      if($resultset2 && $resultset2->num_rows >0){
-                        $selected = 'checked';
-                      } else {
-                        $selected = '';
-                      }
-                      echo "<label><input type='checkbox' $selected name='company".$x."[]' value=" .$companyRow['id']. " />" . $companyRow['name'] ."</label><br>";
-                    }
-                    ?>
-                  </div>
-                  <small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small>
+                    <?php echo $lang['COMPANIES']; ?>: <br>
+                    <div class="checkbox">
+                        <?php
+                        $selection_company_checked = $selection_company;
+                        $stmt_company_relationship->execute();
+                        $result_relation = $stmt_company_relationship->get_result();
+                        while($row_relation = $result_relation->fetch_assoc()){
+                            $needle = 'value="'.$row_relation['companyID'].'"';
+                            if(strpos($selection_company_checked, $needle) !== false){
+                                $selection_company_checked = str_replace($needle, $needle.' checked ', $selection_company_checked);
+                            }
+                        }
+                        echo $selection_company_checked;
+                        ?>
+                    </div>
+                    <small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small>
                 </div>
               </div>
               <br><br>
@@ -685,49 +592,49 @@ $(document).ready(function(){
                 <div class="row">
                   <div class="col-md-3">
                     <?php echo $lang['OVERTIME_ALLOWANCE']; ?>: <br>
-                    <input type="number" class="form-control" name="overTimeAll<?php echo $x; ?>" value="<?php echo $overTimeAll; ?>"
+                    <input type="number" class="form-control" name="overTimeAll" value="<?php echo $row['overTimeLump']; ?>"
                      data-toggle="popover" title="Important!" data-trigger="focus" data-content="This value will always be read at the end of each month."/>
                   </div>
                   <div class="col-md-3">
-                    <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter<?php echo $x; ?>" value="<?php echo $pauseAfter; ?>"/>
+                    <?php echo $lang['TAKE_BREAK_AFTER']; ?>: <input type="number" class="form-control" step=any  name="pauseAfter" value="<?php echo $row['pauseAfterHours']; ?>"/>
                   </div>
                   <div class="col-md-3">
-                    <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest<?php echo $x; ?>" value="<?php echo $rest; ?>"/>
+                    <?php echo $lang['HOURS_OF_REST']; ?>: <input type="number" class="form-control" step=any  name="rest" value="<?php echo $row['hoursOfRest']; ?>"/>
                   </div>
                   <div class="col-md-3">
                     <?php echo $lang['VACATION_DAYS']. $lang['PER_YEAR']; ?>
-                    <input type="number" class="form-control" name="daysPerYear<?php echo $x; ?>" value="<?php echo $vacDaysPerYear; ?>"/>
+                    <input type="number" class="form-control" name="daysPerYear" value="<?php echo $row['vacPerYear']; ?>"/>
                   </div>
                 </div>
                 <br>
                 <div class="row">
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['mon']; ?>
-                    <input type="number" step="any" class="form-control" name="mon<?php echo $x; ?>" size="2" value= "<?php echo $mon; ?>" />
+                    <input type="number" step="any" class="form-control" name="mon" size="2" value= "<?php echo $row['mon']; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['tue']; ?>
-                    <input type="number" step="any" class="form-control" name="tue<?php echo $x; ?>" size="2" value= "<?php echo $tue; ?>" />
+                    <input type="number" step="any" class="form-control" name="tue" size="2" value= "<?php echo $row['tue']; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['wed']; ?>
-                    <input type="number" step="any" class="form-control" name="wed<?php echo $x; ?>" size="2" value= "<?php echo $wed; ?>" />
+                    <input type="number" step="any" class="form-control" name="wed" size="2" value= "<?php echo $row['wed']; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['thu']; ?>
-                    <input type="number" step="any" class="form-control" name="thu<?php echo $x; ?>" size="2" value= "<?php echo $thu; ?>" />
+                    <input type="number" step="any" class="form-control" name="thu" size="2" value= "<?php echo $row['thu']; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['fri']; ?>
-                    <input type="number" step="any" class="form-control" name="fri<?php echo $x; ?>" size="2" value= "<?php echo $fri; ?>" />
+                    <input type="number" step="any" class="form-control" name="fri" size="2" value= "<?php echo $row['fri']; ?>" />
                   </div>
                   <div style="width:11%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['sat']; ?>
-                    <input type="number" step="any" class="form-control" name="sat<?php echo $x; ?>" size="2" value= "<?php echo $sat; ?>" />
+                    <input type="number" step="any" class="form-control" name="sat" size="2" value= "<?php echo $row['sat']; ?>" />
                   </div>
                   <div style="width:10%; float:left; margin-left:3%">
                     <?php echo $lang['WEEKDAY_TOSTRING']['sun']; ?>
-                    <input type="number" step="any" class="form-control" name="sun<?php echo $x; ?>" size="2" value= "<?php echo $sun; ?>" />
+                    <input type="number" step="any" class="form-control" name="sun" size="2" value= "<?php echo $row['sun']; ?>" />
                   </div>
                 </div>
               </div>
@@ -737,7 +644,7 @@ $(document).ready(function(){
                     <?php echo $lang['VALID_PERIOD'].' ('.$lang['FROM'].' - '.$lang['TO'].')'; ?>:
                   </div>
                   <div class="col-xs-3">
-                    <input type="text" readonly class="form-control" value="<?php echo substr($intervalStart,0,10); ?>" />
+                    <input type="text" readonly class="form-control" value="<?php echo substr($row['startDate'],0,10); ?>" />
                   </div>
                   <div class="col-xs-3">
                     <input type="text" class="form-control datepicker" name="intervalEnd" placeholder="yyyy-mm-dd" />
@@ -805,7 +712,7 @@ $(document).ready(function(){
               <div class="modal-dialog modal-md" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h4 class="modal-title">Do you really wish to delete <?php echo $firstname.' '.$lastname; ?> ?</h4>
+                    <h4 class="modal-title">Do you really wish to delete <?php echo $row['firstname'].' '.$row['lastname']; ?> ?</h4>
                   </div>
                   <div class="modal-body">
                     All Stamps and Bookings belonging to this User will be lost forever. Do you still wish to proceed?
@@ -824,27 +731,29 @@ $(document).ready(function(){
         </div>
       </div>
       <br>
-
       <?php
-    }
-  }
+  endwhile;
+endif;
+$stmt_company_relationship->close();
   ?>
   <br><br>
 </div>
 
 <script>
-  //ALTER TABLE `userdata`  ADD `forcedPwdChange` TINYINT(1) NULL DEFAULT NULL  AFTER `privatePGPKey`;
-  function forcePswChange(id,event){
+function forcePswChange(id,event){
     $.post("ajaxQuery/AJAX_db_utility.php",{function: "forcePwdChange",userid: id},function(data){
-      if(data){
-        console.log(data);
-        event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-check' ></i>"
-      }else{
-        event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-times' ></i>"
-      }
-
-      });
-  }
+        if(data){
+            event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-check' ></i>"
+        } else {
+            event.target.innerHTML = event.target.innerHTML + "<i class='fa fa-times' ></i>"
+        }
+    });
+}
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({
+        container: 'body'
+    });
+});
 </script>
 </div>
 <!-- /BODY -->
