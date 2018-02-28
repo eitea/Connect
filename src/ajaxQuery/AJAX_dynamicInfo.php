@@ -60,7 +60,7 @@ if($showMissingBookings){
         $timeToUTC = $row['timeToUTC']; //just in case.
         $missingBookingsArray[] = array("start" => $start, "end" => $end, "date" => $date, "indexIM" => $indexIM, "timeToUTC" => $timeToUTC);
     } else {
-        echo "no valid timestamp found";
+        // echo "no valid timestamp found";
         $showMissingBookings = false;
     }
 }
