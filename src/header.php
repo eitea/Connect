@@ -14,6 +14,7 @@ require __DIR__ . "/language.php";
 if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
+
 $sql = "SELECT * FROM roles WHERE userID = $userID";
 $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
@@ -48,22 +49,19 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
-    $userKeyCode = $row['keyCode'];
 } else {
     echo $conn->error;
 }
-$result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum, firstTimeWizard FROM configurationData");
+$result = $conn->query("SELECT enableReadyCheck, firstTimeWizard FROM configurationData");
 if ($result) {
     $row = $result->fetch_assoc();
     if($row['firstTimeWizard'] == 'FALSE'){ redirect('../setup/wizard'); }
     $showReadyPlan = $row['enableReadyCheck'];
-    $masterPasswordHash = $row['masterPassword'];
-    $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
@@ -75,10 +73,10 @@ if ($isTimeAdmin) {
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //forgotten checkouts
-    $result = $conn->query("SELECT indexIM FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
+    $result = $conn->query("SELECT indexIM FROM logs WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //gemini date in logs
-    $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+    $result = $conn->query("SELECT * FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //lunchbreaks
     $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
@@ -180,20 +178,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
         $passwordConfirm = $_POST['passwordConfirm'];
-        $newMasterPass = '';
-        if($userKeyCode){
-            $newMasterPass = simple_decryption($userKeyCode, $_POST['passwordCurrent']);
-            $newMasterPass = simple_encryption($newMasterPass, $password);
-        } elseif($masterPasswordHash && !empty($_POST['passwordMaster'])){
-            $newMasterPass = simple_encryption($_POST['passwordMaster'], $password);
-        }
         $output = '';
-        if($newMasterPass && (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[~\!@#\$%&\*_\-\+\.\?]/', $password))){
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert">&times;</a>Passwörter mit Masterpasswortverschlüsselung müssen mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.</div>';
-        } elseif(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
+        if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
-            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
-            if($newMasterPass) $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
+            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
+
             if(!$conn->error){
                 $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
             } else {
@@ -209,8 +198,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
             $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
         }
-    } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
-      $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
+    } elseif(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+      $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
@@ -441,18 +430,11 @@ if ($_SESSION['color'] == 'light') {
                   </ul>
                   <div class="tab-content">
                       <div id="myModalPassword" class="tab-pane fade in active"><br>
-                          <div class="col-md-12">
+                          <div class="col-md-6">
                               <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
                           </div>
                           <div class="col-md-6">
                               <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
-                          </div>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" ><br>
-                              <?php if ($masterPasswordHash): ?>
-                                  <label><?php echo $lang['MASTER_PASSWORD'] ?> (Experimentell)</label>
-                                  <input type="password" class="form-control" name="passwordMaster"><br>
-                              <?php endif;?>
                           </div>
                       </div>
                       <div id="myModalPGP" class="tab-pane fade"><br>
@@ -599,7 +581,7 @@ if ($result && ($row = $result->fetch_assoc())) {
     $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
-$result = mysqli_query($conn,  "SELECT `time`, indexIM FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+$result = mysqli_query($conn,  "SELECT `time`, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonVal = $lang['CHECK_OUT'];
     $buttonNam = 'stampOut';
@@ -625,7 +607,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonNam = 'stampIn';
     $buttonEmoji = '';
     $today = getCurrentTimestamp();
-    $result = mysqli_query($conn, "SELECT timeEnd FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
+    $result = mysqli_query($conn, "SELECT timeEnd FROM logs WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
     if ($result && ($row = $result->fetch_assoc())) {
         $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
         if ($diff < $cd / 60) {$ckIn_disabled = 'disabled';}
@@ -1138,13 +1120,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       }
     }
 }
-if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {
-    if (simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') {
-        echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
-    }
-}
 $user_agent = $_SERVER["HTTP_USER_AGENT"];
 if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
 }
+
 ?>

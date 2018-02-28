@@ -39,9 +39,8 @@ function create_tables($conn) {
         real_email VARCHAR(50),
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
-        keyCode VARCHAR(100),
-        publicPGPKey TEXT NULL,
-        privatePGPKey TEXT NULL
+        publicPGPKey VARCHAR(150) NULL,
+        privatePGPKey VARCHAR(150) NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -56,20 +55,6 @@ function create_tables($conn) {
         status INT(3),
         emoji INT(2) DEFAULT 0,
         FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE ldapConfigTab (
-        ldapConnect VARCHAR(30),
-        ldapPassword VARCHAR(30),
-        ldapUsername VARCHAR(30),
-        adminID INT(6) UNSIGNED,
-        version INT(5) DEFAULT 0,
-        FOREIGN KEY (adminID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
@@ -105,8 +90,7 @@ function create_tables($conn) {
         detailRight VARCHAR(120),
         uid VARCHAR(20),
         istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        publicPGPKey TEXT,
-        privatePGPKey TEXT
+        publicPGPKey VARCHAR(150)
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -215,9 +199,7 @@ function create_tables($conn) {
         cooldownTimer INT(3) DEFAULT '2',
         enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-        masterPassword VARCHAR(100),
-        enableAuditLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        checkSum VARCHAR(40)
+        activeEncryption ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -496,8 +478,6 @@ function create_tables($conn) {
         iban VARCHAR(400),
         bankName VARCHAR(400),
         parentID INT(6) UNSIGNED,
-        iv VARCHAR(150),
-        iv2 VARCHAR(50),
         FOREIGN KEY (parentID) REFERENCES clientInfoData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -724,8 +704,6 @@ function create_tables($conn) {
         quantity DECIMAL(8,2),
         purchase DECIMAL(10,2),
         cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        iv VARCHAR(255),
-        iv2 VARCHAR(255),
         origin VARCHAR(16),
         FOREIGN KEY (historyID) REFERENCES processHistory(id)
         ON UPDATE CASCADE
@@ -775,9 +753,7 @@ function create_tables($conn) {
         price DECIMAL(10,2),
         unit VARCHAR(20),
         cash ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        purchase DECIMAL(10,2),
-        iv VARCHAR(255),
-        iv2 VARCHAR(255)
+        purchase DECIMAL(10,2)
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1542,27 +1518,45 @@ function create_tables($conn) {
 
 
     $sql = "CREATE TABLE security_modules(
-        userID INT(6) UNSIGNED,
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         module VARCHAR(50) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        privatePGPKey TEXT NOT NULL,
-        publicPGPKey TEXT NOT NULL,
+        symmetricKey VARCHAR(150) NOT NULL,
+        publicPGPKey VARCHAR(150) NOT NULL
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE security_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 
-
-    $sql = "CREATE TABLE security_user(
+    $sql = "CREATE TABLE security_company(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED,
-        key TEXT NOT NULL,
-        module VARCHAR(50) NOT NULL,
+        companyID INT(6) UNSIGNED NOT NULL,
+        privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
-
-
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 
 }

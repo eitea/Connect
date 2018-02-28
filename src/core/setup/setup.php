@@ -200,10 +200,7 @@ ignore_user_abort(1);
             $conn->query($sql);
 
             //insert configs
-            $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, masterPassword) VALUES (5, 2,'')";
-            $conn->query($sql);
-            //insert ldap config
-            $sql = "INSERT INTO ldapConfigTab (adminID, version) VALUES (1, $VERSION_NUMBER)";
+            $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
             $conn->query($sql);
             //insert ERP numbers
             $conn->query("INSERT INTO erp_settings (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");

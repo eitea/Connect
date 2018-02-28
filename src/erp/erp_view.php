@@ -40,8 +40,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     //insert products
     $historyID = $conn->insert_id;
     $origin = randomPassword(16);
-    $conn->query("INSERT INTO products(name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2, historyID, origin)
-    SELECT name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2, $historyID, '$origin' FROM products WHERE historyID = $val");
+    $conn->query("INSERT INTO products(name, description, price, quantity, unit, taxID, cash, purchase, position historyID, origin)
+    SELECT name, description, price, quantity, unit, taxID, cash, purchase, position, $historyID, '$origin' FROM products WHERE historyID = $val");
     if($conn->error){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {

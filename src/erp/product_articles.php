@@ -28,10 +28,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_purchase = floatval($_POST['add_product_purchase']);
     $product_company = $cmpID;
 
-    $mc = new MasterCrypt($_SESSION["masterpassword"]);
-    $iv = $mc->iv;
-    $iv2 = $mc->iv2;
-    $conn->query("UPDATE articles SET companyID = $product_company, name = '".$mc->encrypt($product_name)."', description = '".$mc->encrypt($product_description)."', price = '$product_price', unit = '$product_unit', taxID =  $product_tax_id, cash = '$product_is_cash', purchase = '$product_purchase', iv = '$iv', iv2 = '$iv2' WHERE id = $articleID");
+    $conn->query("UPDATE articles SET companyID = $product_company, name = '$product_name', description = '$product_description', price = '$product_price', unit = '$product_unit', taxID =  $product_tax_id, cash = '$product_is_cash', purchase = '$product_purchase' WHERE id = $articleID");
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
@@ -51,10 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_purchase = floatval($_POST['add_product_purchase']);
     $product_company = $cmpID;
 
-    $mc = new MasterCrypt($_SESSION["masterpassword"]);
-    $iv = $mc->iv;
-    $iv2 = $mc->iv2;
-    $conn->query("INSERT INTO articles (companyID, name, description, price, unit, taxID, cash, purchase, iv, iv2) VALUES($product_company, '".$mc->encrypt($product_name)."', '".$mc->encrypt($product_description)."', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase', '$iv', '$iv2')");
+    $conn->query("INSERT INTO articles (companyID, name, description, price, unit, taxID, cash, purchase) VALUES($product_company, '$product_name', '$product_description', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase')");
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
@@ -80,10 +74,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <?php
       $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE companyID = $cmpID AND taxID = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
-        $mc = new MasterCrypt($_SESSION["masterpassword"], $row['iv'],$row['iv2']);
         echo '<tr>';
-        echo '<td>'.$mc->getStatus().$mc->decrypt($row['name']).'</td>';
-        echo '<td>'.$mc->getStatus().$mc->decrypt($row['description']).'</td>';
+        echo '<td>'.$row['name'].'</td>';
+        echo '<td>'.$row['description'].'</td>';
         echo '<td>'.number_format($row['price'],2,',','.').'</td>';
         echo '<td>'.number_format($row['purchase'],2,',','.').'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
@@ -138,7 +131,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               $tax_result = $conn->query("SELECT * FROM taxRates");
               while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
                 $selected = '';
-                if($tax_row['id'] == 3) $selected = 'selected'; 
+                if($tax_row['id'] == 3) $selected = 'selected';
                 echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].'   '.$tax_row['percentage'].'% </option>';
               }
               ?>
@@ -204,7 +197,7 @@ $("#product_purchase").on("keyup", function(){
 });
 
 </script>
-<?php 
+<?php
   if($isUpdate){
     echo "<script>document.getElementById('addArticle').click()</script>";
   }
