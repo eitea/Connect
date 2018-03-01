@@ -234,7 +234,7 @@ echo mysqli_error($conn);
             $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
             LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
             LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-            WHERE $projectBookingTable.timestampID = $indexIM ORDER BY start, end;";
+            WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end, start;";
             $result = mysqli_query($conn, $sql);
             if($result && $result->num_rows > 0){
                 $numRows = $result->num_rows;
