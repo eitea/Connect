@@ -21,6 +21,12 @@ if(isset($_POST['saveButton'])){
     $conn->query("UPDATE policyData SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
     echo mysqli_error($conn);
 }
+if(isset($_POST['deactive_encryption'])){
+    $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
+}
+if(isset($_POST['active_encryption'])){
+
+}
 
 $result = $conn->query("SELECT * FROM policyData");
 $row = $result->fetch_assoc();
