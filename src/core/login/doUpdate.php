@@ -2095,6 +2095,7 @@ if($row['version'] < 138){
         echo '<br>Training: add to new module';
     }
 }
+
 if($row['version'] < 139){
     $sql = "ALTER TABLE dsgvo_training_completed_questions ADD COLUMN lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP";
     if(!$conn->query($sql)){
@@ -2108,9 +2109,7 @@ if($row['version'] < 139){
     } else {
         echo '<br>Training: answer every n days';
     }
-}
 
-if($row['version'] < 139){
     $conn->query("ALTER TABLE configurationData ADD COLUMN firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
     if($conn->error){
         echo $conn->error;
