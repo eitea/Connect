@@ -268,7 +268,6 @@ $(document).ready(function(){
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     },
     responsive: true,
-    dom: 'f',
     autoWidth: false,
     paging: true
   });
