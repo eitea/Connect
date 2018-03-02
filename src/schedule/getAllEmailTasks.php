@@ -6,9 +6,14 @@ $result = $conn->query("SELECT * FROM emailprojects");
 if($result){
     while($row = $result->fetch_assoc()){
         $security = empty($row['security']) ? '' : '/'.$row['security'];
-        $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX';
-        $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
+        $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}';
+        $trash = 'Connect_Tasks';
+        //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
+        if(!$imap->getMailboxes($trash)) $imap->createMailbox($trash);
+        $mailbox .= 'INBOX';
+        $imap->switchMailbox($mailbox);
+
         $mailsIds = $imap->searchMailbox('ALL');
         $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']); echo $conn->error;
         while($rule = $result->fetch_assoc()){
@@ -83,7 +88,7 @@ if($result){
                         $stmt_emp->close();
                         $stmt_team->close();
 
-                        $imap->deleteMail($mail_number);
+                        $imap->moveMail($mail_number, $trash);
                     } else {
                         echo $stmt->error;
                     }
