@@ -346,7 +346,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $stmt_viewed->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
-        $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
+        $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
         $stmt_booking->bind_param('s', $x);
         $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID WHERE p.dynamicID = ?");
         $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
@@ -446,7 +446,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '</td>';
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
-                echo '<button class="btn btn-default" onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
+                $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"'; //he has to wait at least 1 minute
+                echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
@@ -909,7 +910,7 @@ function showProjects(client, project, place){
         });
     }
 }
- function activateTemplate(event){
+function activateTemplate(event){
     id = $(".select2-templates").select2('data');
     if(id === -1){
         //Create new Template
@@ -919,9 +920,9 @@ function showProjects(client, project, place){
         //Fill editingModal- with data
         //open editingModal-
     }
- }
-  function checkInput(event){
-      //check Input
+}
+function checkInput(event){
+    //check Input
     console.log(event);
     if(tinymce.activeEditor.getContent()==""){
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
@@ -929,28 +930,26 @@ function showProjects(client, project, place){
     }
 
     if(tinymce.activeEditor.getContent().length>(<?php
-        $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
-        $maxSQL = $max->fetch_assoc();
-        echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
+    $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
+    $maxSQL = $max->fetch_assoc();
+    echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
         alert("Description Too Big");
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
-  }
-  function reviewChange(event,id){
-      console.log(event);
-      projectid = id;
-      needsReview = event.target.checked ? 'TRUE' : 'FALSE';
-      $.post("ajaxQuery/AJAX_db_utility.php",{
-          needsReview: needsReview,
-          function: "changeReview",
-          projectid: projectid
-      },function(data){
-          console.log(data);
-      });
-  }
-</script>
-<script>
+}
+function reviewChange(event,id){
+    console.log(event);
+    projectid = id;
+    needsReview = event.target.checked ? 'TRUE' : 'FALSE';
+    $.post("ajaxQuery/AJAX_db_utility.php",{
+        needsReview: needsReview,
+        function: "changeReview",
+        projectid: projectid
+    },function(data){
+        console.log(data);
+    });
+}
 $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings again
     $.ajax({
         url:'ajaxQuery/AJAX_getTrainingSurvey.php',
@@ -964,7 +963,12 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
             $("#currentSurveyModal .survey-modal").modal("show");
         }
    });
-})
+});
+
+setTimeout( function(){
+    $('button[name="pauseBtn"]').prop("disabled", false);
+}, 60000 );
+
 
 </script>
 </div>

@@ -20,7 +20,7 @@
         $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
         LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
         LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-        WHERE $projectBookingTable.timestampID = $request_addendum ORDER BY start ASC;";
+        WHERE $projectBookingTable.timestampID = $request_addendum ORDER BY end, start;";
         $res_b = $conn->query($sql);
         if($res_b && $res_b->num_rows == 0){
             echo '<tr style="background-color:#eeeeee;"><td>'.carryOverAdder_Hours($A,$timeToUTC).'</td><td>-</td><td>-</td><td>-</td><td>'.$lang['CHECK_IN'].'</td><td>-</td></tr>';
