@@ -324,13 +324,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         $occupation = $query_filter = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
+        if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
+        if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
+        if($filterings['project']){ $query_filter .= " AND d.clientprojectid = ".intval($filterings['project']); }
         if($filterings['tasks']){
             if($filterings['tasks'] == 'REVIEW_1'){
-                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
+                $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
             } elseif($filterings['tasks'] == 'REVIEW_2'){
-                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
+                $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
             } else {
-                $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
+                $query_filter .= " AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }

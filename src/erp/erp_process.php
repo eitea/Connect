@@ -16,11 +16,11 @@ WHERE proposals.clientID = clientData.id AND proposals.id = processHistory.proce
 if($result && $result->num_rows > 0){
   $proposal_row = $result->fetch_assoc();
 } else {
-  $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+  $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
   redirect('view?err=2'); //STRIKE
 }
 if(!in_array($proposal_row['companyID'], $available_companies)){
-  $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+  $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
   redirect('view?err=2'); //STRIKE
 }
 
@@ -201,25 +201,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //END POST
 ?>
 <div class="page-header-fixed">
-<div class="page-header">
-  <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$proposal_row['id_number'].'</small>'; ?>
-    <div class="page-header-button-group">
-      <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
-      <a href="../system/clientDetail?custID=<?php echo $proposal_row['clientID']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
-      <div class="btn-group">
-        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Daten erneuern"><i class="fa fa-refresh"></i></a>
-        <ul class="dropdown-menu">
-          <li><form method="POST"><button type="submit" class="btn btn-link" name="update_clientData"><?php echo $lang['CLIENTS']; ?> Info</button></form></li>
-          <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
-        </ul>
-      </div>
-      <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
-      <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
-      <a href="download?proc=<?php echo $historyID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
-      <a style="margin-left: 20px" data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
+    <div class="page-header">
+        <h3><?php echo $lang['PROCESS'] .' - '. $lang['EDIT'].' <small>'.$proposal_row['id_number'].'</small>'; ?>
+            <div class="page-header-button-group">
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target=".proposal_details" title="Auftragsdaten bearbeiten"><i class="fa fa-cog"></i></button>
+                <a href="../system/clientDetail?custID=<?php echo $proposal_row['clientID']; ?>" class="btn btn-default" title="<?php echo $lang['CLIENT'] .' - Details'; ?>"><i class="fa fa-briefcase"></i></a>
+                <div class="btn-group">
+                    <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Daten erneuern"><i class="fa fa-refresh"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><form method="POST"><button type="submit" class="btn btn-link" name="update_clientData"><?php echo $lang['CLIENTS']; ?> Info</button></form></li>
+                        <li><form method="POST"><button type="submit" class="btn btn-link" name="update_articles"><?php echo $lang['ARTICLE']; ?></button></form></li>
+                    </ul>
+                </div>
+                <button data-target=".product-summary" data-toggle="modal" class="btn btn-default" title="<?php echo $lang['OVERVIEW']; ?>"><i class="fa fa-list-alt"></i></button>
+                <button type="submit" form="positionForm" class="btn btn-default blinking" name="save_positions" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+                <a href="download?proc=<?php echo $historyID; ?>" target="_blank" class="btn btn-default" title="Download PDF"><i class="fa fa-download"></i></a>
+                <a style="margin-left: 20px" data-target=".choose-transition" data-toggle="modal" class="btn btn-default" title=""><i class="fa fa-arrow-right"></i></a>
+            </div>
+        </h3>
     </div>
-  </h3>
-</div>
 </div>
 <div class="page-content-fixed-150">
 <form id="positionForm" method="POST">
@@ -255,6 +255,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo '</tr>';
         $LAST_POSITION = $prod_row['position'];
       }
+      echo $conn->error;
       ?>
     </tbody>
   </table>
@@ -293,7 +294,7 @@ $("#sort tbody").sortable({
         </thead>
         <tbody>
           <?php
-          if($result){  $result->data_seek(0); }
+          if($result){  $result->data_seek(0); } //TODO: remove this
           $sum_purchase = $sum_sell = $partial_sum_purchase = $partial_sum_sell = 0;
           while($result && ($prod_row = $result->fetch_assoc())){
             $prod_row["name"] = $prod_row["name"];
@@ -479,7 +480,7 @@ $x = $prod_row['id'];
           <label><?php echo $lang['TAXES']; ?></label>
           <select class="js-example-basic-single btn-block" name="add_product_taxes">
             <?php
-            $tax_result = $conn->query("SELECT * FROM taxRates");
+            $tax_result = $conn->query("SELECT id, description, percentage FROM taxRates");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
               $selected = '';
               if($tax_row['id'] == 3) $selected = 'selected';
@@ -509,7 +510,7 @@ $x = $prod_row['id'];
       <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">
         <option value="0"><?php echo $lang['ARTICLE']; ?> ...</option>
         <?php
-        $result = $conn->query("SELECT * FROM articles");
+        $result = $conn->query("SELECT id, name FROM articles");
         while($result && ($prod_row = $result->fetch_assoc())){
           echo "<option value='".$prod_row['id']."'>".$prod_row['name']."</option>";
         }
@@ -563,7 +564,7 @@ $x = $prod_row['id'];
           <select class="js-example-basic-single" name="meta_paymentMethod">
             <option value="">...</option>
             <?php
-            $tax_result = $conn->query("SELECT * FROM paymentMethods");
+            $tax_result = $conn->query("SELECT name FROM paymentMethods");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
               $selected = $tax_row['name'] == $proposal_row['paymentMethod'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
@@ -580,7 +581,7 @@ $x = $prod_row['id'];
           <select class="js-example-basic-single" name="meta_shipmentType">
             <option value="">...</option>
             <?php
-            $tax_result = $conn->query("SELECT * FROM shippingMethods");
+            $tax_result = $conn->query("SELECT name FROM shippingMethods");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
               $selected = $tax_row['name'] == $proposal_row['shipmentType'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
@@ -593,7 +594,7 @@ $x = $prod_row['id'];
           <select class="js-example-basic-single" name="meta_representative">
             <option value="">...</option>
             <?php
-            $tax_result = $conn->query("SELECT * FROM representatives");
+            $tax_result = $conn->query("SELECT name FROM representatives");
             while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
               $selected = $tax_row['name'] == $proposal_row['representative'] ? 'selected' : '';
               echo '<option '.$selected.' value="'.$tax_row['name'].'" >'.$tax_row['name'].'</option>';
@@ -648,7 +649,7 @@ $x = $prod_row['id'];
 
           foreach($available_transitions as $t){
             echo '<div class="row"><div class="col-xs-6"><label><input type="radio" name="copy_transition" value="'.$t.'" />'.getNextERP($t, $proposal_row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
-          }
+        }
           ?>
         </div>
       </div>

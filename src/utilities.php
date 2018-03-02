@@ -173,6 +173,21 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     return $message;
 }
 
+function mc_status(){
+    static $encrypt = null;
+    if($encrypt === null){
+        global $conn;
+        $encrypt = false;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData");
+        if($result && ($row = $result->fetch_assoc()) && $row['activeEncryption'] == 'TRUE') $encrypt = true;
+    }
+    if($encrypt){
+         return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
+    } else {
+        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
+    }
+}
+
 /*
 * low - at least x characters (x from policy table)
 * medium - at least low and one capital letter and one number

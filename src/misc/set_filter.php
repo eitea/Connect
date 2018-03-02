@@ -103,8 +103,6 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     }
     if(isset($_POST['searchEmployees'])){
         $filterings['employees'] = $_POST['searchEmployees'];
-    }else{
-        $filterings['employees'] = array();
     }
     if(isset($filterings['savePage'])){
         $_SESSION['filterings'] = $filterings;
@@ -296,29 +294,29 @@ if($scale > 2){ //3 columns
               <br><br>
           <?php endif; ?>
           <?php if(isset($filterings['employees'])): ?>
-          <label><?php echo $lang["EMPLOYEE"]; ?>/ Team</label>
-          <select class="select2-team-icons js-example-basic-single " name="searchEmployees[]" multiple="multiple">
-          <?php
-            $modal_options = '';
-            $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
-            while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
-            $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
-            for($i = 0; $i < count($filterings['employees']); $i++){
-              $result = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $result);
-          }
-            echo $result;
-            $selected = '';
-            $result = $conn->query("SELECT id, name FROM $teamTable");
-            while ($row = $result->fetch_assoc()) {
-              $selected .= '<option value="team;'.$row['id'].'" data-icon="group" >'.$row['name'].'</option>';
-            }
-            for($i = 0; $i < count($filterings['employees']); $i++){
-              $selected = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $selected);
-            }
-            echo $selected;
-          ?>
-          </select>
-        <?php endif;?>
+              <label><?php echo $lang["EMPLOYEE"]; ?>/ Team</label>
+              <select class="select2-team-icons js-example-basic-single " name="searchEmployees[]" multiple="multiple">
+                  <?php
+                  $modal_options = '';
+                  $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
+                  while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
+                  $result = str_replace('<option value="', '<option value="user;', $modal_options); //append 'user;' before every value
+                  for($i = 0; $i < count($filterings['employees']); $i++){
+                      $result = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $result);
+                  }
+                  echo $result;
+                  $selected = '';
+                  $result = $conn->query("SELECT id, name FROM $teamTable");
+                  while ($row = $result->fetch_assoc()) {
+                      $selected .= '<option value="team;'.$row['id'].'" data-icon="group" >'.$row['name'].'</option>';
+                  }
+                  for($i = 0; $i < count($filterings['employees']); $i++){
+                      $selected = str_replace('<option value="'.$filterings['employees'][$i].'" ', '<option selected value="'.$filterings['employees'][$i].'" ', $selected);
+                  }
+                  echo $selected;
+                  ?>
+              </select>
+          <?php endif;?>
     </div>
 
         <?php if(isset($filterings['date']) || isset($filterings['logs'])): ?>
