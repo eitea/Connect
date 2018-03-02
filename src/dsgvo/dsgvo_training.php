@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
-        showInfo("question text hasn't been sanitized");
         $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title' WHERE id = $questionID");
         showError($conn->error);
         $stmt->bind_param("s", $text);
@@ -62,7 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $allowOverwrite = test_input($_POST["allowOverwrite"]);
         $random = test_input($_POST["random"]);
         $moduleID = intval($_POST["module"]);
-        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID WHERE id = $trainingID");
+        $answerEveryNDays = 0; // 0 means no interval
+        if(isset($_POST["answerEveryNDays"])){
+            $answerEveryNDays = intval($_POST["answerEveryNDays"]);
+        }
+        if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE'){
+            $answerEveryNDays = 0; // 0 means no interval
+        }
+        $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID, answerEveryNDays = $answerEveryNDays WHERE id = $trainingID");
         showError($conn->error);
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         showError($conn->error);

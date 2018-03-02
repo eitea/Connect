@@ -1401,6 +1401,8 @@ function create_tables($conn) {
         onLogin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         allowOverwrite ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         moduleID int(6),
+        answerEveryNDays int(6),
+        random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         PRIMARY KEY (id),
         FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (moduleID) REFERENCES dsgvo_training_modules(id) ON UPDATE CASCADE ON DELETE CASCADE)";
@@ -1448,8 +1450,8 @@ function create_tables($conn) {
         correct ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         version INT(6) DEFAULT 0,
         tries INT(6) DEFAULT 1,
-        random ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         duration INT(6) DEFAULT 0,
+        lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (questionID, userID),
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE

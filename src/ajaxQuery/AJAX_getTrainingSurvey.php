@@ -18,13 +18,17 @@ $result = $conn->query(
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
              SELECT userID 
              FROM dsgvo_training_completed_questions 
-             WHERE questionID = tq.id AND userID = $userID
+             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
          )
         UNION 
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
              SELECT userID 
              FROM dsgvo_training_completed_questions 
-             WHERE questionID = tq.id AND userID = $userID
+             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
          )
     ) temp"
 );
@@ -101,7 +105,9 @@ while ($row = $result->fetch_assoc()){
             NOT EXISTS (
                 SELECT userID 
                 FROM dsgvo_training_completed_questions 
-                WHERE questionID = tq.id AND userID = $userID
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
             )"
         ); // only select not completed questions
     }else{
@@ -112,7 +118,9 @@ while ($row = $result->fetch_assoc()){
             EXISTS (
                 SELECT userID 
                 FROM dsgvo_training_completed_questions 
-                WHERE questionID = tq.id AND userID = $userID
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
             )"
         ); //only select completed questions
     }
