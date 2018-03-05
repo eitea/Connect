@@ -126,10 +126,10 @@ $row = $result->fetch_assoc();
             <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
             <br><br><br>
             <div class="col-md-4">Username</div>
-            <div class="col-md-8"><input type="text" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /></div>
+            <div class="col-md-8"><input type="text" autocomplete="new-user" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /></div>
             <br><br>
             <div class="col-md-4">Passwort</div>
-            <div class="col-md-8"><input type="text" class="form-control password" name="mail_password" /></div>
+            <div class="col-md-8"><input type="text" autocomplete="new-password" class="form-control password" name="mail_password" /></div>
             <br>
         </div>
         <div class="col-md-4">
