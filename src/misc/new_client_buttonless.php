@@ -8,7 +8,8 @@
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($canEditClients == 'TRUE'){
         if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
-            $name = htmlentities($_POST['create_client_name'], ENT_QUOTES, "UTF-8");
+            $name = test_input($_POST['create_client_name']);
+
             $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
             $sql = "INSERT INTO clientData (name, companyID, clientNumber) VALUES('$name', $companyID, '".$_POST['clientNumber']."')";
@@ -23,7 +24,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(mysqli_error($conn)){
                 echo mysqli_error($conn);
             } else {
-                echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
+                //echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
             }
         } elseif(isset($_POST['create_client'])){
             echo '<div class="alert alert-danger fade in">';

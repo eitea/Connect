@@ -50,11 +50,18 @@ function isHoliday($ts) {
     return false;
 }
 
+
+
+
+
 function test_input($data, $strong = false) {
+    //REGEXString
+    $regex_names = "/([^-_@A-Za-z0-9ąa̧ ɓçđɗɖęȩə̧ɛ̧ƒɠħɦįi̧ ɨɨ̧ƙłm̧ ɲǫo̧ øơɔ̧ɍşţŧųu̧ ưʉy̨ƴæɑðǝəɛɣıĳɩŋœɔʊĸßʃþʋƿȝʒʔáàȧâäǟǎăāãåǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ ẹġĝǧğg̃ ģĥḥíìiîïǐĭīĩịĵķǩĺļľŀḽm̂ m̄ ŉńn̂ ṅn̈ ňn̄ ñņṋóòôȯȱöȫǒŏōõȭőọǿơp̄ ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯÁÀȦÂÄǞǍĂĀÃÅǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ ẸĠĜǦĞG̃ ĢĤḤÍÌIÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂ M̄ ʼNŃN̂ ṄN̈ ŇN̄ ÑŅṊÓÒÔȮȰÖȪǑŎŌÕȬŐỌǾƠP̄ ŔŘŖŚŜṠŠŞṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮĄA̧ ƁÇĐƊƉĘȨƏ̧Ɛ̧ƑƓĦꞪĮI̧ ƗƗ̧ƘŁM̧ ƝǪO̧ ØƠƆ̧ɌŞŢŦŲU̧ ƯɄY̨ƳÆⱭÐƎƏƐƔIĲƖŊŒƆƱĸƩÞƲȜƷʔ]+)/";
     if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
     } else {
-        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+        //$data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data); OLD TEST
+        $data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
     $data = trim($data);
     return $data;
@@ -566,4 +573,44 @@ function convToUTF8($text) {
         }
     }
     return $buf;
+}
+
+function getEstimatedHours($estimatedTime){
+    $tim = array();
+	$allHours = 0;
+    if(strstr($estimatedTime,'M')){
+        $finder = preg_split("/[M]/",$estimatedTime)[0].'M';
+       $estimatedTime = str_replace($finder, $finder.' ', $estimatedTime);
+    }
+	if(strstr($estimatedTime,'w')){
+        $finder = preg_split("/[w]/",$estimatedTime)[0].'w';
+       $estimatedTime = str_replace($finder, $finder.' ', $estimatedTime);
+    }
+	if(strstr($estimatedTime,'t')){
+        $finder = preg_split("/[t]/",$estimatedTime)[0].'t';
+       $estimatedTime = str_replace($finder, $finder.' ', $estimatedTime);
+    }
+	if(strstr($estimatedTime,'m')){
+        $finder = preg_split("/[m]/",$estimatedTime)[0].'m';
+       $estimatedTime = str_replace($finder, $finder.' ', $estimatedTime);
+    }
+	$tim = preg_split("/[\s]/", $estimatedTime);
+	for($i = 0;$i<count($tim);$i++){
+		if(strstr($tim[$i],'M')){
+			$tim[$i] = intval($tim[$i]) * 730.5;
+		}elseif(strstr($tim[$i],'w')){
+			$tim[$i] = intval($tim[$i]) * 168;
+		}elseif(strstr($tim[$i],'t')){
+			$tim[$i] = intval($tim[$i]) * 24;
+		}elseif(strstr($tim[$i],'m')){
+			$tim[$i] = intval($tim[$i]) / 60;
+		}else{
+			$tim[$i] = intval($tim[$i]);
+		}
+	}
+	for($i = 0;$i<count($tim);$i++){
+		$allHours += $tim[$i];
+	}
+	
+    return $allHours;//somefloat;
 }

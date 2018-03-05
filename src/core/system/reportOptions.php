@@ -1,6 +1,9 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<script>
+
+<?php
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+    echo '<script>
   document.onreadystatechange = () => {
     if (document.readyState === "complete"){
       if(document.getElementById("defaultCheck").hasAttribute("checked")){
@@ -12,10 +15,9 @@
         document.getElementById("smtpDropDown").setAttribute("disabled","disabled");
       }
    }
-
   }
-</script>
-<?php
+</script>';
+}
 if(isset($_POST['saveButton'])){
     if((getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) && isset($_POST['defaultOptions'])){
         $conn->query("UPDATE $mailOptionsTable SET host = 'adminmail', port = 25, username = 'admin', password = 'admin', smtpSecure = 'SSL', sender = 'noreply@eitea.at', sendername = 'Connect im Auftrag von ', isDefault = 1");
@@ -52,7 +54,7 @@ if(isset($_POST['saveButton'])){
             $val = test_input($_POST['feedback_mail_recipient']);
             $conn->query("UPDATE $mailOptionsTable SET feedbackRecipient = '$val'");
         }
-        $conn->query("UPDATE $mailOptionsTable SET isDefault = null");
+        $conn->query("UPDATE $mailOptionsTable SET isDefault = 0");
     }
     echo mysqli_error($conn);
 }
@@ -124,10 +126,10 @@ $row = $result->fetch_assoc();
             <div class="col-md-8"><input type="number" class="form-control" name="smtp_port"  value="<?php echo $row['port']; ?>" /></div>
             <br><br><br>
             <div class="col-md-4">Username</div>
-            <div class="col-md-8"><input type="text" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /></div>
+            <div class="col-md-8"><input type="text" autocomplete="new-user" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /></div>
             <br><br>
             <div class="col-md-4">Passwort</div>
-            <div class="col-md-8"><input type="text" class="form-control password" name="mail_password" /></div>
+            <div class="col-md-8"><input type="text" autocomplete="new-password" class="form-control password" name="mail_password" /></div>
             <br>
         </div>
         <div class="col-md-4">

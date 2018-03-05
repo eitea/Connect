@@ -19,11 +19,11 @@ if($result){
         while($rule = $result->fetch_assoc()){
             foreach($mailsIds as $mail_number){
                 $mail = $imap->getMail($mail_number);
-                if($subject = strstr($mail->subject, $rule['identifier'])){
-                    echo $subject .' - found<br>';
+                $pos = strpos($mail->subject, $rule['identifier']);
+                if($pos !== false){
+                    //echo $mail->subject .' - found<br>';
                     $id = uniqid();
                     $null = null;
-                    $name = str_replace($rule['identifier'],"",$subject);
 
                     $doc = new DOMDocument();
                     //$doc->encoding = 'iso-8859-1';
@@ -46,6 +46,7 @@ if($result){
                         }
                     }
 
+                    $name = substr_replace($mail->subject, '', $pos, strlen($rule['identifier']));
                     $company = $rule['company'];
                     $client = $rule['client'];
                     $project = $rule['clientproject'];

@@ -736,6 +736,7 @@ function dynamicOnLoad(modID){
         paste_data_images: true,
         menubar: false,
         statusbar: false,
+        browser_spellcheck: true,
         height: 300,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
@@ -938,6 +939,14 @@ function activateTemplate(event){
 }
 function checkInput(event){
     //check Input
+    form = event.target;
+    if(tinymce.activeEditor.getContent()==""){
+        if(form.getElementsByTagName("textarea")[0].textLength<1){
+            alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
+            return false;
+        }
+    }
+
     if(tinymce.activeEditor.getContent().length>(<?php
     $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
     $maxSQL = $max->fetch_assoc();
