@@ -1066,33 +1066,33 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
               <ul class="nav navbar-nav">
                 <?php
                 if(count($available_companies) == 2){
-                  echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                  echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
-                  while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                    echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                    if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                      echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                    }
-                  }
-                } else {
-                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                  while($result && ($row = $result->fetch_assoc())){
-                    echo '<li>';
-                    echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
-                    echo '<ul class="nav nav-list">';
-                    echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                    echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                    echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                    echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
                     while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                      echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                      if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                        echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                      }
+                        echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                        if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                            echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                        }
                     }
-                    echo '</ul></div></li>';
-                  }
+                } else {
+                    $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                    while($result && ($row = $result->fetch_assoc())){
+                        echo '<li>';
+                        echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                        echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
+                        echo '<ul class="nav nav-list">';
+                        echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                        echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                        while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                            echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                            if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                                echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                            }
+                        }
+                        echo '</ul></div></li>';
+                    }
                 }
                 ?>
                 <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
@@ -1191,22 +1191,22 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <span><?php echo $validation_output; ?></span>
       <span><?php echo $error_output; ?></span>
 
-<?php
-  $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
-  $row = $result->fetch_assoc();
-  if($row['expiration'] == 'TRUE'){ //can a password expire?
-    $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
-    if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
-      if($row['expirationType'] == 'FORCE'){ //force the change
-        include 'footer.php';
-        die();
+      <?php
+      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
+      $row = $result->fetch_assoc();
+      if($row['expiration'] == 'TRUE'){ //can a password expire?
+          $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
+              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
+              if($row['expirationType'] == 'FORCE'){ //force the change
+                  include 'footer.php';
+                  die();
+              }
+          }
       }
-    }
-}
-$user_agent = $_SERVER["HTTP_USER_AGENT"];
-if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
-}
+      $user_agent = $_SERVER["HTTP_USER_AGENT"];
+      if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
+      }
 
-?>
+      ?>

@@ -22,10 +22,14 @@ if(isset($_POST['saveButton'])){
     echo mysqli_error($conn);
 }
 if(isset($_POST['deactive_encryption'])){
+    //TODO: decrypt
+
     $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
 }
-if(isset($_POST['active_encryption'])){
-
+if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_POST['encryption_pass_confirm'] == $_POST['encryption_pass']){
+    //TODO encrypt
+    
+    $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
 }
 
 $result = $conn->query("SELECT * FROM policyData");

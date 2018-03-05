@@ -2182,6 +2182,12 @@ if($row['version'] < 139){
     }
 }
 
+//if($row['version'] < 140){}
+//if($row['version'] < 141){}
+//if($row['version'] < 142){}
+//if($row['version'] < 143){}
+
+
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
