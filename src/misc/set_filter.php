@@ -316,6 +316,7 @@ if($scale > 2){ //3 columns
                   echo $selected;
                   ?>
               </select>
+              <input type="hidden" name="searchEmployees[]">
           <?php endif;?>
     </div>
 

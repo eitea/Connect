@@ -9,20 +9,55 @@ require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
 function formatPercent($num){ return ($num * 100)."%"; }
-function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
-    if($current<$estimate){
-        $yellowBar = $current/($estimate+0.0001);
+function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+   $allHours = 0;
+   if(strpos($estimate,'M')){
+       $finder = preg_split("/[M]/",$estimate)[0].'M';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'w')){
+       $finder = preg_split("/[w]/",$estimate)[0].'w';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'t')){
+       $finder = preg_split("/[t]/",$estimate)[0].'t';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'m')){
+       $finder = preg_split("/[m]/",$estimate)[0].'m';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   $tim = preg_split("/[\s]/", $estimate);
+   for($i = 0;$i<count($tim);$i++){
+       if(strpos($tim[$i],'M')){
+           $tim[$i] = intval($tim[$i]) * 730.5;
+       }elseif(strpos($tim[$i],'w')){
+           $tim[$i] = intval($tim[$i]) * 168;
+       }elseif(strpos($tim[$i],'t')){
+           $tim[$i] = intval($tim[$i]) * 24;
+       }elseif(strpos($tim[$i],'m')){
+           $tim[$i] = intval($tim[$i]) / 60;
+       }else{
+           $tim[$i] = intval($tim[$i]);
+       }
+   }
+   for($i = 0;$i<count($tim);$i++){
+       $allHours += $tim[$i];
+   }
+
+    if($current < $allHours){
+        $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
-        $timeLeft = $estimate - $current;
+        $timeLeft = $allHours - $current;
         $redBar = 0;
         $timeOver = 0;
     } else {
-        $timeOver = $current - $estimate;
+        $timeOver = $current - $allHours;
         $timeLeft = 0;
         $greenBar = 0;
-        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current + 0.0001);
+        $yellowBar = ($allHours)/($timeLeft + $timeOver + $current + 0.0001);
         $redBar = 1-$yellowBar;
-        $current = $estimate;
+        $current = $allHours;
     }
     $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
     $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
@@ -192,7 +227,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
-                echo "<script>console.log('".strlen($description)."')</script>";
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
                         $mname = strip_tags($matches[1][$i]);
@@ -392,7 +426,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 $selection[] = 'user;'.$emp_row['userid'];
             }
 
-            if(count($filterings['employees']) && !array_intersect($filterings['employees'], $selection)) continue;
+            if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
 
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -407,7 +441,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             $stmt_time->execute();
             $currentTime = 0;
             if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
-            echo generate_progress_bar(floatval($currentTime),floatval($row["estimatedHours"])); // generate_progress_bar($cur,$estimate): string
+            echo generate_progress_bar(floatval($currentTime), $row["estimatedHours"]);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
@@ -629,10 +663,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-$("#projectForm").on("submit",function(){
-    console.log("here");
-
-})
 $("#bookCompletedCheckbox").change(function(event){
     $("#bookCompleted").attr('readonly', this.checked);
     $("#bookRanger").attr('disabled', this.checked);
@@ -742,14 +772,13 @@ function dynamicOnLoad(modID){
                 pastedData = clipboardData.getData('text/rtf');
 
                 var stringToBinaryArray = function(txt) {
-                        var buffer = new ArrayBuffer(txt.length);
-                        var bufferView = new Uint8Array(buffer);
-                        for (var i = 0; i < txt.length; i++) {
-                            bufferView[i] = txt.charCodeAt(i);
-                        }
-                        return buffer;
+                    var buffer = new ArrayBuffer(txt.length);
+                    var bufferView = new Uint8Array(buffer);
+                    for (var i = 0; i < txt.length; i++) {
+                        bufferView[i] = txt.charCodeAt(i);
                     }
-
+                    return buffer;
+                }
 
                 var settings = {};
                 var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
@@ -820,18 +849,6 @@ $('button[name=editModal]').click(function(){
   }
 });
 appendModal('');
-
-$("tbody").on("click",function(){
-    $('button[name=editModal]').click(function(){
-            var index = $(this).val();
-        if(existingModals.indexOf(index) == -1){
-            appendModal(index);
-        } else {
-            $('#editingModal-'+index).modal('show');
-        }
-        });
-        appendModal('');
-})
 
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
@@ -921,12 +938,6 @@ function activateTemplate(event){
 }
 function checkInput(event){
     //check Input
-    //console.log(event);
-    if(tinymce.activeEditor.getContent()==""){
-        alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
-        return false;
-    }
-
     if(tinymce.activeEditor.getContent().length>(<?php
     $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
     $maxSQL = $max->fetch_assoc();
@@ -937,7 +948,6 @@ function checkInput(event){
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
 }
 function reviewChange(event,id){
-    //console.log(event);
     projectid = id;
     needsReview = event.target.checked ? 'TRUE' : 'FALSE';
     $.post("ajaxQuery/AJAX_db_utility.php",{
@@ -966,8 +976,6 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
 setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );
-
-
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

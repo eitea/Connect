@@ -970,7 +970,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
             echo "<script>$('#adminOption_REPORT').click();</script>";
         } ?>
-      <?php endif;?>
+      <?php endif; ?>
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
