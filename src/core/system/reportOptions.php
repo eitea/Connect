@@ -52,7 +52,7 @@ if(isset($_POST['saveButton'])){
             $val = test_input($_POST['feedback_mail_recipient']);
             $conn->query("UPDATE $mailOptionsTable SET feedbackRecipient = '$val'");
         }
-        $conn->query("UPDATE $mailOptionsTable SET isDefault = null");
+        $conn->query("UPDATE $mailOptionsTable SET isDefault = 0");
     }
     echo mysqli_error($conn);
 }
