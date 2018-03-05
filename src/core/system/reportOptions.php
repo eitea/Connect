@@ -1,6 +1,9 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<script>
+
+<?php
+if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+    echo '<script>
   document.onreadystatechange = () => {
     if (document.readyState === "complete"){
       if(document.getElementById("defaultCheck").hasAttribute("checked")){
@@ -12,10 +15,9 @@
         document.getElementById("smtpDropDown").setAttribute("disabled","disabled");
       }
    }
-
   }
-</script>
-<?php
+</script>';
+}
 if(isset($_POST['saveButton'])){
     if((getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) && isset($_POST['defaultOptions'])){
         $conn->query("UPDATE $mailOptionsTable SET host = 'adminmail', port = 25, username = 'admin', password = 'admin', smtpSecure = 'SSL', sender = 'noreply@eitea.at', sendername = 'Connect im Auftrag von ', isDefault = 1");
