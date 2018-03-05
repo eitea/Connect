@@ -924,7 +924,6 @@ function checkInput(event){
     //check Input
     console.log(event);
     form = event.target;
-    form = document.getElementById(form.id);
     if(tinymce.activeEditor.getContent()==""){
         if(form.getElementsByTagName("textarea")[0].textLength<1){
             alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
