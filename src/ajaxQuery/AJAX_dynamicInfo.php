@@ -60,7 +60,7 @@ if($showMissingBookings){
         $timeToUTC = $row['timeToUTC']; //just in case.
         $missingBookingsArray[] = array("start" => $start, "end" => $end, "date" => $date, "indexIM" => $indexIM, "timeToUTC" => $timeToUTC);
     } else {
-        echo "no valid timestamp found";
+        // echo "no valid timestamp found";
         $showMissingBookings = false;
     }
 }
@@ -279,7 +279,8 @@ if (sizeof($missingBookingsArray) == 0) {
                         <!-- time chooser -->
                         <div class="col-md-4">
                             <label><?php echo $lang['TIME']; ?></label>
-                            <select class="js-example-basic-single" name="time-range">
+                            <input type="hidden" name="time-range" id="real-time-range<?php echo $x; ?>" />
+                            <select class="js-example-basic-single" id="time-range-chooser<?php echo $x; ?>">
                             <?php 
                             $lastDate = "";
                             foreach ($missingBookingsArray as $booking) {
@@ -292,6 +293,47 @@ if (sizeof($missingBookingsArray) == 0) {
                             ?>
                             </select>
                         </div>
+                        <div class="col-md-4">
+                            <label id="time-range-date<?php echo $x; ?>"></label>
+                            <div class="input-group">
+                                <input type="time" class="form-control" readonly onkeypress="return event.keyCode != 13;" id="time-range-start<?php echo $x; ?>" >
+                                <span class="input-group-addon"> - </span>
+                                <input type="time" class="form-control timepicker" onkeypress="return event.keyCode != 13;" id="time-range-end<?php echo $x; ?>"/>
+                            </div>
+                        </div>
+                        <script>
+                            (function(){ //creates own scope
+                                function updateStartAndEnd(date,start,end){ 
+                                    $("#time-range-date<?php echo $x; ?>").html(date);
+                                    $("#time-range-start<?php echo $x; ?>").val(start);
+                                    $("#time-range-end<?php echo $x; ?>").val(end);
+                                }
+                                var timeRange = $("#time-range-chooser<?php echo $x; ?>").val(); // format date;start;end;timeToUTC;indexIM
+                                $("#real-time-range<?php echo $x; ?>").val(timeRange)
+                                var arr = timeRange.split(";");
+                                updateStartAndEnd(arr[0], arr[1], arr[2]);
+                                $("#time-range-chooser<?php echo $x; ?>").change(function(){
+                                    var timeRange = $("#time-range-chooser<?php echo $x; ?>").val();
+                                    $("#real-time-range<?php echo $x; ?>").val(timeRange);
+                                    var arr = timeRange.split(";");
+                                    updateStartAndEnd(arr[0], arr[1], arr[2]);                                    
+                                })
+                                $("#time-range-end<?php echo $x; ?>").change(function(){
+                                    var timeRange = $("#time-range-chooser<?php echo $x; ?>").val();
+                                    var newEnd = $("#time-range-end<?php echo $x; ?>").val();
+                                    var arr = timeRange.split(";");
+                                    if(Number(newEnd.replace(":",""))>Number(arr[2].replace(":",""))){
+                                        newEnd = arr[2];
+                                    }else if (Number(newEnd.replace(":",""))<Number(arr[1].replace(":",""))){
+                                        newEnd = arr[1];
+                                    }
+                                    arr[2] = newEnd;
+                                    $("#time-range-end<?php echo $x; ?>").val(newEnd);
+                                    timeRange = arr.join(";");
+                                    $("#real-time-range<?php echo $x; ?>").val(timeRange);
+                                })
+                            })()
+                        </script>
                         <!-- /time chooser -->
                     </div>
                     <div class="row">

@@ -14,6 +14,8 @@ $companyID = $row["companyID"];
 $onLogin = $row["onLogin"];
 $allowOverwrite = $row["allowOverwrite"];
 $random = $row["random"];
+$moduleID = $row["moduleID"];
+$answerEveryNDays = $row["answerEveryNDays"];
 
 $userArray = array();
 $teamArray = array();
@@ -29,10 +31,22 @@ while($row = $result->fetch_assoc()){
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header">Aufgabenstellung/Schulung Bearbeiten</div>
+        <div class="modal-header"><i class="fa fa-cube"></i> Aufgabenstellung/Schulung Bearbeiten</div>
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
+            <label>Set*</label>
+            <select class="js-example-basic-single" name="module" required>
+                <?php 
+                $result = $conn->query("SELECT * FROM dsgvo_training_modules");
+                while ($result && ($row = $result->fetch_assoc())) {
+                    $name = $row["name"];
+                    $id = $row["id"];
+                    $selected = ($id == $moduleID)?"selected":"";
+                    echo "<option $selected value='$id'>$name</option>";
+                }
+                ?>
+            </select>
             <label>Version</label>
             <input type="number" class="form-control" name="version" placeholder="1" min="1" step="1" value="<?php echo $version ?>" />
             <label>Zugeordnete Personen</label>
@@ -66,6 +80,8 @@ while($row = $result->fetch_assoc()){
             <br/><label>Anordnung der Antworten</label><br/>
             <label><input type="radio" name="random" value="TRUE" <?php if($random == 'TRUE') echo "checked" ?> />Antwortmöglichkeiten zufällig anordnen.</label><br/>
             <label><input type="radio" name="random" value="FALSE" <?php if($random == 'FALSE') echo "checked" ?> />Antwortmöglichkeiten wie in der Frage belassen.</label>
+            <br /><label>Wiederholungsintervall in Tagen</label>
+            <input type="number" title="Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt" min="1" max="365" class="form-control" name="answerEveryNDays" value="<?php echo $answerEveryNDays; ?>" <?php if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE') echo "disabled" ?> />
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
@@ -74,3 +90,19 @@ while($row = $result->fetch_assoc()){
       </div>
     </div>
 </form>
+<script>
+$("input[name=onLogin][value='TRUE']").change(function(event){
+    if($("input[name=allowOverwrite][value='TRUE']").is(':checked'))
+        $("input[name=answerEveryNDays]").attr("disabled",false)
+})
+$("input[name=onLogin][value='FALSE']").change(function(event){
+    $("input[name=answerEveryNDays]").attr("disabled",true)
+})
+$("input[name=allowOverwrite][value='TRUE']").change(function(event){
+    if($("input[name=onLogin][value='TRUE']").is(':checked'))
+        $("input[name=answerEveryNDays]").attr("disabled",false)
+})
+$("input[name=allowOverwrite][value='FALSE']").change(function(event){
+    $("input[name=answerEveryNDays]").attr("disabled",true)
+})
+</script>

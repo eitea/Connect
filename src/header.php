@@ -100,48 +100,72 @@ $validation_output = $error_output = '';
 $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             WHERE questionID = tq.id AND userID = $userID
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
          )
         UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             WHERE questionID = tq.id AND userID = $userID
+             SELECT userID 
+             FROM dsgvo_training_completed_questions 
+             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
          )
     ) temp"
 );
 echo $conn->error;
-$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-$result = $conn->query(
-    "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-        WHERE userID = $userID
-        UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
-        WHERE tr.userID = $userID
-    ) temp"
-);
-echo $conn->error;
-$userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+if(!$userHasSurveys){
+    $result = $conn->query(
+        "SELECT count(*) count FROM (
+            SELECT userID FROM dsgvo_training_user_relations tur
+            LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
+            WHERE userID = $userID 
+            AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 )
+            UNION
+            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
+            INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+            LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
+            WHERE tr.userID = $userID
+            AND NOT EXISTS (
+                 SELECT userID 
+                 FROM dsgvo_training_completed_questions 
+                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 )
+        ) temp"
+    );
+    echo $conn->error;
+    $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+}
 $userHasUnansweredOnLoginSurveys = false;
 if($userHasUnansweredSurveys){
     $result = $conn->query(
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                 SELECT userID
-                 FROM dsgvo_training_completed_questions
-                 WHERE questionID = tq.id AND userID = $userID
+                SELECT userID 
+                FROM dsgvo_training_completed_questions 
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
              )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                 SELECT userID
-                 FROM dsgvo_training_completed_questions
-                 WHERE questionID = tq.id AND userID = $userID
+                SELECT userID 
+                FROM dsgvo_training_completed_questions 
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
              )
         ) temp"
     );
@@ -273,6 +297,7 @@ if ($_SESSION['color'] == 'light') {
 
   <script src="plugins/jQuery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
   <script src='plugins/select2/js/select2.min.js'></script>
@@ -331,6 +356,70 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
     document.getElementsByName('privatePGP')[0].value = '';
   }
   </script>
+  <script>
+    function showError(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-exclamation-triangle',
+	        title: '',
+            message: message 
+        },{
+            type: 'danger'
+        });
+    }
+    function showWarning(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-warning',
+	        title: '',
+            message: message 
+        },{
+            type: 'warning'
+        });
+    }
+    function showInfo(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-info',
+	        title: '',
+            message: message 
+        },{
+            type: 'info'
+        });
+    }
+    function showSuccess(message){
+        if(!message || message.length == 0) return;
+        $.notify({
+            icon: 'fa fa-check',
+	        title: '',
+            message: message 
+        },{
+            type: 'success'
+        });
+    }
+  </script>
+  <?php 
+    function showError($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showWarning($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showInfo($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    function showSuccess($message){
+        if(!$message || strlen($message) == 0) return;
+        $message = str_replace("'", "\\'", $message);
+        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+  ?>
 </head>
 <body id="body_container" class="is-table-row">
   <div id="loader"></div>
@@ -611,6 +700,8 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
     if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
+    // only display surveys when user is stamped in 
+    $userHasUnansweredOnLoginSurveys = false;
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
     $buttonEmoji = '';

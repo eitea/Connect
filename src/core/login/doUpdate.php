@@ -2058,6 +2058,58 @@ if($row['version'] < 137){
         echo '<br>Role: Can edit suppliers';
     }
 }
+if($row['version'] < 138){
+    $sql = "CREATE TABLE dsgvo_training_modules (
+        id int(6) NOT NULL AUTO_INCREMENT,
+        name varchar(100),
+        PRIMARY KEY (id)
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: modules';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD COLUMN moduleID int(6)";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: module id';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD FOREIGN KEY (moduleID) REFERENCES dsgvo_training_modules(id) ON UPDATE CASCADE ON DELETE CASCADE";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: module constraint';
+    }
+    // add previous trainings to a module (can't be displayed otherwise)
+    $sql = "INSERT INTO dsgvo_training_modules (name) VALUES ('before module update')";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: add new module';
+    }
+    $moduleID = mysqli_insert_id($conn);
+    $sql = "UPDATE dsgvo_training SET moduleID = $moduleID";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: add to new module';
+    }
+}
+if($row['version'] < 139){
+    $sql = "ALTER TABLE dsgvo_training_completed_questions ADD COLUMN lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: last answered';
+    }
+    $sql = "ALTER TABLE dsgvo_training ADD COLUMN answerEveryNDays int(6)";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: answer every n days';
+    }
+}
 
 // ------------------------------------------------------------------------------
 
