@@ -922,7 +922,6 @@ function activateTemplate(event){
 }
 function checkInput(event){
     //check Input
-    console.log(event);
     form = event.target;
     if(tinymce.activeEditor.getContent()==""){
         if(form.getElementsByTagName("textarea")[0].textLength<1){
@@ -939,8 +938,6 @@ function checkInput(event){
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
-    console.log("true");
-    return false;
 }
 function reviewChange(event,id){
     //console.log(event);
