@@ -171,8 +171,8 @@ $lang_ger['CAN_BOOK'] = 'Kann Buchen';
 $lang_eng['CAN_EDIT_TEMPLATES'] = 'Can edit Templates';
 $lang_ger['CAN_EDIT_TEMPLATES'] = 'Kann Vorlagen editieren';
 
-$lang_eng['CAN_USE_ARCHIVE'] = 'Can use the Archive';
-$lang_ger['CAN_USE_ARCHIVE'] = 'Kann das Archiv benutzen';
+$lang_eng['CAN_USE_ARCHIVE'] = 'Can use Archive';
+$lang_ger['CAN_USE_ARCHIVE'] = 'Kann Archiv benutzen';
 
 $lang_eng['CAN_USE_SOCIAL_MEDIA'] = 'Can use Social Media';
 $lang_ger['CAN_USE_SOCIAL_MEDIA'] = 'Kann soziale Medien benutzen';
@@ -793,9 +793,6 @@ $lang_ger['MARK_AS_ABSENT'] = 'Als Abwesend eintragen';
 $lang_eng['MAY_TAKE_A_WHILE'] = 'This may take a few seconds.';
 $lang_ger['MAY_TAKE_A_WHILE'] = 'Der Vorgang könnte einige Sekunden dauern.';
 
-$lang_eng['MASTER_PASSWORD'] = 'Master Password';
-$lang_ger['MASTER_PASSWORD'] = 'Master Passwort';
-
 $lang_eng['MESSAGE_DELETE_REQUEST'] = 'Only deletes the request, NOT actual hours!';
 $lang_ger['MESSAGE_DELETE_REQUEST'] = 'Löscht nur den Antrag, NICHT die eigentlichen Stunden!';
 
@@ -930,12 +927,6 @@ $lang_ger['PASSWORD_CURRENT'] = 'Aktuelles Passwort';
 
 $lang_eng['PASSWORD_MINLENGTH'] = 'Minimal Password Length';
 $lang_ger['PASSWORD_MINLENGTH'] = 'Minimale Passwortlänge';
-
-$lang_eng['PASSWORD_REMOVE_PROMPT'] = 'Do you really want to delete the master password? This may take a while. \nDO NOT INTERRUPT!';
-$lang_ger['PASSWORD_REMOVE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort löschen? Das könnte eine Weile dauern. \nBITTE NICHT UNTERBRECHEN!';
-
-$lang_eng['PASSWORD_CHANGE_PROMPT'] = 'Do you really want to change the master password? \nDO NOT INTERRUPT!';
-$lang_ger['PASSWORD_CHANGE_PROMPT'] = 'Wollen Sie wirklich das Master Passwort ändern? \nBITTE NICHT UNTERBRECHEN!';
 
 $lang_eng['PAYMENT'] = 'Payment';
 $lang_ger['PAYMENT'] = 'Zahlung';

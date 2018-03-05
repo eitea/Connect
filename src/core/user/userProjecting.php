@@ -34,38 +34,48 @@ if($result && $result->num_rows > 0){
 
 //addendums
 $request_addendum = false;
-$result = $conn->query("SELECT * FROM logs WHERE userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //192h = 8 days
+$result = $conn->query("SELECT indexIM, time, timeEnd, timeToUTC FROM logs WHERE status = 0 AND userID = $userID AND DATE('".carryOverAdder_Hours($start, -182)."') < time"); //192h = 8 days
 while($result && ($row = $result->fetch_assoc())){
-  $has_bookings = false;
-  $i = $row['indexIM'];
-  $A = $row['time'];
-  $res_b = $conn->query("SELECT * FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC"); //changes must be carried over to AJAX_dynamicInfo
-  while($row_b = $res_b->fetch_assoc()){ //changes must be carried over to addendum page
-    $has_bookings = true;
-    $B = $row_b['start'];
-    if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){
-      $request_addendum = $i;
-      //to process the next ADD
-      $date = substr(carryOverAdder_Hours($A, $timeToUTC),0,10);
-      $indexIM = $i;
-      $timeToUTC = $row['timeToUTC'];
-      $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
-      $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
-      break;
+    $has_bookings = false;
+    $i = $row['indexIM'];
+    $A = $row['time']; //check beginning
+    $res_b = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = $i ORDER BY start ASC"); //changes must be carried over to AJAX_dynamicInfo
+    if($res_b && $res_b->num_rows > 0){
+        while($row_b = $res_b->fetch_assoc()){ //changes must be carried over to addendum page
+            $has_bookings = true;
+            $B = $row_b['start'];
+            if(timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){
+                $request_addendum = $i;
+                //to process the next ADD
+                $date = substr(carryOverAdder_Hours($A, $timeToUTC),0,10);
+                $indexIM = $i;
+                $timeToUTC = $row['timeToUTC'];
+                $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
+                $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
+                break;
+            }
+            $A = $row_b['end'];
+        }
+    } elseif($row['timeEnd'] != '0000-00-00 00:00:00') {
+        $request_addendum = $i; //no bookings at all -> auto-refill
+        $date = substr(carryOverAdder_Hours($A, $timeToUTC),0,10);
+        $indexIM = $i;
+        $timeToUTC = $row['timeToUTC'];
+        $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
+        $end = substr(carryOverAdder_Hours($row['timeEnd'], $timeToUTC), 11, 5);
     }
-    $A = $row_b['end'];
-  }
-  if($request_addendum) break;
-  $B = $row['timeEnd'];
-  if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
-    $request_addendum = $i;
-    $date = substr($A,0,10);
-    $indexIM = $i;
-    $timeToUTC = $row['timeToUTC'];
-    $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
-    $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
-    break;
-  }
+
+    if($request_addendum) break;
+    $B = $row['timeEnd'];
+    if($has_bookings && $B != '0000-00-00 00:00:00' && timeDiff_Hours($A, $B) > $bookingTimeBuffer/60){ //also check end
+        $request_addendum = $i;
+        $date = substr($A,0,10);
+        $indexIM = $i;
+        $timeToUTC = $row['timeToUTC'];
+        $start = substr(carryOverAdder_Hours($A, $timeToUTC), 11, 5);
+        $end = substr(carryOverAdder_Hours($B, $timeToUTC), 11, 5);
+        break;
+    }
 }
 echo $conn->error;
 
@@ -75,7 +85,7 @@ $keepFields = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(!empty($_POST['captcha'])){
-    die("Bot detected. Aborting all Operations.");
+    die("Bot detected. Aborting all Operations."); //STRIKE
   }
 
   if(isset($_POST["add"]) && isset($_POST['end']) && test_Time($_POST['end']) && test_Time($_POST['start'])){

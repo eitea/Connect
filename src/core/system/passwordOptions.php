@@ -1,79 +1,6 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID);?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
-//just encrypt the values from current to new, MasterCrypt will handle the masterPass settings
-function mc_update_values($current, $new, $statement = '') {
-    global $conn;
-    $logFile = fopen("./cryptlog.txt", "a");
-    if ($statement) {
-        fwrite($logFile, "\r\n" . getCurrentTimestamp() . " (UTC): Master password $statement\r\n");
-    }
-    $i = 0;
-    //articles
-    $result = $conn->query("SELECT id, name, description, iv, iv2 FROM articles");
-    $stmt = $conn->prepare("UPDATE articles SET name = ?, description = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $description, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering articles\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-        $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-    }
-    $stmt->close();
-    //products
-    $result = $conn->query("SELECT id, name, description, iv, iv2 FROM products");
-    $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $description, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering products\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $name = $mc_new->encrypt($mc_old->decrypt($row["name"]));
-        $description = $mc_new->encrypt($mc_old->decrypt($row["description"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-    }
-    $stmt->close();
-    //bank data
-    $result = $conn->query("SELECT * FROM clientInfoBank");
-    $stmt = $conn->prepare("UPDATE clientInfoBank SET bic = ?, iban = ?, bankName = ?, iv = ?, iv2 = ? WHERE id = ?");
-    $stmt->bind_param("sssssi", $bic, $iban, $name, $iv, $iv2, $id);
-    fwrite($logFile, "\t" . getCurrentTimestamp() . " (UTC): altering bank\r\n");
-    while ($row = $result->fetch_assoc()) {
-        $i++;
-        $mc_old = new MasterCrypt($current, $row['iv'], $row['iv2']);
-        $mc_new = new MasterCrypt($new);
-        $bic = $mc_new->encrypt($mc_old->decrypt($row['bic']));
-        $iban = $mc_new->encrypt($mc_old->decrypt($row["iban"]));
-        $name = $mc_new->encrypt($mc_old->decrypt($row["bankName"]));
-        $iv = $mc_new->iv;
-        $iv2 = $mc_new->iv2;
-        $id = $row["id"];
-        $stmt->execute();
-        if ($conn->error) {
-            fwrite($logFile, "\t\t" . getCurrentTimestamp() . " (UTC): Error in row with id $id: " . $conn->error . "\r\n");
-        }
-    }
-    fwrite($logFile, date("y-m-d h:i:s") . ": Finished\r\n");
-    fwrite($logFile, date("y-m-d h:i:s") . ":  rows affected\r\n");
-    $stmt->close();
-    fclose($logFile);
-}
 if(isset($_POST['saveButton'])){
     //general
     $length = intval($_POST['passwordLength']);
@@ -91,44 +18,25 @@ if(isset($_POST['saveButton'])){
         }
     }
     $type = test_input($_POST['enableTimechange_type']);
-    $conn->query("UPDATE $policyTable SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
+    $conn->query("UPDATE policyData SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
     echo mysqli_error($conn);
-    //masterpassword
-    if(!empty($_POST['masterPass_new']) && !empty($_POST['masterPass_newConfirm']) && $_POST['masterPass_new'] == $_POST['masterPass_newConfirm']
-    && (!$masterPasswordHash || crypt($_POST['masterPass_current'], $masterPasswordHash) == $masterPasswordHash)){ //from header
-        $current = '';
-        $new_master = base64_encode($_POST['masterPass_new']);
-        if($masterPasswordHash){ $current = base64_encode($_POST['masterPass_current']); }
-        if($current && crypt(base64_decode($current), $masterPasswordHash) == $masterPasswordHash){
-            mc_update_values($current, $new_master, 'changed');
-        } elseif(!$masterPasswordHash) {
-            mc_update_values($current, $new_master , 'added');
-        } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPTECTED'].'</div>';
-        }
-        $checkSum = simple_encryption("ABCabc123!", $new_master);
-        $new_master = password_hash($_POST['masterPass_new'], PASSWORD_BCRYPT);
-        if($conn->query("UPDATE configurationData SET masterPassword = '$new_master', checkSum = '$checkSum'")){
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-        } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-        }
-    }
-} elseif(isset($_POST['masterPass_deactivate']) && !empty($_POST['masterPass_current'])){
-    mc_update_values($_SESSION['masterpassword'], '', 'removed');
-    $conn->query("UPDATE configurationData SET masterPassword = ''"); echo $conn->error;
-    $masterPasswordHash = '';
-    $_SESSION['masterpassword'] = '';
-    $conn->query("UPDATE UserData SET keyCode = '' "); echo $conn->error;
-} elseif(isset($_POST['masterPass_deactivate'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Aktuelles Passwort fehlt.</div>';
+}
+if(isset($_POST['deactive_encryption'])){
+    //TODO: decrypt
+
+    $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
+}
+if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_POST['encryption_pass_confirm'] == $_POST['encryption_pass']){
+    //TODO encrypt
+    
+    $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
 }
 
-$result = $conn->query("SELECT * FROM $policyTable");
+$result = $conn->query("SELECT * FROM policyData");
 $row = $result->fetch_assoc();
 ?>
 
-<form method="POST" id="formPasswordOptions">
+<form method="POST">
     <div class="page-header">
         <h3><?php echo $lang['PASSWORD'].' '.$lang['OPTIONS']; ?>
             <div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" name="saveButton" title="Save"><i class="fa fa-floppy-o"></i></button></div>
@@ -177,7 +85,7 @@ $row = $result->fetch_assoc();
         </div>
     </div>
     <br>
-    <div class="container-fluid">
+    <div class="row">
         <div class="col-md-4">
             Änderung nach Monaten:
         </div>
@@ -197,62 +105,32 @@ $row = $result->fetch_assoc();
     </div>
 
     <br><hr><br>
+</form>
 
-    <h4><?php echo mc_status(); ?><?php echo $lang["MASTER_PASSWORD"]; ?> <small><?php if($masterPasswordHash): echo $lang["ENCRYPTION_ACTIVE"]; else: echo $lang["ENCRYPTION_DEACTIVATED"]; endif;?></small><a role="button" data-toggle="collapse" href="#password_info_master"><i class="fa fa-info-circle"></i></a></h4>
-        <br>
-        <div class="collapse" id="password_info_master">
-            <div class="well">
-                Das Masterpasswort wird zum verschlüsseln sensibler Daten verwendet, die nur unter eingabe des Passworts wieder entschlüsselt werden können.
-                Es sind insgesamt <b><?php echo mc_total_row_count(); ?></b> Einträge betroffen.
-            </div>
-        </div>
-        <br>
-        <div class="container-fluid">
-            <?php if($masterPasswordHash): ?>
-                <div class="col-md-4">
-                    <?php echo $lang["PASSWORD_CURRENT"]; ?>:
-                </div>
-                <div class="col-md-5">
-                    <input type="password" class="form-control" name="masterPass_current" value=""/>
-                </div>
-                <?php if($masterPasswordHash): ?>
-                    <div class="col-md-3"><button type="submit" class="btn btn-warning" name="masterPass_deactivate" value="true"><?php echo $lang["ENCRYPTION_DEACTIVATE"]; ?></button></div>
-                <?php endif; ?>
-                <br><br>
-            <?php endif; ?>
+<form method="POST">
+    <?php
+    $result = $conn->query("SELECT activeEncryption FROM configurationData");
+    if($result && ($row = $result->fetch_assoc())){
+        if($row['activeEncryption'] == 'TRUE'){
+            echo '<button type="submit" name="deactive_encryption">Verschlüsselung DEAKTIVIEREN</button>';
+        } else {
+            echo '<div class="row">
             <div class="col-md-4">
-                <?php echo $lang["NEW_PASSWORD"]; ?>:
+            <label>Neues Passwort</label>
+            <input type="password" name="encryption_pass" class="form-control" />
             </div>
-            <div class="col-md-8">
-                <input type="password" class="form-control" name="masterPass_new" value=""/>
-            </div>
-            <br><br>
             <div class="col-md-4">
-                <?php echo $lang["NEW_PASSWORD_CONFIRM"]; ?>:
+            <label>Neues Passwort Bestätigen</label>
+            <input type="password" name="encryption_pass_confirm" class="form-control" />
             </div>
-            <div class="col-md-8">
-                <input type="password" class="form-control" name="masterPass_newConfirm" value=""/>
-            </div>
-            <br><br>
             <div class="col-md-4">
-                <a href="../system/cryptlog" target="_blank"><?php echo $lang["ENCRYPTION_LOG"]; ?> </a>
+            <label>OK</label><br>
+            <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
             </div>
-            <br><br><br>
-        </div>
-    </form>
-
-    <script>
-    $("#formPasswordOptions").submit(function(event){
-        if($("input[name='masterPass_new']").val() && $("input[name='masterPass_new']").val() == $("input[name='masterPass_newConfirm']").val()){
-            alert("<?php echo mc_list_changes(); ?>");
-            if (confirm("<?php echo $lang['PASSWORD_CHANGE_PROMPT'];?>") == true) {
-                return true;
-            } else {
-                event.preventDefault();
-                return false;
-            }
+            </div>';
         }
-    });
-</script>
+    }
+    ?>
+</form>
 
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

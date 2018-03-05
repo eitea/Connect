@@ -44,17 +44,11 @@ function carryOverAdder_Minutes($a, $b) {
 function isHoliday($ts) {
     require "connection.php";
     $result = $conn->query("SELECT * FROM holidays WHERE begin LIKE '" . substr($ts, 0, 10) . "%'"); //the sql § comparison aint working
-    return ($result && ($row = $result->fetch_assoc()) && strpos($row['name'], '(§)'));
+    while($result && ($row = $result->fetch_assoc())){
+        if(strpos($row['name'], '(§)')) return true;
+    }
+    return false;
 }
-
-/*
-function isHoliday($ts){|
-require "connection.php";
-$sql = "SELECT * FROM $holidayTable WHERE begin LIKE '". substr($ts, 0, 10)."%'";
-$result = mysqli_query($conn, $sql);
-return($result && $result->num_rows>0);
-}
- */
 
 
 
@@ -82,7 +76,6 @@ function test_Time($time) {
     return preg_match("/^([01][0-9]|2[0-3]):([0-5][0-9])$/", $time);
 }
 
-//$hours is a float
 function displayAsHoursMins($hour) {
     $hours = round($hour, 2); //i know params are passed by value if not specified otherwise, but still.. I got trust issues with this language
     $s = '';
@@ -91,36 +84,125 @@ function displayAsHoursMins($hour) {
         $hours = $hours * -1;
     }
     if ($hours >= 1) {
-        $s .= intval($hours) . 'h ';
-        $hours = $hours - intval($hours);
+        $s .= floor($hours) . 'h ';
+        $hours = $hours - floor($hours);
     }
     $s .= round($hours * 60) . 'min';
     return $s;
-} //oh lol.. yes, we can overwrite our connection o.o
+}
 
 function redirect($url) {
     if (!headers_sent()) {
         header('Location: ' . $url);
-        exit;
     } else {
         echo '<script type="text/javascript">';
         echo 'window.location.href="' . $url . '";';
         echo '</script>';
         echo '<noscript>';
         echo '<meta http-equiv="refresh" content="0;url=' . $url . '" />';
-        echo '</noscript>';exit;
+        echo '</noscript>';
+    }
+    exit;
+}
+
+function simple_encryption($message, $key) {
+    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+    $nonce = openssl_random_pseudo_bytes($nonceSize);
+    $ciphertext = openssl_encrypt($message, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
+    return base64_encode($nonce . $ciphertext);
+}
+
+function simple_decryption($message, $key) {
+    $message = base64_decode($message, true);
+    if ($message === false) {
+        throw new Exception('Encryption failure');
+    }
+    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
+    $nonce = mb_substr($message, 0, $nonceSize, '8bit');
+    $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
+    $plaintext = openssl_decrypt($ciphertext, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
+    return $plaintext;
+}
+
+//userID and privateKey are only needed in the first call
+//if anything fails, it will return message as-is
+function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $privateKey = '', &$err = ''){
+    global $conn;
+    static $activeEncryption = null; //http://php.net/manual/en/language.variables.scope.php#language.variables.scope.static
+    if($activeEncryption === null){
+        $activeEncryption = true;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
+        if(!$result || $result->num_rows < 1){ $activeEncryption = false; }
+    }
+    if(!$activeEncryption) return $message;
+    $privateKey = base64_decode($privateKey);
+    if($module == 'DSGVO'){
+        static $symmetric = false;
+        if(!$symmetric && $userID && $privateKey){
+            $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = 'DSGVO' ORDER BY recentDate LIMIT 1");
+            if($result && ( $row=$result->fetch_assoc() )){
+                $cipher_private_module = base64_decode($row['privateKey']);
+                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules");
+                if($result && ( $row=$result->fetch_assoc() )){
+                    $public_module = base64_decode($row['publicPGPKey']);
+                    $cipher_symmetric = base64_decode($row['symmetricKey']);
+                    //decrypt access
+                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+                    //decrypt module
+                    $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+                    $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+                    $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+
+                    if($symmetric){
+                        if($mode == 'encrypt'){
+                            return simple_encryption($message, $symmetric);
+                        } else {
+                            return simple_decryption($message, $symmetric);
+                        }
+                    }
+                    $err = 'Could not retrieve symmetric Key';
+                    return $message;
+                }
+            }
+            $err = $conn->error;
+            return $message;
+        } elseif($symmetric) {
+            if($mode == 'encrypt'){
+                return simple_encryption($message, $symmetric);
+            } else {
+                return simple_decryption($message, $symmetric);
+            }
+        }
+    }
+    $err = 'Something went wrong';
+    return $message;
+}
+
+function mc_status(){
+    static $encrypt = null;
+    if($encrypt === null){
+        global $conn;
+        $encrypt = false;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData");
+        if($result && ($row = $result->fetch_assoc()) && $row['activeEncryption'] == 'TRUE') $encrypt = true;
+    }
+    if($encrypt){
+         return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
+    } else {
+        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
     }
 }
 
-/*see if password matches policy, returns true or false.
- * writes error message in optional output
- * low - at least x characters (x from policy table)
- * medium - at least one capital letter and one number
- * high - at least one special character
- */
+/*
+* low - at least x characters (x from policy table)
+* medium - at least low and one capital letter and one number
+* high - at least medium and one special character
+*/
 function match_passwordpolicy($p, &$out = '') {
-    require "connection.php";
-    $result = $conn->query("SELECT * FROM $policyTable");
+    global $conn;
+    $result = $conn->query("SELECT passwordLength, complexity FROM policyData LIMIT 1");
     $row = $result->fetch_assoc();
 
     if (strlen($p) < $row['passwordLength']) {
@@ -144,7 +226,7 @@ function match_passwordpolicy($p, &$out = '') {
 }
 
 function getNextERP($identifier, $companyID, $offset = 0) {
-    require "connection.php";
+    global $conn;
     $result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $companyID");
     echo $conn->error;
     if ($row = $result->fetch_assoc()) {
@@ -177,166 +259,9 @@ function randomPassword($length = 8) {
 }
 
 /*
-echo $test=strtotime('2016-02-3 05:44:21');
-echo date('Y-m-d H:i:s', $test);
- */
-
-function simple_encryption($message, $key) {
-    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
-    $nonce = openssl_random_pseudo_bytes($nonceSize);
-    $ciphertext = openssl_encrypt($message, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
-    return base64_encode($nonce . $ciphertext);
-}
-
-function simple_decryption($message, $key) {
-    $message = base64_decode($message, true);
-    if ($message === false) {
-        throw new Exception('Encryption failure');
-    }
-    $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
-    $nonce = mb_substr($message, 0, $nonceSize, '8bit');
-    $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
-    $plaintext = openssl_decrypt($ciphertext, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $nonce);
-    return $plaintext;
-}
-
-//just returns a public and a private key
-function pgp_generate_keys($user){
-    require_once dirname(__FILE__).'/../lib/openpgp.php';
-    require_once dirname(__FILE__).'/../lib/openpgp_crypt_rsa.php';
-
-    $rsa = new \phpseclib\Crypt\RSA();
-    $k = $rsa->createKey(512);
-    $rsa->loadKey($k['privatekey']);
-
-    $nkey = new OpenPGP_SecretKeyPacket(array(
-       'n' => $rsa->modulus->toBytes(),
-       'e' => $rsa->publicExponent->toBytes(),
-       'd' => $rsa->exponent->toBytes(),
-       'p' => $rsa->primes[2]->toBytes(),
-       'q' => $rsa->primes[1]->toBytes(),
-       'u' => $rsa->coefficients[2]->toBytes()
-   ));
-
-    $uid = new OpenPGP_UserIDPacket($user);
-
-    $wkey = new OpenPGP_Crypt_RSA($nkey);
-    $m = $wkey->sign_key_userid(array($nkey, $uid));
-
-    // Serialize private key
-    $key['private'] = $m->to_bytes();
-
-    // Serialize public key message
-    $pubm = clone($m);
-    $pubm[0] = new OpenPGP_PublicKeyPacket($pubm[0]);
-
-    $key['public'] = $pubm->to_bytes();
-
-    return $key;
-}
-/** Usage
- * Encrypt
- * $c = new MasterCrypt();
- * $encrypted = $c->encrypt("sensible info 1");
- * $encrypted2 = $c->encrypt("sensible info 2");
- * INSERT INTO table1 (var1,var2,iv,iv2) VALUES ('$encrypted','$encrypted2','$c->iv','$c->iv2');
- *
- * Decrypt
- * SELECT var1,var2,iv,iv2 FROM table1;
- * $c = new MasterCrypt($iv,$iv2);
- * echo $c->decrypt($var1);
- * echo $c->decrypt($var2);
- */
-class MasterCrypt {
-    public $iv; //initalization vector
-    public $iv2;
-    private $password;
-
-    function __construct($pass, $iv = '', $iv2 = '') {
-        $this->password = base64_decode($pass, true);
-        $this->iv = $iv;
-        $this->iv2 = $iv2;
-        if ($this->password && (!$iv || !$iv2)) {
-            $this->iv2 = bin2hex(openssl_random_pseudo_bytes(8));
-            $this->iv = bin2hex(openssl_random_pseudo_bytes(32));
-            $this->iv = openssl_encrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
-        }
-    }
-    function encrypt($unencrypted) {
-        if ($this->password && $this->iv && $this->iv2) {
-            $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
-            $encrypted = simple_encryption($unencrypted, $iv);
-            return $encrypted;
-        } else {
-            return $unencrypted;
-        }
-    }
-    function decrypt($encrypted) {
-        if ($this->password) {
-            $iv = openssl_decrypt($this->iv, 'aes-256-cbc', $this->password, 0, $this->iv2);
-            return simple_decryption($encrypted, $iv);
-        } else {
-            if ($this->iv && $this->iv2) { //if values are encrypted, then **** it
-                return '****';
-            }
-            return $encrypted;
-        }
-    }
-    function getStatus($encrypt = false) {
-        if ($encrypt) {
-            if ($this->password) {
-                return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
-            }
-            return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
-        }
-        if ($this->iv && $this->iv2) {
-            return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
-        }
-        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
-    }
-}
-
-function mc_status() {
-    if (!empty($_SESSION['masterpassword'])) {
-        return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
-    } else {
-        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
-    }
-}
-
-/**
- * List all changes before user confirms or cancels master password change
- *
- * @return string
- */
-function mc_list_changes() {
-    require __DIR__ . "/connection.php";
-    $out = "Changes following data: \\n";
-    $out .= ($conn->query("SELECT * FROM articles")->num_rows ?? "0") . " Changes in articles\\n";
-    $out .= ($conn->query("SELECT * FROM products")->num_rows ?? "0") . " Changes in products\\n";
-    $out .= ($conn->query("SELECT * FROM $clientDetailBankTable")->num_rows ?? "0") . " Changes in banking data\\n";
-    return $out;
-}
-
-/**
- * Returns rows affected by master password change
- *
- * @return int
- */
-function mc_total_row_count() {
-    require __DIR__ . "/connection.php";
-    $total_count = 0;
-    $total_count += $conn->query("SELECT * FROM articles")->num_rows ?? 0;
-    $total_count += $conn->query("SELECT * FROM products")->num_rows ?? 0;
-    $total_count += $conn->query("SELECT * FROM $clientDetailBankTable")->num_rows ?? 0;
-    return $total_count;
-}
-
-/*
- * requires Calculator/IntervalCalculator
- *
- * query must contain WHERE clause
- */
+* requires Calculator/IntervalCalculator
+* query must contain WHERE clause
+*/
 function getFilledOutTemplate($templateID, $bookingQuery = "") {
     set_time_limit(60);
     require "connection.php";

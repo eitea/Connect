@@ -16,7 +16,7 @@ function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both t
         $timeLeft = $estimate - $current;
         $redBar = 0;
         $timeOver = 0;
-    }else{
+    } else {
         $timeOver = $current - $estimate;
         $timeLeft = 0;
         $greenBar = 0;
@@ -36,15 +36,15 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 ?>
 <div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
-    <?php include dirname(__DIR__) . '/misc/set_filter.php';?>
+    <?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
     <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
         <div class="dropdown" style="display:inline;">
             <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
                 <div class="container-fluid">
-                    <li ><button class="btn btn-default form-control" data-toggle="modal" data-target="#editingModal-" >New</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
                     <li class="divider"></li>
-                    <li ><button class="btn btn-default form-control" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
                 </div>
             </ul>
         </div>
@@ -153,7 +153,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
 
                 $description = test_input($_POST['description']);
-                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% Abgeschlossen'  WHERE id = $bookingID");
+                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen'  WHERE id = $bookingID");
 
                 if($conn->error){
                 	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
@@ -164,7 +164,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].' (Projekt)</div>';
             }
         } else { //STRIKE
-            $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+            $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID");
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Project not Available.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
     }
@@ -239,8 +239,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $end = $_POST["enddate"] ?? "";
                 }
 
-
-
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -301,6 +299,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     } // end if dynamic Admin
 } //end if POST
+
+$completed_tasks = file_get_contents('task_changelog.txt', true);
 ?>
 
 <table class="table table-hover">
@@ -324,14 +324,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         $occupation = $query_filter = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
+        if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
+        if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
+        if($filterings['project']){ $query_filter .= " AND d.clientprojectid = ".intval($filterings['project']); }
         if($filterings['tasks']){
             if($filterings['tasks'] == 'REVIEW_1'){
-                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
+                $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
             } elseif($filterings['tasks'] == 'REVIEW_2'){
-                $query_filter = "AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
+                $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
             } else {
-                $query_filter = "AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
-            }
+                $query_filter .= " AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
+            } //like its slightly annoying, but really not bad ^^
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
         $stmt_team = $conn->prepare("SELECT name, teamid FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
@@ -343,7 +346,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $stmt_viewed->bind_param('s', $x);
         $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? ");
         $stmt_employee->bind_param('s', $x);
-        $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
+        $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
         $stmt_booking->bind_param('s', $x);
         $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID WHERE p.dynamicID = ?");
         $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
@@ -389,7 +392,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $selection[] = 'user;'.$emp_row['userid'];
             }
 
-            if(!array_intersect($filterings['employees'], $selection)) continue;
+            if(count($filterings['employees']) && !array_intersect($filterings['employees'], $selection)) continue;
 
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
@@ -430,20 +433,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             echo '<td>'; //employees
             echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
-
             echo implode(',<br>', $employees);
             echo '</td>';
 
             echo '<td>';
             $review = '<input type="checkbox" ';
-            ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? $review= $review.' disabled ' : $review= $review.' onchange="reviewChange(event,\''.$x.'\')" ' ;
-            if($row['needsreview'] == 'TRUE') $review= $review.'checked ';
-            $review= $review.'></input>';
-            echo $review;
+            $review .= ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? ' disabled ' : ' onchange="reviewChange(event,\''.$x.'\')" ' ;
+            if($row['needsreview'] == 'TRUE') $review .= 'checked ';
+            echo $review.'>';
+            if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
+
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
-                echo '<button class="btn btn-default" onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal"><i class="fa fa-pause"></i></button> ';
+                $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"'; //he has to wait at least 1 minute
+                echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
                 echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
@@ -727,9 +731,7 @@ function dynamicOnLoad(modID){
         file_picker_types: 'file image media',
         init_instance_callback: function (editor) {
             editor.on('paste', function (e) {
-                console.log('Here');
-
-                console.log(e.clipboardData.types.includes("text/rtf"));
+                //console.log(e.clipboardData.types.includes("text/rtf"));
                 if(e.clipboardData.types.includes("text/rtf")){
                     var clipboardData, pastedData;
 
@@ -753,7 +755,7 @@ function dynamicOnLoad(modID){
                 var settings = {};
                 var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
                 var part = doc.render();
-                console.log(part);
+                //console.log(part);
                 for(i=0;i<part.length;i++){
                     part[i][0].innerHTML = part[i][0].innerHTML.replace("[Unsupported image format]","");
                     this.execCommand("mceInsertContent",false,part[i][0].innerHTML);
@@ -775,7 +777,7 @@ function dynamicOnLoad(modID){
                     // necessary, as we are looking to handle it internally.
                     var id = 'blobid' + (new Date()).getTime();
                     var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                    console.log(reader.result.split(";")[0].split(":")[1]) //mime type
+                    //console.log(reader.result.split(";")[0].split(":")[1]) //mime type
                     var base64 = reader.result.split(',')[1];
                     alert("Base64 size: "+base64.length+" chars")
                     var blobInfo = blobCache.create(id, file, base64);
@@ -907,7 +909,7 @@ function showProjects(client, project, place){
         });
     }
 }
- function activateTemplate(event){
+function activateTemplate(event){
     id = $(".select2-templates").select2('data');
     if(id === -1){
         //Create new Template
@@ -917,38 +919,36 @@ function showProjects(client, project, place){
         //Fill editingModal- with data
         //open editingModal-
     }
- }
-  function checkInput(event){
-      //check Input
-    console.log(event);
+}
+function checkInput(event){
+    //check Input
+    //console.log(event);
     if(tinymce.activeEditor.getContent()==""){
         alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
         return false;
     }
 
     if(tinymce.activeEditor.getContent().length>(<?php
-        $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
-        $maxSQL = $max->fetch_assoc();
-        echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
+    $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
+    $maxSQL = $max->fetch_assoc();
+    echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
         alert("Description Too Big");
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
-  }
-  function reviewChange(event,id){
-      console.log(event);
-      projectid = id;
-      needsReview = event.target.checked ? 'TRUE' : 'FALSE';
-      $.post("ajaxQuery/AJAX_db_utility.php",{
-          needsReview: needsReview,
-          function: "changeReview",
-          projectid: projectid
-      },function(data){
-          console.log(data);
-      });
-  }
-</script>
-<script>
+}
+function reviewChange(event,id){
+    //console.log(event);
+    projectid = id;
+    needsReview = event.target.checked ? 'TRUE' : 'FALSE';
+    $.post("ajaxQuery/AJAX_db_utility.php",{
+        needsReview: needsReview,
+        function: "changeReview",
+        projectid: projectid
+    }, function(data){
+        //console.log(data);
+    });
+}
 $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings again
     $.ajax({
         url:'ajaxQuery/AJAX_getTrainingSurvey.php',
@@ -962,7 +962,12 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
             $("#currentSurveyModal .survey-modal").modal("show");
         }
    });
-})
+});
+
+setTimeout( function(){
+    $('button[name="pauseBtn"]').prop("disabled", false);
+}, 60000 );
+
 
 </script>
 </div>

@@ -71,12 +71,10 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
         $res = $conn->query("SELECT num FROM accounts WHERE id = $addAccount");
         if ($res && ($rowP = $res->fetch_assoc())) {
             $accNum = $rowP['num'];
-        }
-        else{//else STRIKE
+        } else { //else STRIKE
             $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Monat.</strong> '.$lang['ERROR_STRIKE'].'</div>';
         }
-
 
         if ($accNum >= 5000 && $accNum < 8000 && $have) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Konten Klasse 5, 6 und 7 dürfen nicht im Haben stehen.</div>';
@@ -107,10 +105,10 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
             $res = $conn->query("SELECT percentage, account2, account3, code FROM taxRates WHERE id = $tax");
             if (!$res || $res->num_rows < 1) {
                 $accept = false;
-                $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+                $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID"); //STRIKE
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Ungültiger Steuersatz.</strong> '.$lang['ERROR_STRIKE'].'</div>';
             }
-            //STRIKE
+
             $taxRow = $res->fetch_assoc();
 
             //prepare balance
