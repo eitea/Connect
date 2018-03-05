@@ -484,6 +484,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                   <?php endif;?>
                   <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                   <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+                  <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
                   <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
               </div>
           </div>
@@ -506,6 +507,29 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
           </div>
       </div>
   </div>
+
+  <div id="searchModal"></div>
+  <script>
+        $(document).ready(function(){
+            $(".openSearchModal").click(function(){
+                openSearchModal()
+            })
+        })
+        function openSearchModal(){
+        $.ajax({
+                url:'ajaxQuery/AJAX_getSearch.php',
+                data:{modal:true},
+                type: 'get',
+                success : function(resp){
+                    $("#searchModal").html(resp);
+                },
+                error : function(resp){console.error(resp)},
+                complete: function(resp){
+                    $("#searchModal .modal").modal("show");
+                }
+        });
+        }
+  </script>
 
   <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
   <!-- modal -->

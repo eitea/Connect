@@ -124,7 +124,7 @@ ul.nav.navbar-nav .nav.nav-list {
 }
 
 /* LOADER */
-#loader {
+#loader, .searchLoader {
   position: fixed;
   left: 55%;
   top: 50%;
