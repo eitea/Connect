@@ -7,22 +7,55 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
-
 function formatPercent($num){ return ($num * 100)."%"; }
-function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both times in hours (float), $referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
-    if($current<$estimate){
-        $yellowBar = $current/($estimate+0.0001);
+function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+   $allHours = 0;
+   if(strpos($estimate,'M')){
+       $finder = preg_split("/[M]/",$estimate)[0].'M';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'w')){
+       $finder = preg_split("/[w]/",$estimate)[0].'w';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'t')){
+       $finder = preg_split("/[t]/",$estimate)[0].'t';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   if(strpos($estimate,'m')){
+       $finder = preg_split("/[m]/",$estimate)[0].'m';
+      $estimate = str_replace($finder, $finder.' ', $estimate);
+   }
+   $tim = preg_split("/[\s]/", $estimate);
+   for($i = 0;$i<count($tim);$i++){
+       if(strpos($tim[$i],'M')){
+           $tim[$i] = intval($tim[$i]) * 730.5;
+       }elseif(strpos($tim[$i],'w')){
+           $tim[$i] = intval($tim[$i]) * 168;
+       }elseif(strpos($tim[$i],'t')){
+           $tim[$i] = intval($tim[$i]) * 24;
+       }elseif(strpos($tim[$i],'m')){
+           $tim[$i] = intval($tim[$i]) / 60;
+       }else{
+           $tim[$i] = intval($tim[$i]);
+       }
+   }
+   for($i = 0;$i<count($tim);$i++){
+       $allHours += $tim[$i];
+   }
+    if($current < $allHours){
+        $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
-        $timeLeft = $estimate - $current;
+        $timeLeft = $allHours - $current;
         $redBar = 0;
         $timeOver = 0;
     } else {
-        $timeOver = $current - $estimate;
+        $timeOver = $current - $allHours;
         $timeLeft = 0;
         $greenBar = 0;
-        $yellowBar = ($estimate)/($timeLeft + $timeOver + $current + 0.0001);
+        $yellowBar = ($allHours)/($timeLeft + $timeOver + $current + 0.0001);
         $redBar = 1-$yellowBar;
-        $current = $estimate;
+        $current = $allHours;
     }
     $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
     $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
@@ -31,7 +64,6 @@ function generate_progress_bar($current,$estimate, $referenceTime = 8){ //both t
     $bar .= "<div data-toggle='tooltip' title='".round($timeOver,2)." Stunden' class='progress-bar progress-bar-danger' style='height:10px;width:".formatPercent($redBar)."'></div>";
     return "$bar</div>";
 }
-
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
 ?>
 <div class="page-header-fixed">
@@ -93,10 +125,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $description = test_input($_POST['description']);
             $startDate = $date." ".$start;
             $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-
             $endDate = $date." ".$end;
             $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-
             if(timeDiff_Hours($startDate, $endDate) < 0){
                 $endDate = carryOverAdder_Hours($endDate, 24);
                 $date = substr($endDate, 0, 10);
@@ -140,7 +170,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
-
                 $microtasks = $conn->query("SELECT microtaskid, ischecked FROM microtasks WHERE projectid='$dynamicID'");
                 if($microtasks){
                     while($microrow = $microtasks->fetch_assoc()){
@@ -151,10 +180,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
-
                 $description = test_input($_POST['description']);
                 $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen'  WHERE id = $bookingID");
-
                 if($conn->error){
                 	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
                 } else {
@@ -192,7 +219,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $null = null;
                 $name = test_input($_POST["name"]);
                 $description = $_POST["description"];
-                echo "<script>console.log('".strlen($description)."')</script>";
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
                         $mname = strip_tags($matches[1][$i]);
@@ -207,7 +233,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
-
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
                 $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
@@ -232,13 +257,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     $tags = '';
                 }
-
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
                     $end = $_POST["enddate"] ?? "";
                 }
-
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -256,11 +279,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
                 $nextDate = $series->get_next_date();
                 $series = base64_encode(serialize($series));
-
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                     projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
                 $stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
@@ -299,7 +320,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     } // end if dynamic Admin
 } //end if POST
-
 $completed_tasks = file_get_contents('task_changelog.txt', true);
 ?>
 
@@ -369,7 +389,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
-
             $selection = array('user;'.$row['projectowner'], 'user;'.$row['projectleader']);
             $employees = array();
             $stmt_team->execute();
@@ -384,20 +403,16 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                     $selection[] = 'user;'.$emp_row_mem['userID'];
                 }
             }
-
             $stmt_employee->execute();
             $emp_result = $stmt_employee->get_result();
             while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['userid']){
                 $employees[] = $userID_toName[$emp_row['userid']];
                 $selection[] = 'user;'.$emp_row['userid'];
             }
-
-            if(count($filterings['employees']) && !array_intersect($filterings['employees'], $selection)) continue;
-
+            if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = $tags = '';
-
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
             }
@@ -407,35 +422,29 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             $stmt_time->execute();
             $currentTime = 0;
             if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
-            echo generate_progress_bar(floatval($currentTime),floatval(getEstimatedHours($row["estimatedHours"]))); // generate_progress_bar($cur,$estimate): string
+            echo generate_progress_bar(floatval($currentTime), $row["estimatedHours"]);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
-
             if($row['projectseries']){
                 echo '<td><i class="fa fa-clock-o"></i></td>';
             } else {
                 echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
             }
-
             $stmt_booking->execute();
             $isInUse = $stmt_booking->get_result(); //max 1 row
-
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
             echo '</td>';
-
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
             echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
-
             echo '<td>'; //employees
             echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
             echo implode(',<br>', $employees);
             echo '</td>';
-
             echo '<td>';
             $review = '<input type="checkbox" ';
             $review .= ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? ' disabled ' : ' onchange="reviewChange(event,\''.$x.'\')" ' ;
@@ -443,7 +452,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo $review.'>';
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
-
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"'; //he has to wait at least 1 minute
@@ -456,11 +464,9 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
             }
-
             echo '</form></td>';
             echo '</tr>';
         }
-
         ?>
         <!--training-->
         <?php if($userHasUnansweredSurveys): ?>
@@ -629,10 +635,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-$("#projectForm").on("submit",function(){
-    console.log("here");
-
-})
 $("#bookCompletedCheckbox").change(function(event){
     $("#bookCompleted").attr('readonly', this.checked);
     $("#bookRanger").attr('disabled', this.checked);
@@ -650,7 +652,6 @@ function checkMicroTasks(){
         $("#bookRanger").attr('max',99);
     }
 }
-
 $("#microlist input[type='checkbox']").change(function(){
     var allisgood = true;
     $("#microlist input[type='checkbox']").each(function(){
@@ -666,7 +667,6 @@ $("#microlist input[type='checkbox']").change(function(){
         $("#bookRanger").attr('max',99);
     }
 });
-
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
         if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
@@ -706,7 +706,6 @@ function dynamicOnLoad(modID){
         paste_data_images: true,
         menubar: false,
         statusbar: false,
-        browser_spellcheck: true,
         height: 300,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
@@ -714,7 +713,6 @@ function dynamicOnLoad(modID){
                 var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
                 editor.insertContent(html);
             }
-
             editor.addButton("InsertMicroTask",{
                 tooltip: "Insert MicroTask",
                 icon: "template",
@@ -734,24 +732,19 @@ function dynamicOnLoad(modID){
                 //console.log(e.clipboardData.types.includes("text/rtf"));
                 if(e.clipboardData.types.includes("text/rtf")){
                     var clipboardData, pastedData;
-
                 // Stop data actually being pasted into div
                 e.preventDefault();
-
                 // Get pasted data via clipboard API
                 clipboardData = e.clipboardData || window.clipboardData;
                 pastedData = clipboardData.getData('text/rtf');
-
                 var stringToBinaryArray = function(txt) {
-                        var buffer = new ArrayBuffer(txt.length);
-                        var bufferView = new Uint8Array(buffer);
-                        for (var i = 0; i < txt.length; i++) {
-                            bufferView[i] = txt.charCodeAt(i);
-                        }
-                        return buffer;
+                    var buffer = new ArrayBuffer(txt.length);
+                    var bufferView = new Uint8Array(buffer);
+                    for (var i = 0; i < txt.length; i++) {
+                        bufferView[i] = txt.charCodeAt(i);
                     }
-
-
+                    return buffer;
+                }
                 var settings = {};
                 var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
                 var part = doc.render();
@@ -791,7 +784,6 @@ function dynamicOnLoad(modID){
         }
     });
 } //end dnymaicOnLoad()
-
 function appendModal(index){
     $.ajax({
     url:'ajaxQuery/AJAX_dynamicEditModal.php',
@@ -821,19 +813,6 @@ $('button[name=editModal]').click(function(){
   }
 });
 appendModal('');
-
-$("tbody").on("click",function(){
-    $('button[name=editModal]').click(function(){
-            var index = $(this).val();
-        if(existingModals.indexOf(index) == -1){
-            appendModal(index);
-        } else {
-            $('#editingModal-'+index).modal('show');
-        }
-        });
-        appendModal('');
-})
-
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
     var index = $(this).val();
@@ -859,7 +838,6 @@ $('.view-modal-open').click(function(){
     $('#infoModal-'+index).modal('show');
   }
 });
-
 $(document).ready(function() {
     dynamicOnLoad();
     $('.table').DataTable({
@@ -882,7 +860,6 @@ $(document).ready(function() {
         $('.table').trigger('column-reorder.dt');
     }, 500);
 });
-
 function showClients(company, client, place){
     if(company != ""){
         $.ajax({
@@ -940,7 +917,6 @@ function checkInput(event){
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
 }
 function reviewChange(event,id){
-    //console.log(event);
     projectid = id;
     needsReview = event.target.checked ? 'TRUE' : 'FALSE';
     $.post("ajaxQuery/AJAX_db_utility.php",{
@@ -965,12 +941,9 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
         }
    });
 });
-
 setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );
-
-
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
