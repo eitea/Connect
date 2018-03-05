@@ -5,7 +5,7 @@ if (empty($_SESSION['userid'])) {
 }
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-$privateKey = $_SESSION['privateKey'];
+//$privateKey = $_SESSION['privateKey'];
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
 require __DIR__ . "/connection.php";

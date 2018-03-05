@@ -922,10 +922,14 @@ function activateTemplate(event){
 }
 function checkInput(event){
     //check Input
-    //console.log(event);
+    console.log(event);
+    form = event.target;
+    form = document.getElementById(form.id);
     if(tinymce.activeEditor.getContent()==""){
-        alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
-        return false;
+        if(form.getElementsByTagName("textarea")[0].textLength<1){
+            alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
+            return false;
+        }
     }
 
     if(tinymce.activeEditor.getContent().length>(<?php
@@ -936,6 +940,8 @@ function checkInput(event){
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
+    console.log("true");
+    return false;
 }
 function reviewChange(event,id){
     //console.log(event);
