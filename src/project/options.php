@@ -118,11 +118,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <div class="row">
                     <div class="col-md-6">
                         <label>Username</label>
-                        <input type="email" class="form-control" name="username" id="username"/>
+                        <input type="email" autocomplete="new-email" class="form-control" name="username" id="username"/>
                     </div>
                     <div class="col-md-6">
                         <label>Password</label>
-                        <input type="text" class="form-control password" name="password" id="password"/>
+                        <input type="text" autocomplete="new-password" class="form-control password" name="password" id="password"/>
                     </div>
                 </div>
             </div>
@@ -174,11 +174,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <div class="row">
                     <div class="col-md-6">
                         <label>Username</label>
-                        <input type="email" class="form-control" id="edit_username" name="edit_username" />
+                        <input type="email" autocomplete="new-email" class="form-control" id="edit_username" name="edit_username" />
                     </div>
                     <div class="col-md-6">
                         <label>Password</label>
-                        <input type="password" class="form-control required-field" id="edit_password" name="edit_password" />
+                        <input type="password" autocomplete="new-password" class="form-control required-field" id="edit_password" name="edit_password" />
                     </div>
                 </div>
             </div>
