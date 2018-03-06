@@ -183,9 +183,8 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Cell($w[5],7,$lang['TOTAL_PRICE'], '', 1, 'R', 1);
 
   while($prod_row = $prod_res->fetch_assoc()){
-    $mc = new MasterCrypt($_SESSION["masterpassword"], $prod_row["iv"],$prod_row["iv2"]);
-    $prod_row["name"] = $mc->decrypt($prod_row["name"]);
-    $prod_row["description"] = $mc->decrypt($prod_row["description"]);
+    $prod_row["name"] = $prod_row["name"];
+    $prod_row["description"] = $prod_row["description"];
     if($prod_row['name'] == 'NEW_PAGE'){
       $pdf->AddPage();
     } elseif($prod_row['name'] == 'PARTIAL_SUM'){

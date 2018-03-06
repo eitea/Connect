@@ -8,7 +8,7 @@ if(!($canEditSuppliers == 'TRUE' || $canEditClients == 'TRUE')){
     echo "no permission (you need canEditSuppliers or canEditClients)";
     include dirname(dirname(__DIR__)) . '/footer.php';
     die();
-} 
+}
 
 if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
     $filterClient = intval($_GET['custID']);
@@ -222,14 +222,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } elseif (isset($_POST['addBankingDetail']) && !empty($_POST['bankName']) && !empty($_POST['iban']) && !empty($_POST['bic'])) {
         $activeTab = 'banking';
-        $mc = new MasterCrypt($_SESSION["masterpassword"]);
-        $bankName = $mc->encrypt($_POST['bankName']);
-        $ibanVal = $mc->encrypt($_POST['iban']);
-        $bicVal = $mc->encrypt($_POST['bic']);
-        $iv = $mc->iv;
-        $iv2 = $mc->iv2;
-        $stmt = $conn->prepare("INSERT INTO clientInfoBank (bankName, iban, bic, iv, iv2, parentID) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param('sssssi', $bankName, $ibanVal, $bicVal, $iv, $iv2, $detailID);
+        $bankName = $_POST['bankName'];
+        $ibanVal = $_POST['iban'];
+        $bicVal = $_POST['bic'];
+        $stmt = $conn->prepare("INSERT INTO clientInfoBank (bankName, iban, bic, parentID) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param('sssi', $bankName, $ibanVal, $bicVal, $detailID);
         $stmt->execute();
         $stmt->close();
         if ($conn->error) {
@@ -248,15 +245,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } elseif (!empty($_POST['editBankingDetail'])) {
         $activeTab = 'banking';
-        $mc = new MasterCrypt($_SESSION["masterpassword"]);
-        $bankName = $mc->encrypt($_POST['edit_bankName']);
-        $ibanVal = $mc->encrypt($_POST['edit_iban']);
-        $bicVal = $mc->encrypt($_POST['edit_bic']);
-        $iv = $mc->iv;
-        $iv2 = $mc->iv2;
+        $bankName = $_POST['edit_bankName'];
+        $ibanVal = $_POST['edit_iban'];
+        $bicVal = $_POST['edit_bic'];
         $val = intval($_POST['editBankingDetail']);
-        $stmt = $conn->prepare("UPDATE clientInfoBank SET bankName = ?, iban = ?, bic = ?, iv = ?, iv2 = ? WHERE id = ?");
-        $stmt->bind_param('sssssi', $bankName, $ibanVal, $bicVal, $iv, $iv2, $val);
+        $stmt = $conn->prepare("UPDATE clientInfoBank SET bankName = ?, iban = ?, bic = ? WHERE id = ?");
+        $stmt->bind_param('sssi', $bankName, $ibanVal, $bicVal, $val);
         $stmt->execute();
         $stmt->close();
         if ($conn->error) {
@@ -754,20 +748,19 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                 <?php
                 $modals = '';
                 while ($resultBank && ($rowBank = $resultBank->fetch_assoc())) {
-                    $mc = new MasterCrypt($_SESSION["masterpassword"], $rowBank['iv'], $rowBank['iv2']);
                     echo '<tr>';
-                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bankName']) . '</td>';
-                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['iban']) . '</td>';
-                    echo '<td>' . $mc->getStatus() . $mc->decrypt($rowBank['bic']) . '</td>';
+                    echo '<td>' .$rowBank['bankName'] . '</td>';
+                    echo '<td>' .$rowBank['iban'] . '</td>';
+                    echo '<td>' .$rowBank['bic'] . '</td>';
                     echo '<td><button type="submit" class="btn btn-default" name="removeBank" value="' . $rowBank['id'] . '" title="' . $lang['DELETE'] . '" ><i class="fa fa-trash-o"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target=".edit-bank-' . $rowBank['id'] . '" title="' . $lang['EDIT'] . '" ><i class="fa fa-pencil"></i></button></td>';
                     echo '</tr>';
 
                     $modals .= '<div class="modal fade edit-bank-' . $rowBank['id'] . '"><div class="modal-dialog modal-content modal-sm">
                     <div class="modal-header h4">' . $lang['EDIT'] . '</div><div class="modal-body"><div class="container-fluid">
-                    <label><label>Bankname ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bankName" value="' . $mc->decrypt($rowBank['bankName']) . '" /><br>
-                    <label><label>IBAN ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_iban" value="' . $mc->decrypt($rowBank['iban']) . '" /><br>
-                    <label><label>BIC ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bic" value="' . $mc->decrypt($rowBank['bic']) . '" /><br>
+                    <label><label>Bankname ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bankName" value="' . $rowBank['bankName'] . '" /><br>
+                    <label><label>IBAN ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_iban" value="' . $rowBank['iban'] . '" /><br>
+                    <label><label>BIC ' . mc_status() . '</label></label><input type="text" class="form-control" name="edit_bic" value="' .$rowBank['bic'] . '" /><br>
                     </div></div><div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-warning" name="editBankingDetail" value="' . $rowBank['id'] . '" >' . $lang['SAVE'] . '</button>

@@ -5,6 +5,7 @@ if (empty($_SESSION['userid'])) {
 }
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
+//$privateKey = $_SESSION['privateKey'];
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
 require __DIR__ . "/connection.php";
@@ -14,6 +15,7 @@ require __DIR__ . "/language.php";
 if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
+
 $sql = "SELECT * FROM roles WHERE userID = $userID";
 $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
@@ -48,21 +50,23 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, keyCode FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange,forcedPwdChange FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
-    $userKeyCode = $row['keyCode'];
+
+    if($row['forcedPwdChange']==='1'){
+        redirect("../login/passwordChange");
+    }
 } else {
     echo $conn->error;
 }
-$result = $conn->query("SELECT masterPassword, enableReadyCheck, checkSum FROM configurationData");
+$result = $conn->query("SELECT enableReadyCheck, firstTimeWizard FROM configurationData");
 if ($result) {
     $row = $result->fetch_assoc();
+    if($row['firstTimeWizard'] == 'FALSE'){ redirect('../setup/wizard'); }
     $showReadyPlan = $row['enableReadyCheck'];
-    $masterPasswordHash = $row['masterPassword'];
-    $masterPass_checkSum = $row['checkSum']; //ABCabc123!
 }
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
@@ -74,10 +78,10 @@ if ($isTimeAdmin) {
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //forgotten checkouts
-    $result = $conn->query("SELECT indexIM FROM $logTable WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
+    $result = $conn->query("SELECT indexIM FROM logs WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //gemini date in logs
-    $result = $conn->query("SELECT * FROM $logTable l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM $logTable l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+    $result = $conn->query("SELECT * FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //lunchbreaks
     $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
@@ -86,12 +90,12 @@ if ($isTimeAdmin) {
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
 }
-$result = $conn->query("SELECT DISTINCT companyID FROM $companyToUserRelationshipTable WHERE userID = $userID OR $userID = 1");
+$result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
     $available_companies[] = $row['companyID'];
 }
-$result = $conn->query("SELECT DISTINCT userID FROM $companyToUserRelationshipTable WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
+$result = $conn->query("SELECT DISTINCT userID FROM relationship_company_client WHERE companyID IN(" . implode(', ', $available_companies) . ") OR $userID = 1");
 $available_users = array('-1');
 while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
@@ -100,16 +104,16 @@ $validation_output = $error_output = '';
 $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
-             SELECT userID 
-             FROM dsgvo_training_completed_questions 
+             SELECT userID
+             FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
              WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
          )
         UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
-             SELECT userID 
-             FROM dsgvo_training_completed_questions 
+             SELECT userID
+             FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
              WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
@@ -123,10 +127,10 @@ if(!$userHasSurveys){
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-            WHERE userID = $userID 
+            WHERE userID = $userID
             AND NOT EXISTS (
-                 SELECT userID 
-                 FROM dsgvo_training_completed_questions 
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                  WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
@@ -137,8 +141,8 @@ if(!$userHasSurveys){
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
             WHERE tr.userID = $userID
             AND NOT EXISTS (
-                 SELECT userID 
-                 FROM dsgvo_training_completed_questions 
+                 SELECT userID
+                 FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                  WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
@@ -153,16 +157,16 @@ if($userHasUnansweredSurveys){
     $result = $conn->query(
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                SELECT userID 
-                FROM dsgvo_training_completed_questions 
+                SELECT userID
+                FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
              )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                SELECT userID 
-                FROM dsgvo_training_completed_questions 
+                SELECT userID
+                FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
@@ -193,20 +197,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
         $passwordConfirm = $_POST['passwordConfirm'];
-        $newMasterPass = '';
-        if($userKeyCode){
-            $newMasterPass = simple_decryption($userKeyCode, $_POST['passwordCurrent']);
-            $newMasterPass = simple_encryption($newMasterPass, $password);
-        } elseif($masterPasswordHash && !empty($_POST['passwordMaster'])){
-            $newMasterPass = simple_encryption($_POST['passwordMaster'], $password);
-        }
         $output = '';
-        if($newMasterPass && (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[~\!@#\$%&\*_\-\+\.\?]/', $password))){
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert">&times;</a>Passwörter mit Masterpasswortverschlüsselung müssen mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.</div>';
-        } elseif(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
+        if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
-            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', keyCode = '$newMasterPass', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
-            if($newMasterPass) $_SESSION['masterpassword'] = base64_encode(simple_decryption($newMasterPass, $password));
+            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
+
             if(!$conn->error){
                 $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
             } else {
@@ -222,8 +217,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
             $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
         }
-    } elseif(isset($_POST['masterPassword']) && crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
-      $userID = $_SESSION['userid'] = (crypt($_POST['masterPassword'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
+    } elseif(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+      $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
@@ -326,32 +321,31 @@ if ($_SESSION['color'] == 'light') {
         document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
         document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
       }, 1000);
-    }
-    <?php
-if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
-    $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-    if ($result) {
-        $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
-        if ($privateDecoded != false) {
-            $unlockedPGP = $privateDecoded;
-            echo 'document.getElementById("options").click();';
-        }
-    }
-}
-?>
+  }
+  <?php
+  if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
+      $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
+      if ($result) {
+          $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
+          if ($privateDecoded != false) {
+              $unlockedPGP = $privateDecoded;
+              echo 'document.getElementById("options").click();';
+          }
+      }
+  }
+  ?>
   });
   function generateKeys($userID){
-    $.ajax({
-      type: "POST",
-      url: "ajaxQuery/AJAX_pgpKeyGen.php",
-      data: { userID: $userID}
-    }).done(function(keys){
-      keys = JSON.parse(keys);
-      document.getElementsByName('privatePGP')[0].value = keys[0];
-      document.getElementsByName('publicPGP')[0].value = keys[1];
-    })
+      $.ajax({
+          type: "POST",
+          url: "ajaxQuery/AJAX_pgpKeyGen.php",
+          data: { userID: $userID}
+      }).done(function(keys){
+          keys = JSON.parse(keys);
+          document.getElementsByName('privatePGP')[0].value = keys[0];
+          document.getElementsByName('publicPGP')[0].value = keys[1];
+      });
   }
-
   function clearPGP(){
     document.getElementsByName('privatePGP')[0].value = '';
   }
@@ -362,7 +356,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
         $.notify({
             icon: 'fa fa-exclamation-triangle',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'danger'
         });
@@ -372,7 +366,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
         $.notify({
             icon: 'fa fa-warning',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'warning'
         });
@@ -382,7 +376,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
         $.notify({
             icon: 'fa fa-info',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'info'
         });
@@ -392,13 +386,13 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
         $.notify({
             icon: 'fa fa-check',
 	        title: '',
-            message: message 
+            message: message
         },{
             type: 'success'
         });
     }
   </script>
-  <?php 
+  <?php
     function showError($message){
         if(!$message || strlen($message) == 0) return;
         $message = str_replace("'", "\\'", $message);
@@ -530,8 +524,7 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
         });
         }
   </script>
-
-  <?php require dirname(__DIR__) . "/plugins/pgp/autoload.php";?>
+  
   <!-- modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
@@ -546,18 +539,11 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                   </ul>
                   <div class="tab-content">
                       <div id="myModalPassword" class="tab-pane fade in active"><br>
-                          <div class="col-md-12">
+                          <div class="col-md-6">
                               <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
                           </div>
                           <div class="col-md-6">
                               <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
-                          </div>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" ><br>
-                              <?php if ($masterPasswordHash): ?>
-                                  <label><?php echo $lang['MASTER_PASSWORD'] ?> (Experimentell)</label>
-                                  <input type="password" class="form-control" name="passwordMaster"><br>
-                              <?php endif;?>
                           </div>
                       </div>
                       <div id="myModalPGP" class="tab-pane fade"><br>
@@ -659,16 +645,16 @@ if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
                 <div class="modal-body">
                     <!-- modal body -->
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have a problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I found a bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I want an additional feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Additional Feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="I have positive feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
+                        <label><input type="radio" name="feedback_type" value="Positive Feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
                     </div>
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
@@ -704,7 +690,7 @@ if ($result && ($row = $result->fetch_assoc())) {
     $bookingTimeBuffer = 5;
 }
 //display checkin or checkout + disabled
-$result = mysqli_query($conn,  "SELECT `time`, indexIM FROM $logTable WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
+$result = mysqli_query($conn,  "SELECT `time`, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
     $buttonVal = $lang['CHECK_OUT'];
     $buttonNam = 'stampOut';
@@ -724,13 +710,13 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
     if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
 } else {
-    // only display surveys when user is stamped in 
+    // only display surveys when user is stamped in
     $userHasUnansweredOnLoginSurveys = false;
     $buttonVal = $lang['CHECK_IN'];
     $buttonNam = 'stampIn';
     $buttonEmoji = '';
     $today = getCurrentTimestamp();
-    $result = mysqli_query($conn, "SELECT timeEnd FROM $logTable WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
+    $result = mysqli_query($conn, "SELECT timeEnd FROM logs WHERE userID = $userID AND time LIKE '" . substr($today, 0, 10) . " %' AND status = '0'");
     if ($result && ($row = $result->fetch_assoc())) {
         $diff = timeDiff_Hours($row['timeEnd'], $today) + 0.0003;
         if ($diff < $cd / 60) {$ckIn_disabled = 'disabled';}
@@ -799,52 +785,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <?php endif; ?>
                   <?php endif;?>
               <?php endif; //endif(canStamp)?>
-              <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
-              <div class="panel panel-default panel-borderless no-margin">
-          <div class="panel-heading" role="tab" id="headingSuppliers">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-suppliers"  id="supplierOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Lieferanten</a>
-          </div>
-          <div id="collapse-suppliers" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingSuppliers">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-          <!--      <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
-                <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li> -->
-                <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if ($this_page == "editSuppliers.php") {
-            echo "<script>$('#supplierOption').click();</script>";
-        }
-        ?>
+            <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+            <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
             <?php endif;//canUseSuppliers ?>
-              <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
-              <div class="panel panel-default panel-borderless no-margin">
-          <div class="panel-heading" role="tab" id="headingClients">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-clients" id="clientOption"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> Kunden</a>
-          </div>
-          <div id="collapse-clients" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingClients">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-
-            <!--  <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
-                          <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
-                          <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
-                          <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>-->
-                          <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
-
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if ($this_page == "editCustomers.php") {
-            echo "<script>$('#clientOption').click();</script>";
-        }
-        ?>
-                <?php endif;//canuseClients ?>
+            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
+            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>    
+            <?php endif;//canuseClients ?>
           </ul>
       </div>
     <div class="panel-group" id="sidebar-accordion">
@@ -891,7 +837,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         </ul>
                     </div>
                 </li>
-                <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
+                <li><a href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
                   <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
@@ -925,7 +871,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomers.php" || $this_page == "editCustomer_detail.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomer_detail.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
@@ -1009,7 +955,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
             echo "<script>$('#adminOption_REPORT').click();</script>";
         } ?>
-      <?php endif;?>
+      <?php endif; ?>
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
@@ -1029,7 +975,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                           <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                           <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                          <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                          <li><a href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
                       </ul>
                   </div>
                 </li>
@@ -1040,7 +986,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <ul class="nav nav-list">
                       <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
                       <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                      <li><a href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
@@ -1083,10 +1029,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if (isset($_GET['t']) || $this_page == "erp_view.php" || $this_page == "erp_process.php") {
+        if ($this_page == "erp_view.php" || $this_page == "erp_process.php") {
             echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
-        } elseif ($this_page == "editSuppliers.php") {
-            echo "<script>$('#adminOption_ERP').click();$('#erpSuppliers').click();</script>";
         } elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
             echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
         } elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
@@ -1105,33 +1049,33 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
               <ul class="nav navbar-nav">
                 <?php
                 if(count($available_companies) == 2){
-                  echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                  echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                  $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
-                  while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                    echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                    if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                      echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                    }
-                  }
-                } else {
-                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                  while($result && ($row = $result->fetch_assoc())){
-                    echo '<li>';
-                    echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                    echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
-                    echo '<ul class="nav nav-list">';
-                    echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                    echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                    echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                    echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
                     while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                      echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                      if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                        echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                      }
+                        echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                        if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                            echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                        }
                     }
-                    echo '</ul></div></li>';
-                  }
+                } else {
+                    $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
+                    while($result && ($row = $result->fetch_assoc())){
+                        echo '<li>';
+                        echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
+                        echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
+                        echo '<ul class="nav nav-list">';
+                        echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
+                        echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
+                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
+                        while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                            echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
+                            if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
+                                echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
+                            }
+                        }
+                        echo '</ul></div></li>';
+                    }
                 }
                 ?>
                 <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
@@ -1230,26 +1174,22 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <span><?php echo $validation_output; ?></span>
       <span><?php echo $error_output; ?></span>
 
-<?php
-  $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
-  $row = $result->fetch_assoc();
-  if($row['expiration'] == 'TRUE'){ //can a password expire?
-    $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
-    if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
-      if($row['expirationType'] == 'FORCE'){ //force the change
-        include 'footer.php';
-        die();
+      <?php
+      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
+      $row = $result->fetch_assoc();
+      if($row['expiration'] == 'TRUE'){ //can a password expire?
+          $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
+              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
+              if($row['expirationType'] == 'FORCE'){ //force the change
+                  include 'footer.php';
+                  die();
+              }
+          }
       }
-    }
-}
-if ($masterPasswordHash && !empty($_SESSION['masterpassword'])) {
-    if (simple_decryption($masterPass_checkSum, $_SESSION['masterpassword']) != 'ABCabc123!') {
-        echo '<div class="alert alert-info"><a href="#" data-dismiss="alert" class="close">&times;</a>Das Masterpasswort wurde geändert. </div>';
-    }
-}
-$user_agent = $_SERVER["HTTP_USER_AGENT"];
-if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
-}
-?>
+      $user_agent = $_SERVER["HTTP_USER_AGENT"];
+      if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
+      }
+
+      ?>

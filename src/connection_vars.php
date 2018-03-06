@@ -3,11 +3,8 @@
 Update: This file is no longer maintained. Substitution of variables into hardcoded strings
 TODO: remove this file.
 */
-$adminLDAPTable = "ldapConfigTab";
 $adminGitHubTable = "gitHubConfigTab";
 $auditLogsTable = "auditLogs";
-
-$bookingTable = "bookingData"; //contains weekly schedule for each user
 
 $configTable = "configurationData";
 $clientTable = "clientData"; //customers
@@ -36,8 +33,6 @@ $mailOptionsTable = "mailingOptions";
 $mailReportsTable = 'mailReports';
 $mailReportsRecipientsTable = 'mailRecipients';
 
-$negative_logTable = "unlogs"; //deleted
-
 $pdfTemplateTable = "templateData";
 $projectTable = "projectData"; //each customer can have projects
 $projectBookingTable = "projectBookingData"; //bookings made for each project
@@ -55,5 +50,3 @@ $travelTable = "travelBookings";
 $travelCountryTable = "travelCountryData"; //for calculation of travel expenses
 
 $intervalTable = "intervalData"; //holy grail of grails
-
-$vacationTable = "vacationData"; //deleted

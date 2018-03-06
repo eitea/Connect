@@ -1,33 +1,52 @@
 <?php
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
-require_once dirname(dirname(__DIR__)).'/plugins/imap/autoload.php';
+require_once dirname(dirname(__DIR__)).'/plugins/imap/autoload.php'; //TODO: remove
+
+$trash = 'Connect_Tasks';
 $result = $conn->query("SELECT * FROM emailprojects");
 if($result){
     while($row = $result->fetch_assoc()){
         $security = empty($row['security']) ? '' : '/'.$row['security'];
-        $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX';
-        $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
+        $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}';
+        //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
+        if(!$imap->getMailboxes($trash)) $imap->createMailbox($trash);
+        $imap->switchMailbox($mailbox.'INBOX');
+
         $mailsIds = $imap->searchMailbox('ALL');
         $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']); echo $conn->error;
         while($rule = $result->fetch_assoc()){
             foreach($mailsIds as $mail_number){
                 $mail = $imap->getMail($mail_number);
-                if($subject = strstr($mail->subject, $rule['identifier'])){
-                    echo $subject .' - found<br>';
+                $pos = strpos($mail->subject, $rule['identifier']);
+                if($pos !== false){
+                    //echo $mail->subject .' - found<br>';
                     $id = uniqid();
                     $null = null;
-                    $name = str_replace($rule['identifier'],"",$subject);
-                    $description = convToUTF8($mail->textHtml);
+
+                    $doc = new DOMDocument();
+                    //$doc->encoding = 'iso-8859-1';
+                    @$doc->loadHTML($mail->textHtml);
+                    $doc_body = new DOMDocument();
+                    $body = $doc->getElementsByTagName('body')->item(0);
+                    foreach ($body->childNodes as $child){
+                        $doc_body->appendChild($doc_body->importNode($child, true));
+                    }
+                    $description = $doc_body->saveHTML();
+
+                    //TODO: should replace this with dom viewer attr also, since descr can be very large
+                    //$images = $doc->getElementsByTagName('img');
                     $attachments = $mail->getAttachments();
                     foreach($attachments as $attach){ //easy custom rawData
                         if(strpos($description, $attach->contentId)){
                             $description = str_replace("cid:".$attach->contentId, "data:image/jpeg;base64,".base64_encode($attach->rawData), $description);
                         } else {
-                            $description .= '<img src="data:image/jpeg;base64,'.base64_encode($attach->rawData).'" />';
+                            $description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.base64_encode($attach->rawData).'" />';
                         }
                     }
+
+                    $name = substr_replace($mail->subject, '', $pos, strlen($rule['identifier']));
                     $company = $rule['company'];
                     $client = $rule['client'];
                     $project = $rule['clientproject'];
@@ -83,7 +102,7 @@ if($result){
                         $stmt_emp->close();
                         $stmt_team->close();
 
-                        $imap->deleteMail($mail_number);
+                        $imap->moveMail($mail_number, $trash);
                     } else {
                         echo $stmt->error;
                     }

@@ -40,8 +40,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     //insert products
     $historyID = $conn->insert_id;
     $origin = randomPassword(16);
-    $conn->query("INSERT INTO products(name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2, historyID, origin)
-    SELECT name, description, price, quantity, unit, taxID, cash, purchase, position, iv, iv2, $historyID, '$origin' FROM products WHERE historyID = $val");
+    $conn->query("INSERT INTO products(name, description, price, quantity, unit, taxID, cash, purchase, position historyID, origin)
+    SELECT name, description, price, quantity, unit, taxID, cash, purchase, position, $historyID, '$origin' FROM products WHERE historyID = $val");
     if($conn->error){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
@@ -126,7 +126,7 @@ $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filtering
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
 $result = $conn->query("SELECT proposals.*, companyID, clientData.name as clientName, companyData.name as companyName
 FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
-WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query");
+WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query  ORDER BY curDate DESC");
 ?>
 
 <table class="table table-hover">
@@ -155,7 +155,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
         echo '</tr>';
 
         $filterings['procedures'][2];
-        $result_process = $conn->query("SELECT * FROM processHistory WHERE processID = ".$row['id']);
+        $result_process = $conn->query("SELECT id, id_number FROM processHistory WHERE processID = ".$row['id']." ORDER BY id_number");
         $product_placements = array_fill_keys($transitions, array());
         while($row_history = $result_process->fetch_assoc()){
           $i = $row_history['id'];
@@ -268,7 +268,6 @@ $(document).ready(function(){
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     },
     responsive: true,
-    dom: 'f',
     autoWidth: false,
     paging: true
   });

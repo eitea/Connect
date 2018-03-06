@@ -184,7 +184,7 @@ class Mailbox {
 	 * @param $name
 	 */
 	public function createMailbox($name) {
-		$this->imap('createmailbox', $this->imapPath . '.' . $name);
+		$this->imap('createmailbox', $this->imapPath . $name);
 	}
 
 	/**

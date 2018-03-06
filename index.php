@@ -1,12 +1,13 @@
 <?php
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_tester.php',                   'php/info' => 'core/system/phpinfo.php',                   'login/passwordChange' => 'core/login/passwordChange.php',
+  'login/access' => 'core/login/login_docker.php',                   'php/info' => 'core/system/phpinfo.php',                   'login/passwordChange' => 'core/login/passwordChange.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
   'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
 
-  'social/home' => 'core/system/socialMedia.php',                   'setup/run' => 'core/setup/setup.php',                      'setup/wizard' => 'core/setup/install_wizard.php',
+  'social/home' => 'core/system/socialMedia.php',
+  'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',          'setup/keys' => 'core/setup/download_keys.php',
 
   'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
   'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',

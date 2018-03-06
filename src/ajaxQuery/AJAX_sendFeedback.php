@@ -89,7 +89,7 @@ $mail->addAddress($recipient); // Add recipient
 
 #region mail_content
 $mail->isHTML(true); // Set email format to HTML
-$mail->Subject = "Feedback from $userName";
+$mail->Subject = "Feedback Feedback / $type";
 $mail->Body    = $content;
 $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
 

@@ -71,9 +71,20 @@ require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 include dirname(dirname(__DIR__)) . '/validate.php';
 
-$sql = "SELECT * FROM $adminLDAPTable;";
-$result = mysqli_query($conn, $sql);
-$row = $result->fetch_assoc();
+$result = mysqli_query($conn, "SELECT version FROM configurationData;");
+if(!$result){ //can be removed later on
+    $result = mysqli_query($conn, "SELECT version FROM ldapConfigTab;");
+    $row = $result->fetch_assoc();
+    $conn->query("ALTER TABLE configurationData ADD COLUMN version INT(5) DEFAULT ".$row['version']." NOT NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Table Update: Cleanup';
+    }
+    $conn->query("DROP TABLE ldapConfigTab");
+} else {
+    $row = $result->fetch_assoc();
+}
 
 if ($row['version'] < 100) {
     $conn->query("DELETE FROM holidays");
@@ -119,15 +130,10 @@ if ($row['version'] < 100) {
 }
 
 if ($row['version'] < 101) {
-    $conn->query("ALTER TABLE articles ADD COLUMN iv VARCHAR(255)");
-    $conn->query("ALTER TABLE articles ADD COLUMN iv2 VARCHAR(255)");
     $conn->query("ALTER TABLE articles CHANGE name name VARCHAR(255)"); //50 -> 255
     $conn->query("ALTER TABLE articles CHANGE description description VARCHAR(1200)"); //600 -> 1200
-    $conn->query("ALTER TABLE products ADD COLUMN iv VARCHAR(255)");
-    $conn->query("ALTER TABLE products ADD COLUMN iv2 VARCHAR(255)");
     $conn->query("ALTER TABLE products CHANGE name name VARCHAR(255)"); //50 -> 255
     $conn->query("ALTER TABLE products CHANGE description description VARCHAR(600)"); //300 -> 600
-    $conn->query("UPDATE configurationData set masterPassword = ''");
 
     $conn->query("CREATE TABLE resticconfiguration(
     path VARCHAR(255),
@@ -675,11 +681,6 @@ if ($row['version'] < 115) {
         echo '<br>Finanzen: Doppelte Buchungen Fix';
     }
 
-    $conn->query("ALTER TABLE UserData ADD COLUMN keyCode VARCHAR(100)");
-    if (!$conn->error) {
-        echo '<br>Verschlüsselung: Master Passwort aktualisiert';
-    }
-
     $conn->query("ALTER TABLE configurationData ADD COLUMN checkSum VARCHAR(20)");
 }
 
@@ -738,8 +739,8 @@ if ($row['version'] < 116) {
 
     $result = $conn->query("SELECT * FROM products");
     $conn->query("DELETE FROM products");
-    $stmt = $conn->prepare("INSERT INTO products (name, description, historyID, origin, price, quantity, unit, taxID, cash, purchase, position, iv, iv2) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssisddsiddiss", $name, $desc, $historyID, $origin, $price, $quantity, $unit, $taxID, $cash, $purchase, $pos, $iv, $iv2);
+    $stmt = $conn->prepare("INSERT INTO products (name, description, historyID, origin, price, quantity, unit, taxID, cash, purchase, position) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssisddsiddiss", $name, $desc, $historyID, $origin, $price, $quantity, $unit, $taxID, $cash, $purchase, $pos);
     echo $stmt->error;
     while ($row = $result->fetch_assoc()) {
         $name = $row['name'];
@@ -751,8 +752,6 @@ if ($row['version'] < 116) {
         $cash = $row['cash'];
         $purchase = $row['purchase'];
         $pos = $row['position'];
-        $iv = $row['iv'];
-        $iv2 = $row['iv2'];
         $origin = randomPassword(16);
 
         $processRes = $conn->query("SELECT id FROM processHistory WHERE processID = " . $row['proposalID']);
@@ -1997,7 +1996,7 @@ if($row['version'] < 137){
         echo $conn->error;
     } else {
         echo '<br>Fixing Contact Persons';
-    }  
+    }
     $sql = "DELETE FROM position";
     $conn->query($sql);
     $conn->query("INSERT INTO position (name) VALUES ('GF'),('Management'),('Leitung')");
@@ -2032,7 +2031,7 @@ if($row['version'] < 137){
     } else {
         echo '<br>Bigger Task Description (Max. 15MB)';
     }
-    
+
     $sql = "ALTER TABLE roles ADD COLUMN canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -2096,6 +2095,7 @@ if($row['version'] < 138){
         echo '<br>Training: add to new module';
     }
 }
+
 if($row['version'] < 139){
     $sql = "ALTER TABLE dsgvo_training_completed_questions ADD COLUMN lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP";
     if(!$conn->query($sql)){
@@ -2109,12 +2109,88 @@ if($row['version'] < 139){
     } else {
         echo '<br>Training: answer every n days';
     }
+
+    $conn->query("ALTER TABLE configurationData ADD COLUMN firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Setup: Installation Wizard';
+    }
+    $conn->query("UPDATE configurationData SET firstTimeWizard = 'TRUE'");
+
+    $conn->query("ALTER TABLE configurationData ADD COLUMN activeEncryption ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: Inactive';
+    }
+
+    $conn->query("ALTER TABLE configurationData DROP COLUMN masterPassword");
+    $conn->query("ALTER TABLE configurationData DROP COLUMN checkSum");
+
+    $sql = "CREATE TABLE security_modules(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        module VARCHAR(50) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        symmetricKey VARCHAR(150) NOT NULL,
+        publicPGPKey VARCHAR(150) NOT NULL,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: Module Keys';
+    }
+
+    $sql = "CREATE TABLE security_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: User Keys';
+    }
+
+    $conn->query("ALTER TABLE companyData ADD COLUMN publicPGPKey VARCHAR(150)");
+
+    $sql = "CREATE TABLE security_company(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED,
+        companyID INT(6) UNSIGNED NOT NULL,
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security Update: Company Keys';
+    }
 }
 
-// ------------------------------------------------------------------------------
+//if($row['version'] < 140){}
+//if($row['version'] < 141){}
+//if($row['version'] < 142){}
+//if($row['version'] < 143){}
 
+
+// ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
-$conn->query("UPDATE $adminLDAPTable SET version=$VERSION_NUMBER");
+$conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
 echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht automatisch weitergeleitet werden: <a href="../user/home">Weiter</a>';
 ?>
 <script type="text/javascript">
