@@ -2182,7 +2182,15 @@ if($row['version'] < 139){
     }
 }
 
-//if($row['version'] < 140){}
+if($row['version'] < 140){
+    $sql = "ALTER TABLE dynamicprojects ADD isTemplate ENUM('TRUE','FALSE') NOT NULL DEFAULT 'FALSE';";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Task Update: Templates';
+    }
+    
+}
 //if($row['version'] < 141){}
 //if($row['version'] < 142){}
 //if($row['version'] < 143){}

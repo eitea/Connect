@@ -1245,7 +1245,10 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE dynamicprojectsteams(
         projectid VARCHAR(100) NOT NULL,
-        teamid INT(6) UNSIGNED
+        teamid INT(6) UNSIGNED,
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;

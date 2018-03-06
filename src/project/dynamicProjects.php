@@ -74,7 +74,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
             <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
                 <div class="container-fluid">
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" onclick="resetNewTask()" data-target="#editingModal-" >New</button></li>
                     <li class="divider"></li>
                     <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
                 </div>
@@ -245,6 +245,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
                 $estimate = test_input($_POST['estimatedHours']);
+                $isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
                 if($isDynamicProjectsAdmin == 'TRUE'){
                     $skill = intval($_POST['projectskill']);
                     $parent = test_input($_POST["parent"]); //dynamproject id
@@ -281,8 +282,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $series = base64_encode(serialize($series));
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags, isTemplate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssbiiissssisiisbisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags, $isTemplate);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -376,14 +377,14 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+                WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
                 AND d.projectstart <= UTC_TIMESTAMP $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
@@ -510,11 +511,15 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "TEMPLATES" ?></div>
                 <div class="modal-body">
                     <div class="col-sm-12">
-                        PLACEHOLDER
-<!--                        <label>Select Template</label>
-                        <select class="form-control select2-templates" >
+                        <label>Select Template</label>
+                        <select id="templateSelect" class="form-control select2-templates" >
                             <option value="-1" >New...</option>
-                        </select>-->
+                            <?php $tempresult = $conn->query("SELECT projectname,projectid FROM dynamicprojects WHERE isTemplate = 'TRUE'");
+                                  while($tempresult && ($template = $tempresult->fetch_assoc())){
+                                      echo '<option value="'.$template['projectid'].'" >'.$template['projectname'].'</option>';
+                                  }
+                            ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -783,7 +788,7 @@ function dynamicOnLoad(modID){
             input.click();
         }
     });
-} //end dnymaicOnLoad()
+} //end dynamicOnLoad()
 function appendModal(index){
     $.ajax({
     url:'ajaxQuery/AJAX_dynamicEditModal.php',
@@ -888,13 +893,25 @@ function showProjects(client, project, place){
 }
 function activateTemplate(event){
     id = $(".select2-templates").select2('data');
-    if(id === -1){
+    if(id[0].id == -1){
         //Create new Template
+        $("#template-list-modal").modal('hide');
+        $("#editingModal- .modal-title")[0].innerText = "Template editieren";
+        isTemplate = document.createElement("input");
+        isTemplate.name = "isTemplate";
+        isTemplate.id = "isTemplate";
+        isTemplate.style = "visibility: hidden; height:1px; width:1px";
+        $("#editingModal- form")[0].appendChild(isTemplate);
+        $("#editingModal-").modal('show');
     }else{
         $("#template-list-modal").modal('hide');
-        //Get Template Data
-        //Fill editingModal- with data
-        //open editingModal-
+        var index = id[0].id;
+//        console.log(index);
+        if(existingModals.indexOf(index) == -1){
+            appendModal(index);
+        } else {
+            $('#editingModal-'+index).modal('show');
+        }
     }
 }
 function checkInput(event){
@@ -915,6 +932,11 @@ function checkInput(event){
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
+}
+function resetNewTask(){
+    $("#editingModal- .modal-title")[0].innerText = "Task editieren";
+    isTemplate = $("#editingModal- #isTemplate")[0];
+    $("#editingModal- form")[0].removeChild(isTemplate);
 }
 function reviewChange(event,id){
     projectid = id;
