@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endDate = $date." ".$_POST['end'];
     $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
 
-    $insertInfoText = test_input(trim($_POST['infoText']));
+    $insertInfoText = test_input($_POST['infoText']);
     $insertInternInfoText = test_input($_POST['internInfoText']);
 
     if($request_addendum && empty($_POST['confirm_addendum'])){ //every if has a story

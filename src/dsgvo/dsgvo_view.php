@@ -219,11 +219,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
           if (!$mail->send()) {
               $errorInfo = $mail->ErrorInfo;
-              $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
-              echo $errorInfo;
-          }
-          if ($conn->error) {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+              $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('".$contact_row['email']."', '$errorInfo')");
+              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $errorInfo . '</div>';
+          } elseif ($conn->error) {
+              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
           } else {
               echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_CREATE'] . '</div>';
           }

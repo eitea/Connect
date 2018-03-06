@@ -10,41 +10,21 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
 function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
-   $allHours = 0;
-   if(strpos($estimate,'M')){
-       $finder = preg_split("/[M]/",$estimate)[0].'M';
-      $estimate = str_replace($finder, $finder.' ', $estimate);
-   }
-   if(strpos($estimate,'w')){
-       $finder = preg_split("/[w]/",$estimate)[0].'w';
-      $estimate = str_replace($finder, $finder.' ', $estimate);
-   }
-   if(strpos($estimate,'t')){
-       $finder = preg_split("/[t]/",$estimate)[0].'t';
-      $estimate = str_replace($finder, $finder.' ', $estimate);
-   }
-   if(strpos($estimate,'m')){
-       $finder = preg_split("/[m]/",$estimate)[0].'m';
-      $estimate = str_replace($finder, $finder.' ', $estimate);
-   }
-   $tim = preg_split("/[\s]/", $estimate);
-   for($i = 0;$i<count($tim);$i++){
-       if(strpos($tim[$i],'M')){
-           $tim[$i] = intval($tim[$i]) * 730.5;
-       }elseif(strpos($tim[$i],'w')){
-           $tim[$i] = intval($tim[$i]) * 168;
-       }elseif(strpos($tim[$i],'t')){
-           $tim[$i] = intval($tim[$i]) * 24;
-       }elseif(strpos($tim[$i],'m')){
-           $tim[$i] = intval($tim[$i]) / 60;
-       }else{
-           $tim[$i] = intval($tim[$i]);
-       }
-   }
-   for($i = 0;$i<count($tim);$i++){
-       $allHours += $tim[$i];
-   }
-
+    $allHours = 0;
+    $times = explode(' ', $estimate); //TODO: should base it on intervalData
+    foreach($times as $t){
+        if(is_numeric($t)){
+            $allHours += $t;
+        } elseif(substr($t, -1) == 'M'){
+            $allHours += intval($t) * 5 * 4 * 7.6;
+        } elseif(substr($t, -1) == 'w'){
+            $allHours += intval($t) * 5 * 7.6;
+        } elseif(substr($t, -1) == 't'){
+            $allHours += intval($t) * 24;
+        } elseif(substr($t, -1) == 'm'){
+            $allHours += intval($t) / 60;
+        }
+    }
     if($current < $allHours){
         $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
@@ -837,6 +817,7 @@ function appendModal(index){
         if(index){
             $('#editingModal-'+index).modal('show');
         }
+        $("#projectForm"+index).rememberState();
     }
    });
 }

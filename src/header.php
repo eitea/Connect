@@ -305,6 +305,7 @@ if ($_SESSION['color'] == 'light') {
   <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
   <script src="plugins/html2canvas/html2canvas.min.js"></script>
+    <script src="plugins/remember-state/remember-state.min.js"></script>
 
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
   <link href="<?php echo $css_file; ?>" rel="stylesheet" />
@@ -764,7 +765,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
             <?php endif;//canUseSuppliers ?>
             <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>    
+            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
             <?php endif;//canuseClients ?>
           </ul>
       </div>
@@ -1150,7 +1151,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <span><?php echo $error_output; ?></span>
 
       <?php
-      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
+      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
       if($row['expiration'] == 'TRUE'){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
@@ -1166,5 +1167,4 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
       }
-
       ?>
