@@ -211,22 +211,19 @@ if($advanced){
     $teams = array();
     $clients = array();
     $trainings = array();
+    $tasks = array();
     $result = $conn->query("SELECT id, firstname, lastname FROM UserData GROUP BY id");
     while ($result && ($row = $result->fetch_assoc())) {
         $users[] = array("id"=>$row['id'],"name"=> $row["firstname"]." ".$row["lastname"]);
     }
     $result = $conn->query("SELECT id, name FROM $teamTable");
-    while ($result && ($row = $result->fetch_assoc())) {
-        $teams[] = array("id"=>$row['id'],"name"=> $row["name"]);
-    }
+    while ($result && ($row = $result->fetch_assoc())) { $teams[] = array("id"=>$row['id'],"name"=> $row["name"]); }
     $result = $conn->query("SELECT id, name, isSupplier FROM clientData");
-    while ($result && ($row = $result->fetch_assoc())) {
-        $clients[] = array("id"=>$row['id'],"name"=> $row["name"],"supplier"=>$row["isSupplier"]=='TRUE');
-    }
+    while ($result && ($row = $result->fetch_assoc())) { $clients[] = array("id"=>$row['id'],"name"=> $row["name"],"supplier"=>$row["isSupplier"]=='TRUE'); }
     $result = $conn->query("SELECT id, name,companyID FROM dsgvo_training");
-    while ($result && ($row = $result->fetch_assoc())) {
-        $trainings[] = array("id"=>$row['id'],"name"=> $row["name"], "company"=> $row["companyID"]);
-    }
+    while ($result && ($row = $result->fetch_assoc())) { $trainings[] = array("id"=>$row['id'],"name"=> $row["name"], "company"=> $row["companyID"]); }
+    $result = $conn->query("SELECT projectid, projectname, projectdescription FROM dynamicprojects");
+    while ($result && ($row = $result->fetch_assoc())) { $tasks[] = array("id"=>$row['projectid'],"name"=> $row["projectname"], "description"=> $row["projectdescription"]); }
     foreach ($users as $user) {
         $name = $user["name"];
         $id = $user["id"];
@@ -250,7 +247,20 @@ if($advanced){
             $routesGER[] = array("name"=>"Kunde bearbeiten ($name)", "url"=>"../system/clientDetail?custID=$id");
         }
     }
-
+    foreach ($trainings as $training) {
+        $name = $training["name"];
+        $id = $training["id"];
+        $companyID = $training["company"];
+        $routesENG[] = array("name"=>"Trainings ($name)", "url"=>"../dsgvo/training?n=$companyID&trainingid=$id");
+        $routesGER[] = array("name"=>"Schulungen ($name)", "url"=>"../dsgvo/training?n=$companyID&trainingid=$id");
+    }
+    foreach ($tasks as $task) {
+        $name = $task["name"];
+        $id = $task["id"];
+        $description = strip_tags($task["description"]);
+        $routesENG[] = array("name"=>"Task ($name)", "url"=>"../dynamic-projects/view?id=$id", "tags"=>array($description));
+        $routesGER[] = array("name"=>"Task ($name)", "url"=>"../dynamic-projects/view?id=$id", "tags"=>array($description));
+    }
 }
 
 function test_input($data){
@@ -265,13 +275,14 @@ function formatList($list){
         $output .= '<li class="list-group-item">';
         $name = $item["name"];
         $url = $item["url"];
+        $output .= "<a href='$url'>$name</a>";
         $tags = array();
         if(isset($item["tags"])){
             $tags = $item["tags"];
+            $output .= "<br>";
         }
-        $output .= "<a href='$url'>$name</a>";
         foreach ($tags as $tag) {
-            $output .= " <span class='label label-default pull-right' style='display:inline-block'>$tag</span> ";
+            $output .= "<span class='label label-default' style='display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:150px;margin:4px'>$tag</span> ";
         }
         $output .= '</li>';
     }

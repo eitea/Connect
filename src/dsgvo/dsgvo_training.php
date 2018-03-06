@@ -193,6 +193,9 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
             $questionID = $row_question["id"];
             $title = $row_question["title"];
             $text = $row_question["text"];
+            if($trainingID == $activeTab){
+                echo "<script>$('#moduleCollapse-$moduleID').addClass('in')</script>";
+            }
             ?>
             <div class="col-md-12"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
             <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
