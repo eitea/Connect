@@ -4,6 +4,8 @@ $userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 
+$result = $conn->query("SELECT isCoreAdmin FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
+$enableToAdvancedSearch = !($userID != 1 && (!$result || $result->num_rows <= 0));
 
 if(isset($_REQUEST["modal"])){
     $german = $english = "";
@@ -29,10 +31,12 @@ if(isset($_REQUEST["modal"])){
                                     <div class="row">
                                         <div class="col-md-12"><label><input type="checkbox" id="englishSearchCheckbox" <?php echo $english; ?> > Englisch</label></div>
                                     </div>
+                                    <?php if($enableToAdvancedSearch): ?>
                                     <div role="separator" class="divider"></div>
                                     <div class="row">
                                         <div class="col-md-12"><label><input type="checkbox" id="advancedSearchCheckbox" > Erweiterte Suche</label></div>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
                             </span>
                         </div>
@@ -206,7 +210,7 @@ foreach ($available_companies as $company) {
     $routesGER[] = array("name"=>"Artikel ($name)", "url"=>"../erp/articles?cmp=$companyID", "tags"=>array("ERP Artikel"));
 }
 
-if($advanced){
+if($advanced && $enableToAdvancedSearch){
     $users = array();
     $teams = array();
     $clients = array();
