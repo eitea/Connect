@@ -1197,6 +1197,7 @@ function create_tables($conn) {
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
+        isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
