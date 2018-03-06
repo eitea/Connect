@@ -209,6 +209,8 @@ foreach ($available_companies as $company) {
 if($advanced){
     $users = array();
     $teams = array();
+    $clients = array();
+    $trainings = array();
     $result = $conn->query("SELECT id, firstname, lastname FROM UserData GROUP BY id");
     while ($result && ($row = $result->fetch_assoc())) {
         $users[] = array("id"=>$row['id'],"name"=> $row["firstname"]." ".$row["lastname"]);
@@ -216,6 +218,14 @@ if($advanced){
     $result = $conn->query("SELECT id, name FROM $teamTable");
     while ($result && ($row = $result->fetch_assoc())) {
         $teams[] = array("id"=>$row['id'],"name"=> $row["name"]);
+    }
+    $result = $conn->query("SELECT id, name, isSupplier FROM clientData");
+    while ($result && ($row = $result->fetch_assoc())) {
+        $clients[] = array("id"=>$row['id'],"name"=> $row["name"],"supplier"=>$row["isSupplier"]=='TRUE');
+    }
+    $result = $conn->query("SELECT id, name,companyID FROM dsgvo_training");
+    while ($result && ($row = $result->fetch_assoc())) {
+        $trainings[] = array("id"=>$row['id'],"name"=> $row["name"], "company"=> $row["companyID"]);
     }
     foreach ($users as $user) {
         $name = $user["name"];
@@ -229,6 +239,18 @@ if($advanced){
         $routesENG[] = array("name"=>"Edit Team ($name)", "url"=>"../system/teams?id=$id");
         $routesGER[] = array("name"=>"Team Bearbeiten ($name)", "url"=>"../system/teams?id=$id");
     }
+    foreach ($clients as $client) {
+        $name = $client["name"];
+        $id = $client["id"];
+        if($client["supplier"]){
+            $routesENG[] = array("name"=>"Edit Supplier ($name)", "url"=>"../system/clientDetail?supID=$id");
+            $routesGER[] = array("name"=>"Lieferant bearbeiten ($name)", "url"=>"../system/clientDetail?supID=$id");
+        }else{
+            $routesENG[] = array("name"=>"Edit Clients ($name)", "url"=>"../system/clientDetail?custID=$id");
+            $routesGER[] = array("name"=>"Kunde bearbeiten ($name)", "url"=>"../system/clientDetail?custID=$id");
+        }
+    }
+
 }
 
 function test_input($data){

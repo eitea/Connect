@@ -9,6 +9,9 @@ enableToDSGVO($userID);?>
 // A question is a text with different answers      (renamed to Frage)
 
 $trainingID = 0;
+if(isset($_REQUEST["trainingid"])){
+    $trainingID = intval($_REQUEST["trainingid"]);
+}
 if(!isset($_REQUEST["n"])){
     showError("no company");
     include dirname(__DIR__) . '/footer.php';
