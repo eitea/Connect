@@ -507,11 +507,14 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
 </table>
     <div id="selectTemplate" >
         <div class="modal fade" id="template-list-modal">
-            <div class="modal-dialog modal-content modal-sm">
-                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "TEMPLATES" ?></div>
+            <form method="POST" onsubmit=' return setUpDeleteTemplate()'>
+            <div class="modal-dialog modal-content modal-md">
+                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "Templates" ?></div>
                 <div class="modal-body">
-                    <div class="col-sm-12">
+                    <div class="col-md-12">
                         <label>Select Template</label>
+                    </div>
+                    <div class="col-md-9">
                         <select id="templateSelect" class="form-control select2-templates" >
                             <option value="-1" >New...</option>
                             <?php $tempresult = $conn->query("SELECT projectname,projectid FROM dynamicprojects WHERE isTemplate = 'TRUE'");
@@ -521,12 +524,17 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                             ?>
                         </select>
                     </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-warning" onclick="editTemplate()" ><i class="fa fa-pencil"></i></button>
+                        <button type="submit" name="deleteProject" class="btn btn-warning" ><i class="fa fa-trash-o"></i></button>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-warning" onclick="activateTemplate(event)" ><?php echo $lang['APPLY']; ?></button>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 <div id="editingModalDiv">
@@ -912,6 +920,42 @@ function activateTemplate(event){
         } else {
             $('#editingModal-'+index).modal('show');
         }
+    }
+}
+function setUpDeleteTemplate(){
+ id =  $(".select2-templates").select2("data");   
+ if(id[0].id==-1){
+    return false;
+ }else{
+    $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
+ }
+     
+}
+function editTemplate(){
+    id =  $(".select2-templates").select2("data");
+    if(id[0].id==-1){
+     return false;   
+    }else{
+        $("#template-list-modal").modal('hide');
+        $.ajax({
+        url:'ajaxQuery/AJAX_dynamicEditModal.php',
+        data:{projectid: id[0].id,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
+        type: 'post',
+        success : function(resp){
+            resp = resp.replace('name="editDynamicProject" value=""','name="editDynamicProject" value="'+id[0].id+'"');
+            resp = resp.replace('</form>','<input name="isTemplate" style="visibility:hidden;height:1px;width:1px;" ></input></form>');
+            $("#editingModalDiv").append(resp);
+            //existingModals.push(index);
+            onPageLoad();
+            dynamicOnLoad();
+        },
+        error : function(resp){},
+        complete: function(resp){
+            if(id[0].id){
+                $('#tempeditingModal-'+id[0].id).modal('show');
+            }
+        }
+        });
     }
 }
 function checkInput(event){

@@ -47,7 +47,7 @@ if($x){
 }
 ?>
 
-<div class="modal fade" id="editingModal-<?php echo $x; ?>">
+<div class="modal fade" id="<?php if($dynrow['isTemplate']=='TRUE') echo "temp"; ?>editingModal-<?php echo $x; ?>">
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
             <form method="POST" onSubmit="return  checkInput(event)" id="projectForm<?php echo $x; ?>">
