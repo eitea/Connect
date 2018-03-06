@@ -56,7 +56,6 @@ function test_input($data, $strong = false) {
     if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
     } else {
-        //$data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data); OLD TEST
         $data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
     $data = trim($data);
