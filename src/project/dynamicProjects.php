@@ -914,7 +914,6 @@ function activateTemplate(event){
     }else{
         $("#template-list-modal").modal('hide');
         var index = id[0].id;
-//        console.log(index);
         if(existingModals.indexOf(index) == -1){
             appendModal(index);
         } else {
