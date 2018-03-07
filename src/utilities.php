@@ -51,6 +51,7 @@ function isHoliday($ts) {
 }
 
 function test_input($data, $strong = false) {
+    //REGEXString
     if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
     } else {

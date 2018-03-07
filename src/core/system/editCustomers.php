@@ -60,7 +60,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <?php
                 while ($row = $result->fetch_assoc()) {
                     $i = $row['id'];
-                    echo '<tr style="cursor: pointer" class="clickable-row" data-href="../system/clientDetail?custID='.$i.'">';
+                    echo '<tr style="cursor: pointer" onclick="checkIfCheckbox(event,'.$i.')" >';
                     echo "<td><input type='checkbox' name='index[]' value='$i'></td>";
                     echo "<td>".$row['companyName']."</td>";
                     echo "<td>".$row['name']."</td>";
@@ -91,5 +91,11 @@ jQuery(document).ready(function($) {
         window.location = $(this).data("href");
     });
 });
+
+function checkIfCheckbox(event,id){
+    if(event.explicitOriginalTarget.nodeName!='INPUT'){
+        window.location.href="../system/clientDetail?custID="+id;
+    }
+}
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

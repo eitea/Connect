@@ -12,6 +12,7 @@ if(!empty($_POST['captcha']))  die("mep.");
 
 require dirname(dirname(__DIR__)) .'/connection.php';
 require dirname(dirname(__DIR__)) .'/utilities.php';
+include dirname(dirname(__DIR__)) .'/version_number.php';
 
 $invalidLogin = "";
 
@@ -35,8 +36,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
         $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
         $result = $conn->query($sql);
         if($result && $result->num_rows > 0){
-            require dirname(dirname(__DIR__)) ."/language.php";
-            include dirname(dirname(__DIR__)) .'/version_number.php';
+            require dirname(dirname(__DIR__)) ."/language.php";            
             //check for updates
             $result = mysqli_query($conn, "SELECT version FROM configurationData;");
             if(!$result || (($row = $result->fetch_assoc()) && $row['version'] < $VERSION_NUMBER)){
