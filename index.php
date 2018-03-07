@@ -11,7 +11,7 @@ $routes = array(
 
   'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
   'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
-  'system/teams' => 'core/system/system_teams.php',                      'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
+  'system/teams' => 'core/system/teamConfig.php',                      'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
   'system/password' => 'core/system/passwordOptions.php',                'system/email' => 'core/system/reportOptions.php',                'system/tasks' => 'core/system/taskScheduler.php',
   'system/update' => 'core/system/pullGitRepo.php',                      'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',
   'system/designer' => 'core/system/templateSelect.php',                 'system/clients' => 'core/system/editCustomers.php',              'system/clientDetail' => 'core/system/editCustomer_detail.php',

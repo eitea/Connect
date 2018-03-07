@@ -268,7 +268,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         $conn->query($sql);
     }
-}
+} //endif POST
 
 if ($_SESSION['color'] == 'light') {
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
@@ -283,75 +283,74 @@ if ($_SESSION['color'] == 'light') {
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
+    <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
-  <script src="plugins/jQuery/jquery.min.js"></script>
-  <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
-  <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src="plugins/jQuery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
-  <script src='plugins/select2/js/select2.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
+    <script src='plugins/select2/js/select2.min.js'></script>
 
-  <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
-  <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
+    <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
 
-  <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
-  <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
-  <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
+    <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
+    <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
+    <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
-  <script src="plugins/html2canvas/html2canvas.min.js"></script>
+    <script src="plugins/html2canvas/html2canvas.min.js"></script>
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
-  <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
-  <link href="<?php echo $css_file; ?>" rel="stylesheet" />
-  <title>Connect</title>
-  <script>
-  $(document).ready(function() {
-    if($('#seconds').length) {
-      var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
-      function pad(val) {
-        return val > 9 ? val : "0" + val;
-      }
-      window.setInterval(function(){
-        document.getElementById("seconds").innerHTML = pad(++sec % 60);
-        document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
-        document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
-      }, 1000);
-  }
-  <?php
-  if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
-      $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-      if ($result) {
-          $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
-          if ($privateDecoded != false) {
-              $unlockedPGP = $privateDecoded;
-              echo 'document.getElementById("options").click();';
-          }
-      }
-  }
-  ?>
-  });
-  function generateKeys($userID){
-      $.ajax({
-          type: "POST",
-          url: "ajaxQuery/AJAX_pgpKeyGen.php",
-          data: { userID: $userID}
-      }).done(function(keys){
-          keys = JSON.parse(keys);
-          document.getElementsByName('privatePGP')[0].value = keys[0];
-          document.getElementsByName('publicPGP')[0].value = keys[1];
-      });
-  }
-  function clearPGP(){
-    document.getElementsByName('privatePGP')[0].value = '';
-  }
-  </script>
-  <script>
+    <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+    <link href="<?php echo $css_file; ?>" rel="stylesheet" />
+    <title>Connect</title>
+    <script>
+    $(document).ready(function() {
+        if($('#seconds').length) {
+            var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
+            function pad(val) {
+                return val > 9 ? val : "0" + val;
+            }
+            window.setInterval(function(){
+                document.getElementById("seconds").innerHTML = pad(++sec % 60);
+                document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
+                document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
+            }, 1000);
+        }
+        <?php
+        if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
+            $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
+            if ($result) {
+                $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
+                if ($privateDecoded != false) {
+                    $unlockedPGP = $privateDecoded;
+                    echo 'document.getElementById("options").click();';
+                }
+            }
+        }
+        ?>
+    });
+    function generateKeys($userID){
+        $.ajax({
+            type: "POST",
+            url: "ajaxQuery/AJAX_pgpKeyGen.php",
+            data: { userID: $userID}
+        }).done(function(keys){
+            keys = JSON.parse(keys);
+            document.getElementsByName('privatePGP')[0].value = keys[0];
+            document.getElementsByName('publicPGP')[0].value = keys[1];
+        });
+    }
+    function clearPGP(){
+        document.getElementsByName('privatePGP')[0].value = '';
+    }
+
     function showError(message){
         if(!message || message.length == 0) return;
         $.notify({

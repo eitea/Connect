@@ -10,8 +10,8 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     $allHours = 0;
-    $times = explode(' ', $estimate); //TODO: should base it on intervalData
-    foreach($times as $t){
+    $times = explode(' ', $estimate);
+    foreach($times as $t){ //TODO: should base hours on intervalData, not 24/7 format
         if(is_numeric($t)){
             $allHours += $t;
         } elseif(substr($t, -1) == 'M'){
@@ -38,6 +38,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
         $redBar = 1-$yellowBar;
         $current = $allHours;
     }
+    //TODO: change title
     $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
     $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
     $bar .= "<div data-toggle='tooltip' title='".round($current,2)." Stunden' class='progress-bar progress-bar-warning' style='height:10px;width:".formatPercent($yellowBar)."'></div>";
