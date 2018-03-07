@@ -71,7 +71,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['action_accept']) && !isset($processHistory['action_accept'])){
         $proc_activity = 'action_accept';
         $proc_info = 'DECLINED';
-        if($_POST['action_accept']){ 
+        if($_POST['action_accept']){
             $proc_info = 'ACCEPTED';
         }
         $stmt->execute();
@@ -92,14 +92,14 @@ $stmt->close();
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <script src="plugins/jQuery/jquery.min.js"></script>
-  <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
-  <link href="plugins/homeMenu/template.css" rel="stylesheet" />
-  <title>Connect</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="plugins/jQuery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+    <link href="plugins/homeMenu/template.css" rel="stylesheet" />
+    <title>Connect</title>
 </head>
 <body>
     <div class="container-fluid">
@@ -146,7 +146,7 @@ $stmt->close();
                     echo '<div class="col-sm-3">';
                     if(isset($processHistory['ENABLE_SIGN']) && !isset($processHistory['action_sign'])){
                         $show_save = true;
-                        echo '<input type="text" class="form-control signed-box" name="action_sign" placeholder="Unterschrift" />';                    
+                        echo '<input type="text" class="form-control signed-box" name="action_sign" placeholder="Unterschrift" />';
                     }
                     echo '</div>';
                     if($show_save){

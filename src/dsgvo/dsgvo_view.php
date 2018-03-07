@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $val = intval($_POST['clone']);
     $conn->query("INSERT INTO documents (companyID, docID, name, txt, version) SELECT companyID, docID, name, txt, version FROM documents WHERE id = $val AND companyID = $cmpID");
     //TODO: cloning a BASE has to result in merging the freetext INTO the document
+
     if($conn->error){
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
     } else {
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   }
     if (isset($_POST['addDocument']) && !empty($_POST['add_docName'])) {
-        $val = test_input($_POST['add_docName']);
+        $val = secure_data('DSGVO', test_input($_POST['add_docName']), 'encrypt', $userID, $privateKey);
         $conn->query("INSERT INTO documents(name, txt, companyID, version) VALUES('$val', ' ', $cmpID, '1.0') ");
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';

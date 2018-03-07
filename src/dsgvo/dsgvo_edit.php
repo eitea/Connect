@@ -6,8 +6,8 @@ if(!empty($_GET['d'])){
     $docID = intval($_GET['d']);
     $result = $conn->query("SELECT * FROM documents WHERE id = $docID AND companyID IN (".implode(', ', $available_companies).")");
     if($result && ($row = $result->fetch_assoc())){
-        $documentContent = $row['txt'];
-        $name = $row['name'];
+        $documentContent = secure_data('DSGVO', $row['txt'], 'decrypt', $userID, $privateKey);
+        $name = secure_data('DSGVO', $row['name'], 'decrypt');
         $version = $row['version'];
         $cmpID = $row['companyID'];
         $isBase = $row['isBase'];
@@ -25,8 +25,8 @@ if(!$docID){
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['documentContent']) && !empty($_POST['templateName']) && !empty($_POST['templateVersion'])){
-    $documentContent = $_POST['documentContent'];
-    $name = test_input($_POST['templateName']);
+    $documentContent = secure_data('DSGVO', $_POST['documentContent']);
+    $name = secure_data('DSGVO', test_input($_POST['templateName']));
     $newVersion = test_input($_POST['templateVersion']);
     $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ?, version = ? WHERE id = $docID");
     $stmt->bind_param("sss", $documentContent, $name, $version);
@@ -67,12 +67,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
         <?php elseif(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $documentContent, $matches)): ?>
         <div class="col-md-10 col-md-offset-1">
-            <?php //16:30..
-            $result = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
-            $result = $result->fetch_all(MYSQLI_ASSOC);
-            //TODO: combine these arrays so i can say $result[$match]['content'] AND $result[$match]['id]
-            $result_ids = array_combine(array_column($result, 'identifier'), array_column($result, 'id'));
-            $result = array_combine(array_column($result, 'identifier'), array_column($result, 'content'));
+            <?php
+            $res = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
+            $result = array();
+            while($res && ($row = $res->fetch_assoc())){
+                $result['identifier']['id'] = $row['id'];
+                $result['identifier']['content'] = secure_data('DSGVO', $row['content'], 'decrypt');
+            }
 
             for($i = 0; $i < count($matches[0]); $i++){
                 $match = $matches[0][$i];
@@ -82,15 +83,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $documentContent = $split[1];
                 //remove the braces for html & sql conform posting
                 $match = substr($match, 1, -1);
-                $customtext = isset($result[$match]) ? $result[$match] : '';
+                $customtext = isset($result[$match]) ? $result[$match]['content'] : '';
                 if(isset($_POST['save']) && isset($_POST[$match])){
-                    $customtext = test_input($_POST[$match]);
+                    $customtext = secure_data('DSGVO', test_input($_POST[$match]));
                     if(isset($result[$match])){
-                        $val = $result_ids[$match];
+                        $val = $result[$match]['id'];
                         $conn->query("UPDATE document_customs SET content = '$customtext' WHERE id = $val");
                     } else {
                         $conn->query("INSERT INTO document_customs (doc_id, companyID, identifier, content, status) VALUES ('$doc_ident', $cmpID, '$match', '$customtext', 'visible') ");
                     }
+                    $customtext = secure_data('DSGVO', test_input($_POST[$match]), 'decrypt');
                 }
                 echo '<textarea name="'.$match.'" class="form-control" rows="3" >'.$customtext.'</textarea>';
             }

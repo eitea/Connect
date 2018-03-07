@@ -88,7 +88,6 @@ if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_
 
         if($accept){
             $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
-
             // dsgvo_access cannot decrypt this yet
             // $stmt = $conn->prepare("UPDATE documentProcess SET document_text = ?, document_headline = ? WHERE id = ?");
             // $stmt->bind_param('sss', $text, $head, $id);
@@ -100,16 +99,31 @@ if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_
             // }
             // $stmt->close();
 
-            $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?"); echo $stmt->error;
             $stmt->bind_param('sss', $text, $head, $id);
-            $result = $conn->query("SELECT id, txt, name FROM documentProcess");
+            $result = $conn->query("SELECT id, txt, name FROM documents"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = $row['id'];
                 $text = simple_encryption($row['txt'], $symmetric);
                 $head = simple_encryption($row['name'], $symmetric);
+                $stmt->execute();
             }
             $stmt->close();
+
+            $stmt = $conn->prepare("UPDATE document_customs SET content = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('si', $text, $id);
+            $result = $conn->query("SELECT id, content FROM document_customs"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = $row['id'];
+                $text = simple_encryption($row['content'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
+
+            echo $conn->error;
         }
+
+        echo $err;
     } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Error: </strong>Incorrektes Passwort.</div>';
     }
@@ -203,30 +217,30 @@ $row = $result->fetch_assoc();
             <label>Aktuelles Passwort</label>
             <input type="password" autocomplete="new-password" name="encryption_current_pass" class="form-control">
         </div>
-    </div>
-    <?php
-    $result = $conn->query("SELECT activeEncryption FROM configurationData");
-    if($result && ($row = $result->fetch_assoc())){
-        if($row['activeEncryption'] == 'TRUE'){
-            echo '<button type="submit" name="deactive_encryption">Verschlüsselung DEAKTIVIEREN</button>';
-        } else {
-            echo '<div class="row">
-            <div class="col-md-4">
-            <label>Neues Login Passwort</label>
-            <input type="password" name="encryption_pass" class="form-control" />
-            </div>
-            <div class="col-md-4">
-            <label>Neues Login Passwort Bestätigen</label>
-            <input type="password" name="encryption_pass_confirm" class="form-control" />
-            </div>
-            <div class="col-md-4">
-            <label>OK</label><br>
-            <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
-            </div>
-            </div>';
+        <?php
+        $result = $conn->query("SELECT activeEncryption FROM configurationData");
+        if($result && ($row = $result->fetch_assoc())){
+            if($row['activeEncryption'] == 'TRUE'){
+                echo '<div class="col-md-4"><label>Deaktivieren</label><br><button type="submit" name="deactive_encryption" class="btn btn-warning">Verschlüsselung Deaktivieren</button></div>';
+            } else {
+                echo '</div><div class="row">
+                <div class="col-md-4">
+                <label>Neues Login Passwort</label>
+                <input type="password" name="encryption_pass" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                <label>Neues Login Passwort Bestätigen</label>
+                <input type="password" name="encryption_pass_confirm" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                <label>Aktivieren</label><br>
+                <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
+                </div>
+                </div>';
+            }
         }
-    }
-    ?>
+        ?>
+    </div>
 </form>
 
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
