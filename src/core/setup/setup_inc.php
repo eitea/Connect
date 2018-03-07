@@ -1371,6 +1371,7 @@ function create_tables($conn) {
         optionalemployees varchar(100) DEFAULT NULL,
         emailaccount int(6) NOT NULL,
         leader int(6) DEFAULT NULL,
+        estimatedHours varchar(100) NOT NULL DEFAULT '0',
         PRIMARY KEY (id)
        )";
         if(!$conn->query($sql)){

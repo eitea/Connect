@@ -2189,6 +2189,11 @@ if($row['version'] < 140){
     } else {
         echo '<br>Task Update: Templates';
     }
+    $sql = "ALTER TABLE taskemailrules ADD estimatedHours VARCHAR(100) NOT NULL DEFAULT '0';";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Email-Tasks Update: estimatedHours';
 
     $conn->query("ALTER TABLE teamData ADD COLUMN isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
     if(!$conn->error){

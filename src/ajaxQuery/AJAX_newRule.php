@@ -3,9 +3,9 @@
 require dirname(__DIR__)."/connection.php";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    if(!empty($_POST['id'])){
-        $id = intval($_POST['id']);
-        echo $id;
+    if(!empty($_POST['eid'])){
+        $eid = intval($_POST['eid']);
+        echo $eid;
         //var_dump($_POST);
         try{
             if(isset($_POST['Identifier'])&&isset($_POST['Company'])&&isset($_POST['Client'])&&isset($_POST['Color'])&&isset($_POST['Status'])&&isset($_POST['Priority'])&&isset($_POST['Parent'])&&isset($_POST['Owner'])&&isset($_POST['Employees'])&&isset($_POST['Leader'])){
@@ -32,7 +32,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     }
                 }
                 $Leader = $_POST['Leader'];
-                $conn->query("INSERT INTO taskemailrules VALUES(null,'$Identifier','$Company','$Client','$ClientProject','$Color','$Status','$Priority','$Parent','$Owner','$Employees','$OEmployees','$id','$Leader')");
+                $estimated = $_POST['estimated'];
+                if(!empty($_POST['rid'])){
+                    $rid = intval($_POST['rid']);
+                    $conn->query("UPDATE taskemailrules SET identifier='$Identifier', company='$Company', client='$Client', clientproject='$ClientProject', color='$Color', status='$Status', priority='$Priority', parent='$Parent', owner='$Owner', employees='$Employees', optionalemployees='$OEmployees', emailaccount='$eid', leader='$Leader', estimatedHours='$estimated' WHERE id=$rid;"); 
+                }else{
+                    $conn->query("INSERT INTO taskemailrules VALUES(null,'$Identifier','$Company','$Client','$ClientProject','$Color','$Status','$Priority','$Parent','$Owner','$Employees','$OEmployees','$eid','$Leader','$estimated')");
+                }
                 if($conn->error){
                     echo $conn->error;
                 }

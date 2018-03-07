@@ -207,7 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <th>Priority</th>
             <th>Parent</th>
             <th>Owner</th>
-            <th>Employees</th>
+            <th>Employees/Teams</th>
             <th>Opt. Employees</th>
             <th>Task-Leader</th>
             <th></th>
@@ -240,38 +240,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             echo '<div class="col-sm-4"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" id="Company" name="filterCompany" onchange="showClients(this.value, \''.$userID.'\', \'clientHint\');" >';
                             echo '<option value="0">...</option>';
                             while($result && ($row_fc = $result_fc->fetch_assoc())){
-                                $checked = $dynrow['companyid'] == $row_fc['id'] ? 'selected' : '';
-                                echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+                                echo "<option value='".$row_fc['id']."' >".$row_fc['name']."</option>";
                             }
                             echo '</select></div>';
                             ?>
                             <div class="col-sm-4">
                                 <label><?php echo $lang['CLIENT']; ?></label>
                                 <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="showProjects(this.value, 'projectHint');">
-                                    <?php
-                                    if(count($available_companies) <= 2 ){
-                                        $result_fc = $conn->query("SELECT id, name FROM clientData WHERE companyID IN (".implode(', ', $available_companies).");");
-                                    }
-                                    echo '<option value="0">...</option>';
-                                    while($result && ($row_fc = $result_fc->fetch_assoc())){
-                                        $checked = $dynrow['clientid'] == $row_fc['id'] ? 'selected' : '';
-                                        echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
-                                    }
-                                    ?>
+                                    <option value="0">...</option>;
                                 </select>
                             </div>
                             <div class="col-sm-4">
                                 <label><?php echo $lang['PROJECT']; ?></label>
                                 <select id="projectHint" class="js-example-basic-single" name="filterProject">
-                                    <?php
-                                    if($dynrow['clientid']){
-                                        $result_fc = $conn->query("SELECT id, name FROM projectData WHERE clientID = ". $dynrow['clientid']);
-                                        while($result && ($row_fc = $result_fc->fetch_assoc())){
-                                            $checked = $dynrow['clientprojectid'] == $row_fc['id'] ? 'selected' : '';
-                                            echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
-                                        }
-                                    }
-                                    ?>
                                 </select>
                             </div>
                         </div>
@@ -321,7 +302,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 ?>
                             </select><br>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-2">
                             <label>Status*</label>
                             <div class="input-group">
                                 <select id="Status" class="form-control" name="status" >
@@ -332,6 +313,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 </select>
                             </div><br>
                         </div>
+                         <div class="col-md-4">
+                            <label>Geschätzte Zeit <a data-toggle="collapse" href="#estimateCollapse-"><i class="fa fa-question-circle-o"></i></a></label>
+                            <input type="text" class="form-control" value="" id="estimatedHours" /><br>
+                        </div>
+                        <div class="row">
+                                <div class="col-md-12">
+                                    <div class="collapse" id="estimateCollapse-">
+                                        <div class="well">
+                                            Die <strong>Geschätzte Zeit</strong> wird per default in Stunden angegeben. D.h. 120 = 120 Stunden. <br>
+                                            Mit "m", "t", "w" oder "M" können genauere Angaben gemacht werden: z.B. 2M für 2 Monate, 7m = 7 Minuten, 4t = 4 Tage und 6w = 6 Wochen.<br>
+                                            Konkret: "2M 3w 50" würde also für 2 Monate, 3 Wochen und 50 Stunden stehen. (Alle anderen Angaben werden gespeichert, aber vom Programm ignoriert)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <div class="col-md-4">
                             <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
                             <input id="Color" type="color" class="form-control" name="color"><br>
@@ -350,7 +346,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         </div>
                         <div class="col-md-4">
                             <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
-                            <select id="Opt. Employees" class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
+                            <select id="OptEmployees" class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
                                 <?php
                                 echo str_replace('<option value="', '<option value="user;', $modal_options);
                                 ?>
@@ -362,7 +358,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div><!-- /modal-body -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" onclick="addRuleFunc()" name="addRule"><?php echo $lang['ADD']; ?></button>
+                <button type="button" class="btn btn-warning" onclick="addRuleFunc()" id="addRuleBtn" name="addRule"><?php echo $lang['ADD']; ?></button>
             </div>
         </div>
     </form>
@@ -409,8 +405,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         for(i=0;i<document.getElementById("Employees").selectedOptions.length;i++){
             Employees.push(document.getElementById("Employees").selectedOptions[i].value);
         }
-        for(i=0;i<document.getElementById("Opt. Employees").selectedOptions.length;i++){
-            OEmployees.push(document.getElementById("Opt. Employees").selectedOptions[i].value);
+        for(i=0;i<document.getElementById("OptEmployees").selectedOptions.length;i++){
+            OEmployees.push(document.getElementById("OptEmployees").selectedOptions[i].value);
         }
         var Company = document.getElementById("Company").selectedOptions.length>0 ? document.getElementById("Company").selectedOptions[0].value : null;
         var Client = document.getElementById("clientHint").selectedOptions.length>0 ? document.getElementById("clientHint").selectedOptions[0].value : null;
@@ -428,7 +424,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             Employees: Employees,
             OEmployees: OEmployees,
             Leader: document.getElementById("Task-Leader").selectedOptions[0].value,
-            id: document.getElementById("emailId").value,
+            eid: document.getElementById("emailId").value,
+            rid: document.getElementById("addRuleBtn").value,
+            estimated: document.getElementById("estimatedHours").value,
         }, function(data){
             //console.log(data);
             editRules(null,data);
@@ -471,7 +469,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 parenttask.innerHTML = rulesets[i]['parent'];
                 priority.innerHTML = '<span class="badge" style="background-color:' +priority_color[rulesets[i]['priority']] + '">' + rulesets[i]['priority'] + ' </span>';
                 status.innerHTML = rulesets[i]['status'];
-                buttons.innerHTML = '<button type="button" name="delete" onclick="deleteRule('+ rulesets[i]['id'] +','+ rulesets[i]['emailaccount'] +')" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
+                buttons.innerHTML = '<button type="button" name="delete" onclick="deleteRule('+ rulesets[i]['id'] +','+ rulesets[i]['emailaccount'] +')" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> <button type="button" name="edit" onclick="changeRule('+ rulesets[i]['id'] +')" title="Editieren" class="btn btn-default" ><i class="fa fa-pencil"></i></button> ';
                 parent.appendChild(identifier);
                 parent.appendChild(company);
                 parent.appendChild(client);
@@ -528,7 +526,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         data:{companyID:company, clientID:client},
         type: 'get',
         success : function(resp){
-          $("#"+place).html(resp);
+          $("#"+place).html(resp).trigger('change');
         },
         error : function(resp){}
         });
@@ -541,7 +539,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         data:{clientID:client},
         type: 'get',
         success : function(resp){
-          $("#"+place).html(resp);
+          $("#"+place).html(resp).trigger('change');
         },
         error : function(resp){}
       });
@@ -567,6 +565,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function retrieveEmails(){
         $.post("../report/tasks",{},function(data){
             console.log(data);
+        });
+    }
+    function changeRule(id){
+        $.post("ajaxQuery/AJAX_getRule.php",{
+            id: id,
+        }, function(data){
+            console.log(JSON.parse(data));
+            var ruleData = JSON.parse(data);
+            document.getElementById("Identifier").value = ruleData.identifier;
+            document.getElementById("estimatedHours").value = ruleData.estimatedHours;
+            document.getElementById("Color").value = ruleData.color;
+            document.getElementById("addRuleBtn").value = ruleData.id;
+            $("#Company").val(ruleData.company).trigger('change');
+            $("#Owner").val(ruleData.owner).trigger('change');
+            $("#Task-Leader").val(ruleData.leader).trigger('change');
+            $("#Employees").val((ruleData.employees.substring(0,ruleData.employees.length-1)).split(',')).trigger('change');
+            $("#clientHint").val(ruleData.client).trigger('change');
+            $("#Priority").val(ruleData.priority).trigger('change');
+            $("#Parent").val(ruleData.parent).trigger('change');
+            $("#OptEmployees").val((ruleData.optionalemployees.substring(0,ruleData.optionalemployees.length-1)).split(',')).trigger('change');
+            $("#Status").val(ruleData.status).trigger('change');
+            $("#projectHint").val(ruleData.clientproject).trigger('change');
+            changeIdForRule(ruleData.emailaccount);
+            $("#add-rule").modal('show');
         });
     }
 </script>

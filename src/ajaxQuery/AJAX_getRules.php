@@ -49,12 +49,24 @@ require dirname(__DIR__)."/connection.php";
 
                     $employees = explode(",",$rules[$i]['employees']);
                         for($y = 0;$y<count($employees)-1;$y++){
-                            if($employees[$y] = strstr($employees[$y],';')) $employees[$y] = ltrim($employees[$y],';');
-                            $company = $conn->query("SELECT CONCAT(firstname,' ',lastname) AS name FROM UserData WHERE id = ".$employees[$y]);
-                            if($conn->error){
-                                $conn->query("INSERT INTO emailprojectlogs (timeofoccurence,body) VALUES (CURRENT_TIMESTAMP,$conn->error)");
-                            }else{
-                                $employees[$y] = $company->fetch_assoc()['name'];
+                            if(strstr($employees[$y],'user;')){
+                                $employees[$y] = strstr($employees[$y],'user;');
+                                $employees[$y] = ltrim($employees[$y],'user;');
+                                $company = $conn->query("SELECT CONCAT(firstname,' ',lastname) AS name FROM UserData WHERE id = ".$employees[$y]);
+                                if($conn->error){
+                                    $conn->query("INSERT INTO emailprojectlogs (timeofoccurence,body) VALUES (CURRENT_TIMESTAMP,$conn->error)");
+                                }else{
+                                    $employees[$y] = $company->fetch_assoc()['name'];
+                                }
+                            }elseif(strstr($employees[$y],'team;')){
+                                $employees[$y] = strstr($employees[$y],'team;');
+                                $employees[$y] = ltrim($employees[$y],'team;');
+                                $company = $conn->query("SELECT name FROM teamData WHERE id = ".$employees[$y]);
+                                if($conn->error){
+                                    $conn->query("INSERT INTO emailprojectlogs (timeofoccurence,body) VALUES (CURRENT_TIMESTAMP,$conn->error)");
+                                }else{
+                                    $employees[$y] = $company->fetch_assoc()['name'];
+                                }
                             }
                         }
                  

@@ -125,6 +125,7 @@ while ($row = $result->fetch_assoc()){
         ); //only select completed questions
     }
     while($row_question = $result_question->fetch_assoc()){
+        $questionArray = array();
         $questionArray[] = array(
             "type"=>"html",
             "name"=>"question",
@@ -143,12 +144,12 @@ while ($row = $result->fetch_assoc()){
             "choicesOrder"=>$random == 'TRUE'?"random":"none",
             "choices"=>$choices
         );
+        $trainingArray[] = array(
+            "name"=>$trainingID,
+            "title"=>$row["name"],
+            "elements"=>$questionArray,
+        );
     }
-    $trainingArray[] = array(
-        "name"=>$trainingID,
-        "title"=>$row["name"],
-        "elements"=>$questionArray,
-    );
 }
 if(!$hasQuestions){
     return;
