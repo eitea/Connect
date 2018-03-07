@@ -1,6 +1,9 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
 <?php
 $teamID = 0;
+if(isset($_GET["id"])){
+    $teamID = intval($_GET["id"]);
+}
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     $name = test_input($_POST['createTeam_name']);
     $conn->query("INSERT INTO teamData (name) VALUES('$name')");
