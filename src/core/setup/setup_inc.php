@@ -1197,6 +1197,7 @@ function create_tables($conn) {
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
+        isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1245,7 +1246,10 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE dynamicprojectsteams(
         projectid VARCHAR(100) NOT NULL,
-        teamid INT(6) UNSIGNED
+        teamid INT(6) UNSIGNED,
+        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;

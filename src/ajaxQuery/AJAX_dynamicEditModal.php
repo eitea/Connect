@@ -47,10 +47,10 @@ if($x){
 }
 ?>
 
-<div class="modal fade" id="editingModal-<?php echo $x; ?>">
+<div class="modal fade" id="<?php if($dynrow['isTemplate']=='TRUE') echo "temp"; ?>editingModal-<?php echo $x; ?>">
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
-            <form method="POST" id="projectForm<?php echo $x; ?>">
+            <form method="POST" onSubmit="return  checkInput(event)" id="projectForm<?php echo $x; ?>">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Task editieren</h4>
@@ -110,7 +110,7 @@ if($x){
                             </div>
 
                             <div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
-                            <div class="col-md-12"><label>Task Name*</label><input spellchecking="true" class="form-control" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                            <div class="col-md-12"><label>Task Name*</label><input spellchecking="true" class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
                             if($isDynamicProjectsAdmin == 'TRUE'){
@@ -123,19 +123,19 @@ if($x){
                             <div class="row">
                                 <div class="col-md-4">
                                     <label><?php echo $lang["OWNER"]; ?>*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="owner">
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="owner">
                                     <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["LEADER"]; ?>*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="leader">
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="leader">
                                     <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>
                                 <div class="col-md-4">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="employees[]" multiple="multiple">
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                                         <?php
                                         if($isDynamicProjectsAdmin != 'TRUE'){
                                             $result = str_replace('<option value="', '<option selected value="user;', $modal_options);
@@ -370,7 +370,7 @@ if($x){
                 <div class="modal-footer">
                     <div class="pull-left"><?php echo $x; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                    <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
+                    <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php if($dynrow['isTemplate'] == 'FALSE')echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
                 </div>
             </form>
         </div>

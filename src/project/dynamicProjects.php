@@ -7,7 +7,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
-
 function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
    $allHours = 0;
@@ -44,7 +43,6 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
    for($i = 0;$i<count($tim);$i++){
        $allHours += $tim[$i];
    }
-
     if($current < $allHours){
         $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
@@ -66,7 +64,6 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     $bar .= "<div data-toggle='tooltip' title='".round($timeOver,2)." Stunden' class='progress-bar progress-bar-danger' style='height:10px;width:".formatPercent($redBar)."'></div>";
     return "$bar</div>";
 }
-
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
 ?>
 <div class="page-header-fixed">
@@ -77,7 +74,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
             <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
                 <div class="container-fluid">
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" onclick="resetNewTask()" data-target="#editingModal-" >New</button></li>
                     <li class="divider"></li>
                     <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
                 </div>
@@ -128,10 +125,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $description = test_input($_POST['description']);
             $startDate = $date." ".$start;
             $startDate = carryOverAdder_Hours($startDate, $timeToUTC * -1);
-
             $endDate = $date." ".$end;
             $endDate = carryOverAdder_Hours($endDate, $timeToUTC * -1);
-
             if(timeDiff_Hours($startDate, $endDate) < 0){
                 $endDate = carryOverAdder_Hours($endDate, 24);
                 $date = substr($endDate, 0, 10);
@@ -175,7 +170,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                 }
                 $conn->query("UPDATE dynamicprojects SET projectpercentage = $percentage WHERE projectid = '$dynamicID'");
-
                 $microtasks = $conn->query("SELECT microtaskid, ischecked FROM microtasks WHERE projectid='$dynamicID'");
                 if($microtasks){
                     while($microrow = $microtasks->fetch_assoc()){
@@ -186,10 +180,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
-
                 $description = test_input($_POST['description']);
                 $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen'  WHERE id = $bookingID");
-
                 if($conn->error){
                 	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
                 } else {
@@ -241,7 +233,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
-
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
                 $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
@@ -254,6 +245,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
                 $percentage = intval($_POST['completed']);
                 $estimate = test_input($_POST['estimatedHours']);
+                $isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
                 if($isDynamicProjectsAdmin == 'TRUE'){
                     $skill = intval($_POST['projectskill']);
                     $parent = test_input($_POST["parent"]); //dynamproject id
@@ -266,13 +258,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     $tags = '';
                 }
-
                 if ($end == "number") {
                     $end = $_POST["endnumber"] ?? "";
                 } elseif ($end == "date") {
                     $end = $_POST["enddate"] ?? "";
                 }
-
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -290,12 +280,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
                 $nextDate = $series->get_next_date();
                 $series = base64_encode(serialize($series));
-
                 // PROJECT
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-                $stmt->bind_param("ssbiiissssisiisbisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags);
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags, isTemplate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssbiiissssisiisbisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags, $isTemplate);
                 $stmt->send_long_data(2, $description);
                 $stmt->send_long_data(12, $series);
                 $stmt->execute();
@@ -333,7 +321,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     } // end if dynamic Admin
 } //end if POST
-
 $completed_tasks = file_get_contents('task_changelog.txt', true);
 ?>
 
@@ -390,20 +377,19 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+                WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
                 AND d.projectstart <= UTC_TIMESTAMP $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
-
             $selection = array('user;'.$row['projectowner'], 'user;'.$row['projectleader']);
             $employees = array();
             $stmt_team->execute();
@@ -418,20 +404,16 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                     $selection[] = 'user;'.$emp_row_mem['userID'];
                 }
             }
-
             $stmt_employee->execute();
             $emp_result = $stmt_employee->get_result();
             while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['userid']){
                 $employees[] = $userID_toName[$emp_row['userid']];
                 $selection[] = 'user;'.$emp_row['userid'];
             }
-
             if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
-
             $stmt_viewed->execute();
             $viewed_result = $stmt_viewed->get_result();
             $rowStyle = $tags = '';
-
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
             }
@@ -447,29 +429,23 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             echo '<td>'.$row['projectstart'].'</td>';
             echo '<td>'.$row['projectend'].'</td>';
-
             if($row['projectseries']){
                 echo '<td><i class="fa fa-clock-o"></i></td>';
             } else {
                 echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
             }
-
             $stmt_booking->execute();
             $isInUse = $stmt_booking->get_result(); //max 1 row
-
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
             echo '</td>';
-
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
             echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
-
             echo '<td>'; //employees
             echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
             echo implode(',<br>', $employees);
             echo '</td>';
-
             echo '<td>';
             $review = '<input type="checkbox" ';
             $review .= ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? ' disabled ' : ' onchange="reviewChange(event,\''.$x.'\')" ' ;
@@ -477,7 +453,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo $review.'>';
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
-
             echo '<td><form method="POST">';
             if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
                 $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"'; //he has to wait at least 1 minute
@@ -490,11 +465,9 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
             }
-
             echo '</form></td>';
             echo '</tr>';
         }
-
         ?>
         <!--training-->
         <?php if($userHasUnansweredSurveys): ?>
@@ -534,15 +507,26 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
 </table>
     <div id="selectTemplate" >
         <div class="modal fade" id="template-list-modal">
-            <div class="modal-dialog modal-content modal-sm">
-                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "TEMPLATES" ?></div>
+            <form method="POST" onsubmit=' return setUpDeleteTemplate()'>
+            <div class="modal-dialog modal-content modal-md">
+                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "Templates" ?></div>
                 <div class="modal-body">
-                    <div class="col-sm-12">
-                        PLACEHOLDER
-<!--                        <label>Select Template</label>
-                        <select class="form-control select2-templates" >
+                    <div class="col-md-12">
+                        <label>Select Template</label>
+                    </div>
+                    <div class="col-md-9">
+                        <select id="templateSelect" class="form-control select2-templates" >
                             <option value="-1" >New...</option>
-                        </select>-->
+                            <?php $tempresult = $conn->query("SELECT projectname,projectid FROM dynamicprojects WHERE isTemplate = 'TRUE'");
+                                  while($tempresult && ($template = $tempresult->fetch_assoc())){
+                                      echo '<option value="'.$template['projectid'].'" >'.$template['projectname'].'</option>';
+                                  }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-warning" onclick="editTemplate()" ><i class="fa fa-pencil"></i></button>
+                        <button type="submit" name="deleteProject" class="btn btn-warning" ><i class="fa fa-trash-o"></i></button>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -550,6 +534,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                     <button type="button" class="btn btn-warning" onclick="activateTemplate(event)" ><?php echo $lang['APPLY']; ?></button>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 <div id="editingModalDiv">
@@ -680,7 +665,6 @@ function checkMicroTasks(){
         $("#bookRanger").attr('max',99);
     }
 }
-
 $("#microlist input[type='checkbox']").change(function(){
     var allisgood = true;
     $("#microlist input[type='checkbox']").each(function(){
@@ -696,7 +680,6 @@ $("#microlist input[type='checkbox']").change(function(){
         $("#bookRanger").attr('max',99);
     }
 });
-
 $("#bookCompleted").keyup(function(event){
     if($("#bookCompleted").val() == 100){
         if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
@@ -736,7 +719,6 @@ function dynamicOnLoad(modID){
         paste_data_images: true,
         menubar: false,
         statusbar: false,
-        browser_spellcheck: true,
         height: 300,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
@@ -744,7 +726,6 @@ function dynamicOnLoad(modID){
                 var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
                 editor.insertContent(html);
             }
-
             editor.addButton("InsertMicroTask",{
                 tooltip: "Insert MicroTask",
                 icon: "template",
@@ -764,14 +745,11 @@ function dynamicOnLoad(modID){
                 //console.log(e.clipboardData.types.includes("text/rtf"));
                 if(e.clipboardData.types.includes("text/rtf")){
                     var clipboardData, pastedData;
-
                 // Stop data actually being pasted into div
                 e.preventDefault();
-
                 // Get pasted data via clipboard API
                 clipboardData = e.clipboardData || window.clipboardData;
                 pastedData = clipboardData.getData('text/rtf');
-
                 var stringToBinaryArray = function(txt) {
                     var buffer = new ArrayBuffer(txt.length);
                     var bufferView = new Uint8Array(buffer);
@@ -780,7 +758,6 @@ function dynamicOnLoad(modID){
                     }
                     return buffer;
                 }
-
                 var settings = {};
                 var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
                 var part = doc.render();
@@ -819,8 +796,7 @@ function dynamicOnLoad(modID){
             input.click();
         }
     });
-} //end dnymaicOnLoad()
-
+} //end dynamicOnLoad()
 function appendModal(index){
     $.ajax({
     url:'ajaxQuery/AJAX_dynamicEditModal.php',
@@ -850,7 +826,6 @@ $('button[name=editModal]').click(function(){
   }
 });
 appendModal('');
-
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
     var index = $(this).val();
@@ -876,7 +851,6 @@ $('.view-modal-open').click(function(){
     $('#infoModal-'+index).modal('show');
   }
 });
-
 $(document).ready(function() {
     dynamicOnLoad();
     $('.table').DataTable({
@@ -899,7 +873,6 @@ $(document).ready(function() {
         $('.table').trigger('column-reorder.dt');
     }, 500);
 });
-
 function showClients(company, client, place){
     if(company != ""){
         $.ajax({
@@ -928,13 +901,61 @@ function showProjects(client, project, place){
 }
 function activateTemplate(event){
     id = $(".select2-templates").select2('data');
-    if(id === -1){
+    if(id[0].id == -1){
         //Create new Template
+        $("#template-list-modal").modal('hide');
+        $("#editingModal- .modal-title")[0].innerText = "Template editieren";
+        isTemplate = document.createElement("input");
+        isTemplate.name = "isTemplate";
+        isTemplate.id = "isTemplate";
+        isTemplate.style = "visibility: hidden; height:1px; width:1px";
+        $("#editingModal- form")[0].appendChild(isTemplate);
+        $("#editingModal-").modal('show');
     }else{
         $("#template-list-modal").modal('hide');
-        //Get Template Data
-        //Fill editingModal- with data
-        //open editingModal-
+        var index = id[0].id;
+//        console.log(index);
+        if(existingModals.indexOf(index) == -1){
+            appendModal(index);
+        } else {
+            $('#editingModal-'+index).modal('show');
+        }
+    }
+}
+function setUpDeleteTemplate(){
+ id =  $(".select2-templates").select2("data");   
+ if(id[0].id==-1){
+    return false;
+ }else{
+    $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
+ }
+     
+}
+function editTemplate(){
+    id =  $(".select2-templates").select2("data");
+    if(id[0].id==-1){
+     return false;   
+    }else{
+        $("#template-list-modal").modal('hide');
+        $.ajax({
+        url:'ajaxQuery/AJAX_dynamicEditModal.php',
+        data:{projectid: id[0].id,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
+        type: 'post',
+        success : function(resp){
+            resp = resp.replace('name="editDynamicProject" value=""','name="editDynamicProject" value="'+id[0].id+'"');
+            resp = resp.replace('</form>','<input name="isTemplate" style="visibility:hidden;height:1px;width:1px;" ></input></form>');
+            $("#editingModalDiv").append(resp);
+            //existingModals.push(index);
+            onPageLoad();
+            dynamicOnLoad();
+        },
+        error : function(resp){},
+        complete: function(resp){
+            if(id[0].id){
+                $('#tempeditingModal-'+id[0].id).modal('show');
+            }
+        }
+        });
     }
 }
 function checkInput(event){
@@ -955,6 +976,11 @@ function checkInput(event){
         return false;
     }
     <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
+}
+function resetNewTask(){
+    $("#editingModal- .modal-title")[0].innerText = "Task editieren";
+    isTemplate = $("#editingModal- #isTemplate")[0];
+    $("#editingModal- form")[0].removeChild(isTemplate);
 }
 function reviewChange(event,id){
     projectid = id;
@@ -981,7 +1007,6 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
         }
    });
 });
-
 setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );

@@ -2,7 +2,6 @@
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
 require_once dirname(dirname(__DIR__)).'/plugins/imap/autoload.php'; //TODO: remove
-
 $trash = 'Connect_Tasks';
 $result = $conn->query("SELECT * FROM emailprojects");
 if($result){
@@ -13,7 +12,6 @@ if($result){
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
         if(!$imap->getMailboxes($trash)) $imap->createMailbox($trash);
         $imap->switchMailbox($mailbox.'INBOX');
-
         $mailsIds = $imap->searchMailbox('ALL');
         $result = $conn->query("SELECT * FROM taskemailrules WHERE emailaccount = ".$row['id']); echo $conn->error;
         while($rule = $result->fetch_assoc()){
@@ -24,7 +22,6 @@ if($result){
                     //echo $mail->subject .' - found<br>';
                     $id = uniqid();
                     $null = null;
-
                     $doc = new DOMDocument();
                     //$doc->encoding = 'iso-8859-1';
                     @$doc->loadHTML($mail->textHtml);
@@ -34,7 +31,6 @@ if($result){
                         $doc_body->appendChild($doc_body->importNode($child, true));
                     }
                     $description = $doc_body->saveHTML();
-
                     //TODO: should replace this with dom viewer attr also, since descr can be very large
                     //$images = $doc->getElementsByTagName('img');
                     $attachments = $mail->getAttachments();
@@ -45,7 +41,6 @@ if($result){
                             $description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.base64_encode($attach->rawData).'" />';
                         }
                     }
-
                     $name = substr_replace($mail->subject, '', $pos, strlen($rule['identifier']));
                     $company = $rule['company'];
                     $client = $rule['client'];
@@ -101,7 +96,6 @@ if($result){
                         echo $stmt_team->error;
                         $stmt_emp->close();
                         $stmt_team->close();
-
                         $imap->moveMail($mail_number, $trash);
                     } else {
                         echo $stmt->error;
