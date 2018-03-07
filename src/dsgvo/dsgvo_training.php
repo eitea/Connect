@@ -133,6 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
+    } elseif (isset($_POST["editModule"])) {
+        $name = test_input($_POST['name']);
+        $moduleID = intval($_POST["editModule"]);
+        $conn->query("UPDATE dsgvo_training_modules SET name = '$name' WHERE id=$moduleID");
+        showError($conn->error);
+        $moduleID = mysqli_insert_id($conn);
     }
 }
 $activeTab = $trainingID;
@@ -170,11 +176,14 @@ while ($result_module && ($row_module = $result_module->fetch_assoc())) {
     ?>
 <div class="panel panel-default">
     <div class="panel-heading container-fluid">
-    <span data-container="body" data-toggle="tooltip" title="Modul">    
+    <span data-container="body" data-toggle="tooltip" title="Set">    
         <div class="col-xs-6"><a data-toggle="collapse" href="#moduleCollapse-<?php echo $moduleID; ?>"><i style="margin-left:-10px" class="fa fa-cubes"></i> <?php echo $moduleName ?></a></div>
     </span>
     <div class="col-xs-6 text-right">
-        <form method="post">   
+        <form method="post">
+            <span data-container="body" data-toggle="tooltip" title="Set bearbeiten">                   
+                <button type="button" style="background:none;border:none;color:black;" name="editModule" value="<?php echo $moduleID; ?>"><i class="fa fa-pencil-square-o"></i></button>
+            </span>   
             <span data-container="body" data-toggle="tooltip" title="Exportieren eines einzelnen Sets">
                 <button type="button" style="background:none;border:none;color:black;" name="export" value="<?php echo $moduleID; ?>"><i class="fa fa-download"></i></button>
             </span>
@@ -377,6 +386,9 @@ $("button[name=export]").click(function(){
 })
 $("button[name=testTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingTest.php')
+})
+$("button[name=editModule]").click(function(){
+    setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoModuleEdit.php')
 })
 </script>
 
