@@ -144,10 +144,18 @@ showError($conn->error);
 <div class="page-header">
     <h3>Schulungen
         <div class="page-header-button-group">
-            <button type="button" data-toggle="modal" data-target="#newModuleModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default"><i class="fa fa-cubes"></i> neuses Set</button>
-            <button type="button" data-toggle="modal" data-target="#newTrainingModal" title="<?php echo $lang['ADD']; ?>" class="btn btn-default"><i class="fa fa-cube"></i> neues Modul</button>
+            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Sets (Container für Module)">
+                <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> neuses Set</button>
+            </span>
+            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls (Container für Fragen)">
+            <button type="button" data-toggle="modal" data-target="#newTrainingModal" class="btn btn-default"><i class="fa fa-cube"></i> neues Modul</button>
+            </span>
+            <span data-container="body" data-toggle="tooltip" title="Importieren von exportierten Sets">
             <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
+            </span>
+            <span data-container="body" data-toggle="tooltip" title="Exportieren von Sets">
             <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
+            </span>
         </div>
     </h3>
 </div>
@@ -162,11 +170,17 @@ while ($result_module && ($row_module = $result_module->fetch_assoc())) {
     ?>
 <div class="panel panel-default">
     <div class="panel-heading container-fluid">
-    <div class="col-xs-6"><a data-toggle="collapse" href="#moduleCollapse-<?php echo $moduleID; ?>"><i style="margin-left:-10px" class="fa fa-cubes"></i> <?php echo $moduleName ?></a></div>
+    <span data-container="body" data-toggle="tooltip" title="Modul">    
+        <div class="col-xs-6"><a data-toggle="collapse" href="#moduleCollapse-<?php echo $moduleID; ?>"><i style="margin-left:-10px" class="fa fa-cubes"></i> <?php echo $moduleName ?></a></div>
+    </span>
     <div class="col-xs-6 text-right">
         <form method="post">   
-            <button type="button" style="background:none;border:none;color:black;" name="export" value="<?php echo $moduleID; ?>"><i class="fa fa-download"></i></button>
-            <button type="submit" style="background:none;border:none;color:#d90000;" name="removeModule" value="<?php echo $moduleID; ?>"><i class="fa fa-trash-o"></i></button>
+            <span data-container="body" data-toggle="tooltip" title="Exportieren eines einzelnen Sets">
+                <button type="button" style="background:none;border:none;color:black;" name="export" value="<?php echo $moduleID; ?>"><i class="fa fa-download"></i></button>
+            </span>
+            <span data-container="body" data-toggle="tooltip" title="Gesamtes Set mit allen Modulen und Fragen löschen">            
+                <button type="submit" style="background:none;border:none;color:#d90000;" name="removeModule" value="<?php echo $moduleID; ?>"><i class="fa fa-trash-o"></i></button>
+            </span>
         </form>
     </div>
     </div>
@@ -181,8 +195,14 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
     <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
 <div class="panel panel-default">
     <div class="panel-heading container-fluid">
-    <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><i style="margin-left:-10px" class="fa fa-cube"></i> <?php echo $row['name']; ?></a></div>
-    <div class="col-xs-6 text-right"><button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button></div>
+    <span data-container="body" data-toggle="tooltip" title="Modul">            
+        <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><i style="margin-left:-10px" class="fa fa-cube"></i> <?php echo $row['name']; ?></a></div>
+    </span>
+    <div class="col-xs-6 text-right">
+        <span data-container="body" data-toggle="tooltip" title="Gesamtes Modul mit allen Fragen löschen">            
+            <button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button>
+        </span>        
+    </div>
     </div>
     <div class="collapse <?php if ($trainingID == $activeTab) {  echo 'in'; } ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
 						                <div class="panel-body container-fluid">
@@ -197,9 +217,16 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
                 echo "<script>$('#moduleCollapse-$moduleID').addClass('in')</script>";
             }
             ?>
-            <div class="col-md-12"><button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
-            <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
-            <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
+            <div class="col-md-12">
+                <span data-container="body" data-toggle="tooltip" title="Frage löschen">   
+                    <button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Frage bearbeiten">   
+                    <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Einzelauswertung der Frage">                   
+                    <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
+                </span>
     <?php echo $title ?></div>
     <?php
     endwhile;
@@ -208,11 +235,21 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
 
             <div class="col-md-12 float-right">
             <div class="btn-group float-right" style="float:right!important">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></a>
-            <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
-            <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
-            <button type="button" class="btn btn-default" name="testTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-play"></i></button>
-            <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
+                <span data-container="body" data-toggle="tooltip" title="Frage hinzufügen">                   
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Auswertung des Moduls als Graph">                   
+                    <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Auswertung des Moduls als Tabelle">                   
+                    <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Modul aus der Sicht des Benutzers abspielen">                   
+                    <button type="button" class="btn btn-default" name="testTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-play"></i></button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="Modul bearbeiten">                   
+                    <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
+                </span>
             </div>
             </div>
         </div>
@@ -374,6 +411,7 @@ function onModalLoad(){
         templateSelection: formatState
     });
     $(".js-example-basic-single").select2();
+    $('[data-toggle="tooltip"]').tooltip(); 
 }
 onModalLoad();
 </script>
