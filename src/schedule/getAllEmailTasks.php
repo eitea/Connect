@@ -55,10 +55,11 @@ if($result){
                     $percentage = 0;
                     $series = null;
                     $projectleader = $rule['leader'];
+                    $estimated = $rule['estimatedHours'];
                     // PROJECT
                     $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                        projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage, projectleader) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->bind_param("ssbiiissssisisbii", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $series, $percentage, $projectleader);
+                        projectpriority, projectparent, projectowner, projectnextdate, projectseries, projectpercentage, projectleader, estimatedHours) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("ssbiiissssisisbiis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $nextDate, $series, $percentage, $projectleader, $estimated);
                     $stmt->send_long_data(2, $description);
                     $stmt->execute();
                     if(!$stmt->error){
