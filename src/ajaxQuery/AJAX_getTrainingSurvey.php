@@ -125,6 +125,7 @@ while ($row = $result->fetch_assoc()){
         ); //only select completed questions
     }
     while($row_question = $result_question->fetch_assoc()){
+        $questionArray = array();
         $questionArray[] = array(
             "type"=>"html",
             "name"=>"question",
@@ -148,7 +149,6 @@ while ($row = $result->fetch_assoc()){
             "title"=>$row["name"],
             "elements"=>$questionArray,
         );
-        $questionArray = array();
     }
 }
 if(!$hasQuestions){
