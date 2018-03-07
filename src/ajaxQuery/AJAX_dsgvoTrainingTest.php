@@ -44,6 +44,7 @@ $random = $row["random"];
 $onLogin = $row["onLogin"];
 $result_questions = $conn->query("SELECT id, text FROM dsgvo_training_questions WHERE trainingID = $trainingID"); 
 while($row_question = $result_questions->fetch_assoc()){
+    $questionArray = array();
     $questionArray[] = array(
         "type"=>"html",
         "name"=>"question",
@@ -62,12 +63,13 @@ while($row_question = $result_questions->fetch_assoc()){
         "choicesOrder"=>$random == 'TRUE'?"random":"none",
         "choices"=>$choices
     );
+    $trainingArray[] = array(
+        "name"=>$trainingID,
+        "title"=>$row["name"],
+        "elements"=>$questionArray,
+    );
 }
-$trainingArray[] = array(
-    "name"=>$trainingID,
-    "title"=>$row["name"],
-    "elements"=>$questionArray,
-);
+
 ?>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
 

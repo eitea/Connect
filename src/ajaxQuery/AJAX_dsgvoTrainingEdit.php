@@ -31,7 +31,7 @@ while($row = $result->fetch_assoc()){
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header"><i class="fa fa-cube"></i> Aufgabenstellung/Schulung Bearbeiten</div>
+        <div class="modal-header"><i class="fa fa-cube"></i> Modul Bearbeiten</div>
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
