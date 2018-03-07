@@ -143,12 +143,13 @@ while ($row = $result->fetch_assoc()){
             "choicesOrder"=>$random == 'TRUE'?"random":"none",
             "choices"=>$choices
         );
+        $trainingArray[] = array(
+            "name"=>$trainingID,
+            "title"=>$row["name"],
+            "elements"=>$questionArray,
+        );
+        $questionArray = array();
     }
-    $trainingArray[] = array(
-        "name"=>$trainingID,
-        "title"=>$row["name"],
-        "elements"=>$questionArray,
-    );
 }
 if(!$hasQuestions){
     return;
