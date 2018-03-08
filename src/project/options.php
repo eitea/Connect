@@ -357,7 +357,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div><!-- /tab-content -->
             </div><!-- /modal-body -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" onclick="clearInputs()" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-warning" onclick="addRuleFunc()" id="addRuleBtn" name="addRule"><?php echo $lang['ADD']; ?></button>
             </div>
         </div>
@@ -367,9 +367,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <script>
     function clearInputs(){
         document.getElementById("resetForm").reset();
+        $("#addRuleBtn").val(null);
         $(".select2-team-icons").val(null).trigger('change');
         $(".js-example-basic-single").val(null).trigger('change');
         $("#Priority").val(1).trigger('change');
+        $("#navTabModal li:first-child a").tab('show');
     }
     function editAccount(event,e_id){
         var id = document.getElementById("edit_id");
@@ -571,22 +573,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $.post("ajaxQuery/AJAX_getRule.php",{
             id: id,
         }, function(data){
-            console.log(JSON.parse(data));
             var ruleData = JSON.parse(data);
             document.getElementById("Identifier").value = ruleData.identifier;
             document.getElementById("estimatedHours").value = ruleData.estimatedHours;
             document.getElementById("Color").value = ruleData.color;
             document.getElementById("addRuleBtn").value = ruleData.id;
             $("#Company").val(ruleData.company).trigger('change');
+            setTimeout(function(){
+                $("#clientHint").val(ruleData.client).trigger('change');
+                console.log('client');
+                setTimeout(function(){
+                    $("#projectHint").val(ruleData.clientproject).trigger('change');
+                    console.log('project');
+                },100);
+            },100);
             $("#Owner").val(ruleData.owner).trigger('change');
             $("#Task-Leader").val(ruleData.leader).trigger('change');
             $("#Employees").val((ruleData.employees.substring(0,ruleData.employees.length-1)).split(',')).trigger('change');
-            $("#clientHint").val(ruleData.client).trigger('change');
             $("#Priority").val(ruleData.priority).trigger('change');
             $("#Parent").val(ruleData.parent).trigger('change');
             $("#OptEmployees").val((ruleData.optionalemployees.substring(0,ruleData.optionalemployees.length-1)).split(',')).trigger('change');
-            $("#Status").val(ruleData.status).trigger('change');
-            $("#projectHint").val(ruleData.clientproject).trigger('change');
+            $("#Status").val(ruleData.status).trigger('change'); 
             changeIdForRule(ruleData.emailaccount);
             $("#add-rule").modal('show');
         });

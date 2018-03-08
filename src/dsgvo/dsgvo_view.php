@@ -76,8 +76,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $result->free();
                             $id = $row['id'];
                             $stmt_up->execute();
+                            if($conn->error){
+                                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                            }
                           } else {  //insert as new document
                             $stmt->execute();
+                            if($conn->error){
+                                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                            }
                           }
                         } else {
                           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fehler in '.$filename[0].'.xml: Fehlerhafte Tags.</div>';
@@ -121,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         //prepare document
         $result = $conn->query("SELECT docID, name, txt, version FROM documents WHERE id = $docID AND companyID = $cmpID");
         if($row = $result->fetch_assoc()){
-          $doc_cont = $row['txt'];
+          $doc_cont = test_input($row['txt']);
           $doc_head = $row['name'];
           $doc_ver = $row['version'];
           $doc_ident = $row['docID'];
@@ -130,8 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           echo $conn->error;
           $accept = false;
         }
-        $result = $conn->query("SELECT p.firstname, p.lastname, c.name, c.address_Street, c.address_Country_Postal, c.address_Country_City  FROM contactPersons p
-        INNER JOIN clientData ON p.clientID = clientData.id INNER JOIN clientInfoData c ON clientData.id = c.clientID WHERE p.id = $contactID");
+        $result = $conn->query("SELECT p.firstname, p.lastname, e.name, c.address_Street, c.address_Country_Postal, c.address_Country_City  FROM contactPersons p
+        INNER JOIN clientData e ON p.clientID = e.id INNER JOIN clientInfoData c ON e.id = c.clientID WHERE p.id = $contactID");
         if($accept && ($row = $result->fetch_assoc())){
           $doc_cont = str_replace('[LINK]', $link, $doc_cont);
           $doc_cont = str_replace('[FIRSTNAME]', $contact_row['firstname'], $doc_cont);
