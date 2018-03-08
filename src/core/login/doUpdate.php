@@ -2195,7 +2195,9 @@ if($row['version'] < 140){
     } else {
         echo '<br>Email-Tasks Update: estimatedHours';
     }
-    
+}
+
+if($row['version'] < 141){
     $conn->query("ALTER TABLE teamData ADD COLUMN isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
     if(!$conn->error){
         echo $conn->error;
@@ -2203,7 +2205,6 @@ if($row['version'] < 140){
         echo '<br>Team Update: Abteilungen';
     }
 }
-//if($row['version'] < 141){}
 //if($row['version'] < 142){}
 //if($row['version'] < 143){}
 

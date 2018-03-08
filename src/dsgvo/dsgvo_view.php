@@ -12,33 +12,32 @@ if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventu
     <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
     <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
   </div>
-  <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank">Neueste Dokumente von Consulio laden</a> </span>
+  <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank">Neueste Dokumente von Consulio laden</a></span>
 </h3></div>
-
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 
 $cmpID = intval($_GET['n']);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  if (!empty($_POST['delete'])){
-    $val = intval($_POST['delete']);
-    $conn->query("DELETE FROM documents WHERE id = $val AND companyID = $cmpID;");
-    if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-    } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
-    }
-  } elseif (!empty($_POST['clone'])){
-    $val = intval($_POST['clone']);
-    $conn->query("INSERT INTO documents (companyID, docID, name, txt, version) SELECT companyID, docID, name, txt, version FROM documents WHERE id = $val AND companyID = $cmpID");
-    //TODO: cloning a BASE has to result in merging the freetext INTO the document
+    if (!empty($_POST['delete'])){
+        $val = intval($_POST['delete']);
+        $conn->query("DELETE FROM documents WHERE id = $val AND companyID = $cmpID;");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+        }
+    } elseif (!empty($_POST['clone'])){
+        $val = intval($_POST['clone']);
+        $conn->query("INSERT INTO documents (companyID, docID, name, txt, version) SELECT companyID, docID, name, txt, version FROM documents WHERE id = $val AND companyID = $cmpID");
+        //TODO: cloning a BASE has to result in merging the freetext INTO the document
 
-    if($conn->error){
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-    } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
+        }
     }
-}
     if (isset($_POST['addDocument']) && !empty($_POST['add_docName'])) {
         $val = secure_data('DSGVO', test_input($_POST['add_docName']), 'encrypt', $userID, $privateKey);
         $conn->query("INSERT INTO documents(name, txt, companyID, version) VALUES('$val', ' ', $cmpID, '1.0') ");
@@ -51,24 +50,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_FILES['uploadZip']) && !empty($_FILES['uploadZip']['name'])) {
         $filename = $_FILES["uploadZip"]["name"];
         $source = $_FILES["uploadZip"]["tmp_name"];
-
         $accepted_types = array('application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed');
-        if ($_FILES['uploadZip']["size"] < 8000008 && in_array($_FILES["uploadZip"]["type"], $accepted_types) && substr_compare($filename, '.zip', -4) === 0) {
+        if($_FILES['uploadZip']["size"] < 8000008 && in_array($_FILES["uploadZip"]["type"], $accepted_types) && substr_compare($filename, '.zip', -4) === 0) {
             $zip = new ZipArchive();
-            if ($zip->open($_FILES['uploadZip']["tmp_name"]) === true) {
+            if($zip->open($_FILES['uploadZip']["tmp_name"]) === true) {
                 $stmt = $conn->prepare("INSERT INTO documents(name, txt, companyID, version, docID, isBase) VALUES(?, ?, $cmpID, ?, ?, 'TRUE')");
                 $stmt->bind_param('ssss', $doc_name, $doc_txt, $doc_ver, $doc_id);
                 $stmt_up = $conn->prepare("UPDATE documents SET txt = ?, name = ?, version = ? WHERE id = ?");
                 $stmt_up->bind_param('sssi', $doc_name, $doc_txt, $doc_ver, $id);
-                for ($i = 0; $i < $zip->numFiles; $i++) {
+                for($i = 0; $i < $zip->numFiles; $i++) {
                     $filename = explode('.', $zip->getNameIndex($i));
-                    if (count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0] . '.xml'))) {
+                    if(count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0] . '.xml'))) {
                         $meta = simplexml_load_string($meta);
                         if($meta->template_name && $meta->template_version && $meta->template_ID){
-                          $doc_name = $meta->template_name;
+                          $doc_name = secure_data('DSGVO', test_input($meta->template_name), 'encrypt', $userID, $privateKey);
                           $doc_ver = $meta->template_version;
                           $doc_id = $meta->template_ID;
-                          $doc_txt = convToUTF8(nl2br($zip->getFromIndex($i)));
+                          $doc_txt = secure_data('DSGVO', convToUTF8(nl2br($zip->getFromIndex($i))));
                           //upload exists: update
                           $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id'");
                           if($result && $result->num_rows > 0){
@@ -101,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Ungültig: File zu groß oder kein gültiges ZIP.</div>';
         }
     }
-    if (isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])) {
+    if(isset($_POST['sendAccess']) && !empty($_POST['send_contact']) && !empty($_POST['send_document'])) {
         $accept = true;
         $processID = uniqid();
         $docID = intval($_POST['send_document']);
@@ -127,34 +125,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         //prepare document
         $result = $conn->query("SELECT docID, name, txt, version FROM documents WHERE id = $docID AND companyID = $cmpID");
         if($row = $result->fetch_assoc()){
-          $doc_cont = test_input($row['txt']);
-          $doc_head = $row['name'];
-          $doc_ver = $row['version'];
-          $doc_ident = $row['docID'];
-          $result->free();
+            $doc_cont = secure_data('DSGVO', test_input($row['txt']), 'decrypt', $userID, $privateKey);
+            $doc_head = secure_data('DSGVO', $row['name'], 'decrypt');
+            $doc_ver = $row['version'];
+            $doc_ident = $row['docID'];
+            $result->free();
         } else {
-          echo $conn->error;
-          $accept = false;
+            echo $conn->error;
+            $accept = false;
         }
-        $result = $conn->query("SELECT p.firstname, p.lastname, e.name, c.address_Street, c.address_Country_Postal, c.address_Country_City  FROM contactPersons p
-        INNER JOIN clientData e ON p.clientID = e.id INNER JOIN clientInfoData c ON e.id = c.clientID WHERE p.id = $contactID");
+        $result = $conn->query("SELECT p.firstname, p.lastname, e.name, c.address_Street, c.address_Country_Postal, c.address_Country_City FROM contactPersons p"
+        ."INNER JOIN clientData e ON p.clientID = e.id INNER JOIN clientInfoData c ON e.id = c.clientID WHERE p.id = $contactID");
         if($accept && ($row = $result->fetch_assoc())){
-          $doc_cont = str_replace('[LINK]', $link, $doc_cont);
-          $doc_cont = str_replace('[FIRSTNAME]', $contact_row['firstname'], $doc_cont);
-          $doc_cont = str_replace('[LASTNAME]', $contact_row['lastname'], $doc_cont);
-          $doc_cont = str_replace('[Companyname]', $row['name'], $doc_cont);
-          $doc_cont = str_replace('[Companystreet]', $row['address_Street'], $doc_cont);
-          $doc_cont = str_replace('[Companyplace]', $row['address_Country_City'], $doc_cont);
-          $doc_cont = str_replace('[Companypostcode]', $row['address_Country_Postal'], $doc_cont);
-          $result->free();
-          if(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $doc_cont, $matches) && $matches){
-            $result = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
-            $result = $result->fetch_all(MYSQLI_ASSOC);
-            $result = array_combine(array_column($result, 'identifier'), array_column($result, 'content'));
-            foreach($matches[0] as $match){
-              $doc_cont = str_replace($match, $result[substr($match,1,-1)], $doc_cont);
+            $doc_cont = str_replace('[LINK]', $link, $doc_cont);
+            $doc_cont = str_replace('[FIRSTNAME]', $contact_row['firstname'], $doc_cont);
+            $doc_cont = str_replace('[LASTNAME]', $contact_row['lastname'], $doc_cont);
+            $doc_cont = str_replace('[Companyname]', $row['name'], $doc_cont);
+            $doc_cont = str_replace('[Companystreet]', $row['address_Street'], $doc_cont);
+            $doc_cont = str_replace('[Companyplace]', $row['address_Country_City'], $doc_cont);
+            $doc_cont = str_replace('[Companypostcode]', $row['address_Country_Postal'], $doc_cont);
+            $result->free();
+            if(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $doc_cont, $matches) && $matches){
+                $result = $conn->query("SELECT id, identifier, content FROM document_customs WHERE doc_id = '$doc_ident' AND companyID = $cmpID ");
+                $result = $result->fetch_all(MYSQLI_ASSOC);
+                $result = array_combine(array_column($result, 'identifier'), array_column($result, 'content'));
+                foreach($matches[0] as $match){
+                    $doc_cont = str_replace($match, secure_data('DSGVO', $result[substr($match,1,-1)], 'decrypt'), $doc_cont);
+                }
             }
-          }
         }
 
         if($accept){
@@ -240,7 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-
 <table class="table">
   <thead><tr>
     <th>Name</th>
@@ -258,7 +255,8 @@ while ($row = $result->fetch_assoc()) {
       $row['version'] .= ' <small>(Basis)</small>';
     }
     echo "<tr $style>";
-    echo '<td>' . $row['name'] . '</td>';
+    echo '<td>' . secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
+    //echo $err;
     echo '<td>' . $row['version'] . '</td>';
     echo '<td><form method="POST">';
     echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';

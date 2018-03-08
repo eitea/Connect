@@ -46,7 +46,6 @@ if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_
         $_SESSION['privateKey'] = $private;
         $conn->query("UPDATE UserData SET psw = '$hash', publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = $userID");
         if($conn->error) $accept = false;
-
         //company
         $result = $conn->query("SELECT id FROM companyData LIMIT 1");
         if($accept && $result && ($row = $result->fetch_assoc())){
@@ -88,16 +87,6 @@ if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_
 
         if($accept){
             $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
-            // dsgvo_access cannot decrypt this yet
-            // $stmt = $conn->prepare("UPDATE documentProcess SET document_text = ?, document_headline = ? WHERE id = ?");
-            // $stmt->bind_param('sss', $text, $head, $id);
-            // $result = $conn->query("SELECT id, document_text, document_headline FROM documentProcess");
-            // while($result && ($row = $result->fetch_assoc())){
-            //     $id = $row['id'];
-            //     $text = simple_encryption($row['document_text'], $symmetric);
-            //     $head = simple_encryption($row['document_headline'], $symmetric);
-            // }
-            // $stmt->close();
 
             $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?"); echo $stmt->error;
             $stmt->bind_param('sss', $text, $head, $id);
@@ -122,7 +111,7 @@ if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_
 
             echo $conn->error;
         }
-
+        if($accept) echo '<div class="alert alert-success"><a data-dismiss="alert" class="close">&times;</a>Verschlüsselung wurde erfolgreich aktiviert</div>';
         echo $err;
     } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Error: </strong>Incorrektes Passwort.</div>';

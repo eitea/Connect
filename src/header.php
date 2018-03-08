@@ -1189,13 +1189,4 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
       }
-
-      //$privateKey = base64_decode($privateKey);
-      //echo $privateKey;
-      //$message = "Hello World!";
-      // $crypted = simple_encryption($message, "AAA");
-      // echo simple_decryption($crypted, "AAA");
-
-      // $crypted = secure_data('DSGVO', $message, 'encrypt', $userID, $privateKey);
-      // echo secure_data('DSGVO', $crypted, 'decrypt');
       ?>

@@ -1320,20 +1320,6 @@ $lang_ger['USER_INACTIVE'] = 'Deaktivierte Benutzer';
 $lang_eng['USER_MODULES'] = 'User Modules';
 $lang_ger['USER_MODULES'] = 'Benutzer Module';
 
-$lang_eng['USER_PROJECTING_INFO'] = 'To create an entry, select a project, enter a valid time and fill out the infobox. Following rules apply:<ul>
-<li>Entries with negative dates are not valid. Breaks have to be checked out.</li>
-<li>Lunchbreaks have to be consumed as a whole, otherwise a complete one will be added additionally afterwards.</li>
-<li>Gaps between bookings and breaks may not be too big.</li>
-</ul>
-<a href="makeRequest.php">Forgot to Checkout your lunchbreak?</a>';
-$lang_ger['USER_PROJECTING_INFO'] = 'Für die erfolgreiche Erstellung eines Eintrags benötigt es die Selektion eines Projekts, eine gültige Uhrzeit und eine Eingabe aller benötigten Infoboxen.
-Dabei sind die folgenden Regeln zu beachten: <ul>
-<li>Einträge mit negativen Uhrzeiten sind nicht gültig. Wird eine Pause gemacht, muss diese durch Ausstempeln erzeugt werden.</li>
-<li>Liegt zwischen, nach oder vor einer Buchung ein zu großer Zeitunterschied, muss nachgetragen werden. Nachträge werden automatisch abgefragt.</li>
-<li>Die Mittagspause muss am Stück konsumiert werden, andernfalls wird im Anschluss eine vollständige Pause hinzugefügt.</li>
-</ul>
-<a href="makeRequest.php">Mittagspause vergessen?</a>';
-
 $lang_eng['VACATION'] = 'Vacation';
 $lang_ger['VACATION'] = 'Urlaub';
 

@@ -219,14 +219,8 @@ echo mysqli_error($conn);
     <?php elseif($showEmergencyUndoButton): ?>
       <button type='submit' class="btn btn-danger" name='undo' value='emergency' title='Emergency Undo. Can only be pressed every 2 Hours'>Undo</button>
     <?php endif; ?>
-    <button type='button' class="btn btn-default" style="border:0;background:0;" data-toggle="collapse" href="#userProjecting_info" aria-expanded="false"><i class="fa fa-question-circle-o fa-2x"></i></button>
   </div>
   <br>
-  <div class="collapse" id="userProjecting_info">
-    <div class="well">
-      <?php echo $lang['USER_PROJECTING_INFO']; ?>
-    </div>
-  </div>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-hover table-striped">
