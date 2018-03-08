@@ -11,7 +11,7 @@ function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     $allHours = 0;
     $times = explode(' ', $estimate);
-    foreach($times as $t){ //TODO: should base hours on intervalData, not 24/7 format
+    foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
         if(is_numeric($t)){
             $allHours += $t;
         } elseif(substr($t, -1) == 'M'){
@@ -68,8 +68,14 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 <div class="page-content-fixed-100">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(!empty($_POST['play'])){
-        $x = test_input($_POST['play'], true);
+    if(!empty($_POST['play']) || !empty($_POST['play-take'])){
+        if(!empty($_POST['play'])){
+            $x = test_input($_POST['play'], true);
+        } else {
+            $x = test_input($_POST['play-take'], true);
+            $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
+            $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
+        }
         $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
         if($result->num_rows < 1){
             $result = mysqli_query($conn, "SELECT indexIM FROM logs WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00' LIMIT 1");
@@ -88,6 +94,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         } else {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.</div>';
+        }
+    }
+    if(!empty($_POST['take_task'])){
+        $x = test_input($_POST['take_task'], true);
+        $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
         }
     }
     if(!empty($_POST['createForgottenBooking']) && !empty($_POST['description']) && isset($_POST["time-range"])){
@@ -224,7 +240,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $status = $_POST["status"];
                 $priority = intval($_POST["priority"]); //1-5
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
-                $leader = $_POST['leader'] ? intval($_POST['leader']) : $userID;
+                $leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
                 $percentage = intval($_POST['completed']);
                 $estimate = test_input($_POST['estimatedHours']);
                 $isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
@@ -325,8 +341,8 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
     </thead>
     <tbody>
         <?php
-        $occupation = $query_filter = '';
-        $priority_color = ['', '#2a5da1', '#0c95d9', '#6b6b6b', '#ff7600', '#ff0000'];
+        $modals = $occupation = $query_filter = '';
+        $priority_color = ['', '#2a5da1', '#0c95d9', '#9d9c9c', '#ff7600', '#ff0000'];
         if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
         if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
         if($filterings['project']){ $query_filter .= " AND d.clientprojectid = ".intval($filterings['project']); }
@@ -337,7 +353,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
             } else {
                 $query_filter .= " AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
-            } //like its slightly annoying, but really not bad ^^
+            }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
         $stmt_team = $conn->prepare("SELECT name, teamid FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
@@ -372,7 +388,8 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
-            $selection = array('user;'.$row['projectowner'], 'user;'.$row['projectleader']);
+            $selection = array('user;'.$row['projectowner']);
+            if($row['projectleader']) $selection[] = 'user;'.$row['projectleader'];
             $employees = array();
             $stmt_team->execute();
             $emp_result = $stmt_team->get_result();
@@ -425,7 +442,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
             echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
             echo '<td>'; //employees
-            echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u><br>';
+            if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
             echo implode(',<br>', $employees);
             echo '</td>';
             echo '<td>';
@@ -441,7 +458,11 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
-                echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
+                if(!$row['projectleader']){
+                    echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
+                } else {
+                    echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
+                }
             }
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
@@ -449,6 +470,18 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             }
             echo '</form></td>';
             echo '</tr>';
+
+            if(!$row['projectleader']){
+                $modals .= '<div id="play-take-'.$x.'" class="modal fade" style="z-index:1500;">
+                <div class="modal-dialog modal-content modal-sm">
+                <div class="modal-header h4">Task Übernehmen</div>
+                <div class="modal-body">Wollen Sie den Task dabei auch gleichzeitig als verantwortlichen Mitarbeiter übernehmen?</div>
+                <div class="modal-footer"><form method="POST">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-default" type="submit" title="Task normal starten" name="play" value="'.$x.'">Nein</button>
+                <button class="btn btn-warning" type="submit" title="Task als Verantwortlicher starten" name="play-take" value="'.$x.'">Ja</button>
+                </form></div></div></div>';
+            }
         }
         ?>
         <!--training-->
@@ -520,6 +553,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         </div>
     </div>
 <div id="editingModalDiv">
+    <?php echo $modals; ?>
     <?php if($occupation): ?>
     <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">
@@ -694,6 +728,10 @@ function dynamicOnLoad(modID){
         minimumResultsForSearch: Infinity
     });
     $('[data-toggle="tooltip"]').tooltip();
+    $('button[name="take_task"]').on('click', function(){
+        var c = confirm("Wollen Sie als Verantwortlicher Mitarbeiter eingetragen werden?");
+        return c;
+    });
     tinymce.init({
         selector: '.projectDescriptionEditor',
         plugins: 'image code paste emoticons table',
@@ -821,6 +859,7 @@ $('.view-modal-open').click(function(){
         $("#editingModalDiv").append(resp);
         existingModals_info.push(index);
         onPageLoad();
+        dynamicOnLoad(index);
       },
       error : function(resp){},
       complete: function(resp){

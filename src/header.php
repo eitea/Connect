@@ -177,7 +177,6 @@ if($userHasUnansweredSurveys){
     echo $conn->error;
     $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
@@ -194,7 +193,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
-
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
         $passwordConfirm = $_POST['passwordConfirm'];

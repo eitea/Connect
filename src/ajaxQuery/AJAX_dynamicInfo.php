@@ -2,11 +2,11 @@
 require dirname(__DIR__) . "/connection.php";
 require dirname(__DIR__) . "/language.php";
 require dirname(__DIR__) . "/utilities.php";
-$x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
 
 session_start();
 $userID = $_SESSION["userid"] or die("Session died");
-$x = preg_replace("/[^A-Za-z0-9]/", '', $_GET['projectid']);
+$x = test_input($_GET['projectid'], 1);
+
 $result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectID = '$x' AND
     ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with dynamicProjects.php
 if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
@@ -25,6 +25,7 @@ $result = $conn->query("SELECT d.projectid, projectname, projectdescription, pro
     WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $row = $result->fetch_assoc();
+$projectleader = $row['projectleader'];
 $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
 $stmt_booking->bind_param('s', $x);
 $stmt_booking->execute();
@@ -285,7 +286,7 @@ if (sizeof($missingBookingsArray) == 0) {
                             <label><?php echo $lang['TIME']; ?></label>
                             <input type="hidden" name="time-range" id="real-time-range<?php echo $x; ?>" />
                             <select class="js-example-basic-single" id="time-range-chooser<?php echo $x; ?>">
-                            <?php 
+                            <?php
                             $lastDate = "";
                             foreach ($missingBookingsArray as $booking) {
                                 if($lastDate != $booking["date"]){
@@ -307,7 +308,7 @@ if (sizeof($missingBookingsArray) == 0) {
                         </div>
                         <script>
                             (function(){ //creates own scope
-                                function updateStartAndEnd(date,start,end){ 
+                                function updateStartAndEnd(date,start,end){
                                     $("#time-range-date<?php echo $x; ?>").html(date);
                                     $("#time-range-start<?php echo $x; ?>").val(start);
                                     $("#time-range-end<?php echo $x; ?>").val(end);
@@ -320,8 +321,8 @@ if (sizeof($missingBookingsArray) == 0) {
                                     var timeRange = $("#time-range-chooser<?php echo $x; ?>").val();
                                     $("#real-time-range<?php echo $x; ?>").val(timeRange);
                                     var arr = timeRange.split(";");
-                                    updateStartAndEnd(arr[0], arr[1], arr[2]);                                    
-                                })
+                                    updateStartAndEnd(arr[0], arr[1], arr[2]);
+                                });
                                 $("#time-range-end<?php echo $x; ?>").change(function(){
                                     var timeRange = $("#time-range-chooser<?php echo $x; ?>").val();
                                     var newEnd = $("#time-range-end<?php echo $x; ?>").val();
@@ -335,7 +336,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                     $("#time-range-end<?php echo $x; ?>").val(newEnd);
                                     timeRange = arr.join(";");
                                     $("#real-time-range<?php echo $x; ?>").val(timeRange);
-                                })
+                                });
                             })()
                         </script>
                         <!-- /time chooser -->
@@ -358,7 +359,14 @@ if (sizeof($missingBookingsArray) == 0) {
                 $hasActiveBooking = $result->num_rows;
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
                 if($dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
-                    echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
+                    if(!$projectleader){
+                        echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
+                    } else {
+                        echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
+                    }
+                }
+                if(!$projectleader){
+                    echo "<button class='btn btn-default' type='submit' title='Task übernehmen' name='take_task' value='$x'><i class='fa fa-address-card'></i></button>";
                 }
                  ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
