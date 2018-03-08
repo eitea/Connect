@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
       echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
     }
-  }
+}
     if (isset($_POST['addDocument']) && !empty($_POST['add_docName'])) {
         $val = secure_data('DSGVO', test_input($_POST['add_docName']), 'encrypt', $userID, $privateKey);
         $conn->query("INSERT INTO documents(name, txt, companyID, version) VALUES('$val', ' ', $cmpID, '1.0') ");

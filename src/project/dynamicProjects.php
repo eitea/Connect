@@ -347,12 +347,17 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
         if($filterings['project']){ $query_filter .= " AND d.clientprojectid = ".intval($filterings['project']); }
         if($filterings['tasks']){
-            if($filterings['tasks'] == 'REVIEW_1'){
+            if($filterings['tasks'] != 'ACTIVE_PLANNED'){
+                $query_filter .= " AND d.projectstart <= UTC_TIMESTAMP ";
+            }
+            if($filterings['tasks'] == 'ACTIVE_PLANNED'){
+                $query_filter .= " AND d.projectstart > UTC_TIMESTAMP ";
+            } else if($filterings['tasks'] == 'REVIEW_1'){
                 $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
             } elseif($filterings['tasks'] == 'REVIEW_2'){
                 $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
             } else {
-                $query_filter .= " AND d.projectstatus = '".test_input($filterings['tasks'], true)."' ";
+                $query_filter .= " AND d.projectstatus = '".test_input($filterings['tasks'])."' ";
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
@@ -383,7 +388,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
-                AND d.projectstart <= UTC_TIMESTAMP $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){

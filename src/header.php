@@ -17,8 +17,7 @@ if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
 
-$sql = "SELECT * FROM roles WHERE userID = $userID";
-$result = $conn->query($sql);
+$result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $isCoreAdmin = $row['isCoreAdmin'];
@@ -51,7 +50,7 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange,forcedPwdChange FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
@@ -71,6 +70,7 @@ if ($result) {
 }
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
+
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
 if ($isTimeAdmin) {
@@ -82,10 +82,10 @@ if ($isTimeAdmin) {
     $result = $conn->query("SELECT indexIM FROM logs WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //gemini date in logs
-    $result = $conn->query("SELECT * FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+    $result = $conn->query("SELECT id FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //lunchbreaks
-    $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
+    $result = $conn->query("SELECT l1.indexIM FROM logs l1
     INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
     WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
@@ -109,15 +109,18 @@ $result = $conn->query(
              FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
+             OR dsgvo_training.answerEveryNDays = 0 )
          )
         UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
              SELECT userID
              FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
+             OR dsgvo_training.answerEveryNDays = 0 )
          )
     ) temp"
 );
@@ -633,8 +636,8 @@ if ($_SESSION['color'] == 'light') {
   <?php endif;?>
     <!-- feedback modal -->
 
-    <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
-<form method="post" enctype="multipart/form-data" id="feedback_form">
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+    <form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -642,7 +645,6 @@ if ($_SESSION['color'] == 'light') {
                     <h4 class="modal-title" id="feedbackModalLabel"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
                 </div>
                 <div class="modal-body">
-                    <!-- modal body -->
                     <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
@@ -664,9 +666,6 @@ if ($_SESSION['color'] == 'light') {
                     </div>
                     <div id="screenshot"> <!-- image will be placed here -->
                     </div>
-
-
-                    <!-- /modal body -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
@@ -674,8 +673,8 @@ if ($_SESSION['color'] == 'light') {
                 </div>
             </div>
         </div>
-            </form>
-    </div>
+    </form>
+</div>
 
 <!-- /feedback modal -->
 <?php

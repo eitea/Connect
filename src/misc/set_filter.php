@@ -274,6 +274,7 @@ if($scale > 2){ //3 columns
                   <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
                   <option value="DEACTIVATED" <?php if($filterings['tasks'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
                   <option value="ACTIVE" <?php if($filterings['tasks'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
+                  <option value="ACTIVE_PLANNED" <?php if($filterings['tasks'] == 'ACTIVE_PLANNED') echo 'selected'; ?>>Aktiv (Geplant)</option>
                   <option value="DRAFT" <?php if($filterings['tasks'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
                   <option value="REVIEW_1" <?php if($filterings['tasks'] == 'REVIEW_1') echo 'selected'; ?>>Review (Aktiv)</option>
                   <option value="REVIEW_2" <?php if($filterings['tasks'] == 'REVIEW_2') echo 'selected'; ?>>Review (Inaktiv)</option>
@@ -346,7 +347,7 @@ if($scale > 2){ //3 columns
             <label><?php echo $lang['ACTIVITY']; ?></label>
               <select name="searchActivity" class="js-example-basic-single">
                 <option value="0"><?php echo $lang['DISPLAY_ALL']; ?></option>
-                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?> ><?php echo $lang['VACATION']; ?></option>
+                <option value="1" <?php if($filterings['logs'][0] == '1'){echo 'selected';}?>><?php echo $lang['VACATION']; ?></option>
                 <option value="2" <?php if($filterings['logs'][0] == '2'){echo 'selected';}?>><?php echo $lang['SPECIAL_LEAVE']; ?></option>
                 <option value="4" <?php if($filterings['logs'][0] == '4'){echo 'selected';}?>><?php echo $lang['VOCATIONAL_SCHOOL']; ?></option>
                 <option value="6" <?php if($filterings['logs'][0] == '6'){echo 'selected';}?>><?php echo $lang['COMPENSATORY_TIME']; ?></option>
