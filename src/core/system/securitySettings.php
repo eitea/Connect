@@ -1,3 +1,5 @@
+<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 if(isset($_POST['deactive_encryption']) && crypt($_POST['encryption_current_pass'], $userPasswordHash) == $userPasswordHash){
     //TODO: decrypt and outdate all keys
@@ -103,42 +105,41 @@ $result = $conn->query("SELECT * FROM policyData");
 $row = $result->fetch_assoc();
  ?>
 
-
-
  <form method="POST">
-     <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"> </i> </a></h4>
-     <br>
-     <div class="collapse" id="password_info_encryption">
-         <div class="well"><?php echo $lang['INFO_ENCRYPTION']; ?></div>
-     </div>
-     <br>
+     <div class="page-header"><h3>Security Einstellungen  <div class="page-header-button-group">
+        <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+      </div></h3></div>
+
+     <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"> </i> </a></h4><br>
+     <div class="collapse" id="password_info_encryption"><div class="well"><?php echo $lang['INFO_ENCRYPTION']; ?></div></div>
+
      <div class="row">
-         <div class="col-md-4">
-             <label>Aktuelles Passwort</label>
-             <input type="password" autocomplete="new-password" name="encryption_current_pass" class="form-control">
-         </div>
          <?php
-         $result = $conn->query("SELECT activeEncryption FROM configurationData");
-         if($result && ($row = $result->fetch_assoc())){
-             if($row['activeEncryption'] == 'TRUE'){
-                 echo '<div class="col-md-4"><label>Deaktivieren</label><br><button type="submit" name="deactive_encryption" class="btn btn-warning">Verschlüsselung Deaktivieren</button></div>';
-             } else {
-                 echo '</div><div class="row">
-                 <div class="col-md-4">
-                 <label>Neues Login Passwort</label>
-                 <input type="password" name="encryption_pass" class="form-control" />
-                 </div>
-                 <div class="col-md-4">
-                 <label>Neues Login Passwort Bestätigen</label>
-                 <input type="password" name="encryption_pass_confirm" class="form-control" />
-                 </div>
-                 <div class="col-md-4">
-                 <label>Aktivieren</label><br>
-                 <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
-                 </div>
-                 </div>';
-             }
+         $result = $conn->query("SELECT activeEncryption FROM configurationData AND activeEncryption = 'TRUE'");
+         $checked = ($result && $result->num_rows > 0) ? 'checked' : '';
+
+         $result = $conn->query("SELECT module FROM security_modules WHERE outDated = 'FALSE'");
+         if($result && $result->num_rows > 0){
+             $result = array_column($result->fetch_all(), 0);
+         } else {
+             $result = array();
          }
          ?>
+         <div class="col-sm-4"><label><input type="checkbox" <?php echo $checked; ?> name="activate_encryption" value="0" /> Aktiv</label></div>
+     </div>
+     <div class="row">
+         <div class="col-md-4"><label><input disabled type="checkbox" <?php if(in_array('TIME', $result)) echo 'checked'; ?> name="encrypt_time" value="0" /> Zeiterfassung</label></div>
+         <div class="col-md-4"><label><input disabled type="checkbox" <?php if(in_array('PROJECT', $result)) echo 'checked'; ?> name="encrypt_project" value="0" /> Projekte</label></div>
+         <div class="col-md-4"><label><input disabled type="checkbox" <?php if(in_array('REPORT', $result)) echo 'checked'; ?> name="encrypt_report" value="0" /> Berichte</label></div>
+         <div class="col-md-4"><label><input disabled type="checkbox" <?php if(in_array('ERP', $result)) echo 'checked'; ?> name="encrypt_erp" value="0" /> ERP</label></div>
+         <div class="col-md-4"><label><input disabled type="checkbox" <?php if(in_array('FINANCE', $result)) echo 'checked'; ?> name="encrypt_finance" value="0" /> Finanzen</label></div>
+         <div class="col-md-4"><label><input type="checkbox" <?php if(in_array('DSGVO', $result)) echo 'checked'; ?> name="encrypt_dsgvo" value="0" /> DSGVO</label></div>
      </div>
  </form>
+
+<br><hr>
+ <h4>Benutzer Verwaltung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"> </i> </a></h4><br>
+
+
+
+<?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>

@@ -134,10 +134,10 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     if($module == 'DSGVO'){
         static $symmetric = false;
         if(!$symmetric && $userID && $privateKey){
-            $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = 'DSGVO' ORDER BY recentDate LIMIT 1");
+            $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = 'DSGVO' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
             if($result && ( $row=$result->fetch_assoc() )){
                 $cipher_private_module = base64_decode($row['privateKey']);
-                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules");
+                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
                 if($result && ( $row=$result->fetch_assoc() )){
                     $public_module = base64_decode($row['publicPGPKey']);
                     $cipher_symmetric = base64_decode($row['symmetricKey']);
@@ -159,7 +159,13 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
                     }
                     $err = 'Could not retrieve symmetric Key';
                     return $message;
+                } elseif($result){
+                    $err = 'Module encryption not active';
+                    return $message;
                 }
+            } elseif($result){
+                $err = 'User Access not found';
+                return $message;
             }
             $err = $conn->error;
             return $message;

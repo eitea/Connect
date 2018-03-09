@@ -2205,6 +2205,7 @@ if($row['version'] < 141){
         echo '<br>Team Update: Abteilungen';
     }
 }
+
 //if($row['version'] < 142){}
 //if($row['version'] < 143){}
 
