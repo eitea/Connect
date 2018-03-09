@@ -12,7 +12,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     $allHours = 0;
     $times = explode(' ', $estimate);
     foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
-        if(is_numeric($t)){
+        if(is_numeric($t) ||substr($t, -1) == 'h'){
             $allHours += $t;
         } elseif(substr($t, -1) == 'M'){
             $allHours += intval($t) * 730.5;
