@@ -76,6 +76,25 @@ function parse_questions($html){ // this will return an array of questions
     return $ret_array;
 }
 
+function parse_question($html){
+    $questionRegex = '/\{.*?\}/s';
+    $htmlRegex = '/\<\/*.+?\/*\>/s';
+    global $hasQuestions;
+    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
+    preg_match($questionRegex,$html,$matches);
+    // I only parse the first question for now
+    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
+    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
+    $answerRegex = '/\[([\?])\]([^\[\}]+)/s';
+    preg_match_all($answerRegex,$question,$matches);
+    // var_dump($answerRegex);
+    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
+    foreach ($matches[2] as $key => $value) {
+        return html_entity_decode($value);
+    }
+    return "Welche dieser Antworten ist richtig?";
+}
+
 $result = $conn->query( // this gets all trainings the user can complete
     "SELECT tur.trainingID id, tr.name, tr.random
      FROM dsgvo_training_user_relations tur 
@@ -138,7 +157,7 @@ while ($row = $result->fetch_assoc()){
         $questionArray[] = array(
             "type"=>"radiogroup",
             "name"=>$row_question["id"],
-            "title"=>"Welche dieser Antworten ist richtig?",
+            "title"=>parse_question($row_question["text"]),
             "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
             "colCount"=>1,
             "choicesOrder"=>$random == 'TRUE'?"random":"none",

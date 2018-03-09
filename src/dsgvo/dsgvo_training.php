@@ -403,17 +403,27 @@ function formatState (state) {
 function onModalLoad(){
     tinymce.init({
         selector: '.tinymce',
-        toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion | emoticons',
+        toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion insertquestion2 | emoticons',
         setup: function(editor){
             function insertQuestion(){
-                var html = "<p>{ </p><p>[-] Wrong Answer 1 </p><p>[+] Right Answer 2 </p><p> }</p>";
+                var html = "<p>{ </p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
                 editor.insertContent(html);
             }
 
             editor.addButton("insertquestion",{
-                tooltip: "Insert question",
+                tooltip: "Benutzerdefinierte Frage einfügen",
                 icon: "template",
                 onclick: insertQuestion,
+            });
+            function insertQuestion2(){
+                var html = "<p>{ </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
+                editor.insertContent(html);
+            }
+
+            editor.addButton("insertquestion2",{
+                tooltip: "Frage einfügen",
+                icon: "template",
+                onclick: insertQuestion2,
             });
         },
         height : "480",
