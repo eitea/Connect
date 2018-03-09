@@ -28,12 +28,6 @@ function openSurveyModal(){
 
 <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 <script>
-/* //ugly workaround. TODO: find cleaner solution
-$('input[type="password"]').attr('readonly', true);
-$('input[type="password"]').on('focus', function(e){
-    $(this).attr('readonly', false);
-});
-*/
 $("#feedback_form").submit(function(event){
     console.log("feedBack");
     event.preventDefault();

@@ -31,7 +31,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
             $_SESSION['privateKey'] = $private;
             $conn->query("UPDATE UserData SET psw = '$hash', publicPGPKey = '".base64_encode($admin_public)."', privatePGPKey = '".$private_encrypt."'  WHERE id = $userID");
             if($conn->error) $accept = false;
-
+            
             //company PAIR
             $result = $conn->query("SELECT id FROM companyData LIMIT 1");
             if($accept && $result && ($row = $result->fetch_assoc())){

@@ -603,6 +603,7 @@ function create_tables($conn) {
         companyID INT(6) UNSIGNED,
         leader INT(6),
         leaderreplacement INT(6),
+        isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

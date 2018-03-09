@@ -5,7 +5,8 @@ if (empty($_SESSION['userid'])) {
 }
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
-//$privateKey = $_SESSION['privateKey'];
+$privateKey = $_SESSION['privateKey'];
+
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
 require __DIR__ . "/connection.php";
@@ -16,8 +17,7 @@ if ($this_page != "editCustomer_detail.php") {
     unset($_SESSION['unlock']);
 }
 
-$sql = "SELECT * FROM roles WHERE userID = $userID";
-$result = $conn->query($sql);
+$result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $isCoreAdmin = $row['isCoreAdmin'];
@@ -50,7 +50,7 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange,forcedPwdChange FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
@@ -70,6 +70,7 @@ if ($result) {
 }
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
+
 $numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
 $numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
 if ($isTimeAdmin) {
@@ -81,10 +82,10 @@ if ($isTimeAdmin) {
     $result = $conn->query("SELECT indexIM FROM logs WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //gemini date in logs
-    $result = $conn->query("SELECT * FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
+    $result = $conn->query("SELECT id FROM logs l1, $userTable WHERE l1.userID = $userTable.id AND EXISTS(SELECT * FROM logs l2 WHERE DATE(DATE_ADD(l1.time, INTERVAL timeToUTC  hour)) = DATE(DATE_ADD(l2.time, INTERVAL timeToUTC  hour)) AND l1.userID = l2.userID AND l1.indexIM != l2.indexIM) ORDER BY l1.time DESC");
     if ($result && $result->num_rows > 0) {$numberOfAlerts += $result->num_rows;}
     //lunchbreaks
-    $result = $conn->query("SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
+    $result = $conn->query("SELECT l1.indexIM FROM logs l1
     INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
     WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
     AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)");
@@ -108,15 +109,18 @@ $result = $conn->query(
              FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
+             OR dsgvo_training.answerEveryNDays = 0 )
          )
         UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
              SELECT userID
              FROM dsgvo_training_completed_questions
              LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
+             OR dsgvo_training.answerEveryNDays = 0 )
          )
     ) temp"
 );
@@ -176,7 +180,6 @@ if($userHasUnansweredSurveys){
     echo $conn->error;
     $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
@@ -193,7 +196,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
-
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
         $passwordConfirm = $_POST['passwordConfirm'];
@@ -268,7 +270,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         $conn->query($sql);
     }
-}
+} //endif POST
 
 if ($_SESSION['color'] == 'light') {
     $css_file = 'plugins/homeMenu/homeMenu_light.css';
@@ -283,74 +285,74 @@ if ($_SESSION['color'] == 'light') {
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
+    <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
-  <script src="plugins/jQuery/jquery.min.js"></script>
-  <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
-  <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src="plugins/jQuery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
-  <script src='plugins/select2/js/select2.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
+    <script src='plugins/select2/js/select2.min.js'></script>
 
-  <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
-  <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/dataTables/datatables.min.css"/>
+    <script type="text/javascript" src="plugins/dataTables/datatables.min.js"></script>
 
-  <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
-  <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
-  <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
+    <link href="plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" >
+    <script type="text/javascript" src="plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" ></script>
+    <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
-  <script src="plugins/html2canvas/html2canvas.min.js"></script>
+    <script src="plugins/html2canvas/html2canvas.min.js"></script>
+    <script src="plugins/remember-state/remember-state.min.js"></script>
 
-  <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
-  <link href="<?php echo $css_file; ?>" rel="stylesheet" />
-  <title>Connect</title>
-  <script>
-  $(document).ready(function() {
-    if($('#seconds').length) {
-      var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
-      function pad(val) {
-        return val > 9 ? val : "0" + val;
-      }
-      window.setInterval(function(){
-        document.getElementById("seconds").innerHTML = pad(++sec % 60);
-        document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
-        document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
-      }, 1000);
-  }
-  <?php
-  if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
-      $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-      if ($result) {
-          $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
-          if ($privateDecoded != false) {
-              $unlockedPGP = $privateDecoded;
-              echo 'document.getElementById("options").click();';
-          }
-      }
-  }
-  ?>
-  });
-  function generateKeys($userID){
-      $.ajax({
-          type: "POST",
-          url: "ajaxQuery/AJAX_pgpKeyGen.php",
-          data: { userID: $userID}
-      }).done(function(keys){
-          keys = JSON.parse(keys);
-          document.getElementsByName('privatePGP')[0].value = keys[0];
-          document.getElementsByName('publicPGP')[0].value = keys[1];
-      });
-  }
-  function clearPGP(){
-    document.getElementsByName('privatePGP')[0].value = '';
-  }
-  </script>
-  <script>
+    <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+    <link href="<?php echo $css_file; ?>" rel="stylesheet" />
+    <title>Connect</title>
+    <script>
+    $(document).ready(function() {
+        if($('#seconds').length) {
+            var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
+            function pad(val) {
+                return val > 9 ? val : "0" + val;
+            }
+            window.setInterval(function(){
+                document.getElementById("seconds").innerHTML = pad(++sec % 60);
+                document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
+                document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
+            }, 1000);
+        }
+        <?php
+        if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
+            $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
+            if ($result) {
+                $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
+                if ($privateDecoded != false) {
+                    $unlockedPGP = $privateDecoded;
+                    echo 'document.getElementById("options").click();';
+                }
+            }
+        }
+        ?>
+    });
+    function generateKeys($userID){
+        $.ajax({
+            type: "POST",
+            url: "ajaxQuery/AJAX_pgpKeyGen.php",
+            data: { userID: $userID}
+        }).done(function(keys){
+            keys = JSON.parse(keys);
+            document.getElementsByName('privatePGP')[0].value = keys[0];
+            document.getElementsByName('publicPGP')[0].value = keys[1];
+        });
+    }
+    function clearPGP(){
+        document.getElementsByName('privatePGP')[0].value = '';
+    }
+
     function showError(message){
         if(!message || message.length == 0) return;
         $.notify({
@@ -524,7 +526,7 @@ if ($_SESSION['color'] == 'light') {
         });
         }
   </script>
-  
+
   <!-- modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
@@ -634,8 +636,8 @@ if ($_SESSION['color'] == 'light') {
   <?php endif;?>
     <!-- feedback modal -->
 
-    <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
-<form method="post" enctype="multipart/form-data" id="feedback_form">
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+    <form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
@@ -643,7 +645,6 @@ if ($_SESSION['color'] == 'light') {
                     <h4 class="modal-title" id="feedbackModalLabel"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
                 </div>
                 <div class="modal-body">
-                    <!-- modal body -->
                     <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
@@ -665,9 +666,6 @@ if ($_SESSION['color'] == 'light') {
                     </div>
                     <div id="screenshot"> <!-- image will be placed here -->
                     </div>
-
-
-                    <!-- /modal body -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
@@ -675,8 +673,8 @@ if ($_SESSION['color'] == 'light') {
                 </div>
             </div>
         </div>
-            </form>
-    </div>
+    </form>
+</div>
 
 <!-- /feedback modal -->
 <?php
@@ -789,7 +787,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
             <?php endif;//canUseSuppliers ?>
             <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>    
+            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
             <?php endif;//canuseClients ?>
           </ul>
       </div>
@@ -1175,7 +1173,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <span><?php echo $error_output; ?></span>
 
       <?php
-      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM $policyTable"); echo $conn->error;
+      $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
       if($row['expiration'] == 'TRUE'){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
@@ -1191,5 +1189,4 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
       }
-
       ?>

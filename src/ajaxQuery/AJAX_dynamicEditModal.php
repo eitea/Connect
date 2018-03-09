@@ -37,7 +37,8 @@ if($x){
     $dynrow['projectstart'] = date('Y-m-d');
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
-    $dynrow['projectowner'] = $dynrow['projectleader'] = $userID;
+    $dynrow['projectowner'] = $userID;
+    $dynrow['projectleader'] = 0;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
@@ -110,7 +111,7 @@ if($x){
                             </div>
 
                             <div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
-                            <div class="col-md-12"><label>Task Name*</label><input spellchecking="true" class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                            <div class="col-md-12"><label>Task Name*</label><input spellchecking="true" class="form-control" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
                             <?php
                             $modal_options = '';
                             if($isDynamicProjectsAdmin == 'TRUE'){
@@ -121,21 +122,15 @@ if($x){
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }
                             ?>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label><?php echo $lang["OWNER"]; ?>*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="owner">
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="owner">
                                     <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>
-                                <div class="col-md-4">
-                                    <label><?php echo $lang["LEADER"]; ?>*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="leader">
-                                    <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
-                                    </select><br>
-                                </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons required-field" name="employees[]" multiple="multiple">
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="employees[]" multiple="multiple">
                                         <?php
                                         if($isDynamicProjectsAdmin != 'TRUE'){
                                             $result = str_replace('<option value="', '<option selected value="user;', $modal_options);
@@ -215,66 +210,79 @@ if($x){
                             </div>
                         </div>
                         <div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>
-                            <div class="col-md-6">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                        <label>Skill Minimum</label>
-                                        <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
-                                        <?php endif; ?>
-                                    </div>
+                                    <label>Status*</label>
+                                    <div class="input-group">
+                                        <select class="form-control" name="status" >
+                                            <option value="DEACTIVATED" <?php if($dynrow['projectstatus'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
+                                            <option value="ACTIVE" <?php if($dynrow['projectstatus'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
+                                            <option value="DRAFT" <?php if($dynrow['projectstatus'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
+                                            <option value="COMPLETED" <?php if($dynrow['projectstatus'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
+                                        </select>
+                                        <span class="input-group-addon text-warning"><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?></span>
+                                        <input type='number' class="form-control" name='completed' value="<?php echo $dynrow['projectpercentage']; ?>" min="0" max="100" step="1"/>
+                                    </div><br>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="col-md-6">
-                                    <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                        <label>Level</label>
-                                        <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
-                                        <?php endif; ?>
-                                    </div>
+                                        <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                            <label>Skill Minimum</label>
+                                            <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-md-6">
+                                        <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                            <label>Level</label>
+                                            <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
+                                            <?php endif; ?>
+                                        </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label>Status*</label>
-                                <div class="input-group">
-                                    <select class="form-control" name="status" >
-                                        <option value="DEACTIVATED" <?php if($dynrow['projectstatus'] == "DEACTIVATED") echo 'selected'; ?>>Deaktiviert</option>
-                                        <option value="ACTIVE" <?php if($dynrow['projectstatus'] == 'ACTIVE') echo 'selected'; ?>>Aktiv</option>
-                                        <option value="DRAFT" <?php if($dynrow['projectstatus'] == 'DRAFT') echo 'selected'; ?>>Entwurf</option>
-                                        <option value="COMPLETED" <?php if($dynrow['projectstatus'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
+                                    <input type="color" class="form-control" value="<?php echo $dynrow['projectcolor']; ?>" name="color"><br>
+                                </div>
+                                <div class="col-md-4">
+                                <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                    <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
+                                    <select class="form-control js-example-basic-single" name="parent">
+                                        <option value=''>Keines</option>
+                                        <?php
+                                        $result = $conn->query("SELECT projectid, projectname FROM dynamicprojects");
+                                        while ($row = $result->fetch_assoc()) {
+                                            $selected = ($row['projectid'] == $dynrow['projectparent']) ? 'selected' : '';
+                                            echo '<option '.$selected.' value="'.$row["projectid"].'" >'.$row["projectname"].'</option>';
+                                        }
+                                        ?>
+                                    </select><br>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label><?php echo $lang["LEADER"]; ?></label>
+                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="leader">
+                                        <option value="">...</option>
+                                        <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
+                                    </select><br>
+                                </div>
+                                <div class="col-md-6">
+                                <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                    <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
+                                    <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
+                                        <?php
+                                        $result = $modal_options;
+                                        for($i = 0; $i < count($dynrow_emps); $i++){
+                                            if($dynrow_emps[$i]['position'] == 'optional')
+                                            $result = str_replace('<option value="'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="'.$dynrow_emps[$i]['userid'].'" ', $result);
+                                        }
+                                        echo $result;
+                                        ?>
                                     </select>
-                                    <span class="input-group-addon text-warning"><?php echo $lang["DYNAMIC_PROJECTS_PERCENTAGE_FINISHED"]; ?></span>
-                                    <input type='number' class="form-control" name='completed' value="<?php echo $dynrow['projectpercentage']; ?>" min="0" max="100" step="1"/>
-                                </div><br>
-                            </div>
-                            <div class="col-md-4">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_COLOR"]; ?></label>
-                                <input type="color" class="form-control" value="<?php echo $dynrow['projectcolor']; ?>" name="color"><br>
-                            </div>
-                            <div class="col-md-4">
-                            <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
-                                <select class="form-control js-example-basic-single" name="parent">
-                                    <option value=''>Keines</option>
-                                    <?php
-                                    $result = $conn->query("SELECT projectid, projectname FROM dynamicprojects");
-                                    while ($row = $result->fetch_assoc()) {
-                                        $selected = ($row['projectid'] == $dynrow['projectparent']) ? 'selected' : '';
-                                        echo '<option '.$selected.' value="'.$row["projectid"].'" >'.$row["projectname"].'</option>';
-                                    }
-                                    ?>
-                                </select><br>
-                                <?php endif; ?>
-                            </div>
-                            <div class="col-md-4">
-                            <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
-                                <select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
-                                    <?php
-                                    $result = $modal_options;
-                                    for($i = 0; $i < count($dynrow_emps); $i++){
-                                        if($dynrow_emps[$i]['position'] == 'optional')
-                                        $result = str_replace('<option value="'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="'.$dynrow_emps[$i]['userid'].'" ', $result);
-                                    }
-                                    echo $result;
-                                    ?>
-                                </select>
-                                <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                         <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>

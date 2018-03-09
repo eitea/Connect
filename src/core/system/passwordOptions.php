@@ -21,79 +21,6 @@ if(isset($_POST['saveButton'])){
     $conn->query("UPDATE policyData SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
     echo mysqli_error($conn);
 } //crypt($_POST['password'], $row['psw']) == $row['psw']
-if(isset($_POST['deactive_encryption']) && crypt($_POST['encryption_current_pass'], $userPasswordHash) == $userPasswordHash){
-    //TODO: decrypt
-
-    $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
-} elseif(isset($_POST['deactive_encryption'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
-}
-
-if(isset($_POST['active_encryption']) && !empty($_POST['encryption_pass']) && $_POST['encryption_pass_confirm'] == $_POST['encryption_pass']){
-    if(crypt($_POST['encryption_current_pass'], $userPasswordHash) == $userPasswordHash){
-        $accept = true;
-        $err = $content_personal = $content_company = '';
-        //user PAIR
-        $keyPair = sodium_crypto_box_keypair();
-        $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-        $user_public = sodium_crypto_box_publickey($keyPair);
-        $hash = password_hash($_POST['encryption_pass'], PASSWORD_BCRYPT);
-        $content_personal = $private." \n".base64_encode($user_public);
-        $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
-        $_SESSION['privateKey'] = $private;
-        $conn->query("UPDATE UserData SET psw = '$hash', publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$private_encrypt."'  WHERE id = $userID");
-        if($conn->error) $accept = false;
-
-        //company PAIR
-        $result = $conn->query("SELECT id FROM companyData LIMIT 1");
-        if($accept && $result && ($row = $result->fetch_assoc())){
-            $companyID = $row['id'];
-            $keyPair = sodium_crypto_box_keypair();
-            $private = sodium_crypto_box_secretkey($keyPair);
-            $public = sodium_crypto_box_publickey($keyPair);
-            $content_company = base64_encode($private)." \n".base64_encode($public);
-            $conn->query("UPDATE companyData SET publicPGPKey = '".base64_encode($public)."' WHERE id = $companyID");
-            $nonce = random_bytes(24);
-            $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$user_public);
-            $conn->query("INSERT INTO security_company(userID, companyID, privateKey) VALUES ($userID, 1, '".base64_encode($private_encrypt)."')");
-            if($conn->error) $accept = false;
-        } else {
-            $err .= $conn->error;
-        }
-
-        if($accept){ //module PAIR
-            $keyPair = sodium_crypto_box_keypair();
-            $private = sodium_crypto_box_secretkey($keyPair);
-            $public = sodium_crypto_box_publickey($keyPair);
-            $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-            $nonce = random_bytes(24);
-            $symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
-            $conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('DSGVO', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
-            if($conn->error) $accept = false;
-        } else {
-            $err .= $conn->error;
-        }
-
-        if($accept){ //PAIR access
-            $nonce = random_bytes(24);
-            $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$user_public);
-            $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
-            if($conn->error) $accept = false;
-        } else {
-            $err .= $conn->error;
-        }
-
-        //TODO encrypt
-        $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
-    } else {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Error: </strong>Incorrektes Passwort.</div>';
-    }
-} elseif(isset($_POST['active_encryption'])){
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
-}
-
-$result = $conn->query("SELECT * FROM policyData");
-$row = $result->fetch_assoc();
 ?>
 
 <form method="POST">
@@ -165,37 +92,4 @@ $row = $result->fetch_assoc();
     </div>
     <br><hr><br>
 </form>
-
-<form method="POST">
-    <div class="row">
-        <div class="col-md-4">
-            <label>Aktuelles Passwort</label>
-            <input type="password" autocomplete="new-password" name="encryption_current_pass" class="form-control">
-        </div>
-    </div>
-    <?php
-    $result = $conn->query("SELECT activeEncryption FROM configurationData");
-    if($result && ($row = $result->fetch_assoc())){
-        if($row['activeEncryption'] == 'TRUE'){
-            echo '<button type="submit" name="deactive_encryption">Verschlüsselung DEAKTIVIEREN</button>';
-        } else {
-            echo '<div class="row">
-            <div class="col-md-4">
-            <label>Neues Login Passwort</label>
-            <input type="password" name="encryption_pass" class="form-control" />
-            </div>
-            <div class="col-md-4">
-            <label>Neues Login Passwort Bestätigen</label>
-            <input type="password" name="encryption_pass_confirm" class="form-control" />
-            </div>
-            <div class="col-md-4">
-            <label>OK</label><br>
-            <button type="submit" name="active_encryption" class="btn btn-warning" >Verschlüsselung Aktivieren</button>
-            </div>
-            </div>';
-        }
-    }
-    ?>
-</form>
-
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
