@@ -2205,7 +2205,15 @@ if($row['version'] < 141){
         echo '<br>Team Update: Abteilungen';
     }
 }
-//if($row['version'] < 142){}
+
+if($row['version'] < 142){
+    $conn->query("DELETE FROM dsgvo_training_questions WHERE id = 1 OR id = 2");
+    if(!$conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: remove test questions';
+    }
+}
 //if($row['version'] < 143){}
 
 
