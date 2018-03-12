@@ -160,7 +160,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
-  <link href="plugins/homeMenu/homeMenu_green.css" rel="stylesheet" />
   <title>Register</title>
 </head>
 <style>
@@ -171,7 +170,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
   <div class="container-fluid">
-    <div class="navbar-header"><a class="navbar-brand" href="auth"><img alt="Connect" src="images/logo.png" height="30px" ></a></div>
+    <div class="navbar-header"><h3>Connect</h3></div>
   </div>
 </nav>
 
