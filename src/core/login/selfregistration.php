@@ -1,11 +1,11 @@
 <?php
 if(!empty($_POST['captcha'])){
   header('HTTP/1.0 403 Forbidden');
-  die("Malicious bot detected. IP has been detected, aborting all operations.");
+  die("Malicious bot detected. IP has been registered, aborting all operations."); //TODO ip has not been registered. yet.
 } else {
-  require '../language.php';
-  require "../connection.php";
-  include '../utilities.php';
+  require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'language.php';
+  require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'connection.php';
+  include dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'utilities.php';
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -160,7 +160,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   <script src="../plugins/jQuery/jquery-3.2.1.min.js"></script>
   <script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
   <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
-  <link href="plugins/homeMenu/homeMenu_green.css" rel="stylesheet" />
   <title>Register</title>
 </head>
 <style>
@@ -171,7 +170,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
   <div class="container-fluid">
-    <div class="navbar-header"><a class="navbar-brand" href="auth"><img alt="Connect" src="images/logo.png" height="30px" ></a></div>
+    <div class="navbar-header"><h3>Connect</h3></div>
   </div>
 </nav>
 

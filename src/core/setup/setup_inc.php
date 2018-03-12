@@ -195,11 +195,13 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE configurationData(
+        version INT(5),
         bookingTimeBuffer INT(3) DEFAULT '5',
         cooldownTimer INT(3) DEFAULT '2',
         enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-        activeEncryption ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
+        activeEncryption ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

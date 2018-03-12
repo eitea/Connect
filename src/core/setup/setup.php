@@ -200,7 +200,7 @@ ignore_user_abort(1);
             $conn->query($sql);
 
             //insert configs
-            $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer) VALUES (5, 2)";
+            $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, version) VALUES (5, 2, $VERSION_NUMBER)";
             $conn->query($sql);
             //insert ERP numbers
             $conn->query("INSERT INTO erp_settings (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
