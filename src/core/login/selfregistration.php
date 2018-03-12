@@ -1,11 +1,11 @@
 <?php
 if(!empty($_POST['captcha'])){
   header('HTTP/1.0 403 Forbidden');
-  die("Malicious bot detected. IP has been detected, aborting all operations.");
+  die("Malicious bot detected. IP has been registered, aborting all operations."); //TODO ip has not been registered. yet.
 } else {
-  require '../language.php';
-  require "../connection.php";
-  include '../utilities.php';
+  require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'language.php';
+  require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'connection.php';
+  include dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'utilities.php';
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
