@@ -409,6 +409,10 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 </form>
 <br>
 
+<?php if($companyRow['publicPGPKey']): ?>
+    <div class="page-seperated-section"><h4>Public Key</h4><?php echo $companyRow['publicPGPKey']; ?></div><br>
+<?php endif; ?>
+
 <!-- GENERAL -->
 <form method="POST" class="page-seperated-section">
   <div class="container-fluid">
