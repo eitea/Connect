@@ -26,8 +26,17 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
             $_SESSION['timeToUTC'] = intval($_POST['funZone']);
             $_SESSION['filterings'] = array();
             $_SESSION['color'] = $row['color'];
-            $_SESSION['privateKey'] = $row['privatePGPKey'] ? base64_encode(simple_decryption($row['privatePGPKey'], $_POST['password'])) : false;
-
+            //check key pairs
+            if(!$row['privatePGPKey']){
+                $keyPair = sodium_crypto_box_keypair();
+                $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+                $user_public = sodium_crypto_box_publickey($keyPair);
+                $encrypted = simple_encryption($private, $_POST['tester_pass']);
+                $conn->query("UPDATE UserData SET publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = ".$row['id']);
+                $_SESSION['privateKey'] = $private;
+            } else {
+                $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['tester_pass']);
+            }
             //if core admin
             $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");
             if($result && $result->num_rows > 0){

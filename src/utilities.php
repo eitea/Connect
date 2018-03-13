@@ -49,7 +49,7 @@ function isHoliday($ts) {
     }
     return false;
 }
-
+//name should be clean_input or sanitize_input
 function test_input($data, $strong = false) {
     //REGEXString
     if($strong){

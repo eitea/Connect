@@ -29,7 +29,7 @@ function openSurveyModal(){
 <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 <script>
 $("#feedback_form").submit(function(event){
-    console.log("feedBack");
+    //console.log("feedBack");
     event.preventDefault();
     var img = window.feedbackCanvasObject.toDataURL()
     var postData =  {
@@ -66,7 +66,7 @@ $(".feedback-button").on("click",function(){
         window.feedbackCanvasObject = canvas
         $('#feedbackModal').appendTo("body").modal('show');
     });
-})
+});
 
 var reload = 0;
 function onPageLoad(){
@@ -181,7 +181,6 @@ $(document).ready(function() {
   $(':submit').click(function() {
     isDirty = false;
   });
-
   window.onbeforeunload = function() {
     if(isDirty){ return "You have unsaved changes on this page. Discard your changes?"; }
     document.getElementById("loader").style.display = "block";

@@ -2200,10 +2200,14 @@ if($row['version'] < 140){
 if($row['version'] < 141){
     $conn->query("ALTER TABLE teamData ADD COLUMN isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
     if(!$conn->error){
-        echo $conn->error;
-    } else {
         echo '<br>Team Update: Abteilungen';
     }
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectstart DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL");
+    if(!$conn->error){
+        echo '<br>Tasks Update: Aktiv - Geplant';
+    }
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectend DATETIME DEFAULT '0000-00-00 00:00:00' NOT NULL");
 }
 
 //if($row['version'] < 142){}

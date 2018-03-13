@@ -17,7 +17,7 @@ $routes = array(
   'system/designer' => 'core/system/templateSelect.php',            'system/clients' => 'core/system/editCustomers.php',         'system/clientDetail' => 'core/system/editCustomer_detail.php',
   'system/previewTem' => 'core/system/templatePreview.php',         'system/downloadTem' => 'core/system/templateDownload.php',  'system/editTemp' => 'core/system/templateEdit.php',
   'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          'system/restic' => 'core/system/resticBackup.php',
-  'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/archiveOptions.php',
+  'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/archiveOptions.php',        'system/security' => 'core/system/securitySettings.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',

@@ -17,12 +17,13 @@ include dirname(dirname(__DIR__)) .'/version_number.php';
 $invalidLogin = "";
 
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['loginButton'])) {
-    $query = "SELECT * FROM  UserData  WHERE email = '" . test_input($_POST['loginName']) . "' ";
-    $result = mysqli_query($conn, $query);
+    $result = $conn->query("SELECT * FROM  UserData  WHERE email = '" . test_input($_POST['loginName']) . "' ");
     if($result){
         $row = $result->fetch_assoc();
+    } else {
+        echo $conn->error;
     }
-    if(crypt($_POST['password'], $row['psw']) == $row['psw']) {
+    if($result && crypt($_POST['password'], $row['psw']) == $row['psw']) {
         $redirect = "../user/home";
         $_SESSION['userid'] = $row['id'];
         $_SESSION['firstname'] = $row['firstname'];
@@ -30,8 +31,17 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
         $_SESSION['timeToUTC'] = intval($_POST['funZone']);
         $_SESSION['filterings'] = array();
         $_SESSION['color'] = $row['color'];
-        $_SESSION['privateKey'] = $row['privatePGPKey'] ? simple_decryption($row['privatePGPKey'], $_POST['password']) : false; //base64 encoded
-
+        //check key pairs
+        if(!$row['privatePGPKey']){
+            $keyPair = sodium_crypto_box_keypair();
+            $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+            $user_public = sodium_crypto_box_publickey($keyPair);
+            $encrypted = simple_encryption($private, $_POST['password']);
+            $conn->query("UPDATE UserData SET publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = ".$row['id']);
+            $_SESSION['privateKey'] = $private;
+        } else {
+            $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['password']);
+        }
         //if core admin
         $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
         $result = $conn->query($sql);

@@ -357,57 +357,57 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 ?>
 
 <div class="page-seperated-body page-header-fixed">
-<div class="page-header page-seperated-section">
-  <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
-    <div class="page-header-button-group">
-      <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
+    <div class="page-header page-seperated-section">
+        <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
+            <div class="page-header-button-group">
+                <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </h3>
     </div>
-  </h3>
-</div>
 </div>
 <div class="page-seperated-body page-content-fixed-130">
 <form method="POST">
-  <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4>
+    <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4>
+                </div>
+                <div class="modal-body">
+                    <?php echo $lang['WARNING_DELETE_COMPANY']; ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
+                    <button type="submit" name='deleteCompany' class="btn btn-warning"><?php echo $lang['CONFIRM']; ?></button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <?php echo $lang['WARNING_DELETE_COMPANY']; ?>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
-          <button type="submit" name='deleteCompany' class="btn btn-warning"><?php echo $lang['CONFIRM']; ?></button>
-        </div>
-      </div>
     </div>
-  </div>
 </form>
 
 <!-- LOGO -->
 <form method="post" enctype="multipart/form-data" class="page-seperated-section">
-  <div class="container-fluid">
-    <div class="row">
-      <h4> Logo
-        <div class="page-header-button-group">
-          <button type="submit" name="delete_logo" class="btn btn-default"><i class="fa fa-trash-o"></i></button>
-          <button type="submit" name="save_logo" class="btn btn-default" value="<?php echo $cmpID;?>"><i class="fa fa-floppy-o"></i></button>
+    <div class="container-fluid">
+        <div class="row">
+            <h4> Logo
+                <div class="page-header-button-group">
+                    <button type="submit" name="delete_logo" class="btn btn-default"><i class="fa fa-trash-o"></i></button>
+                    <button type="submit" name="save_logo" class="btn btn-default" value="<?php echo $cmpID;?>"><i class="fa fa-floppy-o"></i></button>
+                </div>
+            </h4>
         </div>
-      </h4>
     </div>
-  </div>
-  <div class="container-fluid">
-    <div class="col-sm-4">
-      <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
-    </div>
-    <div class="col-sm-8">
-      <input type="file" name="fileToUpload"/>
-      <small>Empfohlen 350x200px; Max. 5MB</small>
-    </div>
-  </div>
-</form>
-<br>
+    <div class="container-fluid">
+        <div class="col-sm-4">
+            <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
+            </div>
+            <div class="col-sm-8">
+                <input type="file" name="fileToUpload"/>
+                <small>Empfohlen 350x200px; Max. 5MB</small>
+            </div>
+        </div>
+    </form>
+    <br>
 
 <?php if($companyRow['publicPGPKey']): ?>
     <div class="page-seperated-section"><h4>Public Key</h4><?php echo $companyRow['publicPGPKey']; ?></div><br>

@@ -170,157 +170,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    if(isset($_POST['isDSGVOAdmin'])){
-        if(secure_data('DSGVO', 'DUMMY', 'encrypt', $userID, $privateKey) != 'DUMMY'){ //encryption is active
-            $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $x");
-            if($result && ( $row = $result->fetch_assoc()) && $row['publicPGPKey']){
-                $public = $row['publicPGPKey'];
-            } elseif(isset($psw)) {
-                $keyPair = sodium_crypto_box_keypair();
-                $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-                $public = base64_encode(sodium_crypto_box_publickey($keyPair));
-                $content_personal = $private." \n".$public;
-                $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
-                $conn->query("UPDATE UserData SET publicPGPKey = '".$public."', privatePGPKey = '".$private_encrypt."' WHERE id = $userID");
-            } else {
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Das DSGVO Modul kann nicht ohne eine Passwortänderung des Benutzers aktiviert werden.</div>';
-            }
-
-            if(issset($public)){
-                $public = base64_decode($public);
-                $result = $conn->query("SELECT privateKey, publicPGPKey FROM security_access a, security_modules m WHERE a.userID = $userID AND a.module = 'DSGVO'
-                    AND m.module = 'DSGVO' AND a.outDated = 'FALSE' AND m.outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
-                if($result && ( $row=$result->fetch_assoc() )){
-                    $public_module = base64_decode($row['publicPGPKey']);
-                    $cipher_private_module = base64_decode($row['privateKey']);
-
-                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
-
-                    $nonce = random_bytes(24);
-                    $private_encrypt = $nonce . sodium_crypto_box($private_module, $nonce, $private_module.$public);
-                    $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
-                    echo $conn->error;
-                    $conn->query("UPDATE UserData SET forcePswChange = 1 WHERE id = $x;");
-                    echo $conn->error;
-                    $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
-                 } else {
-                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Kein Schlüsselpaar gefunden. '.$conn->error.'</div>';
-                 }
-             }
-
-        } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Keine Verschlüsselung</div>';
-            $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'";
-        }
-    } else {
-        $sql = "UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-
-    if(isset($_POST['isCoreAdmin'])){
-        $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
-    } else {
-        $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isDynamicProjectsAdmin'])){
-        $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
-    } else {
-        $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isTimeAdmin'])){
-        $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isProjectAdmin'])){
-        $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isReportAdmin'])){
-        $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isERPAdmin'])){
-        $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['isFinanceAdmin'])){
-        $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
-    }$conn->query($sql);
-    if(isset($_POST['canStamp'])){
-        $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
-        $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canEditTemplates'])){
-        $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canUseSocialMedia'])){
-        $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canCreateTasks'])){
-        $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canUseArchive'])){
-        $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canUseClients'])){
-        $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canUseSuppliers'])){
-        $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canEditClients'])){
-        $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-    if(isset($_POST['canEditSuppliers'])){
-        $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
-    } else {
-        $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
-    }
-    $conn->query($sql);
-
     echo mysqli_error($conn);
     if($userID == $x){
         redirect("../system/users?ACT=$x");
@@ -348,17 +197,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $selection_company = '';
 $result = $conn->query("SELECT id, name FROM companyData");
 while($row = $result->fetch_assoc()){
-    $selection_company .= '<label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br>';
+    $selection_company .= '<div class="col-md-3"><label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br></div>';
 }
 $stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
 $stmt_company_relationship->bind_param('i', $x);
 ?>
 <br>
 
-<div class="container-fluid panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+<div class="container-fluid panel-group" id="accordion">
   <?php
   $result = $conn->query("SELECT *, UserData.id AS user_id FROM UserData
-  INNER JOIN $roleTable ON $roleTable.userID = UserData.id
   INNER JOIN $intervalTable ON $intervalTable.userID = UserData.id
   LEFT JOIN socialprofile ON socialprofile.userID = UserData.id
   WHERE endDate IS NULL ORDER BY UserData.id ASC");
@@ -369,7 +217,7 @@ $stmt_company_relationship->bind_param('i', $x);
       ?>
 
       <div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="heading<?php echo $x; ?>">
+        <div class="panel-heading" id="heading<?php echo $x; ?>">
           <h4 class="panel-title">
             <div class="row">
               <div class="col-md-6">
@@ -436,7 +284,8 @@ $stmt_company_relationship->bind_param('i', $x);
                     <input type="password" class="form-control" name="passwordConfirm" placeholder="* * * *">
                   </div>
                 </div>
-                <div class="form-group">
+              </div>
+              <div class="row">
                   <div class="col-md-2">
                     <?php echo $lang['SUPERVISOR']; ?>:
                   </div>
@@ -451,15 +300,14 @@ $stmt_company_relationship->bind_param('i', $x);
                     ?>
                     </select>
                   </div>
-                  <div class="col-md-3" >
-                    <label style="float:right;"  ><?php echo "Last Password Change: ".(date_create($row['lastPswChange'])->format('d.m.Y')); ?></label>
+                  <div class="col-md-4 text-right">
+                    <label><?php echo "Last Password Change: ".(date_create($row['lastPswChange'])->format('d.m.Y')); ?></label>
                   </div>
                   <div class="col-md-3" >
-                    <button type="button" class="btn btn-danger" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
+                    <button type="button" class="btn btn-danger btn-block" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
                   </div>
-                </div>
               </div>
-              <div class="container-fluid radio">
+              <div class="row radio">
                 <div class="col-md-2">
                   <?php echo $lang['GENDER']; ?>:
                 </div>
@@ -474,7 +322,7 @@ $stmt_company_relationship->bind_param('i', $x);
                   </label>
                 </div>
               </div>
-              <div class="container-fluid">
+              <div class="row">
                 <div class="col-md-5">
                   <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($row['beginningDate'],0,10); ?></p>
                 </div>
@@ -487,106 +335,23 @@ $stmt_company_relationship->bind_param('i', $x);
                   <input type="text" class="form-control datepicker" name="exitDate" value="<?php echo substr($row['exitDate'],0,10); ?>"/>
                 </div>
               </div>
-              <br>
-              <div class="container-fluid">
-                <div class="col-md-4">
-                  <?php echo $lang['ADMIN_MODULES']; ?>: <br>
-                  <div class="checkbox">
-                    <div class="col-md-6">
-                      <label>
-                      <input type="checkbox" name="isCoreAdmin" <?php if($row['isCoreAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isTimeAdmin" <?php if($row['isTimeAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isReportAdmin" <?php if($row['isReportAdmin'] == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="canEditSuppliers" <?php if($row['canEditSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
-                      </label>
-                    </div>
-                    <div class="col-md-6">
-                      <label>
-                        <input type="checkbox" name="isERPAdmin" <?php if($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isDynamicProjectsAdmin" <?php if($row['isDynamicProjectsAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isFinanceAdmin" <?php if($row['isFinanceAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
-                      </label><br>
-                      <label>
-                        <input type="checkbox" name="isDSGVOAdmin" <?php if($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canEditClients" <?php if($row['canEditClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <?php echo $lang['USER_MODULES']; ?>:
-                  <div class="checkbox">
-                  <div class="col-md-6">
-                      <label>
-                        <input type="checkbox" name="canStamp" <?php if($row['canStamp'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canBook" <?php if($row['canBook'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canEditTemplates" <?php if($row['canEditTemplates'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canUseSocialMedia" <?php if($row['canUseSocialMedia'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
-                      </label>
-                    </div>
-                    <div class="col-md-6">
-                      <label>
-                        <input type="checkbox" name="canCreateTasks" <?php if($row['canCreateTasks'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
-                      </label>
-                      <label>
-                        <input type="checkbox" name="canUseArchive" <?php if($row['canUseArchive'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canUseClients" <?php if($row['canUseClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
-                      </label>
-                      <br>
-                      <label>
-                        <input type="checkbox" name="canUseSuppliers" <?php if($row['canUseSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                    <?php echo $lang['COMPANIES']; ?>: <br>
-                    <div class="checkbox">
-                        <?php
-                        $selection_company_checked = $selection_company;
-                        $stmt_company_relationship->execute();
-                        $result_relation = $stmt_company_relationship->get_result();
-                        while($row_relation = $result_relation->fetch_assoc()){
-                            $needle = 'value="'.$row_relation['companyID'].'"';
-                            if(strpos($selection_company_checked, $needle) !== false){
-                                $selection_company_checked = str_replace($needle, $needle.' checked ', $selection_company_checked);
-                            }
+              <!-- ROLES MOVED TO SECURITY -->
+              <div class="row">
+                  <div class="col-md-12"><?php echo $lang['COMPANIES']; ?>:</div>
+                    <?php
+                    $selection_company_checked = $selection_company;
+                    $stmt_company_relationship->execute();
+                    $result_relation = $stmt_company_relationship->get_result();
+                    while($row_relation = $result_relation->fetch_assoc()){
+                        $needle = 'value="'.$row_relation['companyID'].'"';
+                        if(strpos($selection_company_checked, $needle) !== false){
+                            $selection_company_checked = str_replace($needle, $needle.' checked ', $selection_company_checked);
                         }
-                        echo $selection_company_checked;
-                        ?>
-                    </div>
-                    <small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small>
-                </div>
+                    }
+                    echo $selection_company_checked;
+                    ?>
+                <div class="col-md-12"><small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small></div>
               </div>
-              <br><br>
               <!-- Interval table -->
               <div class="container-fluid well">
                 <div class="row">
@@ -608,34 +373,38 @@ $stmt_company_relationship->bind_param('i', $x);
                 </div>
                 <br>
                 <div class="row">
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['mon']; ?>
-                    <input type="number" step="any" class="form-control" name="mon" size="2" value= "<?php echo $row['mon']; ?>" />
-                  </div>
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['tue']; ?>
-                    <input type="number" step="any" class="form-control" name="tue" size="2" value= "<?php echo $row['tue']; ?>" />
-                  </div>
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['wed']; ?>
-                    <input type="number" step="any" class="form-control" name="wed" size="2" value= "<?php echo $row['wed']; ?>" />
-                  </div>
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['thu']; ?>
-                    <input type="number" step="any" class="form-control" name="thu" size="2" value= "<?php echo $row['thu']; ?>" />
-                  </div>
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['fri']; ?>
-                    <input type="number" step="any" class="form-control" name="fri" size="2" value= "<?php echo $row['fri']; ?>" />
-                  </div>
-                  <div style="width:11%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['sat']; ?>
-                    <input type="number" step="any" class="form-control" name="sat" size="2" value= "<?php echo $row['sat']; ?>" />
-                  </div>
-                  <div style="width:10%; float:left; margin-left:3%">
-                    <?php echo $lang['WEEKDAY_TOSTRING']['sun']; ?>
-                    <input type="number" step="any" class="form-control" name="sun" size="2" value= "<?php echo $row['sun']; ?>" />
-                  </div>
+                    <div class="col-md-7">
+                        <div style="width:23%; float:left;">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['mon']; ?>
+                            <input type="number" step="any" class="form-control" name="mon" size="2" value= "<?php echo $row['mon']; ?>" />
+                        </div>
+                        <div style="width:23%; float:left; margin-left:3%">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['tue']; ?>
+                            <input type="number" step="any" class="form-control" name="tue" size="2" value= "<?php echo $row['tue']; ?>" />
+                        </div>
+                        <div style="width:22%; float:left; margin-left:3%">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['wed']; ?>
+                            <input type="number" step="any" class="form-control" name="wed" size="2" value= "<?php echo $row['wed']; ?>" />
+                        </div>
+                        <div style="width:23%; float:left; margin-left:3%">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['thu']; ?>
+                            <input type="number" step="any" class="form-control" name="thu" size="2" value= "<?php echo $row['thu']; ?>" />
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div style="width:31%; float:left;">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['fri']; ?>
+                            <input type="number" step="any" class="form-control" name="fri" size="2" value= "<?php echo $row['fri']; ?>" />
+                        </div>
+                        <div style="width:32%; float:left; margin-left:3%">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['sat']; ?>
+                            <input type="number" step="any" class="form-control" name="sat" size="2" value= "<?php echo $row['sat']; ?>" />
+                        </div>
+                        <div style="width:31%; float:left; margin-left:3%">
+                            <?php echo $lang['WEEKDAY_TOSTRING']['sun']; ?>
+                            <input type="number" step="any" class="form-control" name="sun" size="2" value= "<?php echo $row['sun']; ?>" />
+                        </div>
+                    </div>
                 </div>
               </div>
               <div class="container-fluid well">
@@ -708,8 +477,8 @@ $stmt_company_relationship->bind_param('i', $x);
               <br><br>
 
             <!-- Delete confirm modal -->
-            <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-              <div class="modal-dialog modal-md" role="document">
+            <div class="modal fade bs-example-modal-sm<?php echo $x; ?>" tabindex="-1">
+              <div class="modal-dialog modal-md">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title">Do you really wish to delete <?php echo $row['firstname'].' '.$row['lastname']; ?> ?</h4>
