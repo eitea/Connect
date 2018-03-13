@@ -820,8 +820,8 @@ $lang_eng['MY_REQUESTS'] = 'My Requests';
 $lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 
 //TODO: Find a good name
-$lang_eng['MESSAGING'] = 'Messages';
-$lang_ger['MESSAGING'] = 'Nachrichten';
+$lang_eng['MESSAGING'] = 'Post';
+$lang_ger['MESSAGING'] = 'Post ';
 
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
