@@ -2208,6 +2208,13 @@ if($row['version'] < 141){
         echo '<br>Tasks Update: Aktiv - Geplant';
     }
     $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectend DATETIME DEFAULT '0000-00-00 00:00:00' NOT NULL");
+
+    $conn->query("DELETE FROM dsgvo_training_questions WHERE id = 1 OR id = 2");
+    if(!$conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Training: remove test questions';
+    }
 }
 
 //if($row['version'] < 142){}
