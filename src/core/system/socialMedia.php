@@ -122,6 +122,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                     echo '</tr>';
                     ?>
                     <script>setInterval(function(){updateSocialBadge("#badge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
+
+
+                    <!-- TODO: Chat is here -->
+
                     <!-- chat modal -->
                     <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $x; ?>">
                         <div class="modal-dialog" role="form">

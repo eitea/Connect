@@ -835,6 +835,18 @@ $lang_ger['POST_TO'] = 'An';
 $lang_eng['POST'] = 'Post message';
 $lang_ger['POST'] = 'Nachricht verschicken';
 
+$lang_eng['MESSAGE'] = 'Message';
+$lang_ger['MESSAGE'] = 'Nachricht';
+
+$lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
+$lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
+
+$lang_eng['SUBJECT_NOT_SPECIFIED'] = 'There is no subject specified!';
+$lang_ger['SUBJECT_NOT_SPECIFIED'] = 'Es wurde kein Betreff angegeben!';
+
+$lang_eng['MESSAGE_NOT_SPECIFIED'] = 'There is no message specified!';
+$lang_ger['MESSAGE_NOT_SPECIFIED'] = 'Es wurde keine Nachricht eingegeben!';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 
