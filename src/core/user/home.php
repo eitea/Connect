@@ -22,7 +22,7 @@
 <script type="text/javascript">
 setTimeout(function(){
   location = ''
-},120000)
+},180000)
 </script>
 
 <?php

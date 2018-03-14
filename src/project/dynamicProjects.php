@@ -56,7 +56,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
             <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
                 <div class="container-fluid">
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" onclick="resetNewTask()" data-target="#editingModal-" >New</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
                     <li class="divider"></li>
                     <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
                 </div>
@@ -984,30 +984,11 @@ function editTemplate(){
         });
     }
 }
-function checkInput(event){
-    //check Input
-    form = event.target;
-    if(tinymce.activeEditor.getContent()==""){
-        if(form.getElementsByTagName("textarea")[0].textLength<1){
-            alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
-            return false;
-        }
-    }
-
-    if(tinymce.activeEditor.getContent().length>(<?php
-    $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
-    $maxSQL = $max->fetch_assoc();
-    echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
-        alert("Description Too Big");
-        return false;
-    }
-    <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
-}
-function resetNewTask(){
-    $("#editingModal- .modal-title")[0].innerText = "Task editieren";
-    isTemplate = $("#editingModal- #isTemplate")[0];
-    $("#editingModal- form")[0].removeChild(isTemplate);
-}
+// function resetNewTask(){
+//     $("#editingModal- .modal-title")[0].innerText = "Task editieren";
+//     isTemplate = $("#editingModal- #isTemplate")[0];
+//     $("#editingModal- form")[0].removeChild(isTemplate);
+// }
 function reviewChange(event,id){
     projectid = id;
     needsReview = event.target.checked ? 'TRUE' : 'FALSE';
