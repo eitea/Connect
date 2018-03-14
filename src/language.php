@@ -823,6 +823,18 @@ $lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 $lang_eng['MESSAGING'] = 'Post';
 $lang_ger['MESSAGING'] = 'Post ';
 
+$lang_eng['SUBJECT'] = 'Subject';
+$lang_ger['SUBJECT'] = 'Betreff';
+
+$lang_eng['SEND'] = 'Send';
+$lang_ger['SEND'] = 'Senden';
+
+$lang_eng['POST_TO'] = 'To';
+$lang_ger['POST_TO'] = 'An';
+
+$lang_eng['POST'] = 'Post message';
+$lang_ger['POST'] = 'Nachricht verschicken';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 

@@ -111,7 +111,7 @@ $routesENG[] = array("name"=>"My Times", "url"=>"../user/time", "tags"=>array("M
 $routesGER[] = array("name"=>"Meine Zeiten", "url"=>"../user/time", "tags"=>array("Monatsbericht"));
 $routesENG[] = array("name"=>"Request", "url"=>"../user/request");
 $routesGER[] = array("name"=>"Anträge", "url"=>"../user/request", "tags"=>array("Antrag stellen"));
-//TODO: Add Tags?
+//TODO: Add Tags
 $routesENG[] = array("name"=>"Request", "url"=>"../social/post");
 $routesGER[] = array("name"=>"Anträge", "url"=>"../social/post");
 $routesENG[] = array("name"=>"Book Projects", "url"=>"../user/book", "tags"=>array("Booking"));
