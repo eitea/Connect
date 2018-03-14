@@ -12,8 +12,8 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     $allHours = 0;
     $times = explode(' ', $estimate);
     foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
-        if(is_numeric($t) ||substr($t, -1) == 'h'){
-            $allHours += $t;
+        if(is_numeric($t) || substr($t, -1) == 'h'){
+            $allHours += intval($t);
         } elseif(substr($t, -1) == 'M'){
             $allHours += intval($t) * 730.5;
         } elseif(substr($t, -1) == 'w'){
@@ -338,7 +338,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //end if POST
 $completed_tasks = file_get_contents('task_changelog.txt', true);
 ?>
-
+<form method="POST">
+<?php
+if($filterings['tasks'] == 'ACTIVE_PLANNED'){
+    echo '<div class="text-right"><button type="submit" formaction="../tasks/icalDownload" formtarget="_blank" class="btn btn-warning">Als .ical Downloaden</button></div>';
+}
+?>
 <table class="table table-hover">
     <thead>
         <tr>
@@ -448,7 +453,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
-            $A = substr($row['projectstart'],0,10);
+            $A = substr(carryOverAdder_Hours($row['projectstart'], $timeToUTC),0,10);
             $B = $row['projectend'] == '0000-00-00 00:00:00' ? '' : substr($row['projectend'],0,10);
             echo '<td>'.$A.'</td>';
             echo '<td>'.$B.'</td>';
@@ -476,12 +481,12 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo $review.'>';
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
-            echo '<td><form method="POST">';
+            echo '<td>';
             if($useRow && $useRow['userID'] == $userID) {
                 $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
                 echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
+            } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
                 if(!$row['projectleader']){
                     echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
                 } else {
@@ -493,7 +498,8 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
             }
-            echo '</form></td>';
+            if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
+            echo '</td>';
             echo '</tr>';
 
             if(!$row['projectleader']){
@@ -560,6 +566,9 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         <!--/training-->
     </tbody>
 </table>
+</form>
+<div id="editingModalDiv">
+    <?php echo $modals; ?>
     <div id="selectTemplate" >
         <div class="modal fade" id="template-list-modal">
             <form method="POST" onsubmit=' return setUpDeleteTemplate()'>
@@ -592,8 +601,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             </form>
         </div>
     </div>
-<div id="editingModalDiv">
-    <?php echo $modals; ?>
     <?php if($occupation): ?>
     <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">

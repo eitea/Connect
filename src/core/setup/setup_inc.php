@@ -1203,7 +1203,13 @@ function create_tables($conn) {
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectowner) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectleader) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1215,6 +1221,9 @@ function create_tables($conn) {
         position VARCHAR(10) DEFAULT 'normal' NOT NULL,
         PRIMARY KEY(projectid, userid),
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (userid) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
@@ -1252,7 +1261,11 @@ function create_tables($conn) {
         teamid INT(6) UNSIGNED,
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (teamid) REFERENCES teamData(id)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
+
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1264,7 +1277,10 @@ function create_tables($conn) {
         logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         userID INT(6),
         extra1 VARCHAR(250),
-        extra2 VARCHAR(450)
+        extra2 VARCHAR(450),
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     )");
 
     $sql = "CREATE TABLE sharedfiles (
