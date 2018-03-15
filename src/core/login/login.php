@@ -17,7 +17,7 @@ include dirname(dirname(__DIR__)) .'/version_number.php';
 $invalidLogin = "";
 
 if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['loginButton'])) {
-    $result = $conn->query("SELECT * FROM  UserData  WHERE email = '" . test_input($_POST['loginName']) . "' ");
+    $result = $conn->query("SELECT * FROM UserData WHERE email = '" . test_input($_POST['loginName']) . "' ");
     if($result){
         $row = $result->fetch_assoc();
     } else {
