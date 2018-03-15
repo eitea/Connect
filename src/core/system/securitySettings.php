@@ -18,7 +18,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //you can only deactivate if you can decrypt every module.
         $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE'");
         if(count($encrypted_modules) > $result->num_rows){
-            
+
         }
         $conn->query("UPDATE security_company SET outDated = 'TRUE'");
         $conn->query("UPDATE security_modules SET outDated = 'TRUE'");
@@ -84,113 +84,138 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(!empty($_POST['saveRoles'])){
+        $error = '';
         $x = intval($_POST['saveRoles']);
         if(isset($_POST['isDSGVOAdmin'])){
             $conn->query("UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'");
         } else {
             $conn->query("UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'");
         }
+        $error = $conn->error;
         if(isset($_POST['isCoreAdmin'])){
             $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
         } else {
             $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isDynamicProjectsAdmin'])){
             $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
         } else {
             $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isTimeAdmin'])){
             $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isProjectAdmin'])){
             $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isReportAdmin'])){
             $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isERPAdmin'])){
             $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['isFinanceAdmin'])){
             $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
-        }$conn->query($sql);
+        }
+        $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canStamp'])){
             $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
             $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canEditTemplates'])){
             $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canUseSocialMedia'])){
             $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canCreateTasks'])){
             $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canUseArchive'])){
             $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canUseClients'])){
             $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canUseSuppliers'])){
             $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canEditClients'])){
             $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
         if(isset($_POST['canEditSuppliers'])){
             $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
         } else {
             $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
         }
         $conn->query($sql);
+        $error = $conn->error;
+        if($error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+        }
     }
 }
 ?>

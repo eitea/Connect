@@ -125,7 +125,8 @@ $result = $conn->query(
     ) temp"
 );
 echo $conn->error;
-$userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredSurveys = $userHasSurveys = 0;
+if($result) $userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 if(!$userHasSurveys){
     $result = $conn->query(
         "SELECT count(*) count FROM (
@@ -154,7 +155,7 @@ if(!$userHasSurveys){
         ) temp"
     );
     echo $conn->error;
-    $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+    if($result) $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
 $userHasUnansweredOnLoginSurveys = false;
 if($userHasUnansweredSurveys){

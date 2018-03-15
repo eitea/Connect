@@ -2223,6 +2223,7 @@ if($row['version'] < 141){
         echo '<br>FK: task - teams';
     }
 
+    $conn->query("ALTER TABLE dynamicprojectsemployees MODIFY COLUMN userid INT(6) UNSIGNED");
     $conn->query("ALTER TABLE dynamicprojectsemployees ADD CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
     if($conn->error){
         echo $conn->error;
@@ -2230,6 +2231,7 @@ if($row['version'] < 141){
         echo '<br>FK: task - employees';
     }
 
+    $conn->query("ALTER TABLE dynamicprojectslogs MODIFY COLUMN userid INT(6) UNSIGNED");
     $conn->query("ALTER TABLE dynamicprojectslogs ADD CONSTRAINT fk_user_id FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
     if($conn->error){
         echo $conn->error;
@@ -2237,6 +2239,7 @@ if($row['version'] < 141){
         echo '<br>FK: task - logs';
     }
 
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectowner INT(6) UNSIGNED");
     $conn->query("ALTER TABLE dynamicprojects ADD CONSTRAINT fk_owner_id FOREIGN KEY (projectowner) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
     if($conn->error){
         echo $conn->error;
@@ -2244,6 +2247,7 @@ if($row['version'] < 141){
         echo '<br>FK: task - owner';
     }
 
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectleader INT(6) UNSIGNED");
     $conn->query("ALTER TABLE dynamicprojects ADD CONSTRAINT fk_leader_id FOREIGN KEY (projectleader) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE SET NULL");
     if($conn->error){
         echo $conn->error;
