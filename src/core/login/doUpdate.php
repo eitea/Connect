@@ -2205,6 +2205,25 @@ if($row['version'] < 141){
         echo '<br>Team Update: Abteilungen';
     }
 }
+
+if($row['version'] < 142){
+    $conn->query("CREATE TABLE messages(
+        userID INT(6) UNSIGNED not NULL,        
+        partner INT(6) UNSIGNED not NULL,
+        subject varchar2(60),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        PRIMARY KEY (userID),
+        FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+        )");
+    if(!$conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Team Update: Messages';
+    }
+}
 //if($row['version'] < 142){}
 //if($row['version'] < 143){}
 

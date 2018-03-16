@@ -36,6 +36,7 @@
 
                 <!-- modal footer -->
                 <div class="modal-footer">
+                    <!-- FIXME: Cancel Button not working yet -->
                     <button type="button" class="btn btn-default" data-dsismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                     <button type="submit" class="btn btn-warning" name="sendButton"><?php echo $lang['SEND']; ?></button>
                 </div>

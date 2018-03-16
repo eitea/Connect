@@ -1571,5 +1571,21 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+    
+    // messages [userID, partnerID, subject, message, picture, sent, seen]
+    $sql = "CREATE TABLE messages(
+        userID INT(6) UNSIGNED not NULL,        
+        partner INT(6) UNSIGNED not NULL,
+        subject varchar2(60),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        PRIMARY KEY (userID),
+        FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
 
 }
