@@ -838,6 +838,9 @@ $lang_ger['POST'] = 'Nachricht verschicken';
 $lang_eng['MESSAGE'] = 'Message';
 $lang_ger['MESSAGE'] = 'Nachricht';
 
+$lang_eng['CONVERSATIONS'] = 'Conversations';
+$lang_ger['CONVERSATIONS'] = 'Konversationen';
+
 $lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
 $lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
 
