@@ -45,8 +45,6 @@
             $message = $_POST['message'];
             $partnerID = -1;
 
-
-
             // select the partnerid from the database
             $sql = "SELECT * FROM socialprofile INNER JOIN userdata on userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = 'Lukas Troyer' GROUP BY userdata.id LIMIT 1";
             $result = $conn->query($sql);
@@ -57,7 +55,7 @@
             }
 
             // the partner was not found in the database or its the same user
-            if($partnerID == -1){
+            if($partnerID == -1 || $partnerID == $userID){
                 showInfo("Invalid Receiver");
                 return;
             }
@@ -108,14 +106,20 @@
     </form>
 
     <!-- Active Conversations -->
-    <!-- <h4><?php //echo $lang['CONVERSATIONS']; ?></h4>-->
+    <h4><?php echo $lang['CONVERSATIONS']; ?></h4>
     <?php
-       $result = $conn->query("SELECT id, firstname, lastname FROM UserData INNER JOIN roles ON roles.userID = UserData.id WHERE canUseSocialMedia = 'TRUE' ORDER BY lastname ASC");
+        $sql = "SELECT partnerID, firstname, lastname from UserData INNER JOIN messages ON messages.partnerID = userdata.id GROUP BY partnerID";
+        $result = $conn->query($sql);
         while($row = $result->fetch_assoc()){
             $name = "${row['firstname']} ${row['lastname']}";
-            $x = $row["id"];
+            $x = $row["partnerID"];
+            echo "Conversation: " . $name . " - ID: " . $x . "<br>";
         }
     ?>
+
+
+
+
 </div>
 
 <!--
