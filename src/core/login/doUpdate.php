@@ -2208,15 +2208,15 @@ if($row['version'] < 141){
 
 if($row['version'] < 142){
     $conn->query("CREATE TABLE messages(
+        messageID INT(6) UNSIGNED not NULL AUTO_INCREMENT,
         userID INT(6) UNSIGNED not NULL,        
-        partner INT(6) UNSIGNED not NULL,
-        subject varchar2(60),
+        partnerID INT(6) UNSIGNED not NULL,
+        subject varchar(60),
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
         seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        PRIMARY KEY (userID),
-        FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+        PRIMARY KEY (messageID)
         )");
     if(!$conn->error){
         echo $conn->error;
@@ -2224,7 +2224,6 @@ if($row['version'] < 142){
         echo '<br>Team Update: Messages';
     }
 }
-//if($row['version'] < 142){}
 //if($row['version'] < 143){}
 
 
