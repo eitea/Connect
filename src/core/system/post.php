@@ -4,7 +4,7 @@
 <!-- TODO: Badge -->
 <!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
-
+<!-- FIXME: There's a loading screen forever bc of the return (when invalid input) --> 
 
 <?php include dirname(dirname(__DIR__)) .'/header.php';?>
 
@@ -46,13 +46,15 @@
             $partnerID = -1;
 
             // select the partnerid from the database
-            $sql = "SELECT * FROM socialprofile INNER JOIN userdata on userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = 'Lukas Troyer' GROUP BY userdata.id LIMIT 1";
+            $sql = "SELECT * FROM socialprofile INNER JOIN userdata on userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY userdata.id LIMIT 1";
             $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $partnerID = $row['userID'];
                 }
             }
+
+            echo $partnerID . " " . $userID;
 
             // the partner was not found in the database or its the same user
             if($partnerID == -1 || $partnerID == $userID){
@@ -63,6 +65,12 @@
             // messages [userID, partnerID, subject, message, picture, sent, seen]
             $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partnerID, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");        
             
+            ?>
+            <script>
+                sendMessage(<?php echo $partnerID; ?>,$("#message<?php echo $partnerID; ?>").val(),"#messages<?php echo $partnerID; ?>",limit<?php echo $partnerID; ?>)
+            </script>
+            <?php
+
             showInfo("Message sent!");
         }
     ?>
@@ -107,7 +115,12 @@
 
     <!-- Active Conversations -->
     <h4><?php echo $lang['CONVERSATIONS']; ?></h4>
+    <script>
+        getMessages(<?php echo $partnerID; ?>, "#messages<?php echo $partnerID; ?>", true, limit<?php echo $partnerID; ?>)
+    </script>
+    
     <?php
+
         $sql = "SELECT partnerID, firstname, lastname from UserData INNER JOIN messages ON messages.partnerID = userdata.id GROUP BY partnerID";
         $result = $conn->query($sql);
         while($row = $result->fetch_assoc()){
@@ -117,15 +130,22 @@
         }
     ?>
 
+    
 
 
 
 </div>
 
-<!--
-TODO: Add AJAX Scripts to send and receive Messages (and one for Alerts)
+
+<!-- TODO: Add AJAX Scripts to send and receive Messages (and one for Alerts) -->
 
 <script>
+    /**
+    *  Receive new messages
+    * partner: the user_id of your conversation partner
+    * scroll: 
+    * limit: 
+    */
     function getMessages(partner, target, scroll = false, limit = 50) {
         $.ajax({
             url: 'ajaxQuery/AJAX_socialGetMessage.php',
@@ -144,10 +164,18 @@ TODO: Add AJAX Scripts to send and receive Messages (and one for Alerts)
             },
         })
     }
+
+    /**
+    *  Send messages
+    * partner: the user_id of your conversation partner
+    * scroll: 
+    * limit: 
+    */
     function sendMessage(partner, message, target, limit = 50) {
         if(message.length==0){
             return
         }
+
         $.ajax({
             url: 'ajaxQuery/AJAX_socialSendMessage.php',
             data: {
@@ -160,5 +188,6 @@ TODO: Add AJAX Scripts to send and receive Messages (and one for Alerts)
             },
         })
     }
--->
+</script>
+
 <?php include dirname(dirname(__DIR__)).'/footer.php'; ?>
