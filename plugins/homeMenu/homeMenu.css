@@ -255,11 +255,9 @@ i{
   margin-right:5px;
   margin-left:5px;
 }
-
 .bold{
   font-weight: bold;
 }
-
 .grey{
   color:grey;
 }
@@ -282,7 +280,15 @@ i{
   border: 1px solid #fbc871;
   box-shadow: 0 0 2px #fbc871;
 }
-
+.badge.alert-badge{
+    background-color: #f0ad4e;
+    font-weight: 300;
+    padding: 3px 6px;
+    margin:0 15px 0 30px;
+}
+.badge.alert-badge > a {
+    color:white;
+}
 span.select2.select2-container.select2-container--default {
   width: 100% !important;
 }
@@ -290,18 +296,6 @@ span.select2.select2-container.select2-container--default {
 .page-header-button-group{
   display:inline;
   padding-left:15px;
-}
-.badge.alert-badge{
-  position:absolute;
-  top:5px;
-  right:185px;
-  font-weight: 300;
-  padding: 3px 6px;
-  margin:0 15px 0 30px;
-  background-color: #f0ad4e;
-}
-.badge.alert-badge > a {
-	color:white;
 }
 
 .datetimepicker .active {

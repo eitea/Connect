@@ -63,6 +63,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         //TODO: foreach user with access to corresponding module, encrypt key with public key.
                         $result = $conn->query("SELECT * FROM roles");
                         while($row = $result->fetch_assoc()){
+
                         }
 
                         $nonce = random_bytes(24);
@@ -235,152 +236,152 @@ if(!empty($key_downloads)){
     <div class="collapse" id="password_info_encryption"><div class="well"><?php echo $lang['INFO_ENCRYPTION']; ?></div></div>
 
     <div class="row">
-        <div class="col-sm-4"><label><input id="activate_encryption" type="checkbox" <?php if($config_row['activeEncryption'] == 'TRUE') echo 'checked'; ?> name="activate_encryption" value="0" /> Aktiv</label></div>
+        <div class="col-sm-4"><label><input id="activate_encryption" type="checkbox" <?php if($config_row['activeEncryption'] == 'TRUE') echo 'checked'; ?> name="activate_encryption" value="1" /> Aktiv</label></div>
     </div>
     <div id="module-checkboxes" <?php if($config_row['activeEncryption'] == 'FALSE') echo 'style="display:none"'; ?> class="row">
         <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('TIME', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="TIME" /> Zeiterfassung</label></div>
         <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('PROJECT', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="PROJECT" /> Projekte</label></div>
         <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('REPORT', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="REPORT" /> Berichte</label></div>
-        <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('ERP', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="ERP" /> ERP</label></div>
+        <div class="col-md-3"><label><input type="checkbox" <?php if(array_key_exists('ERP', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="ERP" /> ERP</label></div>
         <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('FINANCE', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="FINANCE" /> Finanzen</label></div>
         <div class="col-md-3"><label><input type="checkbox" <?php if(array_key_exists('DSGVO', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="DSGVO" /> DSGVO</label></div>
     </div>
 </form>
 
 <br><hr>
- <h4>Benutzer Verwaltung</h4><br>
+<h4>Benutzer Verwaltung</h4><br>
 
- <div class="container-fluid panel-group" id="accordion">
-     <?php
-     $result = $conn->query("SELECT * FROM roles");
-     while ($result && ($row = $result->fetch_assoc())):
-         $x = $row['userID'];
-         ?>
-         <div class="panel panel-default">
-             <div class="panel-heading" role="tab" id="heading<?php echo $x; ?>">
-                 <h4 class="panel-title">
-                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>"><?php echo $userID_toName[$x]; ?></a>
-                 </h4>
-             </div>
-             <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>">
-                 <div class="panel-body">
-                     <form method="POST">
-                         <h4><?php echo $lang['ADMIN_MODULES']; ?></h4>
-                         <div class="row checkbox">
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isCoreAdmin" <?php if($row['isCoreAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isTimeAdmin" <?php if($row['isTimeAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isReportAdmin" <?php if($row['isReportAdmin'] == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isERPAdmin" <?php if($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isDynamicProjectsAdmin" <?php if($row['isDynamicProjectsAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isFinanceAdmin" <?php if($row['isFinanceAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="isDSGVOAdmin" <?php if($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canEditClients" <?php if($row['canEditClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
-                                 </label>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canEditSuppliers" <?php if($row['canEditSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
-                                 </label>
-                             </div>
-                         </div>
-                         <br><h4><?php echo $lang['USER_MODULES']; ?></h4>
-                         <div class="row checkbox">
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canStamp" <?php if($row['canStamp'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canBook" <?php if($row['canBook'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canEditTemplates" <?php if($row['canEditTemplates'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canUseSocialMedia" <?php if($row['canUseSocialMedia'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
-                                 </label>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canCreateTasks" <?php if($row['canCreateTasks'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
-                                 </label>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canUseArchive" <?php if($row['canUseArchive'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canUseClients" <?php if($row['canUseClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
-                                 </label><br>
-                             </div>
-                             <div class="col-md-3">
-                                 <label>
-                                     <input type="checkbox" name="canUseSuppliers" <?php if($row['canUseSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
-                                 </label>
-                             </div>
-                         </div>
-                         <br>
-                         <div class="row">
-                             <div class="col-sm-2 col-sm-offset-10 text-right">
-                                 <button type="submit" name="saveRoles" value="<?php echo $x; ?>" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-                             </div>
-                         </div>
-                     </form>
-                 </div>
-             </div>
-         </div><br>
-     <?php endwhile; ?>
- </div>
+<div class="container-fluid panel-group" id="accordion">
+    <?php
+    $result = $conn->query("SELECT * FROM roles");
+    while ($result && ($row = $result->fetch_assoc())):
+        $x = $row['userID'];
+        ?>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading<?php echo $x; ?>">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $x; ?>"><?php echo $userID_toName[$x]; ?></a>
+                </h4>
+            </div>
+            <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>">
+                <div class="panel-body">
+                    <form method="POST">
+                        <h4><?php echo $lang['ADMIN_MODULES']; ?></h4>
+                        <div class="row checkbox">
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isCoreAdmin" <?php if($row['isCoreAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isTimeAdmin" <?php if($row['isTimeAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isReportAdmin" <?php if($row['isReportAdmin'] == 'TRUE'){echo 'checked';} ?>  /><?php echo $lang['REPORTS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isERPAdmin" <?php if($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isDynamicProjectsAdmin" <?php if($row['isDynamicProjectsAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isFinanceAdmin" <?php if($row['isFinanceAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="isDSGVOAdmin" <?php if($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canEditClients" <?php if($row['canEditClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_CLIENTS']; ?>
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canEditSuppliers" <?php if($row['canEditSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_SUPPLIERS']; ?>
+                                </label>
+                            </div>
+                        </div>
+                        <br><h4><?php echo $lang['USER_MODULES']; ?></h4>
+                        <div class="row checkbox">
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canStamp" <?php if($row['canStamp'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['CAN_CHECKIN']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canBook" <?php if($row['canBook'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_BOOK']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canEditTemplates" <?php if($row['canEditTemplates'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_EDIT_TEMPLATES']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canUseSocialMedia" <?php if($row['canUseSocialMedia'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?>
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canCreateTasks" <?php if($row['canCreateTasks'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_CREATE_TASKS']; ?>
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canUseArchive" <?php if($row['canUseArchive'] == 'TRUE'){echo 'checked';} ?>/><?php echo $lang['CAN_USE_ARCHIVE']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canUseClients" <?php if($row['canUseClients'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_CLIENTS']; ?>
+                                </label><br>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canUseSuppliers" <?php if($row['canUseSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
+                                </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-2 col-sm-offset-10 text-right">
+                                <button type="submit" name="saveRoles" value="<?php echo $x; ?>" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div><br>
+    <?php endwhile; ?>
+</div>
 
- <script>
- $('#activate_encryption').change(function(){
-     if(this.checked){
-         $('#module-checkboxes').show();
-     } else {
-         $('#module-checkboxes').hide();
-     }
- });
+<script>
+$('#activate_encryption').change(function(){
+    if(this.checked){
+        $('#module-checkboxes').show();
+    } else {
+        $('#module-checkboxes').hide();
+    }
+});
 </script>
- <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>

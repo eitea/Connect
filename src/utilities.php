@@ -42,7 +42,7 @@ function carryOverAdder_Minutes($a, $b) {
 }
 
 function isHoliday($ts) {
-    require "connection.php";
+    global $conn;
     $result = $conn->query("SELECT * FROM holidays WHERE begin LIKE '" . substr($ts, 0, 10) . "%'"); //the sql § comparison aint working
     while($result && ($row = $result->fetch_assoc())){
         if(strpos($row['name'], '(§)')) return true;
@@ -131,50 +131,49 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     }
     if(!$activeEncryption) return $message;
     $privateKey = base64_decode($privateKey);
-    if($module == 'DSGVO'){
-        static $symmetric = false;
-        if(!$symmetric && $userID && $privateKey){
-            $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = 'DSGVO' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
-            if($result && ( $row=$result->fetch_assoc() )){
-                $cipher_private_module = base64_decode($row['privateKey']);
-                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
-                if($result && ( $row=$result->fetch_assoc() )){
-                    $public_module = base64_decode($row['publicPGPKey']);
-                    $cipher_symmetric = base64_decode($row['symmetricKey']);
-                    //decrypt access
-                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
-                    //decrypt module
-                    $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-                    $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
-                    $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
 
-                    if($symmetric){
-                        if($mode == 'encrypt'){
-                            return simple_encryption($message, $symmetric);
-                        } else {
-                            return simple_decryption($message, $symmetric);
-                        }
+    static $symmetric = false;
+    if(!$symmetric && $userID && $privateKey){
+        $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+        if($result && ( $row=$result->fetch_assoc() )){
+            $cipher_private_module = base64_decode($row['privateKey']);
+            $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+            if($result && ( $row=$result->fetch_assoc() )){
+                $public_module = base64_decode($row['publicPGPKey']);
+                $cipher_symmetric = base64_decode($row['symmetricKey']);
+                //decrypt access
+                $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+                //decrypt module
+                $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+                $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+                $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+
+                if($symmetric){
+                    if($mode == 'encrypt'){
+                        return simple_encryption($message, $symmetric);
+                    } else {
+                        return simple_decryption($message, $symmetric);
                     }
-                    $err = 'Could not retrieve symmetric Key';
-                    return $message;
-                } elseif($result){
-                    $err = 'Module encryption not active';
-                    return $message;
                 }
+                $err = 'Could not retrieve symmetric Key';
+                return $message;
             } elseif($result){
-                $err = 'User Access not found';
+                $err = 'Module encryption not active';
                 return $message;
             }
-            $err = $conn->error;
+        } elseif($result){
+            $err = 'User Access not found';
             return $message;
-        } elseif($symmetric) {
-            if($mode == 'encrypt'){
-                return simple_encryption($message, $symmetric);
-            } else {
-                return simple_decryption($message, $symmetric);
-            }
+        }
+        $err = $conn->error;
+        return $message;
+    } elseif($symmetric) {
+        if($mode == 'encrypt'){
+            return simple_encryption($message, $symmetric);
+        } else {
+            return simple_decryption($message, $symmetric);
         }
     }
     $err = 'Something went wrong';

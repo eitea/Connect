@@ -38,7 +38,7 @@ if($x){
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
     $dynrow['projectowner'] = $userID;
-    $dynrow['projectleader'] = 0;
+    $dynrow['projectleader'] = ($isDynamicProjectsAdmin == 'TRUE') ? 0 : $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0

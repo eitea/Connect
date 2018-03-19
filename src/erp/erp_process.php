@@ -57,7 +57,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $meta_porto_percentage = intval($_POST['meta_porto_percentage']);
     $proposal_row['portoRate'] =  $meta_porto_percentage;
   }
-
   if(isset($_POST['translate'])){
     if(!empty($_POST['copy_transition'])){
       $transit = $_POST['copy_transition'];
@@ -111,22 +110,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
   } elseif(isset($_POST['add_position_sum'])){
     $LAST_POSITION = intval($_POST['add_position_sum']) +1;
-    $conn->query("INSERT INTO products (historyID, position, name) VALUES($historyID, $LAST_POSITION, 'PARTIAL_SUM')");
+    $conn->query("INSERT INTO products (historyID, position, name) VALUES($historyID, $LAST_POSITION, '".secure_data('ERP', 'PARTIAL_SUM', 'encrypt', $userID, $privateKey)."')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_text']) && !empty($_POST['add_position_text_text'])){
     $LAST_POSITION = intval($_POST['add_position_text']) +1;
     $txt = test_input($_POST['add_position_text_text']);
-    $conn->query("INSERT INTO products (historyID, position, name, description) VALUES($historyID, $LAST_POSITION, 'CLEAR_TEXT', '$txt')");
+    $conn->query("INSERT INTO products (historyID, position, name, description) VALUES($historyID, $LAST_POSITION, '".secure_data('ERP', 'CLEAR_TEXT', 'encrypt', $userID, $privateKey)."', '$txt')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_position_page'])){
     $LAST_POSITION = intval($_POST['add_position_page']) +1;
-    $conn->query("INSERT INTO products (historyID, position, name) VALUES($historyID, $LAST_POSITION, 'NEW_PAGE')");
+    $conn->query("INSERT INTO products (historyID, position, name) VALUES($historyID, $LAST_POSITION, '".secure_data('ERP', 'NEW_PAGE', 'encrypt', $userID, $privateKey)."')");
     if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';}
   } elseif(isset($_POST['add_product'])){
     $LAST_POSITION = intval($_POST['add_product']) +1;
     if(!empty($_POST['add_product_name']) && !empty($_POST['add_product_quantity']) && !empty($_POST['add_product_price'])){
-      $product_name = test_input($_POST['add_product_name']);
-      $product_description = test_input($_POST['add_product_description']);
+      $product_name = secure_data('ERP', test_input($_POST['add_product_name']), 'encrypt', $userID, $privateKey);
+      $product_description = secure_data('ERP', test_input($_POST['add_product_description']));
       $product_quantity = floatval($_POST['add_product_quantity']);
       $product_price = floatval($_POST['add_product_price']);
       $product_tax_id = intval($_POST['add_product_taxes']);
@@ -151,13 +150,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $x = intval($_POST['update_product']);
     $check_result = $conn->query("SELECT name FROM products WHERE id = $x");
     if($check_row = $check_result->fetch_assoc()){
-      if($check_row['name'] == 'CLEAR_TEXT'){
-        $product_description = test_input($_POST['update_description_'.$x]);
+      if(secure_data('ERP', $check_row['name'], 'decrypt', $userID, $privateKey) == 'CLEAR_TEXT'){
+        $product_description = secure_data('ERP', test_input($_POST['update_description_'.$x]));
         $conn->query("UPDATE products SET description='$product_description' WHERE id = $x");
         if($conn->error){ echo $conn->error;} else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
       } elseif(!empty($_POST['update_name_'.$x]) && !empty($_POST['update_price_'.$x]) && !empty($_POST['update_quantity_'.$x])){
-        $product_name = test_input($_POST['update_name_'.$x]);
-        $product_description = test_input($_POST['update_description_'.$x]);
+        $product_name = secure_data('ERP', test_input($_POST['update_name_'.$x]));
+        $product_description = secure_data('ERP', test_input($_POST['update_description_'.$x]));
         $product_quantity = floatval($_POST['update_quantity_'.$x]);
         $product_purchase = floatval($_POST['update_purchase_'.$x]);
         $product_price = floatval($_POST['update_price_'.$x]);
@@ -242,8 +241,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $prod_row["description"] = $prod_row["description"];
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
-        echo '<td>'.$prod_row['name'].'</td>';
-        echo '<td style="max-width:500px;">'.$prod_row['description'].'</td>';
+        echo '<td>'.mc_status().' '.secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey).'</td>';
+        echo '<td style="max-width:500px;">'.mc_status().' '.secure_data('ERP', $prod_row['description'], 'decrypt').'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.intval($prod_row['percentage']).'%</td>';
@@ -356,7 +355,7 @@ while($unit_result && ($unit_row = $unit_result->fetch_assoc())){
 
 if($result){  $result->data_seek(0); }
 while($result && ($prod_row = $result->fetch_assoc())):
-  $prod_row["name"] = $prod_row["name"];
+  $prod_row["name"] = secure_data('ERP', $prod_row["name"], 'decrypt');
   $prod_row["description"] = $prod_row["description"];
   if($prod_row['name'] != 'NEW_PAGE' && $prod_row['name'] != 'PARTIAL_SUM'):
 $x = $prod_row['id'];

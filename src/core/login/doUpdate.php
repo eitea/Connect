@@ -1622,7 +1622,7 @@ if($row['version'] < 128){ //30.01.2018
     password VARCHAR(50) NOT NULL,
     logEnabled ENUM('TRUE','FALSE') NOT NULL,
     PRIMARY KEY (id))");
-    if(!$conn->query($sql)){
+    if($conn->error){
         echo $conn->error;
     } else {
         echo '<br>Projekte: Emails';

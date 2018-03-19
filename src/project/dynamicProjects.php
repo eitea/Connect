@@ -467,6 +467,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
+            echo '<br><small style="color:transparent;">'.$x.'</small>';
             echo '</td>';
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
             echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
@@ -495,8 +496,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
             if(!$useRow) echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button> ";
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
-                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
+                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
             }
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
             echo '</td>';
@@ -885,14 +886,6 @@ function appendModal(index){
    });
 }
 var existingModals = new Array();
-$('button[name=editModal]').click(function(){
-    var index = $(this).val();
-  if(existingModals.indexOf(index) == -1){
-      appendModal(index);
-  } else {
-    $('#editingModal-'+index).modal('show');
-  }
-});
 appendModal('');
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
@@ -919,28 +912,6 @@ $('.view-modal-open').click(function(){
   } else {
     $('#infoModal-'+index).modal('show');
   }
-});
-$(document).ready(function() {
-    dynamicOnLoad();
-    $('.table').DataTable({
-        ordering:false,
-        language: {
-            <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-        },
-        responsive: true,
-        dom: 'tf',
-        autoWidth: false,
-        fixedHeader: {
-            header: true,
-            headerOffset: 150,
-            zTop: 1
-        },
-        paging: false
-    });
-    setTimeout(function(){
-        window.dispatchEvent(new Event('resize'));
-        $('.table').trigger('column-reorder.dt');
-    }, 500);
 });
 function showClients(company, client, place){
     if(company != ""){
@@ -980,7 +951,7 @@ function activateTemplate(event){
         isTemplate.style = "visibility: hidden; height:1px; width:1px";
         $("#editingModal- form")[0].appendChild(isTemplate);
         $("#editingModal-").modal('show');
-    }else{
+    } else {
         $("#template-list-modal").modal('hide');
         var index = id[0].id;
         if(existingModals.indexOf(index) == -1){
@@ -991,13 +962,12 @@ function activateTemplate(event){
     }
 }
 function setUpDeleteTemplate(){
- id =  $(".select2-templates").select2("data");
- if(id[0].id==-1){
-    return false;
- }else{
-    $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
- }
-
+    id =  $(".select2-templates").select2("data");
+    if(id[0].id==-1){
+        return false;
+    } else {
+        $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
+    }
 }
 function editTemplate(){
     id =  $(".select2-templates").select2("data");
@@ -1026,6 +996,14 @@ function editTemplate(){
         });
     }
 }
+$('.table').on('click', 'button[name=editModal]', function(){
+    var index = $(this).val();
+  if(existingModals.indexOf(index) == -1){
+      appendModal(index);
+  } else {
+    $('#editingModal-'+index).modal('show');
+  }
+});
 // function resetNewTask(){
 //     $("#editingModal- .modal-title")[0].innerText = "Task editieren";
 //     isTemplate = $("#editingModal- #isTemplate")[0];
@@ -1059,6 +1037,27 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
 setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );
+$(document).ready(function() {
+    dynamicOnLoad();
+    $('.table').DataTable({
+        ordering:false,
+        language: {
+            <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+        },
+        responsive: true,
+        autoWidth: false,
+        fixedHeader: {
+            header: true,
+            headerOffset: 150,
+            zTop: 1
+        },
+        paging: false
+    });
+    setTimeout(function(){
+        window.dispatchEvent(new Event('resize'));
+        $('.table').trigger('column-reorder.dt');
+    }, 500);
+});
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

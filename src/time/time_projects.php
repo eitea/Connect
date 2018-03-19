@@ -317,10 +317,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <form action="../project/pdfDownload" method="POST" target='_blank' style="display:inline-block">
       <?php //quess who needs queries.
       $companyQuery = $clientQuery = $projectQuery = $userQuery = $chargedQuery = $breakQuery = $driveQuery = "";
-      if($filterings['company']){$companyQuery = "AND $companyTable.id = ".$filterings['company']; }
-      if($filterings['client']){$clientQuery = "AND $clientTable.id = ".$filterings['client']; }
-      if($filterings['project']){$projectQuery = "AND $projectTable.id = ".$filterings['project']; }
-      if($filterings['users']){$userQuery = "AND $userTable.id IN (".implode(', ', $filterings['users']).')'; }
+      if($filterings['company']){$companyQuery = "AND companyData.id = ".$filterings['company']; }
+      if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
+      if($filterings['project']){$projectQuery = "AND projectData.id = ".$filterings['project']; }
+      if($filterings['users']){$userQuery = "AND UserData.id IN (".implode(', ', $filterings['users']).')'; }
       if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
       if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
       if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
