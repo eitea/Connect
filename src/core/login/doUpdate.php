@@ -1308,11 +1308,11 @@ if ($row['version'] < 122) {
 if ($row['version'] < 123) {
     $conn->query("CREATE TABLE sharedfiles (
 	  id int(11) NOT NULL AUTO_INCREMENT,
-	  name varchar(20) NOT NULL COMMENT 'ursprünglicher Name der Datei',
-	  type varchar(10) NOT NULL COMMENT 'Dateiendung',
-	  owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
-	  sharegroup int(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
-	  hashkey varchar(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
+	  name varchar(20) NOT NULL,
+	  type varchar(10) NOT NULL,
+	  owner int(11) NOT NULL,
+	  sharegroup int(11) NOT NULL,
+	  hashkey varchar(32) NOT NULL,
 	  filesize bigint(20) NOT NULL,
 	  uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  PRIMARY KEY (id),
@@ -1326,14 +1326,14 @@ if ($row['version'] < 123) {
     }
 
     $conn->query("CREATE TABLE sharedgroups (
-	  id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
-	  name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
-	  dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
-	  ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
-	  uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten',
-	  owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
+	  id int(11) NOT NULL AUTO_INCREMENT,
+	  name varchar(50) NOT NULL,
+	  dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	  ttl int(10) NOT NULL,
+	  uri varchar(128) NOT NULL,
+	  owner int(11) NOT NULL,
 	  files varchar(200) DEFAULT NULL,
-	  company int(11) NOT NULL COMMENT 'Mandant',
+	  company int(11) NOT NULL,
 	  PRIMARY KEY (id),
 	  UNIQUE KEY url (uri),
 	  KEY owner (owner)
@@ -1360,24 +1360,6 @@ if ($row['version'] < 123) {
         $conn->error;
     } else {
         echo '<br>s3Upload';
-    }
-
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
-
-    $conn->query("ALTER TABLE mailingoptions ADD COLUMN isDefault TINYINT(1) NOT NULL DEFAULT 1");
-    if ($conn->error) {
-        $conn->error;
-    } else {
-        echo '<br>mailingoptions';
-    }
-
-    $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
-
-    $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
-    if ($conn->error) {
-        $conn->error;
-    } else {
-        echo '<br>PGPKeys';
     }
 
     $conn->query("ALTER TABLE contactPersons ADD COLUMN dial VARCHAR(20)");
@@ -2256,7 +2238,15 @@ if($row['version'] < 141){
     }
 }
 
-//if($row['version'] < 142){}
+if($row['version'] < 142){
+    $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
+    $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
+
+    if(!$conn->error){
+        echo '<br>PGP: keypairs';
+    }
+
+}
 //if($row['version'] < 143){}
 //if($row['version'] < 144){}
 //if($row['version'] < 145){}

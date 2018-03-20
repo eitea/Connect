@@ -48,7 +48,7 @@ if(!empty($_POST['delete'])){
         $result = $conn->query("SELECT $clientTable.*, $companyTable.name AS companyName FROM $clientTable INNER JOIN $companyTable ON $clientTable.companyID = $companyTable.id
         WHERE isSupplier = 'TRUE' AND companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC");
         while ($row = $result->fetch_assoc()) {
-            echo '<tr>';
+            echo '<tr class="clicker">';
             echo "<td>".$row['companyName']."</td>";
             echo "<td>".$row['name']."</td>";
             echo "<td>".$row['clientNumber']."</td>";
@@ -80,8 +80,8 @@ function checkAppendModal(index){
     if(existingModals.indexOf(index) == -1){
         $.ajax({
             url:'ajaxQuery/AJAX_customerDetailModal.php',
-            data:{custid: index},
-            type: 'POST',
+            data:{supID: index},
+            type: 'GET',
             success : function(resp){
                 $("#editingModalDiv").append(resp);
                 existingModals.push(index);

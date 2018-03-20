@@ -4,7 +4,7 @@
 $docID = 0;
 if(!empty($_GET['d'])){
     $docID = intval($_GET['d']);
-    $result = $conn->query("SELECT * FROM documents WHERE id = $docID AND companyID IN (".implode(', ', $available_companies).")");
+    $result = $conn->query("SELECT * FROM documents WHERE id = $docID AND companyID IN (".implode(', ', $available_companies).") LIMIT 1");
     if($result && ($row = $result->fetch_assoc())){
         $documentContent = secure_data('DSGVO', $row['txt'], 'decrypt', $userID, $privateKey);
         $name = secure_data('DSGVO', $row['name'], 'decrypt');
@@ -37,6 +37,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
+    $documentContent = $_POST['documentContent'];
+    $name = $_POST['templateName'];
   } elseif(!empty($_POST['documentContent'])) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   }
