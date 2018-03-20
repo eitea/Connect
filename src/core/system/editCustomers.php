@@ -36,6 +36,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 $companyQuery = $clientQuery = "";
 if($filterings['company']){$companyQuery = "AND clientData.companyID = ".$filterings['company']; }
 if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
+
 $result = $conn->query("SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSupplier = 'FALSE' $companyQuery $clientQuery ORDER BY name ASC"); echo $conn->error;
 ?>

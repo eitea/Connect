@@ -50,11 +50,12 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey FROM UserData WHERE id = $userID");
 if ($result) {
     $row = $result->fetch_assoc();
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
+    $publicKey = $row['publicPGPKey'];
 
     if($row['forcedPwdChange']==='1'){
         redirect("../login/passwordChange");
