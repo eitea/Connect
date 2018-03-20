@@ -2,17 +2,17 @@
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
-  $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
-  echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
-  include dirname(__DIR__) . '/footer.php';
-  die();
+    $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
+    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+    include dirname(__DIR__) . '/footer.php';
+    die();
 }?>
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
-  <div class="page-header-button-group">
-    <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
-    <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
-  </div>
-  <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank">Neueste Dokumente von Consulio laden</a></span>
+    <div class="page-header-button-group">
+        <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
+        <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i></button>
+    </div>
+    <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank">Neueste Dokumente von Consulio laden</a></span>
 </h3></div>
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
@@ -63,29 +63,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     if(count($filename) == 2 && $filename[1] == 'txt' && ($meta = $zip->getFromName($filename[0] . '.xml'))) {
                         $meta = simplexml_load_string($meta);
                         if($meta->template_name && $meta->template_version && $meta->template_ID){
-                          $doc_name = secure_data('DSGVO', test_input($meta->template_name), 'encrypt', $userID, $privateKey);
-                          $doc_ver = $meta->template_version;
-                          $doc_id = $meta->template_ID;
-                          $doc_txt = secure_data('DSGVO', convToUTF8(nl2br($zip->getFromIndex($i))));
-                          //upload exists: update
-                          $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id'");
-                          if($result && $result->num_rows > 0){
-                            $row = $result->fetch_assoc();
-                            $result->free();
-                            $id = $row['id'];
-                            $stmt_up->execute();
-                            if($conn->error){
-                                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                            $doc_name = secure_data('DSGVO', test_input($meta->template_name), 'encrypt', $userID, $privateKey);
+                            $doc_ver = $meta->template_version;
+                            $doc_id = $meta->template_ID;
+                            $doc_txt = secure_data('DSGVO', convToUTF8(nl2br($zip->getFromIndex($i))));
+                            //upload exists: update
+                            $result = $conn->query("SELECT id FROM documents WHERE companyID = $cmpID AND docID = '$doc_id'");
+                            if($result && $result->num_rows > 0){
+                                $row = $result->fetch_assoc();
+                                $result->free();
+                                $id = $row['id'];
+                                $stmt_up->execute();
+                                if($conn->error){
+                                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                                }
+                            } else {  //insert as new document
+                                $stmt->execute();
+                                if($conn->error){
+                                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                                }
                             }
-                          } else {  //insert as new document
-                            $stmt->execute();
-                            if($conn->error){
-                                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-                            }
-                          }
                         } else {
-                          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fehler in '.$filename[0].'.xml: Fehlerhafte Tags.</div>';
-                          continue;
+                            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Fehler in '.$filename[0].'.xml: Fehlerhafte Tags.</div>';
+                            continue;
                         }
                     }
                 }
@@ -156,213 +156,213 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if($accept){
-          //create process and history
-          $stmt = $conn->prepare("INSERT INTO documentProcess(id, docID, personID, password, document_text, document_headline, document_version) VALUES(?, ?, ?, ?, ?, ?, ?)");
-          $stmt->bind_param('siissss', $processID, $docID, $contactID, $pass, $doc_cont, $doc_head, $doc_ver);
-          $stmt->execute();
-          $stmt->close();
-          $stmt = $conn->prepare("INSERT INTO documentProcessHistory(processID, activity) VALUES('$processID', ?)");
-          $stmt->bind_param("s", $activity);
-          if (isset($_POST['send_andRead'])) {
-              $activity = 'ENABLE_READ';
-              $stmt->execute();
-          }
-          if (isset($_POST['send_andSign'])) {
-              $activity = 'ENABLE_SIGN';
-              $stmt->execute();
-          }
-          if (isset($_POST['send_andAccept'])) {
-              $activity = 'ENABLE_ACCEPT';
-              $stmt->execute();
-          }
-          $stmt->close();
+            //create process and history
+            $stmt = $conn->prepare("INSERT INTO documentProcess(id, docID, personID, password, document_text, document_headline, document_version) VALUES(?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('siissss', $processID, $docID, $contactID, $pass, $doc_cont, $doc_head, $doc_ver);
+            $stmt->execute();
+            $stmt->close();
+            $stmt = $conn->prepare("INSERT INTO documentProcessHistory(processID, activity) VALUES('$processID', ?)");
+            $stmt->bind_param("s", $activity);
+            if (isset($_POST['send_andRead'])) {
+                $activity = 'ENABLE_READ';
+                $stmt->execute();
+            }
+            if (isset($_POST['send_andSign'])) {
+                $activity = 'ENABLE_SIGN';
+                $stmt->execute();
+            }
+            if (isset($_POST['send_andAccept'])) {
+                $activity = 'ENABLE_ACCEPT';
+                $stmt->execute();
+            }
+            $stmt->close();
 
-          //build email content
-          if ($_POST['send_template']) {
-            $val = intval($_POST['send_template']);
-            $res = $conn->query("SELECT htmlCode FROM templateData WHERE id = $val AND type='document' AND userIDs = $cmpID ");
-            $content = $res->fetch_assoc()['htmlCode'];
-          } else {
-            $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurde&nbsp;folgendes Dokument an&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] versendet. Es ist unter folgendem Link einsehbar:</p>" .
+            //build email content
+            if ($_POST['send_template']) {
+                $val = intval($_POST['send_template']);
+                $res = $conn->query("SELECT htmlCode FROM templateData WHERE id = $val AND type='document' AND userIDs = $cmpID ");
+                $content = $res->fetch_assoc()['htmlCode'];
+            } else {
+                $content = "<p>Guten Tag,</p><p>&nbsp;</p><p>Soeben wurde&nbsp;folgendes Dokument an&nbsp;[FIRSTNAME]&nbsp;[LASTNAME] versendet. Es ist unter folgendem Link einsehbar:</p>" .
                 "<p>[LINK]</p><p>&nbsp;</p><p>Zu beachten sind:</p><ul><li>Alle T&auml;tigkeiten auf dieser&nbsp;Seite werden mitprotokolliert und sind f&uuml;r den&nbsp;Absender dieses Dokuments einsehbar.&nbsp;</li>" .
                 "<li>Jede Option kann nur einmal abgespeichert werden und ist im Nachhinein nicht mehr &auml;nderbar.</li><li>Falsch eingegebene Passw&ouml;rter werden gespeichert.&nbsp;</li></ul><p>&nbsp;</p><p>Danke.</p>";
-          }
+            }
 
-          $content = str_replace("[LINK]", $link, $content);
-          $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
-          $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
+            $content = str_replace("[LINK]", $link, $content);
+            $content = str_replace('[FIRSTNAME]', $contact_row['firstname'], $content);
+            $content = str_replace('[LASTNAME]', $contact_row['lastname'], $content);
 
-          //send mail
-          require dirname(dirname(__DIR__)) . '/plugins/phpMailer/autoload.php';
-          $mail = new PHPMailer();
-          $mail->CharSet = 'UTF-8';
-          $mail->Encoding = "base64";
-          $mail->IsSMTP();
+            //send mail
+            require dirname(dirname(__DIR__)) . '/plugins/phpMailer/autoload.php';
+            $mail = new PHPMailer();
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = "base64";
+            $mail->IsSMTP();
 
-          $result = $conn->query("SELECT * FROM $mailOptionsTable");
-          $row = $result->fetch_assoc();
-          if (!empty($row['username']) && !empty($row['password'])) {
-              $mail->SMTPAuth = true;
-              $mail->Username = $row['username'];
-              $mail->Password = $row['password'];
-          } else {
-              $mail->SMTPAuth = false;
-          }
-          if (empty($row['smptSecure'])) {
-              $mail->SMTPSecure = $row['smtpSecure'];
-          }
+            $result = $conn->query("SELECT * FROM $mailOptionsTable");
+            $row = $result->fetch_assoc();
+            if (!empty($row['username']) && !empty($row['password'])) {
+                $mail->SMTPAuth = true;
+                $mail->Username = $row['username'];
+                $mail->Password = $row['password'];
+            } else {
+                $mail->SMTPAuth = false;
+            }
+            if (empty($row['smptSecure'])) {
+                $mail->SMTPSecure = $row['smtpSecure'];
+            }
 
-          $mail->Host = $row['host'];
-          $mail->Port = $row['port'];
-          $mail->setFrom($row['sender']);
+            $mail->Host = $row['host'];
+            $mail->Port = $row['port'];
+            $mail->setFrom($row['sender']);
 
-          $mail->addAddress($contact_row['email'], $contact_row['firstname'] . ' ' . $contact_row['lastname']);
+            $mail->addAddress($contact_row['email'], $contact_row['firstname'] . ' ' . $contact_row['lastname']);
 
-          $mail->isHTML(true); // Set email format to HTML
-          $mail->Subject = 'Connect - Dokumentenversand';
-          $mail->Body = $content;
-          $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
-          if (!$mail->send()) {
-              $errorInfo = $mail->ErrorInfo;
-              $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('".$contact_row['email']."', '$errorInfo')");
-              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $errorInfo . '</div>';
-          } elseif ($conn->error) {
-              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
-          } else {
-              echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_CREATE'] . '</div>';
-          }
+            $mail->isHTML(true); // Set email format to HTML
+            $mail->Subject = 'Connect - Dokumentenversand';
+            $mail->Body = $content;
+            $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
+            if (!$mail->send()) {
+                $errorInfo = $mail->ErrorInfo;
+                $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('".$contact_row['email']."', '$errorInfo')");
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $errorInfo . '</div>';
+            } elseif ($conn->error) {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+            } else {
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_CREATE'] . '</div>';
+            }
         } else {
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Dokument oder Kontakperson unzulässig.</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Dokument oder Kontakperson unzulässig.</div>';
         }
     }
 }
 ?>
 
 <table class="table">
-  <thead><tr>
-    <th>Name</th>
-    <th>Version</th>
-    <th></th>
-  </tr></thead>
-  <tbody>
-  <?php
-$doc_selects = '';
-$result = $conn->query("SELECT * FROM documents WHERE companyID = $cmpID");
-while ($row = $result->fetch_assoc()) {
-    $style = '';
-    if($row['isBase'] == 'TRUE'){
-      $style = 'style="background-color:#efefef"';
-      $row['version'] .= ' <small>(Basis)</small>';
-    }
-    echo "<tr $style>";
-    echo '<td>' . secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
-    //echo $err;
-    echo '<td>' . $row['version'] . '</td>';
-    echo '<td><form method="POST">';
-    echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-    echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
-    echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
-    echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
-    echo '</form></td>';
-    echo '</tr>';
-    $doc_selects .= '<option value="' . $row['id'] . '" >' . $row['name'] .' - '. $row['version']. '</option>';
-}
-?>
-  </tbody>
+    <thead><tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th></th>
+    </tr></thead>
+    <tbody>
+        <?php
+        $doc_selects = '';
+        $result = $conn->query("SELECT * FROM documents WHERE companyID = $cmpID");
+        while ($row = $result->fetch_assoc()) {
+            $style = '';
+            if($row['isBase'] == 'TRUE'){
+                $style = 'style="background-color:#efefef"';
+                $row['version'] .= ' <small>(Basis)</small>';
+            }
+            echo "<tr $style>";
+            echo '<td>' .mc_status(). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
+            //echo $err;
+            echo '<td>' . $row['version'] . '</td>';
+            echo '<td><form method="POST">';
+            echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+            echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
+            echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
+            echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+            echo '</form></td>';
+            echo '</tr>';
+            $doc_selects .= '<option value="' . $row['id'] . '" >' . $row['name'] .' - '. $row['version']. '</option>';
+        }
+        ?>
+    </tbody>
 </table>
 
 <form method="POST">
-  <div id="send-as-mail" class="modal fade">
-    <div class="modal-dialog modal-content modal-md"><div class="modal-header h4">Dokument Senden</div>
-      <div class="modal-body">
-        <div class="container-fluid">
-          <label><?php echo $lang['DOCUMENTS']; ?></label>
-          <select id="send-select-doc" class="js-example-basic-single" name="send_document"><?php echo $doc_selects; ?></select>
-          <br><br>
-          <div class="row form-group">
-            <div class="col-sm-4">
-              <label><?php echo $lang['CLIENT']; ?></label>
-              <select class="js-example-basic-single" onchange="showContacts(this.value);">
-              <option value="">...</option>
-              <?php
-$res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
-if ($res && $res->num_rows > 1) {echo '<option value="0">...</option>';}
-while ($res && ($row_fc = $res->fetch_assoc())) {
-    echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name'] . "</option>";
-    $filterClient = $row['id'];
-}
-?>
-              </select>
+    <div id="send-as-mail" class="modal fade">
+        <div class="modal-dialog modal-content modal-md"><div class="modal-header h4">Dokument Senden</div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <label><?php echo $lang['DOCUMENTS']; ?></label>
+                <select id="send-select-doc" class="js-example-basic-single" name="send_document"><?php echo $doc_selects; ?></select>
+                <br><br>
+                <div class="row form-group">
+                    <div class="col-sm-4">
+                        <label><?php echo $lang['CLIENT']; ?></label>
+                        <select class="js-example-basic-single" onchange="showContacts(this.value);">
+                            <option value="">...</option>
+                            <?php
+                            $res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
+                            if ($res && $res->num_rows > 1) {echo '<option value="0">...</option>';}
+                            while ($res && ($row_fc = $res->fetch_assoc())) {
+                                echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name'] . "</option>";
+                                $filterClient = $row['id'];
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><?php echo $lang['CONTACT_PERSON']; ?></label>
+                        <select id="contactHint" class="js-example-basic-single" name="send_contact"></select>
+                    </div>
+                </div>
+                <div class="row form-group checkbox">
+                    <div class="col-sm-4"><label><input type="checkbox" name="send_andRead" /> + Lesen</label></div>
+                    <div class="col-sm-4"><label><input type="checkbox" name="send_andAccept" /> + Akzeptieren</label></div>
+                    <div class="col-sm-4"><label><input type="checkbox" name="send_andSign" /> + Unterschreiben</label></div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-6"><label>Zugang mit Passwort schützen</label><input type="text" name="send_andPassword" placeholder="Password" class="form-control" /></div>
+                    <div class="col-sm-6">
+                        <label>E-Mail Vorlage</label>
+                        <select class="js-example-basic-single" name="send_template">
+                            <option value="0"><?php echo $lang['DEFAULT']; ?></option>
+                            <?php
+                            $res = $conn->query("SELECT * FROM templateData WHERE type='document' AND userIDs = $cmpID");
+                            while ($res && ($row_fc = $res->fetch_assoc())) {
+                                echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name'] . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-4">
-              <label><?php echo $lang['CONTACT_PERSON']; ?></label>
-              <select id="contactHint" class="js-example-basic-single" name="send_contact"></select>
-            </div>
-          </div>
-          <div class="row form-group checkbox">
-            <div class="col-sm-4"><label><input type="checkbox" name="send_andRead" /> + Lesen</label></div>
-            <div class="col-sm-4"><label><input type="checkbox" name="send_andAccept" /> + Akzeptieren</label></div>
-            <div class="col-sm-4"><label><input type="checkbox" name="send_andSign" /> + Unterschreiben</label></div>
-          </div>
-          <br>
-          <div class="row">
-            <div class="col-sm-6"><label>Zugang mit Passwort schützen</label><input type="text" name="send_andPassword" placeholder="Password" class="form-control" /></div>
-            <div class="col-sm-6">
-              <label>E-Mail Vorlage</label>
-              <select class="js-example-basic-single" name="send_template">
-                <option value="0"><?php echo $lang['DEFAULT']; ?></option>
-                <?php
-$res = $conn->query("SELECT * FROM templateData WHERE type='document' AND userIDs = $cmpID");
-while ($res && ($row_fc = $res->fetch_assoc())) {
-    echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name'] . "</option>";
-}
-?>
-              </select>
-            </div>
-          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="sendAccess">Dokument Senden</button>
-      </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning" name="sendAccess">Dokument Senden</button>
+        </div>
     </div>
-  </div>
+</div>
 </form>
 
 <form method="POST">
-  <div class="modal fade" id="new-document">
-    <div class="modal-dialog modal-content modal-md">
-      <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
-      <div class="modal-body">
-        <label>Name</label>
-        <input type="text" class="form-control" name="add_docName" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['ADD']; ?></button>
-      </div>
+    <div class="modal fade" id="new-document">
+        <div class="modal-dialog modal-content modal-md">
+            <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
+            <div class="modal-body">
+                <label>Name <?php echo mc_status(); ?> </label>
+                <input type="text" class="form-control" name="add_docName" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['ADD']; ?></button>
+            </div>
+        </div>
     </div>
-  </div>
 </form>
 
 <form method="POST" enctype="multipart/form-data">
-  <div class="modal fade" id="zip-upload">
-    <div class="modal-dialog modal-content modal-md">
-      <div class="modal-header h4">ZIP <?php echo $lang['UPLOAD']; ?></div>
-      <div class="modal-body">
-        <label class="btn btn-default">
-          .zip File <?php echo $lang['UPLOAD']; ?>
-          <input type="file" name="uploadZip" style="display:none">
-        </label>
-        <small>Max. 8MB</small>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-warning"><?php echo $lang['UPLOAD']; ?></button>
-      </div>
+    <div class="modal fade" id="zip-upload">
+        <div class="modal-dialog modal-content modal-md">
+            <div class="modal-header h4">ZIP <?php echo $lang['UPLOAD']; ?></div>
+            <div class="modal-body">
+                <label class="btn btn-default">
+                    .zip File <?php echo $lang['UPLOAD']; ?>
+                    <input type="file" name="uploadZip" style="display:none">
+                </label>
+                <small>Max. 8MB</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning"><?php echo $lang['UPLOAD']; ?></button>
+            </div>
+        </div>
     </div>
-  </div>
 </form>
 
 <script>

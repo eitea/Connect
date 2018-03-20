@@ -125,7 +125,8 @@ $result = $conn->query(
     ) temp"
 );
 echo $conn->error;
-$userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+$userHasUnansweredSurveys = $userHasSurveys = 0;
+if($result) $userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 if(!$userHasSurveys){
     $result = $conn->query(
         "SELECT count(*) count FROM (
@@ -154,7 +155,7 @@ if(!$userHasSurveys){
         ) temp"
     );
     echo $conn->error;
-    $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+    if($result) $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
 $userHasUnansweredOnLoginSurveys = false;
 if($userHasUnansweredSurveys){
@@ -309,91 +310,10 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
+    <script src="plugins/homeMenu/js/homeMenu.min.js"></script>
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
-    <script>
-    $(document).ready(function() {
-        if($('#seconds').length) {
-            var sec = parseInt(document.getElementById("seconds").innerHTML) + parseInt(document.getElementById("minutes").innerHTML) * 60 + parseInt(document.getElementById("hours").innerHTML) * 3600;
-            function pad(val) {
-                return val > 9 ? val : "0" + val;
-            }
-            window.setInterval(function(){
-                document.getElementById("seconds").innerHTML = pad(++sec % 60);
-                document.getElementById("minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
-                document.getElementById("hours").innerHTML = pad(parseInt(sec / 3600, 10));
-            }, 1000);
-        }
-        <?php
-        if (isset($_POST['unlockPrivatePGP']) && isset($_POST['encryptionPassword'])) {
-            $result = $conn->query("SELECT privatePGPKey FROM userdata WHERE id = $userID");
-            if ($result) {
-                $privateDecoded = openssl_decrypt($result->fetch_assoc()['privatePGPKey'], 'AES-128-ECB', $_POST['encryptionPassword']);
-                if ($privateDecoded != false) {
-                    $unlockedPGP = $privateDecoded;
-                    echo 'document.getElementById("options").click();';
-                }
-            }
-        }
-        ?>
-    });
-    function generateKeys($userID){
-        $.ajax({
-            type: "POST",
-            url: "ajaxQuery/AJAX_pgpKeyGen.php",
-            data: { userID: $userID}
-        }).done(function(keys){
-            keys = JSON.parse(keys);
-            document.getElementsByName('privatePGP')[0].value = keys[0];
-            document.getElementsByName('publicPGP')[0].value = keys[1];
-        });
-    }
-    function clearPGP(){
-        document.getElementsByName('privatePGP')[0].value = '';
-    }
-
-    function showError(message){
-        if(!message || message.length == 0) return;
-        $.notify({
-            icon: 'fa fa-exclamation-triangle',
-	        title: '',
-            message: message
-        },{
-            type: 'danger'
-        });
-    }
-    function showWarning(message){
-        if(!message || message.length == 0) return;
-        $.notify({
-            icon: 'fa fa-warning',
-	        title: '',
-            message: message
-        },{
-            type: 'warning'
-        });
-    }
-    function showInfo(message){
-        if(!message || message.length == 0) return;
-        $.notify({
-            icon: 'fa fa-info',
-	        title: '',
-            message: message
-        },{
-            type: 'info'
-        });
-    }
-    function showSuccess(message){
-        if(!message || message.length == 0) return;
-        $.notify({
-            icon: 'fa fa-check',
-	        title: '',
-            message: message
-        },{
-            type: 'success'
-        });
-    }
-  </script>
   <?php
     function showError($message){
         if(!$message || strlen($message) == 0) return;
@@ -418,73 +338,75 @@ if ($_SESSION['color'] == 'light') {
   ?>
 </head>
 <body id="body_container" class="is-table-row">
-  <div id="loader"></div>
-  <!-- navbar -->
-  <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-          <div class="navbar-header hidden-xs">
-              <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT <span style="font-size:9pt">(Beta)</span></a>
-          </div>
-          <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
-              <ul class="nav navbar-nav" style="margin:10px">
-                  <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                          <form method="POST" class="navbar-form navbar-left">
-                              <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Neutral</button></li>
-                              <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Default</button></li>
-                              <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
-                              <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Dark</button></li>
-                          </form>
-                      </ul>
-                  </li>
-              </ul>
-              <ul class="nav navbar-nav" style="margin:10px">
-                  <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                          <form method="POST" class="navbar-form navbar-left">
-                              <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
-                              <li class="divider"></li>
-                              <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
-                          </form>
-                      </ul>
-                  </li>
-              </ul>
-          </div>
-          <div class="navbar-right" style="margin-right:10px;">
-              <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-              <?php
-              $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID");
-              $row = $result->fetch_assoc();
-              $social_status = $row["status"];
-              $social_isAvailable = $row["isAvailable"];
-              $defaultGroupPicture = "images/group.png";
-              $defaultPicture = "images/defaultProfilePicture.png";
-              $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
-              ?>
-              <?php if ($canUseSocialMedia == 'TRUE'): ?>
-                  <a class="hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><img  src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
-                  <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings" role="button"><?php echo $_SESSION['firstname']; ?></span>
-                  <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
-                      <i class="fa fa-commenting"></i>
-                      <span class="badge pull-right alert-badge" <?php if($numberOfSocialAlerts == 0) echo "style='display:none'"; ?> id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span></a></li>
-                      </a>
-                  <?php else: ?>
-                      <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-                  <?php endif;?>
-                  <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
-                      <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
-                          <i class="fa fa-bell"></i><span class="badge alert-badge"> <?php echo $numberOfAlerts; ?></span>
-                      </a>
-                  <?php endif;?>
-                  <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-                  <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-                  <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
-                  <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
-              </div>
-          </div>
-      </nav>
+    <div id="loader"></div>
+    <!-- navbar -->
+    <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header hidden-xs">
+                <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT <span style="font-size:9pt">(Beta)</span></a>
+            </div>
+            <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
+                <ul class="nav navbar-nav" style="margin:10px">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-paint-brush" ></i><span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <form method="POST" class="navbar-form navbar-left">
+                                <li><button type="submit" class="btn btn-link" name="set_skin" value="default">Neutral</button></li>
+                                <li><button type="submit" class="btn btn-link" name="set_skin" value="dark">Default</button></li>
+                                <li><button type="submit" class="btn btn-link" name="set_skin" value="light">Light</button></li>
+                                <li><button type="submit" class="btn btn-link" name="set_skin" value="stellar">Dark</button></li>
+                            </form>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav" style="margin:10px">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <form method="POST" class="navbar-form navbar-left">
+                                <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
+                                <li class="divider"></li>
+                                <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
+                            </form>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="navbar-right" style="margin-right:10px;">
+                <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
+                <?php
+                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID");
+                $row = $result->fetch_assoc();
+                $social_status = $row["status"];
+                $social_isAvailable = $row["isAvailable"];
+                $defaultGroupPicture = "images/group.png";
+                $defaultPicture = "images/defaultProfilePicture.png";
+                $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+                ?>
+                <?php if ($canUseSocialMedia == 'TRUE'): ?>
+                    <a href="" class="hidden-xs" data-toggle="modal" data-target="#socialSettings"><img src='<?php echo $profilePicture; ?>' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
+                    <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings"><?php echo $_SESSION['firstname']; ?></span>
+                    <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
+                        <i class="fa fa-commenting"></i>
+                        <?php if($numberOfSocialAlerts > 0): ?>
+                            <span class="badge pull-right alert-badge" style="position:absolute;top:5px;right:270px;" id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span>
+                        <?php endif; ?>
+                    </a>
+                <?php else: ?>
+                    <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
+                <?php endif; ?>
+                <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
+                    <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
+                        <i class="fa fa-bell"></i><span class="badge alert-badge" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
+                    </a>
+                <?php endif; ?>
+                <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
+                <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+                <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
+                <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
+            </div>
+        </div>
+    </nav>
   <!-- /navbar -->
 
   <div id="infoDiv_collapse" class="modal fade">
@@ -771,19 +693,18 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <!-- User-Section: BOOKING -->
                   <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
                       <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-
-                      <?php
-                      $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                          LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                          WHERE d.isTemplate = 'FALSE' AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
-                          echo $conn->error;
-                          if (($result && $result->num_rows > 0)||$userHasSurveys): ?>
-                          <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
-                              <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
-                          </a></li>
-                      <?php endif; ?>
                   <?php endif;?>
-              <?php endif; //endif(canStamp)?>
+                  <?php
+                  $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                      WHERE d.isTemplate = 'FALSE' AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
+                      echo $conn->error;
+                      if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
+                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
+                          <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
+                      </a></li>
+                  <?php endif; ?>
+              <?php endif; //endif(canStamp) ?>
             <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
             <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
             <?php endif;//canUseSuppliers ?>
@@ -804,20 +725,21 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                <li>
-                  <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
-                    <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleUsers" style="height: 0px;">
-                    <ul class="nav nav-list">
-                      <li><a <?php if ($this_page == 'editUsers.php') {echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
-                      <li><a <?php if ($this_page == 'admin_saldoview.php') {echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                      <li><a <?php if ($this_page == 'register.php') {echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
-                      <li><a <?php if ($this_page == 'deactivatedUsers.php') {echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
-                      <li><a <?php if ($this_page == 'checkinLogs.php') {echo $setActiveLink;}?> href="../system/checkinLogs">Checkin Logs</a></li>
-                    </ul>
-                  </div>
-                </li>
+                  <li>
+                      <a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a>
+                      <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
+                          <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
+                      </a>
+                      <div class="collapse" id="toggleUsers" style="height: 0px;">
+                          <ul class="nav nav-list">
+                              <li><a <?php if ($this_page == 'editUsers.php') {echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
+                              <li><a <?php if ($this_page == 'admin_saldoview.php') {echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
+                              <li><a <?php if ($this_page == 'register.php') {echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
+                              <li><a <?php if ($this_page == 'deactivatedUsers.php') {echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
+                              <li><a <?php if ($this_page == 'checkinLogs.php') {echo $setActiveLink;}?> href="../system/checkinLogs">Checkin Logs</a></li>
+                          </ul>
+                      </div>
+                  </li>
                 <li>
                     <a id="coreCompanyToggle" <?php if ($this_page == 'editCompanies.php') {echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
                         <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
@@ -839,32 +761,32 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 <li><a href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
-                  <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
-                    <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleSettings" style="height: 0px;">
-                    <ul class="nav nav-list">
-                      <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                      <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
-                      <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
-                      <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
-                      <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
-                        <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
-                        <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
-                      <?php endif;?>
-                      <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
-                    </ul>
-                  </div>
+                    <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
+                        <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="collapse" id="toggleSettings" style="height: 0px;">
+                        <ul class="nav nav-list">
+                            <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                            <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
+                            <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
+                            <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
+                            <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
+                                <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
+                                <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
+                            <?php endif;?>
+                            <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
+                        </ul>
+                    </div>
                 </li>
               </ul>
             </div>
           </div>
         </div>
         <?php
-        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" ){
+        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page == 'archiveOptions.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -902,7 +824,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
-      <?php if ($isProjectAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
+      <?php if ($isProjectAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
               <div class="panel-heading" role="tab" id="headingProject">
                   <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
@@ -916,9 +838,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                               <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                           <?php endif;?>
-                          <?php if ($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks = 'TRUE' ): ?>
-                              <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><span><?php echo $lang['DYNAMIC_PROJECTS']; ?></span></a></li>
-                          <?php endif;?>
                           <?php if ($isProjectAdmin == 'TRUE'): ?>
                               <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
                           <?php endif;?>
@@ -926,7 +845,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   </div>
               </div>
           </div>
-          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "dynamicProjects.php" || $this_page == "options.php") {
+          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
               echo "<script>$('#adminOption_PROJECT').click();</script>";
           } ?>
       <?php endif;?>

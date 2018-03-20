@@ -15,7 +15,7 @@ if ($result && $result->num_rows > 0) {
     $firstTimeWizard = true;  //safety check
 }
 
-if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
+if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['accept_licence'])){
     if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
         $result = $conn->query("SELECT firstname, lastname, email FROM UserData WHERE id = $userID LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
@@ -31,7 +31,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
             $_SESSION['privateKey'] = $private;
             $conn->query("UPDATE UserData SET psw = '$hash', publicPGPKey = '".base64_encode($admin_public)."', privatePGPKey = '".$private_encrypt."'  WHERE id = $userID");
             if($conn->error) $accept = false;
-            
+
             //company PAIR
             $result = $conn->query("SELECT id FROM companyData LIMIT 1");
             if($accept && $result && ($row = $result->fetch_assoc())){
@@ -49,24 +49,23 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
                 $err .= $conn->error;
             }
 
-            if($accept){ //module PAIR
-                $keyPair = sodium_crypto_box_keypair();
-                $private = sodium_crypto_box_secretkey($keyPair);
-                $public = sodium_crypto_box_publickey($keyPair);
-                $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-                $nonce = random_bytes(24);
-                $symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
-                $conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('DSGVO', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
-                if($conn->error) $accept = false;
-            } else {
-                $err .= $conn->error;
-            }
+            if($accept){ //module and access
+                $modules = ['DSGVO', 'ERP'];
+                foreach($modules as $module){
+                    $keyPair = sodium_crypto_box_keypair();
+                    $private = sodium_crypto_box_secretkey($keyPair);
+                    $public = sodium_crypto_box_publickey($keyPair);
+                    $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+                    $nonce = random_bytes(24);
+                    $symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
+                    $conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('$module', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
+                    if($conn->error){ $accept = false; $err .= $conn->error; }
 
-            if($accept){ //PAIR access
-                $nonce = random_bytes(24);
-                $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$admin_public);
-                $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
-                if($conn->error) $accept = false;
+                    $nonce = random_bytes(24);
+                    $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$admin_public);
+                    $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, '$module', '".base64_encode($private_encrypt)."')");
+                    if($conn->error){ $accept = false; $err .= $conn->error; }
+                }
             } else {
                 $err .= $conn->error;
             }
@@ -163,6 +162,12 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST'){
                         <label><input type="checkbox" checked name="wizard_encryption" value="1"> Aktivieren</label>
                     </div>
                 </div>
+                <br><hr><br>
+                <div class="col-sm-12 text-center" style="height:250px; overflow-y:auto;">
+                    <?php echo nl2br(file_get_contents(dirname(dirname(dirname(__DIR__))).DIRECTORY_SEPARATOR.'LICENSE')); ?>
+                </div>
+                <label><input type="checkbox" name="accept_licence" value="1" /> Gelesen und Akzeptiert</label>
+                <br>
                 <div class="row text-right">
                     <button type="submit" class="btn btn-warning">Weiter</button>
                 </div>

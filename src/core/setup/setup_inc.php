@@ -37,6 +37,7 @@ function create_tables($conn) {
         emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
         color VARCHAR(10) DEFAULT 'dark',
         real_email VARCHAR(50),
+        forcedPwdChange TINYINT(1) NULL DEFAULT NULL,
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
         publicPGPKey VARCHAR(150) NULL,
@@ -1186,13 +1187,13 @@ function create_tables($conn) {
         clientid INT(6) UNSIGNED,
         clientprojectid INT(6) UNSIGNED,
         projectcolor VARCHAR(10),
-        projectstart VARCHAR(12),
-        projectend VARCHAR(12),
+        projectstart DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        projectend DATETIME DEFAULT '0000-00-00 00:00.00' NOT NULL,
         projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE',
         projectpriority INT(6),
         projectparent VARCHAR(100),
-        projectowner INT(6),
-        projectleader INT(6),
+        projectowner INT(6) UNSIGNED,
+        projectleader INT(6) UNSIGNED,
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0,
@@ -1203,7 +1204,13 @@ function create_tables($conn) {
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectowner) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectleader) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1211,10 +1218,13 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE dynamicprojectsemployees(
         projectid VARCHAR(100) NOT NULL,
-        userid INT(6),
+        userid INT(6) UNSIGNED,
         position VARCHAR(10) DEFAULT 'normal' NOT NULL,
         PRIMARY KEY(projectid, userid),
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (userid) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
@@ -1252,7 +1262,11 @@ function create_tables($conn) {
         teamid INT(6) UNSIGNED,
         FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (teamid) REFERENCES teamData(id)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
+
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1264,7 +1278,10 @@ function create_tables($conn) {
         logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         userID INT(6),
         extra1 VARCHAR(250),
-        extra2 VARCHAR(450)
+        extra2 VARCHAR(450),
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
     )");
 
     $sql = "CREATE TABLE sharedfiles (
@@ -1571,18 +1588,16 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-    
-    // messages [userID, partnerID, subject, message, picture, sent, seen]
+
     $sql = "CREATE TABLE messages(
-        messageID INT(6) UNSIGNED not NULL AUTO_INCREMENT,
-        userID INT(6) UNSIGNED not NULL,        
-        partnerID INT(6) UNSIGNED not NULL,
+        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED NOT NULL,
+        partnerID INT(6) UNSIGNED NOT NULL,
         subject varchar(60),
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        PRIMARY KEY (messageID)
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
         )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

@@ -143,7 +143,7 @@ if (sizeof($missingBookingsArray) == 0) {
             <div class="tab-content">
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-                    $result = $conn->query("SELECT projectdescription, projectstatus FROM dynamicprojects WHERE projectid = '$x'");
+                    $result = $conn->query("SELECT projectdescription, projectstatus, projectstart FROM dynamicprojects WHERE projectid = '$x'");
                     $dynrow =  $result->fetch_assoc();
                     $description = $dynrow['projectdescription'];
                     $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
@@ -358,17 +358,18 @@ if (sizeof($missingBookingsArray) == 0) {
                 $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
                 $hasActiveBooking = $result->num_rows;
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
-                if($dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
+                if(strtotime($dynrow['projectstart']) < time() && $dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
                     if(!$projectleader){
-                        echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
+                        echo "<button type='button' class='btn btn-default' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
                     } else {
-                        echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
+                        echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
                     }
+                    echo "<button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button>";
                 }
                 if(!$projectleader){
                     echo "<button class='btn btn-default' type='submit' title='Task übernehmen' name='take_task' value='$x'><i class='fa fa-address-card'></i></button>";
                 }
-                 ?>
+                ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>
             </form>
         </div>

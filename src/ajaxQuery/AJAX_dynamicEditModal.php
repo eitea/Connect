@@ -38,7 +38,7 @@ if($x){
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
     $dynrow['projectowner'] = $userID;
-    $dynrow['projectleader'] = 0;
+    $dynrow['projectleader'] = ($isDynamicProjectsAdmin == 'TRUE') ? 0 : $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
@@ -51,12 +51,13 @@ if($x){
 <div class="modal fade" id="<?php if($dynrow['isTemplate']=='TRUE') echo "temp"; ?>editingModal-<?php echo $x; ?>">
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
-            <form method="POST" onSubmit="return  checkInput(event)" id="projectForm<?php echo $x; ?>">
+            <form method="POST" id="projectForm<?php echo $x; ?>">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Task editieren</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="remember_state pull-right"></div>
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Basic*</a></li>
                         <li><a data-toggle="tab" href="#projectAdvanced<?php echo $x; ?>">Erweiterte Optionen</a></li>
@@ -205,7 +206,7 @@ if($x){
                             </div>
                             <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
-                                <textarea class="form-control projectDescriptionEditor" name="description"  ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <textarea class="form-control projectDescriptionEditor tinymce-remember" name="description"  ><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>

@@ -501,8 +501,8 @@ $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie
 $lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
 $lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
 
-$lang_eng['ERROR_STRIKE'] = 'code-manipulation found, you have been striked!';
-$lang_ger['ERROR_STRIKE'] = 'Code-Manipulation entdeckt, Sie wurden gestriked!';
+$lang_eng['ERROR_STRIKE'] = 'Code-manipulation detected, penalty point was added.';
+$lang_ger['ERROR_STRIKE'] = 'Code-Manipulation entdeckt, penalty Punkt wurde addiert.';
 
 $lang_eng['ERROR_TIMES_INVALID'] = 'Times were invalid.';
 $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
@@ -689,9 +689,12 @@ $lang_eng['INFO_COMPANYLESS_USERS'] = 'Users without companies are not selectabl
 $lang_ger['INFO_COMPANYLESS_USERS'] = 'Benutzer ohne Mandanten sind nicht auswählbar.';
 
 $lang_eng['INFO_ENCRYPTION'] = 'By encrypting your Data, only certain users with explicit rights can read sensitive data. <br>
-                                Since every Key is Role-specific, please make sure all users have the correct access-rights.';
+                                Since every Key is Role-specific, please make sure all users have the correct access-rights.<br>
+                                <br><label class="btn btn-sm btn-danger" >Warning</label> This feature is still in development and may not function properly. Generating a backup is recommended. Use with caution.';
 $lang_ger['INFO_ENCRYPTION'] = 'Durch die Verschlüsselung der sensiblen Daten werden explizite Lese-rechte vergeben. <br>
-                                Da jeder Schlüssel Rollen-spezifisch angepasst wird, stellen Sie vorher bitte sicher, dass jeder Benutzer die richtigen Zugriffsrechte besitzt.';
+                                Da jeder Schlüssel Rollen-spezifisch angepasst wird, stellen Sie vorher bitte sicher, dass jeder Benutzer die richtigen Zugriffsrechte besitzt.<br>
+                                <br><label class="btn btn-sm btn-danger" >Warnung</label> Dieses feature befindet sich noch in der Entwicklungphase und könnte daher unter Umständen nicht ordnungsgemäß funktionieren.
+                                Es wird empfohlen davor ein Backup zu generieren.';
 
 $lang_eng['INFO_EXPIRATION'] = 'Passwords with valid expiration settings will be invalid once the set timespan has expired. This timespan is defined in months. <br>
                                 Once a password has expired, the corresponding user will receive a notification with a warning. <br>

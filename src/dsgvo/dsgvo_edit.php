@@ -47,13 +47,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <div class="page-header"><h3><?php echo $name ?><div class="page-header-button-group"><button type="submit" name="save" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
     <div class="row">
         <?php if($isBase == 'FALSE'): ?>
-        <div class="col-sm-8"><label>Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $name; ?>" /><br></div>
+        <div class="col-sm-8"><label><?php echo mc_status(); ?> Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $name; ?>" /><br></div>
         <div class="col-sm-2"><label>Version</label><input type="text" class="form-control" name="templateVersion" value="<?php echo $version; ?>" placeholder="Version" /><br></div>
         <div class="col-sm-2"><label><?php echo $lang['DOCUMENTS']; ?></label><a href='documents?n=<?php echo $cmpID; ?>' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a><br></div>
-        </div>
-        <br>
-        <div class="row">
-        <div class="col-md-10" style="max-width:780px;"><label><?php echo $name; ?></label><textarea name="documentContent"><?php echo $documentContent; ?></textarea></div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-10" style="max-width:780px;"><label><?php echo mc_status().' '.$name; ?></label><textarea name="documentContent"><?php echo $documentContent; ?></textarea></div>
         <div class="col-md-2">
             <br><br>Click to Insert: <br><br>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[LINK]'>URL</button>

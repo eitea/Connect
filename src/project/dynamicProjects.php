@@ -12,8 +12,8 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     $allHours = 0;
     $times = explode(' ', $estimate);
     foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
-        if(is_numeric($t) ||substr($t, -1) == 'h'){
-            $allHours += $t;
+        if(is_numeric($t) || substr($t, -1) == 'h'){
+            $allHours += intval($t);
         } elseif(substr($t, -1) == 'M'){
             $allHours += intval($t) * 730.5;
         } elseif(substr($t, -1) == 'w'){
@@ -56,7 +56,7 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
             <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
                 <div class="container-fluid">
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" onclick="resetNewTask()" data-target="#editingModal-" >New</button></li>
+                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
                     <li class="divider"></li>
                     <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
                 </div>
@@ -95,8 +95,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.</div>';
         }
-    }
-    if(!empty($_POST['take_task'])){
+    } elseif(!empty($_POST['task-plan-date']) && (!empty($_POST['task-plan']) || !empty($_POST['task-plan-take']))){
+        if(!empty($_POST['task-plan-take'])){
+            $x = test_input($_POST['task-plan-take'], 1);
+            $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
+        } else {
+            $x = test_input($_POST['task-plan'], 1);
+        }
+        if(test_Date($_POST['task-plan-date'].':00')){
+            $date = carryOverAdder_Hours($_POST['task-plan-date'].':00', $timeToUTC * -1);
+            $conn->query("UPDATE dynamicprojects SET projectstart = '$date' WHERE projectid = '$x'");
+            if($conn->error){
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            } else {
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+            }
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Datum ungültig. Format YYYY-MM-DD HH:mm</div>';
+        }
+    } elseif(!empty($_POST['take_task'])){
         $x = test_input($_POST['take_task'], true);
         $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
         if($conn->error){
@@ -321,7 +338,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //end if POST
 $completed_tasks = file_get_contents('task_changelog.txt', true);
 ?>
-
+<form method="POST">
+<?php
+if($filterings['tasks'] == 'ACTIVE_PLANNED'){
+    echo '<div class="text-right"><button type="submit" formaction="../tasks/icalDownload" formtarget="_blank" class="btn btn-warning">Als .ical Downloaden</button></div>';
+}
+?>
 <table class="table table-hover">
     <thead>
         <tr>
@@ -352,7 +374,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             }
             if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $query_filter .= " AND d.projectstart > UTC_TIMESTAMP ";
-            } else if($filterings['tasks'] == 'REVIEW_1'){
+            } elseif($filterings['tasks'] == 'REVIEW_1'){
                 $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'TRUE' ";
             } elseif($filterings['tasks'] == 'REVIEW_2'){
                 $query_filter .= " AND d.projectstatus = 'REVIEW' AND needsreview = 'FALSE' ";
@@ -372,7 +394,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
         $stmt_booking->bind_param('s', $x);
-        $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p INNER JOIN logs ON logs.indexIM = p.timestampID WHERE p.dynamicID = ?");
+        $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p WHERE p.dynamicID = ?");
         $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
@@ -431,8 +453,10 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
-            echo '<td>'.$row['projectstart'].'</td>';
-            echo '<td>'.$row['projectend'].'</td>';
+            $A = substr(carryOverAdder_Hours($row['projectstart'], $timeToUTC),0,10);
+            $B = $row['projectend'] == '0000-00-00 00:00:00' ? '' : substr($row['projectend'],0,10);
+            echo '<td>'.$A.'</td>';
+            echo '<td>'.$B.'</td>';
             if($row['projectseries']){
                 echo '<td><i class="fa fa-clock-o"></i></td>';
             } else {
@@ -443,6 +467,7 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo '<td>';
             if($useRow = $isInUse->fetch_assoc()){ echo 'WORKING<br><small>'.$userID_toName[$useRow['userID']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
+            echo '<br><small style="color:transparent;">'.$x.'</small>';
             echo '</td>';
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
             echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
@@ -457,23 +482,25 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             echo $review.'>';
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
-            echo '<td><form method="POST">';
-            if($useRow && $useRow['userID'] == $userID) { //if this task IsInUse and this user is the one using it
-                $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"'; //he has to wait at least 1 minute
+            echo '<td>';
+            if($useRow && $useRow['userID'] == $userID) {
+                $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
                 echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif($row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){ //only if project is active, this task is not already in use and this user has no other active bookings
+            } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
                 if(!$row['projectleader']){
                     echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
                 } else {
                     echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
                 }
             }
+            if(!$useRow) echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button> ";
             if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
-                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
+                echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
             }
-            echo '</form></td>';
+            if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
+            echo '</td>';
             echo '</tr>';
 
             if(!$row['projectleader']){
@@ -486,6 +513,21 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
                 <button class="btn btn-default" type="submit" title="Task normal starten" name="play" value="'.$x.'">Nein</button>
                 <button class="btn btn-warning" type="submit" title="Task als Verantwortlicher starten" name="play-take" value="'.$x.'">Ja</button>
                 </form></div></div></div>';
+            }
+            if(!$useRow){
+                $modals .= '<div id="task-plan-'.$x.'" class="modal fade" style="z-index:1500;">
+                <div class="modal-dialog modal-content modal-sm"><form method="POST">
+                <div class="modal-header h4">Task Planen</div>
+                <div class="modal-body"> Wollen Sie diesen Task auf ein anderes Datum verschieben? <br>
+                Geplante Tasks werden automatisch übernommen und kehren mit dem eingestellten Datum automatisch wieder.<br><br>
+                <input type="text" class="form-control datetimepicker" name="task-plan-date" value="'.$row['projectstart'].'" placeholder="z.B. 2018-12-24 10:30"/><br>
+                </div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>';
+                if($row['projectleader']){
+                    $modals .= '<button class="btn btn-warning" type="submit" title="Task Verschieben" name="task-plan" value="'.$x.'">Verschieben</button>';
+                } else {
+                    $modals .= '<button class="btn btn-warning" type="submit" title="Task Verschieben" name="task-plan-take" value="'.$x.'">Verschieben</button>';
+                }
+                $modals .= '</div></form></div></div>';
             }
         }
         ?>
@@ -525,6 +567,9 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
         <!--/training-->
     </tbody>
 </table>
+</form>
+<div id="editingModalDiv">
+    <?php echo $modals; ?>
     <div id="selectTemplate" >
         <div class="modal fade" id="template-list-modal">
             <form method="POST" onsubmit=' return setUpDeleteTemplate()'>
@@ -557,8 +602,6 @@ $completed_tasks = file_get_contents('task_changelog.txt', true);
             </form>
         </div>
     </div>
-<div id="editingModalDiv">
-    <?php echo $modals; ?>
     <?php if($occupation): ?>
     <div class="modal fade" id="dynamic-booking-modal">
         <div class="modal-dialog modal-content modal-md">
@@ -745,16 +788,16 @@ function dynamicOnLoad(modID){
         menubar: false,
         statusbar: false,
         height: 300,
+        browser_spellcheck: true,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
-            function insertMicroTask(){
-                var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
-                editor.insertContent(html);
-            }
             editor.addButton("InsertMicroTask",{
                 tooltip: "Insert MicroTask",
                 icon: "template",
-                onclick: insertMicroTask,
+                onclick: function(){
+                    var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
+                    editor.insertContent(html);
+                },
             });
         },
         // enable title field in the Image dialog
@@ -843,14 +886,6 @@ function appendModal(index){
    });
 }
 var existingModals = new Array();
-$('button[name=editModal]').click(function(){
-    var index = $(this).val();
-  if(existingModals.indexOf(index) == -1){
-      appendModal(index);
-  } else {
-    $('#editingModal-'+index).modal('show');
-  }
-});
 appendModal('');
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
@@ -877,28 +912,6 @@ $('.view-modal-open').click(function(){
   } else {
     $('#infoModal-'+index).modal('show');
   }
-});
-$(document).ready(function() {
-    dynamicOnLoad();
-    $('.table').DataTable({
-        ordering:false,
-        language: {
-            <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-        },
-        responsive: true,
-        dom: 'tf',
-        autoWidth: false,
-        fixedHeader: {
-            header: true,
-            headerOffset: 150,
-            zTop: 1
-        },
-        paging: false
-    });
-    setTimeout(function(){
-        window.dispatchEvent(new Event('resize'));
-        $('.table').trigger('column-reorder.dt');
-    }, 500);
 });
 function showClients(company, client, place){
     if(company != ""){
@@ -938,7 +951,7 @@ function activateTemplate(event){
         isTemplate.style = "visibility: hidden; height:1px; width:1px";
         $("#editingModal- form")[0].appendChild(isTemplate);
         $("#editingModal-").modal('show');
-    }else{
+    } else {
         $("#template-list-modal").modal('hide');
         var index = id[0].id;
         if(existingModals.indexOf(index) == -1){
@@ -949,13 +962,12 @@ function activateTemplate(event){
     }
 }
 function setUpDeleteTemplate(){
- id =  $(".select2-templates").select2("data");
- if(id[0].id==-1){
-    return false;
- }else{
-    $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
- }
-
+    id =  $(".select2-templates").select2("data");
+    if(id[0].id==-1){
+        return false;
+    } else {
+        $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
+    }
 }
 function editTemplate(){
     id =  $(".select2-templates").select2("data");
@@ -984,30 +996,19 @@ function editTemplate(){
         });
     }
 }
-function checkInput(event){
-    //check Input
-    form = event.target;
-    if(tinymce.activeEditor.getContent()==""){
-        if(form.getElementsByTagName("textarea")[0].textLength<1){
-            alert("<?php echo $lang["ERROR_MISSING_FIELDS"] ?>");
-            return false;
-        }
-    }
-
-    if(tinymce.activeEditor.getContent().length>(<?php
-    $max = $conn->query("SHOW VARIABLES LIKE 'max_allowed_packet';");
-    $maxSQL = $max->fetch_assoc();
-    echo $maxSQL['Value'] ?>-500) || tinymce.activeEditor.getContent().length>16777215){
-        alert("Description Too Big");
-        return false;
-    }
-    <?php if($canCreateTasks == 'TRUE') echo '$("#projectForm :disabled ").each(function(){this.disabled = false});'; ?>
-}
-function resetNewTask(){
-    $("#editingModal- .modal-title")[0].innerText = "Task editieren";
-    isTemplate = $("#editingModal- #isTemplate")[0];
-    $("#editingModal- form")[0].removeChild(isTemplate);
-}
+$('.table').on('click', 'button[name=editModal]', function(){
+    var index = $(this).val();
+  if(existingModals.indexOf(index) == -1){
+      appendModal(index);
+  } else {
+    $('#editingModal-'+index).modal('show');
+  }
+});
+// function resetNewTask(){
+//     $("#editingModal- .modal-title")[0].innerText = "Task editieren";
+//     isTemplate = $("#editingModal- #isTemplate")[0];
+//     $("#editingModal- form")[0].removeChild(isTemplate);
+// }
 function reviewChange(event,id){
     projectid = id;
     needsReview = event.target.checked ? 'TRUE' : 'FALSE';
@@ -1036,6 +1037,27 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
 setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );
+$(document).ready(function() {
+    dynamicOnLoad();
+    $('.table').DataTable({
+        ordering:false,
+        language: {
+            <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+        },
+        responsive: true,
+        autoWidth: false,
+        fixedHeader: {
+            header: true,
+            headerOffset: 150,
+            zTop: 1
+        },
+        paging: false
+    });
+    setTimeout(function(){
+        window.dispatchEvent(new Event('resize'));
+        $('.table').trigger('column-reorder.dt');
+    }, 500);
+});
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -1,31 +1,33 @@
 <?php
 $routes = array(
-  'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',      'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_docker.php',                   'php/info' => 'core/system/phpinfo.php',                   'login/passwordChange' => 'core/login/passwordChange.php',
+  'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
+  'login/access' => 'core/login/login_docker.php',                  'php/info' => 'core/system/phpinfo.php',                     'login/passwordChange' => 'core/login/passwordChange.php',
 
-  'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',               'user/book' => 'core/user/userProjecting.php',
-  'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',              'user/ready' => 'core/user/readyPlan.php',
+  'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
+  'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',               'user/ready' => 'core/user/readyPlan.php',
 
   'social/post' => 'core/system/post.php',                          'social/home' => 'core/system/socialMedia.php',
   'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',          'setup/keys' => 'core/setup/download_keys.php',
 
-  'system/users' => 'core/system/editUsers.php',                         'system/saldo' => 'core/system/admin_saldoview.php',              'system/register' => 'core/system/register.php',
-  'system/deactivated' => 'core/system/deactivatedUsers.php',            'system/company' => 'core/system/editCompanies.php',              'system/new' => 'core/system/new_Companies.php',
-  'system/teams' => 'core/system/teamConfig.php',                      'system/holidays' => 'core/system/editHolidays.php',              'system/advanced' => 'core/system/advancedOptions.php',
-  'system/password' => 'core/system/passwordOptions.php',                'system/email' => 'core/system/reportOptions.php',                'system/tasks' => 'core/system/taskScheduler.php',
-  'system/update' => 'core/system/pullGitRepo.php',                      'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',
-  'system/designer' => 'core/system/templateSelect.php',                 'system/clients' => 'core/system/editCustomers.php',              'system/clientDetail' => 'core/system/editCustomer_detail.php',
-  'system/previewTem' => 'core/system/templatePreview.php',              'system/downloadTem' => 'core/system/templateDownload.php',       'system/editTemp' => 'core/system/templateEdit.php',
-  'system/downloadSql' => 'core/system/system_backup_download.php',      'system/cryptlog'=> 'core/system/viewCryptLog.php',               'system/restic' => 'core/system/resticBackup.php',
-  'system/checkinLogs' => 'core/system/checkinLogs.php',                 'system/archive' => 'core/system/archiveOptions.php',
+  'system/users' => 'core/system/editUsers.php',                    'system/saldo' => 'core/system/admin_saldoview.php',         'system/register' => 'core/system/register.php',
+  'system/deactivated' => 'core/system/deactivatedUsers.php',       'system/company' => 'core/system/editCompanies.php',         'system/new' => 'core/system/new_Companies.php',
+  'system/teams' => 'core/system/teamConfig.php',                   'system/holidays' => 'core/system/editHolidays.php',         'system/advanced' => 'core/system/advancedOptions.php',
+  'system/password' => 'core/system/passwordOptions.php',           'system/email' => 'core/system/reportOptions.php',           'system/tasks' => 'core/system/taskScheduler.php',
+  'system/update' => 'core/system/pullGitRepo.php',                 'system/backup' => 'core/system/system_backup.php',          'system/restore' => 'core/system/system_restore.php',
+  'system/designer' => 'core/system/templateSelect.php',            'system/clients' => 'core/system/editCustomers.php',         'system/clientDetail' => 'core/system/editCustomer_detail.php',
+  'system/previewTem' => 'core/system/templatePreview.php',         'system/downloadTem' => 'core/system/templateDownload.php',  'system/editTemp' => 'core/system/templateEdit.php',
+  'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          'system/restic' => 'core/system/resticBackup.php',
+  'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/archiveOptions.php',        'system/security' => 'core/system/securitySettings.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
 
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
-  'project/log' => 'project/audit_projectBookings.php',             'dynamic-projects/view' => 'project/dynamicProjects.php',    'project/options'    => 'project/options.php',
+  'project/log' => 'project/audit_projectBookings.php',             'project/options' => 'project/options.php',
 
-  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity'=>'project/report_productivity.php',    'report/autotask' => 'schedule/autotask.php',
+  'dynamic-projects/view' => 'project/dynamicProjects.php',         'tasks/icalDownload' => 'project/download_ical.php',
+
+  'report/send' => 'schedule/sendMailReport.php',                   'report/productivity' => 'project/report_productivity.php',  'report/autotask' => 'schedule/autotask.php',
   'report/tasks' => 'schedule/getAllEmailTasks.php',
 
   'erp/view' => 'erp/erp_view.php',                                 'erp/articles' => 'erp/product_articles.php',                'erp/taxes' => 'erp/editTaxes.php',

@@ -20,7 +20,10 @@ if(isset($_POST['saveButton'])){
     $type = test_input($_POST['enableTimechange_type']);
     $conn->query("UPDATE policyData SET passwordLength = $length, complexity = '$compl', expiration = '$exp', expirationDuration = $dur, expirationType = '$type'");
     echo mysqli_error($conn);
-} //crypt($_POST['password'], $row['psw']) == $row['psw']
+}
+
+$result = $conn->query("SELECT * FROM policyData LIMIT 1");
+$row = $result->fetch_assoc();
 ?>
 
 <form method="POST">

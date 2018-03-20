@@ -31,10 +31,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin', '$end', '$infoText', '$type')";
       $conn->query($sql);
       echo mysqli_error($conn);
-    } else {
+  } else {
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
     }
-
   }elseif(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
       $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
@@ -76,13 +75,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['addDrive']) && !empty($_POST['addInfoText']) && !empty($_POST['addTimeStart']) && !empty($_POST['addTimeEnd'])){
     $timeStart = test_input($_POST['addDate'].' '.$_POST['addTimeStart']) .'.00';
     $timeEnd = test_input($_POST['addDate'].' '.$_POST['addTimeEnd']) .'.00';
-
     $kmStart = intval($_POST['addKmStart']);
     $kmEnd = intval($_POST['addKmEnd']);
     $countryID = intval($_POST['addCountry']);
-
     $infotext = test_input($_POST['addInfoText']);
-
     $expenses = floatval($_POST['addExpenses']);
     $hosting10 = floatval($_POST['addHosting10']);
     $hosting20 = floatval($_POST['addHosting20']);
@@ -100,6 +96,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   } elseif(isset($_POST['addDrive'])) {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Fehler: </strong>Hervorgehobene Felder dürfen nicht leer sein.</div>';
   }
+  if(!empty($_POST['delete_request'])){
+      $id = intval($_POST['delete_request']);
+      $conn->query("DELETE FROM userRequestsData WHERE id = $id AND status = '0'");
+      if($conn->error){
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      } else {
+          echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+      }
+  }
 }
 ?>
 
@@ -111,59 +116,63 @@ $sql = "SELECT * FROM $userRequests WHERE userID = $userID AND requestType NOT I
 $result = $conn->query($sql);
 if($result && $result->num_rows > 0): ?>
 <form method="POST">
-  <?php if($filterRequest) echo '<input type="hidden" name="filterRequest_all" value="1" />' ?>
-<table class="table table-hover">
-  <tr>
-    <th><?php echo $lang['TYPE']; ?></th>
-    <th><?php echo $lang['FROM']; ?></th>
-    <th><?php echo $lang['TO']; ?></th>
-    <th>Status</th>
-    <th><?php echo $lang['REPLY_TEXT']; ?> </th>
-  </tr>
-  <tbody>
-      <?php
-      while($row = $result->fetch_assoc()){
-        //hide: old requests, accepted/ denied requests,
-        if(!$filterRequest && timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] != 0){
-          continue;
-          //always display: future dates, open requests
-        }
-        $style = "";
-        if($row['status'] == 0) {
-          $style="";
-        } elseif ($row['status'] == 1) {
-          $style="#b52140";
-        } elseif ($row['status'] == 2) {
-          $style="#13b436";
-        }
-        echo "<tr>";
-        echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
-        if($row['requestType'] == 'log'||$row['requestType'] == 'doc'){
-          echo '<td>'.substr($row['fromDate'],0,16).'</td>';
-          echo '<td>'.substr($row['toDate'],0,16).'</td>';
-        } else {
-          echo '<td>'.substr($row['fromDate'],0,10) .'</td>';
-          echo '<td>'.substr($row['toDate'],0,10) .'</td>';
-        }
-        echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
-        echo '<td>' . $row['answerText'] . '</td>';
-        echo '</tr>';
-      }
-      ?>
-  </tbody>
-</table>
+    <?php if($filterRequest) echo '<input type="hidden" name="filterRequest_all" value="1" />' ?>
+    <table class="table table-hover">
+        <tr>
+            <th><?php echo $lang['TYPE']; ?></th>
+            <th><?php echo $lang['FROM']; ?></th>
+            <th><?php echo $lang['TO']; ?></th>
+            <th>Status</th>
+            <th><?php echo $lang['REPLY_TEXT']; ?> </th>
+            <th></th>
+        </tr>
+        <tbody>
+            <?php
+            while($row = $result->fetch_assoc()){
+                //hide: old requests, accepted/ denied requests,
+                if(!$filterRequest && timeDiff_Hours($row['toDate'], getCurrentTimestamp()) > 0 && $row['status'] != 0){
+                    continue;
+                    //always display: future dates, open requests
+                }
+                $style = "";
+                if($row['status'] == 0) {
+                    $style="";
+                } elseif ($row['status'] == 1) {
+                    $style="#b52140";
+                } elseif ($row['status'] == 2) {
+                    $style="#13b436";
+                }
+                echo "<tr>";
+                echo '<td>' . $lang['REQUEST_TOSTRING'][$row['requestType']] . '</td>';
+                if($row['requestType'] == 'log'||$row['requestType'] == 'doc'){
+                    echo '<td>'.substr($row['fromDate'],0,16).'</td>';
+                    echo '<td>'.substr($row['toDate'],0,16).'</td>';
+                } else {
+                    echo '<td>'.substr($row['fromDate'],0,10) .'</td>';
+                    echo '<td>'.substr($row['toDate'],0,10) .'</td>';
+                }
+                echo "<td style='color:$style'>" . $lang['REQUESTSTATUS_TOSTRING'][$row['status']] .'</td>';
+                echo '<td>' . $row['answerText'] . '</td>';
+                echo '<td>';
+                if($row['status'] == 0) echo '<button type="submit" name="delete_request" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+                echo '</td>';
+                echo '</tr>';
+            }
+            ?>
+        </tbody>
+    </table>
 </form>
 <div class="row">
-  <div class="col-sm-2">
-    <form method="post">
-      <?php
-      echo '<div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$filterRequest_text.'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
-      echo '<li><button type="submit" name="filterRequest_default" class="btn btn-link" >Alte ausblenden</button></li>';
-      echo '<li><button type="submit" name="filterRequest_all" class="btn btn-link" >'.$lang['DISPLAY_ALL'].'</button></li>';
-      echo '</ul></div>';
-      ?>
-    </form>
-  </div>
+    <div class="col-sm-2">
+        <form method="post">
+            <?php
+            echo '<div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$filterRequest_text.'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
+            echo '<li><button type="submit" name="filterRequest_default" class="btn btn-link" >Alte ausblenden</button></li>';
+            echo '<li><button type="submit" name="filterRequest_all" class="btn btn-link" >'.$lang['DISPLAY_ALL'].'</button></li>';
+            echo '</ul></div>';
+            ?>
+        </form>
+    </div>
 </div>
 <?php endif; ?>
 

@@ -1622,7 +1622,7 @@ if($row['version'] < 128){ //30.01.2018
     password VARCHAR(50) NOT NULL,
     logEnabled ENUM('TRUE','FALSE') NOT NULL,
     PRIMARY KEY (id))");
-    if(!$conn->query($sql)){
+    if($conn->error){
         echo $conn->error;
     } else {
         echo '<br>Projekte: Emails';
@@ -2200,23 +2200,72 @@ if($row['version'] < 140){
 if($row['version'] < 141){
     $conn->query("ALTER TABLE teamData ADD COLUMN isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
     if(!$conn->error){
+        echo '<br>Team Update: Abteilungen';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectstart DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL");
+    if(!$conn->error){
+        echo '<br>Tasks Update: Aktiv - Geplant';
+    }
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectend DATETIME DEFAULT '0000-00-00 00:00:00' NOT NULL");
+
+    $conn->query("DELETE FROM dsgvo_training_questions WHERE id = 1 OR id = 2");
+    if($conn->error){
         echo $conn->error;
     } else {
-        echo '<br>Team Update: Abteilungen';
+        echo '<br>Training: remove test questions';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojectsteams ADD CONSTRAINT fk_team_id FOREIGN KEY (teamid) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>FK: task - teams';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojectsemployees MODIFY COLUMN userid INT(6) UNSIGNED");
+    $conn->query("ALTER TABLE dynamicprojectsemployees ADD CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>FK: task - employees';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojectslogs MODIFY COLUMN userid INT(6) UNSIGNED");
+    $conn->query("ALTER TABLE dynamicprojectslogs ADD CONSTRAINT fk_user_id FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>FK: task - logs';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectowner INT(6) UNSIGNED");
+    $conn->query("ALTER TABLE dynamicprojects ADD CONSTRAINT fk_owner_id FOREIGN KEY (projectowner) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>FK: task - owner';
+    }
+
+    $conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectleader INT(6) UNSIGNED");
+    $conn->query("ALTER TABLE dynamicprojects ADD CONSTRAINT fk_leader_id FOREIGN KEY (projectleader) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE SET NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>FK: task - leader';
     }
 }
 
 if($row['version'] < 142){
     $conn->query("CREATE TABLE messages(
-        messageID INT(6) UNSIGNED not NULL AUTO_INCREMENT,
-        userID INT(6) UNSIGNED not NULL,        
-        partnerID INT(6) UNSIGNED not NULL,
+        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED NOT NULL,
+        partnerID INT(6) UNSIGNED NOT NULL,
         subject varchar(60),
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        PRIMARY KEY (messageID)
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
         )");
     if(!$conn->error){
         echo $conn->error;
@@ -2225,7 +2274,8 @@ if($row['version'] < 142){
     }
 }
 //if($row['version'] < 143){}
-
+//if($row['version'] < 144){}
+//if($row['version'] < 145){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

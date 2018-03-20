@@ -16,31 +16,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $isUpdate = true;
     $articleID = intval($_POST['update']);
     $update_row = $conn->query("SELECT * FROM articles WHERE id = $articleID");
-    $update_row = $update_row->fetch_assoc();
-  } elseif(isset($_POST['add_product']) && !empty($_POST['add_product_name']) && !empty($_POST['add_product_price']) && !empty($_POST['isUpdate'])){
-    $articleID = $_POST['isUpdate'];
-    $product_name = test_input($_POST['add_product_name']);
-    $product_description = test_input($_POST['add_product_description']);
-    $product_price = floatval($_POST['add_product_price']);
-    $product_unit = test_input($_POST['add_product_unit']);
-    $product_tax_id = intval($_POST['add_product_taxes']);
-    $product_is_cash = empty($_POST['add_product_as_bar']) ? 'FALSE' : 'TRUE';
-    $product_purchase = floatval($_POST['add_product_purchase']);
-    $product_company = $cmpID;
-
-    $conn->query("UPDATE articles SET companyID = $product_company, name = '$product_name', description = '$product_description', price = '$product_price', unit = '$product_unit', taxID =  $product_tax_id, cash = '$product_is_cash', purchase = '$product_purchase' WHERE id = $articleID");
-    if(mysqli_error($conn)){
-      echo $conn->error;
-    } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
+    if(!$update_row) echo $update_row->error;
+    if(!($update_row = $update_row->fetch_assoc())) {
+        //STRIKE
+        $conn->query("UPDATE UserData SET strikeCount = strikeCount +1 WHERE id = $userID");
+        die($lang['ERROR_STRIKE']);
     }
   } elseif(isset($_POST['delete'])){
     $articleID = intval($_POST['delete']);
     $conn->query("DELETE FROM articles WHERE id = $articleID");
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
   } elseif(isset($_POST['add_product']) && !empty($_POST['add_product_name']) && !empty($_POST['add_product_price'])){
-    $product_name = test_input($_POST['add_product_name']);
-    $product_description = test_input($_POST['add_product_description']);
+    $product_name = secure_data('ERP', test_input($_POST['add_product_name']), 'encrypt', $userID, $privateKey);
+    $product_description = secure_data('ERP', test_input($_POST['add_product_description']));
     $product_price = floatval($_POST['add_product_price']);
     $product_unit = test_input($_POST['add_product_unit']);
     $product_tax_id = intval($_POST['add_product_taxes']);
@@ -48,11 +36,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $product_purchase = floatval($_POST['add_product_purchase']);
     $product_company = $cmpID;
 
-    $conn->query("INSERT INTO articles (companyID, name, description, price, unit, taxID, cash, purchase) VALUES($product_company, '$product_name', '$product_description', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase')");
+    if(!empty($_POST['isUpdate'])){
+        $articleID = $_POST['isUpdate'];
+        $conn->query("UPDATE articles SET companyID = $product_company, name = '$product_name', description = '$product_description', price = '$product_price', unit = '$product_unit',
+        taxID =  $product_tax_id, cash = '$product_is_cash', purchase = '$product_purchase' WHERE id = $articleID");
+    } else {
+        $conn->query("INSERT INTO articles (companyID, name, description, price, unit, taxID, cash, purchase)
+        VALUES($product_company, '$product_name', '$product_description', '$product_price', '$product_unit', $product_tax_id, '$product_is_cash', '$product_purchase')");
+    }
     if(mysqli_error($conn)){
       echo $conn->error;
     } else {
-      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
+      echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
   } elseif (isset($_POST['add_product'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
@@ -75,14 +70,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE companyID = $cmpID AND taxID = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
         echo '<tr>';
-        echo '<td>'.$row['name'].'</td>';
-        echo '<td>'.$row['description'].'</td>';
+        echo '<td>'.mc_status().' '.secure_data('ERP', $row['name'], 'decrypt', $userID, $privateKey).'</td>';
+        echo '<td>'.mc_status().' '.secure_data('ERP', $row['description'], 'decrypt').'</td>';
         echo '<td>'.number_format($row['price'],2,',','.').'</td>';
         echo '<td>'.number_format($row['purchase'],2,',','.').'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
         echo '<td>'.$row['taxName'].' '.$row['percentage'].'%</td>';
         echo '<td><button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'" ><i class="fa fa-trash-o"></i></button>';
-        echo '<button type="submit" name="update" value="'.$row['id'].'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-cog"></i></button> ';
+        echo '<button type="submit" name="update" value="'.$row['id'].'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button>';
+        echo '</td>';
         echo '</tr>';
       }
       ?>
@@ -101,15 +97,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       </div>
       <div class="modal-body">
         <label>Name<?php echo mc_status(); ?></label>
-        <input <?php if($isUpdate) echo 'value="'.$update_row['name'].'" ' ?> type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
+        <input <?php if($isUpdate) echo 'value="'.secure_data('ERP', $update_row['name'], 'decrypt').'" ' ?> type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
         <br>
         <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
-        <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"><?php if($isUpdate) echo $update_row['description'] ?></textarea>
+        <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"><?php if($isUpdate) echo secure_data('ERP', $update_row['description'], 'decrypt'); ?></textarea>
         <br>
         <div class="row">
           <div class="col-md-3">
             <label><?php echo $lang['PURCHASE_PRICE']; ?></label>
-            <input <?php if($isUpdate) echo 'value="'.$update_row['purchase'].'" ' ?> id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
+            <input <?php if($isUpdate) echo 'value="'.$update_row['purchase'].'" '; ?> id="product_purchase" type="number" step='0.01' class="form-control" name="add_product_purchase" placeholder="EUR" />
           </div>
           <div class="col-md-1"><label>+</label></div>
           <div class="col-md-3">
@@ -119,7 +115,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <div class="col-md-1"><label>=</label></div>
           <div class="col-md-4">
             <label><?php echo $lang['PRICE_STK']; ?></label>
-            <input <?php if($isUpdate) echo 'value="'.$update_row['price'].'" ' ?> id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
+            <input <?php if($isUpdate) echo 'value="'.$update_row['price'].'" '; ?> id="product_price" type="number" step="0.01" class="form-control required-field" name="add_product_price" placeholder="EUR" />
           </div>
         </div>
         <br><br>
@@ -127,14 +123,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           <div class="col-md-4">
             <label><?php echo $lang['TAXES']; ?></label>
             <select class="js-example-basic-single btn-block" name="add_product_taxes">
-              <?php
-              $tax_result = $conn->query("SELECT * FROM taxRates");
-              while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
-                $selected = '';
-                if($tax_row['id'] == 3) $selected = 'selected';
-                echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].'   '.$tax_row['percentage'].'% </option>';
-              }
-              ?>
+                <?php
+                $tax_result = $conn->query("SELECT * FROM taxRates");
+                while($tax_result && ($tax_row = $tax_result->fetch_assoc())){
+                    $selected = '';
+                    if($tax_row['id'] == 3) $selected = 'selected';
+                    echo '<option '.$selected.' value="'.$tax_row['id'].'" >'.$tax_row['description'].' '.$tax_row['percentage'].'% </option>';
+                }
+                ?>
             </select>
           </div>
           <div class="col-md-4">
@@ -199,7 +195,7 @@ $("#product_purchase").on("keyup", function(){
 </script>
 <?php
   if($isUpdate){
-    echo "<script>document.getElementById('addArticle').click()</script>";
+    echo "<script>document.getElementById('addArticle').click();</script>";
   }
 
 include dirname(__DIR__) . '/footer.php'; ?>
