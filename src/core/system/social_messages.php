@@ -6,7 +6,7 @@
 <!-- TODO: Multiple Receivers -->
 <!-- FIXME: There's a loading screen forever bc of the return (when invalid input) --> 
 
-<?php include dirname(dirname(__DIR__)) .'/header.php';?>
+<?php require dirname(dirname(__DIR__)) .'/header.php';?>
 
 
 <!-- Page header -->
