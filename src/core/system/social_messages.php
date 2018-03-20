@@ -29,49 +29,44 @@
             //Check the $_POST values
             if(!isset($_POST['to']) || $_POST['to'] == ""){
                 showError($lang['RECEIVER_NOT_SPECIFIED']);
-                return;
-            }
-            if(!isset($_POST['subject']) || $_POST['subject'] == ""){
+            }else if(!isset($_POST['subject']) || $_POST['subject'] == ""){
                 showError($lang['SUBJECT_NOT_SPECIFIED']);
-                return;
-            }
-            if(!isset($_POST['message']) || $_POST['message'] == ""){
+            }else if(!isset($_POST['message']) || $_POST['message'] == ""){
                 showError($lang['MESSAGE_NOT_SPECIFIED']);
-                return;
-            }
-            
-            $to = $_POST['to'];
-            $subject = $_POST['subject'];
-            $message = $_POST['message'];
-            $partnerID = -1;
+            }else {
+                // no errors
+                $to = $_POST['to'];
+                $subject = $_POST['subject'];
+                $message = $_POST['message'];
+                $partnerID = -1;
 
-            // select the partnerid from the database
-            $sql = "SELECT * FROM socialprofile INNER JOIN userdata on userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY userdata.id LIMIT 1";
-            $result = $conn->query($sql);
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $partnerID = $row['userID'];
+                // select the partnerid from the database
+                $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY userdata.id LIMIT 1";
+                $result = $conn->query($sql);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $partnerID = $row['userID'];
+                    }
                 }
+
+                // the partner was not found in the database or its the same user
+                if($partnerID == -1 || $partnerID == $userID){
+                    showInfo("Invalid Receiver");
+                    return;
+                }
+
+                // messages [userID, partnerID, subject, message, picture, sent, seen]
+                $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partnerID, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");        
+                
+                ?>
+                <script>
+                    sendMessage(<?php echo $partnerID; ?>,$("#message<?php echo $partnerID; ?>").val(),"#messages<?php echo $partnerID; ?>",limit<?php echo $partnerID; ?>)
+                </script>
+                <?php
+
+                showInfo("Message sent!");
+                
             }
-
-            echo $partnerID . " " . $userID;
-
-            // the partner was not found in the database or its the same user
-            if($partnerID == -1 || $partnerID == $userID){
-                showInfo("Invalid Receiver");
-                return;
-            }
-
-            // messages [userID, partnerID, subject, message, picture, sent, seen]
-            $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partnerID, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");        
-            
-            ?>
-            <script>
-                sendMessage(<?php echo $partnerID; ?>,$("#message<?php echo $partnerID; ?>").val(),"#messages<?php echo $partnerID; ?>",limit<?php echo $partnerID; ?>)
-            </script>
-            <?php
-
-            showInfo("Message sent!");
         }
     ?>
 
