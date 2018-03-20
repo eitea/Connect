@@ -2,18 +2,69 @@
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $activeTab = 0;
-
+$query_access_modules = array(
+    'DSGVO' => "isDSGVOAdmin = 'TRUE'",
+    'ERP' => "isERPAdmin = 'TRUE'"
+);
 $result = $conn->query("SELECT activeEncryption FROM configurationData");
 if(!$result) die($lang['ERROR_UNEXPECTED']);
 $config_row = $result->fetch_assoc();
 
 $encrypted_modules = array();
-$result = $conn->query("SELECT DISTINCT module FROM security_modules WHERE outDated = 'FALSE'");
+$result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules WHERE outDated = 'FALSE'");
 while($row = $result->fetch_assoc()){
     $encrypted_modules[$row['module']] = $row['outDated'];
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    function encrypt_module($module, $symmetric){
+        global $conn;
+        if($module == 'DSGVO'){
+            $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('sss', $text, $head, $id);
+            $result = $conn->query("SELECT id, txt, name FROM documents"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = $row['id'];
+                $text = simple_encryption($row['txt'], $symmetric);
+                $head = simple_encryption($row['name'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
+
+            $stmt = $conn->prepare("UPDATE document_customs SET content = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('si', $text, $id);
+            $result = $conn->query("SELECT id, content FROM document_customs"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = $row['id'];
+                $text = simple_encryption($row['content'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
+            echo $conn->error;
+        } elseif($module == 'ERP'){
+            $stmt = $conn->prepare("UPDATE products SET name = ?, description = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('ssi', $name, $text, $id);
+            $result = $conn->query("SELECT id, name, description FROM products"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = intval($row['id']);
+                $name = simple_encryption($row['name'], $symmetric);
+                $text = simple_encryption($row['description'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
+
+            $stmt = $conn->prepare("UPDATE articles SET name = ?, description = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('ssi', $name, $text, $id);
+            $result = $conn->query("SELECT id, name, description FROM articles"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = intval($row['id']);
+                $name = simple_encryption($row['name'], $symmetric);
+                $text = simple_encryption($row['description'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
+        }
+    }
     if(empty($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'TRUE'){
         //you can only deactivate if you can decrypt every module.
         $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE'");
@@ -38,13 +89,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $key_downloads['company_'.$companyID] = base64_encode($private)." \n".base64_encode($public);
                 $conn->query("UPDATE companyData SET publicPGPKey = '".base64_encode($public)."' WHERE id = $companyID"); echo $conn->error;
                 $nonce = random_bytes(24);
-                $encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.$user_public);
+                $encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey));
                 $conn->query("INSERT INTO security_company(userID, companyID, privateKey) VALUES ($userID, 1, '".base64_encode($encrypted)."')"); echo $conn->error;
                 if($conn->error) $accept = false;
             }
             if($accept && !empty($_POST['module_encrypt'])){ //module
                 $stmt = $conn->prepare("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $module, $public, $encrypted);
+
+                $stmt_access = $conn->prepare("INSERT INTO security_access(userID, module, privateKey) VALUES(?, ?, ?)");
+                $stmt_access->bind_param("iss", $access_user, $module, $access_private_encrypted);
                 foreach($_POST['module_encrypt'] as $module){
                     $module = test_input($module, true);
                     $keyPair = sodium_crypto_box_keypair();
@@ -53,34 +107,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
                     $nonce = random_bytes(24);
 
-                    //$conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('DSGVO', '".base64_encode($public)."', '".base64_encode($encrypted)."')");
-                    $encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
+                    $encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
                     $public = base64_encode($public);
                     $stmt->execute();
                     if($conn->error) $accept = false;
 
                     if($accept){ //access
-                        //TODO: foreach user with access to corresponding module, encrypt key with public key.
-                        $result = $conn->query("SELECT * FROM roles");
+                        encrypt_module($module, $symmetric);
+                        $result = $conn->query("SELECT publicPGPKey, id FROM UserData LEFT JOIN roles ON userID = id WHERE publicPGPKey IS NOT NULL AND ".$query_access_modules[$module]);
                         while($row = $result->fetch_assoc()){
-
+                            $user_public = base64_decode($row['publicPGPKey']);
+                            $nonce = random_bytes(24);
+                            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+                            $access_user = $row['id'];
+                            $stmt_access->execute();
+                            echo $conn->error;
                         }
-
-                        $nonce = random_bytes(24);
-                        $encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.$user_public);
-                        $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($encrypted)."')");
-                        if($conn->error) $accept = false;
                     } else {
                         $err .= $conn->error;
                     }
-
-
-
                 }
                 $stmt->close();
+                $stmt_access->close();
+                $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
             }
         } else {
-
+            //see if any modules were added, and encrypt those too.
+            //see if modules were removed, and decrypt them.
         }
     }
 

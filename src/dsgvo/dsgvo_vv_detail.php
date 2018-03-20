@@ -203,6 +203,7 @@ if(isset($settings['EXTRA_DOC'])){
                 }
             }
 
+            //no other sane choice for the backend to be but here
             if($space && isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
                 $setID = $space;
                 $setting = test_input($_POST['add_category_name']);
