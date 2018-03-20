@@ -788,16 +788,16 @@ function dynamicOnLoad(modID){
         menubar: false,
         statusbar: false,
         height: 300,
+        browser_spellcheck: true,
         toolbar: 'undo redo | cut copy paste | styleselect | link image file media | code table | InsertMicroTask | emoticons',
         setup: function(editor){
-            function insertMicroTask(){
-                var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
-                editor.insertContent(html);
-            }
             editor.addButton("InsertMicroTask",{
                 tooltip: "Insert MicroTask",
                 icon: "template",
-                onclick: insertMicroTask,
+                onclick: function(){
+                    var html = "<p>[<label style='color: red;font-weight:bold'>MicroTaskName</label>] { </p><p> MicrotaskDescription here </p><p> }</p>";
+                    editor.insertContent(html);
+                },
             });
         },
         // enable title field in the Image dialog
