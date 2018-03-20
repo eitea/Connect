@@ -41,7 +41,7 @@
                 $partnerID = -1;
 
                 // select the partnerid from the database
-                $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY userdata.id LIMIT 1";
+                $sql = "SELECT * FROM socialprofile INNER JOIN userdata ON userdata.id = socialprofile.userID WHERE concat(firstname, ' ', lastname) = {$to} GROUP BY userdata.id LIMIT 1";
                 $result = $conn->query($sql);
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
@@ -60,9 +60,12 @@
                 
                 ?>
                 <script>
-                    sendMessage(<?php echo $partnerID; ?>,$("#message<?php echo $partnerID; ?>").val(),"#messages<?php echo $partnerID; ?>",limit<?php echo $partnerID; ?>)
+                    sendMessage(<?php echo $partnerID; ?>,$("#message<?php echo $partnerID; ?>").val(), "#messages<?php echo $partnerID; ?>", limit<?php echo $partnerID; ?>)
                 </script>
+
+
                 <?php
+
 
                 showInfo("Message sent!");
                 
@@ -132,7 +135,7 @@
 </div>
 
 
-<!-- TODO: Add AJAX Scripts to send and receive Messages (and one for Alerts) -->
+<!-- TODO: Add AJAX Scripts for alerts -->
 
 <script>
     /**
