@@ -40,6 +40,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt->execute();
             }
             $stmt->close();
+
+            $stmt = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('si', $text, $id);
+            $result = $conn->query("SELECT id, setting FROM dsgvo_vv_settings"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = $row['id'];
+                $text = simple_encryption($row['setting'], $symmetric);
+                $stmt->execute();
+            }
+            $stmt->close();
             echo $conn->error;
         } elseif($module == 'ERP'){
             $stmt = $conn->prepare("UPDATE products SET name = ?, description = ? WHERE id = ?"); echo $stmt->error;

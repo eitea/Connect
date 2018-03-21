@@ -447,7 +447,7 @@ if ($_SESSION['color'] == 'light') {
                     $("#searchModal .modal").modal("show");
                 }
         });
-        }
+    }
   </script>
 
   <!-- modal -->
@@ -460,7 +460,7 @@ if ($_SESSION['color'] == 'light') {
               <div class="modal-body">
                   <ul class="nav nav-tabs">
                       <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
-                      <li><a data-toggle="tab" href="#myModalPGP">PGP</a></li>
+                      <li><a data-toggle="tab" href="#myModalPGP">Security</a></li>
                   </ul>
                   <div class="tab-content">
                       <div id="myModalPassword" class="tab-pane fade in active"><br>
@@ -472,7 +472,7 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                       </div>
                       <div id="myModalPGP" class="tab-pane fade"><br>
-                          <h4 class="modal-title">Pretty Good Protection</h4><button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
+                          <button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
                           <br>
                           <div class="col-md-12">
                               <label>Public Key</label>

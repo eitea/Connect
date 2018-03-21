@@ -21,14 +21,16 @@ if($vv_row['type'] == 'app'){ $doc_type = 'APP'; }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
-    $stmt_update_setting->bind_param("si", $setting, $valID);
+    $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
     $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
-    $stmt_insert_setting->bind_param("iss", $setID, $setting, $cat);
+    $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
 }
 function getSettings($like, $mults = false){
     global $conn;
     global $vvID;
     global $templateID;
+    global $userID;
+    global $privateKey;
     $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_template_settings.id, dsgvo_vv_settings.id AS valID
     FROM dsgvo_vv_template_settings LEFT JOIN dsgvo_vv_settings ON setting_id = dsgvo_vv_template_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND templateID = $templateID");
     echo $conn->error;
@@ -37,11 +39,11 @@ function getSettings($like, $mults = false){
         $settings[$row['opt_name']]['descr'] = $row['opt_descr'];
         $settings[$row['opt_name']]['id'] = $row['id'];
         if($mults){
-            $settings[$row['opt_name']]['setting'][] = $row['setting'];
+            $settings[$row['opt_name']]['setting'][] = secure_data('DSGVO', $row['setting'], 'decrypt', $userID, $privateKey);
             $settings[$row['opt_name']]['valID'][] = $row['valID'];
             $settings[$row['opt_name']]['category'][] = $row['category'];
         } else {
-            $settings[$row['opt_name']]['setting'] = $row['setting'];
+            $settings[$row['opt_name']]['setting'] = secure_data('DSGVO', $row['setting'], 'decrypt', $userID, $privateKey);
             $settings[$row['opt_name']]['valID'] = $row['valID'];
         }
     }
@@ -59,6 +61,7 @@ $settings = getSettings('DESCRIPTION');
 if(isset($settings['DESCRIPTION'])):
     if(isset($_POST['DESCRIPTION'])){
         $setting = strip_tags($_POST['DESCRIPTION']);
+        $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
         $valID = $settings['DESCRIPTION']['valID'];
         if($valID){
             $stmt_update_setting->execute();
@@ -91,7 +94,7 @@ if(isset($settings['DESCRIPTION'])):
                 <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?></div>
             </div>
             <?php else: ?>
-            <div class="panel-heading">Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation</div>
+            <div class="panel-heading">Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation <?php echo mc_status(); ?></div>
             <div class="panel-body">
                 <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
             </div>
@@ -109,6 +112,7 @@ if(isset($settings['DESCRIPTION'])):
             if(isset($_POST[$key])){
                 $val['setting'] = $setting = strip_tags($_POST[$key]);
                 $valID = $val['valID'];
+                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                 if($valID){
                     $stmt_update_setting->execute();
                 } else {
@@ -117,7 +121,7 @@ if(isset($settings['DESCRIPTION'])):
                 }
             }
             echo '<div class="row">';
-            echo '<div class="col-sm-6 bold">'.$val['descr'].'</div>';
+            echo '<div class="col-sm-6 bold">'.$val['descr'].' '.mc_status().'</div>';
             echo '<div class="col-sm-6 grey"><input type="text" class="form-control" maxlength="700" name="'.$key.'" value="'.$val['setting'].'"/></div>';
             echo '</div>';
         }
@@ -134,6 +138,7 @@ if(isset($settings['DESCRIPTION'])):
             foreach($settings as $key => $val){
                 if(isset($_POST[$key])){
                     $val['setting'] = $setting = intval($_POST[$key]);
+                    $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                     $valID = $val['valID'];
                     if($valID){
                         $stmt_update_setting->execute();
@@ -161,7 +166,7 @@ $settings = getSettings('EXTRA_%');
 if(isset($settings['EXTRA_DVR'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_DVR']['descr'].'</div>';
+    echo '<div class="panel-heading">'.$settings['EXTRA_DVR']['descr'].' '.mc_status().'</div>';
     echo '<div class="row"><div class="col-sm-6 bold">DVR-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">DAN-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
     echo '</div></div>';
@@ -169,7 +174,7 @@ if(isset($settings['EXTRA_DVR'])){
 if(isset($settings['EXTRA_FOLGE'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].'</div>';
+    echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].' '.mc_status().'</div>';
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Ja, wann?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_DATE" class="form-control datepicker"></div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wenn Nein, warum?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_REASON" class="form-control"></div></div>';
@@ -178,7 +183,7 @@ if(isset($settings['EXTRA_FOLGE'])){
 if(isset($settings['EXTRA_DOC'])){
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].'</div>';
+    echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].' '.mc_status().'</div>';
     echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="0">Nein</div></div>';
     echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control"></div></div>';
     echo '</div></div>';
@@ -191,29 +196,35 @@ if(isset($settings['EXTRA_DOC'])){
         <div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
         <div class="panel-body">
             <?php
+            if(!empty($_POST['delete_cat'])){
+                $conn->query("DELETE FROM dsgvo_vv_settings WHERE id = ".intval($_POST['delete_cat']));
+                echo $conn->error;
+            }
             $str_heads = $space = $space_key = '';
             $heading = getSettings('APP_HEAD_%', true);
             foreach($heading as $key => $val){
                 if($val['setting'][0]){
-                    $str_heads .= '<th>'.$val['setting'][0].'</th>';
+                    $str_heads .= '<th><div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button>
+                    <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li></ul></div></th>';
                 } else {
                     $space_key = !$space ? $key : $space_key;
                     $space = !$space ? $val['id'] : $space;
                     unset($heading[$key]);
                 }
             }
-
             //no other sane choice for the backend to be but here
             if($space && isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
                 $setID = $space;
                 $setting = test_input($_POST['add_category_name']);
+                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                 $cat = test_input($_POST['add_category_mittlung']);
                 $stmt_insert_setting->execute();
                 if($conn->error){
                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
                 } else {
                     $heading[$space_key] = array('id' => $conn->insert_id, 'category' => array());
-                    $str_heads .= '<th>'.$setting.'</th>';
+                    $str_heads .= '<th><div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$setting.'</button>
+                    <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li></ul></div></th>';
                 }
             } elseif(!$space){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Kein Platz mehr.</div>';
@@ -239,6 +250,7 @@ if(isset($settings['EXTRA_DOC'])){
                         $valID = $catVal['valID'];
                         if(!empty($_POST[$catKey])){
                             $catVal['setting'] = $setting = '1';
+                            $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                             if($valID){ //update to true if checked and exists
                                 $stmt_update_setting->execute();
                             } else { //insert with true if checked and not exists
@@ -248,6 +260,7 @@ if(isset($settings['EXTRA_DOC'])){
                             }
                         } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
                             $catVal['setting'] = $setting = '0';
+                            $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                             $stmt_update_setting->execute();
                         }
                     }
@@ -263,6 +276,7 @@ if(isset($settings['EXTRA_DOC'])){
                         if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             if(!empty($_POST[$headKey.'_'.$catKey])){
                                 $setting = '1';
+                                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 $checked = 'checked';
                                 if($j){
                                     $valID = $headVal['valID'][$j];
@@ -275,6 +289,7 @@ if(isset($settings['EXTRA_DOC'])){
                             } elseif($j && $headVal['setting'][$j]){
                                 $valID = $headVal['valID'][$j];
                                 $setting = '0';
+                                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 $checked = '';
                                 $stmt_update_setting->execute();
                                 echo $stmt_update_setting->error;
