@@ -996,6 +996,9 @@ $lang_ger['PRODUCTS'] = 'Produkte';
 $lang_eng['PROJECT'] = 'Project';
 $lang_ger['PROJECT'] = 'Projekt';
 
+$lang_eng['PROJECTS'] = 'Project';
+$lang_ger['PROJECTS'] = 'Projekt';
+
 $lang_eng['PROJECT_BOOKINGS'] = 'Projectbookings';
 $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';
 
@@ -1206,9 +1209,6 @@ $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
 
-$lang_eng['STATIC_PROJECTS'] = 'Static Projects';
-$lang_ger['STATIC_PROJECTS'] = 'Statische Projekte';
-
 $lang_eng['STREET'] = 'Street';
 $lang_ger['STREET'] ='Straße';
 
@@ -1349,9 +1349,6 @@ $lang_ger['VAT'] = 'USt.';
 
 $lang_eng['VIEW'] = 'View';
 $lang_ger['VIEW'] = 'Ansehen';
-
-$lang_eng['VIEW_PROJECTS'] = 'View Projects';
-$lang_ger['VIEW_PROJECTS'] = 'Projekte';
 
 $lang_eng['VIEW_TIMESTAMPS'] = 'My Times';
 $lang_ger['VIEW_TIMESTAMPS'] = 'Meine Zeiten';

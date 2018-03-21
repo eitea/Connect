@@ -835,7 +835,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <div class="panel-body">
                       <ul class="nav navbar-nav">
                           <?php if ($isProjectAdmin == 'TRUE'): ?>
-                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                           <?php endif;?>
                           <?php if ($isProjectAdmin == 'TRUE'): ?>

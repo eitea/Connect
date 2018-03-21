@@ -15,7 +15,6 @@ $result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules W
 while($row = $result->fetch_assoc()){
     $encrypted_modules[$row['module']] = $row['outDated'];
 }
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function encrypt_module($module, $symmetric){
         global $conn;
