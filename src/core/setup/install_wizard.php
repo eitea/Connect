@@ -123,8 +123,8 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
         <?php if(isset($accept) && $accept): ?>
             <div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>Schlüssel wurden erstellt</div>
             <form method="POST" target="_blank" action="keys">
-                <input type="hidden" name="personal" value="<?php echo urlencode($content_personal); ?>" >
-                <input type="hidden" name="company" value="<?php echo urlencode($content_company); ?>" >
+                <input type="hidden" name="personal" value="<?php echo $content_personal; ?>" >
+                <input type="hidden" name="company" value="<?php echo $content_company; ?>" >
                 <button type="submit" class="btn btn-warning">Schlüssel Herunterladen</button>
                 <br>
                 <small> Diese Datei beinhaltet Sicherheitskopien Ihrer Zugangschlüssel und sollte von Ihnen stets sicher verwahrt werden.<br>

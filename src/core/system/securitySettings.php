@@ -65,28 +65,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt->close();
         }
     }
-    if(empty($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'TRUE'){
-        //you can only deactivate if you can decrypt every module.
-        $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE'");
-        if(count($encrypted_modules) > $result->num_rows){
 
-        }
-        $conn->query("UPDATE security_company SET outDated = 'TRUE'");
-        $conn->query("UPDATE security_modules SET outDated = 'TRUE'");
-        $conn->query("UPDATE security_access SET outDated = 'TRUE'");
-
-        $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
-    }
     if(isset($_POST['activate_encryption'])){
         if($config_row['activeEncryption'] == 'FALSE'){
             //activate encrytpion
             $accept = true;
             $key_downloads = array();
-            foreach($available_companies as $companyID){
+            $result = $conn->query("SELECT id FROM companyData"); echo $conn->error;
+            if(!$result) $accept = false;
+            while($result && ($row = $result->fetch_assoc())){
+                $companyID = $row['id'];
                 $keyPair = sodium_crypto_box_keypair();
                 $private = sodium_crypto_box_secretkey($keyPair);
                 $public = sodium_crypto_box_publickey($keyPair);
-                $key_downloads['company_'.$companyID] = base64_encode($private)." \n".base64_encode($public);
+                $key_downloads[] = base64_encode($private)." \n".base64_encode($public);
                 $conn->query("UPDATE companyData SET publicPGPKey = '".base64_encode($public)."' WHERE id = $companyID"); echo $conn->error;
                 $nonce = random_bytes(24);
                 $encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey));
@@ -96,7 +88,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if($accept && !empty($_POST['module_encrypt'])){ //module
                 $stmt = $conn->prepare("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $module, $public, $encrypted);
-
                 $stmt_access = $conn->prepare("INSERT INTO security_access(userID, module, privateKey) VALUES(?, ?, ?)");
                 $stmt_access->bind_param("iss", $access_user, $module, $access_private_encrypted);
                 foreach($_POST['module_encrypt'] as $module){
@@ -124,17 +115,37 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             echo $conn->error;
                         }
                     } else {
-                        $err .= $conn->error;
+                        echo $conn->error;
                     }
                 }
                 $stmt->close();
                 $stmt_access->close();
                 $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
             }
+            if($accept){
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>O.K.</div>';
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
         } else {
-            //see if any modules were added, and encrypt those too.
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Feature yet to be implemented</div>';
+            //see if any modules were added, and encrypt those
+
+
             //see if modules were removed, and decrypt them.
         }
+    }
+    if(empty($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'TRUE'){
+        //you can only deactivate if you can decrypt every module.
+        $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE'");
+        if(count($encrypted_modules) > $result->num_rows){
+
+        }
+        $conn->query("UPDATE security_company SET outDated = 'TRUE'");
+        $conn->query("UPDATE security_modules SET outDated = 'TRUE'");
+        $conn->query("UPDATE security_access SET outDated = 'TRUE'");
+
+        $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
     }
 
     if(!empty($_POST['saveRoles'])){
@@ -276,7 +287,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <?php
 if(!empty($key_downloads)){
-    //TODO: present keys for download
+    echo '<form method="POST" target="_blank" action="../setup/keys">';
+    foreach($key_downloads as $dKey){
+        echo '<input type="hidden" name="company[]" value="'.$dKey.'" >';
+    }
+    echo '<button type="submit" class="btn btn-warning">Schlüssel Herunterladen</button>';
+    echo '</form>';
 }
 ?>
 
