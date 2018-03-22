@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToTemplate($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; enableToTemplate($userID); ?>
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
@@ -40,7 +40,9 @@ if(isset($_GET['id'])){
 }
 
 if($templateName == 'Main_Report'){
-  die("Cannot edit Main Report");
+    echo 'Cannot edit main Report';
+    include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php';
+    die();
 }
 ?>
 
@@ -88,4 +90,4 @@ $('.btn-insert').click(function() {
 });
 </script>
 
-<?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
+<?php include dirname(__DIR__) . '/footer.php'; ?>

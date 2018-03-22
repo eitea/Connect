@@ -49,7 +49,6 @@ while ($result && ($rowu = $result->fetch_assoc())) {
 $resultNotes = $conn->query("SELECT * FROM clientInfoNotes WHERE parentID = $detailID"); echo $conn->error;
 $resultBank = $conn->query("SELECT * FROM clientInfoBank WHERE parentID = $detailID"); echo $conn->error;
 $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName FROM contactPersons LEFT JOIN position ON position.id = position WHERE clientID = $x"); echo $conn->error;
-
 ?>
 
 <div class="modal fade" id="editingModal-<?php echo $x; ?>">
@@ -63,7 +62,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs">
-                        <li><a data-toggle="tab" href="#project<?php echo $x; ?>" ><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
+                        <li><a data-toggle="tab" href="#project<?php echo $x; ?>" ><?php echo $lang['PROJECTS']; ?></a></li>
                         <li class="active"><a data-toggle="tab" href="#home<?php echo $x; ?>" ><?php echo $lang['RECORD']; ?></a></li>
                         <li><a data-toggle="tab" href="#menuTaxes<?php echo $x; ?>" ><?php echo $lang['TAXES']; ?></a></li>
                         <li><a data-toggle="tab" href="#menuBank<?php echo $x; ?>" >Banking</a></li>
@@ -74,7 +73,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                     </ul>
                     <div class="tab-content">
                         <div id="project<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'project') {echo 'in active';} ?>">
-                            <h3><?php echo $lang['VIEW_PROJECTS']; ?>
+                            <h3><?php echo $lang['PROJECTS']; ?>
                             <div class="page-header-button-group">
                                 <button type="submit" class="btn btn-default" name='delete_projects' title="<?php echo $lang['DELETE']; ?>" ><i class="fa fa-trash-o"></i></button>
                                 <button type="button" class="btn btn-default" title="<?php echo $lang['ADD']; ?>" data-toggle="modal" data-target=".add-project"><i class="fa fa-plus"></i></button>
@@ -92,7 +91,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $result_p = $conn->query("SELECT * FROM $projectTable WHERE clientID = $x");
+                                    $result_p = $conn->query("SELECT * FROM projectData WHERE clientID = $x");
                                     while ($row_p = $result_p->fetch_assoc()) {
                                         $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
                                         echo '<tr>';

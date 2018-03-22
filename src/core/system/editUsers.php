@@ -150,6 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $private_encrypt = simple_encryption($privateKey, $_POST['password']);
                   $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID'");
               } else {
+                  //TODO: if encryption is active, check if $userID can give access to all modules this user as (outDated == TRUE). if one is missing, cancel operation.
                   $keyPair = sodium_crypto_box_keypair();
                   $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
                   $user_public = sodium_crypto_box_publickey($keyPair);
@@ -162,7 +163,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $result = $conn->query("SELECT id, privateKey, publicPGPKey FROM security_company LEFT JOIN companyData ON companyData.id = security_company.companyID WHERE userID = $x");
                   while($result && ($row = $result->fetch_assoc())){
                   }
-
                   $result = $conn->query("SELECT id, privateKey FROM security_access WHERE userID = $x");
                   while($result && ($row = $result->fetch_assoc())){
                   }

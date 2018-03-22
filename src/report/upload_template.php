@@ -14,7 +14,7 @@ if(isset($_POST["templateUpload"])) {
   }
   $fp = file_get_contents($_FILES['fileToUpload']['tmp_name'], 'rb');
   if($fp){
-    include dirname(dirname(__DIR__)).'/connection.php';
+    include dirname(__DIR__).DIRECTORY_SEPARATOR.'connection.php';
     $fp = $conn->real_escape_string($fp);
     $conn->query("INSERT INTO $pdfTemplateTable (name, htmlCode) VALUES('$name', '$fp')");
     echo mysqli_error($conn);

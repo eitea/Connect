@@ -9,7 +9,9 @@ if(!($canUseClients == 'TRUE' || $canEditClients == 'TRUE')){
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if($_SERVER["REQUEST_METHOD"] == "POST"){    
+    require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'client_backend.php';
+
     if(!empty($_POST['delete'])){
         $conn->query("DELETE FROM clientData WHERE id = ".intval($_POST['delete']));
         if($conn->error){
@@ -81,7 +83,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSu
             $.ajax({
                 url:'ajaxQuery/AJAX_customerDetailModal.php',
                 data:{custid: index},
-                type: 'POST',
+                type: 'GET',
                 success : function(resp){
                     $("#editingModalDiv").append(resp);
                     existingModals.push(index);

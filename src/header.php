@@ -772,10 +772,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <div class="collapse" id="toggleSettings" style="height: 0px;">
                         <ul class="nav nav-list">
                             <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                            <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_advanced.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_password.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_report.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                            <li><a <?php if ($this_page == 'options_archive.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                             <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                             <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                             <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
@@ -793,7 +793,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page == 'archiveOptions.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -850,7 +850,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   </div>
               </div>
           </div>
-          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
+          <?php if ($this_page == "project_view.php" || $this_page = 'project_detail.php' || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
               echo "<script>$('#adminOption_PROJECT').click();</script>";
           } ?>
       <?php endif;?>
@@ -870,7 +870,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
                 <li><a <?php if ($this_page == 'report_productivity.php') {echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
               <?php endif;?>
-                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li>
+                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
               </ul>
             </div>
           </div>
