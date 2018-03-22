@@ -215,13 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
         }
     }
-    if(isset($_POST['savePAS']) && !empty(trim($_POST['publicPGP']))){
-        $conn->query("UPDATE userdata SET publicPGPKey = '".test_input($_POST['publicPGP'])."' WHERE id=".$userID);
-        if(!empty($_POST['privatePGP']) && !empty($_POST['encodePGP'])){
-            $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
-            $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
-        }
-    } elseif(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+    if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
     } elseif(isset($_POST["GERMAN"])){
       $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
@@ -402,7 +396,7 @@ if ($_SESSION['color'] == 'light') {
                     </a>
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-                <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+                <a class="btn navbar-btn navbar-link" id="header-gears" data-toggle="modal" data-target="#passwordModal"><i class="fa fa-gears"></i></a>
                 <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
                 <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
             </div>
@@ -451,7 +445,7 @@ if ($_SESSION['color'] == 'light') {
   </script>
 
   <!-- modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
           <form method="POST">
               <div class="modal-header">
@@ -464,40 +458,54 @@ if ($_SESSION['color'] == 'light') {
                   </ul>
                   <div class="tab-content">
                       <div id="myModalPassword" class="tab-pane fade in active"><br>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" >
+                              </div>
                           </div>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
+                              </div>
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" ><br>
+                              </div>
+                          </div>
+                          <div class="col-md-12 text-right">
+                              <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
                           </div>
                       </div>
                       <div id="myModalPGP" class="tab-pane fade"><br>
-                          <button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
-                          <br>
                           <div class="col-md-12">
                               <label>Public Key</label>
-                              <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php
-                              $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
-                              if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
-                              ?></textarea><br>
+                              <br><?php echo $publicKey; ?><br><br>
                           </div>
                           <div class="col-md-12">
-                              <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP"><i class="fa fa-eye"></i></button>
-                              <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP); ?></textarea><br>
-                          </div>
-                          <div class="col-md-12"><label>Encryption Password</label>
-                              <input placeholder="Ihr Private Key wird mit diesem Passwort verschlüsselt! z.B. Ihr Benutzer-Passwort" type="password" class="form-control" name="encodePGP"/><br>
+                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userPasswordHash) != $userPasswordHash): ?>
+                                  <label>Keypair download</label>
+                                  <input type="hidden" name="personal" value="<?php echo $privateKey."\n".$publicKey; ?>" />
+                                  <div class="text-right">
+                                      <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Download</button>
+                                  </div>
+                              <?php else: ?>
+                                  <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><br>
+                                  <small>Zum entsperren des Schlüsselpaar Downloads</small>
+                                  <input type="password" name="unlockKeyDownload" class="form-control">
+                                  <?php if(isset($_POST['unlockKeyDownload'])) echo '<span style="color:red">*Falsches Passwort</span>'; ?>
+                                  <br>
+                                  <div class="text-right">
+                                      <button type="submit" class="btn btn-warning">Entsperren</button>
+                                  </div>
+                              <?php endif; ?>
                           </div>
                       </div>
                   </div>
               </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" onClick="clearPGP()" data-dismiss="modal">Cancel</button>
-                  <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
-              </div>
           </form>
       </div>
   </div>
+
+  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGP").click();});</script>'; ?>
 
   <form method="POST">
     <div class="modal fade" id="decryptPGP" role="dialog" tab-index="-1">
