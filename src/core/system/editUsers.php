@@ -146,7 +146,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
           if (strcmp($_POST['password'], $_POST['passwordConfirm']) == 0  && match_passwordpolicy($_POST['password'])) {
               $psw = password_hash($password, PASSWORD_BCRYPT);
-              $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP WHERE id = '$x';");
+              if($x == $userID){
+                  $private_encrypt = simple_encryption($privateKey, $_POST['password']);
+                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID'");
+              } else {
+                  $keyPair = sodium_crypto_box_keypair();
+                  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+                  $user_public = sodium_crypto_box_publickey($keyPair);
+
+                  $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
+                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1, publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '$private_encrypt' WHERE id = '$x';");
+                  //give user a new key pair.
+                  /*
+                  //cannot re-encrypt keys, nor give access the admin doesnt have.
+                  $result = $conn->query("SELECT id, privateKey, publicPGPKey FROM security_company LEFT JOIN companyData ON companyData.id = security_company.companyID WHERE userID = $x");
+                  while($result && ($row = $result->fetch_assoc())){
+                  }
+
+                  $result = $conn->query("SELECT id, privateKey FROM security_access WHERE userID = $x");
+                  while($result && ($row = $result->fetch_assoc())){
+                  }
+                  */
+              }
           } else {
               echo '<div class="alert alert-danger fade in">';
               echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';

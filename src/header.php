@@ -51,15 +51,11 @@ if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
 $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey FROM UserData WHERE id = $userID");
-if ($result) {
-    $row = $result->fetch_assoc();
+if($result && ($row = $result->fetch_assoc())) {
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
     $publicKey = $row['publicPGPKey'];
-
-    if($row['forcedPwdChange']==='1'){
-        redirect("../login/passwordChange");
-    }
+    $forcedPwdChange = ($row['forcedPwdChange'] === '1');
 } else {
     echo $conn->error;
 }
@@ -200,12 +196,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['posttimer'] = time();
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
-        $passwordConfirm = $_POST['passwordConfirm'];
         $output = '';
-        if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
+        if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
-            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
-
+            $private_encrypted = simple_encryption($privateKey, $password);
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
             if(!$conn->error){
                 $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
             } else {
@@ -214,23 +209,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
         }
+    } elseif(isset($_POST['savePAS'])) {
+        $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
     if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
     } elseif(isset($_POST["GERMAN"])){
-      $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
+      $sql="UPDATE UserData SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'GER';
       $validation_output = mysqli_error($conn);
     } elseif(isset($_POST['ENGLISH'])){
-      $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
+      $sql="UPDATE UserData SET preferredLang='ENG' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'ENG';
       $validation_output = mysqli_error($conn);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
-        $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
+        $conn->query("UPDATE UserData SET color = '$txt' WHERE id = $userID");
     }
     if (isset($_POST['saveSocial'])) {
         // picture upload
@@ -447,17 +444,17 @@ if ($_SESSION['color'] == 'light') {
   <!-- modal -->
   <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
-          <form method="POST">
-              <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
-              </div>
-              <div class="modal-body">
-                  <ul class="nav nav-tabs">
-                      <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
-                      <li><a data-toggle="tab" href="#myModalPGP">Security</a></li>
-                  </ul>
-                  <div class="tab-content">
-                      <div id="myModalPassword" class="tab-pane fade in active"><br>
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
+          </div>
+          <div class="modal-body">
+              <ul class="nav nav-tabs">
+                  <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
+                  <li><a id="myModalPGPtab" data-toggle="tab" href="#myModalPGP">Security</a></li>
+              </ul>
+              <div class="tab-content">
+                  <div id="myModalPassword" class="tab-pane fade in active"><br>
+                       <form method="POST">
                           <div class="row">
                               <div class="col-md-6">
                                   <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" >
@@ -474,38 +471,38 @@ if ($_SESSION['color'] == 'light') {
                           <div class="col-md-12 text-right">
                               <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
                           </div>
-                      </div>
-                      <div id="myModalPGP" class="tab-pane fade"><br>
+                      </form>
+                  </div>
+                  <div id="myModalPGP" class="tab-pane fade"><br>
+                      <form method="POST">
                           <div class="col-md-12">
                               <label>Public Key</label>
                               <br><?php echo $publicKey; ?><br><br>
                           </div>
                           <div class="col-md-12">
-                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userPasswordHash) != $userPasswordHash): ?>
+                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userPasswordHash) == $userPasswordHash): ?>
                                   <label>Keypair download</label>
-                                  <input type="hidden" name="personal" value="<?php echo $privateKey."\n".$publicKey; ?>" />
-                                  <div class="text-right">
-                                      <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Download</button>
-                                  </div>
+                                  <input type="hidden" name="personal" value="<?php echo $privateKey."\n".$publicKey; ?>" /><br>
+                                  <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Download</button>
                               <?php else: ?>
                                   <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><br>
                                   <small>Zum entsperren des Schlüsselpaar Downloads</small>
                                   <input type="password" name="unlockKeyDownload" class="form-control">
-                                  <?php if(isset($_POST['unlockKeyDownload'])) echo '<span style="color:red">*Falsches Passwort</span>'; ?>
+                                  <?php if(isset($_POST['unlockKeyDownload'])) echo '<small style="color:red">Falsches Passwort</small>'; ?>
                                   <br>
                                   <div class="text-right">
                                       <button type="submit" class="btn btn-warning">Entsperren</button>
                                   </div>
                               <?php endif; ?>
                           </div>
-                      </div>
+                      </form>
                   </div>
               </div>
-          </form>
+          </div>
       </div>
   </div>
 
-  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGP").click();});</script>'; ?>
+  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGPtab").click();});</script>'; ?>
 
   <form method="POST">
     <div class="modal fade" id="decryptPGP" role="dialog" tab-index="-1">
@@ -1103,11 +1100,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
-      if($row['expiration'] == 'TRUE'){ //can a password expire?
+      if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
-          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
-              if($row['expirationType'] == 'FORCE'){ //force the change
+              if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
                   include 'footer.php';
                   die();
               }

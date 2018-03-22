@@ -37,7 +37,7 @@ function create_tables($conn) {
         emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
         color VARCHAR(10) DEFAULT 'dark',
         real_email VARCHAR(50),
-        forcedPwdChange TINYINT(1) NULL DEFAULT NULL,
+        forcedPwdChange TINYINT(1) NOT NULL DEFAULT 0,
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
         publicPGPKey VARCHAR(150) NULL,
