@@ -1,16 +1,15 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToClients($userID); ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
-if(!($canUseClients == 'TRUE' || $canEditClients == 'TRUE')){
-    echo "Access denied.";
-    include dirname(dirname(__DIR__)) . '/footer.php';
-    die();
-}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
-if($_SERVER["REQUEST_METHOD"] == "POST"){    
-    require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'client_backend.php';
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(!empty($_POST['saveID'])){
+        $filterClient = intval($_POST['saveID']);
+        require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'client_backend.php';
+    }
 
     if(!empty($_POST['delete'])){
         $conn->query("DELETE FROM clientData WHERE id = ".intval($_POST['delete']));
@@ -58,7 +57,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSu
             echo '<td>'.$row['name'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target="#delete-confirm-'.$row['id'].'" ><i class="fa fa-trash-o"></i></button>';
+            echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
             echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
             echo '</td>';
             echo '</tr>';
@@ -73,9 +72,11 @@ WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSu
         ?>
     </tbody>
 </table>
+
 <div id="editingModalDiv">
     <?php echo $modals; ?>
 </div>
+
 <script>
     var existingModals = new Array();
     function checkAppendModal(index){
@@ -100,13 +101,14 @@ WHERE companyID IN (".implode(', ', $available_companies).") AND clientData.isSu
             $('#editingModal-'+index).modal('show');
         }
     }
-
-    $('.table').on('click', 'button[name=editModal]', function(){
-        checkAppendModal($(this).val());
+    $('button[name=deleteModal]').click(function(){
+        $('#delete-confirm-'+$(this).val()).modal('show');
         event.stopPropagation();
     });
+
     $('.clicker').click(function(){
         checkAppendModal($(this).find('button[name=editModal]:first').val());
+        event.stopPropagation();
     });
 
     $('.table').DataTable({

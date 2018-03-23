@@ -1,32 +1,14 @@
 <?php
-isset($canEditSuppliers, $canEditClients) or die ("no permission (you need canEditSuppliers or canEditClients)");
-if(!($canEditSuppliers == 'TRUE' || $canEditClients == 'TRUE')){
-    echo "no permission (you need canEditSuppliers or canEditClients)";
-    include dirname(dirname(__DIR__)) . '/footer.php';
-    die();
-}
-if (isset($_GET['custID']) && is_numeric($_GET['custID'])) {
-    $filterClient = intval($_GET['custID']);
-} elseif (isset($_GET['supID']) && is_numeric($_GET['supID'])) {
-    $filterClient = intval($_GET['supID']);
-} else { // STRIKE
-    $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-    echo '<script>alert("<strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'")</script>';
-    redirect("../user/logout");
-}
-// get corresponding id from detailTable
-$result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $filterClient");
-if ($result && ($row = $result->fetch_assoc())) {
-    $detailID = $row['id'];
-} else { // no detailTable found -> create one
-    $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($filterClient)");
-    $detailID = $conn->insert_id;
-    echo mysqli_error($conn);
-}
 $activeTab = 'home';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['saveAll'])) {
-        $activeTab = $_POST['saveAll'];
+    // get corresponding id from detailTable
+    $result = $conn->query("SELECT id FROM $clientDetailTable WHERE clientId = $filterClient LIMIT 1");
+    if ($result && ($row = $result->fetch_assoc())) {
+        $detailID = $row['id'];
+    } else { // no detailTable found -> create one
+        $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($filterClient)");
+        $detailID = $conn->insert_id;
+        echo mysqli_error($conn);
     }
     //always update
     $val = isset($_POST['contactType']) ? test_input($_POST['contactType']) : '';

@@ -9,8 +9,8 @@ canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',          |
 */
 
 function enableToCore($userID){
-  require 'connection.php';
-  $sql = "SELECT isCoreAdmin FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isCoreAdmin FROM roles WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -20,8 +20,8 @@ function enableToCore($userID){
 }
 
 function enableToTime($userID){
-  require 'connection.php';
-  $sql = "SELECT isTimeAdmin FROM $roleTable WHERE userID = $userID AND isTimeAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isTimeAdmin FROM roles WHERE userID = $userID AND isTimeAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -31,8 +31,8 @@ function enableToTime($userID){
 }
 
 function enableToProject($userID){
-  require 'connection.php';
-  $sql = "SELECT isProjectAdmin FROM $roleTable WHERE userID = $userID AND isProjectAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isProjectAdmin FROM roles WHERE userID = $userID AND isProjectAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -42,8 +42,8 @@ function enableToProject($userID){
 }
 
 function enableToStamps($userID){
-  require 'connection.php';
-  $sql = "SELECT canStamp FROM $roleTable WHERE userID = $userID AND canStamp = 'TRUE'";
+  global $conn;
+  $sql = "SELECT canStamp FROM roles WHERE userID = $userID AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -53,8 +53,8 @@ function enableToStamps($userID){
 }
 
 function enableToBookings($userID){
-  require 'connection.php';
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canBook = 'TRUE' AND canStamp = 'TRUE'";
+  global $conn;
+  $sql = "SELECT * FROM roles WHERE userID = $userID AND canBook = 'TRUE' AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -64,8 +64,8 @@ function enableToBookings($userID){
 }
 
 function enableToTemplate($userID){
-  require 'connection.php';
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND (isCoreAdmin = 'TRUE' OR canEditTemplates = 'TRUE')";
+  global $conn;
+  $sql = "SELECT * FROM roles WHERE userID = $userID AND (isCoreAdmin = 'TRUE' OR canEditTemplates = 'TRUE')";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -75,8 +75,8 @@ function enableToTemplate($userID){
 }
 
 function enableToReport($userID){
-  require 'connection.php';
-  $sql = "SELECT isReportAdmin FROM $roleTable WHERE userID = $userID AND isReportAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isReportAdmin FROM roles WHERE userID = $userID AND isReportAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -86,8 +86,8 @@ function enableToReport($userID){
 }
 
 function enableToERP($userID){
-  require 'connection.php';
-  $sql = "SELECT isERPAdmin FROM $roleTable WHERE userID = $userID AND isERPAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isERPAdmin FROM roles WHERE userID = $userID AND isERPAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -97,8 +97,8 @@ function enableToERP($userID){
 }
 
 function enableToFinance($userID){
-  require 'connection.php';
-  $sql = "SELECT isFinanceAdmin FROM $roleTable WHERE userID = $userID AND isFinanceAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isFinanceAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -108,8 +108,8 @@ function enableToFinance($userID){
 }
 
 function enableToDSGVO($userID){
-  require 'connection.php';
-  $sql = "SELECT isFinanceAdmin FROM $roleTable WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -119,18 +119,23 @@ function enableToDSGVO($userID){
 }
 
 function enableToClients($userID){
-  require 'connection.php';
-  $sql = "SELECT isERPAdmin, isCoreAdmin FROM $roleTable WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE')";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND ( canUseClients = 'TRUE' OR canEditClients = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')";
-    $result = $conn->query($sql);
+    global $conn;
+    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseClients = 'TRUE' OR canEditClients = 'TRUE')");
     if($userID != 1 && (!$result || $result->num_rows <= 0)){
-      echo 'Access denied. <a href="../user/logout"> logout</a>';
-      include 'footer.php';
-      die();
+        echo 'Access denied. <a href="../user/logout"> logout</a>';
+        include 'footer.php';
+        die();
     }
-  }
+}
+
+function enableToSuppliers($userID){
+    global $conn;
+    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')");
+    if($userID != 1 && (!$result || $result->num_rows <= 0)){
+        echo 'Access denied. <a href="../user/logout"> logout</a>';
+        include 'footer.php';
+        die();
+    }
 }
 
 function denyToContainer(){
@@ -142,8 +147,8 @@ function denyToContainer(){
 }
 
 function enableToSocialMedia($userID){
-  require 'connection.php';
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
+  global $conn;
+  $sql = "SELECT * FROM roles WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -153,8 +158,8 @@ function enableToSocialMedia($userID){
 }
 
 function isDynamicProjectAdmin($userID){
-  require 'connection.php';
-  $sql = "SELECT * FROM $roleTable WHERE userID = $userID AND isDynamicProjectsAdmin = 'TRUE'";
+  global $conn;
+  $sql = "SELECT * FROM roles WHERE userID = $userID AND isDynamicProjectsAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo ('Access denied.');
@@ -164,7 +169,7 @@ function isDynamicProjectAdmin($userID){
 }
 
 function enableToDynamicProjects($userID){
-  require 'connection.php';
+  global $conn;
   enableToBookings($userID);
   // test whether user has active dynamic projects
   $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.*

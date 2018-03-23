@@ -53,8 +53,8 @@ function create_tables($conn) {
         time DATETIME NOT NULL,
         timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
         timeToUTC INT(2) DEFAULT '2',
-        status INT(3),
-        emoji INT(2) DEFAULT 0,
+        status INT(3) NOT NULL DEFAULT 0,
+        emoji INT(2) NOT NULL DEFAULT 0,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -65,7 +65,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE holidays(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        begin DATETIME,
+        begin DATETIME NOT NULL,
         end DATETIME,
         name VARCHAR(60) NOT NULL
     )";

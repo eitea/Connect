@@ -996,8 +996,8 @@ $lang_ger['PRODUCTS'] = 'Produkte';
 $lang_eng['PROJECT'] = 'Project';
 $lang_ger['PROJECT'] = 'Projekt';
 
-$lang_eng['PROJECTS'] = 'Project';
-$lang_ger['PROJECTS'] = 'Projekt';
+$lang_eng['PROJECTS'] = 'Projects';
+$lang_ger['PROJECTS'] = 'Projekte';
 
 $lang_eng['PROJECT_BOOKINGS'] = 'Projectbookings';
 $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';

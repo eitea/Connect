@@ -55,7 +55,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
             <form method="POST">
-                <input name="clientID" value="<?php echo $x; ?>" style="visibility:hidden; height: 1px; width: 1px;">
+                <input name="saveID" value="<?php echo $x; ?>" style="visibility:hidden; height: 1px; width: 1px;">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Kunde editieren</h4>
@@ -81,13 +81,11 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                             <hr>
                             <table class="table table-hover">
                                 <thead>
-                                    <th><?php echo $lang['DELETE']; ?></th>
                                     <th></th>
                                     <th>Name</th>
                                     <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
                                     <th><?php echo $lang['HOURS']; ?></th>
                                     <th><?php echo $lang['HOURLY_RATE']; ?></th>
-                                    <th></th>
                                 </thead>
                                 <tbody>
                                     <?php
@@ -95,7 +93,6 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                     while ($row_p = $result_p->fetch_assoc()) {
                                         $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
                                         echo '<tr>';
-                                        echo '<td><input type="checkbox" name="delete_projects_index[]" value=' . $row_p['id'] . ' /></td>';
                                         echo '<td>' . $productive . '</td>';
                                         echo '<td>' . $row_p['name'] . '</td>';
                                         echo '<td>';
@@ -121,7 +118,6 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                         echo '</td>';
                                         echo '<td>' . $row_p['hours'] . '</td>';
                                         echo '<td>' . $row_p['hourlyPrice'] . '</td>';
-                                        echo '<td><button type="button" class="btn btn-default" data-toggle="modal" data-target=".editingProjectsModal-' . $row_p['id'] . '"><i class="fa fa-pencil"></i></td>';
                                         echo '</tr>';
                                     }
                                     ?>
@@ -261,6 +257,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                                     echo '<td><button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
                                                     echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button></td>';
                                                     echo '</tr>';
+                                                    //TODO: what is this bs?
                                                     $currentmodal = '<form method="POST"><div id="edit-contact-' . $contactRow['id'] . '" class="modal fade">
                                                     <div class="modal-dialog modal-content modal-md">
                                                     <div class="modal-header h4">Ansprechpartner Editieren</div>
@@ -397,9 +394,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                     </div>
                                 </div>
                             </div>
-                            <div id="menuBank<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'banking') {
-                                echo 'in active';
-                            } ?>">
+                            <div id="menuBank<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'banking') { echo 'in active'; } ?>">
                             <div class="row form-group">
                                 <h3><div class="col-sm-9">Bankdaten</div></h3>
                             </div>
@@ -457,18 +452,14 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                 </div>
                             </div>
                         </div>
-                        <div id="menuBilling<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'billing') {
-                            echo 'in active';
-                        } ?>">
+                        <div id="menuBilling<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'billing') { echo 'in active'; } ?>">
                         <div class="row checkbox">
                             <div class="col-sm-9">
                                 <h3>Rechnungsdaten</h3>
                             </div>
                             <br>
                             <div class="col-sm-3">
-                                <input type="checkbox" name="eBill" <?php if ($row['eBill'] == 'true') {
-                                    echo 'checked';
-                                } ?> />
+                                <input type="checkbox" name="eBill" <?php if ($row['eBill'] == 'true') { echo 'checked'; } ?> />
                                 E-Rechnung
                             </div>
                         </div>
@@ -520,22 +511,14 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                             </div>
                             <div class="col-sm-3">
                                 <select name="billDelivery" class="js-example-basic-single">
-                                    <option <?php if ($row['billDelivery'] == 'Fax') {
-                                        echo 'selected';
-                                    } ?> value="Fax">Fax</option>
-                                    <option <?php if ($row['billDelivery'] == 'Post') {
-                                        echo 'selected';
-                                    } ?> value="Post">Post</option>
-                                    <option <?php if ($row['billDelivery'] == 'E-Mail') {
-                                        echo 'selected';
-                                    } ?> value="E-Mail">E-Mail</option>
+                                    <option <?php if ($row['billDelivery'] == 'Fax') { echo 'selected'; } ?> value="Fax">Fax</option>
+                                    <option <?php if ($row['billDelivery'] == 'Post') { echo 'selected'; } ?> value="Post">Post</option>
+                                    <option <?php if ($row['billDelivery'] == 'E-Mail') { echo 'selected'; } ?> value="E-Mail">E-Mail</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <div id="menuPayment<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'payment') {
-                        echo 'in active';
-                    } ?>">
+                    <div id="menuPayment<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'payment') { echo 'in active'; } ?>">
                     <h3>Zahlungsdaten</h3>
                     <hr>
                     <div class="row form-group">
@@ -565,9 +548,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                             Mahnungen erlaubt
                         </div>
                         <div class="col-sm-9">
-                            <input type="checkbox" name="warningEnabled" <?php if ($row['warningEnabled'] == 'true') {
-                                echo 'checked';
-                            } ?> />
+                            <input type="checkbox" name="warningEnabled" <?php if ($row['warningEnabled'] == 'true') { echo 'checked'; } ?> />
                         </div>
                     </div>
                     <br>
@@ -615,15 +596,11 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                             Verzugszinsberechnung
                         </div>
                         <div class="col-md-1">
-                            <input type="checkbox" name="calculateInterest" <?php if ($row['calculateInterest'] == 'true') {
-                                echo 'checked';
-                            } ?>/>
+                            <input type="checkbox" name="calculateInterest" <?php if ($row['calculateInterest'] == 'true') { echo 'checked'; } ?>/>
                         </div>
                     </div>
                 </div>
-                <div id="menuContact<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'notes') {
-                    echo 'in active';
-                } ?>">
+                <div id="menuContact<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'notes') { echo 'in active'; } ?>">
                 <h3>Bemerkungen</h3>
                 <hr>
                 <table class="table table-hover">
@@ -736,14 +713,9 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
     </div><!-- /modal-body -->
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-        <button type="submit" class="btn btn-warning" name="editCustomer" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
+        <button type="submit" class="btn btn-warning" name="editCustomer" ><?php echo $lang['SAVE']; ?></button>
     </div>
-</form>
-</div>
-</div>
-</div>
-<?php echo $editmodals ?>
-<form method="POST">
+
     <!-- ADD CONTACT PERSON -->
     <div id="add-contact-person<?php echo $x; ?>" class="modal fade">
         <div class="modal-dialog modal-content modal-md">
@@ -790,131 +762,9 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
             </div>
         </div>
     </div>
+    <!-- /END CONTACT PERSON -->
 </form>
-<form method="POST">
-    <input name="clientID" value="<?php echo $x; ?>" style="visibility:hidden; height: 1px; width: 1px;">
-    <!-- ADD PROJECT -->
-    <div class="modal fade add-project">
-        <div class="modal-dialog modal-content modal-md">
-            <div class="modal-header"><h4><?php echo $lang['ADD']; ?></h4></div>
-            <div class="modal-body">
-                <label>Name</label>
-                <input type=text class="form-control required-field" name='name' placeholder='Name'>
-                <br>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label><?php echo $lang['HOURS']; ?></label>
-                        <input type="number" class="form-control" name='hours' step="any">
-                    </div>
-                    <div class="col-md-6">
-                        <label><?php echo $lang['HOURLY_RATE']; ?></label>
-                        <input type="number" class="form-control" name='hourlyPrice' step="any">
-                    </div>
-                </div>
-                <br>
-                <div class="container-fluid">
-                    <div class="col-md-6 checkbox">
-                        <input type="checkbox" name="status" value="checked" checked> <i class="fa fa-tags"></i> <?php echo $lang['PRODUCTIVE']; ?>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="checkbox">
-                            <?php
-                            $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-                            if ($resF->num_rows > 0) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-                                    echo '<input type="checkbox" ' . $checked . ' name="createField_1"/>' . $rowF['name'];
-                                }
-                            }
-                            if ($resF->num_rows > 1) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-                                    echo '<br><input type="checkbox" ' . $checked . ' name="createField_2" />' . $rowF['name'];
-                                }
-                            }
-                            if ($resF->num_rows > 2) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $rowF['isForAllProjects'] == 'TRUE' ? 'checked' : '';
-                                    echo '<br><input type="checkbox" ' . $checked . ' name="createField_3" />' . $rowF['name'];
-                                }
-                            }
-                            ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-warning" name='add'> <?php echo $lang['ADD']; ?> </button>
-            </div>
-        </div>
-    </div>
-</form>
-
-<?php
-mysqli_data_seek($result_p, 0);
-while ($row = $result_p->fetch_assoc()):
-    $x = $row['id'];
-    ?>
-    <!-- Edit projects (time only) -->
-    <form method="post">
-        <input name="clientID" value="<?php echo $x; ?>" style="visibility:hidden; height: 1px; width: 1px;">
-        <div class="modal fade editingProjectsModal-<?php echo $x ?>">
-            <div class="modal-dialog modal-md modal-content" role="document">
-                <div class="modal-header">
-                    <h4><?php echo $row['name']; ?></h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label><?php echo $lang['HOURS']; ?></label>
-                            <input type="number" class="form-control" step="any" name="boughtHours" value="<?php echo $row['hours']; ?>">
-                        </div>
-                        <div class="col-md-6">
-                            <label><?php echo $lang['HOURLY_RATE']; ?></label>
-                            <input type="number" class="form-control" step="any" name="pricedHours" value="<?php echo $row['hourlyPrice']; ?>">
-                        </div>
-                    </div>
-                    <div class="row checkbox">
-                        <div class="col-md-6">
-                            <label><input type="checkbox" name="productive" <?php echo $row['status']; ?> /><?php echo $lang['PRODUCTIVE']; ?></label>
-                        </div>
-                        <div class="col-md-6"><br>
-                            <?php
-                            $resF = $conn->query("SELECT * FROM $companyExtraFieldsTable WHERE companyID = " . $rowClient['companyID'] . " ORDER BY id ASC");
-                            if ($resF->num_rows > 0) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $row['field_1'] == 'TRUE' ? 'checked' : '';
-                                    echo '<label><input type="checkbox" ' . $checked . ' name="addField_1_' . $row['id'] . '"/> ' . $rowF['name'] . '</label>';
-                                }
-                            }
-                            if ($resF->num_rows > 1) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $row['field_2'] == 'TRUE' ? 'checked' : '';
-                                    echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_2_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-                                }
-                            }
-                            if ($resF->num_rows > 2) {
-                                $rowF = $resF->fetch_assoc();
-                                if ($rowF['isActive'] == 'TRUE') {
-                                    $checked = $row['field_3'] == 'TRUE' ? 'checked' : '';
-                                    echo '<br><label><input type="checkbox" ' . $checked . ' name="addField_3_' . $row['id'] . '" /> ' . $rowF['name'] . '</label>';
-                                }
-                            }
-                            ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning" name="save" value="<?php echo $x ?>"><?php echo $lang['SAVE']; ?></button>
-                </div>
-            </div>
-        </div>
-    </form>
-<?php endwhile;?>
+</div>
+</div>
+</div>
+<?php echo $editmodals ?>

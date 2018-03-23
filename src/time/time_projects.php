@@ -297,7 +297,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <div class="page-content-fixed-150">
 <ul class="nav nav-tabs">
-  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['VIEW_PROJECTS']; ?></a></li>
+  <li <?php if($activeTab == 'home'){echo 'class="active"';}?>><a data-toggle="tab" href="#home"><?php echo $lang['PROJECTS']; ?></a></li>
   <?php foreach($filterings['users'] as $u){
     $active = '';
     if($u == $activeTab) $active = 'class="active"';
@@ -310,7 +310,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="tab-content">
   <!-- ############################### Projects ################################### -->
   <div id="home" class="tab-pane fade <?php if($activeTab == 'home'){echo 'active in';}?>">
-  <div class="page-header"><h3><?php echo $lang['VIEW_PROJECTS']; ?><div class="page-header-button-group">
+  <div class="page-header"><h3><?php echo $lang['PROJECTS']; ?><div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addProjectBookings" title="<?php echo $lang['BOOKINGS'] .' '.$lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
     <button type='submit' class="btn btn-default" name='saveCharged' form="project_table" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
     <button type="submit" class="btn btn-default" name="csvDownload" form="csvForm" title="CSV Download"><i class="fa fa-download"></i> CSV</button>

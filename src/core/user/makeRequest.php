@@ -13,42 +13,36 @@ $filterRequest_text = 'Alte ausblenden';
 $filterRequest = $unlock = 0;
 
 $currentMonth = substr(getCurrentTimestamp(),0,7);
-$result = $conn->query("SELECT kmMoney FROM $userTable WHERE id = $userID");
+$result = $conn->query("SELECT kmMoney FROM UserData WHERE id = $userID");
 $kmMoney = $result->fetch_assoc()['kmMoney'];
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(!empty($_POST['captcha'])){
     die("Bot detected. Aborting all running Operations.");
   }
-  if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['day'])){
-    if(test_Date($_POST['day'].' '.$_POST['start'].':00') && test_Date($_POST['day'].' '.$_POST['end'].':00')){
-      $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
-      $row = $result->fetch_assoc();
-      $begin = test_input($_POST['day'].' '.$_POST['start'].':00');
-      $end = test_input($_POST['day'].' '.$_POST['end'].':00');
-      $infoText = test_input($_POST['requestText']);
-      $type = test_input($_POST['requestType']);
-      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin', '$end', '$infoText', '$type')";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-  } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
-    }
-  }elseif(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
-    if(test_Date($_POST['start'].' 08:00:00') && test_Date($_POST['end'].' 08:00:00')){
-      $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
-      $row = $result->fetch_assoc();
-      $begin = test_input($_POST['start'].' '.$row['coreTime']);
-      $end = test_input($_POST['end'].' '.$row['coreTime']);
-      $infoText = test_input($_POST['requestText']);
-      $type = test_input($_POST['requestType']);
-      $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType) VALUES($userID, '$begin', '$end', '$infoText', '$type')";
-      $conn->query($sql);
-      echo mysqli_error($conn);
+if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
+    if(!empty($_POST['day'])){
+        $begin = test_input($_POST['day'].' '.$_POST['start'].':00');
+        $end = test_input($_POST['day'].' '.$_POST['end'].':00');
     } else {
-      echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+        $result = $conn->query("SELECT coreTime FROM UserData WHERE id = $userID");
+        $row = $result->fetch_assoc();
+        $begin = test_input($_POST['start'].' '.$row['coreTime']);
+        $end = test_input($_POST['end'].' '.$row['coreTime']);
     }
-  }elseif(isset($_POST['makeRequest'])){
+    if(test_Date($begin) && test_Date($end) && strtotime($begin) <= strtotime($end)){
+        $infoText = test_input($_POST['requestText']);
+        $type = test_input($_POST['requestType']);
+        $conn->query("INSERT INTO $userRequests (userID, fromDate, toDate, requestText, requestType, timeToUTC) VALUES($userID, '$begin', '$end', '$infoText', '$type', $timeToUTC)");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
+        }
+    } else {
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+    }
+  } elseif(isset($_POST['makeRequest'])){
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
   } elseif(isset($_POST['request_lunchbreak']) && !empty($_POST['lunch_FROM']) && !empty($_POST['lunch_TO'])){
     $timestampID = $_POST['request_lunchbreak'];
