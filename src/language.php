@@ -74,6 +74,9 @@ $lang_ger['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
 $lang_eng['ADVANCED_OPTIONS'] = 'Advanced Options';
 $lang_ger['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
 
+$lang_eng['ADVANCED_SEARCH'] = 'Advanced Search';
+$lang_ger['ADVANCED_SEARCH'] = 'Erweiterte Suche';
+
 $lang_eng['AFFECTED_MONTH'] = 'Affected Month';
 $lang_ger['AFFECTED_MONTH'] = 'Betroffener Monat';
 
@@ -224,6 +227,9 @@ $lang_ger['CLIENTS'] = 'Kunden';
 
 $lang_eng['CLIENT_LIST'] = 'Client List';
 $lang_ger['CLIENT_LIST'] = 'Kundenliste';
+
+$lang_eng['CLOSE'] = 'Close';
+$lang_ger['CLOSE'] = 'Schließen';
 
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
@@ -455,6 +461,9 @@ $lang_ger['ENCRYPTION_LOG'] = 'Ereignisse anzeigen';
 
 $lang_eng['END'] = 'End';
 $lang_ger['END'] = 'Ende';
+
+$lang_eng['ENGLISH'] = 'English';
+$lang_ger['ENGLISH'] = 'Englisch';
 
 $lang_eng['ENTRANCE_DATE'] = 'Date of Entry';
 $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
@@ -1422,6 +1431,9 @@ $lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mit
 
 $lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.', '' => '');
 $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau', '' => '');
+
+$lang_eng['GERMAN'] = 'German';
+$lang_ger['GERMAN'] = 'Deutsch';
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');

@@ -23,18 +23,18 @@ if (isset($_REQUEST["modal"])) {
                             <input autofocus type="text" name="search" value="" class="form-control" id="searchQuery">
                             <span class="input-group-btn">
                                 <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Einstellungen <span class="caret"></span></button>
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $lang['SETTINGS']; ?> <span class="caret"></span></button>
                                 <div class="dropdown-menu">
                                     <div class="row">
-                                        <div class="col-md-12"><label><input type="checkbox" id="germanSearchCheckbox" <?php echo $german; ?> > Deutsch</label></div>
+                                        <div class="col-md-12"><label><input type="checkbox" id="germanSearchCheckbox" <?php echo $german; ?> > <?php echo $lang['GERMAN'] ?></label></div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12"><label><input type="checkbox" id="englishSearchCheckbox" <?php echo $english; ?> > Englisch</label></div>
+                                        <div class="col-md-12"><label><input type="checkbox" id="englishSearchCheckbox" <?php echo $english; ?> > <?php echo $lang['ENGLISH'] ?></label></div>
                                     </div>
                                     <?php if ($enableToAdvancedSearch): ?>
                                     <div role="separator" class="divider"></div>
                                     <div class="row">
-                                        <div class="col-md-12"><label><input type="checkbox" id="advancedSearchCheckbox" > Erweiterte Suche</label></div>
+                                        <div class="col-md-12"><label><input type="checkbox" id="advancedSearchCheckbox" > <?php echo $lang['ADVANCED_SEARCH']; ?></label></div>
                                     </div>
                                     <?php endif;?>
                                 </div>
@@ -46,7 +46,7 @@ if (isset($_REQUEST["modal"])) {
                     <div id="searchResult"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CLOSE']; ?></button>
                 </div>
             </div>
         </div>
@@ -212,7 +212,7 @@ foreach ($available_companies as $company) {
     $routesGER[] = array("name" => "Artikel ($name)", "url" => "../erp/articles?cmp=$companyID", "tags" => array("ERP Artikel"));
 }
 
-if ($advanced && $enableToAdvancedSearch) {
+if ($advanced && $enableToAdvancedSearch) { // search itself should be done in the database itself in future versions
     $users = array();
     $teams = array();
     $clients = array();
