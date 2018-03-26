@@ -258,21 +258,18 @@ $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM lo
     $start = substr($row['time'], 0, 10);
     $prev_row = $row;
     if($result && ($row = $result->fetch_assoc())){
-      $colors = array('', '#81e8e5', '#d4b6ff', '#ffa24b', '#ceddf0', '', '#ffb9b9');
       do {
-        if($prev_row['status'] != $row['status'] || $prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
-          $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-          $color = $colors[$prev_row['status']];
+        if($prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
+          $title = 'Abwesend: ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
           $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-          $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+          $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
           $start = substr($row['time'], 0, 10);
         }
         $prev_row = $row;
       } while($row = $result->fetch_assoc());
-      $title = $lang['ACTIVITY_TOSTRING'][$prev_row['status']] . ': ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-      $color = $colors[$prev_row['status']];
+      $title = 'Abwesend: ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
       $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-      $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '$color'}";
+      $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
     }
   } else {
     $conn->error;
