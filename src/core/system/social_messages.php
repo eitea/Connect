@@ -126,7 +126,7 @@
             // the currently logged in user
             $currentUser = $_SESSION["userid"];
             $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData 
-                INNER JOIN messages ON messages.partnerID = userdata.id 
+                INNER JOIN messages ON messages.partnerID = UserData.id 
                 WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
                 GROUP BY subject";
 
@@ -168,19 +168,23 @@
                                 <div class="modal-body">
                                     <div id="messages<?php echo $subject; ?>">
                                         <?php
-                                            $sql = "SELECT message, partnerID FROM messages WHERE subject = '{$subject}' GROUP BY subject ORDER BY sent ASC";
-                                            $result = $conn->query($sql);
+                                            // select all messages
+                                            $sql = "SELECT message, firstname, lastname FROM UserData 
+                                                INNER JOIN messages ON messages.partnerID = UserData.id 
+                                                WHERE subject = '{$subject}' 
+                                                ORDER BY sent ASC";
 
+                                            $result = $conn->query($sql);
                                             if ($result && $result->num_rows > 0) {
                                                 while ($row = $result->fetch_assoc()) {
                                                     $message = $row['message'];
-                                                    $name = $row['partnerID'];
-                                                    
+                                                    $name = "${row['firstname']} ${row['lastname']}";
                                                     ?>
-
-                                                    <div class="row">
-                                                        <div class="col-xs-12">
-                                                            <div class="well <?php echo $pull; ?>" style="position:relative">
+                                                    
+                                                    <!-- The message -->
+                                                    <div class='row'>
+                                                        <div class='col-xs-12'>
+                                                            <div class='well <?php echo $pull; ?>' style='position:relative'>
                                                                 <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
                                                                 <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
                                                                 <div><?php echo $message ?></div>
@@ -189,12 +193,9 @@
                                                     </div>
 
                                                     <?php
-
                                                 }
                                             }
                                         ?>
-
-                                        
                                     </div>
                                 </div>
 
