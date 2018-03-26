@@ -254,6 +254,7 @@ function create_tables($conn) {
         canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+        canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
