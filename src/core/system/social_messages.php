@@ -1,10 +1,9 @@
-<!-- TODO: remove static strings -->
 <!-- TODO: Add ability to send pictures -->
 <!-- TODO: show all conversations -->
 <!-- TODO: Badge -->
 <!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
-<!-- FIXME: There's a loading screen forever bc of the return (when invalid input) -->
+<!-- TODO: use AJAX scripts -->
 
 
 <!-- Task: 5aa53cf53c635 -->
@@ -64,14 +63,7 @@
             } else {
                 // messages [userID, partnerID, subject, message, picture, sent, seen]
                 $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partnerID, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
-                ?>
-
-                <script>
-                    sendMessage(<?php echo $partnerID; ?>, $("#message<?php echo $partnerID; ?>").val(), "#messages<?php echo $partnerID; ?>", limit<?php echo $partnerID; ?>)
-                </script>
-
-                <?php
-                showInfo("Message sent!");
+               showInfo("Message sent!");
             }
         }
     }
@@ -118,104 +110,130 @@
         </div>
     </form>
 
+
     <!-- Active Conversations -->
     <h4><?php echo $lang['CONVERSATIONS']; ?></h4>
-
 
     <!-- contacts -->
     <table class="table table-hover">
         <thead>
-        <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SUBJECT']; ?></th>
-        <th><?php echo $lang['RECEIVER']; ?></th>
+            <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SUBJECT']; ?></th>
+            <th><?php echo $lang['RECEIVER']; ?></th>
         </thead>
 
         <tbody>
-        <?php
-        $today = substr(getCurrentTimestamp(), 0, 10);
+            <?php
+            // the currently logged in user
+            $currentUser = $_SESSION["userid"];
+            $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData 
+                INNER JOIN messages ON messages.partnerID = userdata.id 
+                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
+                GROUP BY subject";
 
-        $sql = "SELECT userID, partnerID, firstname, lastname, subject from UserData INNER JOIN messages ON messages.partnerID = userdata.id GROUP BY subject";
-        $result = $conn->query($sql);
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $name = "${row['firstname']} ${row['lastname']}";
-                $x = $row["partnerID"];
-                $subject = $row['subject'];
+            $result = $conn->query($sql);
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $name = "${row['firstname']} ${row['lastname']}";
+                    $partnerID = $row["partnerID"];
+                    $subject = $row['subject'];   /*Identify the html elements with the subject*/
 
-                echo $name . " " . $x;
+                    echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
+                    echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
+                    echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
+                    
+                    echo '</tr>';
+                    ?>
 
-                echo "<tr data-toggle='modal' data-target='#chat$x' style='cursor:pointer;'>";
-                echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
-                echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
-                echo '</tr>';
-                ?>
+                    <!-- chat modal -->
+                    <div class="modal fade" id="chat<?php echo $subject; ?>" tabindex="-1" role="dialog"
+                        aria-labelledby="chatLabel<?php echo $subject; ?>">
+                        <div class="modal-dialog" role="form">
 
-                <!-- chat modal -->
-                <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog"
-                     aria-labelledby="chatLabel<?php echo $x; ?>">
-                    <div class="modal-dialog" role="form">
+                            <div class="modal-content">
+                                <!-- Title -->
+                                <div class="modal-header" style="padding-bottom:5px;">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
 
-                        <div class="modal-content">
-                            <!-- Title -->
-                            <div class="modal-header" style="padding-bottom:5px;">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                    <h4 class="modal-title" id="chatLabel<?php echo $subject; ?>">
+                                        <img src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle'
+                                            style='width:25px;display:inline-block;'> <?php echo $name ?>
+                                    </h4>
+                                </div>
 
-                                <h4 class="modal-title" id="chatLabel<?php echo $x; ?>">
-                                    <img src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle'
-                                         style='width:25px;display:inline-block;'> <?php echo $name ?>
-                                </h4>
+                                <br>
+
+                                <!-- All messages -->
+                                <div class="modal-body">
+                                    <div id="messages<?php echo $subject; ?>">
+                                        <?php
+                                            $sql = "SELECT message, partnerID FROM messages WHERE subject = '{$subject}' GROUP BY subject ORDER BY sent ASC";
+                                            $result = $conn->query($sql);
+
+                                            if ($result && $result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $message = $row['message'];
+                                                    $name = $row['partnerID'];
+                                                    
+                                                    ?>
+
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <div class="well <?php echo $pull; ?>" style="position:relative">
+                                                                <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
+                                                                <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
+                                                                <div><?php echo $message ?></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <?php
+
+                                                }
+                                            }
+                                        ?>
+
+                                        
+                                    </div>
+                                </div>
+
+                                <!-- AJAX stuff -->
+                                <!--<script>
+                                    interval<?php echo $subject; ?> = 0
+                                    limit<?php echo $subject; ?> = 10
+                                    $("#chat<?php echo $subject; ?>").on('show.bs.modal', function (e) {
+                                        getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", true, limit<?php echo $subject; ?>)
+                                        interval<?php echo $subject; ?> = setInterval(function () {
+                                            getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
+                                        }, 1000)
+                                    })
+
+                                    // scroll
+                                    $("#messages<?php echo $subject; ?>").parent().scroll(function () {
+                                        if ($("#messages<?php echo $subject; ?>").parent().scrollTop() == 0) {
+                                            limit<?php echo $subject; ?> += 1
+                                            $("#messages<?php echo $subject; ?>").parent().scrollTop(1);
+                                            getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
+                                        }
+                                    })
+
+                                    // scroll to top
+                                    $("#chat<?php echo $subject; ?>").on('shown.bs.modal', function (e) {
+                                        $("#messages<?php echo $subject; ?>").parent().scrollTop($("#messages<?php echo $subject; ?>")[0].scrollHeight);
+                                    })-->
+                                </script>
                             </div>
-
-                            <br>
-
-                            <!-- All messages -->
-                            <div class="modal-body">
-                                <div id="messages<?php echo $x; ?>"></div>
-                            </div>
-
-                            <!-- Get the messages -->
-                            <script>
-                                interval<?php echo $x; ?> = 0
-                                limit<?php echo $x; ?> = 10
-                                $("#chat<?php echo $x; ?>").on('show.bs.modal', function (e) {
-                                    getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", true, limit<?php echo $x; ?>)
-                                    interval<?php echo $x; ?> = setInterval(function () {
-                                        getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", false, limit<?php echo $x; ?>)
-                                    }, 1000)
-                                })
-
-                                $("#messages<?php echo $x; ?>").parent().scroll(function () {
-                                    if ($("#messages<?php echo $x; ?>").parent().scrollTop() == 0) {
-                                        limit<?php echo $x; ?> += 1
-                                        $("#messages<?php echo $x; ?>").parent().scrollTop(1);
-                                        getMessages(<?php echo $x; ?>, "#messages<?php echo $x; ?>", false, limit<?php echo $x; ?>)
-                                    }
-                                })
-
-                                $("#chat<?php echo $x; ?>").on('shown.bs.modal', function (e) {
-                                    $("#messages<?php echo $x; ?>").parent().scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight);
-                                })
-
-                                $("#chatinput<?php echo $x; ?>").submit(function (e) {
-                                    e.preventDefault()
-                                    sendMessage(<?php echo $x; ?>, $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", limit<?php echo $x; ?>)
-                                    $("#message<?php echo $x; ?>").val("")
-                                    return false
-                                })
-                            </script>
                         </div>
                     </div>
-                </div>
-                <!-- /chat modal -->
-                <?php
+                    <!-- /chat modal -->
+                    <?php
 
+                }
+            } else {
+                echo mysqli_error($conn);
             }
-        } else {
-            echo mysqli_error($conn);
-        }
-        ?>
-
+            ?>
         </tbody>
     </table>
     <!-- /contacts -->
