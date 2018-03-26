@@ -422,6 +422,13 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             }
             echo '</td>';
             echo '</tr>';
+            echo '<tr>
+            <td style="padding:0; border:0;" colspan="5" id="clicker-row-'.$row['id'].'"></td>
+            <td style="padding:0; border:0;display:none;"></td>
+            <td style="padding:0; border:0;display:none;"></td>
+            <td style="padding:0; border:0;display:none;"></td>
+            <td style="padding:0; border:0;display:none;"></td>
+            </tr>';
         }
         ?>
     </tbody>
@@ -440,14 +447,16 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
                 data:{custid: index},
                 type: 'GET',
                 success : function(resp){
-                    $("#editingModalDiv").append(resp);
+                    //$("#editingModalDiv").append(resp);
                     existingModals.push(index);
+                    $("#clicker-row-"+index).append(resp);
+                    //$('#clicker-row-'+index).find('form').slideToggle();
                     onPageLoad();
                 },
                 error : function(resp){},
                 complete: function(resp){
                     if(index){
-                        $('#editingModal-'+index).modal('show');
+                        //$('#editingModal-'+index).modal('show');
                     }
                     $('.uid-check').click(function(e){
                       var index = $(this).val();
@@ -468,7 +477,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
                 }
             });
         } else {
-            $('#editingModal-'+index).modal('show');
+            $('#clicker-row-'+index).find('form').slideToggle();
         }
     }
     $('button[name=deleteModal]').click(function(){
@@ -478,13 +487,14 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
 
     $('.clicker').click(function(){
         checkAppendModal($(this).find('button[name=editModal]:first').val());
+        //$(this).next('tr').find('form').slideToggle();
         event.stopPropagation();
     });
 
     $('.table').DataTable({
         autoWidth: false,
-        order: [[ 2, "asc" ]],
-        columns: [null, null, null, null, {orderable: false}],
+        order: [],
+        ordering: false,
         responsive: true,
         colReorder: true,
         language: {
