@@ -89,7 +89,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $result_p = $conn->query("SELECT * FROM projectData WHERE clientID = $x");
+                                    $result_p = $conn->query("SELECT name, hours, hourlyPrice, field_1, field_2, field_3 FROM projectData WHERE clientID = $x");
                                     while ($row_p = $result_p->fetch_assoc()) {
                                         $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
                                         echo '<tr>';

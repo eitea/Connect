@@ -292,9 +292,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 }
-?>
 
-<?php
 if(!empty($key_downloads)){
     echo '<form method="POST" target="_blank" action="../setup/keys">';
     foreach($key_downloads as $dKey){

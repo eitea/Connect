@@ -1,7 +1,8 @@
 <?php
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
-  'login/access' => 'core/login/login_docker.php',                  'php/info' => 'core/system/phpinfo.php',
+  'login/access' => 'core/login/login_docker.php',
+  'php/info' => 'core/dev/phpinfo.php',                          'php/ext' => 'core/dev/phpext.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
   'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',               'user/ready' => 'core/user/readyPlan.php',

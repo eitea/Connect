@@ -409,17 +409,19 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo ($row['isSupplier'] == 'FALSE') ? '<td>'.$lang['CLIENT'].'</td>' : '<td>'.$lang['SUPPLIER'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
-            echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
+            if(($row['isSupplier'] == 'TRUE' && ($canEditSuppliers || $isERPAdmin || $isCoreAdmin)) || $row['isSupplier'] == 'FALSE' && ($canEditClients || $isERPAdmin || $isCoreAdmin)){
+              echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
+              echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
+
+              $modals .= '<div id="delete-confirm-'.$row['id'].'" class="modal fade">
+              <div class="modal-dialog modal-content modal-sm">
+              <div class="modal-header h4">'.$lang['DELETE_SELECTION'].'</div><div class="modal-body">'.sprintf($lang['ASK_DELETE'], $row['name']).'</div>
+              <div class="modal-footer"><form method="POST">
+              <button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
+              <button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'">'.$lang['DELETE'].'</button></form></div></div></div>';
+            }
             echo '</td>';
             echo '</tr>';
-            $modals .= '<div id="delete-confirm-'.$row['id'].'" class="modal fade">
-            <div class="modal-dialog modal-content modal-sm">
-            <div class="modal-header h4">'.$lang['DELETE_SELECTION'].'</div><div class="modal-body">'.sprintf($lang['ASK_DELETE'], $row['name']).'</div>
-            <div class="modal-footer"><form method="POST">
-            <button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
-            <button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'">'.$lang['DELETE'].'</button>
-            </form></div></div></div>';
         }
         ?>
     </tbody>
