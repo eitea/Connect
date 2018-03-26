@@ -3,8 +3,8 @@ session_start();
 isset($_POST["result"]) or die("no result");
 isset($_SESSION["userid"]) or die("no user logged in");
 
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 
 $userID = $_SESSION['userid'];
 $result = json_decode($_POST["result"]);

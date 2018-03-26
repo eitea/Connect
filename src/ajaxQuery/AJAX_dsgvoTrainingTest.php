@@ -2,8 +2,8 @@
 session_start();
 $userID = $_SESSION['userid'] or die("no user signed in");
 $trainingID = isset($_POST["trainingID"]) or die("no training id");
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 $trainingID = intval($_POST["trainingID"]);
 $onLogin = false;
 $doneSurveys = false;

@@ -3,12 +3,10 @@ if (!isset($_REQUEST["operation"])) {
     echo "error (no operation)";
     die();
 }
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 $operation = $_REQUEST["operation"];
 if ($operation == "export") {
-    require dirname(__DIR__) . "/connection.php";
-    require dirname(__DIR__) . "/language.php";
     $output = array();
     $extra = "";
     if(isset($_REQUEST["module"])){

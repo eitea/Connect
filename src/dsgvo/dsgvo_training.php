@@ -1,6 +1,6 @@
-<?php require dirname(__DIR__) . '/header.php';
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 enableToDSGVO($userID);?>
-<?php require dirname(__DIR__) . "/misc/helpcenter.php";?>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php";?>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
