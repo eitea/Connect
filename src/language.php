@@ -47,11 +47,14 @@ $lang_ger['ADD_TIMESTAMPS'] = 'Mehrere Zeitstempel hinzufügen';
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
-$lang_eng['ADDRESS_FORM'] = 'Address Form';
-$lang_ger['ADDRESS_FORM'] = 'Anrede';
-
 $lang_eng['ADDRESS'] = 'Address';
 $lang_ger['ADDRESS'] = 'Adresse';
+
+$lang_eng['ADDRESS_BOOK'] = 'Address Book';
+$lang_ger['ADDRESS_BOOK'] = 'Adressbuch';
+
+$lang_eng['ADDRESS_FORM'] = 'Address Form';
+$lang_ger['ADDRESS_FORM'] = 'Anrede';
 
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
@@ -221,9 +224,6 @@ $lang_ger['CLIENT'] = 'Kunde';
 
 $lang_eng['CLIENTS'] = 'Clients';
 $lang_ger['CLIENTS'] = 'Kunden';
-
-$lang_eng['CLIENT_LIST'] = 'Client List';
-$lang_ger['CLIENT_LIST'] = 'Kundenliste';
 
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
@@ -1223,9 +1223,6 @@ $lang_ger['SUPPLIER'] = 'Lieferant';
 
 $lang_eng['SUPPLIERS'] = 'Suppliers';
 $lang_ger['SUPPLIERS'] = 'Lieferanten';
-
-$lang_eng['SUPPLIER_LIST'] = 'Supplier List';
-$lang_ger['SUPPLIER_LIST'] = 'Lieferantenliste';
 
 $lang_eng['TASK_SCHEDULER'] = 'Task Scheduler';
 $lang_ger['TASK_SCHEDULER'] = 'Taskplaner';

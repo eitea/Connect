@@ -691,11 +691,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       </a></li>
                   <?php endif; ?>
               <?php endif; //endif(canStamp) ?>
-            <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../system/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
-            <?php endif;//canUseSuppliers ?>
-            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE' || $canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink; }?> href="../system/clients"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
             <?php endif;//canuseClients ?>
           </ul>
       </div>
@@ -877,7 +874,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                           <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                           <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                          <li><a href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                          <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
                       </ul>
                   </div>
                 </li>
@@ -888,11 +885,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <ul class="nav nav-list">
                       <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
                       <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a href="../system/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                      <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
-
                 <li>
                     <a id="articleToggle" <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleArticle" data-parent="#sidenav01" class="collapse in">
                         <span><?php echo $lang['ARTICLE']; ?></span> <i class="fa fa-caret-down"></i>

@@ -15,7 +15,7 @@ $routes = array(
   'system/teams' => 'core/system/teamConfig.php',                   'system/holidays' => 'core/system/editHolidays.php',         'system/advanced' => 'core/system/options_advanced.php',
   'system/password' => 'core/system/options_password.php',          'system/email' => 'core/system/options_report.php',          'system/tasks' => 'core/system/taskScheduler.php',
   'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',        'system/clients' => 'core/system/editCustomers.php',
-  'system/clientDetail' => 'core/system/editCustomer_detail.php',   'system/suppliers' => 'core/system/editSuppliers.php',
+  'system/clientDetail' => 'core/system/editCustomer_detail.php',
 
   'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          'system/restic' => 'core/system/resticBackup.php',
   'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/options_archive.php',       'system/security' => 'core/system/securitySettings.php',

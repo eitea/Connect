@@ -120,17 +120,8 @@ function enableToDSGVO($userID){
 
 function enableToClients($userID){
     global $conn;
-    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseClients = 'TRUE' OR canEditClients = 'TRUE')");
-    if($userID != 1 && (!$result || $result->num_rows <= 0)){
-        echo 'Access denied. <a href="../user/logout"> logout</a>';
-        include 'footer.php';
-        die();
-    }
-}
-
-function enableToSuppliers($userID){
-    global $conn;
-    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')");
+    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseClients = 'TRUE'
+    OR canEditClients = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')");
     if($userID != 1 && (!$result || $result->num_rows <= 0)){
         echo 'Access denied. <a href="../user/logout"> logout</a>';
         include 'footer.php';
