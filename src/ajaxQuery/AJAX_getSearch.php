@@ -53,9 +53,9 @@ if (isset($_REQUEST["modal"])) {
         </div>
         <script>
             fetchSearchResults = _.debounce (function () {
-                Cookies.set("search-german",$("#germanSearchCheckbox").prop("checked"));
-                Cookies.set("search-english",$("#englishSearchCheckbox").prop("checked"));
-                Cookies.set("search-advanced",$("#advancedSearchCheckbox").prop("checked"));
+                Cookies.set("search-german",$("#germanSearchCheckbox").prop("checked"), { expires: 30 /*days*/ });
+                Cookies.set("search-english",$("#englishSearchCheckbox").prop("checked"), { expires: 30 /*days*/ });
+                Cookies.set("search-advanced",$("#advancedSearchCheckbox").prop("checked"), { expires: 30 /*days*/ });
                 
                 $("#searchResult").html("<div style='width:100%;height:200px;'><div class='searchLoader'></div></div>");
                 $.ajax({
