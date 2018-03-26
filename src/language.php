@@ -801,6 +801,9 @@ $lang_ger['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 $lang_eng['MAKE_REQUEST'] = 'File Application';
 $lang_ger['MAKE_REQUEST'] = 'Antrag Stellen';
 
+$lang_eng['MANAGE_TEMPLATES'] = 'Manage Templates';
+$lang_ger['MANAGE_TEMPLATES'] = 'Vorlagen verwalten';
+
 $lang_eng['MANDATORY_SETTINGS'] = 'Mandatory Settings';
 $lang_ger['MANDATORY_SETTINGS'] = 'Pflichtfelder';
 
@@ -1370,6 +1373,9 @@ $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
 
 $lang_eng['VOCATIONAL_SCHOOL'] = 'Training';
 $lang_ger['VOCATIONAL_SCHOOL'] = 'Weiterbildung';
+
+$lang_eng['VV_TEMPLATE_TYPES'] = array('base' => 'Base', 'app' => 'Procedure');
+$lang_ger['VV_TEMPLATE_TYPES'] = array('base' => 'Stammblatt', 'app' => 'Verfahren');
 
 $lang_eng['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
 $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';
