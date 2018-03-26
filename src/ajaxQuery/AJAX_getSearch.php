@@ -15,6 +15,7 @@ if (isset($_REQUEST["modal"])) {
         $german = "checked";
     }
     ?>
+        <script src="plugins/jsCookie/src/js.cookie.js"></script>
         <div class="modal fade">
             <div class="modal-dialog modal-content modal-md">
                 <div class="modal-header">
@@ -52,6 +53,10 @@ if (isset($_REQUEST["modal"])) {
         </div>
         <script>
             fetchSearchResults = _.debounce (function () {
+                Cookies.set("search-german",$("#germanSearchCheckbox").prop("checked"));
+                Cookies.set("search-english",$("#englishSearchCheckbox").prop("checked"));
+                Cookies.set("search-advanced",$("#advancedSearchCheckbox").prop("checked"));
+                
                 $("#searchResult").html("<div style='width:100%;height:200px;'><div class='searchLoader'></div></div>");
                 $.ajax({
                     url: 'ajaxQuery/AJAX_getSearch.php',
@@ -81,6 +86,11 @@ if (isset($_REQUEST["modal"])) {
             $("#searchQuery").keyup(function(event){
                 fetchSearchResults();
             })
+            if( Cookies.get("search-german") && Cookies.get("search-english") && Cookies.get("search-advanced")){
+                $("#germanSearchCheckbox").prop("checked", Cookies.get("search-german") == "true")
+                $("#englishSearchCheckbox").prop("checked", Cookies.get("search-english") == "true")
+                $("#advancedSearchCheckbox").prop("checked", Cookies.get("search-advanced") == "true")
+            }
         </script>
     <?php
 die();
