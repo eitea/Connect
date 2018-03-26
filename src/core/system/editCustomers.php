@@ -449,6 +449,22 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
                     if(index){
                         $('#editingModal-'+index).modal('show');
                     }
+                    $('.uid-check').click(function(e){
+                      var index = $(this).val();
+                      $.ajax({
+                        url: 'ajaxQuery/AJAX_vies.php',
+                        data: { vatNumber : $('#vat-number-'+index).val() },
+                        type: 'get',
+                        success : function(resp){
+                          if(resp){
+                            $("#uid-validate-"+index).html('<i style="color:green" class="fa fa-check"></i> ' + resp);
+                          } else {
+                            $("#uid-validate-"+index).html('<i style="color:red" class="fa fa-times"></i>');
+                          } //of equal weight. save them,
+                        },
+                        error : function(resp){}
+                      });
+                    });
                 }
             });
         } else {

@@ -45,10 +45,10 @@ $available_users = array('-1');
 while ($result && ($rowu = $result->fetch_assoc())) {
     $available_users[] = $rowu['userID'];
 }
-
 $resultNotes = $conn->query("SELECT * FROM clientInfoNotes WHERE parentID = $detailID"); echo $conn->error;
 $resultBank = $conn->query("SELECT * FROM clientInfoBank WHERE parentID = $detailID"); echo $conn->error;
-$resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName FROM contactPersons LEFT JOIN position ON position.id = position WHERE clientID = $x"); echo $conn->error;
+$resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positionName
+FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN external_users ON contactID = contactPersons.id WHERE clientID = $x"); echo $conn->error;
 ?>
 
 <div class="modal fade" id="editingModal-<?php echo $x; ?>">
@@ -89,7 +89,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $result_p = $conn->query("SELECT name, hours, hourlyPrice, field_1, field_2, field_3 FROM projectData WHERE clientID = $x");
+                                    $result_p = $conn->query("SELECT name, status, hours, hourlyPrice, field_1, field_2, field_3 FROM projectData WHERE clientID = $x");
                                     while ($row_p = $result_p->fetch_assoc()) {
                                         $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
                                         echo '<tr>';
@@ -242,6 +242,12 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                             </tr></thead>
                                             <tbody>
                                                 <?php
+                                                $position_select = '<select type="text" name="edit_contacts_position" placeholder="Position" class="js-example-basic-single">';
+                                                $result = $conn->query("SELECT * FROM position ORDER BY name");
+                                                while ($row = $result->fetch_assoc()) {
+                                                    $position_select .= '<option value="' . $row['id'] . '" >' . $row['name'] . '</option>';
+                                                }
+                                                $position_select .= '</select>';
                                                 $editmodals = '';
                                                 while ($resultContacts && ($contactRow = $resultContacts->fetch_assoc())) {
                                                     echo '<tr>';
@@ -256,9 +262,9 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                                     echo '<td>' . $contactRow['phone'] . '</td>';
                                                     echo '<td><button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
                                                     echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button></td>';
+                                                    echo '<button type="submit" name=""';
                                                     echo '</tr>';
-                                                    //TODO: what is this bs?
-                                                    $currentmodal = '<form method="POST"><div id="edit-contact-' . $contactRow['id'] . '" class="modal fade">
+                                                    $editmodals .= '<form method="POST"><div id="edit-contact-' . $contactRow['id'] . '" class="modal fade">
                                                     <div class="modal-dialog modal-content modal-md">
                                                     <div class="modal-header h4">Ansprechpartner Editieren</div>
                                                     <div class="modal-body">
@@ -275,14 +281,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                                     </div>
                                                     <div class="row form-group">
                                                     <div class="col-md-4"><label>E-Mail</label><input type="email" name="edit_contacts_email" value="' . $contactRow['email'] . '" class="form-control required-field"/></div>
-                                                    <div class="col-md-4"><label>Position</label><select type="text" name="edit_contacts_position" placeholder="Position" class="form-control select2-position">';
-                                                    $currentmodal .= '<option value="-1" >+ Neu...</option>';
-                                                    $result = $conn->query("SELECT * FROM position ORDER BY name");
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        $currentmodal .= '<option value="' . $row['id'] . '" >' . $row['name'] . '</option>';
-                                                    }
-                                                    $currentmodal = str_replace('<option value="' . $contactRow['position'] . '" >', '<option selected value="' . $contactRow['position'] . '" >', $currentmodal);
-                                                    $currentmodal .= '</select></div>
+                                                    <div class="col-md-4"><label>Position</label>'.str_replace('<option value="' . $contactRow['gender'] . '" />', '<option selected value="' . $contactRow['gender'] . '" />', $position_select).'</div>
                                                     <div class="col-md-4"><label>Verantwortung</label><input type="text" name="edit_contacts_responsibility" value="' . $contactRow['responsibility'] . '" class="form-control"/></div>
                                                     </div>
                                                     <div class="row form-group">
@@ -300,7 +299,6 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                                     </div>
                                                     </div>
                                                     </div></form>';
-                                                    $editmodals .= str_replace('<option value="' . $contactRow['gender'] . '" />', '<option selected value="' . $contactRow['gender'] . '" />', $currentmodal);
                                                 }
                                                 ?>
                                             </tbody>
@@ -347,14 +345,14 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="vatnumber" value="<?php echo $row['vatnumber']; ?>" />
+                                            <input type="text" class="form-control" name="vatnumber" id="vat-number-<?php echo $x; ?>" value="<?php echo $row['vatnumber']; ?>" />
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default" type="button">Überprüfen</button>
+                                                <button class="btn btn-default uid-check" type="button" value="<?php echo $x; ?>">Überprüfen</button>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="col-sm-1">
-                                        <span id="uidValidate" ></span>
+                                        <span id="uid-validate-<?php echo $x; ?>" ></span>
                                     </div>
                                 </div>
                                 <div class="row form-group">
@@ -734,7 +732,7 @@ $resultContacts = $conn->query("SELECT contactPersons.*, position.name AS positi
                 </div>
                 <div class="row form-group">
                     <div class="col-md-4"><label>E-Mail</label><input type="email" name="contacts_email" placeholder="E-Mail" class="form-control required-field"/></div>
-                    <div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="js-example-basic-single select2-position">
+                    <div class="col-md-4"><label>Position</label><select type="text" name="contacts_position" placeholder="Position" class="js-example-basic-single">
                         <?php
                         $result = $conn->query("SELECT * FROM position ORDER BY name");
                         echo '<option value="-1" >+ Neu...</option>';
