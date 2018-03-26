@@ -844,6 +844,9 @@ $lang_ger['MESSAGE'] = 'Nachricht';
 $lang_eng['CONVERSATIONS'] = 'Conversations';
 $lang_ger['CONVERSATIONS'] = 'Konversationen';
 
+$lang_eng['RECEIVER'] = 'Receiver';
+$lang_ger['RECEIVER'] = 'Empfänger';
+
 $lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
 $lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
 
