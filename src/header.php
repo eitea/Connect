@@ -311,6 +311,8 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
+    <script src="plugins/lodash/lodash.js"></script>    
+
     <script src="plugins/homeMenu/js/homeMenu.min.js"></script>
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
@@ -403,7 +405,7 @@ if ($_SESSION['color'] == 'light') {
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                 <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
-                <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
+                <a class="btn navbar-btn navbar-link openSearchModal" title="CTRL-SHIFT-F"><i class="fa fa-search"></i></a>
                 <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
             </div>
         </div>
@@ -433,21 +435,28 @@ if ($_SESSION['color'] == 'light') {
             $(".openSearchModal").click(function(){
                 openSearchModal()
             })
+            $(document).on("keydown",function(event){
+               if (event.ctrlKey && event.shiftKey && event.keyCode == 70 /* f */) {
+                   openSearchModal()
+               }
+            })
         })
-        function openSearchModal(){
-        $.ajax({
+        const openSearchModal = _.throttle(function() {
+            $.ajax({
                 url:'ajaxQuery/AJAX_getSearch.php',
-                data:{modal:true},
+                data:{ modal:true },
                 type: 'get',
                 success : function(resp){
                     $("#searchModal").html(resp);
                 },
                 error : function(resp){console.error(resp)},
                 complete: function(resp){
+                    $("#searchModal .modal").modal("hide"); // hide old modal if pressed multiple times
+                    $(".modal-backdrop.fade.in").hide();
                     $("#searchModal .modal").modal("show");
                 }
-        });
-    }
+            });
+        },1000, {leading:true,trailing:false})
   </script>
 
   <!-- modal -->

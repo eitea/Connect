@@ -51,7 +51,7 @@ if(isset($_REQUEST["modal"])){
             </div>
         </div>
         <script>
-            function fetchSearchResults(){
+            fetchSearchResults = _.debounce (function () {
                 $("#searchResult").html("<div style='width:100%;height:200px;'><div class='searchLoader'></div></div>");
                 $.ajax({
                     url: 'ajaxQuery/AJAX_getSearch.php',
@@ -69,7 +69,7 @@ if(isset($_REQUEST["modal"])){
                         $("#searchResult").html(resp)
                     }
                 });
-            }
+            }, 600, { leading: false, trailing: true });
             $("#searchForm").submit(function(event){
                 event.preventDefault();
                 fetchSearchResults();
@@ -78,14 +78,8 @@ if(isset($_REQUEST["modal"])){
             $("#searchForm input[type=checkbox]").change(function(event){
                 fetchSearchResults();
             })
-            var lastKeyUpTime = 0;
             $("#searchQuery").keyup(function(event){
-                lastKeyUpTime = Date.now();
-                setTimeout(function(){
-                    if(lastKeyUpTime<Date.now()-500){
-                        fetchSearchResults();
-                    }
-                }, 600);
+                fetchSearchResults();
             })
         </script>
     <?php
