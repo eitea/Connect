@@ -312,6 +312,9 @@ $lang_ger['DATATABLES_LANG_OPTIONS'] = '
         "previous":   "Vorherige"
     }';
 
+$lang_eng['DATA_MATRIX'] = 'Data Matrix';
+$lang_ger['DATA_MATRIX'] = 'Datenmatrix';
+
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
 

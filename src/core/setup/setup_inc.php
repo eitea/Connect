@@ -1151,6 +1151,32 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6) UNSIGNED,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix_settings (
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        matrixID INT(6) UNSIGNED,
+        opt_name VARCHAR(30) NOT NULL,
+        opt_descr VARCHAR(350) NOT NULL,
+        opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+        UNIQUE KEY (matrixID,opt_name),
+        FOREIGN KEY (matrixID) REFERENCES dsgvo_vv_data_matrix(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE dsgvo_vv(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         templateID INT(6) UNSIGNED,
@@ -1167,6 +1193,7 @@ function create_tables($conn) {
         id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         vv_id INT(6) UNSIGNED,
         setting_id INT(10) UNSIGNED,
+        matrix_setting_id INT(10) UNSIGNED,
         setting VARCHAR(850) NOT NULL,
         category VARCHAR(50),
         FOREIGN KEY (vv_id) REFERENCES dsgvo_vv(id)
@@ -1174,7 +1201,10 @@ function create_tables($conn) {
         ON DELETE CASCADE,
         FOREIGN KEY (setting_id) REFERENCES dsgvo_vv_template_settings(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (matrix_setting_id) REFERENCES dsgvo_vv_data_matrix_settings(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
     )";
     if(!$conn->query($sql)){
         echo $conn->error;

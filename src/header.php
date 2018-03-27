@@ -311,9 +311,10 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
+    <link href="plugins/animate.css/animate.css" rel="stylesheet" />
     <script src="plugins/lodash/lodash.js"></script>    
 
-    <script src="plugins/homeMenu/js/homeMenu.min.js"></script>
+    <script src="plugins/homeMenu/js/homeMenu.js"></script>
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
@@ -421,7 +422,7 @@ if ($_SESSION['color'] == 'light') {
               the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
               <br><br>
               LIZENZHINWEIS<br>
-              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic, rtf.js, lodash
+              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic, rtf.js, lodash, animate.css
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['BACK'] ?></button>
@@ -787,7 +788,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
                             <?php endif;?>
                             <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
-                            <li><a <?php if ($this_page == 'dsgvo_data_matrix.php') {echo $setActiveLink;}?> href="../system/data-matrix"><span> DSGVO Datenmatrix</span></a></li>
+                            <li><a <?php if ($this_page == 'dsgvo_data_matrix.php') {echo $setActiveLink;}?> href="../system/data-matrix"><span> DSGVO <?php echo $lang['DATA_MATRIX']; ?></span></a></li>
                         </ul>
                     </div>
                 </li>

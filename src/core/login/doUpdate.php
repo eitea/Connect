@@ -2247,7 +2247,53 @@ if($row['version'] < 142){
     }
 
 }
-//if($row['version'] < 143){}
+
+if($row['version'] < 143){
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6) UNSIGNED,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix';
+    }
+
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix_settings (
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        matrixID INT(6) UNSIGNED,
+        opt_name VARCHAR(30) NOT NULL,
+        opt_descr VARCHAR(350) NOT NULL,
+        opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+        UNIQUE KEY (matrixID,opt_name),
+        FOREIGN KEY (matrixID) REFERENCES dsgvo_vv_data_matrix(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD COLUMN matrix_setting_id INT(10) UNSIGNED");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings Foreign Key';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD FOREIGN KEY (matrix_setting_id) REFERENCES dsgvo_vv_data_matrix_settings(id) ON UPDATE CASCADE ON DELETE SET NULL");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings Foreign Key';
+    }
+}
+
 //if($row['version'] < 144){}
 //if($row['version'] < 145){}
 

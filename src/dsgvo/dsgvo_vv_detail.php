@@ -18,22 +18,42 @@ if(!$result || $result->num_rows < 1 || !($vv_row = $result->fetch_assoc()) || !
 $templateID = $vv_row['templateID'];
 $doc_type = 'BASE';
 if($vv_row['type'] == 'app'){ $doc_type = 'APP'; }
+$company = $vv_row['companyID'];
+$matrix_result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $company");
+if($matrix_result){
+    if($matrix_result->num_rows === 0){
+        showError("Diese Firma hat keine Matrix in den Einstellungen. <a href='../system/data-matrix'>Hier klicken</a>, um eine zu erstellen.");
+    }
+    $matrixID = $matrix_result->fetch_assoc()["id"];
+}else{
+    showError($conn->error);
+}
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
     $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
     $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
     $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
+    $stmt_update_setting_matrix = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
+    $stmt_update_setting_matrix->bind_param("si", $setting_encrypt, $valID);
+    $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
+    $stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
 }
-function getSettings($like, $mults = false){
+function getSettings($like, $mults = false, $from_matrix = false){
     global $conn;
     global $vvID;
     global $templateID;
     global $userID;
     global $privateKey;
-    $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_template_settings.id, dsgvo_vv_settings.id AS valID
-    FROM dsgvo_vv_template_settings LEFT JOIN dsgvo_vv_settings ON setting_id = dsgvo_vv_template_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND templateID = $templateID");
-    echo $conn->error;
+    if($from_matrix){ // from matrix, returned id references a tuple in dsgvo_vv_data_matrix_settings
+        global $matrixID;
+        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_data_matrix_settings.id, dsgvo_vv_settings.id AS valID
+        FROM dsgvo_vv_data_matrix_settings LEFT JOIN dsgvo_vv_settings ON dsgvo_vv_settings.matrix_setting_id = dsgvo_vv_data_matrix_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND dsgvo_vv_data_matrix_settings.matrixID = $matrixID");
+    }else{ // from template
+        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_template_settings.id, dsgvo_vv_settings.id AS valID
+        FROM dsgvo_vv_template_settings LEFT JOIN dsgvo_vv_settings ON setting_id = dsgvo_vv_template_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND templateID = $templateID");
+    }
+    showError($conn->error);
     $settings = array();
     while($row = $result->fetch_assoc()){
         $settings[$row['opt_name']]['descr'] = $row['opt_descr'];
@@ -70,13 +90,14 @@ if(isset($settings['DESCRIPTION'])):
             $stmt_insert_setting->execute();
         }
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            showError($conn->error);
         } else {
             $settings['DESCRIPTION']['setting'] = $setting;
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+            showSuccess($lang['OK_SAVE']);
         }
     }
 ?>
+ <script>$("#bodyContent").show()</script>debug
     <div class="col-md-6">
         <div class="panel panel-default">
             <?php
@@ -220,16 +241,18 @@ if(isset($settings['EXTRA_DOC'])){
                 $cat = test_input($_POST['add_category_mittlung']);
                 $stmt_insert_setting->execute();
                 if($conn->error){
-                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                    showError($conn->error);
                 } else {
                     $heading[$space_key] = array('id' => $conn->insert_id, 'category' => array());
                     $str_heads .= '<th><div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$setting.'</button>
                     <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li></ul></div></th>';
                 }
             } elseif(!$space){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Kein Platz mehr.</div>';
+                showWarning("Kein Platz mehr");
             }
             ?>
+           
+            <?php  if($matrixID){ ?>
             <table class="table table-condensed">
             <thead><tr>
             <th>Gruppierung</th>
@@ -240,69 +263,79 @@ if(isset($settings['EXTRA_DOC'])){
             <th><a data-toggle="modal" data-target="#add-cate" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></a></th>
             </tr></thead>
             <?php
-            $settings = getSettings('APP_GROUP_%');
-            foreach($settings as $key => $val){
-                $i = 1;
-                $cats = getSettings('APP_CAT_'.ltrim($key, 'APP_GROUP_').'_%');
-                echo '<tr><td rowspan="'.(count($cats) +1).'" >'.$val['descr'].'</td></tr>';
-                foreach($cats as $catKey => $catVal){
-                    if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                        $valID = $catVal['valID'];
-                        if(!empty($_POST[$catKey])){
-                            $catVal['setting'] = $setting = '1';
-                            $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-                            if($valID){ //update to true if checked and exists
-                                $stmt_update_setting->execute();
-                            } else { //insert with true if checked and not exists
-                                $cat = '';
-                                $setID = $catVal['id'];
-                                $stmt_insert_setting->execute();
-                            }
-                        } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
-                            $catVal['setting'] = $setting = '0';
-                            $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-                            $stmt_update_setting->execute();
-                        }
-                    }
-                    echo '<tr>';
-                    echo '<td>'.$i++.'</td>';
-                    echo '<td>'.$catVal['descr'].'</td>';
-                    $checked = $catVal['setting'] ? 'checked' : '';
-                    echo '<td><input type="checkbox" '.$checked.' name="'.$catKey.'" value="1" /> Trifft Zu</td>';
-
-                    foreach($heading as $headKey => $headVal){
-                        $j = array_search($catKey, $headVal['category']); //$j = numeric index
-                        $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';
+                $settings = getSettings('APP_GROUP_%', false, true); // settings from matrix
+                $fieldID = 0;
+                foreach($settings as $key => $val){
+                    $i = 1;
+                    $cats = getSettings('APP_CAT_'.util_strip_prefix($key, 'APP_GROUP_').'_%', false, true);
+                    echo '<tr><td rowspan="'.(count($cats) +1).'" >'.$val['descr'].'</td></tr>';
+                    foreach($cats as $catKey => $catVal){
                         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                            if(!empty($_POST[$headKey.'_'.$catKey])){
-                                $setting = '1';
+                            $valID = $catVal['valID'];
+                            if(!empty($_POST[$catKey])){
+                                $catVal['setting'] = $setting = '1';
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-                                $checked = 'checked';
-                                if($j){
-                                    $valID = $headVal['valID'][$j];
-                                    $stmt_update_setting->execute();
-                                } else {
-                                    $cat = $catKey;
-                                    $setID = $headVal['id'];
-                                    $stmt_insert_setting->execute();
+                                if($valID){ //update to true if checked and exists
+                                    $stmt_update_setting_matrix->execute();
+                                } else { //insert with true if checked and not exists
+                                    $cat = '';
+                                    $setID = $catVal['id'];
+                                    $stmt_insert_setting_matrix->execute();
                                 }
-                            } elseif($j && $headVal['setting'][$j]){
-                                $valID = $headVal['valID'][$j];
-                                $setting = '0';
+                            } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
+                                $catVal['setting'] = $setting = '0';
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-                                $checked = '';
-                                $stmt_update_setting->execute();
-                                echo $stmt_update_setting->error;
+                                $stmt_update_setting_matrix->execute();
                             }
                         }
-                        echo '<td class="text-center"><input type="checkbox" '.$checked.' name="'.$headKey.'_'.$catKey.'" value="1" ></td>';
+                        $fieldID ++;
+                        echo '<tr>';
+                        echo '<td>'.$fieldID.'</td>';
+                        echo '<td>'.$catVal['descr'].'</td>';
+                        $checked = $catVal['setting'] ? 'checked' : '';
+                        echo '<td><input type="checkbox" '.$checked.' name="'.$catKey.'" value="1" /> Trifft Zu</td>';
+                        
+                        foreach($heading as $headKey => $headVal){
+                            $j = array_search($catKey, $headVal['category']); //$j = numeric index
+                            $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';
+                            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                                if(!empty($_POST[$headKey.'_'.$catKey])){
+                                    $setting = '1';
+                                    $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+                                    $checked = 'checked';
+                                    if($j){
+                                        $valID = $headVal['valID'][$j];
+                                        $stmt_update_setting->execute();
+                                    } else {
+                                        $cat = $catKey;
+                                        $setID = $headVal['id'];
+                                        $stmt_insert_setting->execute();
+                                    }
+                                } elseif($j && $headVal['setting'][$j]){
+                                    $valID = $headVal['valID'][$j];
+                                    $setting = '0';
+                                    $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+                                    $checked = '';
+                                    $stmt_update_setting->execute();
+                                    echo $stmt_update_setting->error;
+                                }
+                            }
+                            echo '<td class="text-center"><input type="checkbox" '.$checked.' name="'.$headKey.'_'.$catKey.'" value="1" ></td>';
+                        }
+                        echo '<td></td>';
+                        echo '</tr>';
                     }
-                    echo '<td></td>';
-                    echo '</tr>';
                 }
+                ?>
+                 </table>
+                 <?php
+            }else{
+                ?>
+                Diese Firma hat keine Matrix in den Einstellungen. <a href='../system/data-matrix'>Hier klicken</a>, um eine zu erstellen.
+                <?php
             }
             ?>
-            </table>
+           
         </div>
     </div>
 </div>

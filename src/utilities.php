@@ -574,3 +574,14 @@ function convToUTF8($text) {
     }
     return $buf;
 }
+
+function util_strip_prefix($subject, $prefix) {
+    if (substr($subject, 0, strlen($prefix)) == $prefix) {
+        $subject = substr($subject, strlen($prefix));
+    }
+    return $subject;
+}
+
+function util_starts_with($subject, $prefix) {
+    return substr($subject, 0, strlen($prefix)) === $prefix;
+}
