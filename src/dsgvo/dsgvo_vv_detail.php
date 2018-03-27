@@ -97,7 +97,6 @@ if(isset($settings['DESCRIPTION'])):
         }
     }
 ?>
- <script>$("#bodyContent").show()</script>debug
     <div class="col-md-6">
         <div class="panel panel-default">
             <?php
