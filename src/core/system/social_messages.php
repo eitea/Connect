@@ -38,13 +38,13 @@
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
             // no errors
-            $to = $_POST['to'];
-            $subject = $_POST['subject'];
-            $message = $_POST['message'];
+            $to = test_input($_POST['to']); //TODO: replace this with userID and clean with intval()
+            $subject = test_input($_POST['subject']);
+            $message = test_input($_POST['message']);
             $partnerID = -1;
 
-            //TODO: improve
 
+            //TODO: remove
             // select the partnerid from the database
             $sql = "SELECT id FROM UserData WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY id LIMIT 1";
             $result = $conn->query($sql);
@@ -125,8 +125,8 @@
             <?php
             // the currently logged in user
             $currentUser = $_SESSION["userid"];
-            $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData 
-                INNER JOIN messages ON messages.partnerID = UserData.id 
+            $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData
+                INNER JOIN messages ON messages.partnerID = UserData.id
                 WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
                 GROUP BY subject";
 
@@ -140,7 +140,7 @@
                     echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
                     echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
                     echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
-                    
+
                     echo '</tr>';
                     ?>
 
@@ -169,9 +169,9 @@
                                     <div id="messages<?php echo $subject; ?>">
                                         <?php
                                             // select all messages
-                                            $sql = "SELECT message, firstname, lastname FROM UserData 
-                                                INNER JOIN messages ON messages.partnerID = UserData.id 
-                                                WHERE subject = '{$subject}' 
+                                            $sql = "SELECT message, firstname, lastname FROM UserData
+                                                INNER JOIN messages ON messages.partnerID = UserData.id
+                                                WHERE subject = '{$subject}'
                                                 ORDER BY sent ASC";
 
                                             $result = $conn->query($sql);
@@ -180,7 +180,7 @@
                                                     $message = $row['message'];
                                                     $name = "${row['firstname']} ${row['lastname']}";
                                                     ?>
-                                                    
+
                                                     <!-- The message -->
                                                     <div class='row'>
                                                         <div class='col-xs-12'>
