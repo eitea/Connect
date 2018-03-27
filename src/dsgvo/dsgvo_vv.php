@@ -77,13 +77,28 @@ if(isset($_POST['add_app']) && !empty($_POST['add_app_name']) && !empty($_POST['
     }
 }
 
+if(isset($_POST["change_template"])){
+    $vv_id = intval($_POST["vv_id"]);
+    $template_id = intval($_POST["template_id"]);
+    if($vv_id && $template_id){
+        $conn->query("UPDATE dsgvo_vv SET templateID = $template_id WHERE id = $vv_id");
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang['OK_SAVE']);
+        }
+    }else{
+        showError($lang['ERROR_INVALID_CHARACTER']);
+    }
+}
+
 $result = $conn->query("SELECT dsgvo_vv.id FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv.name='Basis' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID");
 $row = $result->fetch_assoc();
 ?>
 <div class="panel panel-default" style="margin:0 15px">
     <form method="POST">
         <div class="row">
-            <div class="col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>" class="btn btn-link"> Basis </a></div>
+            <div class="col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>" class="btn btn-link"> Stammblatt </a></div>
             <div class="col-sm-5">
                 <select name="change_basic_template" class="js-example-basic-single">
                 <?php
@@ -102,12 +117,50 @@ $row = $result->fetch_assoc();
 </div>
 
 <div class="row">
-    <?php
-    $result = $conn->query("SELECT dsgvo_vv.* FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv_templates.type='app' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID");
-    while($row = $result->fetch_assoc()){
-        echo '<div class="col-md-6"><div class="panel panel-default"><a href="vDetail?v='.$row['id'].'" class="btn btn-link">'.$row['name'].'</a></div></div>';
-    }
-    ?>
+    <div class="col-md-11 col-md-offset-1">
+        <div class="row">
+            <?php
+                $result = $conn->query("SELECT dsgvo_vv.id, dsgvo_vv.name, dsgvo_vv.templateID FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv_templates.type='app' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID ORDER BY dsgvo_vv.id");
+                while($row = $result->fetch_assoc()){
+                    $id = $row['id'];
+                    $name = $row['name'];
+                    $templateID = $row['templateID'];
+                    ?>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <a href="vDetail?v=<?php echo $id ?>" class="btn btn-link"><?php echo $name; ?></a>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <form method="POST">
+                                            <input type="hidden" name="vv_id" value="<?php echo $id; ?>" />
+                                            <div class="input-group">
+                                                <select name="template_id" class="js-example-basic-single">
+                                                    <?php
+                                                    $select_result = $conn->query("SELECT id, name FROM dsgvo_vv_templates WHERE companyID = $cmpID AND type = 'app'");
+                                                    while($select_row = $select_result->fetch_assoc()){
+                                                        $select_id = $select_row["id"];
+                                                        $select_name = $select_row["name"];
+                                                        $selected = $select_id == $templateID?"selected":"";
+                                                        echo "<option $selected value='$select_id'>$select_name</option>";
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <div class="input-group-btn">
+                                                    <button type="submit" class="btn btn-default" name="change_template" value="true"><i class="fa fa-floppy-o"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php
+                }
+            ?>
+        </div>
+    </div>
 </div>
 
 <div id="add-app" class="modal fade">
