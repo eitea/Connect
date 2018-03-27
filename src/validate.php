@@ -1,15 +1,7 @@
 <?php
-/*
-isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',      |
-isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',      | - Define accessable Pages
-isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',   |
-
-canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',          | - Define Menu Items.
-canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',          |
-*/
-
 function enableToCore($userID){
   global $conn;
+  if(!$conn) require 'connection.php'; //5ab9e57714ff6
   $sql = "SELECT isCoreAdmin FROM roles WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -21,6 +13,7 @@ function enableToCore($userID){
 
 function enableToTime($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isTimeAdmin FROM roles WHERE userID = $userID AND isTimeAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -32,6 +25,7 @@ function enableToTime($userID){
 
 function enableToProject($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isProjectAdmin FROM roles WHERE userID = $userID AND isProjectAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -43,6 +37,7 @@ function enableToProject($userID){
 
 function enableToStamps($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT canStamp FROM roles WHERE userID = $userID AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -54,6 +49,7 @@ function enableToStamps($userID){
 
 function enableToBookings($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT * FROM roles WHERE userID = $userID AND canBook = 'TRUE' AND canStamp = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -65,6 +61,7 @@ function enableToBookings($userID){
 
 function enableToTemplate($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT * FROM roles WHERE userID = $userID AND (isCoreAdmin = 'TRUE' OR canEditTemplates = 'TRUE')";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -76,6 +73,7 @@ function enableToTemplate($userID){
 
 function enableToReport($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isReportAdmin FROM roles WHERE userID = $userID AND isReportAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -87,6 +85,7 @@ function enableToReport($userID){
 
 function enableToERP($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isERPAdmin FROM roles WHERE userID = $userID AND isERPAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -98,6 +97,7 @@ function enableToERP($userID){
 
 function enableToFinance($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isFinanceAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -109,6 +109,7 @@ function enableToFinance($userID){
 
 function enableToDSGVO($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -120,6 +121,7 @@ function enableToDSGVO($userID){
 
 function enableToClients($userID){
     global $conn;
+    if(!$conn) require 'connection.php';
     $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (isERPAdmin = 'TRUE' OR isCoreAdmin = 'TRUE' OR canUseClients = 'TRUE'
     OR canEditClients = 'TRUE' OR canUseSuppliers = 'TRUE' OR canEditSuppliers = 'TRUE')");
     if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -139,6 +141,7 @@ function denyToContainer(){
 
 function enableToSocialMedia($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT * FROM roles WHERE userID = $userID AND canUseSocialMedia = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -150,6 +153,7 @@ function enableToSocialMedia($userID){
 
 function isDynamicProjectAdmin($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   $sql = "SELECT * FROM roles WHERE userID = $userID AND isDynamicProjectsAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
@@ -161,6 +165,7 @@ function isDynamicProjectAdmin($userID){
 
 function enableToDynamicProjects($userID){
   global $conn;
+  if(!$conn) require 'connection.php';
   enableToBookings($userID);
   // test whether user has active dynamic projects
   $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.*
