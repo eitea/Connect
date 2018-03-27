@@ -162,7 +162,7 @@
                                         <?php
                                                 // select all messages
                                                 $sql = "SELECT message, firstname, lastname FROM UserData 
-                                                    INNER JOIN messages ON messages.partnerID = UserData.id 
+                                                    INNER JOIN messages ON messages.userID = UserData.id 
                                                     WHERE subject = '{$subject}' and (userID = '{$currentUser}' or partnerID = '{$currentUser}')
                                                     ORDER BY sent ASC";
 
