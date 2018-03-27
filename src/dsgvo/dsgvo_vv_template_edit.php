@@ -87,7 +87,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 <?php if($template_type == 'app'): ?>
     <div class="col-md-12">
-        <label>Extra App Abfragen</label>
+        <label>Extra <?php echo $lang['VV_TEMPLATE_TYPES']['app']; ?> Abfragen</label>
         <div class="panel panel-default">
             <div class="panel-body">
             <?php
