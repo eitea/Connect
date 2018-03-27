@@ -217,7 +217,7 @@
      */
     function getMessages(partner, target, scroll = false, limit = 50) {
         $.ajax({
-            url: 'ajaxQuery/AJAX_socialGetMessage.php',
+            url: 'ajaxQuery/AJAX_postGetMessage.php',
             data: {
                 partner: partner,
                 limit: limit,
