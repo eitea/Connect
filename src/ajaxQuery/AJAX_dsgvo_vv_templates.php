@@ -57,7 +57,7 @@ while($result && ($row = $result->fetch_assoc())){
     echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#clone-temp-'.$row['id'].'" title="Duplizieren"><i class="fa fa-files-o"></i></button> ';
     if($row['name'] != 'Default'){
         echo '<button type="submit" name="delete_template" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button> ';
-        echo '<a href="editTemplate?t='.$row['id'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
+        echo '<a href="editTemplate?t='.$row['id'].'&n='.$cmpID.'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
     }
     echo '</td>';
     echo '</tr>';
