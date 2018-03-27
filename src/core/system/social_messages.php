@@ -1,15 +1,17 @@
+<?php 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
+
 <!-- TODO: Add ability to send pictures -->
 <!-- TODO: show all conversations -->
 <!-- TODO: Badge -->
 <!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
 <!-- TODO: use AJAX scripts -->
-
-
-<!-- Task: 5aa53cf53c635 -->
-
 <?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
-
 
 <!-- Page header -->
 <div class="page-header-fixed">
