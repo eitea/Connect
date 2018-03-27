@@ -3,7 +3,7 @@
 <?php
 if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+    showError($lang['ERROR_STRIKE']);
     include dirname(__DIR__) . '/footer.php';
     die();
 }?>
@@ -24,9 +24,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $val = intval($_POST['delete_template']);
         $conn->query("DELETE FROM dsgvo_vv_templates WHERE id = $val");
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            showError($conn->error);
         } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            showSuccess($lang['OK_DELETE']);
         }        
     }
     if(!empty($_POST['duplicate_template']) && !empty($_POST['duplicate_template_name'])){
@@ -36,9 +36,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $templateID = $conn->insert_id;        
         $conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr, opt_status) SELECT $templateID, opt_name, opt_descr, opt_status FROM dsgvo_vv_template_settings WHERE templateID = $val");
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            showError($conn->error);
         } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            showSuccess($lang['OK_ADD']);
         }
     }
     if(isset($_POST['add_template']) && !empty($_POST['add_name']) && $_POST['add_name'] != 'Default' && !empty($_POST['add_type'])){
@@ -49,16 +49,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $templateID = $conn->insert_id;
             $conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES($templateID, 'DESCRIPTION', '')");
             if($conn->error){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                showError($conn->error);
             } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+               showSuccess($lang['OK_ADD']);
             }
         } else {
             $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+            showError("<strong>Invalid Access.</strong> ".$lang['ERROR_STRIKE']);
         }
     } elseif(isset($_POST['add_template'])) {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'. Default nicht erlaubt.</div>';
+        showError($lang['ERROR_MISSING_FIELDS']);
     }
 }
 
@@ -68,12 +68,12 @@ if(isset($_POST['add_app']) && !empty($_POST['add_app_name']) && !empty($_POST['
     if($name && $val){
         $conn->query("INSERT INTO dsgvo_vv(templateID, name) VALUES ($val, '$name') ");
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            showError($conn->error);
         } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            showSuccess($lang['OK_ADD']);
         }
     } else {
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_CHARACTER'].'</div>';
+        showError($lang['ERROR_INVALID_CHARACTER']);
     }
 }
 
@@ -130,7 +130,7 @@ $row = $result->fetch_assoc();
                             <div class="panel panel-default">
                                 <div class="row">
                                     <div class="col-md-7">
-                                        <a href="vDetail?v=<?php echo $id ?>" class="btn btn-link"><?php echo $name; ?></a>
+                                        <a href="vDetail?v=<?php echo $id ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
                                     </div>
                                     <div class="col-md-5">
                                         <form method="POST">
