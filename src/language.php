@@ -822,6 +822,40 @@ $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 $lang_eng['MY_REQUESTS'] = 'My Requests';
 $lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 
+//TODO: Find a good name
+$lang_eng['MESSAGING'] = 'Post';
+$lang_ger['MESSAGING'] = 'Post ';
+
+$lang_eng['SUBJECT'] = 'Subject';
+$lang_ger['SUBJECT'] = 'Betreff';
+
+$lang_eng['SEND'] = 'Send';
+$lang_ger['SEND'] = 'Senden';
+
+$lang_eng['POST_TO'] = 'To';
+$lang_ger['POST_TO'] = 'An';
+
+$lang_eng['POST'] = 'Post message';
+$lang_ger['POST'] = 'Nachricht verschicken';
+
+$lang_eng['MESSAGE'] = 'Message';
+$lang_ger['MESSAGE'] = 'Nachricht';
+
+$lang_eng['CONVERSATIONS'] = 'Conversations';
+$lang_ger['CONVERSATIONS'] = 'Konversationen';
+
+$lang_eng['RECEIVER'] = 'Receiver';
+$lang_ger['RECEIVER'] = 'Empfänger';
+
+$lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
+$lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
+
+$lang_eng['SUBJECT_NOT_SPECIFIED'] = 'There is no subject specified!';
+$lang_ger['SUBJECT_NOT_SPECIFIED'] = 'Es wurde kein Betreff angegeben!';
+
+$lang_eng['MESSAGE_NOT_SPECIFIED'] = 'There is no message specified!';
+$lang_ger['MESSAGE_NOT_SPECIFIED'] = 'Es wurde keine Nachricht eingegeben!';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 

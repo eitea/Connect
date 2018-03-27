@@ -1605,4 +1605,18 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+    $sql = "CREATE TABLE messages(
+        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED NOT NULL,
+        partnerID INT(6) UNSIGNED NOT NULL,
+        subject varchar(60),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
 }

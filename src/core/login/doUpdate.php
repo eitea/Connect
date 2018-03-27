@@ -2239,6 +2239,22 @@ if($row['version'] < 141){
 }
 
 if($row['version'] < 142){
+    $conn->query("CREATE TABLE messages(
+        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED NOT NULL,
+        partnerID INT(6) UNSIGNED NOT NULL,
+        subject varchar(60),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        )");
+    if(!$conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Team Update: Messages';
+    }
+
     $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
     $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
     if(!$conn->error){
@@ -2263,9 +2279,6 @@ if($row['version'] < 142){
     } else {
         echo '<br>Extern: Benutzer';
     }
-
-    //$conn->query("");
-
 }
 
 //if($row['version'] < 143){}
