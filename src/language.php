@@ -841,8 +841,8 @@ $lang_ger['POST'] = 'Nachricht verschicken';
 $lang_eng['MESSAGE'] = 'Message';
 $lang_ger['MESSAGE'] = 'Nachricht';
 
-$lang_eng['CONVERSATIONS'] = 'Conversations';
-$lang_ger['CONVERSATIONS'] = 'Konversationen';
+$lang_eng['MESSAGES'] = 'Messaging';
+$lang_ger['MESSAGES'] = 'Nachrichten';
 
 $lang_eng['RECEIVER'] = 'Receiver';
 $lang_ger['RECEIVER'] = 'Empfänger';

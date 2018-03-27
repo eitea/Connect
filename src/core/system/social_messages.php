@@ -43,8 +43,6 @@
             $message = $_POST['message'];
             $partnerID = -1;
 
-            //TODO: improve
-
             // select the partnerid from the database
             $sql = "SELECT id FROM UserData WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY id LIMIT 1";
             $result = $conn->query($sql);
@@ -57,7 +55,6 @@
             // the partner was not found in the database or its the same user
             if ($partnerID == -1) {
                 showInfo("Receiver not found!");
-                echo $sql;
             } else if ($partnerID == $userID) {
                 showInfo("You cannot send messages to yourself!");
             } else {
@@ -112,7 +109,7 @@
 
 
     <!-- Active Conversations -->
-    <h4><?php echo $lang['CONVERSATIONS']; ?></h4>
+    <h4><?php echo $lang['MESSAGES']; ?></h4>
 
     <!-- contacts -->
     <table class="table table-hover">
