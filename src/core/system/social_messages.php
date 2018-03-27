@@ -118,122 +118,89 @@
     <table class="table table-hover">
         <thead>
             <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SUBJECT']; ?></th>
-            <th><?php echo $lang['RECEIVER']; ?></th>
         </thead>
 
         <tbody>
             <?php
-            // the currently logged in user
-            $currentUser = $_SESSION["userid"];
-            $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData 
-                INNER JOIN messages ON messages.partnerID = UserData.id 
-                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
-                GROUP BY subject";
+                // the currently logged in user
+                $currentUser = $_SESSION["userid"];
 
-            $result = $conn->query($sql);
-            if ($result && $result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $name = "${row['firstname']} ${row['lastname']}";
-                    $partnerID = $row["partnerID"];
-                    $subject = $row['subject'];   /*Identify the html elements with the subject*/
+                $sql = "SELECT distinct subject FROM messages 
+                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'";
 
-                    echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
-                    echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
-                    echo "<td style='white-space: nowrap;width: 1%;'>$name</td>";
-                    
-                    echo '</tr>';
-                    ?>
+                $result = $conn->query($sql);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $subject = $row['subject'];
 
-                    <!-- chat modal -->
-                    <div class="modal fade" id="chat<?php echo $subject; ?>" tabindex="-1" role="dialog"
-                        aria-labelledby="chatLabel<?php echo $subject; ?>">
-                        <div class="modal-dialog" role="form">
+                        echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
+                        echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
+                        echo '</tr>';
 
-                            <div class="modal-content">
-                                <!-- Title -->
-                                <div class="modal-header" style="padding-bottom:5px;">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                        ?>
 
-                                    <h4 class="modal-title" id="chatLabel<?php echo $subject; ?>">
-                                        <img src='<?php echo $profilePicture; ?>' alt='Profile picture' class='img-circle'
-                                            style='width:25px;display:inline-block;'> <?php echo $name ?>
-                                    </h4>
-                                </div>
+                        <!-- chat modal -->
+                        <div class="modal fade" id="chat<?php echo $subject; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $subject; ?>">
+                            <div class="modal-dialog" role="form">
+                                <div class="modal-content">
+                                    <!-- Header -->
+                                    <div class="modal-header" style="padding-bottom:5px;">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
 
-                                <br>
+                                        <h4 class="modal-title" id="chatLabel<?php echo $subject; ?>">
+                                            <?php echo $subject ?>
+                                        </h4>
+                                    </div>
 
-                                <!-- All messages -->
-                                <div class="modal-body">
-                                    <div id="messages<?php echo $subject; ?>">
+                                    <br>
+
+                                    <!-- All messages -->
+                                    <div class="modal-body">
+                                        <div id="messages<?php echo $subject; ?>">
                                         <?php
-                                            // select all messages
-                                            $sql = "SELECT message, firstname, lastname FROM UserData 
-                                                INNER JOIN messages ON messages.partnerID = UserData.id 
-                                                WHERE subject = '{$subject}' 
-                                                ORDER BY sent ASC";
+                                                // select all messages
+                                                $sql = "SELECT message, firstname, lastname FROM UserData 
+                                                    INNER JOIN messages ON messages.partnerID = UserData.id 
+                                                    WHERE subject = '{$subject}' and (userID = '{$currentUser}' or partnerID = '{$currentUser}')
+                                                    ORDER BY sent ASC";
 
-                                            $result = $conn->query($sql);
-                                            if ($result && $result->num_rows > 0) {
-                                                while ($row = $result->fetch_assoc()) {
-                                                    $message = $row['message'];
-                                                    $name = "${row['firstname']} ${row['lastname']}";
-                                                    ?>
-                                                    
-                                                    <!-- The message -->
-                                                    <div class='row'>
-                                                        <div class='col-xs-12'>
-                                                            <div class='well <?php echo $pull; ?>' style='position:relative'>
-                                                                <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
-                                                                <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
-                                                                <div><?php echo $message ?></div>
+                                                //another variables because of the nested loop
+                                                $result2 = $conn->query($sql);
+                                                if ($result2 && $result2->num_rows > 0) {
+                                                    while ($row2 = $result2->fetch_assoc()) {
+                                                        $message = $row2['message'];
+                                                        $name = "${row2['firstname']} ${row2['lastname']}";
+                                                        ?>
+                                                        
+                                                        <!-- The message -->
+                                                        <div class='row'>
+                                                            <div class='col-xs-12'>
+                                                                <div class='well <?php echo $pull; ?>' style='position:relative'>
+                                                                    <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
+                                                                    <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
+                                                                    <div><?php echo $message ?></div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    <?php
+                                                        <?php
+                                                    }
                                                 }
-                                            }
-                                        ?>
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- AJAX stuff -->
-                                <!--<script>
-                                    interval<?php echo $subject; ?> = 0
-                                    limit<?php echo $subject; ?> = 10
-                                    $("#chat<?php echo $subject; ?>").on('show.bs.modal', function (e) {
-                                        getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", true, limit<?php echo $subject; ?>)
-                                        interval<?php echo $subject; ?> = setInterval(function () {
-                                            getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
-                                        }, 1000)
-                                    })
-
-                                    // scroll
-                                    $("#messages<?php echo $subject; ?>").parent().scroll(function () {
-                                        if ($("#messages<?php echo $subject; ?>").parent().scrollTop() == 0) {
-                                            limit<?php echo $subject; ?> += 1
-                                            $("#messages<?php echo $subject; ?>").parent().scrollTop(1);
-                                            getMessages(<?php echo $subject; ?>, "#messages<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
-                                        }
-                                    })
-
-                                    // scroll to top
-                                    $("#chat<?php echo $subject; ?>").on('shown.bs.modal', function (e) {
-                                        $("#messages<?php echo $subject; ?>").parent().scrollTop($("#messages<?php echo $subject; ?>")[0].scrollHeight);
-                                    })-->
-                                </script>
                             </div>
                         </div>
-                    </div>
-                    <!-- /chat modal -->
-                    <?php
+                        <!-- /chat modal -->
 
+                        <?php
+                    }   
+                } else {
+                    echo mysqli_error($conn);
                 }
-            } else {
-                echo mysqli_error($conn);
-            }
             ?>
         </tbody>
     </table>
