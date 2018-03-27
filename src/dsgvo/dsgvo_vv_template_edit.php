@@ -112,27 +112,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="panel panel-default">
             <div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
             <div class="panel-body">
-            <?php
-            $i = 1;
-            $result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_template_settings WHERE templateID = $tmpID AND opt_name LIKE 'APP_GROUP_%'");
-            while($row = $result->fetch_assoc()){
-                $num = ltrim($row['opt_name'], 'APP_GROUP_');
-                if($num == $i) $i++;                
-                echo '<div class="row"><div class="col-sm-6"><label>Gruppierung</label><input type="text" class="form-control" maxlength="350" name="'.$row['opt_name'].'" value="'.$row['opt_descr'].'"/><br>
-                <label>Datenkategorien der gesammelten personenbezogenen Daten</label><br></div></div>';
-                $j = 1;
-                $cat_result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_template_settings WHERE templateID = $tmpID AND opt_name LIKE 'APP_CAT_$num%'");
-                while($cat_row = $cat_result->fetch_assoc()){
-                    $jnum = ltrim($cat_row['opt_name'], 'APP_CAT_'.$num.'_');
-                    if($jnum == $j) $j++;
-                    echo '<div class="col-sm-5 col-sm-offset-1"><input type="text" class="form-control" maxlength="350" name="'.$cat_row['opt_name'].'" value="'.$cat_row['opt_descr'].'"/><br></div>';
-                }
-                echo '<div class="col-sm-10 col-sm-offset-1"><label>Neue Datenkategorie</label><input type="text" class="form-control" maxlength="350" name="APP_CAT_'.$num.'_'.$j.'"/><br><br></div>
-                <div class="col-sm-1"><br><button type="submit" name="add_setting" value="APP_CAT_'.$num.'_'.$j.'" class="btn btn-warning"><i class="fa fa-plus"></i></button></div>';
-            }
-            echo '<div class="col-sm-11"><label>Neue Gruppierung</label><input type="text" class="form-control" maxlength="350" name="APP_GROUP_'.$i.'"/></div>
-            <div class="col-sm-1"><br><button type="submit" name="add_setting" value="APP_GROUP_'.$i.'" class="btn btn-warning"><i class="fa fa-plus"></i></button></div>';
-            ?>
+                Aus den <a href="../system/data-matrix"><?php echo $lang['DATA_MATRIX']; ?> Einstellungen</a> übernommen.
+                <?php
+                // $i = 1;
+                // $result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_template_settings WHERE templateID = $tmpID AND opt_name LIKE 'APP_GROUP_%'");
+                // while($row = $result->fetch_assoc()){
+                //     $num = ltrim($row['opt_name'], 'APP_GROUP_');
+                //     if($num == $i) $i++;                
+                //     echo '<div class="row"><div class="col-sm-6"><label>Gruppierung</label><input type="text" class="form-control" maxlength="350" name="'.$row['opt_name'].'" value="'.$row['opt_descr'].'"/><br>
+                //     <label>Datenkategorien der gesammelten personenbezogenen Daten</label><br></div></div>';
+                //     $j = 1;
+                //     $cat_result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_template_settings WHERE templateID = $tmpID AND opt_name LIKE 'APP_CAT_$num%'");
+                //     while($cat_row = $cat_result->fetch_assoc()){
+                //         $jnum = ltrim($cat_row['opt_name'], 'APP_CAT_'.$num.'_');
+                //         if($jnum == $j) $j++;
+                //         echo '<div class="col-sm-5 col-sm-offset-1"><input type="text" class="form-control" maxlength="350" name="'.$cat_row['opt_name'].'" value="'.$cat_row['opt_descr'].'"/><br></div>';
+                //     }
+                //     echo '<div class="col-sm-10 col-sm-offset-1"><label>Neue Datenkategorie</label><input type="text" class="form-control" maxlength="350" name="APP_CAT_'.$num.'_'.$j.'"/><br><br></div>
+                //     <div class="col-sm-1"><br><button type="submit" name="add_setting" value="APP_CAT_'.$num.'_'.$j.'" class="btn btn-warning"><i class="fa fa-plus"></i></button></div>';
+                // }
+                // echo '<div class="col-sm-11"><label>Neue Gruppierung</label><input type="text" class="form-control" maxlength="350" name="APP_GROUP_'.$i.'"/></div>
+                // <div class="col-sm-1"><br><button type="submit" name="add_setting" value="APP_GROUP_'.$i.'" class="btn btn-warning"><i class="fa fa-plus"></i></button></div>';
+                ?>
             </div>
         </div>
     </div>
