@@ -5,14 +5,16 @@ require dirname(__DIR__) . "/connection.php";
 $userID = $_SESSION["userid"] ?? -1;
 $limit = $_REQUEST["limit"] ?? 50;
 
-if (isset($_GET["partner"]) && !empty($_SESSION["userid"])) {
+if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $partner = intval($_GET["partner"]);
+    $subject = test_input($_GET["subject"]);
 
     // message has been seen
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
 
     // get the messages
-    $result = $conn->query("SELECT * FROM (SELECT * FROM messages WHERE ( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    $sql = "SELECT * FROM (SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC";
+    $result = $conn->query($sql);
 
 } else {
     die('Invalid Request');
@@ -45,20 +47,37 @@ if (!$result || $result->num_rows == 0) {
 
             <?php
         }
+        
+        //TODO: replace placeholder
+        $name = "placeholder";
         ?>
+
             <div class="row">
                 <div class="col-xs-12">
                     <div class="well <?php echo $pull; ?>" style="position:relative">
-                        <?php if($showseen && !$groupView){ ?>
-                        <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
-                        <?php }elseif($groupView && !$showseen){ ?>
+                        <!-- if -->
+                        <?php if($showseen){ ?>
+                            <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
+                        <?php }elseif(!$showseen){ ?>
                             <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
                         <?php }?>
+                        <!-- endif -->
                         <div><?php echo $message; ?></div>
                     </div>
                 </div>
             </div>
+
         <?php
     }
 }
+
+function test_input($data)
+{
+    require dirname(__DIR__) . "/connection.php";
+    $data = $conn->escape_string($data);
+    $data = trim($data);
+    return $data;
+}
 ?>
+
+

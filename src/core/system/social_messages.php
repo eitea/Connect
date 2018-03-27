@@ -1,4 +1,6 @@
 <?php 
+require dirname(dirname(__DIR__)) . '/header.php';
+
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,7 +13,49 @@ if (session_status() == PHP_SESSION_NONE) {
 <!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
 <!-- TODO: use AJAX scripts -->
-<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+
+<!-- AJAX scripts -->
+<script>
+    function getMessages(partner, subject, target, scroll = false, limit = 50) {
+        $.ajax({
+            url: 'ajaxQuery/AJAX_postGetMessage.php',
+            data: {
+                partner: partner,
+                subject: subject,
+                limit: limit,
+            },
+            type: 'GET',
+            success: function (response) {
+                $(target).html(response)
+                
+                if (scroll)
+                    $(target).parent().scrollTop($(target)[0].scrollHeight);
+            },
+            error: function (response) {
+                $(target).html(response);
+            },
+        })
+    }
+
+    function sendMessage(partner, subject, message, target, limit = 50) {
+        if (message.length == 0) {
+            return
+        }
+
+        $.ajax({
+            url: 'ajaxQuery/AJAX_socialSendMessage.php',
+            data: {
+                partner: partner,
+                subject: subject,
+                message: message,
+            },
+            type: 'GET',
+            success: function (response) {
+                getMessages(partner, subject, target, true, limit)
+            },
+        })
+    }
+</script>
 
 <!-- Page header -->
 <div class="page-header-fixed">
@@ -40,9 +84,9 @@ if (session_status() == PHP_SESSION_NONE) {
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
             // no errors
-            $to = $_POST['to'];
-            $subject = $_POST['subject'];
-            $message = $_POST['message'];
+            $to = test_input($_POST['to']);
+            $subject = test_input($_POST['subject']);
+            $message = test_input($_POST['message']);
             $partnerID = -1;
 
             // select the partnerid from the database
@@ -98,9 +142,8 @@ if (session_status() == PHP_SESSION_NONE) {
 
                     <!-- modal footer -->
                     <div class="modal-footer">
-                        <!-- FIXME: Cancel Button not working yet -->
                         <button type="button" class="btn btn-default"
-                                data-dsismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                                data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                         <button type="submit" class="btn btn-warning" name="sendButton"
                                 target="#chat"><?php echo $lang['SEND']; ?></button>
                     </div>
@@ -124,25 +167,30 @@ if (session_status() == PHP_SESSION_NONE) {
                 // the currently logged in user
                 $currentUser = $_SESSION["userid"];
 
-                $sql = "SELECT distinct subject FROM messages 
-                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'";
+                //select all 
+                $sql = "SELECT subject, userID, partnerID FROM messages 
+                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
+                GROUP BY subject";
 
                 $result = $conn->query($sql);
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $subject = $row['subject'];
+                        $userID = $row['userID'];
+                        $partnerID = $row['partnerID'] ;
+
+                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
+                        $x = ($userID == $currentUser) ? $partnerID : $userID;
 
                         echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
                         echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
                         echo '</tr>';
-
                         ?>
 
                         <!-- chat modal -->
                         <div class="modal fade" id="chat<?php echo $subject; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $subject; ?>">
                             <div class="modal-dialog" role="form">
                                 <div class="modal-content">
-                                    <!-- Header -->
                                     <div class="modal-header" style="padding-bottom:5px;">
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -151,44 +199,22 @@ if (session_status() == PHP_SESSION_NONE) {
                                         <h4 class="modal-title" id="chatLabel<?php echo $subject; ?>">
                                             <?php echo $subject ?>
                                         </h4>
-                                    </div>
-
-                                    <br>
+                                    </div><br>
 
                                     <!-- All messages -->
                                     <div class="modal-body">
-                                        <div id="messages<?php echo $subject; ?>">
-                                        <?php
-                                                // select all messages
-                                                $sql = "SELECT message, firstname, lastname FROM UserData 
-                                                    INNER JOIN messages ON messages.userID = UserData.id 
-                                                    WHERE subject = '{$subject}' and (userID = '{$currentUser}' or partnerID = '{$currentUser}')
-                                                    ORDER BY sent ASC";
+                                        <div id="testing<?php echo $subject; ?>"></div>
+                                    </div>
 
-                                                //another variables because of the nested loop
-                                                $result2 = $conn->query($sql);
-                                                if ($result2 && $result2->num_rows > 0) {
-                                                    while ($row2 = $result2->fetch_assoc()) {
-                                                        $message = $row2['message'];
-                                                        $name = "${row2['firstname']} ${row2['lastname']}";
-                                                        ?>
-                                                        
-                                                        <!-- The message -->
-                                                        <div class='row'>
-                                                            <div class='col-xs-12'>
-                                                                <div class='well <?php echo $pull; ?>' style='position:relative'>
-                                                                    <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
-                                                                    <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
-                                                                    <div><?php echo $message ?></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <?php
-                                                    }
-                                                }
-                                            ?>
-                                        </div>
+                                    <div class="modal-footer">
+                                        <script>
+                                            interval<?php echo $subject; ?> = 0
+                                            limit<?php echo $subject; ?> = 10;
+                                            
+                                            //note: x = the partner
+                                            getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#testing<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -207,46 +233,5 @@ if (session_status() == PHP_SESSION_NONE) {
 
 </div>
 
-
-<!-- TODO: Add AJAX Scripts for alerts -->
-
-<script>
-    function getMessages(partner, target, scroll = false, limit = 50) {
-        $.ajax({
-            url: 'ajaxQuery/AJAX_postGetMessage.php',
-            data: {
-                partner: partner,
-                limit: limit,
-            },
-            type: 'GET',
-            success: function (response) {
-                $(target).html(response)
-                if (scroll)
-                    $(target).parent().scrollTop($(target)[0].scrollHeight);
-            },
-            error: function (response) {
-                $(target).html(response)
-            },
-        })
-    }
-
-    function sendMessage(partner, message, target, limit = 50) {
-        if (message.length == 0) {
-            return
-        }
-
-        $.ajax({
-            url: 'ajaxQuery/AJAX_socialSendMessage.php',
-            data: {
-                partner: partner,
-                message: message,
-            },
-            type: 'GET',
-            success: function (response) {
-                getMessages(partner, target, true, limit)
-            },
-        })
-    }
-</script>
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
