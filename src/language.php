@@ -104,7 +104,6 @@ $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 $lang_eng['ARCHIVE'] = 'Archive';
 $lang_ger['ARCHIVE'] = 'Archiv';
 
-
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
 

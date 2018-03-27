@@ -1594,10 +1594,10 @@ function create_tables($conn) {
         contactID INT(6) UNSIGNED,
         login_mail VARCHAR(120) UNIQUE NOT NULL,
         login_pw VARCHAR(120) NOT NULL,
-        firstname VARCHAR(50),
-        lastname VARCHAR(50),
         publicKey VARCHAR(100) NOT NULL,
         privateKey VARCHAR(100) NOT NULL,
+        entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        lastPswChange DATETIME DEFAULT NULL,
         FOREIGN KEY (contactID) REFERENCES contactPersons(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

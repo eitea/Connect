@@ -13,9 +13,7 @@ require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
-if ($this_page != "editCustomer_detail.php") {
-    unset($_SESSION['unlock']);
-}
+
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();

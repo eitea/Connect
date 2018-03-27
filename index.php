@@ -2,6 +2,7 @@
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
   'login/access' => 'core/login/login_docker.php',
+  
   'php/info' => 'core/dev/phpinfo.php',                             'php/ext' => 'core/dev/phpext.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
@@ -26,8 +27,8 @@ $routes = array(
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
   'project/log' => 'project/audit_projectBookings.php',             'project/options' => 'project/options.php',                  'project/detail' => 'project/project_detail.php',
 
-  'report/designer' => 'report/templateSelect.php',
-  'report/previewTem' => 'report/templatePreview.php',              'report/downloadTem' => 'report/templateDownload.php',       'report/editTemp' => 'report/templateEdit.php',
+  'report/designer' => 'report/templateSelect.php',                 'report/downloadTem' => 'report/templateDownload.php',       'report/editTemp' => 'report/templateEdit.php',
+  'report/previewTem' => 'report/templatePreview.php',
 
   'dynamic-projects/view' => 'project/dynamicProjects.php',         'tasks/icalDownload' => 'project/download_ical.php',
 
@@ -48,6 +49,8 @@ $routes = array(
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
   'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
+
+  'extern/login' => 'external/login.php',                           'extern/home' => 'external/home.php'
 );
 
 $mime_types = array(

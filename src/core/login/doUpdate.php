@@ -2281,7 +2281,21 @@ if($row['version'] < 142){
     }
 }
 
-//if($row['version'] < 143){}
+if($row['version'] < 143){
+    $conn->query("ALTER TABLE external_users ADD COLUMN entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL");
+    if(!$conn->error){
+        echo '<br>Externe Benutzer: Registrierungsdatum';
+    }
+
+    $conn->query("ALTER TABLE external_users ADD COLUMN lastPswChange DATETIME DEFAULT NULL");
+    if(!$conn->error){
+        echo '<br>Externe Benutzer: Passwortänderungsdatum';
+    }
+
+    $conn->query("ALTER TABLE external_users DROP COLUMN firstname");
+    $conn->query("ALTER TABLE external_users DROP COLUMN lastname");
+}
+
 //if($row['version'] < 144){}
 //if($row['version'] < 145){}
 

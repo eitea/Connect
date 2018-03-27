@@ -358,8 +358,34 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
             }
         }
+    } //endif(saveID)
+    if(!empty($_POST['enable_contact']) && !empty($_POST['enable_contact_login']) && !empty($_POST['enable_contact_pass']) && !empty($_POST['enable_contact_pass_confirm'])){
+        $contactID = intval($_POST['enable_contact']);
+        $login = test_input($_POST['enable_contact_login']);
+        $result = $conn->query("SELECT login_mail FROM external_users WHERE login_mail = '$login'"); echo $conn->error;
+        if($_POST['enable_contact_pass'] != $_POST['enable_contact_pass_confirm']){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><b>Error: </b>Passwords did not match.</div>';
+        } elseif(!filter_var($_POST['enable_contact_login'], FILTER_VALIDATE_EMAIL)) {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><'.$lang['ERROR_EMAIL'].'</div>';
+        } elseif($result->num_rows > 0){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_EXISTING_EMAIL'].'</div>';
+        } else {
+            $psw = password_hash($_POST['enable_contact_pass'], PASSWORD_BCRYPT);
+            $keyPair = sodium_crypto_box_keypair();
+            $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+            $public = base64_encode(sodium_crypto_box_publickey($keyPair));
+            $private_encrypt = simple_encryption($private, $_POST['enable_contact_pass']);
 
-    }
+            $conn->query("INSERT INTO external_users (contactID, login_mail, login_pw, publicKey, privateKey) VALUES($contactID, '$login', '$psw', '$public', '$private_encrypt')");
+            if(!$conn->error){
+                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
+        }
+    } elseif(isset($_POST['enable_contact'])){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+    } //nah, you are just going to set up your mail versand, storno that bitch and send them
 
     if(!empty($_POST['delete'])){
         $conn->query("DELETE FROM clientData WHERE id = ".intval($_POST['delete']));
@@ -410,25 +436,25 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
             if(($row['isSupplier'] == 'TRUE' && ($canEditSuppliers || $isERPAdmin || $isCoreAdmin)) || $row['isSupplier'] == 'FALSE' && ($canEditClients || $isERPAdmin || $isCoreAdmin)){
-              echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
-              echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
+                echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
+                echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
 
-              $modals .= '<div id="delete-confirm-'.$row['id'].'" class="modal fade">
-              <div class="modal-dialog modal-content modal-sm">
-              <div class="modal-header h4">'.$lang['DELETE_SELECTION'].'</div><div class="modal-body">'.sprintf($lang['ASK_DELETE'], $row['name']).'</div>
-              <div class="modal-footer"><form method="POST">
-              <button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
-              <button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'">'.$lang['DELETE'].'</button></form></div></div></div>';
+                $modals .= '<div id="delete-confirm-'.$row['id'].'" class="modal fade">
+                <div class="modal-dialog modal-content modal-sm">
+                <div class="modal-header h4">'.$lang['DELETE_SELECTION'].'</div><div class="modal-body">'.sprintf($lang['ASK_DELETE'], $row['name']).'</div>
+                <div class="modal-footer"><form method="POST">
+                <button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
+                <button type="submit" class="btn btn-danger" name="delete" value="'.$row['id'].'">'.$lang['DELETE'].'</button></form></div></div></div>';
             }
             echo '</td>';
             echo '</tr>';
-            echo '<tr>
-            <td style="padding:0; border:0;" colspan="5" id="clicker-row-'.$row['id'].'"></td>
-            <td style="padding:0; border:0;display:none;"></td>
-            <td style="padding:0; border:0;display:none;"></td>
-            <td style="padding:0; border:0;display:none;"></td>
-            <td style="padding:0; border:0;display:none;"></td>
-            </tr>';
+            // echo '<tr>
+            // <td style="padding:0; border:0;" colspan="5" id="clicker-row-'.$row['id'].'"></td>
+            // <td style="padding:0; border:0;display:none;"></td>
+            // <td style="padding:0; border:0;display:none;"></td>
+            // <td style="padding:0; border:0;display:none;"></td>
+            // <td style="padding:0; border:0;display:none;"></td>
+            // </tr>';
         }
         ?>
     </tbody>
@@ -447,16 +473,16 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
                 data:{custid: index},
                 type: 'GET',
                 success : function(resp){
-                    //$("#editingModalDiv").append(resp);
+                    $("#editingModalDiv").append(resp);
                     existingModals.push(index);
-                    $("#clicker-row-"+index).append(resp);
+                    //$("#clicker-row-"+index).append(resp);
                     //$('#clicker-row-'+index).find('form').slideToggle();
                     onPageLoad();
                 },
                 error : function(resp){},
                 complete: function(resp){
                     if(index){
-                        //$('#editingModal-'+index).modal('show');
+                        $('#editingModal-'+index).modal('show');
                     }
                     $('.uid-check').click(function(e){
                       var index = $(this).val();
@@ -477,7 +503,8 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
                 }
             });
         } else {
-            $('#clicker-row-'+index).find('form').slideToggle();
+            $('#editingModal-'+index).modal('show');
+            //$('#clicker-row-'+index).find('form').slideToggle();
         }
     }
     $('button[name=deleteModal]').click(function(){
@@ -493,8 +520,8 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
 
     $('.table').DataTable({
         autoWidth: false,
-        order: [],
-        ordering: false,
+        order: [[ 2, "asc" ]],
+        columns: [null, null, null, null, {orderable: false}],
         responsive: true,
         colReorder: true,
         language: {
