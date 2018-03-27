@@ -9,7 +9,7 @@ if (isset($_GET["partner"]) && !empty($_SESSION["userid"])) {
     $partner = intval($_GET["partner"]);
 
     // message has been seen
-    $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partner = $userID )");
+    $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
 
     // get the messages
     $result = $conn->query("SELECT * FROM (SELECT * FROM messages WHERE ( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");

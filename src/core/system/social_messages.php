@@ -209,12 +209,6 @@
 <!-- TODO: Add AJAX Scripts for alerts -->
 
 <script>
-    /**
-     *  Receive new messages
-     * partner: the user_id of your conversation partner
-     * scroll:
-     * limit:
-     */
     function getMessages(partner, target, scroll = false, limit = 50) {
         $.ajax({
             url: 'ajaxQuery/AJAX_postGetMessage.php',
@@ -234,12 +228,6 @@
         })
     }
 
-    /**
-     *  Send messages
-     * partner: the user_id of your conversation partner
-     * scroll:
-     * limit:
-     */
     function sendMessage(partner, message, target, limit = 50) {
         if (message.length == 0) {
             return
