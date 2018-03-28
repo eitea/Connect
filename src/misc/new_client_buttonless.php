@@ -6,7 +6,6 @@
 
 <?php
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-  if($canEditClients == 'TRUE'){
     if(isset($_POST['create_client']) && !empty($_POST['create_client_name']) && $_POST['create_client_company'] != 0){
       $name = test_input($_POST['create_client_name']);
       $clientNum = test_input($_POST['clientNumber']);
@@ -14,18 +13,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
       $sql = "INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '$clientNum', '$isSupplier')";
-      if($conn->query($sql)){ //if ok, give him default projects
-        $id = $conn->insert_id;
-        $sql = "INSERT INTO $projectTable (clientID, name, status, hours, field_1, field_2, field_3)
-        SELECT '$id', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID";
-        $conn->query($sql);
-        //and his details
-        $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($id)");
+      if($conn->query($sql)){
+        $insert_clientID = $conn->insert_id;
+        if($isSupplier == 'FALSE'){
+            $conn->query("INSERT INTO projectData (clientID, name, status, hours, field_1, field_2, field_3)
+            SELECT '$insert_clientID', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID");
+        }
+        $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($insert_clientID)");
       }
-      if(mysqli_error($conn)){
-        echo mysqli_error($conn);
+      if($conn->error){
+        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
       } else {
-        //echo '<script>window.location="../system/clientDetail?custID='.$id.'";</script>';
+        //echo '<script>window.location="../system/clientDetail?custID='.$insert_clientID.'";</script>';
       }
     } elseif(isset($_POST['create_client'])){
       echo '<div class="alert alert-danger fade in">';
@@ -33,9 +32,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       echo '<strong>Error: </strong>'.$lang['ERROR_MISSING_FIELDS'];
       echo '</div>';
     }
-  } else {
-    echo "no permission (you need canEditClients)";
-  }
 }
 ?>
 
@@ -53,13 +49,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
         <div class="col-md-4">
           <label style="color:white">Typ</label><br>
-          <label><input type="checkbox" name="create_client_supplier" value="1"><?php echo $lang['SUPPLIER']; ?></label>
+          <label><input id="isSupplier" type="checkbox" name="create_client_supplier" value="1"><?php echo $lang['SUPPLIER']; ?></label>
         </div>
         <div class="col-md-6">
           <label>Mandant</label>
           <select id="create_client_company" name="create_client_company" class="js-example-basic-single" style="width:200px">
             <?php
-            $result_cc = $conn->query("SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+            $result_cc = $conn->query("SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
             while ($result_cc && ($row_cc = $result_cc->fetch_assoc())) {
               $cmpnyID = $row_cc['id'];
               $cmpnyName = $row_cc['name'];
@@ -75,12 +71,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="col-md-6">
           <?php
           $clientNums = array(1 => '');
-          $numstrings = '';
-          $res_num = $conn->query("SELECT companyID, clientStep, clientNum FROM erp_settings");
+          $supplierNums = array(1 => '');
+          $numstrings = $snumstrings = '';
+          $stmt_num = $conn->prepare("SELECT clientNumber FROM clientData WHERE isSupplier = ? AND clientNumber IS NOT NULL AND clientNumber != '' AND companyID = ? ORDER BY clientNumber DESC LIMIT 1 ");
+          $stmt_num->bind_param('ss', $isSupplier, $cmpnyID);
+          $res_num = $conn->query("SELECT companyID, clientStep, clientNum, supplierStep, supplierNum FROM erp_settings");
           while($res_num && ($rowNum = $res_num->fetch_assoc())){
             $cmpnyID = $rowNum['companyID'];
+
             $step = $rowNum['clientStep'];
-            $res_c_num = $conn->query("SELECT clientNumber FROM clientData WHERE isSupplier = 'FALSE' AND clientNumber IS NOT NULL AND clientNumber != '' AND companyID = $cmpnyID ORDER BY clientNumber DESC LIMIT 1 ");
+            $isSupplier = 'FALSE';
+            $stmt_num->execute();
+            $res_c_num = $stmt_num->get_result();
             if($row_c_num = $res_c_num->fetch_assoc()){
               $num = $row_c_num['clientNumber'];
               if($row_c_num['clientNumber'] < $rowNum['clientNum']){
@@ -92,6 +94,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             }
             $clientNums[$cmpnyID] = preg_replace('/[0-9]+/', '', $num) . (preg_replace('/[^0-9]+/', '', $num) + $step);
             $numstrings .= $cmpnyID .':"'. $clientNums[$cmpnyID] .'",';
+
+            $sstep = $rowNum['supplierStep'];
+            $isSupplier = 'TRUE';
+            $stmt_num->execute();
+            $res_c_num = $stmt_num->get_result();
+            if($row_c_num = $res_c_num->fetch_assoc()){
+              $snum = $row_c_num['clientNumber'];
+              if($row_c_num['clientNumber'] < $rowNum['clientNum']){
+                $snum = $rowNum['clientNum'];
+              }
+            } else {
+              $snum = $rowNum['clientNum'];
+              $sstep = 0;
+            }
+            $supplierNums[$cmpnyID] = preg_replace('/[0-9]+/', '', $snum) . (preg_replace('/[^0-9]+/', '', $snum) + $sstep);
+            $snumstrings .= $cmpnyID .':"'. $supplierNums[$cmpnyID] .'",';
           }
           ?>
           <label>Kundennummer</label>
@@ -110,6 +128,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <script>
 $('#create_client_company').on('change', function(){
   var clientNums = <?php echo "{ $numstrings }"; ?> ;
-  $('#clientNumber').val(clientNums[$(this).val()]);
+  var supplierNums = <?php echo "{ $snumstrings }"; ?> ;
+  if ($('#isSupplier').is(':checked')) {
+       $('#clientNumber').val(supplierNums[$(this).val()]);
+  } else {
+      $('#clientNumber').val(clientNums[$(this).val()]);
+  }
+});
+$('#isSupplier').change(function(){
+    var clientNums = <?php echo "{ $numstrings }"; ?> ;
+    var supplierNums = <?php echo "{ $snumstrings }"; ?> ;
+    if (this.checked) {
+         $('#clientNumber').val(supplierNums[$('#create_client_company').val()]);
+    } else {
+        $('#clientNumber').val(clientNums[$('#create_client_company').val()]);
+    }
 });
 </script>

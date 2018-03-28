@@ -1,9 +1,10 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToClients($userID); ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, 'supplier' => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
+if(isset($_GET['supID'])){ $filterings['supplier'] = test_input($_GET['supID']);}
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['saveID'])){
@@ -399,10 +400,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 ?>
 
 <div class="page-header">
-    <h3><?php echo $lang['CLIENT']; ?>
+    <h3><?php echo $lang['ADDRESS_BOOK']; ?>
         <div class="page-header-button-group">
             <?php include dirname(dirname(__DIR__)) . '/misc/set_filter.php'; ?>
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['NEW_CLIENT_CREATE']; ?>"><i class="fa fa-plus"></i></button>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
         </div>
     </h3>
 </div>
@@ -413,6 +414,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 $companyQuery = $clientQuery = "";
 if($filterings['company']){$companyQuery = "AND clientData.companyID = ".$filterings['company']; }
 if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
+if($filterings['supplier']){$clientQuery .= " OR clientData.id = ".$filterings['client']; }
 
 $result = $conn->query("SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
 WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC"); echo $conn->error;
@@ -528,5 +530,12 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
         }
     });
+
+    <?php
+    //5aba4f8f6ced5
+    if(isset($insert_clientID)){
+        echo '$("button[name=\'editModal\'][value=\''.$insert_clientID.'\']").click();';
+    }
+    ?>
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

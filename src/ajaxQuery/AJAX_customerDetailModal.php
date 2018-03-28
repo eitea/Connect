@@ -254,7 +254,7 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                             echo '<button type="submit" name="deleteContact" value="' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
                                             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-contact-' . $contactRow['id'] . '" class="btn btn-default"><i class="fa fa-pencil"></i></button>';
                                             if($contactRow['login_mail']){
-                                                echo '<button type="submit" name="disableContact" value="'.$contactRow['id'].'" title="Externen Zugriff entfernen"><i class="fa fa-minus-circle"></i></button>';
+                                                echo '<button type="submit" class="btn btn-default" name="disableContact" value="'.$contactRow['id'].'" title="Externen Zugriff entfernen"><i class="fa fa-minus-circle"></i></button>';
                                             } else {
                                                 echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#enable-contact-'.$contactRow['id'].'" title="Externen Zugriff freigeben" ><i class="fa fa-plus-circle"></i></button>';
                                             }
