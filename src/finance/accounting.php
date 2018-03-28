@@ -226,7 +226,7 @@ if (isset($_POST['transferToWEB']) && $journalID) {
     }
 }
 
-include dirname(__DIR__) . '/misc/new_supplier_buttonless.php';
+include dirname(__DIR__) . '/misc/new_client_buttonless.php';
 
 $account_select = $tax_select = '';
 $web_select = $supplier_select = '<option value="0">...</option><option value="new" >+ Neu</option>';

@@ -68,15 +68,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       echo mysqli_error($conn);
     }
   }
-  //user Requests
-  if(isset($_POST['okay'])){ //vacation, special leave, compensatory time, school, doc
+  //vacation, special leave, compensatory time, school
+  if(isset($_POST['okay'])){
     $requestID = $_POST['okay'];
     $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
     WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
       $i = $row['fromDate'];
       $days = (timeDiff_Hours($i, $row['toDate'])/24) + 1; //days
-      if($row['requestType'] == 'doc') $days--;
       for($j = 0; $j < $days; $j++){
         $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
         if($expected != 0){ //only insert if expectedHours != 0
@@ -84,56 +83,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           $expectedMinutes = ($expected * 60) % 60;
           $i2 = carryOverAdder_Hours($i, $expectedHours);
           $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
-          if($row['requestType'] == 'doc'){
-            $coreTime = $conn->query("SELECT coreTime FROM userdata WHERE id =". $row['userID']);
-            $coreTime = $coreTime->fetch_assoc()['coreTime'];
-            $coreTime = new DateTime(date('Y-m-d',strtotime($row['fromDate']))." ".$coreTime);
-            $fromTime =	new DateTime($row['fromDate']);
-            $rndBoolForScience = false; // maybe he comes back after the appointment and continues to work
-            if(($fromTime->diff($coreTime)->h>0||$fromTime->diff($coreTime)->i>0)&&$fromTime->diff($coreTime)->invert==0){
-              $i = date('Y-m-d H:i:s',$coreTime->getTimestamp());
-              if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
-                $i2 = $row['toDate'];
-
-              } else {
-                echo "<script>console.log('".date('Y-m-d H:i',$coreTime->getTimestamp())."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
-                $rndBoolForScience = true;
-              }
-            } else {
-              $i = $row['fromDate'];
-              if(timeDiff_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $row['toDate'])<$expected){
-                $i2 = $row['toDate'];
-
-              } else {
-                echo "<script>console.log('".$expectedHours."')</script>";
-                $i2 = carryOverAdder_Minutes(carryOverAdder_Hours(date('Y-m-d H:i:s',$coreTime->getTimestamp()), $expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours),$expectedMinutes);
-                $rndBoolForScience = true;
-              }
-            }
-
-            $alreadyWorked = $conn->query("SELECT indexIM, time, timeEnd  FROM $logTable WHERE userID = ".$row['userID']." AND DATE(time) = '".date('Y-m-d',$fromTime->getTimestamp())."'");
-            if($alreadyWorked){
-              $alreadyWorked = $alreadyWorked->fetch_assoc();
-              $previousStart = new DateTime($alreadyWorked['time']);
-              $previousEnd = new DateTime($alreadyWorked['timeEnd']);
-              $newStart = new DateTime($i);
-              $newEnd = new DateTime($i2);
-              $i = $previousStart<$newStart ? date('Y-m-d H:i:s',$previousStart->getTimestamp()) : $i;
-              if($previousEnd<$newEnd){
-                if($rndBoolForScience){
-                  $i2 = date('Y-m-d H:i:s',strtotime($i)+ (($expectedHours>$row['pauseAfterHours'] ? $expectedHours + $row['hoursOfRest'] : $expectedHours) *3600) + ($expectedMinutes*60));
-                  echo "<script>console.log('".$i2."')</script>";
-                }
-              }else{
-                $i2 = date('Y-m-d H:i:s',$previousEnd->getTimestamp());
-              }
-              $sql = "UPDATE $logTable SET time = '$i', timeEnd = '$i2', status = '5' WHERE indexIM = ".$alreadyWorked['indexIM'];
-            }else{
-              $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '5')";
-            }
-
-          }
           if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
           } elseif($row['requestType'] == 'scl'){
@@ -189,7 +138,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("INSERT INTO $logTable(time, timeEnd, userID, timeToUTC, status) VALUES('$timeStart', '$timeFin', $user, $utcTime , '0')");
     }
     if($conn->error){ echo $conn->error; } else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
-    $answerText = $_POST['answerText'. $requestID];
+    $answerText = test_input($_POST['answerText'. $requestID]);
     $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_log'])){
     $requestID = $_POST['nokay_log'];
@@ -248,8 +197,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else { //delete break
       $conn->query("DELETE FROM $projectBookingTable WHERE id = ".$row['id']);
     }
-    $answerText = $_POST['answerText'. $requestID];
+    $answerText = test_input($_POST['answerText'. $requestID]);
     $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+  }
+
+  if(!empty($_POST['nokay_doc'])){
+      $requestID = intval($_POST['nokay_doc']);
+      $answerText = test_input($_POST['answerText'. $requestID]);
+      $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+  } elseif(!empty($_POST['okay_doc'])){
+      $requestID = intval($_POST['okay_doc']);
+      $answerText = test_input($_POST['answerText'. $requestID]);
+      $result = $conn->query("SELECT userID, fromDate, toDate, timeToUTC FROM $userRequests WHERE id = $requestID");
+      $row = $result->fetch_assoc();
+      $A = carryOverAdder_Hours($row['fromDate'], $row['timeToUTC'] * -1);
+      $B = carryOverAdder_Hours($row['toDate'], $row['timeToUTC'] * -1);
+
+      $result = $conn->query("SELECT indexIM, time, timeEnd FROM logs WHERE userID = ".$row['userID']." AND DATE(time) = DATE('".$row['fromDate']."')"); echo $conn->error;
+      if($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())){
+          //this should be handled like a split of a break TODO: find a break that matches, else if bookings dont overlap at all, else error
+
+          // $conn->query("UPDATE logs SET status = 5 WHERE indexIM = ".$row['indexIM']);
+          // $conn->query("INSERT INTO projectBookingData  (start, end, timestampID, infoText, bookingType, mixedStatus )
+          // VALUES('$A', '$B', ".$row['indexIM'].", 'Arztbesuch', 'mixed', '$splitting_activity')");
+          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Ein Zeitstempel existiert bereits.
+          Um Konflikte mit bestehenden Buchungen zu vermeiden, sollte der Antrag als Split in der Zeitansicht gestellt werden. </div>';
+      } else {
+          //this one will create a mixed timestamp
+          $conn->query("INSERT INTO logs (time, timeEnd, userID, timeToUTC, status) VALUES('$A', '$B', ".$row['userID'].", '".$row['timeToUTC']."', 3)");
+          $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+      }
   }
 
   if(mysqli_error($conn)){
@@ -325,14 +302,14 @@ if($result && $result->num_rows > 0):
               echo '<button type="submit" class="btn btn-default" name="okay_div" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
               echo '<button type="submit" class="btn btn-default" name="nokay_div" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
-            }elseif($row['requestType'] == 'doc'){
-              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).' (utc)</td>';
-              echo '<td></td>';
+            } elseif($row['requestType'] == 'doc'){
+              echo '<td>'. substr($row['fromDate'],0,16) . ' - ' . substr($row['toDate'],11,5).'</td>';
+              echo '<td>'. $row['requestText'].'</td>';
               echo '<td><div class="input-group">';
               echo '<input type="text" class="form-control" name="answerText'.$row['id'].'" placeholder="Reply... (Optional)" />';
               echo '<span class="input-group-btn">';
-              echo '<button type="submit" class="btn btn-default" name="okay" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
-              echo '<button type="submit" class="btn btn-default" name="nokay" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="okay_doc" value="'.$row['id'].'" > <img width="18px" height="18px" src="../images/okay.png"> </button> ';
+              echo '<button type="submit" class="btn btn-default" name="nokay_doc" value="'.$row['id'].'"> <img width="18px" height="18px" src="../images/not_okay.png"> </button> ';
               echo '</span></div></td>';
             }
             echo '</tr>';

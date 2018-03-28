@@ -70,7 +70,7 @@ while($result && ($row = $result->fetch_assoc())){
 
 <table class="table table-hover">
     <thead><tr>
-        <?php if(count($available_companies) > 2) echo '<th>'.$lang['COMPANY'].'</th>'; ?> 
+        <?php if(count($available_companies) > 2) echo '<th>'.$lang['COMPANY'].'</th>'; ?>
         <th>Nr.</th>
         <th><?php echo $lang['RECEIPT_DATE']; ?></th>
         <th><?php echo $lang['SUPPLIER']; ?></th>
@@ -84,7 +84,7 @@ while($result && ($row = $result->fetch_assoc())){
     <?php
     $modals = '';
     $runNumbers = array_fill_keys($available_companies, 0); //let's try something fun
-    $result = $conn->query("SELECT receiptBook.*, companyData.name, companyID, percentage, description, clientData.name AS supplierName 
+    $result = $conn->query("SELECT receiptBook.*, companyData.name, companyID, percentage, description, clientData.name AS supplierName
     FROM receiptBook INNER JOIN clientData ON clientData.id = supplierID INNER JOIN companyData ON companyData.id = clientData.companyID INNER JOIN taxRates ON  taxRates.id = taxID
     WHERE companyID IN (".implode(', ', $available_companies).") AND DATE(invoiceDate) >= '".$filterings['date'][0]."' AND DATE(invoiceDate) <= DATE('".$filterings['date'][1]."') $supplierQuery $companyQuery ORDER BY receiptBook.id ASC"); echo $conn->error;
     while($row = $result->fetch_assoc()){
@@ -121,7 +121,7 @@ while($result && ($row = $result->fetch_assoc())){
     ?>
     </tbody>
 </table>
-<?php echo $modals; include dirname(__DIR__) .'/misc/new_supplier_buttonless.php'; ?>
+<?php echo $modals; include dirname(__DIR__) .'/misc/new_client_buttonless.php'; ?>
 <br><br>
 <form method="POST" class="well">
 <div class="row form-group">

@@ -13,9 +13,6 @@ require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
-if ($this_page != "editCustomer_detail.php") {
-    unset($_SESSION['unlock']);
-}
 
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
@@ -51,15 +48,11 @@ if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
 $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey FROM UserData WHERE id = $userID");
-if ($result) {
-    $row = $result->fetch_assoc();
+if($result && ($row = $result->fetch_assoc())) {
     $lastPswChange = $row['lastPswChange'];
     $userPasswordHash = $row['psw'];
     $publicKey = $row['publicPGPKey'];
-
-    if($row['forcedPwdChange']==='1'){
-        redirect("../login/passwordChange");
-    }
+    $forcedPwdChange = ($row['forcedPwdChange'] === '1');
 } else {
     echo $conn->error;
 }
@@ -72,8 +65,11 @@ if ($result) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
-$numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
-$numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
+$numberOfSocialAlerts = 0;
+$result = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID "); echo $conn->error;
+if($result) $numberOfSocialAlerts += $result->num_rows;
+$result = $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')"); echo $conn->error;
+if($result) $numberOfSocialAlerts += $result->num_rows;
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -185,7 +181,7 @@ if($userHasUnansweredSurveys){
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
-        $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+        $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a>';
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
             $validation_output .= $lang['INFO_CHECKIN'] . '</div>';
@@ -200,43 +196,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['posttimer'] = time();
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
         $password = $_POST['password'];
-        $passwordConfirm = $_POST['passwordConfirm'];
         $output = '';
-        if(strcmp($password, $passwordConfirm) == 0 && match_passwordpolicy($password, $output)){
+        if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
-            $conn->query("UPDATE $userTable SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID';");
-
+            $private_encrypted = simple_encryption($privateKey, $password);
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
             if(!$conn->error){
-                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
+                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
             } else {
                 $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             }
         } else {
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$output.'</div>';
+            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" >&times;</a>'.$output.'</div>';
         }
+    } elseif(isset($_POST['savePAS'])) {
+        $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
     }
-    if(isset($_POST['savePAS']) && !empty(trim($_POST['publicPGP']))){
-        $conn->query("UPDATE userdata SET publicPGPKey = '".test_input($_POST['publicPGP'])."' WHERE id=".$userID);
-        if(!empty($_POST['privatePGP']) && !empty($_POST['encodePGP'])){
-            $privateEncoded = openssl_encrypt($_POST['privatePGP'],'AES-128-ECB',$_POST['encodePGP']);
-            $conn->query("UPDATE userdata SET privatePGPKey = '".$privateEncoded."' WHERE id=".$userID);
-        }
-    } elseif(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
+    if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
     } elseif(isset($_POST["GERMAN"])){
-      $sql="UPDATE $userTable SET preferredLang='GER' WHERE id = $userID";
+      $sql="UPDATE UserData SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'GER';
       $validation_output = mysqli_error($conn);
     } elseif(isset($_POST['ENGLISH'])){
-      $sql="UPDATE $userTable SET preferredLang='ENG' WHERE id = $userID";
+      $sql="UPDATE UserData SET preferredLang='ENG' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'ENG';
       $validation_output = mysqli_error($conn);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
-        $conn->query("UPDATE $userTable SET color = '$txt' WHERE id = $userID");
+        $conn->query("UPDATE UserData SET color = '$txt' WHERE id = $userID");
     }
     if (isset($_POST['saveSocial'])) {
         // picture upload
@@ -376,13 +367,15 @@ if ($_SESSION['color'] == 'light') {
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
                 <?php
-                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID");
-                $row = $result->fetch_assoc();
-                $social_status = $row["status"];
-                $social_isAvailable = $row["isAvailable"];
-                $defaultGroupPicture = "images/group.png";
-                $defaultPicture = "images/defaultProfilePicture.png";
-                $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+                if($result){
+                    $row = $result->fetch_assoc();
+                    $social_status = $row["status"];
+                    $social_isAvailable = $row["isAvailable"];
+                    $defaultGroupPicture = "images/group.png";
+                    $defaultPicture = "images/defaultProfilePicture.png";
+                    $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+                }
                 ?>
                 <?php if ($canUseSocialMedia == 'TRUE'): ?>
                     <a href="" class="hidden-xs" data-toggle="modal" data-target="#socialSettings"><img src='<?php echo $profilePicture; ?>' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
@@ -402,7 +395,7 @@ if ($_SESSION['color'] == 'light') {
                     </a>
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
-                <a class="btn navbar-btn navbar-link" id="options" data-toggle="modal" data-target="#myModal"><i class="fa fa-gears"></i></a>
+                <a class="btn navbar-btn navbar-link" id="header-gears" data-toggle="modal" data-target="#passwordModal"><i class="fa fa-gears"></i></a>
                 <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
                 <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
             </div>
@@ -447,85 +440,81 @@ if ($_SESSION['color'] == 'light') {
                     $("#searchModal .modal").modal("show");
                 }
         });
-        }
+    }
   </script>
 
   <!-- modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-content modal-md" >
-          <form method="POST">
-              <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
-              </div>
-              <div class="modal-body">
-                  <ul class="nav nav-tabs">
-                      <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
-                      <li><a data-toggle="tab" href="#myModalPGP">PGP</a></li>
-                  </ul>
-                  <div class="tab-content">
-                      <div id="myModalPassword" class="tab-pane fade in active"><br>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" ><br>
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button><h4 class="modal-title"><?php echo $lang['SETTINGS']; ?></h4>
+          </div>
+          <div class="modal-body">
+              <ul class="nav nav-tabs">
+                  <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
+                  <li><a id="myModalPGPtab" data-toggle="tab" href="#myModalPGP">Security</a></li>
+              </ul>
+              <div class="tab-content">
+                  <div id="myModalPassword" class="tab-pane fade in active"><br>
+                       <form method="POST">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><input type="password" class="form-control" name="passwordCurrent" autocomplete="new-password" >
+                              </div>
                           </div>
-                          <div class="col-md-6">
-                              <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" ><br>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['NEW_PASSWORD'] ?></label><input type="password" class="form-control" name="password" autocomplete="new-password" ><br>
+                              </div>
+                              <div class="col-md-6">
+                                  <label><?php echo $lang['NEW_PASSWORD_CONFIRM'] ?></label><input type="password" class="form-control" name="passwordConfirm" autocomplete="new-password" ><br>
+                              </div>
                           </div>
-                      </div>
-                      <div id="myModalPGP" class="tab-pane fade"><br>
-                          <h4 class="modal-title">Pretty Good Protection</h4><button type="button" class="close" style="margin-top: -20px" onClick="generateKeys(<?php echo $userID ?>)">Generate</button>
-                          <br>
+                          <div class="col-md-12 text-right">
+                              <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
+                          </div>
+                      </form>
+                  </div>
+                  <div id="myModalPGP" class="tab-pane fade"><br>
+                      <form method="POST">
                           <div class="col-md-12">
                               <label>Public Key</label>
-                              <textarea placeholder="Fügen Sie ihren Public Key HIER ein!"  rows=6 style="resize: none" class="form-control" name="publicPGP"><?php
-                              $result = $conn->query("SELECT publicPGPKey FROM userdata WHERE id=$userID");
-                              if(($result)) echo ($result->fetch_assoc()["publicPGPKey"]);
-                              ?></textarea><br>
+                              <br><?php echo $publicKey; ?><br><br>
                           </div>
                           <div class="col-md-12">
-                              <label>Private Key</label><button type="button" style="margin: 5px; padding: 3px;" class="btn btn-default" data-toggle="modal" data-target="#decryptPGP"><i class="fa fa-eye"></i></button>
-                              <textarea placeholder="Fügen Sie ihren Private Key HIER ein!" rows=6 style="resize: none" class="form-control" name="privatePGP"><?php echo ($unlockedPGP); ?></textarea><br>
+                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userPasswordHash) == $userPasswordHash): ?>
+                                  <label>Keypair download</label>
+                                  <input type="hidden" name="personal" value="<?php echo $privateKey."\n".$publicKey; ?>" /><br>
+                                  <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Download</button>
+                              <?php else: ?>
+                                  <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><br>
+                                  <small>Zum entsperren des Schlüsselpaar Downloads</small>
+                                  <input type="password" name="unlockKeyDownload" class="form-control" autocomplete="new-password">
+                                  <?php if(isset($_POST['unlockKeyDownload'])) echo '<small style="color:red">Falsches Passwort</small>'; ?>
+                                  <br>
+                                  <div class="text-right">
+                                      <button type="submit" class="btn btn-warning">Entsperren</button>
+                                  </div>
+                              <?php endif; ?>
                           </div>
-                          <div class="col-md-12"><label>Encryption Password</label>
-                              <input placeholder="Ihr Private Key wird mit diesem Passwort verschlüsselt! z.B. Ihr Benutzer-Passwort" type="password" class="form-control" name="encodePGP"/><br>
-                          </div>
-                      </div>
+                      </form>
                   </div>
               </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" onClick="clearPGP()" data-dismiss="modal">Cancel</button>
-                  <button type="submit" class="btn btn-warning" name="savePAS"><?php echo $lang['SAVE']; ?></button>
-              </div>
-          </form>
+          </div>
       </div>
   </div>
 
-  <form method="POST">
-    <div class="modal fade" id="decryptPGP" role="dialog" tab-index="-1">
-      <div class="modal-dialog modal-content modal-sm">
-        <div class="modal-header">
-          <h4 class="modal-title">Unlock Private PGP Key</h4>
-        </div>
-        <div class="modal-body">
-          <label>Encryption Passwort</label>
-          <input type="password" class="form-control" name="encryptionPassword"/>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-warning" name="unlockPrivatePGP">Weiter</button>
-        </div>
-      </div>
-    </div>
-  </form>
+  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGPtab").click();});</script>'; ?>
 
   <!-- /modal -->
   <?php if ($canUseSocialMedia == 'TRUE'): ?>
     <!-- social settings modal -->
     <form method="post" enctype="multipart/form-data">
-      <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog" aria-labelledby="socialSettingsLabel">
+      <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="form">
               <div class="modal-content">
                   <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                       <h4 class="modal-title" id="socialSettingsLabel"><?php echo $lang['SOCIAL_PROFILE_SETTINGS']; ?></h4>
                   </div>
                   <br>
@@ -559,13 +548,13 @@ if ($_SESSION['color'] == 'light') {
   <?php endif;?>
     <!-- feedback modal -->
 
-<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel">
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog">
     <form method="post" enctype="multipart/form-data" id="feedback_form">
         <div class="modal-dialog" role="form">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="feedbackModalLabel"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
+                    <h4 class="modal-title"><?php echo $lang['GIVE_FEEDBACK']; ?></h4>
                 </div>
                 <div class="modal-body">
                     <div class="radio">
@@ -706,11 +695,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       </a></li>
                   <?php endif; ?>
               <?php endif; //endif(canStamp) ?>
-            <?php if ($canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editSuppliers.php') {echo $setActiveLink;}?> href="../erp/suppliers"><i class="fa fa-file-text-o"></i><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
-            <?php endif;//canUseSuppliers ?>
-            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink;}?> href="../system/clients?t=1"><i class="fa fa-file-text-o"></i><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE' || $canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink; }?> href="../system/clients"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
             <?php endif;//canuseClients ?>
           </ul>
       </div>
@@ -718,12 +704,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section One: CORE -->
       <?php if ($isCoreAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingCore">
+          <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE"><i class="fa fa-caret-down pull-right"></i>
                 <i class="fa fa-gear"></i> <?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
             </a>
           </div>
-          <div id="collapse-core" role="tabpanel" class="panel-collapse collapse"  aria-labelledby="headingCore">
+          <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
                   <li>
@@ -768,10 +754,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <div class="collapse" id="toggleSettings" style="height: 0px;">
                         <ul class="nav nav-list">
                             <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'advancedOptions.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'passwordOptions.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'reportOptions.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                            <li><a <?php if ($this_page == 'archiveOptions.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_advanced.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_password.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
+                            <li><a <?php if ($this_page == 'options_report.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
+                            <li><a <?php if ($this_page == 'options_archive.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                             <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                             <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
                             <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
@@ -789,7 +775,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "reportOptions.php" || $this_page == "editHolidays.php" || $this_page == "advancedOptions.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "passwordOptions.php" || $this_page == 'archiveOptions.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -802,12 +788,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Two: TIME -->
       <?php if ($isTimeAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingTime">
+          <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME"><i class="fa fa-caret-down pull-right"></i>
             <i class="fa fa-history"></i> <?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
             </a>
           </div>
-          <div id="collapse-time" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingTime">
+          <div id="collapse-time" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <li><a <?php if ($this_page == 'getTimeprojects.php') {echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'] . ' ' . $lang['VIEW']; ?></span></a></li>
@@ -827,46 +813,44 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Three: PROJECTS -->
       <?php if ($isProjectAdmin == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
-              <div class="panel-heading" role="tab" id="headingProject">
+              <div class="panel-heading" role="tab">
                   <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
                       <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
                   </a>
               </div>
-              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingProject">
+              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel">
                   <div class="panel-body">
                       <ul class="nav navbar-nav">
                           <?php if ($isProjectAdmin == 'TRUE'): ?>
-                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['STATIC_PROJECTS']; ?></span></a></li>
+                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                          <?php endif;?>
-                          <?php if ($isProjectAdmin == 'TRUE'): ?>
                               <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
-                          <?php endif;?>
+                          <?php endif; ?>
                       </ul>
                   </div>
               </div>
           </div>
-          <?php if ($this_page == "project_view.php" || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
+          <?php if ($this_page == 'project_view.php' || $this_page == 'project_detail.php' || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
               echo "<script>$('#adminOption_PROJECT').click();</script>";
           } ?>
-      <?php endif;?>
+      <?php endif; ?>
 
       <!-- Section Four: REPORTS -->
       <?php if ($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingReport">
+          <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT"><i class="fa fa-caret-down pull-right"></i>
             <i class="fa fa-bar-chart"></i><?php echo $lang['REPORTS']; ?>
             </a>
           </div>
-          <div id="collapse-report" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingReport">
+          <div id="collapse-report" class="panel-collapse collapse" role="tabpanel" >
             <div class="panel-body">
               <ul class="nav navbar-nav">
               <?php if ($isReportAdmin == 'TRUE'): ?>
                 <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
                 <li><a <?php if ($this_page == 'report_productivity.php') {echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
               <?php endif;?>
-                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../system/designer"><span>Report Designer</span> </a></li>
+                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
               </ul>
             </div>
           </div>
@@ -878,10 +862,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab" id="headingERP">
+          <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> ERP</a>
           </div>
-          <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel"  aria-labelledby="headingERP">
+          <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
               <ul class="nav navbar-nav">
                 <li><a <?php if ($this_page == 'offer_proposal_edit.php') {echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESS']; ?></span></a></li>
@@ -894,7 +878,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
                           <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
                           <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                          <li><a href="../system/clients?t=1"><span><?php echo $lang['CLIENT_LIST']; ?></span></a></li>
+                          <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
                       </ul>
                   </div>
                 </li>
@@ -905,11 +889,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     <ul class="nav nav-list">
                       <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
                       <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a href="../erp/suppliers"><span><?php echo $lang['SUPPLIER_LIST']; ?></span></a></li>
+                      <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
                     </ul>
                   </div>
                 </li>
-
                 <li>
                     <a id="articleToggle" <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleArticle" data-parent="#sidenav01" class="collapse in">
                         <span><?php echo $lang['ARTICLE']; ?></span> <i class="fa fa-caret-down"></i>
@@ -1096,11 +1079,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
-      if($row['expiration'] == 'TRUE'){ //can a password expire?
+      if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
-          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0){ //has my password actually expired?
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
               echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
-              if($row['expirationType'] == 'FORCE'){ //force the change
+              if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
                   include 'footer.php';
                   die();
               }

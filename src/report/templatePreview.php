@@ -5,7 +5,7 @@
 </head>
 <body>
 <?php
-require dirname(dirname(__DIR__)) . "/connection.php";
+require dirname(__DIR__) . "/connection.php";
 
 $tempelID = intval($_GET['prevTemplate']);
 $result = $conn->query("SELECT * FROM $pdfTemplateTable WHERE id = $tempelID");

@@ -43,7 +43,7 @@ function carryOverAdder_Minutes($a, $b) {
 
 function isHoliday($ts) {
     global $conn;
-    $result = $conn->query("SELECT * FROM holidays WHERE begin LIKE '" . substr($ts, 0, 10) . "%'"); //the sql § comparison aint working
+    $result = $conn->query("SELECT * FROM holidays WHERE begin LIKE '" . substr($ts, 0, 10) . "%'"); //the sql %(§) comparison stopped working
     while($result && ($row = $result->fetch_assoc())){
         if(strpos($row['name'], '(§)')) return true;
     }

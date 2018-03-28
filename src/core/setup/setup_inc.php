@@ -37,7 +37,7 @@ function create_tables($conn) {
         emUndo DATETIME DEFAULT CURRENT_TIMESTAMP,
         color VARCHAR(10) DEFAULT 'dark',
         real_email VARCHAR(50),
-        forcedPwdChange TINYINT(1) NULL DEFAULT NULL,
+        forcedPwdChange TINYINT(1) NOT NULL DEFAULT 0,
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
         publicPGPKey VARCHAR(150) NULL,
@@ -53,8 +53,8 @@ function create_tables($conn) {
         time DATETIME NOT NULL,
         timeEnd DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
         timeToUTC INT(2) DEFAULT '2',
-        status INT(3),
-        emoji INT(2) DEFAULT 0,
+        status INT(3) NOT NULL DEFAULT 0,
+        emoji INT(2) NOT NULL DEFAULT 0,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -65,7 +65,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE holidays(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        begin DATETIME,
+        begin DATETIME NOT NULL,
         end DATETIME,
         name VARCHAR(60) NOT NULL
     )";
@@ -1276,7 +1276,7 @@ function create_tables($conn) {
         projectid VARCHAR(100) NOT NULL,
         activity VARCHAR(20) NOT NULL,
         logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        userID INT(6),
+        userID INT(6) UNSIGNED,
         extra1 VARCHAR(250),
         extra2 VARCHAR(450),
         FOREIGN KEY (userID) REFERENCES UserData(id)
@@ -1589,6 +1589,22 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE external_users(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        contactID INT(6) UNSIGNED,
+        login_mail VARCHAR(120) UNIQUE NOT NULL,
+        login_pw VARCHAR(120) NOT NULL,
+        publicKey VARCHAR(100) NOT NULL,
+        privateKey VARCHAR(100) NOT NULL,
+        entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        lastPswChange DATETIME DEFAULT NULL,
+        FOREIGN KEY (contactID) REFERENCES contactPersons(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
     $sql = "CREATE TABLE messages(
         messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED NOT NULL,
@@ -1600,7 +1616,7 @@ function create_tables($conn) {
         seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
         )";
     if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
+        echo $conn->error;
     }
 
 }

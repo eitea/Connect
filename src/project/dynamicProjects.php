@@ -385,14 +385,15 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
         $stmt_team = $conn->prepare("SELECT name, teamid FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
         $stmt_team->bind_param('s', $x);
-        $stmt_team_member = $conn->prepare("SELECT userID FROM teamRelationshipData WHERE teamID = ?");
+        $stmt_team_member = $conn->prepare("SELECT userID FROM teamRelationshipData WHERE teamID = ?"); echo $conn->error;
         $stmt_team_member->bind_param('s', $teamID);
+        //changes here have to be synced with AJAX_dynamicInfo.php
         $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
-            ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with AJAX_dynamicInfo.php
+            ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); echo $conn->error;
         $stmt_viewed->bind_param('s', $x);
-        $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? ");
+        $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? "); echo $conn->error;
         $stmt_employee->bind_param('s', $x);
-        $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
+        $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?"); echo $conn->error;
         $stmt_booking->bind_param('s', $x);
         $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p WHERE p.dynamicID = ?");
         $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
@@ -485,7 +486,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>';
             if($useRow && $useRow['userID'] == $userID) {
                 $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
-                echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
+                echo '<button class="btn btn-default" '.$disabled.' type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
                 if(!$row['projectleader']){
@@ -718,41 +719,6 @@ $("#bookCompletedCheckbox").change(function(event){
     if(this.checked){
         $("#bookRanger").val(100);
         $("#bookCompleted").val(100);
-    }
-});
-function checkMicroTasks(){
-    if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
-        $("#bookCompletedCheckbox").attr('disabled',false);
-    } else {
-        $("#bookCompletedCheckbox").attr('disabled',true);
-        $("#bookCompleted").attr('max',99);
-        $("#bookRanger").attr('max',99);
-    }
-}
-$("#microlist input[type='checkbox']").change(function(){
-    var allisgood = true;
-    $("#microlist input[type='checkbox']").each(function(){
-        if(!(this.checked)) allisgood = false;
-    });
-    if(allisgood){
-        $("#bookCompletedCheckbox").attr('disabled',false);
-        $("#bookCompleted").attr('max',100);
-        $("#bookRanger").attr('max',100);
-    } else {
-        $("#bookCompletedCheckbox").attr('disabled',true);
-        $("#bookCompleted").attr('max',99);
-        $("#bookRanger").attr('max',99);
-    }
-});
-$("#bookCompleted").keyup(function(event){
-    if($("#bookCompleted").val() == 100){
-        if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
-            $("#bookCompletedCheckbox").prop('checked', true);
-        } else {
-            $("#bookCompleted").prop('value',99);
-        }
-    } else {
-        $("#bookCompletedCheckbox").prop('checked', false);
     }
 });
 function formatState (state) {
@@ -1051,7 +1017,7 @@ $(document).ready(function() {
             headerOffset: 150,
             zTop: 1
         },
-        paging: false
+        paging: true
     });
     setTimeout(function(){
         window.dispatchEvent(new Event('resize'));

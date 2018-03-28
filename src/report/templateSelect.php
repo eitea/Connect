@@ -1,5 +1,5 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
-<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
+<?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php enableToTemplate($userID); ?>
 
 <div class="page-header">
@@ -196,4 +196,4 @@ function resizeIframe(obj) {
 }
 </script>
 
-<?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>
+<?php include dirname(__DIR__) . '/footer.php'; ?>
