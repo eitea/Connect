@@ -156,69 +156,77 @@ if (session_status() == PHP_SESSION_NONE) {
     <!-- Active Conversations -->
     <h4><?php echo $lang['MESSAGES']; ?></h4>
 
-    <!-- contacts -->
+
     <table class="table table-hover">
         <thead>
-            <th><?php echo $lang['SUBJECT']; ?></th>
-            <th><?php echo "Nachrichten" ?></th>
+            <th style='white-space: nowrap;width: 1%;'><?php echo $lang['SUBJECT']; ?></th>
+            <th style='white-space: nowrap;width: 2%;'><?php echo "Nachrichten" ?></th>
         </thead>
-
-        <tbody>
-            <div class="row">
-
-                <!-- Subjects -->
-                <div class="col-xs-6">
-                    <?php
-                        // the currently logged in user
-                        $currentUser = $_SESSION["userid"];
-
-                        //select all 
-                        $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
-                        $result = $conn->query($sql);
-                        if ($result && $result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $subject = $row['subject'];
-                                $userID = $row['userID'];
-                                $partnerID = $row['partnerID'] ;
-
-                                // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
-                                $x = ($userID == $currentUser) ? $partnerID : $userID;
-
-                                ?>
-
-                                <!-- TABLE: new row --> 
-                                <tr>
-                                    <!-- Subject -->
-                                    <td style='white-space: nowrap;width: 0.2%;' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></td>
-                                    
-                                    <!-- Make the div visible, when someone clicks the button -->
-                                    <script>
-                                        function showChat<?php echo $subject; ?>() {
-                                            var element = document.getElementById("messages");
-                                            var limit = 10;
-
-                                            // get the messages
-                                            getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, limit);
-                                            element.style.display = "block";
-                                        }
-                                    </script>
-                                </tr>
-
-                                <?php
-                            }   
-                        } else {
-                            echo mysqli_error($conn);
-                        }
-                    ?>
-                </div>
-
-                <!-- Messages -->
-                <div class="col-xs-6">
-                    <div id="messages" style="display: block">asdf</div>
-                </div>
-            </div>
-        </tbody>
     </table>
+    
+    <div class="row">
+        <div class="col-xs-4">
+            <?php
+                // the currently logged in user
+                $currentUser = $_SESSION["userid"];
+
+                //select all 
+                $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
+                $result = $conn->query($sql);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $subject = $row['subject'];
+                        $userID = $row['userID'];
+                        $partnerID = $row['partnerID'] ;
+
+                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
+                        $x = ($userID == $currentUser) ? $partnerID : $userID;
+                        ?>
+
+
+                            <!-- Subject -->
+                            <style>
+                                #subject {
+                                    padding: 5px;
+                                }
+
+                                #subject:hover {
+                                    background-color: #F5F5F5;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                }
+                            </style>
+                            
+                            <div id="subject">
+                                <p style='padding: 10px' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></h1>
+                            </div>
+                            
+                            <!-- Make the div visible, when someone clicks the button -->
+                            <script>
+                                function showChat<?php echo $subject; ?>() {
+                                    var element = document.getElementById("messages");
+                                    var limit = 10;
+
+                                    // get the messages
+                                    getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, limit);
+                                    element.style.display = "block";
+                                }
+                            </script>
+
+
+                        <?php
+                    }   
+                } else {
+                    echo mysqli_error($conn);
+                }
+            ?>
+        </div>
+
+        <!-- Messages -->
+        <div class="col-xs-8">
+            <div id="messages" style="display: none"></div>
+        </div>
+    </div>
 
 
       
