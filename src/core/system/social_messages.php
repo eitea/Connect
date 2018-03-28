@@ -1,15 +1,39 @@
+<?php 
+require dirname(dirname(__DIR__)) . '/header.php';
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
+
 <!-- TODO: Add ability to send pictures -->
-<!-- TODO: show all conversations -->
 <!-- TODO: Badge -->
-<!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
-<!-- TODO: use AJAX scripts -->
 
-
-<!-- Task: 5aa53cf53c635 -->
-
-<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
-
+<!-- AJAX scripts -->
+<script>
+    function getMessages(partner, subject, target, scroll = false, limit = 50) {
+        $.ajax({
+            url: 'ajaxQuery/AJAX_postGetMessage.php',
+            data: {
+                partner: partner,
+                subject: subject,
+                limit: limit,
+            },
+            type: 'GET',
+            success: function (response) {
+                $(target).html(response)
+                
+                if (scroll)
+                    $(target).parent().scrollTop($(target)[0].scrollHeight);
+            },
+            error: function (response) {
+                $(target).html(response);
+            },
+        })
+    }
+</script>
 
 <!-- Page header -->
 <div class="page-header-fixed">
@@ -38,13 +62,20 @@
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
             // no errors
+<<<<<<< HEAD
+            $to = test_input($_POST['to']);
+=======
             $to = test_input($_POST['to']); //TODO: replace this with userID and clean with intval()
+>>>>>>> master
             $subject = test_input($_POST['subject']);
             $message = test_input($_POST['message']);
             $partnerID = -1;
 
+<<<<<<< HEAD
+=======
 
             //TODO: remove
+>>>>>>> master
             // select the partnerid from the database
             $sql = "SELECT id FROM UserData WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY id LIMIT 1";
             $result = $conn->query($sql);
@@ -57,7 +88,6 @@
             // the partner was not found in the database or its the same user
             if ($partnerID == -1) {
                 showInfo("Receiver not found!");
-                echo $sql;
             } else if ($partnerID == $userID) {
                 showInfo("You cannot send messages to yourself!");
             } else {
@@ -99,9 +129,8 @@
 
                     <!-- modal footer -->
                     <div class="modal-footer">
-                        <!-- FIXME: Cancel Button not working yet -->
                         <button type="button" class="btn btn-default"
-                                data-dsismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                                data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                         <button type="submit" class="btn btn-warning" name="sendButton"
                                 target="#chat"><?php echo $lang['SEND']; ?></button>
                     </div>
@@ -112,17 +141,53 @@
 
 
     <!-- Active Conversations -->
-    <h4><?php echo $lang['CONVERSATIONS']; ?></h4>
+    <h4><?php echo $lang['MESSAGES']; ?></h4>
 
-    <!-- contacts -->
+
     <table class="table table-hover">
         <thead>
-            <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SUBJECT']; ?></th>
-            <th><?php echo $lang['RECEIVER']; ?></th>
+            <th style='white-space: nowrap;width: 1%;'><?php echo $lang['SUBJECT']; ?></th>
+            <th style='white-space: nowrap;width: 2%;'></th>
         </thead>
-
-        <tbody>
+    </table>
+    
+    <div class="row">
+        <div class="col-xs-4">
             <?php
+<<<<<<< HEAD
+                // the currently logged in user
+                $currentUser = $_SESSION["userid"];
+
+                //select all 
+                $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
+                $result = $conn->query($sql);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $subject = $row['subject'];
+                        $userID = $row['userID'];
+                        $partnerID = $row['partnerID'] ;
+
+                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
+                        $x = ($userID == $currentUser) ? $partnerID : $userID;
+                        ?>
+
+
+                            <!-- Subject -->
+                            <style>
+                                #subject {
+                                    padding: 5px;
+                                }
+
+                                #subject:hover {
+                                    background-color: #F5F5F5;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                }
+                            </style>
+                            
+                            <div id="subject">
+                                <p style='padding: 10px' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></h1>
+=======
             // the currently logged in user
             $currentUser = $_SESSION["userid"];
             $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData
@@ -224,75 +289,41 @@
                                         $("#messages<?php echo $subject; ?>").parent().scrollTop($("#messages<?php echo $subject; ?>")[0].scrollHeight);
                                     })-->
                                 </script>
+>>>>>>> master
                             </div>
-                        </div>
-                    </div>
-                    <!-- /chat modal -->
-                    <?php
+                            
+                            <!-- Make the div visible, when someone clicks the button -->
+                            <script>
+                                function showChat<?php echo $subject; ?>() {
+                                    // get the messages - function getMessages(partner, subject, target, scroll = false, limit = 50)
+                                    getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, 10);
+                                    
+                                    // make it visible
+                                    var element = document.getElementById("messages");
+                                    element.style.display = "block";
+                                }
+                            </script>
 
+
+                        <?php
+                    }   
+                } else {
+                    echo mysqli_error($conn);
                 }
-            } else {
-                echo mysqli_error($conn);
-            }
             ?>
-        </tbody>
-    </table>
+        </div>
+
+        <!-- Messages -->
+        <div class="col-xs-8">
+            <div id="messages" style="display: none; background-color: WhiteSmoke"></div>
+        </div>
+    </div>
+
+
+      
     <!-- /contacts -->
 
 </div>
 
-
-<!-- TODO: Add AJAX Scripts for alerts -->
-
-<script>
-    /**
-     *  Receive new messages
-     * partner: the user_id of your conversation partner
-     * scroll:
-     * limit:
-     */
-    function getMessages(partner, target, scroll = false, limit = 50) {
-        $.ajax({
-            url: 'ajaxQuery/AJAX_socialGetMessage.php',
-            data: {
-                partner: partner,
-                limit: limit,
-            },
-            type: 'GET',
-            success: function (response) {
-                $(target).html(response)
-                if (scroll)
-                    $(target).parent().scrollTop($(target)[0].scrollHeight);
-            },
-            error: function (response) {
-                $(target).html(response)
-            },
-        })
-    }
-
-    /**
-     *  Send messages
-     * partner: the user_id of your conversation partner
-     * scroll:
-     * limit:
-     */
-    function sendMessage(partner, message, target, limit = 50) {
-        if (message.length == 0) {
-            return
-        }
-
-        $.ajax({
-            url: 'ajaxQuery/AJAX_socialSendMessage.php',
-            data: {
-                partner: partner,
-                message: message,
-            },
-            type: 'GET',
-            success: function (response) {
-                getMessages(partner, target, true, limit)
-            },
-        })
-    }
-</script>
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
