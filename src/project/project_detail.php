@@ -44,32 +44,37 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </h3>
 </div>
 
-<h4>Allgemein <div class="page-header-button-group">
-    <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-member" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-</div></h4>
+<h4>Allgemein</h4>
 
-<div class="row">
-    <div class="col-lg-4">
-        <label>Public Key</label><br>
+<div class="row form-group">
+    <div class="col-sm-2">Produktiv</div>
+    <div class="col-sm-10"><label><input type="checkbox" name="project_productive" <?php if($projectRow['status']) echo 'checked'; ?> value="1" /> <i class="fa fa-tags"></i></label></div>
+</div>
+<div class="row form-group">
+    <div class="col-sm-2">Stunden</div>
+    <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hours" value="<?php echo $projectRow['hours']; ?>" /></div>
+    <div class="col-sm-2">Stundenrate</div>
+    <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hourlyPrice" value="<?php echo $projectRow['hourlyPrice']; ?>" /></div>
+</div>
+
+<div class="row form-group">
+<div class="col-sm-2">Optionale Projektfelder</div>
+<div class="col-sm-8">-TBA-</div>
+<?php
+//$result = $conn->query("SELECT isActive, name FROM $companyExtraFieldsTable WHERE companyID = ? ORDER BY id ASC")
+ ?>
+</div>
+
+<div class="row form-group">
+    <div class="col-sm-2">
+        Public Key
+    </div>
+    <div class="col-sm-6">
         <?php echo $projectRow['publicKey']; ?>
     </div>
     <div class="col-sm-4">
-        <form method="POST">
-        <?php if(!empty($_POST['unlockProjectKeyDownload']) && crypt($_POST['unlockProjectKeyDownload'], $userPasswordHash) == $userPasswordHash): ?>
-            <input type="hidden" name="personal" value="<?php echo $projectRow['symmetricKey']."\n".$projectRow['publicKey']; ?>" /><br>
-            <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Keypair Download</button>
-        <?php else: ?>
-            <label><?php echo $lang['PASSWORD_CURRENT'] ?></label><br>
-            <small>Zum entsperren des Schlüsselpaar Downloads</small>
-            <div class="input-group">
-                <input type="password" name="unlockProjectKeyDownload" class="form-control" autocomplete="new-password">
-                <span class="input-group-btn">
-                    <button type="submit" class="btn btn-warning">Entsperren</button>
-                </span>
-            </div>
-            <?php if(isset($_POST['unlockProjectKeyDownload'])) echo '<small style="color:red">Falsches Passwort</small>'; ?>
-        <?php endif; ?>
-        </form>
+        <input type="hidden" name="personal" value="<?php echo $projectRow['symmetricKey']."\n".$projectRow['publicKey']; ?>" />
+        <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Schlüsselpaar Downloaden</button>
     </div>
 </div>
 
