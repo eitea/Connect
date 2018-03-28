@@ -1276,7 +1276,7 @@ function create_tables($conn) {
         projectid VARCHAR(100) NOT NULL,
         activity VARCHAR(20) NOT NULL,
         logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        userID INT(6),
+        userID INT(6) UNSIGNED,
         extra1 VARCHAR(250),
         extra2 VARCHAR(450),
         FOREIGN KEY (userID) REFERENCES UserData(id)
