@@ -29,6 +29,19 @@ if($matrix_result){
     showError($conn->error);
 }
 
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description) VALUES ($userID,?,?)");
+showError($conn->error);
+$stmt_insert_vv_log->bind_param("ss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description);
+function insertVVLog($short,$long){
+    global $stmt_insert_vv_log;
+    global $stmt_insert_vv_log_short_description;
+    global $stmt_insert_vv_log_long_description;
+    $stmt_insert_vv_log_short_description = $short;
+    $stmt_insert_vv_log_long_description = $long;
+    $stmt_insert_vv_log->execute();
+    showError($stmt_insert_vv_log->error);
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
     $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
@@ -91,9 +104,11 @@ if(isset($settings['DESCRIPTION'])):
         $valID = $settings['DESCRIPTION']['valID'];
         if($valID){
             $stmt_update_setting->execute();
+            insertVVLog("UPDATE","Update description for Procedure Directory $vvID to '$setting'");
         } else {
             $setID = $settings['DESCRIPTION']['id'];
             $stmt_insert_setting->execute();
+            insertVVLog("INSERT","Insert description for Procedure Directory $vvID as '$setting'");
         }
         if($conn->error){
             showError($conn->error);
@@ -141,9 +156,11 @@ if(isset($settings['DESCRIPTION'])):
                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                 if($valID){
                     $stmt_update_setting->execute();
+                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
                 } else {
                     $setID = $val['id'];
                     $stmt_insert_setting->execute();
+                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
                 }
             }
             echo '<div class="row">';
@@ -182,9 +199,11 @@ if(isset($settings['DESCRIPTION'])):
                             $valID = $val['valID'];
                             if($valID){
                                 $stmt_update_setting->execute();
+                                insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
                             } else {
                                 $setID = $val['id'];
                                 $stmt_insert_setting->execute();
+                                insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
                             }
                         }
                         $arr = explode("|",$val['setting'],2);
@@ -300,6 +319,7 @@ if(isset($settings['EXTRA_DOC'])){
                     $stmt = $stmt_insert_setting;
                 }
                 $stmt->execute();
+                insertVVLog("INSERT","Add new category '$setting' for Procedure Directory $vvID");                
                 if($stmt->error){
                     showError($stmt->error);
                 } else {
@@ -357,15 +377,18 @@ if(isset($settings['EXTRA_DOC'])){
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 if($valID){ //update to true if checked and exists
                                     $stmt_update_setting_matrix->execute();
+                                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
                                 } else { //insert with true if checked and not exists
                                     $cat = '';
                                     $setID = $catVal['id'];
                                     $stmt_insert_setting_matrix->execute();
+                                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
                                 }
                             } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
                                 $catVal['setting'] = $setting = '0';
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 $stmt_update_setting_matrix->execute();
+                                insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
                             }
                         }
                         $fieldID ++;
@@ -386,10 +409,12 @@ if(isset($settings['EXTRA_DOC'])){
                                     if($j){
                                         $valID = $headVal['valID'][$j];
                                         $stmt_update_setting->execute();
+                                        insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");
                                     } else {
                                         $cat = $catKey;
                                         $setID = $headVal['id'];
                                         $stmt_insert_setting->execute();
+                                        insertVVLog("INSERT","Insert Value '$valID' for Procedure Directory $vvID as '$setting'");
                                     }
                                 } elseif($j && $headVal['setting'][$j]){
                                     $valID = $headVal['valID'][$j];
@@ -397,7 +422,8 @@ if(isset($settings['EXTRA_DOC'])){
                                     $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                     $checked = '';
                                     $stmt_update_setting->execute();
-                                    echo $stmt_update_setting->error;
+                                    insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");                                    
+                                    showError($stmt_update_setting->error);
                                 }
                             }
                             echo '<td class="text-center"><input type="checkbox" '.$checked.' name="'.$headKey.'_'.$catKey.'" value="1" ></td>';

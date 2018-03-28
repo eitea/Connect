@@ -13,9 +13,23 @@ if (isset($_GET['n'])) {
 if (isset($_POST['company_id'])) {
     $newCmpID = intval($_POST['company_id']);
     if ($cmpID !== $newCmpID) {
-        redirect("../system/data-matrix?n=$cmpID");
+        redirect("../system/data-matrix?n=$newCmpID");
     }
 }
+
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description) VALUES ($userID,?,?)");
+showError($conn->error);
+$stmt_insert_vv_log->bind_param("ss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description);
+function insertVVLog($short,$long){
+    global $stmt_insert_vv_log;
+    global $stmt_insert_vv_log_short_description;
+    global $stmt_insert_vv_log_long_description;
+    $stmt_insert_vv_log_short_description = $short;
+    $stmt_insert_vv_log_long_description = $long;
+    $stmt_insert_vv_log->execute();
+    showError($stmt_insert_vv_log->error);
+}
+
 
 if (isset($cmpID)) {
     $result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $cmpID");
@@ -27,6 +41,7 @@ if (isset($cmpID)) {
             $stmt = $conn->prepare("INSERT INTO dsgvo_vv_data_matrix_settings (matrixID, opt_name, opt_descr) VALUES(?, ?, ?)");
             $stmt->bind_param("iss", $matrixID, $opt, $descr);
             $matrixID = $result->fetch_assoc()["id"];
+            insertVVLog("INSERT","Create new default matrix with id $matrixID");
             $opt = 'APP_GROUP_1';
             $descr = 'Kunde';
             $stmt->execute();
@@ -74,6 +89,7 @@ if (isset($_POST['add_setting']) && isset($matrixID)) {
     if (!empty($_POST['add_setting']) && !empty($_POST[test_input($_POST['add_setting'])])) {
         $setting = test_input($_POST['add_setting']);
         $descr = test_input($_POST[$setting]);
+        insertVVLog("INSERT","Add a new field (name: $setting, description: $descr) to matrix $matrixID");        
         $conn->query("INSERT INTO dsgvo_vv_data_matrix_settings (matrixID, opt_name, opt_descr) VALUES ($matrixID, '$setting', '$descr')");
         if ($conn->error) {
             showError($conn->error);
@@ -87,6 +103,7 @@ if (isset($_POST['delete_setting']) && isset($matrixID)) {
     if (!empty($_POST['delete_setting'])) {
         $setting = test_input($_POST['delete_setting']);
         $conn->query("DELETE FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name = '$setting'");
+        insertVVLog("DELETE","Delete a field (name: $setting) in matrix $matrixID");  
         if ($conn->error) {
             showError($conn->error);
         } else {
@@ -107,6 +124,9 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
             if (!empty($descr)) {
                 $stmt->execute();
                 $affected_rows += $stmt->affected_rows;
+                if($stmt->affected_rows && $stmt->affected_rows > 0){
+                    insertVVLog("UPDATE","Update a field (name: $setting, description: $descr) in matrix $matrixID");  
+                }
                 showError($stmt->error);
             }
         }
@@ -132,11 +152,13 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
                 <br />
                 <div>
                 <select class="js-example-basic-single" name="company_id" id="company_chooser">
+                    <option>...</option>
                     <?php
 $result = $conn->query("SELECT id,name FROM $companyTable");
 while ($result && ($row = $result->fetch_assoc())) {
     if (in_array($row['id'], $available_companies)) {
-        echo "<option value='${row['id']}'>${row['name']}</option>";
+        $selected = $cmpID == $row["id"]?"selected":"";
+        echo "<option $selected value='${row['id']}'>${row['name']}</option>";
     }
 }
 ?>
@@ -193,10 +215,15 @@ while ($result && $row = $result->fetch_assoc()) {
                             <?php
 $j = 1;
     $cat_result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name LIKE 'APP_CAT_$num%'");
+    $jnum = 1;
     while ($cat_row = $cat_result->fetch_assoc()) {
         $jnum = util_strip_prefix($cat_row['opt_name'], 'APP_CAT_' . $num . '_');
-        if ($jnum == $j) {
+        // echo $j;
+        // if ($jnum == $j) {
             $j++;
+        // }
+        if(intval($jnum)>=$j){
+            $j = intval($jnum)+1;
         }
         $fieldID++;
 

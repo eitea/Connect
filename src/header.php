@@ -1053,6 +1053,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
                     echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Log</a></li>';
                     echo '</ul></div></li>';
                   }
                 }
@@ -1062,7 +1064,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php" || $this_page == "dsgvo_log.php") {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
