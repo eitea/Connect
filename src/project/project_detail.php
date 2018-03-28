@@ -141,12 +141,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     echo '</div>';
                 }
                 ?>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning" name="hire"><?php echo $lang['ADD']; ?></button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning" name="hire"><?php echo $lang['ADD']; ?></button>
+            </div>
+        </form>
     </div>
 </div>
 
