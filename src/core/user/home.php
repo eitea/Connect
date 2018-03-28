@@ -275,7 +275,7 @@ $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM lo
     $conn->error;
   }
 
-$result = $conn->query("SELECT begin, name FROM holidays WHERE NAME LIKE '% (_)' AND begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."'"); echo $conn->error;
+$result = $conn->query("SELECT begin, name FROM holidays WHERE name LIKE '% (_)' AND begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."'"); echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
     $dates[] = "{ title: '".$row['name']."', start: '".substr($row['begin'], 0, 10)."', textColor: 'white', backgroundColor: '#999'}";
 }
