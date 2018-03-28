@@ -1196,6 +1196,10 @@ function create_tables($conn) {
         matrix_setting_id INT(10) UNSIGNED,
         setting VARCHAR(850) NOT NULL,
         category VARCHAR(50),
+        clientID INT(6) UNSIGNED,
+        FOREIGN KEY (clientID) REFERENCES clientData(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
         FOREIGN KEY (vv_id) REFERENCES dsgvo_vv(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

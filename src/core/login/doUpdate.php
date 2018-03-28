@@ -2292,6 +2292,20 @@ if($row['version'] < 143){
     }else{
         echo '<br>DSGVO: Data Matrix Settings Foreign Key';
     }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD COLUMN clientID INT(6) UNSIGNED");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: VV Settings Client';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD FOREIGN KEY (clientID) REFERENCES clientData(id) ON UPDATE CASCADE ON DELETE SET NULL");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: VV Settings Client Foreign Key';
+    }
 }
 
 //if($row['version'] < 144){}

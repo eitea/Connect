@@ -98,7 +98,7 @@ $row = $result->fetch_assoc();
 <div class="panel panel-default" style="margin:0 15px">
     <form method="POST">
         <div class="row">
-            <div class="col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>" class="btn btn-link"> Stammblatt </a></div>
+            <div class="col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> Stammblatt </a></div>
             <div class="col-sm-5">
                 <select name="change_basic_template" class="js-example-basic-single">
                 <?php
