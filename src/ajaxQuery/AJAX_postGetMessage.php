@@ -12,10 +12,17 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // message has been seen
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
 
+    $result = $conn->query("SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id");
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $firstname = $row['firstname'];
+            $lastname = $row['lastname'];
+        }
+    }
+
     // get the messages
     $sql = "SELECT * FROM (SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC";
     $result = $conn->query($sql);
-
 } else {
     die('Invalid Request');
 }
@@ -26,6 +33,7 @@ if (!$result || $result->num_rows == 0) {
 } else {
     // process the result
     while ($row = $result->fetch_assoc()) {
+
         $message = $row["message"];
         $pull = $row["userID"] == $userID ? "pull-right":"pull-left";       // left or right side?
         $seen = $row["seen"] == 'TRUE' ? "fa-eye":"fa-eye-slash";
@@ -34,8 +42,8 @@ if (!$result || $result->num_rows == 0) {
         $date = date('Y-m-d', strtotime($row["sent"]));
 
         
-        if(isset($row["firstname"], $row["lastname"]))
-            $name = "${row['firstname']} ${row['lastname']}";
+        if(!empty($firstname) && !empty($lastname))
+            $name = $firstname . " " . $lastname;
 
         if($lastdate != $date){
             ?>
@@ -48,8 +56,6 @@ if (!$result || $result->num_rows == 0) {
             <?php
         }
         
-        //TODO: replace placeholder
-        $name = "placeholder";
         ?>
 
             <div class="row">

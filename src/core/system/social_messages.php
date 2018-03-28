@@ -8,11 +8,8 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
 <!-- TODO: Add ability to send pictures -->
-<!-- TODO: show all conversations -->
 <!-- TODO: Badge -->
-<!-- TODO: prevent sql injection (https://www.w3schools.com/php/php_mysql_prepared_statements.asp) -->
 <!-- TODO: Multiple Receivers -->
-<!-- TODO: use AJAX scripts -->
 
 <!-- AJAX scripts -->
 <script>
@@ -33,25 +30,6 @@ if (session_status() == PHP_SESSION_NONE) {
             },
             error: function (response) {
                 $(target).html(response);
-            },
-        })
-    }
-
-    function sendMessage(partner, subject, message, target, limit = 50) {
-        if (message.length == 0) {
-            return
-        }
-
-        $.ajax({
-            url: 'ajaxQuery/AJAX_socialSendMessage.php',
-            data: {
-                partner: partner,
-                subject: subject,
-                message: message,
-            },
-            type: 'GET',
-            success: function (response) {
-                getMessages(partner, subject, target, true, limit)
             },
         })
     }
@@ -160,7 +138,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <table class="table table-hover">
         <thead>
             <th style='white-space: nowrap;width: 1%;'><?php echo $lang['SUBJECT']; ?></th>
-            <th style='white-space: nowrap;width: 2%;'><?php echo "Nachrichten" ?></th>
+            <th style='white-space: nowrap;width: 2%;'></th>
         </thead>
     </table>
     
@@ -204,11 +182,11 @@ if (session_status() == PHP_SESSION_NONE) {
                             <!-- Make the div visible, when someone clicks the button -->
                             <script>
                                 function showChat<?php echo $subject; ?>() {
+                                    // get the messages - function getMessages(partner, subject, target, scroll = false, limit = 50)
+                                    getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, 10);
+                                    
+                                    // make it visible
                                     var element = document.getElementById("messages");
-                                    var limit = 10;
-
-                                    // get the messages
-                                    getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, limit);
                                     element.style.display = "block";
                                 }
                             </script>
@@ -224,7 +202,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div id="messages" style="display: none"></div>
+            <div id="messages" style="display: none; background-color: WhiteSmoke"></div>
         </div>
     </div>
 

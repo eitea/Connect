@@ -11,14 +11,14 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"]) && !empty($_SESS
     require dirname(__DIR__) . "/connection.php";
 
     // insert a new message into the database
-    $conn->query("INSERT INTO messages (userID, partnerID, subject, message) VALUES ($userID, $partner, '$subject', '$message')");
-    echo $conn->error;
+    $sql = "INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partner, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')";
+    
+    $conn->query($sql);
 } else {
     die('Invalid Request');
 }
 
-function test_input($data)
-{
+function test_input($data) {
     require dirname(__DIR__) . "/connection.php";
     $data = $conn->escape_string($data);
     $data = trim($data);
