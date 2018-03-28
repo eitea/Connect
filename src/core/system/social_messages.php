@@ -1,4 +1,4 @@
-<?php 
+<?php
 require dirname(dirname(__DIR__)) . '/header.php';
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -24,7 +24,7 @@ if (session_status() == PHP_SESSION_NONE) {
             type: 'GET',
             success: function (response) {
                 $(target).html(response)
-                
+
                 if (scroll)
                     $(target).parent().scrollTop($(target)[0].scrollHeight);
             },
@@ -62,20 +62,12 @@ if (session_status() == PHP_SESSION_NONE) {
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
             // no errors
-<<<<<<< HEAD
-            $to = test_input($_POST['to']);
-=======
             $to = test_input($_POST['to']); //TODO: replace this with userID and clean with intval()
->>>>>>> master
+
             $subject = test_input($_POST['subject']);
             $message = test_input($_POST['message']);
             $partnerID = -1;
 
-<<<<<<< HEAD
-=======
-
-            //TODO: remove
->>>>>>> master
             // select the partnerid from the database
             $sql = "SELECT id FROM UserData WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY id LIMIT 1";
             $result = $conn->query($sql);
@@ -150,44 +142,10 @@ if (session_status() == PHP_SESSION_NONE) {
             <th style='white-space: nowrap;width: 2%;'></th>
         </thead>
     </table>
-    
+
     <div class="row">
         <div class="col-xs-4">
             <?php
-<<<<<<< HEAD
-                // the currently logged in user
-                $currentUser = $_SESSION["userid"];
-
-                //select all 
-                $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
-                $result = $conn->query($sql);
-                if ($result && $result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $subject = $row['subject'];
-                        $userID = $row['userID'];
-                        $partnerID = $row['partnerID'] ;
-
-                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
-                        $x = ($userID == $currentUser) ? $partnerID : $userID;
-                        ?>
-
-
-                            <!-- Subject -->
-                            <style>
-                                #subject {
-                                    padding: 5px;
-                                }
-
-                                #subject:hover {
-                                    background-color: #F5F5F5;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                }
-                            </style>
-                            
-                            <div id="subject">
-                                <p style='padding: 10px' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></h1>
-=======
             // the currently logged in user
             $currentUser = $_SESSION["userid"];
             $sql = "SELECT userID, partnerID, firstname, lastname, subject FROM UserData
@@ -289,15 +247,14 @@ if (session_status() == PHP_SESSION_NONE) {
                                         $("#messages<?php echo $subject; ?>").parent().scrollTop($("#messages<?php echo $subject; ?>")[0].scrollHeight);
                                     })-->
                                 </script>
->>>>>>> master
                             </div>
-                            
+
                             <!-- Make the div visible, when someone clicks the button -->
                             <script>
                                 function showChat<?php echo $subject; ?>() {
                                     // get the messages - function getMessages(partner, subject, target, scroll = false, limit = 50)
                                     getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, 10);
-                                    
+
                                     // make it visible
                                     var element = document.getElementById("messages");
                                     element.style.display = "block";
@@ -306,7 +263,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
                         <?php
-                    }   
+                    }
                 } else {
                     echo mysqli_error($conn);
                 }
@@ -320,7 +277,7 @@ if (session_status() == PHP_SESSION_NONE) {
     </div>
 
 
-      
+
     <!-- /contacts -->
 
 </div>
