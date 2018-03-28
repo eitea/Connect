@@ -57,11 +57,12 @@ if (!$result || $result->num_rows == 0) {
                     <div class="well <?php echo $pull; ?>" style="position:relative">
                         <!-- if -->
                         <?php if($showseen){ ?>
-                            <i class="fa <?php echo $seen; ?>" style="display:block;top:0px;right:-3px;position:absolute;color:#9d9d9d;"></i>
+                            <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
                         <?php }elseif(!$showseen){ ?>
-                            <span class="label label-default" style="display:block;top:-17px;left:0px;position:absolute;"><?php echo $name; ?></span>
+                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute;"><?php echo $name; ?></span>
                         <?php }?>
                         <!-- endif -->
+                        
                         <div><?php echo $message; ?></div>
                     </div>
                 </div>

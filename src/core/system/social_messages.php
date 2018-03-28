@@ -159,76 +159,69 @@ if (session_status() == PHP_SESSION_NONE) {
     <!-- contacts -->
     <table class="table table-hover">
         <thead>
-            <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SUBJECT']; ?></th>
+            <th><?php echo $lang['SUBJECT']; ?></th>
+            <th><?php echo "Nachrichten" ?></th>
         </thead>
 
         <tbody>
-            <?php
-                // the currently logged in user
-                $currentUser = $_SESSION["userid"];
+            <div class="row">
 
-                //select all 
-                $sql = "SELECT subject, userID, partnerID FROM messages 
-                WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}'
-                GROUP BY subject";
+                <!-- Subjects -->
+                <div class="col-xs-6">
+                    <?php
+                        // the currently logged in user
+                        $currentUser = $_SESSION["userid"];
 
-                $result = $conn->query($sql);
-                if ($result && $result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $subject = $row['subject'];
-                        $userID = $row['userID'];
-                        $partnerID = $row['partnerID'] ;
+                        //select all 
+                        $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
+                        $result = $conn->query($sql);
+                        if ($result && $result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $subject = $row['subject'];
+                                $userID = $row['userID'];
+                                $partnerID = $row['partnerID'] ;
 
-                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
-                        $x = ($userID == $currentUser) ? $partnerID : $userID;
+                                // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
+                                $x = ($userID == $currentUser) ? $partnerID : $userID;
 
-                        echo "<tr data-toggle='modal' data-target='#chat$subject' style='cursor:pointer;'>";
-                        echo "<td style='white-space: nowrap;width: 1%;'>$subject</td>";
-                        echo '</tr>';
-                        ?>
+                                ?>
 
-                        <!-- chat modal -->
-                        <div class="modal fade" id="chat<?php echo $subject; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $subject; ?>">
-                            <div class="modal-dialog" role="form">
-                                <div class="modal-content">
-                                    <div class="modal-header" style="padding-bottom:5px;">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                                <!-- TABLE: new row --> 
+                                <tr>
+                                    <!-- Subject -->
+                                    <td style='white-space: nowrap;width: 0.2%;' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></td>
+                                    
+                                    <!-- Make the div visible, when someone clicks the button -->
+                                    <script>
+                                        function showChat<?php echo $subject; ?>() {
+                                            var element = document.getElementById("messages");
+                                            var limit = 10;
 
-                                        <h4 class="modal-title" id="chatLabel<?php echo $subject; ?>">
-                                            <?php echo $subject ?>
-                                        </h4>
-                                    </div><br>
+                                            // get the messages
+                                            getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, limit);
+                                            element.style.display = "block";
+                                        }
+                                    </script>
+                                </tr>
 
-                                    <!-- All messages -->
-                                    <div class="modal-body">
-                                        <div id="testing<?php echo $subject; ?>"></div>
-                                    </div>
+                                <?php
+                            }   
+                        } else {
+                            echo mysqli_error($conn);
+                        }
+                    ?>
+                </div>
 
-
-                                    <div class="modal-footer">
-                                        <script>
-                                            interval<?php echo $subject; ?> = 0
-                                            limit<?php echo $subject; ?> = 10;
-                                            
-                                            //note: x = the partner
-                                            getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#testing<?php echo $subject; ?>", false, limit<?php echo $subject; ?>)
-                                        </script>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /chat modal -->
-
-                        <?php
-                    }   
-                } else {
-                    echo mysqli_error($conn);
-                }
-            ?>
+                <!-- Messages -->
+                <div class="col-xs-6">
+                    <div id="messages" style="display: block">asdf</div>
+                </div>
+            </div>
         </tbody>
     </table>
+
+
+      
     <!-- /contacts -->
 
 </div>
