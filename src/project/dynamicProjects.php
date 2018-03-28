@@ -486,7 +486,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>';
             if($useRow && $useRow['userID'] == $userID) {
                 $disabled = (time() - strtotime($useRow['start']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
-                echo '<button class="btn btn-default" '.$disabled.' onclick="checkMicroTasks()" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
+                echo '<button class="btn btn-default" '.$disabled.' type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && $isInUse->num_rows < 1 && !$hasActiveBooking){
                 if(!$row['projectleader']){
@@ -719,41 +719,6 @@ $("#bookCompletedCheckbox").change(function(event){
     if(this.checked){
         $("#bookRanger").val(100);
         $("#bookCompleted").val(100);
-    }
-});
-function checkMicroTasks(){
-    if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
-        $("#bookCompletedCheckbox").attr('disabled',false);
-    } else {
-        $("#bookCompletedCheckbox").attr('disabled',true);
-        $("#bookCompleted").attr('max',99);
-        $("#bookRanger").attr('max',99);
-    }
-}
-$("#microlist input[type='checkbox']").change(function(){
-    var allisgood = true;
-    $("#microlist input[type='checkbox']").each(function(){
-        if(!(this.checked)) allisgood = false;
-    });
-    if(allisgood){
-        $("#bookCompletedCheckbox").attr('disabled',false);
-        $("#bookCompleted").attr('max',100);
-        $("#bookRanger").attr('max',100);
-    } else {
-        $("#bookCompletedCheckbox").attr('disabled',true);
-        $("#bookCompleted").attr('max',99);
-        $("#bookRanger").attr('max',99);
-    }
-});
-$("#bookCompleted").keyup(function(event){
-    if($("#bookCompleted").val() == 100){
-        if(document.getElementById("microlist").tBodies[0].firstElementChild.firstElementChild.className=="dataTables_empty"){
-            $("#bookCompletedCheckbox").prop('checked', true);
-        } else {
-            $("#bookCompleted").prop('value',99);
-        }
-    } else {
-        $("#bookCompletedCheckbox").prop('checked', false);
     }
 });
 function formatState (state) {
@@ -1052,7 +1017,7 @@ $(document).ready(function() {
             headerOffset: 150,
             zTop: 1
         },
-        paging: false
+        paging: true
     });
     setTimeout(function(){
         window.dispatchEvent(new Event('resize'));

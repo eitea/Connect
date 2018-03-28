@@ -65,8 +65,11 @@ if ($result) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
-$numberOfSocialAlerts = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID ")->num_rows;
-$numberOfSocialAlerts += $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')")->num_rows;
+$numberOfSocialAlerts = 0;
+$result = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID "); echo $conn->error;
+if($result) $numberOfSocialAlerts += $result->num_rows;
+$result = $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')"); echo $conn->error;
+if($result) $numberOfSocialAlerts += $result->num_rows;
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -364,13 +367,15 @@ if ($_SESSION['color'] == 'light') {
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
                 <?php
-                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID");
-                $row = $result->fetch_assoc();
-                $social_status = $row["status"];
-                $social_isAvailable = $row["isAvailable"];
-                $defaultGroupPicture = "images/group.png";
-                $defaultPicture = "images/defaultProfilePicture.png";
-                $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+                if($result){
+                    $row = $result->fetch_assoc();
+                    $social_status = $row["status"];
+                    $social_isAvailable = $row["isAvailable"];
+                    $defaultGroupPicture = "images/group.png";
+                    $defaultPicture = "images/defaultProfilePicture.png";
+                    $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+                }
                 ?>
                 <?php if ($canUseSocialMedia == 'TRUE'): ?>
                     <a href="" class="hidden-xs" data-toggle="modal" data-target="#socialSettings"><img src='<?php echo $profilePicture; ?>' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
