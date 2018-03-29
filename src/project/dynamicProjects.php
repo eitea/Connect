@@ -85,15 +85,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 //$result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = $indexIM");
                 $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Begin of Task $x' , 'project', '$x')");
                 if($conn->error){
-                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                    showError($conn->error);
                 } else {
-                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a> Task wurde gestartet. Solange dieser läuft, ist Ausstempeln nicht möglich.</div>';
+                    showSuccess('Task wurde gestartet. Solange dieser läuft, ist Ausstempeln nicht möglich.');
                 }
             } else {
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Bitte einstempeln.</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.</div>';
+                showError('<strong>Bitte einstempeln.</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.');
             }
         } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.</div>';
+            showError('<strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.');
         }
     } elseif(!empty($_POST['task-plan-date']) && (!empty($_POST['task-plan']) || !empty($_POST['task-plan-take']))){
         if(!empty($_POST['task-plan-take'])){
@@ -106,21 +106,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $date = carryOverAdder_Hours($_POST['task-plan-date'].':00', $timeToUTC * -1);
             $conn->query("UPDATE dynamicprojects SET projectstart = '$date' WHERE projectid = '$x'");
             if($conn->error){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                showError($conn->error);
             } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+                showSuccess($lang['OK_SAVE']);
             }
         } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Datum ungültig. Format YYYY-MM-DD HH:mm</div>';
+            showError('Datum ungültig. Format YYYY-MM-DD HH:mm');
         }
     } elseif(!empty($_POST['take_task'])){
         $x = test_input($_POST['take_task'], true);
         $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            showError($conn->error);
         } else {
             $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+            showSuccess($lang['OK_ADD']);
         }
     }
     if(!empty($_POST['createForgottenBooking']) && !empty($_POST['description']) && isset($_POST["time-range"])){
@@ -198,16 +198,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $description = test_input($_POST['description']);
                 $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen'  WHERE id = $bookingID");
                 if($conn->error){
-                	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                	showError($conn->error);
                 } else {
                 	redirect('view'); //to refresh the disabled check out button
                 }
             } else {
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_SELECTION'].' (Projekt)</div>';
+                showError($lang['ERROR_MISSING_SELECTION'].' (Projekt)');
             }
         } else { //STRIKE
             $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID");
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Project not Available.</strong> '.$lang['ERROR_STRIKE'].'</div>';
+            showError('<strong>Project not Available.</strong> '.$lang['ERROR_STRIKE']);
         }
     }
     if($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks == 'TRUE'){
@@ -216,9 +216,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $conn->query("DELETE FROM dynamicprojectslogs WHERE projectid = '$val'");
             $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$val'");
             if($conn->error){
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                showError($conn->error);
             } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+                showSuccess($lang['OK_DELETE']);
             }
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
@@ -244,7 +244,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         $mname = preg_quote($mname);
                         $description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);
                         if($conn->error){
-                            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                            showError($conn->error);
                         }
                     }
                 }
@@ -325,13 +325,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $stmt->execute();
                         }
                     }
-                    echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+                    showSuccess($lang['OK_ADD']);
                 } else {
-                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$stmt->error.'</div>';
+                    showError($stmt->error);
                 }
                 $stmt->close();
             } else {
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+                showError($lang['ERROR_MISSING_FIELDS']);
             }
         }
     } // end if dynamic Admin
