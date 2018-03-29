@@ -19,10 +19,29 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 <?php
 $cmpID = intval($_GET['n']);
 
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description) VALUES ($userID,?,?)");
+showError($conn->error);
+$stmt_insert_vv_log->bind_param("ss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description);
+function insertVVLog($short,$long){
+    global $stmt_insert_vv_log;
+    global $stmt_insert_vv_log_short_description;
+    global $stmt_insert_vv_log_long_description;
+    global $userID;
+    global $privateKey;
+    $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    if($encryptionError){
+        showError($encryptionError);
+    }
+    $stmt_insert_vv_log->execute();
+    showError($stmt_insert_vv_log->error);
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['delete_template'])){
         $val = intval($_POST['delete_template']);
         $conn->query("DELETE FROM dsgvo_vv_templates WHERE id = $val");
+        insertVVLog("DELETE","Delete template with id $val");
         if($conn->error){
             showError($conn->error);
         } else {
@@ -35,6 +54,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $conn->query("INSERT INTO dsgvo_vv_templates (companyID, name, type) SELECT companyID, '$name', type FROM dsgvo_vv_templates WHERE id = $val");
         $templateID = $conn->insert_id;        
         $conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr, opt_status) SELECT $templateID, opt_name, opt_descr, opt_status FROM dsgvo_vv_template_settings WHERE templateID = $val");
+        insertVVLog("CLONE","Clone template $val as '$name' with id '$templateID'");
         if($conn->error){
             showError($conn->error);
         } else {
@@ -48,6 +68,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $conn->query("INSERT INTO dsgvo_vv_templates (companyID, name, type) VALUES($cmpID, '$name', '$type')");
             $templateID = $conn->insert_id;
             $conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES($templateID, 'DESCRIPTION', '')");
+            insertVVLog("INSERT","Create template '$name' with id '$templateID' (type: '$type', company: '$cmpID')");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -67,6 +88,7 @@ if(isset($_POST['add_app']) && !empty($_POST['add_app_name']) && !empty($_POST['
     $val = intval($_POST['add_app_template']);
     if($name && $val){
         $conn->query("INSERT INTO dsgvo_vv(templateID, name) VALUES ($val, '$name') ");
+        insertVVLog("INSERT","Add app from template '$val' with name '$name'");        
         if($conn->error){
             showError($conn->error);
         } else {
@@ -82,6 +104,7 @@ if(isset($_POST["change_template"])){
     $template_id = intval($_POST["template_id"]);
     if($vv_id && $template_id){
         $conn->query("UPDATE dsgvo_vv SET templateID = $template_id WHERE id = $vv_id");
+        insertVVLog("UPDATE","Change template of app '$vv_id' to '$template_id'");
         if($conn->error){
             showError($conn->error);
         }else{

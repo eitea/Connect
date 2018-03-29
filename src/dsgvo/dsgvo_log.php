@@ -55,6 +55,11 @@ while ($result && ($row = $result->fetch_assoc())) {
             $short_tooltip = "Ein bestehender Eintrag wurde entfernt";
             $short_description_classes = "text-danger";
             break;
+        case "CLONE": 
+            $tr_classes = "bg-info"; 
+            $short_tooltip = "Ein bestehender Eintrag wurde dupliziert";
+            $short_description_classes = "text-info";
+            break;
         default:
             $tr_classes = "";
             $short_tooltip = "";
