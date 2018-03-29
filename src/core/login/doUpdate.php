@@ -2297,6 +2297,85 @@ if($row['version'] < 143){
 }
 
 if($row['version'] < 144){
+    $conn->query("ALTER TABLE projectData ADD COLUMN creator INT(6)");
+    if(!$conn->error){
+        echo '<br>Projekte: Ersteller';
+    } else {
+        echo '<br>'.$conn->error;
+    }
+
+    $conn->query("ALTER TABLE projectData ADD COLUMN publicKey VARCHAR(150)");
+    if(!$conn->error){
+        echo '<br>Projekte: Public Key';
+    } else {
+        echo '<br>'.$conn->error;
+    }
+
+    $conn->query("ALTER TABLE projectData ADD COLUMN symmetricKey VARCHAR(150)");
+    if(!$conn->error){
+        echo '<br>Projekte: Symmetric Key';
+    } else {
+        echo '<br>'.$conn->error;
+    }
+
+    $sql = "CREATE TABLE security_projects(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Security: Projekte';
+    }
+
+    $sql = "CREATE TABLE relationship_project_user(
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        access VARCHAR(10) NOT NULL DEFAULT 'READ',
+        expirationDate DATE NOT NULL DEFAULT '0000-00-00',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Project: Relation Users';
+    }
+
+    $sql = "CREATE TABLE relationship_project_extern(
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        access VARCHAR(10) NOT NULL DEFAULT 'READ',
+        expirationDate DATE NOT NULL DEFAULT '0000-00-00',
+        FOREIGN KEY (userID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Project: Relation Extern';
+    }
+}
+
+if($row['version'] < 145){
     $sql = "CREATE TABLE dsgvo_vv_data_matrix (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         companyID INT(6) UNSIGNED,
@@ -2373,7 +2452,6 @@ if($row['version'] < 144){
     }
 }
 
-//if($row['version'] < 145){}
 //if($row['version'] < 146){}
 //if($row['version'] < 147){}
 //if($row['version'] < 148){}

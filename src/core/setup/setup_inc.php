@@ -121,7 +121,9 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        dynamicprojectid VARCHAR(100),
+        creator INT(6),
+        symmetricKey VARCHAR(150),
+        publicPGPKey VARCHAR(150),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1639,6 +1641,24 @@ function create_tables($conn) {
         echo $conn->error;
     }
     
+    $sql = "CREATE TABLE security_projects(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE external_users(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         contactID INT(6) UNSIGNED,
@@ -1655,6 +1675,39 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+    $sql = "CREATE TABLE relationship_project_user(
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        access VARCHAR(10) NOT NULL DEFAULT 'READ',
+        expirationDate DATE NOT NULL DEFAULT '0000-00-00',
+        FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE relationship_project_extern(
+        projectID INT(6) UNSIGNED,
+        userID INT(6) UNSIGNED,
+        access VARCHAR(10) NOT NULL DEFAULT 'READ',
+        expirationDate DATE NOT NULL DEFAULT '0000-00-00',
+        FOREIGN KEY (userID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE messages(
         messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED NOT NULL,
