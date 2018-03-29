@@ -14,6 +14,27 @@ require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
 
+function showErrorToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showError('$message')})</script>";
+}
+function showWarningToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+function showInfoToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
+}
+function showSuccessToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}
+
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -181,13 +202,12 @@ if($userHasUnansweredSurveys){
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
-        $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a>';
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
-            $validation_output .= $lang['INFO_CHECKIN'] . '</div>';
+            $validation_output = showInfoToString($lang['INFO_CHECKIN']);
         } elseif (isset($_POST['stampOut'])) {
             $error_output = checkOut($userID, intval($_POST['stampOut']));
-            $validation_output .= $lang['INFO_CHECKOUT'] . '</div>';
+            $validation_output = showInfoToString($lang['INFO_CHECKOUT']);
         }
     }
     if (isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2) {
@@ -202,15 +222,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $private_encrypted = simple_encryption($privateKey, $password);
             $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
             if(!$conn->error){
-                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
+                $validation_output = showSuccessToString('Password successfully changed. '.$userPasswordHash);
             } else {
-                $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                $validation_output = showErrorToString($conn->error);
             }
         } else {
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" >&times;</a>'.$output.'</div>';
+            $validation_output  = showErrorToString($output);
         }
     } elseif(isset($_POST['savePAS'])) {
-        $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+        $validation_output = showErrorToString($lang['ERROR_MISSING_FIELDS']);
     }
     if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -218,12 +238,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql="UPDATE UserData SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'GER';
-      $validation_output = mysqli_error($conn);
+      $validation_output = showErrorToString($conn->error);
     } elseif(isset($_POST['ENGLISH'])){
       $sql="UPDATE UserData SET preferredLang='ENG' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'ENG';
-      $validation_output = mysqli_error($conn);
+      $validation_output = showErrorToString($conn->error);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
@@ -399,7 +419,7 @@ if ($_SESSION['color'] == 'light') {
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                 <a class="btn navbar-btn navbar-link" id="header-gears" data-toggle="modal" data-target="#passwordModal"><i class="fa fa-gears"></i></a>
-                <a class="btn navbar-btn navbar-link openSearchModal" title="CTRL-SHIFT-F"><i class="fa fa-search"></i></a>
+                <a class="btn navbar-btn navbar-link openSearchModal" title="F1 / CTRL-SHIFT-F"><i class="fa fa-search"></i></a>
                 <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
             </div>
         </div>
@@ -433,6 +453,13 @@ if ($_SESSION['color'] == 'light') {
                if (event.ctrlKey && event.shiftKey && event.keyCode == 70 /* f */) {
                    openSearchModal()
                }
+               if (event.ctrlKey && event.shiftKey && event.keyCode == 32 /* space */) {
+                   openSearchModal()
+               }
+               if (event.keyCode == 112 /* f1 */) {
+                   event.preventDefault();
+                   openSearchModal()
+               }
             })
         })
         const openSearchModal = _.throttle(function() {
@@ -448,6 +475,7 @@ if ($_SESSION['color'] == 'light') {
                     $("#searchModal .modal").modal("hide"); // hide old modal if pressed multiple times
                     $(".modal-backdrop.fade.in").hide();
                     $("#searchModal .modal").modal("show");
+                    $("#searchModal input[name='search']").focus();
                 }
             });
         },1000, {leading:true,trailing:false})
@@ -1105,7 +1133,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
           if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
-              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
+              showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
               if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
                   include 'footer.php';
                   die();
@@ -1114,6 +1142,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       }
       $user_agent = $_SERVER["HTTP_USER_AGENT"];
       if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
+          showError('Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser.');
       }
       ?>
