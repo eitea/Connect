@@ -1,4 +1,4 @@
-<?php 
+<?php
 require dirname(dirname(__DIR__)) . '/header.php';
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -26,7 +26,7 @@ $currentUser = $_SESSION["userid"];
             type: 'GET',
             success: function (response) {
                 $(target).html(response)
-                
+
                 if (scroll)
                     $(target).parent().scrollTop($(target)[0].scrollHeight);
             },
@@ -166,7 +166,7 @@ $currentUser = $_SESSION["userid"];
             <th style='white-space: nowrap;width: 2%;'></th>
         </thead>
     </table>
-    
+
     <div class="row">
         <div class="col-xs-4">
             <?php
@@ -198,17 +198,17 @@ $currentUser = $_SESSION["userid"];
                                     cursor: pointer;
                                 }
                             </style>
-                            
+
                             <div id="subject">
                                 <p style='padding: 10px' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></h1>
                             </div>
-                            
+
                             <!-- Make the div visible, when someone clicks the button -->
                             <script>
                                 function showChat<?php echo $subject; ?>() {
                                     // get the messages - function getMessages(partner, subject, target, scroll = false, limit = 50)
                                     getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, 10);
-                                    
+
                                     // make it visible
                                     var element = document.getElementById("messages");
                                     element.style.display = "block";
@@ -217,7 +217,7 @@ $currentUser = $_SESSION["userid"];
 
 
                         <?php
-                    }   
+                    }
                 } else {
                     echo mysqli_error($conn);
                 }
@@ -231,7 +231,7 @@ $currentUser = $_SESSION["userid"];
     </div>
 
 
-      
+
     <!-- /contacts -->
 
 </div>
