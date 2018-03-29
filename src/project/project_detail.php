@@ -3,7 +3,7 @@
 <?php
 if(!isset($_GET['p'])) die('Invalid access');
 $projectID = intval($_GET['p']);
-$result = $conn->query("SELECT p.*, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
+$result = $conn->query("SELECT p.*, c.companyID, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
 $projectRow = $result->fetch_assoc();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -33,79 +33,156 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt->close();
         }
     }
-}
+    if(!empty($_POST['removeUser'])){
+        $x = intval($_POST['removeUser']);
+        $conn->query("DELETE FROM relationship_project_user WHERE userID = $x AND projectID = $projectID");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+        }
+    }
+    if(!empty($_POST['removeExtern'])){
+        $x = intval($_POST['removeExtern']);
+        $conn->query("DELETE FROM relationship_project_extern WHERE userID = $x AND projectID = $projectID");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
+        }
+    }
+    if(isset($_POST['saveGeneral'])){
+        $hours = floatval(test_input($_POST['project_hours']));
+        $hourlyPrice = floatval(test_input($_POST['project_hourlyPrice']));
+        $status = isset($_POST['project_productive']) ? 'checked' : '';
+        $field_1 = $field_2 = $field_3 = 'FALSE';
+        if(isset($_POST['project_field_1'])){ $field_1 = 'TRUE'; }
+        if(isset($_POST['project_field_2'])){ $field_2 = 'TRUE'; }
+        if(isset($_POST['project_field_3'])){ $field_3 = 'TRUE'; }
+
+         $conn->query("UPDATE projectData SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
+         if($conn->error){
+             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+         } else {
+             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+         }
+    }
+} //endif POST
 ?>
 
-<div class="page-header">
-    <h3><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?>
-        <div class="page-header-button-group">
-            <button type="button" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" ><i class="fa fa-floppy-o"></i></button>
+<form method="POST">
+    <div class="page-header">
+        <h3><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?>
+            <div class="page-header-button-group">
+                <button type="button" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveGeneral" ><i class="fa fa-floppy-o"></i></button>
+            </div>
+        </h3>
+    </div>
+
+    <h4>Allgemein</h4>
+
+    <div class="row form-group">
+        <div class="col-sm-2">Produktiv</div>
+        <div class="col-sm-10"><label><input type="checkbox" name="project_productive" <?php echo $projectRow['status']; ?> value="1" /> <i class="fa fa-tags"></i></label></div>
+    </div>
+    <div class="row form-group">
+        <div class="col-sm-2">Stunden</div>
+        <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hours" value="<?php echo $projectRow['hours']; ?>" /></div>
+        <div class="col-sm-2">Stundenrate</div>
+        <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hourlyPrice" value="<?php echo $projectRow['hourlyPrice']; ?>" /></div>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-sm-2">Optionale Projektfelder</div>
+        <?php
+        $resF = $conn->query("SELECT isActive, name FROM $companyExtraFieldsTable WHERE companyID = ".$projectRow['companyID']." ORDER BY id ASC"); echo $conn->error;
+        if($resF->num_rows > 0){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+                $checked = $projectRow['field_1'] == 'TRUE' ? 'checked': '';
+                echo '<div class="col-sm-3"><label><input type="checkbox" '.$checked.' name="project_field_1" /> '.$rowF['name'].'</label></div>';
+            }
+        }
+        if($resF->num_rows > 1){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+                $checked = $projectRow['field_2'] == 'TRUE' ? 'checked': '';
+                echo '<div class="col-sm-3"><label><input type="checkbox" '.$checked.' name="project_field_2" /> '.$rowF['name'].'</label></div>';
+            }
+        }
+        if($resF->num_rows > 2){
+            $rowF = $resF->fetch_assoc();
+            if($rowF['isActive'] == 'TRUE'){
+                $checked = $projectRow['field_3'] == 'TRUE' ? 'checked': '';
+                echo '<div class="col-sm-3"><label><input type="checkbox" '.$checked.' name="project_field_3" /> '.$rowF['name'].'</label></div>';
+            }
+        }
+        $resF->free();
+        ?>
+    </div>
+</form>
+
+<?php if($projectRow['publicKey']): ?>
+<form method="POST" action="../setup/keys" target="_blank">
+    <div class="row form-group">
+        <div class="col-sm-2">
+            Public Key
         </div>
-    </h3>
-</div>
-
-<h4>Allgemein</h4>
-
-<div class="row form-group">
-    <div class="col-sm-2">Produktiv</div>
-    <div class="col-sm-10"><label><input type="checkbox" name="project_productive" <?php if($projectRow['status']) echo 'checked'; ?> value="1" /> <i class="fa fa-tags"></i></label></div>
-</div>
-<div class="row form-group">
-    <div class="col-sm-2">Stunden</div>
-    <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hours" value="<?php echo $projectRow['hours']; ?>" /></div>
-    <div class="col-sm-2">Stundenrate</div>
-    <div class="col-sm-4"><label><input type="number" step="any" class="form-control" name="project_hourlyPrice" value="<?php echo $projectRow['hourlyPrice']; ?>" /></div>
-</div>
-
-<div class="row form-group">
-<div class="col-sm-2">Optionale Projektfelder</div>
-<div class="col-sm-8">-TBA-</div>
-<?php
-//$result = $conn->query("SELECT isActive, name FROM $companyExtraFieldsTable WHERE companyID = ? ORDER BY id ASC")
- ?>
-</div>
-
-<div class="row form-group">
-    <div class="col-sm-2">
-        Public Key
+        <div class="col-sm-6">
+            <?php echo $projectRow['publicKey']; ?>
+        </div>
+        <div class="col-sm-4">
+            <?php
+            $result = $conn->query("SELECT privateKey FROM security_projects WHERE userID = $userID AND projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
+            if($result && ($row = $result->fetch_assoc())):
+                $keypair = base64_decode($privateKey).base64_decode($projectRow['publicKey']);
+                //echo mb_strlen($privateKey).'--<br>';
+                //echo mb_strlen(base64_decode($projectRow['publicKey'])).'--<br>';
+                $cipher = base64_decode($row['privateKey']);
+                $nonce = mb_substr($cipher, 0, 24, '8bit');
+                $encrypted = mb_substr($cipher, 24, null, '8bit');
+                try{
+                    $decrypted = sodium_crypto_box_open($encrypted, $nonce, $keypair);
+                } catch(Exception $e){
+                    $decrypted = '';
+                }
+            ?>
+            <input type="hidden" name="personal" value="<?php echo $decrypted."\n".$projectRow['publicKey']; ?>" />
+            <button type="submit" class="btn btn-warning" name="">Schlüsselpaar Downloaden</button>
+            <?php endif; ?>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <?php echo $projectRow['publicKey']; ?>
-    </div>
-    <div class="col-sm-4">
-        <input type="hidden" name="personal" value="<?php echo $projectRow['symmetricKey']."\n".$projectRow['publicKey']; ?>" />
-        <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Schlüsselpaar Downloaden</button>
-    </div>
-</div>
-
+</form>
+<?php endif; ?>
 
 <br><hr>
 <h4>Benutzer <div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-member" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
 </div></h4>
-
-<div class="row">
-    <div class="col-xs-6 h5">Intern</div>
-    <div class="col-xs-6 h5">Extern</div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <?php
-        $result = $conn->query("SELECT userID FROM relationship_project_user WHERE projectID = $projectID"); echo $conn->error;
-        while($result && ($row = $result->fetch_assoc())){
-            echo '<button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
-            echo $userID_toName[$row['userID']] .'<br>';
-        }
-
-        $result = $conn->query("SELECT userID, firstname, lastname FROM relationship_project_extern INNER JOIN external_users e ON userID = e.id
-        INNER JOIN contactPersons c ON c.id = e.contactID WHERE projectID = $projectID"); echo $conn->error;
-        while($result && ($row = $result->fetch_assoc())){
-            echo '<button type="submit" name="removeExtern" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
-            echo $userID_toName[$row['userID']] .'<br>';
-        }
-        ?>
+<form method="POST">
+    <div class="row">
+        <div class="col-xs-6 h5">Intern</div>
+        <div class="col-xs-6 h5">Extern</div>
     </div>
-</div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php
+            $result = $conn->query("SELECT userID FROM relationship_project_user WHERE projectID = $projectID"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                echo '<button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
+                echo $userID_toName[$row['userID']] .'<br>';
+            }
+
+            $result = $conn->query("SELECT userID, firstname, lastname FROM relationship_project_extern INNER JOIN external_users e ON userID = e.id
+            INNER JOIN contactPersons c ON c.id = e.contactID WHERE projectID = $projectID"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                echo '<button type="submit" name="removeExtern" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
+                echo $userID_toName[$row['userID']] .'<br>';
+            }
+            ?>
+        </div>
+    </div>
+</form>
 
 <div class="modal fade add-member">
     <div class="modal-dialog modal-content modal-md">
