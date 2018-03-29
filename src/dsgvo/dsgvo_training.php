@@ -434,6 +434,7 @@ function formatState (state) {
 function onModalLoad(){
     tinymce.init({
         selector: '.tinymce',
+        plugins: "autolink",
         toolbar: 'undo redo | cut copy paste | styleselect | link | insertquestion insertquestion2 | emoticons',
         setup: function(editor){
             function insertQuestion(){

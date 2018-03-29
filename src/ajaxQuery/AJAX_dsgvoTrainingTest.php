@@ -152,6 +152,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
+                setLinkTargets();
                 var page = survey.currentPage;
                 if(!page) return;
                 var valueName = "training;" + page.name; // training id
@@ -164,4 +165,9 @@ while($row_question = $result_questions->fetch_assoc()){
             survey.onCurrentPageChanged.add(timerCallback);
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
+    </script>
+    <script>
+        function setLinkTargets(){
+            $("#surveyElement a").attr("target","_blank");
+        }
     </script>

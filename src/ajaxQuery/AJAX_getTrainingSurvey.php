@@ -237,6 +237,7 @@ if(!$hasQuestions){
                 timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
+                setLinkTargets();
                 var page = survey.currentPage;
                 if(!page) return;
                 var valueName = "training;" + page.name; // training id
@@ -250,7 +251,11 @@ if(!$hasQuestions){
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
     </script>
-
+    <script>
+        function setLinkTargets(){
+            $("#surveyElement a").attr("target","_blank");
+        }
+    </script>
 
 
 
