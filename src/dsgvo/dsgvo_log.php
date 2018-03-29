@@ -2,6 +2,7 @@
 include dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php";
 enableToDSGVO($userID);
+
 ?>
 
     <div class="page-header">
@@ -12,9 +13,9 @@ enableToDSGVO($userID);
         <thead>
             <tr>
                 <th>Uhrzeit</th>
-                <th>Beschreibung</th>
+                <th><?php echo mc_status(); ?>Beschreibung</th>
                 <th>Benutzer</th>
-                <th>Lange Beschreibung</th>
+                <th><?php echo mc_status(); ?>Lange Beschreibung</th>
             </tr>
         </thead>
         <tbody>
