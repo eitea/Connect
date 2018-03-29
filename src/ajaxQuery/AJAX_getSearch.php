@@ -4,6 +4,12 @@ $userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 
+/*
+
+This page is accessible when clicking 'search' in the navbar or using the following keybard combinations: F1, CTRL SHIFT SPACE, CTRL SHIFT F
+
+*/
+
 $result = $conn->query("SELECT isCoreAdmin FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
 $enableToAdvancedSearch = !($userID != 1 && (!$result || $result->num_rows <= 0));
 
@@ -177,7 +183,7 @@ $routesGER[] = array("name" => "Checkliste", "url" => "../time/check", "tags" =>
 $routesENG[] = array("name" => "Static Projects", "url" => "../project/view");
 $routesGER[] = array("name" => "Statische Projekte", "url" => "../project/view");
 $routesENG[] = array("name" => "Project Logs", "url" => "../project/log");
-$routesGER[] = array("name" => "Buchungsprotokoll", "url" => "../project/log", "tags" => array("Projektbuchungen"));
+$routesGER[] = array("name" => "Buchungsprotokoll", "url" => "../project/log", "tags" => array("Projektbuchungen","Projekt Logs"));
 $routesENG[] = array("name" => "Tasks", "url" => "../dynamic-projects/view", "tags" => array("Dynamic Projects", "Todos"));
 $routesGER[] = array("name" => "Tasks", "url" => "../dynamic-projects/view", "tags" => array("Dynamische Projekte", "Todos"));
 $routesENG[] = array("name" => "Project Options", "url" => "../project/options");
@@ -208,9 +214,11 @@ foreach ($available_companies as $company) {
     $routesENG[] = array("name" => "Agreements ($name)", "url" => "../dsgvo/documents?n=$companyID", "tags" => array("DSGVO Documents"));
     $routesGER[] = array("name" => "Vereinbarungen ($name)", "url" => "../dsgvo/documents?n=$companyID", "tags" => array("DSGVO Vereinbarungen"));
     $routesENG[] = array("name" => "Procedure Directory ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Procedures"));
-    $routesGER[] = array("name" => "Verfahrensverzeichnis ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Verfahren"));
+    $routesGER[] = array("name" => "Verfahrensverzeichnis ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Verfahren", "VV"));
     $routesENG[] = array("name" => "Email Templates ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails"));
     $routesGER[] = array("name" => "Email Vorlagen ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails", "DSGVO Vorlagen"));
+    $routesENG[] = array("name" => "Data Matrix ($name)", "url" => "../system/data-matrix?n=$companyID", "tags" => array("DSGVO Data Matrix", "DSGVO Templates" ));
+    $routesGER[] = array("name" => "Datenmatrix ($name)", "url" => "../system/data-matrix?n=$companyID", "tags" => array("DSGVO Datenmatrix", "DSGVO Vorlagen"));
     $routesENG[] = array("name" => "Procedure Directory - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Procedure Templates"));
     $routesGER[] = array("name" => "Verfahrensverzeichnis - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Verfahrensverzeichnis Vorlagen"));
     $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?n=$companyID", "tags" => array("DSGVO Trainings"));
@@ -223,9 +231,11 @@ foreach ($available_companies as $company) {
     $routesGER[] = array("name" => "Buchungsjournal ($name)", "url" => "../finance/journal?n=$companyID", "tags" => array("Finanzen", "Buchungen"));
     $routesENG[] = array("name" => "Articles ($name)", "url" => "../erp/articles?cmp=$companyID", "tags" => array("ERP Articles"));
     $routesGER[] = array("name" => "Artikel ($name)", "url" => "../erp/articles?cmp=$companyID", "tags" => array("ERP Artikel"));
+    $routesENG[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?n=$companyID", "tags" => array("Training Logs", "Procedure Directory Logs"));
+    $routesGER[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?n=$companyID", "tags" => array("Schulung Logs", "Verfahrensverzeichnis Logs"));
 }
 
-if ($advanced && $enableToAdvancedSearch) { // search itself should be done in the database itself in future versions
+if ($advanced && $enableToAdvancedSearch) { // todo: search itself should be done in the database itself in future versions
     $users = array();
     $teams = array();
     $clients = array();
