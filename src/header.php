@@ -1017,10 +1017,17 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
               <ul class="nav navbar-nav">
                 <?php
                 if(count($available_companies) == 2){
-                  echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                  echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
-                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
+                  $isActivePanel = true;
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";        
+                  echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";                  
+                  echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1038,7 +1045,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
                     echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
-                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Log</a></li>';
+                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
                   }
                 }
