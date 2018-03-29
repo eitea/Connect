@@ -275,12 +275,10 @@ $result = $conn->query("SELECT time, status, userID, firstname, lastname FROM lo
     $conn->error;
   }
 
-$ascii = 41;
-if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) $ascii = 167;
-
-$result = $conn->query("SELECT begin, name FROM holidays WHERE ASCII(SUBSTRING(name, LENGTH(name)-1,1)) = $ascii and begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."'"); echo $conn->error;
+$start = getCurrentTimestamp();
+$result = $conn->query("SELECT begin, name, ASCII(SUBSTRING(name, LENGTH(name)-1,1)) AS asciiVal FROM holidays WHERE begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."'"); echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
-    $dates[] = "{ title: '".$row['name']."', start: '".substr($row['begin'], 0, 10)."', textColor: 'white', backgroundColor: '#999'}";
+    if($row['asciiVal'] == 167 || $row['asciiVal'] == 41) $dates[] = "{ title: '".$row['name']."', start: '".substr($row['begin'], 0, 10)."', textColor: 'white', backgroundColor: '#999'}";
 }
   ?>
 
