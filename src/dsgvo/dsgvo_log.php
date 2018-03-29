@@ -3,12 +3,23 @@ include dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php";
 enableToDSGVO($userID);
 
-$current_filter = "all";
-if(isset($_GET["filter"])){
-    $current_filter = test_input($_GET["filter"]);
+$current_filter_scope = "all";
+$current_filter_short_description = "all";
+if(isset($_GET["filter1"])){
+    $current_filter_scope = test_input($_GET["filter1"]);
 }
+if(isset($_GET["filter2"])){
+    $current_filter_short_description = test_input($_GET["filter2"]);
+}
+$total_number_of_logs = $number_of_shown_logs = 0;
+$result = $conn->query("SELECT count(id) AS number_of_logs FROM dsgvo_vv_logs");
+if($result){
+    $row = $result->fetch_assoc();
+    $total_number_of_logs = $row["number_of_logs"];
+}
+showError($conn->error);
 
-$result = $conn->query("SELECT dsgvo_vv_logs.*,UserData.firstname,UserData.lastname, TIMEDIFF(dsgvo_vv_logs.log_time,CURRENT_TIMESTAMP) AS timespan FROM dsgvo_vv_logs, UserData WHERE UserData.id = dsgvo_vv_logs.user_id ORDER BY log_time DESC,id DESC");
+$result = $conn->query("SELECT dsgvo_vv_logs.*,UserData.firstname,UserData.lastname, TIMEDIFF(dsgvo_vv_logs.log_time,CURRENT_TIMESTAMP) AS timespan FROM dsgvo_vv_logs, UserData WHERE UserData.id = dsgvo_vv_logs.user_id ORDER BY id DESC");
 showError($conn->error);
 
 ?>
@@ -18,10 +29,18 @@ showError($conn->error);
             <div class="col-md-6 pull-right">
                 <form>
                     <div class="input-group">
-                        <select class="form-control" name="filter">
-                            <option value="all" <?php echo $current_filter == "all"?"selected":"" ?> ><?php echo $lang["DISPLAY_ALL"] ?></option>
-                            <option value="VV" <?php echo $current_filter == "VV"?"selected":"" ?> ><?php echo $lang["PROCEDURE_DIRECTORY"] ?></option><!-- todo: find a more dynamic method -->
-                            <option value="TRAINING" <?php echo $current_filter == "TRAINING"?"selected":"" ?> >Schulung</option>
+                        <select class="form-control" name="filter1" style="width:50%">
+                            <option value="all" <?php echo $current_filter_scope == "all"?"selected":"" ?> >Alle Bereiche</option>
+                            <option value="VV" <?php echo $current_filter_scope == "VV"?"selected":"" ?> ><?php echo $lang["PROCEDURE_DIRECTORY"] ?></option><!-- todo: find a more dynamic method -->
+                            <option value="TRAINING" <?php echo $current_filter_scope == "TRAINING"?"selected":"" ?> >Schulung</option>
+                        </select>
+                        <select class="form-control" name="filter2" style="width:50%">
+                            <option value="all" <?php echo $current_filter_short_description == "all"?"selected":"" ?> >Alle Operationen</option>
+                            <option value="INSERT" <?php echo $current_filter_short_description == "INSERT"?"selected":"" ?> >INSERT</option>
+                            <option value="UPDATE" <?php echo $current_filter_short_description == "UPDATE"?"selected":"" ?> >UPDATE</option>
+                            <option value="DELETE" <?php echo $current_filter_short_description == "DELETE"?"selected":"" ?> >DELETE</option>
+                            <option value="CLONE" <?php echo $current_filter_short_description == "CLONE"?"selected":"" ?> >CLONE</option>
+                            <option value="IMPORT" <?php echo $current_filter_short_description == "IMPORT"?"selected":"" ?> >IMPORT</option>
                         </select>
                         <span class="input-group-btn">
                             <button type="submit" class="btn btn-warning">
@@ -66,9 +85,13 @@ showError($conn->error);
         }
 
         // I can't query scope as it is encrypted with different salt
-        if($current_filter != "all" && $scope != $current_filter){
+        if($current_filter_scope != "all" && $scope != $current_filter_scope){
             continue;
         }
+        if($current_filter_short_description != "all" && $short_description != $current_filter_short_description){
+            continue;
+        }
+        $number_of_shown_logs++;
 
         $id = $row["id"];
         $user_id = $row["user_id"];
@@ -113,6 +136,11 @@ showError($conn->error);
         echo "<td>$long_description</td>";
         echo "</tr>";
     }
+
+    if($number_of_shown_logs != $total_number_of_logs){
+        showInfo("Zeige $number_of_shown_logs Einträge von $total_number_of_logs Logeinträgen");
+    }
+
     ?>
                 </tbody>
             </table>
