@@ -181,18 +181,25 @@ if($result_Sum && $result_Sum->num_rows > 0){
 <?php  //PROCESSING CHART DATA:
 $mean_mon = $mean_tue = $mean_wed = $mean_thu = $mean_fri = $mean_sat = $mean_sun = 0;
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 0 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_mon = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows); }
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 1 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_tue = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 2 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_wed = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 3 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_thu = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 4 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_fri = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60 ) AS times FROM $logTable WHERE WEEKDAY(time) = 5 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_sat = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 $result = $conn->query("SELECT (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) AS times FROM $logTable WHERE WEEKDAY(time) = 6 AND userID = $userID AND timeEnd != '0000-00-00 00:00:00'");
+showError($conn->error);
 if($result && $result->num_rows > 0){$mean_sun = sprintf('%.2f',array_sum(array_column($result->fetch_all(),0))/$result->num_rows);}
 
 $today = getCurrentTimestamp();

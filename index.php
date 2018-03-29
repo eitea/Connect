@@ -20,6 +20,7 @@ $routes = array(
 
   'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          'system/restic' => 'core/system/resticBackup.php',
   'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/options_archive.php',       'system/security' => 'core/system/securitySettings.php',
+  'system/data-matrix' => 'core/system/dsgvo_data_matrix.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
@@ -43,7 +44,7 @@ $routes = array(
   'finance/account' => 'finance/accounting.php',                    'finance/plan' => 'finance/accountPlan.php',                 'finance/journal' => 'finance/accountJournal.php',
 
   'dsgvo/documents' => 'dsgvo/dsgvo_view.php',                      'dsgvo/access' => 'dsgvo/dsgvo_access.php',                  'dsgvo/templates' => 'dsgvo/dsgvo_mail.php',
-  'dsgvo/edit' => 'dsgvo/dsgvo_edit.php',                           'dsgvo/vv' => 'dsgvo/dsgvo_vv.php',                          'dsgvo/vtemplates' =>'dsgvo/dsgvo_vv_templates.php',
+  'dsgvo/edit' => 'dsgvo/dsgvo_edit.php',                           'dsgvo/vv' => 'dsgvo/dsgvo_vv.php',                          'dsgvo/log' => 'dsgvo/dsgvo_log.php',
   'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',  'dsgvo/training' => 'dsgvo/dsgvo_training.php',
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',

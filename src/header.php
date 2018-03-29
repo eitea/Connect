@@ -14,6 +14,30 @@ require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
 
+function showErrorToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showError('$message')})</script>";
+}
+
+function showWarningToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+
+function showInfoToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
+}
+
+function showSuccessToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}
+
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -181,13 +205,12 @@ if($userHasUnansweredSurveys){
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
-        $validation_output = '<div class="alert alert-info fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a>';
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
-            $validation_output .= $lang['INFO_CHECKIN'] . '</div>';
+            $validation_output = showInfoToString($lang['INFO_CHECKIN']);
         } elseif (isset($_POST['stampOut'])) {
             $error_output = checkOut($userID, intval($_POST['stampOut']));
-            $validation_output .= $lang['INFO_CHECKOUT'] . '</div>';
+            $validation_output = showInfoToString($lang['INFO_CHECKOUT']);
         }
     }
     if (isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2) {
@@ -202,15 +225,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $private_encrypted = simple_encryption($privateKey, $password);
             $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
             if(!$conn->error){
-                $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a><strong>Success! </strong>Password successfully changed. '.$userPasswordHash.'</div>';
+                $validation_output = showSuccessToString('Password successfully changed. '.$userPasswordHash);
             } else {
-                $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+                $validation_output = showErrorToString($conn->error);
             }
         } else {
-            $validation_output  = '<div class="alert alert-danger fade in"><a href="" class="close" data-dismiss="alert" >&times;</a>'.$output.'</div>';
+            $validation_output  = showErrorToString($output);
         }
     } elseif(isset($_POST['savePAS'])) {
-        $validation_output = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_MISSING_FIELDS'].'</div>';
+        $validation_output = showErrorToString($lang['ERROR_MISSING_FIELDS']);
     }
     if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -218,12 +241,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql="UPDATE UserData SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'GER';
-      $validation_output = mysqli_error($conn);
+      $validation_output = showErrorToString($conn->error);
     } elseif(isset($_POST['ENGLISH'])){
       $sql="UPDATE UserData SET preferredLang='ENG' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'ENG';
-      $validation_output = mysqli_error($conn);
+      $validation_output = showErrorToString($conn->error);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
@@ -302,7 +325,10 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
-    <script src="plugins/homeMenu/js/homeMenu.min.js"></script>
+    <link href="plugins/animate.css/animate.css" rel="stylesheet" />
+    <script src="plugins/lodash/lodash.js"></script>    
+
+    <script src="plugins/homeMenu/js/homeMenu.js"></script>
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
@@ -315,17 +341,17 @@ if ($_SESSION['color'] == 'light') {
     function showWarning($message){
         if(!$message || strlen($message) == 0) return;
         $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+        echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
     }
     function showInfo($message){
         if(!$message || strlen($message) == 0) return;
         $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+        echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
     }
     function showSuccess($message){
         if(!$message || strlen($message) == 0) return;
         $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showError('$message')})</script>";
+        echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
     }
   ?>
 </head>
@@ -396,7 +422,7 @@ if ($_SESSION['color'] == 'light') {
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
                 <a class="btn navbar-btn navbar-link" id="header-gears" data-toggle="modal" data-target="#passwordModal"><i class="fa fa-gears"></i></a>
-                <a class="btn navbar-btn navbar-link openSearchModal"><i class="fa fa-search"></i></a>
+                <a class="btn navbar-btn navbar-link openSearchModal" title="F1 / CTRL-SHIFT-F"><i class="fa fa-search"></i></a>
                 <a class="btn navbar-btn navbar-link" href="../user/logout" title="Logout"><i class="fa fa-sign-out"></i></a>
             </div>
         </div>
@@ -412,7 +438,7 @@ if ($_SESSION['color'] == 'light') {
               the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
               <br><br>
               LIZENZHINWEIS<br>
-              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic, rtf.js
+              Composer: aws, cssToInlineStyles, csvParser, dompdf, mysqldump, phpmailer, hackzilla, http-message; Other: bootstrap, charts.js, dataTables, datetimepicker, font-awesome, fpdf, fullCalendar, imap-client, jquery, jsCookie, maskEdit, select2, tinyMCE, restic, rtf.js, lodash, animate.css
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['BACK'] ?></button>
@@ -426,21 +452,36 @@ if ($_SESSION['color'] == 'light') {
             $(".openSearchModal").click(function(){
                 openSearchModal()
             })
+            $(document).on("keydown",function(event){
+               if (event.ctrlKey && event.shiftKey && event.keyCode == 70 /* f */) {
+                   openSearchModal()
+               }
+               if (event.ctrlKey && event.shiftKey && event.keyCode == 32 /* space */) {
+                   openSearchModal()
+               }
+               if (event.keyCode == 112 /* f1 */) {
+                   event.preventDefault();
+                   openSearchModal()
+               }
+            })
         })
-        function openSearchModal(){
-        $.ajax({
+        const openSearchModal = _.throttle(function() {
+            $.ajax({
                 url:'ajaxQuery/AJAX_getSearch.php',
-                data:{modal:true},
+                data:{ modal:true },
                 type: 'get',
                 success : function(resp){
                     $("#searchModal").html(resp);
                 },
                 error : function(resp){console.error(resp)},
                 complete: function(resp){
+                    $("#searchModal .modal").modal("hide"); // hide old modal if pressed multiple times
+                    $(".modal-backdrop.fade.in").hide();
                     $("#searchModal .modal").modal("show");
+                    $("#searchModal input[name='search']").focus();
                 }
-        });
-    }
+            });
+        },1000, {leading:true,trailing:false})
   </script>
 
   <!-- modal -->
@@ -765,6 +806,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
                             <?php endif;?>
                             <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
+                            <li><a <?php if ($this_page == 'dsgvo_data_matrix.php') {echo $setActiveLink;}?> href="../system/data-matrix"><span> DSGVO <?php echo $lang['DATA_MATRIX']; ?></span></a></li>
                         </ul>
                     </div>
                 </li>
@@ -775,7 +817,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php' || $this_page == 'dsgvo_data_matrix.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -1006,23 +1048,35 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
               <ul class="nav navbar-nav">
                 <?php
                 if(count($available_companies) == 2){
-                  echo '<li><a href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  echo '<li><a href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                  echo '<li><a href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
-                  echo '<li><a href="../dsgvo/vtemplates?n='.$available_companies[1].'" >Ver.V. Templates</a></li>';
-                  echo '<li><a href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
+                  $isActivePanel = true;
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";        
+                  echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";                  
+                  echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                  echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
+                    $isActivePanel = isset($_GET['n']) && ($row['id'] ==  $_GET['n']); //only highlight the current page in the tab for the current company
                     echo '<li>';
                     echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
                     echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
-                    echo '<li><a href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                    echo '<li><a href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                    echo '<li><a href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
-                    echo '<li><a href="../dsgvo/vtemplates?n='.$row['id'].'" >Ver.V. Templates</a></li>';
-                    echo '<li><a href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";                
+                    echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";                  
+                    echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";   
+                    echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
+                    echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
                   }
                 }
@@ -1032,7 +1086,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php" || $this_page == "dsgvo_log.php") {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
@@ -1082,7 +1136,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
           if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
-              echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.</div>';
+              showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
               if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
                   include 'footer.php';
                   die();
@@ -1091,6 +1145,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       }
       $user_agent = $_SERVER["HTTP_USER_AGENT"];
       if (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7') || strpos($user_agent, 'Edge')) {
-          echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser. </div>';
+          showError('Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser.');
       }
       ?>

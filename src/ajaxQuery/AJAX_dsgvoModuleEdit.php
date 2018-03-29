@@ -3,8 +3,8 @@ if (!isset($_REQUEST["moduleID"])){
     echo "error";
     die();
 }
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 
 $moduleID = $_REQUEST["moduleID"];
 $row = $conn->query("SELECT * FROM dsgvo_training_modules WHERE id = $moduleID")->fetch_assoc();

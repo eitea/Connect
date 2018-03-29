@@ -77,6 +77,9 @@ $lang_ger['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
 $lang_eng['ADVANCED_OPTIONS'] = 'Advanced Options';
 $lang_ger['ADVANCED_OPTIONS'] = 'Erweiterte Optionen';
 
+$lang_eng['ADVANCED_SEARCH'] = 'Advanced Search';
+$lang_ger['ADVANCED_SEARCH'] = 'Erweiterte Suche';
+
 $lang_eng['AFFECTED_MONTH'] = 'Affected Month';
 $lang_ger['AFFECTED_MONTH'] = 'Betroffener Monat';
 
@@ -224,6 +227,12 @@ $lang_ger['CLIENT'] = 'Kunde';
 $lang_eng['CLIENTS'] = 'Clients';
 $lang_ger['CLIENTS'] = 'Kunden';
 
+$lang_eng['CLIENT_LIST'] = 'Client List';
+$lang_ger['CLIENT_LIST'] = 'Kundenliste';
+
+$lang_eng['CLOSE'] = 'Close';
+$lang_ger['CLOSE'] = 'Schließen';
+
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
 
@@ -304,6 +313,9 @@ $lang_ger['DATATABLES_LANG_OPTIONS'] = '
         "next":       "Nächste",
         "previous":   "Vorherige"
     }';
+
+$lang_eng['DATA_MATRIX'] = 'Data Matrix';
+$lang_ger['DATA_MATRIX'] = 'Datenmatrix';
 
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
@@ -454,6 +466,9 @@ $lang_ger['ENCRYPTION_LOG'] = 'Ereignisse anzeigen';
 
 $lang_eng['END'] = 'End';
 $lang_ger['END'] = 'Ende';
+
+$lang_eng['ENGLISH'] = 'English';
+$lang_ger['ENGLISH'] = 'Englisch';
 
 $lang_eng['ENTRANCE_DATE'] = 'Date of Entry';
 $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
@@ -791,6 +806,9 @@ $lang_ger['LUNCHBREAK_REPAIR'] = 'Pausen neu berechnen';
 $lang_eng['MAKE_REQUEST'] = 'File Application';
 $lang_ger['MAKE_REQUEST'] = 'Antrag Stellen';
 
+$lang_eng['MANAGE_TEMPLATES'] = 'Manage Templates';
+$lang_ger['MANAGE_TEMPLATES'] = 'Vorlagen verwalten';
+
 $lang_eng['MANDATORY_SETTINGS'] = 'Mandatory Settings';
 $lang_ger['MANDATORY_SETTINGS'] = 'Pflichtfelder';
 
@@ -935,6 +953,9 @@ $lang_ger['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
 
 $lang_eng['OK_ADD'] = 'Entry was added.';
 $lang_ger['OK_ADD'] = 'Eintrag wurde hinzugefügt.';
+
+$lang_eng['OK_IMPORT'] = 'Entry was imported.';
+$lang_ger['OK_IMPORT'] = 'Eintrag wurde importiert.';
 
 $lang_eng['OPTIONS'] = 'Options';
 $lang_ger['OPTIONS'] = 'Optionen';
@@ -1398,6 +1419,9 @@ $lang_ger['VIEW_USER'] = 'Benutzer Ansehen';
 $lang_eng['VOCATIONAL_SCHOOL'] = 'Training';
 $lang_ger['VOCATIONAL_SCHOOL'] = 'Weiterbildung';
 
+$lang_eng['VV_TEMPLATE_TYPES'] = array('base' => 'Base', 'app' => 'Procedure');
+$lang_ger['VV_TEMPLATE_TYPES'] = array('base' => 'Stammblatt', 'app' => 'Verfahren');
+
 $lang_eng['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Blank fields will not overwrite previous data.';
 $lang_ger['WARNING_BLANK_FIELDS_WONT_OVERWRITE'] = 'Leere Felder werden nicht übernommen';
 
@@ -1458,6 +1482,9 @@ $lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mit
 
 $lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.', '' => '');
 $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau', '' => '');
+
+$lang_eng['GERMAN'] = 'German';
+$lang_ger['GERMAN'] = 'Deutsch';
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');

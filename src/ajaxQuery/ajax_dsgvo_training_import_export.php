@@ -3,12 +3,10 @@ if (!isset($_REQUEST["operation"])) {
     echo "error (no operation)";
     die();
 }
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 $operation = $_REQUEST["operation"];
 if ($operation == "export") {
-    require dirname(__DIR__) . "/connection.php";
-    require dirname(__DIR__) . "/language.php";
     $output = array();
     $extra = "";
     if(isset($_REQUEST["module"])){
@@ -74,6 +72,11 @@ $("#copyToClipboardBtn").click(function(){
     <div class="modal-dialog modal-content modal-md">
     <div class="modal-header">Daten importieren</div>
     <div class="modal-body">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="replace_old" value="TRUE"> Alte Sets/Module/Fragen überschreiben
+            </label>
+        </div>
         <textarea name="jsonImport" id="importArea" class="form-control" rows="10" placeholder="JSON data here" style="max-width:100%;min-width:100%;height:60vh;"></textarea>
         <br><div id="jsonError"></div>
     </div>

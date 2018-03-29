@@ -33,7 +33,13 @@ function showError(message){
         title: '',
         message: message
     },{
-        type: 'danger'
+        type: 'danger',
+        delay: 30000,
+        mouse_over: "pause",
+        animate: {
+            enter: 'animated bounceInRight',
+            exit: 'animated bounceOutUp'
+        },
     });
 }
 function showWarning(message){
@@ -43,7 +49,13 @@ function showWarning(message){
         title: '',
         message: message
     },{
-        type: 'warning'
+        type: 'warning',
+        delay: 30000,
+        mouse_over: "pause",
+        animate: {
+            enter: 'animated bounceInRight',
+            exit: 'animated bounceOutUp'
+        },
     });
 }
 function showInfo(message){
@@ -53,7 +65,13 @@ function showInfo(message){
         title: '',
         message: message
     },{
-        type: 'info'
+        type: 'info',
+        delay: 30000,
+        mouse_over: "pause",
+        animate: {
+            enter: 'animated bounceInRight',
+            exit: 'animated bounceOutUp'
+        },
     });
 }
 function showSuccess(message){
@@ -63,6 +81,12 @@ function showSuccess(message){
         title: '',
         message: message
     },{
-        type: 'success'
+        type: 'success',
+        delay: 30000,
+        mouse_over: "pause",
+        animate: {
+            enter: 'animated bounceInRight',
+            exit: 'animated bounceOutUp'
+        },
     });
 }

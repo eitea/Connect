@@ -3,8 +3,8 @@ if (!isset($_REQUEST["questionID"])){
     echo "error";
     die();
 }
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 
 $questionID = $_REQUEST["questionID"];
 $row = $conn->query("SELECT * FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc();

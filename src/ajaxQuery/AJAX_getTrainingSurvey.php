@@ -1,8 +1,8 @@
 <?php
 session_start();
 $userID = $_SESSION['userid'] or die("no user signed in");
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 $onLogin = false;
 $doneSurveys = false;
 $hasQuestions = false; // some questions are not valid (invalid syntax)
@@ -237,6 +237,7 @@ if(!$hasQuestions){
                 timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
+                setLinkTargets();
                 var page = survey.currentPage;
                 if(!page) return;
                 var valueName = "training;" + page.name; // training id
@@ -250,7 +251,11 @@ if(!$hasQuestions){
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
     </script>
-
+    <script>
+        function setLinkTargets(){
+            $("#surveyElement a").attr("target","_blank");
+        }
+    </script>
 
 
 
