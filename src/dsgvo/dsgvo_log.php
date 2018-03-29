@@ -36,11 +36,11 @@ showError($conn->error);
                         </select>
                         <select class="form-control" name="filter2" style="width:50%">
                             <option value="all" <?php echo $current_filter_short_description == "all"?"selected":"" ?> >Alle Operationen</option>
-                            <option value="INSERT" <?php echo $current_filter_short_description == "INSERT"?"selected":"" ?> >INSERT</option>
-                            <option value="UPDATE" <?php echo $current_filter_short_description == "UPDATE"?"selected":"" ?> >UPDATE</option>
-                            <option value="DELETE" <?php echo $current_filter_short_description == "DELETE"?"selected":"" ?> >DELETE</option>
-                            <option value="CLONE" <?php echo $current_filter_short_description == "CLONE"?"selected":"" ?> >CLONE</option>
-                            <option value="IMPORT" <?php echo $current_filter_short_description == "IMPORT"?"selected":"" ?> >IMPORT</option>
+                            <option value="INSERT" <?php echo $current_filter_short_description == "INSERT"?"selected":"" ?> >Einfügen</option>
+                            <option value="UPDATE" <?php echo $current_filter_short_description == "UPDATE"?"selected":"" ?> >Ändern</option>
+                            <option value="DELETE" <?php echo $current_filter_short_description == "DELETE"?"selected":"" ?> >Löschen</option>
+                            <option value="CLONE" <?php echo $current_filter_short_description == "CLONE"?"selected":"" ?> >Duplizieren</option>
+                            <option value="IMPORT" <?php echo $current_filter_short_description == "IMPORT"?"selected":"" ?> >Importieren</option>
                         </select>
                         <span class="input-group-btn">
                             <button type="submit" class="btn btn-warning">
