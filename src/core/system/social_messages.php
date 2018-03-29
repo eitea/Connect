@@ -4,12 +4,14 @@ require dirname(dirname(__DIR__)) . '/header.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
+// the currently logged in user
+$currentUser = $_SESSION["userid"];
 ?>
 
 
 <!-- TODO: Add ability to send pictures -->
 <!-- TODO: Badge -->
-<!-- TODO: Multiple Receivers -->
 
 <!-- AJAX scripts -->
 <script>
@@ -54,7 +56,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sendButton'])) {
         //Check the $_POST values
-        if (!isset($_POST['to']) || $_POST['to'] == "") {
+        if (!isset($_POST['to_userid']) || $_POST['to_userid'] == "") {
             showError($lang['RECEIVER_NOT_SPECIFIED']);
         } else if (!isset($_POST['subject']) || $_POST['subject'] == "") {
             showError($lang['SUBJECT_NOT_SPECIFIED']);
@@ -62,31 +64,16 @@ if (session_status() == PHP_SESSION_NONE) {
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
             // no errors
-            $to = test_input($_POST['to']);  //TODO: replace this with userID and clean with intval()       
+            $to_userid = intval($_POST['to_userid']);  //TODO: replace this with userID and clean with intval()       
             $subject = test_input($_POST['subject']);
             $message = test_input($_POST['message']);
-            $partnerID = -1;
 
-
-            //TODO: remove
-            // select the partnerid from the database
-            $sql = "SELECT id FROM UserData WHERE concat(firstname, ' ', lastname) = '{$to}' GROUP BY id LIMIT 1";
-            $result = $conn->query($sql);
-            if ($result && $result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $partnerID = $row['id'];
-                }
-            }
-
-            // the partner was not found in the database or its the same user
-            if ($partnerID == -1) {
-                showInfo("Receiver not found!");
-            } else if ($partnerID == $userID) {
-                showInfo("You cannot send messages to yourself!");
+            if($to_userid == $currentUser){
+                showError($lang['INVALID_USER']);
             } else {
                 // messages [userID, partnerID, subject, message, picture, sent, seen]
-                $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partnerID, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
-               showInfo("Message sent!");
+                $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $to_userid, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
+                showInfo($lang['MESSAGE_SENT']);
             }
         }
     }
@@ -100,20 +87,56 @@ if (session_status() == PHP_SESSION_NONE) {
 
                     <!-- modal header -->
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="postLabel"><?php echo $lang['POST']; ?></h4>
                     </div>
                     <br>
 
                     <!-- modal body -->
                     <div class="modal-body">
-                        <label for="to"> <?php echo $lang['POST_TO']; ?> </label>
-                        <input required type="text" name="to" class="form-control">
 
+                        <label for="to"> <?php echo $lang['POST_TO']; ?> </label>
+                        <div class="dropdown" id="to">
+                            <input type="button" id="username" class="dropdown-toggle form-control" name="to_username" data-toggle="dropdown" value='<?php echo $lang["SELECT_USER"] ?>'></button>
+                            <input type="hidden" id="userid" class="dropdown-toggle form-control" name="to_userid" data-toggle="dropdown" value='<?php echo $lang["SELECT_USER"] ?>'></button>
+                            
+                            <ul class="dropdown-menu">                                
+                                <?php
+    	                            $sql = "SELECT id, concat(firstname, ' ', lastname) AS username FROM UserData where id != $currentUser GROUP BY id";
+                                    $result = $conn->query($sql);
+                                    if ($result && $result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
+                                            $userID = $row['id'];
+                                            $username = $row['username'];
+                                            ?>
+
+                                            <li onclick='selectUser(<?php echo $userID ?>, "<?php echo $username?>")'><a href="#"><?php echo $username ?></a></li>
+
+                                            <?php
+                                        }
+                                    }
+                                ?>
+                            </ul>
+
+                            <script>
+                                function selectUser(id, name){
+                                    if(id == "" && name == "")
+                                        return;
+
+                                    var formUsernameElement = document.getElementById("username");
+                                    var formIdElement = document.getElementById("userid");
+
+                                    formUsernameElement.value = name;
+                                    formIdElement.value = id;
+                                }
+                            </script>
+                        </div>
+
+                        <br>
 
                         <label for="subject"> <?php echo $lang['SUBJECT']; ?> </label>
                         <input required type="text" name="subject" class="form-control">
+                        <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
                         <textarea required name="message" class="form-control"></textarea>
@@ -147,10 +170,9 @@ if (session_status() == PHP_SESSION_NONE) {
     <div class="row">
         <div class="col-xs-4">
             <?php
-                // the currently logged in user
-                $currentUser = $_SESSION["userid"];
+                //note: currentUser is defined at the beginning of the file
 
-                //select all 
+                //select all subjects
                 $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
                 $result = $conn->query($sql);
                 if ($result && $result->num_rows > 0) {
@@ -168,11 +190,11 @@ if (session_status() == PHP_SESSION_NONE) {
                             <style>
                                 #subject {
                                     padding: 5px;
+                                    border-radius: 5px;
                                 }
 
                                 #subject:hover {
                                     background-color: #F5F5F5;
-                                    border-radius: 5px;
                                     cursor: pointer;
                                 }
                             </style>

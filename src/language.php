@@ -846,6 +846,9 @@ $lang_ger['MESSAGES'] = 'Nachrichten';
 $lang_eng['RECEIVER'] = 'Receiver';
 $lang_ger['RECEIVER'] = 'Empfänger';
 
+$lang_eng['SELECT_USER'] = 'Select a user';
+$lang_ger['SELECT_USER'] = 'Wählen sie einen Benutzer';
+
 $lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
 $lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
 
@@ -854,6 +857,12 @@ $lang_ger['SUBJECT_NOT_SPECIFIED'] = 'Es wurde kein Betreff angegeben!';
 
 $lang_eng['MESSAGE_NOT_SPECIFIED'] = 'There is no message specified!';
 $lang_ger['MESSAGE_NOT_SPECIFIED'] = 'Es wurde keine Nachricht eingegeben!';
+
+$lang_eng['INVALID_USER'] = 'Invalid User!';
+$lang_ger['INVALID_USER'] = 'Ungültiger Benutzer!';
+
+$lang_eng['MESSAGE_SENT'] = 'Message has been sent!';
+$lang_ger['MESSAGE_SENT'] = 'Nachricht wurde verschickt!';
 
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
