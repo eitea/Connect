@@ -15,6 +15,7 @@ enableToDSGVO($userID);
                 <th>Uhrzeit</th>
                 <th><?php echo mc_status(); ?>Beschreibung</th>
                 <th>Benutzer</th>
+                <th><?php echo mc_status(); ?>Bereich</th>
                 <th><?php echo mc_status(); ?>Lange Beschreibung</th>
             </tr>
         </thead>
@@ -27,10 +28,14 @@ while ($result && ($row = $result->fetch_assoc())) {
     $user_id = $row["user_id"];
     $user_name = $row["firstname"]." ".$row["lastname"];
     try{
-        $short_description = $row["short_description"];
+        $short_description = $row["short_description"]; //in case an error gets thrown (eg when not encrypted)
+        $long_description = $row["long_description"];
+        $scope = $row["scope"];
         $short_description = secure_data('DSGVO', $row["short_description"], 'decrypt', $userID, $privateKey, $encryptionError);
         showError($encryptionError);
         $long_description = secure_data('DSGVO', $row["long_description"], 'decrypt', $userID, $privateKey, $encryptionError);
+        showError($encryptionError);
+        $scope = secure_data('DSGVO', $row["scope"], 'decrypt', $userID, $privateKey, $encryptionError);        
         showError($encryptionError);
     }catch(Exception $e){
         showError($e->getMessage());
@@ -39,7 +44,7 @@ while ($result && ($row = $result->fetch_assoc())) {
     $timediff = $row["timespan"];
     $tr_classes = "";
     $short_description_classes = "";
-    switch($short_description){
+    switch($short_description){ // the most used operations get their own color, the rest is blue
         case "INSERT": 
             $tr_classes = "bg-success"; 
             $short_tooltip = "Ein neuer Eintrag wurde hinzugefügt";
@@ -55,20 +60,23 @@ while ($result && ($row = $result->fetch_assoc())) {
             $short_tooltip = "Ein bestehender Eintrag wurde entfernt";
             $short_description_classes = "text-danger";
             break;
-        case "CLONE": 
-            $tr_classes = "bg-info"; 
-            $short_tooltip = "Ein bestehender Eintrag wurde dupliziert";
-            $short_description_classes = "text-info";
-            break;
         default:
-            $tr_classes = "";
-            $short_tooltip = "";
-            $short_description_classes = "text-muted";
+            switch($short_description){
+                case "CLONE": 
+                    $short_tooltip = "Ein bestehender Eintrag wurde dupliziert";
+                    break;
+                case "IMPORT":
+                    $short_tooltip = "Ein Eintrag wurde importiert";
+                    break;                    
+            }
+            $tr_classes = "bg-info";
+            $short_description_classes = "text-info";
     }
     echo "<tr class='$tr_classes'>";
     echo "<td data-toggle='tooltip' data-container='body' data-placement='right' title='$timediff (Log ID: $id)'>$log_time</td>";
     echo "<td class='$short_description_classes' data-toggle='tooltip' data-container='body' data-placement='right' title='$short_tooltip'><strong>$short_description</strong></td>";
     echo "<td data-toggle='tooltip' data-container='body' data-placement='right' title='Benutzer ID: $user_id'>$user_name</td>";
+    echo "<td>$scope</td>";
     echo "<td>$long_description</td>";
     echo "</tr>";
 }

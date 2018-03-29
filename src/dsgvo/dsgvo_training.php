@@ -19,6 +19,27 @@ if(!isset($_REQUEST["n"])){
 }
 $companyID = intval($_REQUEST['n']);
 $moduleID = 0;
+
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
+showError($conn->error);
+$stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
+function insertVVLog($short,$long){
+    global $stmt_insert_vv_log;
+    global $stmt_insert_vv_log_short_description;
+    global $stmt_insert_vv_log_long_description;
+    global $stmt_insert_vv_log_scope;
+    global $userID;
+    global $privateKey;
+    $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_scope = secure_data('DSGVO', "TRAINING", 'encrypt', $userID, $privateKey, $encryptionError);
+    if($encryptionError){
+        showError($encryptionError);
+    }
+    $stmt_insert_vv_log->execute();
+    showError($stmt_insert_vv_log->error);
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
@@ -26,10 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
         showError($conn->error);
         $trainingID = mysqli_insert_id($conn);
+        insertVVLog("INSERT","Create new training '$name' with id '$trainingID'");
     } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
         showError($conn->error);
+        insertVVLog("DELETE","Delete training with id '$trainingID'");
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
@@ -39,11 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("s", $text);
         $stmt->execute();
         showError($stmt->error);
+        insertVVLog("INSERT","Add new question with title '$title'");
     } elseif (isset($_POST["removeQuestion"])) {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
         showError($conn->error);
+        insertVVLog("DELETE","Delete question with id '$questionID'");
     } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
@@ -53,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("s", $text);
         $stmt->execute();
         showError($stmt->error);
+        insertVVLog("UPDATE","Edit question with id '$questionID'");
     } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
         $version = 1;
@@ -96,15 +122,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
+        insertVVLog("UPDATE","Update training '$name'");
     } elseif (isset($_POST["createModule"])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
         showError($conn->error);
         $moduleID = mysqli_insert_id($conn);
+        insertVVLog("INSERT","Create module '$name'");
     } elseif (isset($_POST['removeModule'])) {
         $moduleID = intval($_POST['removeModule']);
         $conn->query("DELETE FROM dsgvo_training_modules WHERE id = $moduleID");
         showError($conn->error);
+        insertVVLog("DELETE","Remove module with id '$moduleID'");
     } elseif (isset($_POST["jsonImport"])) {
         $json = json_decode($_POST["jsonImport"], true);
         foreach ($json as $module) {
@@ -132,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->execute();
                 }
             }
+            insertVVLog("IMPORT","Import module '$name'");
         }
     } elseif (isset($_POST["editModule"])) {
         $name = test_input($_POST['name']);
@@ -139,6 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->query("UPDATE dsgvo_training_modules SET name = '$name' WHERE id=$moduleID");
         showError($conn->error);
         $moduleID = mysqli_insert_id($conn);
+        insertVVLog("UPDATE","Change module name to '$name' (id: '$moduleID')");        
     }
 }
 $activeTab = $trainingID;

@@ -1629,6 +1629,7 @@ function create_tables($conn) {
         user_id INT(6) UNSIGNED,
         log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         short_description VARCHAR(100) NOT NULL,
+        scope VARCHAR(100),
         long_description VARCHAR(500),
         FOREIGN KEY (user_id) REFERENCES UserData(id)
         ON UPDATE CASCADE

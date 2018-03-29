@@ -17,17 +17,19 @@ if (isset($_POST['company_id'])) {
     }
 }
 
-$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description) VALUES ($userID,?,?)");
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
-$stmt_insert_vv_log->bind_param("ss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description);
+$stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
 function insertVVLog($short,$long){
     global $stmt_insert_vv_log;
     global $stmt_insert_vv_log_short_description;
     global $stmt_insert_vv_log_long_description;
+    global $stmt_insert_vv_log_scope;
     global $userID;
     global $privateKey;
     $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
     if($encryptionError){
         showError($encryptionError);
     }
