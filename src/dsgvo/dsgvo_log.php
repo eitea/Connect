@@ -19,9 +19,9 @@ showError($conn->error);
                 <form>
                     <div class="input-group">
                         <select class="form-control" name="filter">
-                            <option value="all"><?php echo $lang["DISPLAY_ALL"] ?></option>
-                            <option value="VV"><?php echo $lang["PROCEDURE_DIRECTORY"] ?></option><!-- todo: find a more dynamic method -->
-                            <option value="TRAINING">Schulung</option>
+                            <option value="all" <?php echo $current_filter == "all"?"selected":"" ?> ><?php echo $lang["DISPLAY_ALL"] ?></option>
+                            <option value="VV" <?php echo $current_filter == "VV"?"selected":"" ?> ><?php echo $lang["PROCEDURE_DIRECTORY"] ?></option><!-- todo: find a more dynamic method -->
+                            <option value="TRAINING" <?php echo $current_filter == "TRAINING"?"selected":"" ?> >Schulung</option>
                         </select>
                         <span class="input-group-btn">
                             <button type="submit" class="btn btn-warning">
