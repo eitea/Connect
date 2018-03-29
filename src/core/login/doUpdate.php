@@ -2239,16 +2239,64 @@ if($row['version'] < 141){
 }
 
 if($row['version'] < 142){
+    $conn->query("CREATE TABLE messages(
+        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        userID INT(6) UNSIGNED NOT NULL,
+        partnerID INT(6) UNSIGNED NOT NULL,
+        subject varchar(60),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        )");
+    if(!$conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Team Update: Messages';
+    }
+
     $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
     $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
-
     if(!$conn->error){
         echo '<br>PGP: keypairs';
     }
 
+    $sql = "CREATE TABLE external_users(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        contactID INT(6) UNSIGNED,
+        login_mail VARCHAR(120) UNIQUE NOT NULL,
+        login_pw VARCHAR(120) NOT NULL,
+        firstname VARCHAR(50),
+        lastname VARCHAR(50),
+        publicKey VARCHAR(100) NOT NULL,
+        privateKey VARCHAR(100) NOT NULL,
+        FOREIGN KEY (contactID) REFERENCES contactPersons(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Extern: Benutzer';
+    }
 }
 
 if($row['version'] < 143){
+    $conn->query("ALTER TABLE external_users ADD COLUMN entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL");
+    if(!$conn->error){
+        echo '<br>Externe Benutzer: Registrierungsdatum';
+    }
+
+    $conn->query("ALTER TABLE external_users ADD COLUMN lastPswChange DATETIME DEFAULT NULL");
+    if(!$conn->error){
+        echo '<br>Externe Benutzer: Passwortänderungsdatum';
+    }
+
+    $conn->query("ALTER TABLE external_users DROP COLUMN firstname");
+    $conn->query("ALTER TABLE external_users DROP COLUMN lastname");
+}
+
+if($row['version'] < 144){
     $sql = "CREATE TABLE dsgvo_vv_data_matrix (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         companyID INT(6) UNSIGNED,
@@ -2324,8 +2372,10 @@ if($row['version'] < 143){
     }
 }
 
-//if($row['version'] < 144){}
 //if($row['version'] < 145){}
+//if($row['version'] < 146){}
+//if($row['version'] < 147){}
+//if($row['version'] < 148){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

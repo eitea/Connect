@@ -2,7 +2,7 @@
 if(isset($_GET['id'])){
   $id = $_GET['id'];
 
-  include dirname(dirname(__DIR__)) . '/connection.php';
+  include dirname(__DIR__) . '/connection.php';
   $result = $conn->query("SELECT htmlCode, name FROM $pdfTemplateTable WHERE id = $id");
   if($result){
     $row = $result->fetch_assoc();

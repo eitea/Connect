@@ -15,7 +15,6 @@ $result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules W
 while($row = $result->fetch_assoc()){
     $encrypted_modules[$row['module']] = $row['outDated'];
 }
-
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function encrypt_module($module, $symmetric){
         global $conn;
@@ -293,9 +292,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 }
-?>
 
-<?php
 if(!empty($key_downloads)){
     echo '<form method="POST" target="_blank" action="../setup/keys">';
     foreach($key_downloads as $dKey){

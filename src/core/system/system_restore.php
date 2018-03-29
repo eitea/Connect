@@ -4,12 +4,16 @@ if(isset($_POST['accept'])){
   $accept = true;
   if($_FILES["fileToUpload"]["error"] > 0){
     $accept = false;
+    $error_output = $_FILES["fileToUpload"]["error"] .'<a href="http://php.net/manual/en/features.file-upload.errors.php" target="_blank"> Fehlermeldung</a>';
   } elseif ($_FILES["fileToUpload"]["size"] <= 0) {
     $accept = false;
-  } elseif ($_FILES["fileToUpload"]["size"] > 15000000) { //15mb
+    $error_output = "Fehler beim Upload";
+} elseif ($_FILES["fileToUpload"]["size"] > 32000000) {
     $accept = false;
+    $error_output = "Datei zu groß (max 32Mb)";
   } elseif ($_FILES["fileToUpload"]["type"] != "application/octet-stream") {
     $accept = false;
+    $error_output = "Ungültige Datei";
   }
 
   if($accept){
@@ -32,8 +36,6 @@ if(isset($_POST['accept'])){
     $import->load($file);
     redirect("../user/logout");
 
-  } else {
-    $error_output = $lang['ERROR_INVALID_UPLOAD'];
   }
 }
 

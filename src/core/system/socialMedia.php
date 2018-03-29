@@ -84,7 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
     </div>
 </div>
 <div class="page-content-fixed-150">
-        <h4><?php echo $lang['SOCIAL_CONTACTS']; ?></h4>
+    <h4><?php echo $lang['SOCIAL_CONTACTS']; ?></h4>
+
     <!-- contacts -->
     <table class="table table-hover">
         <thead>
@@ -92,6 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
             <th style="white-space: nowrap;width: 1%;"><?php echo $lang['SOCIAL_NAME']; ?></th>
             <th><?php echo $lang['SOCIAL_STATUS']; ?></th>
         </thead>
+
         <tbody>
             <?php
             $today = substr(getCurrentTimestamp(), 0, 10);
@@ -122,6 +124,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
                     echo '</tr>';
                     ?>
                     <script>setInterval(function(){updateSocialBadge("#badge<?php echo $x; ?>", <?php echo $x; ?>)},10000)</script>
+
+
+                    <!-- TODO: Chat is here -->
                     <!-- chat modal -->
                     <div class="modal fade" id="chat<?php echo $x; ?>" tabindex="-1" role="dialog" aria-labelledby="chatLabel<?php echo $x; ?>">
                         <div class="modal-dialog" role="form">

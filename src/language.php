@@ -47,11 +47,14 @@ $lang_ger['ADD_TIMESTAMPS'] = 'Mehrere Zeitstempel hinzufügen';
 $lang_eng['ADDITIONAL_FIELDS'] = 'Additional Project Fields';
 $lang_ger['ADDITIONAL_FIELDS'] = 'Weitere Projektfelder';
 
-$lang_eng['ADDRESS_FORM'] = 'Address Form';
-$lang_ger['ADDRESS_FORM'] = 'Anrede';
-
 $lang_eng['ADDRESS'] = 'Address';
 $lang_ger['ADDRESS'] = 'Adresse';
+
+$lang_eng['ADDRESS_BOOK'] = 'Address Book';
+$lang_ger['ADDRESS_BOOK'] = 'Adressbuch';
+
+$lang_eng['ADDRESS_FORM'] = 'Address Form';
+$lang_ger['ADDRESS_FORM'] = 'Anrede';
 
 $lang_eng['ADJUSTMENTS'] = 'Adjustments';
 $lang_ger['ADJUSTMENTS'] = 'Anpassungen';
@@ -103,7 +106,6 @@ $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
 $lang_eng['ARCHIVE'] = 'Archive';
 $lang_ger['ARCHIVE'] = 'Archiv';
-
 
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
@@ -837,6 +839,40 @@ $lang_ger['MONTHLY_REPORT'] ='Monatsbericht';
 $lang_eng['MY_REQUESTS'] = 'My Requests';
 $lang_ger['MY_REQUESTS'] = 'Meine Anträge';
 
+//TODO: Find a good name
+$lang_eng['MESSAGING'] = 'Post';
+$lang_ger['MESSAGING'] = 'Post ';
+
+$lang_eng['SUBJECT'] = 'Subject';
+$lang_ger['SUBJECT'] = 'Betreff';
+
+$lang_eng['SEND'] = 'Send';
+$lang_ger['SEND'] = 'Senden';
+
+$lang_eng['POST_TO'] = 'To';
+$lang_ger['POST_TO'] = 'An';
+
+$lang_eng['POST'] = 'Post message';
+$lang_ger['POST'] = 'Nachricht verschicken';
+
+$lang_eng['MESSAGE'] = 'Message';
+$lang_ger['MESSAGE'] = 'Nachricht';
+
+$lang_eng['MESSAGES'] = 'Messaging';
+$lang_ger['MESSAGES'] = 'Nachrichten';
+
+$lang_eng['RECEIVER'] = 'Receiver';
+$lang_ger['RECEIVER'] = 'Empfänger';
+
+$lang_eng['RECEIVER_NOT_SPECIFIED'] = 'There is no receiver specified!';
+$lang_ger['RECEIVER_NOT_SPECIFIED'] = 'Es wurde kein Empfänger angegeben!';
+
+$lang_eng['SUBJECT_NOT_SPECIFIED'] = 'There is no subject specified!';
+$lang_ger['SUBJECT_NOT_SPECIFIED'] = 'Es wurde kein Betreff angegeben!';
+
+$lang_eng['MESSAGE_NOT_SPECIFIED'] = 'There is no message specified!';
+$lang_ger['MESSAGE_NOT_SPECIFIED'] = 'Es wurde keine Nachricht eingegeben!';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 
@@ -1010,6 +1046,9 @@ $lang_ger['PRODUCTS'] = 'Produkte';
 
 $lang_eng['PROJECT'] = 'Project';
 $lang_ger['PROJECT'] = 'Projekt';
+
+$lang_eng['PROJECTS'] = 'Projects';
+$lang_ger['PROJECTS'] = 'Projekte';
 
 $lang_eng['PROJECT_BOOKINGS'] = 'Projectbookings';
 $lang_ger['PROJECT_BOOKINGS'] = 'Projektbuchungen';
@@ -1221,9 +1260,6 @@ $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
 
-$lang_eng['STATIC_PROJECTS'] = 'Static Projects';
-$lang_ger['STATIC_PROJECTS'] = 'Statische Projekte';
-
 $lang_eng['STREET'] = 'Street';
 $lang_ger['STREET'] ='Straße';
 
@@ -1238,9 +1274,6 @@ $lang_ger['SUPPLIER'] = 'Lieferant';
 
 $lang_eng['SUPPLIERS'] = 'Suppliers';
 $lang_ger['SUPPLIERS'] = 'Lieferanten';
-
-$lang_eng['SUPPLIER_LIST'] = 'Supplier List';
-$lang_ger['SUPPLIER_LIST'] = 'Lieferantenliste';
 
 $lang_eng['TASK_SCHEDULER'] = 'Task Scheduler';
 $lang_ger['TASK_SCHEDULER'] = 'Taskplaner';
@@ -1364,9 +1397,6 @@ $lang_ger['VAT'] = 'USt.';
 
 $lang_eng['VIEW'] = 'View';
 $lang_ger['VIEW'] = 'Ansehen';
-
-$lang_eng['VIEW_PROJECTS'] = 'View Projects';
-$lang_ger['VIEW_PROJECTS'] = 'Projekte';
 
 $lang_eng['VIEW_TIMESTAMPS'] = 'My Times';
 $lang_ger['VIEW_TIMESTAMPS'] = 'Meine Zeiten';

@@ -123,6 +123,9 @@ $routesENG[] = array("name" => "My Times", "url" => "../user/time", "tags" => ar
 $routesGER[] = array("name" => "Meine Zeiten", "url" => "../user/time", "tags" => array("Monatsbericht"));
 $routesENG[] = array("name" => "Request", "url" => "../user/request");
 $routesGER[] = array("name" => "Anträge", "url" => "../user/request", "tags" => array("Antrag stellen"));
+//TODO: Add Tags
+$routesENG[] = array("name"=>"Request", "url"=>"../social/post");
+$routesGER[] = array("name"=>"Anträge", "url"=>"../social/post");
 $routesENG[] = array("name" => "Book Projects", "url" => "../user/book", "tags" => array("Booking"));
 $routesGER[] = array("name" => "Projekte buchen", "url" => "../user/book", "tags" => array("Buchungen"));
 $routesENG[] = array("name" => "Suppliers", "url" => "../erp/suppliers", "tags" => array("Supplier List"));

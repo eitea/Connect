@@ -1,6 +1,9 @@
 <?php
+/*
+* Callees: installation_wizard, header, securitySettings
+*/
 $content_personal = isset($_POST['personal']) ? $_POST['personal'] : '';
-$content_company = $_POST['company'];
+$content_company = isset($_POST['company']) ? $_POST['company'] : '';
 
 $zip = new ZipArchive();
 $zip_name = 'keys.zip';
@@ -9,10 +12,9 @@ if ($zip->open($zip_name, ZIPARCHIVE::CREATE)) {
     if(is_array($content_company)){
         for($i = 0; $i < count($content_company); $i++)
         $zip->addFromString("company_$i.txt", $content_company[$i]);
-    } else {
+    } elseif($content_company) {
         $zip->addFromString('company.txt', $content_company);
     }
-
     $zip->close();
     header('Content-Type: application/octet-stream');
     header("Content-Transfer-Encoding: Binary");
