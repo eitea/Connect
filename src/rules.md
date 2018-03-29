@@ -10,9 +10,10 @@
 * Only Sulgie is allowed to commit to `master` directly.
 * Commits to `master` will be authored in the morning or late evening.
 
-## General rules and info
+## General
 
 * Test your code extensively.
+* If you create new pages, add them to `src\ajaxQuery\AJAX_getSearch.php`
 
 ## Task tracking
 
@@ -43,10 +44,16 @@ Tasks that are ready for review need their ID to be appended to `src/project/tas
   * Optionally `if ($result && $result->num_rows !== 0) {...}`
 * Use one of 4 predefined functions for showing status to the user.
   * If the input is `NULL` or `""`, no message will be shown (so you can always call `showError($conn->error)` after a query).
-  * `showError(string $message)`
-  * `showSuccess(string $message)`
-  * `showInfo(string $message)`
-  * `showWarning(string $message)`
+  * These functions will echo output
+    * `showError(string $message)`
+    * `showSuccess(string $message)`
+    * `showInfo(string $message)`
+    * `showWarning(string $message)`
+  * These functions will return a string that you can output later
+    * `showErrorToString(string $message)`
+    * `showSuccessToString(string $message)`
+    * `showInfoToString(string $message)`
+    * `showWarningToString(string $message)`
 * AJAX files should be placed in `src\ajaxQuery`.
 * Use `src/validate.php` if a feature requires permissions.
 * `convToUTF8($text)` is recommended for handling file input.

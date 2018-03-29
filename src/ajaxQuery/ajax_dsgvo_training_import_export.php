@@ -72,6 +72,11 @@ $("#copyToClipboardBtn").click(function(){
     <div class="modal-dialog modal-content modal-md">
     <div class="modal-header">Daten importieren</div>
     <div class="modal-body">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="replace_old" value="TRUE"> Alte Sets/Module/Fragen überschreiben
+            </label>
+        </div>
         <textarea name="jsonImport" id="importArea" class="form-control" rows="10" placeholder="JSON data here" style="max-width:100%;min-width:100%;height:60vh;"></textarea>
         <br><div id="jsonError"></div>
     </div>

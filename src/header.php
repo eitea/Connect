@@ -19,16 +19,19 @@ function showErrorToString($message){
     $message = str_replace("'", "\\'", $message);
     return "<script>$(document).ready(function(){showError('$message')})</script>";
 }
+
 function showWarningToString($message){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
     return "<script>$(document).ready(function(){showWarning('$message')})</script>";
 }
+
 function showInfoToString($message){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
     return "<script>$(document).ready(function(){showInfo('$message')})</script>";
 }
+
 function showSuccessToString($message){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);

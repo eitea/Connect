@@ -93,12 +93,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
+        $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
+
         if($stmt->error){
             showError($stmt->error);
+        } else{ 
+            showSuccess($lang["OK_SAVE"]);
         }
-        // else{ // todo:
-        //     showSuccess($lang["OK_DELETE"]);
-        // }
         insertVVLog("UPDATE","Edit question with id '$questionID'");
     } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
@@ -119,7 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $answerEveryNDays = 0; // 0 means no interval
         }
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID, answerEveryNDays = $answerEveryNDays WHERE id = $trainingID");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        } else{ 
+            showSuccess($lang["OK_SAVE"]);
+        }
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         showError($conn->error);
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
@@ -157,42 +162,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['removeModule'])) {
         $moduleID = intval($_POST['removeModule']);
         $conn->query("DELETE FROM dsgvo_training_modules WHERE id = $moduleID");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_DELETE"]);
+        }
         insertVVLog("DELETE","Remove module with id '$moduleID'");
     } elseif (isset($_POST["jsonImport"])) {
+        $replace_old = isset($_POST["replace_old"]);
+        //todo: remove next line
+        if($replace_old) showWarning("Replacing old modules currently doesn't work but your import will continue as usual.");
+        $error_happened = false;
         $json = json_decode($_POST["jsonImport"], true);
-        foreach ($json as $module) {
-            $name = test_input($module["module"]);
-            $sets = $module["sets"];
-            $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-            showError($conn->error);
-            $moduleID = mysqli_insert_id($conn);
-            foreach ($sets as $set) {
-                $name = test_input($set["set"]);
-                $version = intval($set["version"]);
-                $onLogin = test_input($set["onlogin"]);
-                $allowOverwrite = test_input($set["allowoverwrite"]);
-                $random = test_input($set["random"]);
-                $questions = $set["questions"];
-                $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
+        if($json){
+            foreach ($json as $module) {
+                $name = test_input($module["module"]);
+                $sets = $module["sets"];
+                //todo: replace old 
+                $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
                 showError($conn->error);
-                $trainingID = mysqli_insert_id($conn);
-                foreach ($questions as $question) {
-                    $title = test_input($question["title"]);
-                    $text = $question["text"];
-                    $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
+                if($conn->error) $error_happened = true;
+                $moduleID = mysqli_insert_id($conn);
+                foreach ($sets as $set) {
+                    $name = test_input($set["set"]);
+                    $version = intval($set["version"]);
+                    $onLogin = test_input($set["onlogin"]);
+                    $allowOverwrite = test_input($set["allowoverwrite"]);
+                    $random = test_input($set["random"]);
+                    $questions = $set["questions"];
+                    $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
                     showError($conn->error);
-                    $stmt->bind_param("s", $text);
-                    $stmt->execute();
+                    if($conn->error) $error_happened = true;
+                    $trainingID = mysqli_insert_id($conn);
+                    foreach ($questions as $question) {
+                        $title = test_input($question["title"]);
+                        $text = $question["text"];
+                        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
+                        showError($conn->error);
+                        if($conn->error) $error_happened = true;
+                        $stmt->bind_param("s", $text);
+                        $stmt->execute();
+                    }
                 }
+                insertVVLog("IMPORT","Import module '$name'");
             }
-            insertVVLog("IMPORT","Import module '$name'");
+        }else{
+            showError($lang["ERROR_MISSING_FIELDS"]);
+            $error_happened = true;
+        }
+        if(!$error_happened){
+            showSuccess($lang["OK_IMPORT"]);
         }
     } elseif (isset($_POST["editModule"])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["editModule"]);
         $conn->query("UPDATE dsgvo_training_modules SET name = '$name' WHERE id=$moduleID");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        } else{ 
+            showSuccess($lang["OK_SAVE"]);
+        }
         $moduleID = mysqli_insert_id($conn);
         insertVVLog("UPDATE","Change module name to '$name' (id: '$moduleID')");        
     }
@@ -215,7 +244,7 @@ showError($conn->error);
             <span data-container="body" data-toggle="tooltip" title="Importieren von exportierten Sets">
             <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
             </span>
-            <span data-container="body" data-toggle="tooltip" title="Exportieren von Sets">
+            <span data-container="body" data-toggle="tooltip" title="Exportieren aller Sets">
             <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
             </span>
         </div>
@@ -435,10 +464,10 @@ $("button[name=detailedInfoTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoDetailedTrainingInfo.php')
 })
 $("button[name=importExport]").click(function(){
-    setCurrentModal({operation: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingImportExport.php')
+    setCurrentModal({operation: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
 })
 $("button[name=export]").click(function(){
-    setCurrentModal({operation:"export",module: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingImportExport.php')
+    setCurrentModal({operation:"export",module: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
 })
 $("button[name=testTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingTest.php')
