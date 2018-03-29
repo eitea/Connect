@@ -45,20 +45,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_ADD"]);
+        }
         $trainingID = mysqli_insert_id($conn);
         insertVVLog("INSERT","Create new training '$name' with id '$trainingID'");
     } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_DELETE"]);
+        }
         insertVVLog("DELETE","Delete training with id '$trainingID'");
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_ADD"]);
+        }
         $stmt->bind_param("s", $text);
         $stmt->execute();
         showError($stmt->error);
@@ -67,7 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_DELETE"]);
+        }
         insertVVLog("DELETE","Delete question with id '$questionID'");
     } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
@@ -77,7 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
-        showError($stmt->error);
+        if($stmt->error){
+            showError($stmt->error);
+        }
+        // else{ // todo:
+        //     showSuccess($lang["OK_DELETE"]);
+        // }
         insertVVLog("UPDATE","Edit question with id '$questionID'");
     } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
@@ -126,7 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST["createModule"])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-        showError($conn->error);
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_ADD"]);
+        }
         $moduleID = mysqli_insert_id($conn);
         insertVVLog("INSERT","Create module '$name'");
     } elseif (isset($_POST['removeModule'])) {
