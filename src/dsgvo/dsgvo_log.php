@@ -25,8 +25,15 @@ showError($conn->error);
 while ($result && ($row = $result->fetch_assoc())) {
     $id = $row["id"];
     $user_id = $row["user_id"];
-    $short_description = $row["short_description"];
-    $long_description = $row["long_description"];
+    try{
+        $short_description = $row["short_description"];
+        $short_description = secure_data('DSGVO', $row["short_description"], 'decrypt', $userID, $privateKey, $encryptionError);
+        showError($encryptionError);
+        $long_description = secure_data('DSGVO', $row["long_description"], 'decrypt', $userID, $privateKey, $encryptionError);
+        showError($encryptionError);
+    }catch(Exception $e){
+        showError($e->getMessage());
+    }
     $log_time = $row["log_time"];
     echo "<tr>";
     echo "<td>$id</td>";

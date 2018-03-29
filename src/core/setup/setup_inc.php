@@ -1628,7 +1628,7 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user_id INT(6) UNSIGNED,
         log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        short_description VARCHAR(20) NOT NULL,
+        short_description VARCHAR(100) NOT NULL,
         long_description VARCHAR(500),
         FOREIGN KEY (user_id) REFERENCES UserData(id)
         ON UPDATE CASCADE

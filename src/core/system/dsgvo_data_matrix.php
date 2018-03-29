@@ -24,12 +24,16 @@ function insertVVLog($short,$long){
     global $stmt_insert_vv_log;
     global $stmt_insert_vv_log_short_description;
     global $stmt_insert_vv_log_long_description;
-    $stmt_insert_vv_log_short_description = $short;
-    $stmt_insert_vv_log_long_description = $long;
+    global $userID;
+    global $privateKey;
+    $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    if($encryptionError){
+        showError($encryptionError);
+    }
     $stmt_insert_vv_log->execute();
     showError($stmt_insert_vv_log->error);
 }
-
 
 if (isset($cmpID)) {
     $result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $cmpID");
