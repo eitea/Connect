@@ -1,49 +1,24 @@
-<?php
-require dirname(dirname(__DIR__)) . '/header.php';
-
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<style>
+.subject {
+    padding: 5px;
+    border-radius: 5px;
 }
 
-// the currently logged in user
-$currentUser = $_SESSION["userid"];
-?>
-
+.subject:hover {
+    background-color: #F5F5F5;
+    cursor: pointer;
+}
+</style>
 
 <!-- TODO: Add ability to send pictures -->
 <!-- TODO: Badge -->
-
-<!-- AJAX scripts -->
-<script>
-    function getMessages(partner, subject, target, scroll = false, limit = 50) {
-        $.ajax({
-            url: 'ajaxQuery/AJAX_postGetMessage.php',
-            data: {
-                partner: partner,
-                subject: subject,
-                limit: limit,
-            },
-            type: 'GET',
-            success: function (response) {
-                $(target).html(response)
-
-                if (scroll)
-                    $(target).parent().scrollTop($(target)[0].scrollHeight);
-            },
-            error: function (response) {
-                $(target).html(response);
-            },
-        })
-    }
-</script>
-
 <!-- Page header -->
 <div class="page-header-fixed">
     <div class="page-header">
         <h4>
             <?php echo $lang['MESSAGING']; ?>
-            <button class="btn btn-default" data-toggle="modal" data-target="#postMessages"
-                    type="button"><?php echo "+"; ?></button>
+            <button class="btn btn-default" data-toggle="modal" data-target="#postMessages" type="button"><i class="fa fa-plus"></i></button>
         </h4>
     </div>
 </div>
@@ -51,36 +26,41 @@ $currentUser = $_SESSION["userid"];
 
 <!-- Page body -->
 <div class="page-content-fixed-150">
-
-    <!-- Evaluate the post form and insert the message into the databse -->
-    <?php
+    <?php //Evaluate the post form and insert the message into the databse
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sendButton'])) {
         //Check the $_POST values
-        if (!isset($_POST['to_userid']) || $_POST['to_userid'] == "") {
+        if (empty($_POST['to_userid'])) {
             showError($lang['RECEIVER_NOT_SPECIFIED']);
-        } else if (!isset($_POST['subject']) || $_POST['subject'] == "") {
+        } elseif (empty($_POST['subject'])) {
             showError($lang['SUBJECT_NOT_SPECIFIED']);
-        } else if (!isset($_POST['message']) || $_POST['message'] == "") {
+        } elseif (empty($_POST['message'])) {
             showError($lang['MESSAGE_NOT_SPECIFIED']);
         } else {
-            // no errors
-            $to_userid = intval($_POST['to_userid']);  //TODO: replace this with userID and clean with intval()       
             $subject = test_input($_POST['subject']);
             $message = test_input($_POST['message']);
-
-            if($to_userid == $currentUser){
-                showError($lang['INVALID_USER']);
-            } else {
-                // messages [userID, partnerID, subject, message, picture, sent, seen]
-                $conn->query("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $to_userid, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
-                showInfo($lang['MESSAGE_SENT']);
+            // messages [userID, partnerID, subject, message, picture, sent, seen]
+            $stmt = $conn->prepare("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, ?, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
+            $stmt->bind_param('i', $to_userid);
+            foreach($_POST['to_userid'] AS $to_userid){ //5abdd31716137
+                $to_userid = intval($to_userid);
+                if($to_userid == $userID){
+                    showError($lang['INVALID_USER']);
+                } else {
+                    $stmt->execute();
+                }
             }
+            if(!$stmt->error){
+                showSuccess($lang['MESSAGE_SENT']);
+            } else {
+                showError($stmt->error);
+            }
+            $stmt->close();
         }
     }
     ?>
 
     <!-- Post Popup -->
-    <form method="post">
+    <form method="POST">
         <div class="modal fade" id="postMessages" tabindex="-1" role="dialog" aria-labelledby="postLabel">
             <div class="modal-dialog" role="form">
                 <div class="modal-content">
@@ -94,43 +74,14 @@ $currentUser = $_SESSION["userid"];
 
                     <!-- modal body -->
                     <div class="modal-body">
-
-                        <label for="to"> <?php echo $lang['POST_TO']; ?> </label>
-                        <div class="dropdown" id="to">
-                            <input type="button" id="username" class="dropdown-toggle form-control" name="to_username" data-toggle="dropdown" value='<?php echo $lang["SELECT_USER"] ?>'></button>
-                            <input type="hidden" id="userid" class="dropdown-toggle form-control" name="to_userid" data-toggle="dropdown" value='<?php echo $lang["SELECT_USER"] ?>'></button>
-                            
-                            <ul class="dropdown-menu">                                
-                                <?php
-    	                            $sql = "SELECT id, concat(firstname, ' ', lastname) AS username FROM UserData where id != $currentUser GROUP BY id";
-                                    $result = $conn->query($sql);
-                                    if ($result && $result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
-                                            $userID = $row['id'];
-                                            $username = $row['username'];
-                                            ?>
-
-                                            <li onclick='selectUser(<?php echo $userID ?>, "<?php echo $username?>")'><a href="#"><?php echo $username ?></a></li>
-
-                                            <?php
-                                        }
-                                    }
-                                ?>
-                            </ul>
-
-                            <script>
-                                function selectUser(id, name){
-                                    if(id == "" && name == "")
-                                        return;
-
-                                    var formUsernameElement = document.getElementById("username");
-                                    var formIdElement = document.getElementById("userid");
-
-                                    formUsernameElement.value = name;
-                                    formIdElement.value = id;
-                                }
-                            </script>
-                        </div>
+                        <label><?php echo $lang['POST_TO']; ?> </label>
+                        <select class="js-example-basic-single" name="to_userid[]" multiple="multiple">
+                            <?php //5abdd31716137
+                            foreach($available_users as $x){
+                            echo '<option value="'.$x.'">'.$userID_toName[$x].'</option>';
+                            }
+                            ?>
+                        </select><br>
 
                         <br>
 
@@ -141,24 +92,18 @@ $currentUser = $_SESSION["userid"];
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
                         <textarea required name="message" class="form-control"></textarea>
                     </div>
-
-
                     <!-- modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default"
-                                data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                        <button type="submit" class="btn btn-warning" name="sendButton"
-                                target="#chat"><?php echo $lang['SEND']; ?></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+                        <button type="submit" class="btn btn-warning" name="sendButton" target="#chat"><?php echo $lang['SEND']; ?></button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
 
-
     <!-- Active Conversations -->
     <h4><?php echo $lang['MESSAGES']; ?></h4>
-
 
     <table class="table table-hover">
         <thead>
@@ -170,53 +115,14 @@ $currentUser = $_SESSION["userid"];
     <div class="row">
         <div class="col-xs-4">
             <?php
-                //note: currentUser is defined at the beginning of the file
-
                 //select all subjects
-                $sql = "SELECT subject, userID, partnerID FROM messages WHERE userID = '{$currentUser}' or partnerID = '{$currentUser}' GROUP BY subject";
-                $result = $conn->query($sql);
+                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY partnerID, subject");
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $subject = $row['subject'];
-                        $userID = $row['userID'];
+                        $x = $row['userID'];
                         $partnerID = $row['partnerID'] ;
-
-                        // the real partner (sometimes was the partner the same user because of the ways the message gets saved)
-                        $x = ($userID == $currentUser) ? $partnerID : $userID;
-                        ?>
-
-
-                            <!-- Subject -->
-                            <style>
-                                #subject {
-                                    padding: 5px;
-                                    border-radius: 5px;
-                                }
-
-                                #subject:hover {
-                                    background-color: #F5F5F5;
-                                    cursor: pointer;
-                                }
-                            </style>
-
-                            <div id="subject">
-                                <p style='padding: 10px' onclick="showChat<?php echo $subject; ?>()"><?php echo $subject; ?></h1>
-                            </div>
-
-                            <!-- Make the div visible, when someone clicks the button -->
-                            <script>
-                                function showChat<?php echo $subject; ?>() {
-                                    // get the messages - function getMessages(partner, subject, target, scroll = false, limit = 50)
-                                    getMessages(<?php echo $x; ?>, "<?php echo $subject; ?>", "#messages", false, 10);
-
-                                    // make it visible
-                                    var element = document.getElementById("messages");
-                                    element.style.display = "block";
-                                }
-                            </script>
-
-
-                        <?php
+                        echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$partnerID.', \''.$subject.'\')">'.$userID_toName[$partnerID].' - '.$subject.'</p></div>';
                     }
                 } else {
                     echo mysqli_error($conn);
@@ -229,12 +135,38 @@ $currentUser = $_SESSION["userid"];
             <div id="messages" style="display: none; background-color: WhiteSmoke"></div>
         </div>
     </div>
-
-
-
     <!-- /contacts -->
-
 </div>
+
+
+<script>
+//Make the div visible, when someone clicks the button
+function showChat(partner, subject) {
+    getMessages(partner, subject, "#messages", false, 10);
+    // make it visible
+    var element = document.getElementById("messages");
+    element.style.display = "block";
+}
+
+function getMessages(partner, subject, target, scroll = false, limit = 50) {
+    $.ajax({
+        url: 'ajaxQuery/AJAX_postGetMessage.php',
+        data: {
+            partner: partner,
+            subject: subject,
+            limit: limit,
+        },
+        type: 'GET',
+        success: function (response) {
+            $(target).html(response);
+            if (scroll) $(target).parent().scrollTop($(target)[0].scrollHeight);
+        },
+        error: function (response) {
+            $(target).html(response);
+        },
+    });
+}
+</script>
 
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
