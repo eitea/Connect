@@ -13,7 +13,8 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
 
     // get the name of the partner
-    $result = $conn->query("SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id");
+    $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id";
+    $result = $conn->query($sql);
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $firstname = $row['firstname'];
@@ -42,8 +43,10 @@ if (!$result || $result->num_rows == 0) {
         $lastdate = $date ?? "";
         $date = date('Y-m-d', strtotime($row["sent"]));
 
-
-        if(!empty($firstname) && !empty($lastname)) $name = $firstname . " " . $lastname;
+        if(!empty($firstname) && !empty($lastname)) 
+            $name = $firstname . " " . $lastname;
+        elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname
+            $name = $firstname . " " . $lastname;
 
         if($lastdate != $date):
         ?>

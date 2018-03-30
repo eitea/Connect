@@ -1,4 +1,11 @@
-<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php 
+require dirname(dirname(__DIR__)) . '/header.php'; 
+
+//IMPORTANT: session is needed, bc if the partner receives the message, the partnerID is the same as the userID -> if the responds, he sends a message to himself
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}    
+?>
 <style>
 .subject {
     padding: 5px;
@@ -118,14 +125,17 @@
         <div class="col-xs-4">
             <?php
                 //select all subjects
-                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY partnerID, subject");
+                $result = $conn->query("SELECT DISTINCT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY partnerID, subject");
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $subject = $row['subject'];
                         $x = $row['userID'];
                         $partnerID = $row['partnerID'] ;
 
-                        echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$partnerID.', \''.$subject.'\')">'.$userID_toName[$partnerID].' - '.$subject.'</p></div>';
+                        echo $subject . " " . $x . " " . $partnerID;
+
+                        $realPartnerID = ($_SESSION['userid'] == $x) ? $partnerID : $x;   // needed, bc if the partner receives the message, the partnerID is the same as the userID -> if the responds, he sends a message to himself
+                        echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$realPartnerID.', \''.$subject.'\')">'.$userID_toName[$realPartnerID].' - '.$subject.'</p></div>';
                     }
                 } else {
                     echo mysqli_error($conn);
