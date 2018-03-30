@@ -83,7 +83,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $indexIM = $row['indexIM'];
                 //TODO: make sure play does not overlap an existing booking and user does not have a lücke in the previous buchung
                 //$result = $conn->query("SELECT start, end FROM projectBookingData WHERE timestampID = $indexIM");
-                $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID) VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Begin of Task $x' , 'project', '$x')");
+                $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType, dynamicID)
+                VALUES(UTC_TIMESTAMP, '0000-00-00 00:00:00', $indexIM, 'Begin of Task $x' , 'project', '$x')");
                 if($conn->error){
                     showError($conn->error);
                 } else {
