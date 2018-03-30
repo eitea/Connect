@@ -124,6 +124,7 @@
                         $subject = $row['subject'];
                         $x = $row['userID'];
                         $partnerID = $row['partnerID'] ;
+
                         echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$partnerID.', \''.$subject.'\')">'.$userID_toName[$partnerID].' - '.$subject.'</p></div>';
                     }
                 } else {
@@ -134,7 +135,31 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div id="messages" style="display: none; background-color: WhiteSmoke"></div>
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 60vh"></div>
+            
+            <div id="chatinput" style="display: none">
+                <form autocomplete="off">
+                    <div class="input-group">
+                        <input required type="text" id="message" placeholder="Type a message" class="form-control">
+                        <span class="input-group-btn"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
+                    </div>
+                </form>
+
+                <script>
+                    $("#chatinput").submit(function (e) {
+                        e.preventDefault()
+
+                        // send the message
+                        if(selectedPartner !== -1 && selectedSubject !== "")
+                            sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", 50);    
+                        
+                        // clear the field
+                        $("#message").val("")
+                        
+                        return false;
+                        })
+                </script>
+            </div>
         </div>
     </div>
     <!-- /contacts -->
@@ -142,12 +167,23 @@
 
 
 <script>
+var selectedPartner = -1;
+var selectedSubject = "";
+
 //Make the div visible, when someone clicks the button
 function showChat(partner, subject) {
-    getMessages(partner, subject, "#messages", false, 10);
-    // make it visible
-    var element = document.getElementById("messages");
-    element.style.display = "block";
+    selectedPartner = partner;
+    selectedSubject = subject;
+
+    //TODO: implement interval, which calls getMessages every x seconds
+
+    getMessages(partner, subject, "#messages", true, 10);
+
+    // make the messages and the response field visible
+    var messagesElement = document.getElementById("messages");
+    var responseElement = document.getElementById("chatinput");
+    messagesElement.style.display = "block";
+    responseElement.style.display = "block";
 }
 
 function getMessages(partner, subject, target, scroll = false, limit = 50) {
@@ -161,13 +197,34 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
         type: 'GET',
         success: function (response) {
             $(target).html(response);
-            if (scroll) $(target).parent().scrollTop($(target)[0].scrollHeight);
+            
+            //Scroll down
+            if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
         },
         error: function (response) {
             $(target).html(response);
         },
     });
 }
+
+function sendMessage(partner, subject, message, target, limit = 50) {
+        if(message.length==0){
+            return
+        }
+
+        $.ajax({
+            url: 'ajaxQuery/AJAX_postSendMessage.php',
+            data: {
+                partner: partner,
+                subject: subject,
+                message: message,
+            },
+            type: 'GET',
+            success: function (response) {
+                getMessages(partner, subject, target, true, limit)
+            },
+        })
+    }
 </script>
 
 

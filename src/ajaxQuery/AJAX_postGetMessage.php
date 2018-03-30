@@ -12,6 +12,7 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // message has been seen
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
 
+    // get the name of the partner
     $result = $conn->query("SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id");
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {

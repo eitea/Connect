@@ -12,8 +12,13 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"]) && !empty($_SESS
 
     // insert a new message into the database
     $sql = "INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partner, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')";
-    
     $conn->query($sql);
+
+    if(!$conn->error)
+        showInfo($lang['MESSAGE_SENT']);
+    else
+        showError($conn->error);
+        
 } else {
     die('Invalid Request');
 }
