@@ -38,6 +38,7 @@
         } else {
             $subject = test_input($_POST['subject']);
             $message = test_input($_POST['message']);
+
             // messages [userID, partnerID, subject, message, picture, sent, seen]
             $stmt = $conn->prepare("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, ?, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
             $stmt->bind_param('i', $to_userid);
@@ -92,10 +93,11 @@
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
                         <textarea required name="message" class="form-control"></textarea>
                     </div>
+                    
                     <!-- modal footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                        <button type="submit" class="btn btn-warning" name="sendButton" target="#chat"><?php echo $lang['SEND']; ?></button>
+                        <button type="submit" class="btn btn-warning" name="sendButton"><?php echo $lang['SEND']; ?></button>
                     </div>
                 </div>
             </div>
