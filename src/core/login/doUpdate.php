@@ -2447,14 +2447,38 @@ if($row['version'] < 145){
     )");
     if($conn->error){
         echo $conn->error;
-    }else{
+    } else {
         echo '<br>DSGVO: Logs';
     }
 }
 
-//if($row['version'] < 146){}
+if($row['version'] < 146){
+    //text, file, s3File, s3Text, folder
+    $sql = "CREATE TABLE project_archive(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        projectID INT(6) UNSIGNED,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        content TEXT,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    );";
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Projekte: Archiv';
+    }
+}
+
+
 //if($row['version'] < 147){}
 //if($row['version'] < 148){}
+//if($row['version'] < 149){}
+//if($row['version'] < 150){}
+//if($row['version'] < 151){}
+//if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

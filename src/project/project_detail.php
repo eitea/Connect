@@ -1,10 +1,8 @@
-<?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; ?>
+<?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; enableToProject($userID); ?>
 
 <?php
 if(!isset($_GET['p'])) die('Invalid access');
 $projectID = intval($_GET['p']);
-$result = $conn->query("SELECT p.*, c.companyID, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
-$projectRow = $result->fetch_assoc();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['hire'])){
@@ -68,13 +66,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
          }
     }
 } //endif POST
+
+$result = $conn->query("SELECT p.*, c.companyID, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
+$projectRow = $result->fetch_assoc();
 ?>
 
 <form method="POST">
     <div class="page-header">
         <h3><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?>
             <div class="page-header-button-group">
-                <button type="button" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveGeneral" ><i class="fa fa-floppy-o"></i></button>
+                <button type="submit" name="saveGeneral" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" ><i class="fa fa-floppy-o"></i></button>
             </div>
         </h3>
     </div>
@@ -144,6 +145,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 try{
                     $decrypted = sodium_crypto_box_open($encrypted, $nonce, $keypair);
                 } catch(Exception $e){
+                    echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
                     $decrypted = '';
                 }
             ?>
@@ -231,4 +233,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <h4>Dateifreigabe <div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-archive" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
 </div></h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td><input type="checkbox" class="form-control" id="allCheck" /></td>
+            <td></td>
+            <td><label>Name</label></td>
+            <td><label>Upload Datum</label></td>
+            <td><label>File Size</label></td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        function drawTree($parent_structure){
+            global $conn;
+            $html = '';
+            
+            $stmt = $conn->prepare("SELECT name, type, parent_directory FROM project_archive WHERE projectID = $projectID AND parent_directory = ? ");
+            $stmt->bind("s", $parent_structure);
+            $stmt->execute();
+            while($result && $row = $result->fetch_assoc()){
+                if($row['type'] == 'folder'){
+                    drawTree($row['parent_directory']);
+                } elseif($row['type'] == 'text'){
+
+                }
+
+            }
+        }
+
+        echo drawTree('ROOT');
+        ?>
+    </tbody>
+</table>
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>
